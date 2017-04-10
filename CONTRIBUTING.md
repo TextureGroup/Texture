@@ -180,50 +180,50 @@ static void someFunction() {
 - There are multiple ways to acquire a lock:
   1. Explicitly call `.lock()` and `.unlock()` :
 ```objc
-    - (void)setContentSpacing:(CGFloat)contentSpacing
-    {
-      __instanceLock__.lock();
-      BOOL needsUpdate = (contentSpacing != _contentSpacing);
-      if (needsUpdate) {
-        _contentSpacing = contentSpacing;
-      }
-      __instanceLock__.unlock();
+- (void)setContentSpacing:(CGFloat)contentSpacing
+{
+  __instanceLock__.lock();
+  BOOL needsUpdate = (contentSpacing != _contentSpacing);
+  if (needsUpdate) {
+    _contentSpacing = contentSpacing;
+  }
+  __instanceLock__.unlock();
 
-      if (needsUpdate) {
-        [self setNeedsLayout];
-      }
-    }
+  if (needsUpdate) {
+    [self setNeedsLayout];
+  }
+}
 
-    - (CGFloat)contentSpacing
-    {
-      CGFloat contentSpacing = 0.0;
-      __instanceLock__.lock();
-      contentSpacing = _contentSpacing;
-      __instanceLock__.unlock();
-      return contentSpacing;
-    }
+- (CGFloat)contentSpacing
+{
+  CGFloat contentSpacing = 0.0;
+  __instanceLock__.lock();
+  contentSpacing = _contentSpacing;
+  __instanceLock__.unlock();
+  return contentSpacing;
+}
 ```
   2. Create an `ASDN::MutexLocker` :
 ```objc
-    - (void)setContentSpacing:(CGFloat)contentSpacing
-    {
-      {
-        ASDN::MutexLocker l(__instanceLock__);
-        if (contentSpacing == _contentSpacing) {
-          return;
-        }
-
-        _contentSpacing = contentSpacing;
-      }
-
-      [self setNeedsLayout];
+- (void)setContentSpacing:(CGFloat)contentSpacing
+{
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    if (contentSpacing == _contentSpacing) {
+      return;
     }
 
-    - (CGFloat)contentSpacing
-    {
-      ASDN::MutexLocker l(__instanceLock__);
-      return _contentSpacing;
-    }
+    _contentSpacing = contentSpacing;
+  }
+
+  [self setNeedsLayout];
+}
+
+- (CGFloat)contentSpacing
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _contentSpacing;
+}
 ```
 - Nullability
   - The adoption of annotations is straightforward. The standard we adopt is using the `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END` on all headers. Then indicate nullability for the pointers that can be so.
