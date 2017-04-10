@@ -231,16 +231,22 @@ static void someFunction() {
 ```objc
 // Properties
 @property(nonatomic, strong, nullable) NSNumber *status
+
 // Methods
 - (nullable NSNumber *)doSomethingWithString:(nullable NSString *)str;
+
 // Functions
 NSString * _Nullable ASStringWithQuotesIfMultiword(NSString * _Nullable string);
+
 // Typedefs
 typedef void (^RemoteCallback)(id _Nullable result, NSError * _Nullable error);
+
 // Block as parameter
 - (void)reloadDataWithCompletion:(void (^ _Nullable)())completion;
+
 // Block as parameter with parameter and return value
 - (void)convertObject:(id _Nonnull (^ _Nullable)(id _Nullable input))handler;
+
 // More complex pointer types
 - (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSSet<ASCollectionElement *> *__autoreleasing  _Nullable *)displaySet preloadSet:(NSSet<ASCollectionElement *> *__autoreleasing  _Nullable *)preloadSet map:(ASElementMap *)map;
 ```
