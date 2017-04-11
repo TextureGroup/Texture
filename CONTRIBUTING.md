@@ -4,7 +4,7 @@ Texture is the most actively developed open source project at [Pinterest](https:
 # Questions
 
 If you are having difficulties using Texture or have a question about usage, please ask a
-question in our [Slack channel](http://asyncdisplaykit.org/slack.html). **Please do not ask for help by filing Github issues.**
+question in our [Slack channel](http://texturegroup.org/slack.html). **Please do not ask for help by filing Github issues.**
 
 # Core Team
 
@@ -26,7 +26,7 @@ Think you've found a bug or have a new feature to suggest? [Let us know](https:/
 
 ## Where to Find Known Issues
 
-We use [GitHub Issues](https://github.com/facebook/AsyncDisplayKit/issues) for all bug tracking. We keep a close eye on this and try to make it clear when we have an internal fix in progress. Before filing a new issue, try to make sure your problem doesn't already exist.
+We use [GitHub Issues](https://github.com/texturegroup/texture/issues) for all bug tracking. We keep a close eye on this and try to make it clear when we have an internal fix in progress. Before filing a new issue, try to make sure your problem doesn't already exist.
 
 ## Reporting New Issues
 1. Update to the most recent master release if possible. We may have already fixed your bug.
@@ -56,7 +56,7 @@ If you're only fixing a bug, it's fine to submit a pull request right away, but 
 4. If the feature is complex, consider writing an Texture RFC issue. Even if you can’t implement the feature yourself, consider writing an RFC issue. If we do end up accepting the feature, the issue provides the needed documentation for contributors to develop the feature according the specification accepted by the core team. We will tag accepted RFC issues with **Needs Volunteer**.
 5. After discussing the feature you may choose to attempt a Pull Request. If you're at all able, start writing some code. We always have more work to do than time to do it. If you can write some code then that will speed the process along.
 
-In short, if you have an idea that would be nice to have, create an issue on the [TextureGroup](https://github.com/TextureGroup/Texture)[/](https://github.com/TextureGroup/Texture)[Texture](https://github.com/TextureGroup/Texture) repo. If you have a question about requesting a feature, start a discussion in our [Slack channel](http://asyncdisplaykit.org/slack.html).
+In short, if you have an idea that would be nice to have, create an issue on the [TextureGroup](https://github.com/TextureGroup/Texture)[/](https://github.com/TextureGroup/Texture)[Texture](https://github.com/TextureGroup/Texture) repo. If you have a question about requesting a feature, start a discussion in our [Slack channel](http://texturegroup.org/slack.html).
 
 # Our Development Process
 
@@ -88,9 +88,17 @@ Copy and paste this to the top of your new file(s):
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 ```
 
@@ -100,11 +108,22 @@ If you’ve modified an existing file, change the header to:
 //  ASDisplayNode.mm
 //  Texture
 //
-//  Original work Copyright (c) 2014-present, Facebook, Inc.
-//  Modified work Copyright (c) 2017-present, Pinterest, Inc. All rights reserved.
+//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under the BSD-style license found in the
 //  LICENSE file in the root directory of this source tree. An additional grant
 //  of patent rights can be found in the PATENTS file in the same directory.
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 ```
 
@@ -255,8 +274,8 @@ typedef void (^RemoteCallback)(id _Nullable result, NSError * _Nullable error);
 
 Please sign our Contributor License Agreement (CLA) before sending pull requests. For any code changes to be accepted, the CLA must be signed.
 
-Complete your CLA here
+Complete your CLA [here](https://cla-assistant.io/TextureGroup/Texture)
 
 # License
 
-By contributing to Texture, you agree that your contributions will be licensed under its Apache license.
+By contributing to Texture, you agree that your contributions will be licensed under its Apache 2 license.
