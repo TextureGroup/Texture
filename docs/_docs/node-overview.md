@@ -12,7 +12,7 @@ A key advantage of using nodes over UIKit components is that **all nodes preform
 
 <table style="width:100%" class = "paddingBetweenCols">
   <tr>
-    <th>ASDK Node</th>
+    <th>Texture Node</th>
     <th>UIKit Equivalent</th> 
   </tr>
   <tr>
@@ -65,7 +65,7 @@ A key advantage of using nodes over UIKit components is that **all nodes preform
 <br>
 Despite having rough equivalencies to UIKit components, in general, AsyncDisplayKit nodes offer more advanced features and conveniences. For example, an `ASNetworkImageNode` does automatic loading and cache management, and even supports progressive jpeg and animated gifs. 
 
-The <a href = "https://github.com/facebook/AsyncDisplayKit/tree/master/examples/AsyncDisplayKitOverview">`AsyncDisplayKitOverview`</a> example app gives basic implementations of each of the nodes listed above. 
+The <a href = "https://github.com/texturegroup/texture/tree/master/examples/AsyncDisplayKitOverview">`AsyncDisplayKitOverview`</a> example app gives basic implementations of each of the nodes listed above. 
  
 
 # Node Inheritance Hierarchy 

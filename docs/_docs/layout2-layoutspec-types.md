@@ -70,7 +70,7 @@ override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec
 </div>
 
 ## ASStackLayoutSpec (Flexbox Container)
-Of all the layoutSpecs in ASDK, `ASStackLayoutSpec` is the most useful and powerful. `ASStackLayoutSpec` uses the flexbox algorithm to determine the position and size of its children. Flexbox is designed to provide a consistent layout on different screen sizes. In a stack layout you align items in either a vertical or horizontal stack. A stack layout can be a child of another stack layout, which makes it possible to create almost any layout using a stack layout spec. 
+Of all the layoutSpecs in Texture, `ASStackLayoutSpec` is the most useful and powerful. `ASStackLayoutSpec` uses the flexbox algorithm to determine the position and size of its children. Flexbox is designed to provide a consistent layout on different screen sizes. In a stack layout you align items in either a vertical or horizontal stack. A stack layout can be a child of another stack layout, which makes it possible to create almost any layout using a stack layout spec. 
 
 `ASStackLayoutSpec` has 7 properties in addition to its `<ASLayoutElement>` properties:
 

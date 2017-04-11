@@ -11,7 +11,7 @@ It is highly recommended that you use AsyncDisplayKit's nodes within a node cont
 
 <table style="width:100%" class = "paddingBetweenCols">
   <tr>
-    <th>ASDK Node Container</th>
+    <th>Texture Node Container</th>
     <th>UIKit Equivalent</th> 
   </tr>
   <tr>

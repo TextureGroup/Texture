@@ -6,11 +6,11 @@ prevPage: display-node.html
 nextPage: button-node.html
 ---
 
-`ASCellNode`, as you may have guessed, is the cell class of ASDK.  Unlike the various cells in UIKit, `ASCellNode` can be used with `ASTableNodes`, `ASCollectionNodes` and `ASPagerNodes`, making it incredibly flexible.
+`ASCellNode`, as you may have guessed, is the cell class of Texture.  Unlike the various cells in UIKit, `ASCellNode` can be used with `ASTableNodes`, `ASCollectionNodes` and `ASPagerNodes`, making it incredibly flexible.
 
 ### 3 Ways to Party
 
-There are three ways in which you can implement the cells you'll use in your ASDK app: subclassing `ASCellNode`, initializing with an existing `ASViewController` or using an existing UIView or `CALayer`.
+There are three ways in which you can implement the cells you'll use in your Texture app: subclassing `ASCellNode`, initializing with an existing `ASViewController` or using an existing UIView or `CALayer`.
 
 #### Subclassing
 

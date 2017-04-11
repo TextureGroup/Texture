@@ -26,8 +26,8 @@ nextPage: containers-asviewcontroller.html
 ### Common Questions
 <ul>
 <li><a href = "faq.html#calayer-s-cornerradius-property-kills-performance">If you care about performance, do not use <code>CALayer</code>'s <code>.cornerRadius</code> property (or shadowPath, border or mask).</a></li>
-<li><a href = "faq.html#asyncdisplaykit-does-not-support-uikit-auto-layout-or-interfacebuilder">ASDK does not support UIKit Auto Layout.</a></li>
-<li><a href = "faq.html#uicollectionviewcell-compatibility">Can I use my <code>UICollectionViewCells</code> with ASDK?.</a></li>
+<li><a href = "faq.html#asyncdisplaykit-does-not-support-uikit-auto-layout-or-interfacebuilder">Texture does not support UIKit Auto Layout.</a></li>
+<li><a href = "faq.html#uicollectionviewcell-compatibility">Can I use my <code>UICollectionViewCells</code> with Texture?.</a></li>
 <li><a href = "faq.html#asdisplaynode-keep-alive-reference"><code>ASDisplayNode</code> keep alive reference.</a></li>
 </ul>
 
@@ -118,7 +118,7 @@ Good application design should not rely on this behavior, because a strong refer
 
 ### UICollectionViewCell Compatibility
 
-ASDK supports using <code>UICollectionViewCells</code> alongside native <code>ASCellNodes</code>. 
+Texture supports using <code>UICollectionViewCells</code> alongside native <code>ASCellNodes</code>. 
 
 Note that these UIKit cells will **not** have the performance benefits of `ASCellNodes` (like preloading, async layout, and async drawing), even when mixed within the same `ASCollectionNode`. 
 

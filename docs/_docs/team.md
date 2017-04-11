@@ -13,7 +13,7 @@ permalink: /docs/team.html
   </tr>
   <tr>
     <td><img src="https://d3vv6lp55qjaqc.cloudfront.net/items/2d1K0a372b1J3V2f071D/Michael-Avatar.jpg" width="100" /></td>
-    <td><p>Michael Schneider (<a href="https://github.com/maicki">@maicki</a>) is especially passionate about API design and recently led the re-architecture of the layout API for the <a href = "upgrading.html">2.0 release</a>. As our resident layout expert, Michael volunteers much of his own time to help developers on ASDK's public <a href="/slack.html">slack channel</a>. Previous, Michael worked on <a href="https://itunes.apple.com/us/app/pocket-save-articles-videos/id309601447">Pocket</a> for iOS, Mac and Chrome and the <a href="https://itunes.apple.com/us/app/instapaper/id288545208">Instapaper</a> Mac app.</p></td> 
+    <td><p>Michael Schneider (<a href="https://github.com/maicki">@maicki</a>) is especially passionate about API design and recently led the re-architecture of the layout API for the <a href = "upgrading.html">2.0 release</a>. As our resident layout expert, Michael volunteers much of his own time to help developers on Texture's public <a href="/slack.html">slack channel</a>. Previous, Michael worked on <a href="https://itunes.apple.com/us/app/pocket-save-articles-videos/id309601447">Pocket</a> for iOS, Mac and Chrome and the <a href="https://itunes.apple.com/us/app/instapaper/id288545208">Instapaper</a> Mac app.</p></td> 
   </tr>
   <tr>
     <td><img src="https://avatars.githubusercontent.com/nguyenhuy" width="100" /></td>
@@ -41,4 +41,4 @@ As part of the team, you would work on AsyncDisplayKit, [PINRemoteImage](https:/
 One interesting thing to note is that Pinterest does not have an internal fork of AsyncDisplayKit. Everything is developed on master, with release branches cut from master only a few weeks before our public application launches. This allows us to move exceptionally quickly in developing and launching improvements to millions of users.
 
 Sound interesting? 
-Send us an email at AsyncDisplayKit(at)gmail.com. 
+Send us an email at textureframework@gmail.com. 

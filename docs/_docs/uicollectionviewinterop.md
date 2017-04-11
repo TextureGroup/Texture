@@ -33,7 +33,7 @@ By default, the interop data source will only be consulted in cases where no `AS
 
 ## CustomCollectionView Example App
 
-The [CustomCollectionView](https://github.com/facebook/AsyncDisplayKit/tree/master/examples/CustomCollectionView) example project demonstrates how to use raw `UIKit` cells alongside native `ASCellNodes`.
+The [CustomCollectionView](https://github.com/texturegroup/texture/tree/master/examples/CustomCollectionView) example project demonstrates how to use raw `UIKit` cells alongside native `ASCellNodes`.
 
 Open the app and verify that `kShowUICollectionViewCells` is enabled in `Sample/ViewController.m`. 
 

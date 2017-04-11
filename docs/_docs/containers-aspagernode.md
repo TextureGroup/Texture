@@ -161,6 +161,6 @@ The reason for this error message is that due to the asynchronous nature of Asyn
 
 Check out the following sample apps to see an `ASPagerNode` in action:
 <ul>
-  <li><a href="https://github.com/facebook/AsyncDisplayKit/tree/master/examples/PagerNode">PagerNode</a></li>
-  <li><a href="https://github.com/facebook/AsyncDisplayKit/tree/master/examples/VerticalWithinHorizontalScrolling">VerticalWithinHorizontalScrolling</a></li>
+  <li><a href="https://github.com/texturegroup/texture/tree/master/examples/PagerNode">PagerNode</a></li>
+  <li><a href="https://github.com/texturegroup/texture/tree/master/examples/VerticalWithinHorizontalScrolling">VerticalWithinHorizontalScrolling</a></li>
 </ul>

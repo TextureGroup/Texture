@@ -34,7 +34,7 @@ AsyncDisplayKit offers a <a href = "node-overview.html">variety of nodes</a> to 
 
 When converting an app to use AsyncDisplayKit, a common mistake is to add nodes directly to an existing view hierarchy.  Doing this will virtually guarantee that your nodes will flash as they are rendered.  
 
-Instead, you should add nodes as subnodes of one of the many <a href = "containers-overview.html">node container classes</a>.  These containers are in charge of telling contained nodes what state they're currently in so that data can be loaded and nodes can be rendered as efficiently as possible.  You should think of these classes as the integration point between UIKit and ASDK.
+Instead, you should add nodes as subnodes of one of the many <a href = "containers-overview.html">node container classes</a>.  These containers are in charge of telling contained nodes what state they're currently in so that data can be loaded and nodes can be rendered as efficiently as possible.  You should think of these classes as the integration point between UIKit and Texture.
 
 <h2><a href = "/docs/layout-engine.html">Layout Engine</a></h2>
 

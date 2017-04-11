@@ -184,7 +184,7 @@ override func animateLayoutTransition(_ context: ASContextTransitioning) {
 </div>
 </div>
 
-The passed <a href="https://github.com/facebook/AsyncDisplayKit/blob/master/AsyncDisplayKit/ASContextTransitioning.h">`ASContextTransitioning`</a> context object in this method contains relevant information to help you determine the state of the nodes before and after the transition. It includes getters into old and new constrained sizes, inserted and removed nodes, and even the raw old and new `ASLayout` objects. In the `SignupNode` example, we're using it to determine the frame for each of the fields and animate them in an out of place.
+The passed <a href="https://github.com/texturegroup/texture/blob/master/AsyncDisplayKit/ASContextTransitioning.h">`ASContextTransitioning`</a> context object in this method contains relevant information to help you determine the state of the nodes before and after the transition. It includes getters into old and new constrained sizes, inserted and removed nodes, and even the raw old and new `ASLayout` objects. In the `SignupNode` example, we're using it to determine the frame for each of the fields and animate them in an out of place.
 
 It is imperative to call `completeTransition:` on the context object once your animation has finished, as it will perform the necessary internal steps for the newly calculated layout to become the current `calculatedLayout`.
 
@@ -256,4 +256,4 @@ override func viewWillTransition(to size: CGSize, with coordinator: UIViewContro
 
 ## Examples that use the Layout Transition API
 
-- [ASDKLayoutTransition](https://github.com/facebook/AsyncDisplayKit/tree/master/examples/ASDKLayoutTransition)
+- [ASDKLayoutTransition](https://github.com/texturegroup/texture/tree/master/examples/ASDKLayoutTransition)

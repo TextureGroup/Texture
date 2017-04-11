@@ -153,7 +153,7 @@ Because `ASCollectionNode` is aware of the position of all of its nodes, it can 
 Lastly, almost all of the concepts we've discussed here apply to `UITableView` / `ASTableNode` and `UIPageViewController` / `ASPagerNode`.
 
 ## iOS 10 Cell Pre-fetching
-Inspired by ASDK, iOS 10 introduced a <a href="">cell pre-fetching</a>. This API increases the number of cells that the collection tracks at any given time, which helps, but isn't anywhere as performance centric as being aware of all cells in the data source. 
+Inspired by Texture, iOS 10 introduced a <a href="">cell pre-fetching</a>. This API increases the number of cells that the collection tracks at any given time, which helps, but isn't anywhere as performance centric as being aware of all cells in the data source. 
 
 Additionally, iOS9 still constitutes a substantial precentage of most app's userbase and will not reduce in number anywhere close to as quickly as the sunset trajectory of iOS 7 and iOS 8 devices. Whereas iOS 9 is the last supported version for about a half-dozen devices, there were zero devices that were deprecated on iOS 8 and only one deivce deprecated on iOS 7. 
 

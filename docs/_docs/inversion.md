@@ -29,4 +29,4 @@ When this is enabled, developers only have to take one more step to have full in
 </div>
 </div>
 
-See the <a href="https://github.com/facebook/AsyncDisplayKit/tree/master/examples/SocialAppLayout-Inverted">SocialAppLayout-Inverted</a> example project for more details.
+See the <a href="https://github.com/texturegroup/texture/tree/master/examples/SocialAppLayout-Inverted">SocialAppLayout-Inverted</a> example project for more details.

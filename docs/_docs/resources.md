@@ -11,11 +11,11 @@ nextPage: installation.html
 Join 700+ AsyncDisplayKit developers and the AsyncDisplayKit <a href="team.html">core team</a> on Slack for real-time debugging, the latest updates, and asynchronous banter. Signup <a href="/slack.html">here</a>.
 
 ### Examples
-Browse through our many <a href="https://github.com/facebook/AsyncDisplayKit/tree/master/examples">example projects</a>. 
+Browse through our many <a href="https://github.com/texturegroup/texture/tree/master/examples">example projects</a>. 
 
-If you are new to AsyncDisplayKit, we recommend that you start with the <a href="https://github.com/facebook/AsyncDisplayKit/tree/master/examples/ASDKgram">ASDKgram</a> example app which compares a photo feed implemented with UIKit to an identical feed implemented with AsyncDisplayKit. The app features:
+If you are new to AsyncDisplayKit, we recommend that you start with the <a href="https://github.com/texturegroup/texture/tree/master/examples/ASDKgram">ASDKgram</a> example app which compares a photo feed implemented with UIKit to an identical feed implemented with AsyncDisplayKit. The app features:
 <ol>
-	<li>An infinitely scrolling home feed that demonstrates ASDK's smoother scrolling performance. </li>
+	<li>An infinitely scrolling home feed that demonstrates Texture's smoother scrolling performance. </li>
 	<li>A significantly sized code base to demonstrate how much less code it takes to design apps using AsyncDisplayKit.</li>
 </ol>
 

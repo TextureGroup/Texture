@@ -71,7 +71,7 @@ Add the following to your Cartfile to get the **latest release** branch:
 <div class = "highlight-group">
 <div class = "code">
 <pre lang="objc" class="objcCode">
-github "facebook/AsyncDisplayKit"
+github "texturegroup/texture"
 </pre>
 </div>
 </div>
@@ -82,7 +82,7 @@ Or, to get the **master** branch:
 <div class = "highlight-group">
 <div class = "code">
 <pre lang="objc" class="objcCode">
-github "facebook/AsyncDisplayKit" "master"
+github "facetexturegroup/textureaster"
 </pre>
 </div>
 </div>
@@ -103,7 +103,7 @@ Run
 <br>
 in Terminal. This will fetch dependencies into a `Carthage/Checkouts` folder, then build each one. 
 
-Look for terminal output confirming `AsyncDisplayKit`, `PINRemoteImage (3.0.0-beta.2)` and `PINCache` are all fetched and built. The ASDK framework Cartfile should handle the dependencies correctly. 
+Look for terminal output confirming `AsyncDisplayKit`, `PINRemoteImage (3.0.0-beta.2)` and `PINCache` are all fetched and built. The Texture framework Cartfile should handle the dependencies correctly. 
 
 In Xcode, on your application targets’ **“General”** settings tab, in the **“Linked Frameworks and Libraries”** section, drag and drop each framework you want to use from the `Carthage/Build` folder on disk.
 
