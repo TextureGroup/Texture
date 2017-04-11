@@ -76,7 +76,7 @@ Note that neither of these methods require a reuse mechanism.
 
 ### Replacing UITableViewController with ASViewController
 
-AsyncDisplayKit does not offer an equivalent to `UITableViewController`. Instead, use an `ASViewController` initialized with an `ASTableNode`. 
+Texture does not offer an equivalent to `UITableViewController`. Instead, use an `ASViewController` initialized with an `ASTableNode`. 
 
 Consider, again, the `ASViewController` subclass - PhotoFeedNodeController - from the <a href="https://github.com/texturegroup/texture/tree/master/examples/ASDKgram">`ASDKgram sample app`</a> that uses a table node as its managed node.
 

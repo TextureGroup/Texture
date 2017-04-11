@@ -127,10 +127,10 @@ node.neverShowPlaceholders = true
 </div>
 </div>
 
-With this property set to `YES`, the main thread will be blocked until display has completed for the cell.  This is more similar to UIKit, and in fact makes AsyncDisplayKit scrolling visually indistinguishable from UIKit's, except being faster.
+With this property set to `YES`, the main thread will be blocked until display has completed for the cell.  This is more similar to UIKit, and in fact makes Texture scrolling visually indistinguishable from UIKit's, except being faster.
 
 <div class = "note">
-Using this option does not eliminate all of the performance advantages of AsyncDisplayKit. Normally, a cell has been preloading and is almost done when it reaches the screen, so the blocking time is very short.  Even if the <code>rangeTuningParameters</code> are set to 0 this option outperforms UIKit.  While the main thread is waiting, subnode display executes concurrently.
+Using this option does not eliminate all of the performance advantages of Texture. Normally, a cell has been preloading and is almost done when it reaches the screen, so the blocking time is very short.  Even if the <code>rangeTuningParameters</code> are set to 0 this option outperforms UIKit.  While the main thread is waiting, subnode display executes concurrently.
 </div>
 
 ### `UITableViewCell` specific propertys

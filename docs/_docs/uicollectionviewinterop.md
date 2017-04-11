@@ -6,7 +6,7 @@ prevPage: placeholder-fade-duration.html
 nextPage: accessibility.html
 ---
 
-AsyncDisplayKit's `ASCollectionNode` offers compatibility with synchronous, standard `UICollectionViewCell` objects alongside native `ASCellNodes`. 
+Texture's `ASCollectionNode` offers compatibility with synchronous, standard `UICollectionViewCell` objects alongside native `ASCellNodes`. 
 
 Note that these UIKit cells will **not** have the performance benefits of `ASCellNodes` (like preloading, async layout, and async drawing), even when mixed within the same `ASCollectionNode`. 
 
@@ -29,7 +29,7 @@ In order to use this feature, you must:
 </ol>
 </ol>
 
-By default, the interop data source will only be consulted in cases where no `ASCellNode` is provided to AsyncDisplayKit. However, if <code>.dequeuesCellsForNodeBackedItems</code> is enabled, then the interop data source will always be consulted to dequeue cells, and will be expected to return <code>_ASCollectionViewCells</code> in cases where a node was provided.
+By default, the interop data source will only be consulted in cases where no `ASCellNode` is provided to Texture. However, if <code>.dequeuesCellsForNodeBackedItems</code> is enabled, then the interop data source will always be consulted to dequeue cells, and will be expected to return <code>_ASCollectionViewCells</code> in cases where a node was provided.
 
 ## CustomCollectionView Example App
 

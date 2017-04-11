@@ -59,7 +59,7 @@ Although the block is destroyed after the view is created, in the event that the
 
 ### ASCellNode Reusability
 <br>
-AsyncDisplayKit does not use cell reuse, for a number of specific reasons, one side effect of this is that it eliminates the large class of bugs associated with cell reuse. 
+Texture does not use cell reuse, for a number of specific reasons, one side effect of this is that it eliminates the large class of bugs associated with cell reuse. 
 <br>
 
 ### LayoutSpecs Are Regenerated
@@ -81,11 +81,11 @@ Using `.cornerRadius` will visually degraded performance on iPhone 4, 4S, and 5 
 For a longer discussion and easy alternative corner rounding solutions, please read our comprehensive <a href = "corner-rounding.html">corner rounding guide</a>. 
 <br>
 
-### AsyncDisplayKit does not support UIKit Auto Layout or InterfaceBuilder
+### Texture does not support UIKit Auto Layout or InterfaceBuilder
 <br>
-UIKit Auto Layout and InterfaceBuilder are not supported by AsyncDisplayKit. It is worth noting that both of these technologies are not permitted in established and disciplined iOS development teams, such as at Facebook, Instagram, and Pinterest.
+UIKit Auto Layout and InterfaceBuilder are not supported by Texture. It is worth noting that both of these technologies are not permitted in established and disciplined iOS development teams, such as at Facebook, Instagram, and Pinterest.
 
-However, AsyncDisplayKit's <a href = "automatic-layout-basics.html">Layout API</a> provides a variety of <a href = "automatic-layout-containers.html">ASLayoutSpec objects</a> that allow implementing automatic layout which is more efficient (multithreaded, off the main thread), easier to debug (can step into the code and see where all values come from, as it is open source), and reusable (you can build composable layouts that can be shared with different parts of the UI).
+However, Texture's <a href = "automatic-layout-basics.html">Layout API</a> provides a variety of <a href = "automatic-layout-containers.html">ASLayoutSpec objects</a> that allow implementing automatic layout which is more efficient (multithreaded, off the main thread), easier to debug (can step into the code and see where all values come from, as it is open source), and reusable (you can build composable layouts that can be shared with different parts of the UI).
 <br>
 
 ### ASDisplayNode keep alive reference

@@ -390,7 +390,7 @@ In certain advanced cases, you may want to override this method. Overriding this
 
 Call this on children`layoutElements` to compute their layouts within your implementation of `-calculateLayoutThatFits:`.
 
-For sample implementations of layout specs and the usage of the `calculateLayoutThatFits:` family of methods, check out the layout specs in AsyncDisplayKit itself!
+For sample implementations of layout specs and the usage of the `calculateLayoutThatFits:` family of methods, check out the layout specs in Texture itself!
 
 ## Deprecation of `-[ASDisplayNode measure:]` 
 

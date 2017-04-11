@@ -8,11 +8,11 @@ nextPage: installation.html
 
 #Asynchronous Performance Gains
 
-AsyncDisplayKit is a UI framework that was originally born from Facebook’s Paper app. It came as an answer to one of the core questions the Paper team faced. **How can you keep the main thread as clear as possible?**
+Texture is a UI framework that was originally born from Facebook’s Paper app. It came as an answer to one of the core questions the Paper team faced. **How can you keep the main thread as clear as possible?**
 
 Nowadays, many apps have a user experience that relies heavily upon continuous gestures and physics based animations. At the very least, your UI is probably dependent on some form of scroll view. These types of user interfaces depend entirely on the main thread and are extremely sensitive to main thread stalls. **A clogged main thread means dropped frames and an unpleasant user experience.**
 
-AsyncDisplayKit Nodes are a thread-safe abstraction layer over UIViews and CALayers:
+Texture Nodes are a thread-safe abstraction layer over UIViews and CALayers:
 
 <img src="/static/images/node-view-layer.png" alt="logo">
 

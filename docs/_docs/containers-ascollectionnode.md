@@ -118,7 +118,7 @@ In the example above, you can see how the index is used to access the photo mode
 
 ### Replacing a UICollectionViewController with an ASViewController
 
-AsyncDisplayKit does not offer an equivalent to UICollectionViewController. Instead, you can use the flexibility of ASViewController to recreate any type of UI<em>...</em>ViewController. 
+Texture does not offer an equivalent to UICollectionViewController. Instead, you can use the flexibility of ASViewController to recreate any type of UI<em>...</em>ViewController. 
 
 Consider, the following ASViewController subclass.
 

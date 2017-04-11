@@ -161,7 +161,7 @@ Our custom node looks like this:
 </div>
 </div>
 
-`ASImageNode` and `ASTextNode`, like the rest of AsyncDisplayKit, are thread-safe, so we can size them on background threads.  The `-layoutThatFits:` method is like `-sizeThatFits:`, but with side effects:  it caches the (`calculatedSize`) for quick access later on &mdash; like in our now-snappy `-layout` implementation.
+`ASImageNode` and `ASTextNode`, like the rest of Texture, are thread-safe, so we can size them on background threads.  The `-layoutThatFits:` method is like `-sizeThatFits:`, but with side effects:  it caches the (`calculatedSize`) for quick access later on &mdash; like in our now-snappy `-layout` implementation.
 
 As you can see, node hierarchies are sized and laid out in much the same way as their view counterparts.  Manually layed out nodes do need to be written with a few things in mind:
 

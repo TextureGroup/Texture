@@ -25,7 +25,7 @@ A common examples of this confusion involves flex grow and flex shrink. E.g. a n
 
 ## Have I provided sizes for any node that lacks an intrinsic size?
 <br>
-AsyncDisplayKit's layout pass is recursive, starting at the layout spec returned from `-layoutSpecThatFits:` and proceeding down until it reaches the leaf nodes included in any nested layout specs.
+Texture's layout pass is recursive, starting at the layout spec returned from `-layoutSpecThatFits:` and proceeding down until it reaches the leaf nodes included in any nested layout specs.
 
 Some leaf nodes have a concept of their own intrinsic size, such as ASTextNode or ASImageNode. A text node knows the length of its formatted string and an ASImageNode knows the size of its static image. Other leaf nodes require an intrinsic size to be set.
 
@@ -53,7 +53,7 @@ A `.sizeRange` consists of a minimum and maximum constrained size (these sizes c
 
 ## `ASRelativeDimension` vs `ASRelativeSize` vs `ASRelativeSizeRange` vs `ASSizeRange`
 <br>
-AsyncDisplayKit's Layout API supports configuring node and layout spec sizes with specific point values as well as relative values. Read the [Layout API Sizing guide](http://texturegroup.org/docs/layout-api-sizing.html) for a helpful chart and documentation on our custom layout value types. 
+Texture's Layout API supports configuring node and layout spec sizes with specific point values as well as relative values. Read the [Layout API Sizing guide](http://texturegroup.org/docs/layout-api-sizing.html) for a helpful chart and documentation on our custom layout value types. 
 
 ## Debugging layout specs with ASCII art
 <br>
