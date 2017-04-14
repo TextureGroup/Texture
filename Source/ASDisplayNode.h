@@ -136,7 +136,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @return An ASDisplayNode instance that loads its view with the given block that is guaranteed to run on the main
  * queue. The view will render synchronously and -layout and touch handling methods on the node will not be called.
  */
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock;
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock NS_DESIGNATED_INITIALIZER;
 
 /**
  * @abstract Alternative initializer with a block to create the backing view.
@@ -147,7 +147,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @return An ASDisplayNode instance that loads its view with the given block that is guaranteed to run on the main
  * queue. The view will render synchronously and -layout and touch handling methods on the node will not be called.
  */
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock;
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_DESIGNATED_INITIALIZER;
 
 /**
  * @abstract Alternative initializer with a block to create the backing layer.
