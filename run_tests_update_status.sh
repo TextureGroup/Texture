@@ -31,7 +31,6 @@ trap trap_handler INT TERM EXIT
 updateStatus "pending" "Starting build…"
 
 echo "--- Running Danger"
-echo "'$DANGER_GITHUB_API_TOKEN'"
 bundle exec danger --verbose 2>&1|tee `pwd`/log.txt
 
 ./build.sh all 2>&1|tee `pwd`/log.txt
