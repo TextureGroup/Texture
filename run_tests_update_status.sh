@@ -34,6 +34,9 @@ updateStatus "pending" "Starting build…"
 
 rm `pwd`/log.txt
 
+echo "--- Running Danger"
+bundle exec danger
+
 updateStatus "success" "Tests passed"
 
 echo "All tests succeeded, updated status to success"
