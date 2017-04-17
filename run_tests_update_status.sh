@@ -31,7 +31,7 @@ trap trap_handler INT TERM EXIT
 updateStatus "pending" "Starting build…"
 
 echo "--- Running Danger"
-rbenv global 2.3.1 && gem install danger --version '~> 4.0' && danger --verbose 2>&1|tee `pwd`/log.txt
+bundle exec danger --verbose 2>&1|tee `pwd`/log.txt
 
 ./build.sh all 2>&1|tee `pwd`/log.txt
 
