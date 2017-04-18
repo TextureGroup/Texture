@@ -1118,9 +1118,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(_ASCollectionReusableView *)view forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
+  // Since _ASCollectionReusableView is not available for subclassing, comparing the classes is faster than isKindOfClass:
   // This is a safeguard similar to the behavior for cells in -[ASCollectionView collectionView:willDisplayCell:forItemAtIndexPath:]
   // It ensures _ASCollectionReusableView receives layoutAttributes and calls applyLayoutAttributes.
-  if (view.layoutAttributes == nil) {
+  if (([view class] == [_ASCollectionReusableView class]) && (view.layoutAttributes == nil)) {
     view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
   }
   
