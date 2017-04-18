@@ -32,9 +32,6 @@ class ImageCellNode: ASCellNode {
   }
 
   override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-    let imageSize = imageNode.image?.size
-    print("imageNode= \(imageNode.bounds), image=\(imageSize)")
-    
     var imageRatio: CGFloat = 0.5
     if imageNode.image != nil {
       imageRatio = (imageNode.image?.size.height)! / (imageNode.image?.size.width)!
