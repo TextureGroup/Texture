@@ -38,7 +38,12 @@
   // The pending state calculated ahead of time, if any.
   ASCollectionLayoutState *_pendingLayout;
   
-  BOOL _layoutDelegateImplementsAdditionalInfoForLayoutWithElements;
+  struct {
+    unsigned int additionalInfoForLayoutWithElements:1;
+    unsigned int ensureLayoutAttributesForElementsInRect:1;
+    unsigned int ensureLayoutAttributesForItemAtIndexPath:1;
+    unsigned int ensureLayoutAttributesForSupplementaryElementOfKind:1;
+  } _layoutDelegateFlags;
 }
 
 @end
@@ -51,7 +56,10 @@
   if (self) {
     ASDisplayNodeAssertNotNil(layoutDelegate, @"Collection layout delegate cannot be nil");
     _layoutDelegate = layoutDelegate;
-    _layoutDelegateImplementsAdditionalInfoForLayoutWithElements = [layoutDelegate respondsToSelector:@selector(additionalInfoForLayoutWithElements:)];
+    _layoutDelegateFlags.additionalInfoForLayoutWithElements = [layoutDelegate respondsToSelector:@selector(additionalInfoForLayoutWithElements:)];
+    _layoutDelegateFlags.ensureLayoutAttributesForElementsInRect = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForElementsInRect:withLayout:)];
+    _layoutDelegateFlags.ensureLayoutAttributesForItemAtIndexPath = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForItemAtIndexPath:withLayout:)];
+    _layoutDelegateFlags.ensureLayoutAttributesForSupplementaryElementOfKind = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForSupplementaryElementOfKind:atIndexPath:withLayout:)];
   }
   return self;
 }
@@ -63,7 +71,7 @@
   ASDisplayNodeAssertMainThread();
   CGSize viewportSize = [self viewportSize];
   id additionalInfo = nil;
-  if (_layoutDelegateImplementsAdditionalInfoForLayoutWithElements) {
+  if (_layoutDelegateFlags.additionalInfoForLayoutWithElements) {
     additionalInfo = [_layoutDelegate additionalInfoForLayoutWithElements:elements];
   }
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize elements:elements additionalInfo:additionalInfo];
@@ -119,6 +127,11 @@
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
   ASDisplayNodeAssertMainThread();
+  
+  if (_layoutDelegate != nil && _layoutDelegateFlags.ensureLayoutAttributesForElementsInRect) {
+    [_layoutDelegate ensureLayoutAttributesForElementsInRect:rect withLayout:_layout];
+  }
+  
   NSArray<UICollectionViewLayoutAttributes *> *result = [_layout layoutAttributesForElementsInRect:rect];
   
   ASElementMap *elements = _layout.context.elements;
@@ -132,6 +145,10 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  if (_layoutDelegate != nil &&  _layoutDelegateFlags.ensureLayoutAttributesForItemAtIndexPath) {
+    [_layoutDelegate ensureLayoutAttributesForItemAtIndexPath:indexPath withLayout:_layout];
+  }
+  
   ASCollectionElement *element = [_layout.context.elements elementForItemAtIndexPath:indexPath];
   UICollectionViewLayoutAttributes *attrs = [_layout layoutAttributesForElement:element];
   [ASCollectionLayout setSize:attrs.frame.size toElement:element];
@@ -140,6 +157,10 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
+  if (_layoutDelegate != nil && _layoutDelegateFlags.ensureLayoutAttributesForSupplementaryElementOfKind) {
+    [_layoutDelegate ensureLayoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath withLayout:_layout];
+  }
+  
   ASCollectionElement *element = [_layout.context.elements supplementaryElementOfKind:elementKind atIndexPath:indexPath];
   UICollectionViewLayoutAttributes *attrs = [_layout layoutAttributesForElement:element];
   [ASCollectionLayout setSize:attrs.frame.size toElement:element];

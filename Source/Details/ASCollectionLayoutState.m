@@ -18,7 +18,6 @@
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASElementMap.h>
@@ -39,13 +38,13 @@
   ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
 }
 
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout additionalInfo:(nullable id)additionalInfo getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
 {
   ASElementMap *elements = context.elements;
   NSMapTable *table = [NSMapTable elementToLayoutAttributesTable];
   
   for (ASLayout *sublayout in layout.sublayouts) {
-    ASCollectionElement *element = ((ASCellNode *)sublayout.layoutElement).collectionElement;
+    ASCollectionElement *element = getElementBlock(sublayout);
     if (element == nil) {
       ASDisplayNodeFailAssert(@"Element not found!");
       continue;
@@ -65,10 +64,10 @@
     [table setObject:attrs forKey:element];
   }
 
-  return [self initWithContext:context contentSize:layout.size elementToLayoutAttributesTable:table];
+  return [self initWithContext:context contentSize:layout.size additionalInfo:additionalInfo elementToLayoutAttributesTable:table];
 }
 
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize additionalInfo:(id)additionalInfo elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
 {
   self = [super init];
   if (self) {
@@ -76,6 +75,7 @@
     _contentSize = contentSize;
     _elementToLayoutAttributesTable = table;
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator contentSize:contentSize pageSize:context.viewportSize];
+    _additionalInfo = additionalInfo;
   }
   return self;
 }

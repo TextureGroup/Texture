@@ -17,10 +17,11 @@
 
 #import <AsyncDisplayKit/ASCollectionFlowLayoutDelegate.h>
 
-#import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
+#import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -43,20 +44,6 @@
   return self;
 }
 
-- (ASSizeRange)sizeRangeThatFits:(CGSize)viewportSize
-{
-  ASSizeRange sizeRange = ASSizeRangeUnconstrained;
-  if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.height = viewportSize.height;
-    sizeRange.max.height = viewportSize.height;
-  }
-  if (ASScrollDirectionContainsHorizontalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.width = viewportSize.width;
-    sizeRange.max.width = viewportSize.width;
-  }
-  return sizeRange;
-}
-
 - (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
 {
   return nil;
@@ -69,6 +56,7 @@
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context
                                                 contentSize:CGSizeZero
+                                             additionalInfo:nil
                              elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   }
   
@@ -80,8 +68,10 @@
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
   stackSpec.concurrent = YES;
-  ASLayout *layout = [stackSpec layoutThatFits:[self sizeRangeThatFits:context.viewportSize]];
-  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout];
+  ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, _scrollableDirections)];
+  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout additionalInfo:nil getElementBlock:^ASCollectionElement * _Nonnull(ASLayout * _Nonnull sublayout) {
+    return ((ASCellNode *)sublayout.layoutElement).collectionElement;
+  }];
 }
 
 @end
