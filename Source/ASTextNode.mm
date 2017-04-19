@@ -30,6 +30,8 @@
 #import <AsyncDisplayKit/ASEqualityHashHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
+//This is a test
+
 /**
  * If set, we will record all values set to attributedText into an array
  * and once we get 2000, we'll write them all out into a plist file.
