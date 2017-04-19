@@ -6,11 +6,11 @@ source_pattern = /(\.m|\.mm|\.h)$/
 # Sometimes it's a README fix, or something like that - which isn't relevant for
 # including in a project's CHANGELOG for example
 declared_trivial = github.pr_title.include? "#trivial"
-has_source_changes = !git.modified_files.grep(/Source/).empty?
+has_changes_in_source_directory = !git.modified_files.grep(/Source/).empty?
 
-modified_source_files = git.modified_files.grep(/(\.m|\.mm|\.h)$/)
+modified_source_files = git.modified_files.grep(source_pattern)
 has_modified_source_files = !modified_source_files.empty?
-added_source_files = git.added_files.grep(/(\.m|\.mm|\.h)$/)
+added_source_files = git.added_files.grep(source_pattern)
 has_added_source_files = !added_source_files.empty?
 
 # Make it more obvious that a PR is a work in progress and shouldn't be merged yet
@@ -21,8 +21,8 @@ warn("This is a big PR, please consider splitting it up to ease code review.") i
 
 # Changelog entries are required for changes to source files.
 no_changelog_entry = !git.modified_files.include?("CHANGELOG.md")
-if has_source_changes && no_changelog_entry && not_declared_trivial
-  fail("Any source code changes should have an entry in CHANGELOG.md.")
+if has_changes_in_source_directory && no_changelog_entry && not_declared_trivial
+  fail("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
 end
 
 def check_file_header(files_to_check, license)
