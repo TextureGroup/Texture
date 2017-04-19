@@ -64,7 +64,7 @@ Pod::Spec.new do |spec|
   # Include optional PINRemoteImage module
   spec.default_subspec = 'PINRemoteImage'
 
-  spec.social_media_url = 'https://twitter.com/AsyncDisplayKit'
+  spec.social_media_url = 'https://twitter.com/TextureiOS'
   spec.library = 'c++'
   spec.pod_target_xcconfig = {
        'CLANG_CXX_LANGUAGE_STANDARD' => 'c++11',
