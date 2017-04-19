@@ -121,7 +121,6 @@ header nav ul li a {
 	padding: 30px 0;
 }
 .hero .hero-title {
-	text-shadow: 5px 5px #1476A2;
 	font-size: 45px;
 	line-height: 110%;
 	color: #fff;
@@ -529,3 +528,35 @@ footer {
 footer p {
 	text-align: center;
 }
+
+/** Banner */
+.texture-banner {
+  padding: 20px 0 20px 0;
+  width: 100%;
+  background-color: #0e1e28;
+  box-shadow: inset 0 -2px 20px 0 rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+.texture-banner .announcement {
+  font-stretch: normal;
+  font-size: 16px;
+  line-height: 1.75;
+  letter-spacing: 0.1px;
+  text-align: center;
+  color: #d7e2e9;
+  font-weight: bold;
+  margin: 0;
+}
+
+.texture-banner .learn-more-link {
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.17;
+  letter-spacing: 0.5px;
+  color: #0484f2;
+  margin-left: 10px;
+}
+
