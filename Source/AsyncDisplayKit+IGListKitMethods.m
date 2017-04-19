@@ -13,6 +13,8 @@
 #import "AsyncDisplayKit+IGListKitMethods.h"
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/_ASCollectionViewCell.h>
+#import <AsyncDisplayKit/_ASCollectionReusableView.h>
+
 
 @implementation ASIGListSectionControllerMethods
 
@@ -35,7 +37,7 @@
                                                                  atIndex:(NSInteger)index
                                                        sectionController:(IGListSectionController<IGListSectionType> *)sectionController
 {
-  return [sectionController.collectionContext dequeueReusableSupplementaryViewOfKind:elementKind forSectionController:sectionController class:[UICollectionReusableView class] atIndex:index];
+  return [sectionController.collectionContext dequeueReusableSupplementaryViewOfKind:elementKind forSectionController:sectionController class:[_ASCollectionReusableView class] atIndex:index];
 }
 
 + (CGSize)sizeForSupplementaryViewOfKind:(NSString *)elementKind atIndex:(NSInteger)index
