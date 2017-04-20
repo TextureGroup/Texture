@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A protocol that your section controllers should conform to,
- * in addition to IGListSectionType, in order to be used with AsyncDisplayKit.
+ * in order to be used with AsyncDisplayKit.
  *
  * @note Your supplementary view source should conform to @c ASSupplementaryNodeSource.
  */

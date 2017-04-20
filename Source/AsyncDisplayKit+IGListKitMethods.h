@@ -32,7 +32,7 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * Call this for your section controller's @c cellForItemAtIndex: method.
  */
-+ (__kindof UICollectionViewCell *)cellForItemAtIndex:(NSInteger)index sectionController:(IGListSectionController<IGListSectionType> *)sectionController;
++ (__kindof UICollectionViewCell *)cellForItemAtIndex:(NSInteger)index sectionController:(IGListSectionController *)sectionController;
 
 /**
  * Call this for your section controller's @c sizeForItemAtIndex: method.
@@ -49,7 +49,7 @@ AS_SUBCLASSING_RESTRICTED
  */
 + (__kindof UICollectionReusableView *)viewForSupplementaryElementOfKind:(NSString *)elementKind
                                                                  atIndex:(NSInteger)index
-                                                       sectionController:(IGListSectionController<IGListSectionType> *)sectionController;
+                                                       sectionController:(IGListSectionController *)sectionController;
 
 /**
  * Call this for your supplementary source's @c sizeForSupplementaryViewOfKind:atIndex: method.
