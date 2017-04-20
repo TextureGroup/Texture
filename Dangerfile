@@ -48,7 +48,7 @@ def check_file_header(files_to_check, license)
         data += io.read
       }
       if !data.start_with?(license_header)
-        fail ("Please ensure new source files begin with: \n" + license_header)
+        fail ("Please ensure new source files begin with: \n```\n" + license_header + "```")
       end
     end
   end
