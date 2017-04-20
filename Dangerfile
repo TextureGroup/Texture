@@ -1,6 +1,3 @@
-#DO NOT COMMIT
-require 'pp'
-
 source_pattern = /(\.m|\.mm|\.h)$/
   
 # Sometimes it's a README fix, or something like that - which isn't relevant for
@@ -48,7 +45,7 @@ def check_file_header(files_to_check, license)
         data += io.read
       }
       if !data.start_with?(license_header)
-        fail ("Please ensure new source files begin with: \n" + license_header)
+        fail ("Please ensure new source files begin with: \n```\n" + license_header + "```")
       end
     end
   end
