@@ -31,6 +31,7 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 //This is a test
+//More test
 
 /**
  * If set, we will record all values set to attributedText into an array
