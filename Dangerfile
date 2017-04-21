@@ -22,31 +22,45 @@ if has_changes_in_source_directory && no_changelog_entry && !declared_trivial
   fail("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
 end
 
-def check_file_header(files_to_check, license)
+def full_license(partial_license, filename)
+    license_header = <<-HEREDOC
+//
+    HEREDOC
+    license_header += "//  " + filename + "\n"
+    license_header += <<-HEREDOC
+//  Texture
+//
+    HEREDOC
+    license_header += partial_license
+    return license_header
+end
+
+def check_file_header(files_to_check, licenses)
   repo_name = github.pr_json["base"]["repo"]["full_name"]
   pr_number = github.pr_json["number"]
   files = github.api.pull_request_files(repo_name, pr_number)
   files.each do |file|
     if files_to_check.include?(file["filename"])
       filename = File.basename(file["filename"])
-      license_header = <<-HEREDOC
-//
-      HEREDOC
-      license_header += "//  " + filename + "\n"
-      license_header += <<-HEREDOC
-//  Texture
-//
-      HEREDOC
-      license_header += license
     
       data = ""
       contents = github.api.get file["contents_url"]
       open(contents["download_url"]) { |io|
         data += io.read
       }
-      if !data.start_with?(license_header)
-        fail ("Please ensure new source files begin with: \n```\n" + license_header + "```")
+      
+      correct_license = false
+      licenses.each do |license|
+        license_header = full_license(license, filename)
+        if data.start_with?(license_header)
+          correct_license = true
+        end
       end
+      
+      if correct_license == false
+        fail ("Please ensure new source files begin with: \n```\n" + full_license(licenses[0], filename) + "```")
+      end
+      
     end
   end
 end
@@ -67,9 +81,10 @@ new_source_license_header = <<-HEREDOC
 //  limitations under the License.
 //
 HEREDOC
-if has_added_source_files
-  check_file_header(added_source_files, new_source_license_header)
-end
+
+# if has_added_source_files
+#   check_file_header(added_source_files, [new_source_license_header])
+# end
 
 # Ensure modified files have proper header
 modified_source_license_header = <<-HEREDOC
@@ -91,6 +106,7 @@ modified_source_license_header = <<-HEREDOC
 //  limitations under the License.
 //
 HEREDOC
-if has_modified_source_files
-  check_file_header(modified_source_files, modified_source_license_header)
-end
+
+# if has_modified_source_files
+#   check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
+# end
