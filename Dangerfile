@@ -81,9 +81,10 @@ new_source_license_header = <<-HEREDOC
 //  limitations under the License.
 //
 HEREDOC
-if has_added_source_files
-  check_file_header(added_source_files, [new_source_license_header])
-end
+
+# if has_added_source_files
+#   check_file_header(added_source_files, [new_source_license_header])
+# end
 
 # Ensure modified files have proper header
 modified_source_license_header = <<-HEREDOC
@@ -105,6 +106,7 @@ modified_source_license_header = <<-HEREDOC
 //  limitations under the License.
 //
 HEREDOC
-if has_modified_source_files
-  check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
-end
+
+# if has_modified_source_files
+#   check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
+# end
