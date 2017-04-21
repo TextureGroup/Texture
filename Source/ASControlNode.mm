@@ -420,9 +420,10 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 
 - (void)sendActionsForControlEvents:(ASControlNodeEvent)controlEvents withEvent:(UIEvent *)event
 {
+  ASDisplayNodeAssertMainThread(); //We access self.view below, it's not safe to call this off of main.
   NSParameterAssert(controlEvents != 0);
   
-  ASDN::MutexLocker l(_controlLock);
+  _controlLock.lock();
 
   // Enumerate the events in the mask, invoking the target-action pairs for each.
   _ASEnumerateControlEventsIncludedInMaskWithBlock(controlEvents, ^
@@ -442,10 +443,13 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
           responder = [self.view targetForAction:action withSender:self];
         }
         
+        //It's unsafe to arbitrarily call out to classes which could own this control node while holding the lock.
+        _controlLock.unlock();
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
         [responder performSelector:action withObject:self withObject:event];
 #pragma clang diagnostic pop
+        _controlLock.lock();
       }
     });
 }
