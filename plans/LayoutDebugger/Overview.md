@@ -28,7 +28,7 @@ There are a few technical difficulties that we need to address:
 
 - Layout spec flattening:  Currently `ASDisplayNode` flattens its layout tree right after it receives an `ASLayout`.  As a result, `ASLayoutSpec` objects are discarded and are not available for inspecting/debugging.  My current solution is introducing a new `shouldSkipFlattening` flag that tells `ASDisplayNode` to keep its layout tree as is.  This flag defaults to `NO`.  In addition, we need to update `-layoutSublayouts` to skip any non-node objects in the tree.  We should avoid introducing runtime overheads to production code and projects that don't use the debugger.
 - Style properties overrding:  It's common for client code to set flex properties to subnodes inside `-layoutSpecThatFits:`.  Doing this will override any values set to these properties by the debugger right before a layout pass which is needed for these changes to be taken into account.  My current idea is adding a special `style` object that is loaded once from the exising object and can be changed by the debugger.  This special object will be preferred over the built-in one when it's time to calculate a new layout.
-- Manual layout is not supported:  Nodes that layout its subnodes manually can't be updated by the debugger.  They are still available for inspecting though.
+- Manual layout is not supported:  Layouts that are done manually (via `-calculateSizeThatFits:` and `-layout`) can't be updated by the debugger.  Nodes inside these layouts are still available for inspecting though.
 
 ## Long-term ideas
 
