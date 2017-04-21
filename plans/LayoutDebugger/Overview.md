@@ -20,7 +20,7 @@ Eventually, we'll possibly move away from PonyDebugger and implement our own fra
 
 ## Integration with Texture (core)
 
-As mentioned above, this framework will be a seperate project that integrates with Texture.  Most of the changes in Texture's components, like `ASLayoutElement`, `ASDisplayNode` and `ASLayoutSpec`s, will be implemented as extensions inside the debugger framework.  We'll try as much as we can to minimalize changes in Textture (core) that are needed to support this project.
+As mentioned above, this framework will be a seperate project that integrates with Texture.  Most of the changes in Texture's components, like `ASLayoutElement`, `ASDisplayNode` and `ASLayoutSpec`s, will be implemented as extensions inside the debugger framework.  We'll try as much as we can to minimalize changes in Texture (core) that are needed to support this project.
 
 ## Technical issues related to Texture (core)
 
@@ -39,5 +39,5 @@ Once we have a functional debugger with a solid foundation, we can start explori
 
 ## Naming
 
-I'm planning to call this project "Texture Debugger".  It'll be a suite of debugging tools tailored mainly for Textture framework.
+I'm planning to call this project "Texture Debugger".  It'll be a suite of debugging tools tailored mainly for Texture framework.
 
