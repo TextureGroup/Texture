@@ -590,7 +590,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     }
       
     // CAEAGLLayer
-    if([view.layer class] isSubclassOfClass:[CAEAGLLayer class]]){
+    if([[view.layer class] isSubclassOfClass:[CAEAGLLayer class]]){
       _flags.canClearContentsOfLayer = NO;
     }
   }
