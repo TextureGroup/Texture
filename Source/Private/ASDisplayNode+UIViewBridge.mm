@@ -773,6 +773,45 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
 }
 
+- (UISemanticContentAttribute)semanticContentAttribute
+{
+  _bridge_prologue_read;
+  if (AS_AT_LEAST_IOS9) {
+    return _getFromViewOnly(semanticContentAttribute);
+  }
+  return UISemanticContentAttributeUnspecified;
+}
+
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)semanticContentAttribute
+{
+  _bridge_prologue_write;
+  if (AS_AT_LEAST_IOS9) {
+#if YOGA
+    YGDirection effectiveDirection = YGDirectionInherit;
+    // NOTE: It's not clear that this is more or less thread-safe than just calling the
+    // preferred +[UIView userInterfaceLayoutDirectionForSemanticContentAttribute:] method.
+    switch ([UIApplication sharedApplication].userInterfaceLayoutDirection) {
+      case UIUserInterfaceLayoutDirectionLeftToRight:
+        if (semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+          effectiveDirection = YGDirectionRTL;
+        } else {
+          effectiveDirection = YGDirectionLTR;
+        }
+        break;
+      case UIUserInterfaceLayoutDirectionRightToLeft:
+        if (semanticContentAttribute != UISemanticContentAttributeForceLeftToRight &&
+            semanticContentAttribute != UISemanticContentAttributePlayback &&
+            semanticContentAttribute != UISemanticContentAttributeSpatial) {
+          effectiveDirection = YGDirectionRTL;
+        }
+        break;
+    }
+    self.style.direction = effectiveDirection;
+#endif
+    _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
+  }
+}
+
 @end
 
 
