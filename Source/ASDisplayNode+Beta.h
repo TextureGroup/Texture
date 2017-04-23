@@ -169,6 +169,7 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 // These methods should not normally be called directly.
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
 @end
 

@@ -75,6 +75,7 @@ typedef struct {
   int setAccessibilityHeaderElements:1;
   int setAccessibilityActivationPoint:1;
   int setAccessibilityPath:1;
+  int setSemanticContentAttribute:1;
 } ASPendingStateFlags;
 
 @implementation _ASPendingState
@@ -118,6 +119,7 @@ typedef struct {
   NSArray *accessibilityHeaderElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
+  UISemanticContentAttribute semanticContentAttribute;
 
   ASPendingStateFlags _flags;
 }
@@ -179,6 +181,7 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize borderWidth=borderWidth;
 @synthesize borderColor=borderColor;
 @synthesize asyncdisplaykit_asyncTransactionContainer=asyncTransactionContainer;
+@synthesize semanticContentAttribute=semanticContentAttribute;
 
 
 static CGColorRef blackColorRef = NULL;
@@ -259,6 +262,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   accessibilityActivationPoint = CGPointZero;
   accessibilityPath = nil;
   edgeAntialiasingMask = (kCALayerLeftEdge | kCALayerRightEdge | kCALayerTopEdge | kCALayerBottomEdge);
+  semanticContentAttribute = UISemanticContentAttributeUnspecified;
 
   return self;
 }
@@ -510,6 +514,12 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 {
   asyncTransactionContainer = flag;
   _flags.setAsyncTransactionContainer = YES;
+}
+
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute
+{
+  semanticContentAttribute = attribute;
+  _flags.setSemanticContentAttribute = YES;
 }
 
 - (BOOL)isAccessibilityElement
@@ -904,6 +914,10 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setOpaque)
     ASDisplayNodeAssert(view.layer.opaque == opaque, @"Didn't set opaque as desired");
 
+  if (flags.setSemanticContentAttribute) {
+    view.semanticContentAttribute = semanticContentAttribute;
+  }
+
   if (flags.setIsAccessibilityElement)
     view.isAccessibilityElement = isAccessibilityElement;
 
@@ -1045,6 +1059,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.allowsGroupOpacity = layer.allowsGroupOpacity;
   pendingState.allowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
   pendingState.edgeAntialiasingMask = layer.edgeAntialiasingMask;
+  pendingState.semanticContentAttribute = view.semanticContentAttribute;
   pendingState.isAccessibilityElement = view.isAccessibilityElement;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
@@ -1119,6 +1134,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   || flags.needsLayout
   || flags.setAsyncTransactionContainer
   || flags.setOpaque
+  || flags.setSemanticContentAttribute
   || flags.setIsAccessibilityElement
   || flags.setAccessibilityLabel
   || flags.setAccessibilityHint

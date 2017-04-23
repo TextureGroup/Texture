@@ -328,6 +328,18 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
   }
 }
 
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
+{
+  YGDirection effectiveDirection = YGDirectionInherit;
+  if (attribute != UISemanticContentAttributeUnspecified && AS_AT_LEAST_IOS9) {
+    UIUserInterfaceLayoutDirection attributeDirection =
+                                      [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
+    effectiveDirection = (attributeDirection == UIUserInterfaceLayoutDirectionLeftToRight
+                          ? YGDirectionLTR : YGDirectionRTL);
+  }
+  self.style.direction = effectiveDirection;
+}
+
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
   if (self.yogaParent) {
@@ -357,14 +369,14 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     ASLayoutElementStyle *style = node.style;
     YGNodeRef yogaNode = node.yogaNode;
 
-    YGNodeStyleSetDirection     (yogaNode, YGDirectionInherit);
+    YGNodeStyleSetDirection     (yogaNode, style.direction);
 
     YGNodeStyleSetFlexWrap      (yogaNode, style.flexWrap);
     YGNodeStyleSetFlexGrow      (yogaNode, style.flexGrow);
     YGNodeStyleSetFlexShrink    (yogaNode, style.flexShrink);
     YGNODE_STYLE_SET_DIMENSION  (yogaNode, FlexBasis, style.flexBasis);
 
-    YGNodeStyleSetFlexDirection (yogaNode, yogaFlexDirection(style.direction));
+    YGNodeStyleSetFlexDirection (yogaNode, yogaFlexDirection(style.flexDirection));
     YGNodeStyleSetJustifyContent(yogaNode, yogaJustifyContent(style.justifyContent));
     YGNodeStyleSetAlignSelf     (yogaNode, yogaAlignSelf(style.alignSelf));
     ASStackLayoutAlignItems alignItems = style.alignItems;
@@ -379,7 +391,7 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     ASEdgeInsets border   = style.border;
 
     YGEdge edge = YGEdgeLeft;
-    for (int i = 0; i < YGEdgeAll + 1; i++) {
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Position, dimensionForEdgeWithEdgeInsets(edge, position), edge);
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Margin, dimensionForEdgeWithEdgeInsets(edge, margin), edge);
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Padding, dimensionForEdgeWithEdgeInsets(edge, padding), edge);
