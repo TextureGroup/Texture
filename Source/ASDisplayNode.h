@@ -692,7 +692,6 @@ extern NSInteger const ASDefaultDrawingPriority;
  * contentMode for your content while it's being re-rendered.
  */
 @property (nonatomic, assign)           UIViewContentMode contentMode;         // default=UIViewContentModeScaleToFill
-@property (nonatomic, assign)           UISemanticContentAttribute semanticContentAttribute; // default=Unspecified
 
 @property (nonatomic, assign, getter=isUserInteractionEnabled) BOOL userInteractionEnabled; // default=YES (NO for layer-backed nodes)
 #if TARGET_OS_IOS

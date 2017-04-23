@@ -773,25 +773,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
 }
 
-- (UISemanticContentAttribute)semanticContentAttribute
-{
-  _bridge_prologue_read;
-  if (AS_AT_LEAST_IOS9) {
-    return _getFromViewOnly(semanticContentAttribute);
-  }
-  return UISemanticContentAttributeUnspecified;
-}
-
-- (void)setSemanticContentAttribute:(UISemanticContentAttribute)semanticContentAttribute
-{
-  _bridge_prologue_write;
-  if (AS_AT_LEAST_IOS9) {
-#if YOGA
-    [self semanticContentAttributeDidChange:semanticContentAttribute];
-#endif
-    _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
-  }
-}
+// Add to setSemanticContentAttribute: when this lands:
+// https://github.com/TextureGroup/Texture/pull/60/files
+//#if YOGA
+//    [self semanticContentAttributeDidChange:semanticContentAttribute];
+//#endif
 
 @end
 
