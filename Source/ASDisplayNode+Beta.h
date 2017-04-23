@@ -174,7 +174,8 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 @interface ASLayoutElementStyle (Yoga)
 
-@property (nonatomic, assign, readwrite) ASStackLayoutDirection direction;
+@property (nonatomic, assign, readwrite) ASStackLayoutDirection flexDirection;
+@property (nonatomic, assign, readwrite) YGDirection direction;
 @property (nonatomic, assign, readwrite) CGFloat spacing;
 @property (nonatomic, assign, readwrite) ASStackLayoutJustifyContent justifyContent;
 @property (nonatomic, assign, readwrite) ASStackLayoutAlignItems alignItems;
