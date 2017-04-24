@@ -251,12 +251,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (!(self = [super initWithFrame:frame collectionViewLayout:layout]))
     return nil;
 
-  // Disable UICollectionView prefetching.
+  // Disable UICollectionView prefetching. Use super, because self disables this method.
   // Experiments done by Instagram show that this option being YES (default)
   // when unused causes a significant hit to scroll performance.
   // https://github.com/Instagram/IGListKit/issues/318
   if (AS_AT_LEAST_IOS10) {
-    self.prefetchingEnabled = NO;
+    super.prefetchingEnabled = NO;
   }
 
   _layoutController = [[ASCollectionViewLayoutController alloc] initWithCollectionView:self];
@@ -2090,6 +2090,16 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 }
 
 #pragma mark - UICollectionView dead-end intercepts
+
+- (void)setPrefetchDataSource:(id<UICollectionViewDataSourcePrefetching>)prefetchDataSource
+{
+  return;
+}
+
+- (void)setPrefetchingEnabled:(BOOL)prefetchingEnabled
+{
+  return;
+}
 
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED // Remove implementations entirely for efficiency if not asserting.
 
