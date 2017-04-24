@@ -420,34 +420,44 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 
 - (void)sendActionsForControlEvents:(ASControlNodeEvent)controlEvents withEvent:(UIEvent *)event
 {
+  ASDisplayNodeAssertMainThread(); //We access self.view below, it's not safe to call this off of main.
   NSParameterAssert(controlEvents != 0);
   
-  ASDN::MutexLocker l(_controlLock);
+  NSMutableArray *resolvedEventTargetActionArray = [[NSMutableArray<ASControlTargetAction *> alloc] init];
+  
+  _controlLock.lock();
 
   // Enumerate the events in the mask, invoking the target-action pairs for each.
   _ASEnumerateControlEventsIncludedInMaskWithBlock(controlEvents, ^
     (ASControlNodeEvent controlEvent)
     {
-      // Use a copy to itereate, the action perform could call remove causing a mutation crash.
-      NSArray *eventTargetActionArray = [_controlEventDispatchTable[_ASControlNodeEventKeyForControlEvent(controlEvent)] copy];
-      
       // Iterate on each target action pair
-      for (ASControlTargetAction *targetAction in eventTargetActionArray) {
-        SEL action = targetAction.action;
-        id responder = targetAction.target;
+      for (ASControlTargetAction *targetAction in _controlEventDispatchTable[_ASControlNodeEventKeyForControlEvent(controlEvent)]) {
+        ASControlTargetAction *resolvedTargetAction = [[ASControlTargetAction alloc] init];
+        resolvedTargetAction.action = targetAction.action;
+        resolvedTargetAction.target = targetAction.target;
         
         // NSNull means that a nil target was set, so start at self and travel the responder chain
-        if (!responder && targetAction.createdWithNoTarget) {
+        if (!resolvedTargetAction.target && targetAction.createdWithNoTarget) {
           // if the target cannot perform the action, travel the responder chain to try to find something that does
-          responder = [self.view targetForAction:action withSender:self];
+          resolvedTargetAction.target = [self.view targetForAction:resolvedTargetAction.action withSender:self];
         }
         
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [responder performSelector:action withObject:self withObject:event];
-#pragma clang diagnostic pop
+        if (resolvedTargetAction.target) {
+          [resolvedEventTargetActionArray addObject:resolvedTargetAction];
+        }
       }
     });
+  
+  _controlLock.unlock();
+  
+  //We don't want to hold the lock while calling out, we could potentially walk up the ownership tree causing a deadlock.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+  for (ASControlTargetAction *targetAction in resolvedEventTargetActionArray) {
+    [targetAction.target performSelector:targetAction.action withObject:self withObject:event];
+  }
+#pragma clang diagnostic pop
 }
 
 #pragma mark - Convenience
