@@ -1,6 +1,6 @@
 //
 //  ASAbsoluteLayoutSpecSnapshotTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 18/10/15.
 //

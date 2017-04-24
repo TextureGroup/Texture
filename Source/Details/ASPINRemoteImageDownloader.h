@@ -1,6 +1,6 @@
 //
 //  ASPINRemoteImageDownloader.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 2/5/16.
 //

@@ -1,6 +1,6 @@
 //
 //  ASWeakMap.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Chris Danford on 7/11/16.
 //

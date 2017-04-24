@@ -1,6 +1,6 @@
 //
 //  ASCellNode+Internal.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Max Gu on 2/19/16.
 //

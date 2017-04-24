@@ -1,6 +1,6 @@
 //
 //  ASEventLog.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 4/11/16.
 //

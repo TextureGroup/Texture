@@ -1,6 +1,6 @@
 //
 //  ASImageNode+AnimatedImage.mm
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 3/22/16.
 //

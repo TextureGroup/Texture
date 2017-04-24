@@ -1,6 +1,6 @@
 //
 //  ASCollectionElement.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 2/28/16.
 //

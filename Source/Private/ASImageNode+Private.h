@@ -1,6 +1,6 @@
 //
 //  ASImageNode+Private.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Michael Schneider on 3/20/17.
 //  Copyright © 2017 Facebook. All rights reserved.

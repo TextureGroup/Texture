@@ -1,6 +1,6 @@
 //
 //  _ASCollectionViewCell.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 1/30/17.
 //  Copyright © 2017 Facebook. All rights reserved.

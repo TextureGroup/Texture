@@ -1,6 +1,6 @@
 //
 //  ASCollectionInternal.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Scott Goodson on 1/1/16.
 //

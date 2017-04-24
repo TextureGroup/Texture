@@ -1,6 +1,6 @@
 //
 //  ASSection.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 28/08/16.
 //

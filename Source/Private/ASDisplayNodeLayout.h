@@ -1,6 +1,6 @@
 //
 //  ASDisplayNodeLayout.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Michael Schneider on 08/26/16.
 //

@@ -1,6 +1,6 @@
 //
 //  ASTableViewInternal.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 26/10/15.
 //

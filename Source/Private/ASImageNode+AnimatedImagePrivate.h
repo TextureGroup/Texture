@@ -1,6 +1,6 @@
 //
 //  ASImageNode+AnimatedImagePrivate.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 3/30/16.
 //

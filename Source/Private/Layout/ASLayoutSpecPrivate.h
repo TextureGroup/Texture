@@ -1,6 +1,6 @@
 //
 //  ASLayoutSpecPrivate.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Michael Schneider on 9/15/16.
 //

@@ -1,6 +1,6 @@
 //
 //  UIImage+ASConvenience.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Hannah Troisi on 6/24/16.
 //

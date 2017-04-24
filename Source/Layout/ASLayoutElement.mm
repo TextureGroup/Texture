@@ -1,6 +1,6 @@
 //
 //  ASLayoutElement.mm
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 3/27/16.
 //

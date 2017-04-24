@@ -1,6 +1,6 @@
 //
 //  ASPagerNode.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Levi McCallum on 12/7/15.
 //

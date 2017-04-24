@@ -1,6 +1,6 @@
 //
 //  ASTextNode+Beta.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Luke on 1/25/16.
 //

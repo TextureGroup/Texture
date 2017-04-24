@@ -1,6 +1,6 @@
 //
 //  ASMainSerialQueue.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 12/11/15.
 //

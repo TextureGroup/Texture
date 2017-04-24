@@ -1,6 +1,6 @@
 //
 //  ASDisplayNodeImplicitHierarchyTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Levi McCallum on 2/1/16.
 //

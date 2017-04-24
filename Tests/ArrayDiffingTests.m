@@ -1,6 +1,6 @@
 //
 //  ArrayDiffingTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Levi McCallum on 1/29/16.
 //

@@ -1,6 +1,6 @@
 //
 //  ASRelativeLayoutSpec.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Samuel Stow on 12/31/15.
 //

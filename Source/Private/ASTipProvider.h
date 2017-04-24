@@ -1,6 +1,6 @@
 //
 //  ASTipProvider.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 4/12/17.
 //  Copyright © 2017 Facebook. All rights reserved.

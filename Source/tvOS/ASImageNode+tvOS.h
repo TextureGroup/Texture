@@ -1,6 +1,6 @@
 //
 //  ASImageNode+tvOS.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Aaron Schubert on 21/04/2016.
 //

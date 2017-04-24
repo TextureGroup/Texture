@@ -1,6 +1,6 @@
 //
 //  ASCollectionFlowLayoutDelegate.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 28/2/17.
 //  Copyright © 2017 Facebook. All rights reserved.

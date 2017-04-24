@@ -1,6 +1,6 @@
 //
 //  ASLayoutElementExtensibility.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Michael Schneider on 3/29/16.
 //

@@ -1,6 +1,6 @@
 //
 //  ASImageContainerProtocolCategories.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 3/18/16.
 //

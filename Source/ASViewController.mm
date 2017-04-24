@@ -1,6 +1,6 @@
 //
 //  ASViewController.mm
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Huy Nguyen on 16/09/15.
 //

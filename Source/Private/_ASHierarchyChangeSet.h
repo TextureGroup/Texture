@@ -1,6 +1,6 @@
 //
 //  _ASHierarchyChangeSet.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 9/29/15.
 //

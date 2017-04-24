@@ -1,6 +1,6 @@
 //
 //  ASPhotosFrameworkImageRequest.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 9/25/15.
 //

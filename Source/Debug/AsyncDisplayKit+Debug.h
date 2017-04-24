@@ -1,6 +1,6 @@
 //
 //  AsyncDisplayKit+Debug.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Hannah Troisi on 3/7/16.
 //

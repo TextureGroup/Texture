@@ -1,6 +1,6 @@
 //
 //  ASTraitCollection.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Ricky Cancro on 5/4/16.
 //

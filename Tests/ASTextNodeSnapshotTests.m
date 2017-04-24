@@ -1,6 +1,6 @@
 //
 //  ASTextNodeSnapshotTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 8/12/16.
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.

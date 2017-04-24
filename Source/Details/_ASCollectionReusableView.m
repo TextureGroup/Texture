@@ -1,6 +1,6 @@
 //
 //  _ASCollectionReusableView.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Phil Larson on 4/10/17.
 //  Copyright © 2017 Facebook. All rights reserved.

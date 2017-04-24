@@ -1,6 +1,6 @@
 //
 //  ASVisibilityProtocols.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 4/28/16.
 //

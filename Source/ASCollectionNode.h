@@ -1,6 +1,6 @@
 //
 //  ASCollectionNode.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Scott Goodson on 9/5/15.
 //

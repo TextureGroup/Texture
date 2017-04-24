@@ -1,6 +1,6 @@
 //
 //  ASCollectionViewLayoutInspector.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 11/19/16.
 //  Copyright © 2016 Facebook. All rights reserved.

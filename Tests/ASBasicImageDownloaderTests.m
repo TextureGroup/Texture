@@ -1,6 +1,6 @@
 //
 //  ASBasicImageDownloaderTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Victor Mayorov on 10/06/15.
 //

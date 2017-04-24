@@ -1,6 +1,6 @@
 //
 //  ASWeakProxy.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Garrett Moon on 4/12/16.
 //

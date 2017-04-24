@@ -1,6 +1,6 @@
 //
 //  ASVideoPlayerNode.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Erekle on 5/6/16.
 //

@@ -1,6 +1,6 @@
 //
 //  ASWeakSet.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 1/7/16.
 //
