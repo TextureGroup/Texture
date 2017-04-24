@@ -19,7 +19,7 @@ warn("This is a big PR, please consider splitting it up to ease code review.") i
 # Changelog entries are required for changes to source files.
 no_changelog_entry = !git.modified_files.include?("CHANGELOG.md")
 if has_changes_in_source_directory && no_changelog_entry && !declared_trivial
-  fail("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
+  warn("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
 end
 
 def full_license(partial_license, filename)
@@ -58,7 +58,7 @@ def check_file_header(files_to_check, licenses)
       end
       
       if correct_license == false
-        fail ("Please ensure new source files begin with: \n```\n" + full_license(licenses[0], filename) + "```")
+        warn ("Please ensure license is correct for #{filename}: \n```\n" + full_license(licenses[0], filename) + "```")
       end
       
     end

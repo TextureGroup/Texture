@@ -1,8 +1,6 @@
 //
 //  ASTableView+Undeprecated.h
 //  Texture
-//
-//  Created by Adlai Holler on 10/10/16.
 //  Copyright © 2016 Facebook. All rights reserved.
 //
 
