@@ -1,5 +1,5 @@
 //
-//  CGRect+ASConvenience.h
+//  CoreGraphics+ASConvenience.h
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
