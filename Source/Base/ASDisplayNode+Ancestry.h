@@ -1,5 +1,5 @@
 //
-//  ASNodeAncestorEnumerator.h
+//  ASDisplayNode+Ancestry.h
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
