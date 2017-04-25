@@ -780,6 +780,23 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
 }
 
+- (UISemanticContentAttribute)semanticContentAttribute
+{
+  _bridge_prologue_read;
+  if (AS_AT_LEAST_IOS9) {
+    return _getFromViewOnly(semanticContentAttribute);
+  }
+  return UISemanticContentAttributeUnspecified;
+}
+
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)semanticContentAttribute
+{
+  _bridge_prologue_write;
+  if (AS_AT_LEAST_IOS9) {
+    _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
+  }
+}
+
 @end
 
 
