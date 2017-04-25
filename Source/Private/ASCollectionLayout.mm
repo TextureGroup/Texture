@@ -1,14 +1,24 @@
 //
 //  ASCollectionLayout.mm
-//  AsyncDisplayKit
+//  Texture
 //
-//  Created by Huy Nguyen on 28/2/17.
-//  Copyright © 2017 Facebook. All rights reserved.
+//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under the BSD-style license found in the
+//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
+//  grant of patent rights can be found in the PATENTS file in the same directory.
+//
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASCollectionLayout.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext+Private.h>
 #import <AsyncDisplayKit/ASCollectionLayoutDelegate.h>
@@ -116,6 +126,7 @@
   for (ASCollectionElement *element in attrsMap) {
     UICollectionViewLayoutAttributes *attrs = [attrsMap objectForKey:element];
     if (CGRectIntersectsRect(rect, attrs.frame)) {
+      [ASCollectionLayout setSize:attrs.frame.size toElement:element];
       [attributesInRect addObject:attrs];
     }
   }
@@ -126,17 +137,31 @@
 {
   ASCollectionLayoutState *state = _state;
   ASCollectionElement *element = [state.elements elementForItemAtIndexPath:indexPath];
-  return [state.elementToLayoutArrtibutesMap objectForKey:element];
+  UICollectionViewLayoutAttributes *attrs = [state.elementToLayoutArrtibutesMap objectForKey:element];
+  [ASCollectionLayout setSize:attrs.frame.size toElement:element];
+  return attrs;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   ASCollectionLayoutState *state = _state;
   ASCollectionElement *element = [state.elements supplementaryElementOfKind:elementKind atIndexPath:indexPath];
-  return [state.elementToLayoutArrtibutesMap objectForKey:element];
+  UICollectionViewLayoutAttributes *attrs = [state.elementToLayoutArrtibutesMap objectForKey:element];
+  [ASCollectionLayout setSize:attrs.frame.size toElement:element];
+  return attrs;
 }
 
 #pragma mark - Private methods
+
++ (void)setSize:(CGSize)size toElement:(ASCollectionElement *)element
+{
+  ASCellNode *node = element.node;
+  if (! CGSizeEqualToSize(size, node.frame.size)) {
+    CGRect nodeFrame = CGRectZero;
+    nodeFrame.size = size;
+    node.frame = nodeFrame;
+  }
+}
 
 - (CGSize)viewportSize
 {
