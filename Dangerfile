@@ -19,7 +19,7 @@ warn("This is a big PR, please consider splitting it up to ease code review.") i
 # Changelog entries are required for changes to source files.
 no_changelog_entry = !git.modified_files.include?("CHANGELOG.md")
 if has_changes_in_source_directory && no_changelog_entry && !declared_trivial
-  fail("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
+  warn("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
 end
 
 def full_license(partial_license, filename)
@@ -58,7 +58,7 @@ def check_file_header(files_to_check, licenses)
       end
       
       if correct_license == false
-        fail ("Please ensure new source files begin with: \n```\n" + full_license(licenses[0], filename) + "```")
+        warn ("Please ensure license is correct for #{filename}: \n```\n" + full_license(licenses[0], filename) + "```")
       end
       
     end
@@ -71,42 +71,31 @@ new_source_license_header = <<-HEREDOC
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-//  
+//
 //      http://www.apache.org/licenses/LICENSE-2.0
-//  
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
 //
 HEREDOC
 
-# if has_added_source_files
-#   check_file_header(added_source_files, [new_source_license_header])
-# end
+if has_added_source_files
+  check_file_header(added_source_files, [new_source_license_header])
+end
 
 # Ensure modified files have proper header
 modified_source_license_header = <<-HEREDOC
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
+//  grant of patent rights can be found in the PATENTS file in the same directory.
+//
 //  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
 //  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
-//  
-//      http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 HEREDOC
 
-# if has_modified_source_files
-#   check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
-# end
+if has_modified_source_files
+  check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
+end
