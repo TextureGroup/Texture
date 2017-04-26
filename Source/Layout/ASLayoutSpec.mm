@@ -94,23 +94,7 @@ ASLayoutElementFinalLayoutElementDefault
 
 #pragma mark - Layout
 
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize
-{
-  return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];
-}
-
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
-{
-  return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];
-}
-
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
-                     restrictedToSize:(ASLayoutElementSize)size
-                 relativeToParentSize:(CGSize)parentSize
-{
-  const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, ASLayoutElementSizeResolve(self.style.size, parentSize));
-  return [self calculateLayoutThatFits:resolvedRange];
-}
+ASLayoutElementLayoutCalculationDefaults
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
 {
@@ -178,22 +162,13 @@ ASLayoutElementFinalLayoutElementDefault
 
 #pragma mark - ASTraitEnvironment
 
-- (ASPrimitiveTraitCollection)primitiveTraitCollection
-{
-  return _primitiveTraitCollection;
-}
-
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
-{
-  _primitiveTraitCollection = traitCollection;
-}
-
 - (ASTraitCollection *)asyncTraitCollection
 {
   ASDN::MutexLocker l(__instanceLock__);
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
+ASPrimitiveTraitCollectionDefaults
 ASPrimitiveTraitCollectionDeprecatedImplementation
 
 #pragma mark - ASLayoutElementStyleExtensibility
@@ -259,13 +234,6 @@ ASLayoutElementStyleExtensibilityForwarding
   if (!ASObjectIsEqual(_debugName, debugName)) {
     _debugName = [debugName copy];
   }
-}
-
-#pragma mark - Deprecated
-
-- (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize
-{
-  return [self layoutThatFits:constrainedSize];
 }
 
 @end
