@@ -1,11 +1,18 @@
 //
 //  UIView+ASConvenience.h
-//  AsyncDisplayKit
+//  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
+//  grant of patent rights can be found in the PATENTS file in the same directory.
+//
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <UIKit/UIKit.h>
@@ -51,15 +58,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol ASDisplayNodeViewProperties
 
-@property (nonatomic, assign)           		BOOL clipsToBounds;
-@property (nonatomic, getter=isHidden)  		BOOL hidden;
-@property (nonatomic, assign)           		BOOL autoresizesSubviews;
-@property (nonatomic, assign)           		UIViewAutoresizing autoresizingMask;
-@property (nonatomic, strong, null_resettable)  UIColor *tintColor;
-@property (nonatomic, assign)           		CGFloat alpha;
-@property (nonatomic, assign)           		CGRect bounds;
-@property (nonatomic, assign)           		CGRect frame;   // Only for use with nodes wrapping synchronous views
-@property (nonatomic, assign)           		UIViewContentMode contentMode;
+@property (nonatomic, assign)          BOOL clipsToBounds;
+@property (nonatomic, getter=isHidden) BOOL hidden;
+@property (nonatomic, assign)          BOOL autoresizesSubviews;
+@property (nonatomic, assign)          UIViewAutoresizing autoresizingMask;
+@property (nonatomic, strong, null_resettable) UIColor *tintColor;
+@property (nonatomic, assign)          CGFloat alpha;
+@property (nonatomic, assign)          CGRect bounds;
+@property (nonatomic, assign)          CGRect frame;   // Only for use with nodes wrapping synchronous views
+@property (nonatomic, assign)          UIViewContentMode contentMode;
+@property (nonatomic, assign)          UISemanticContentAttribute semanticContentAttribute;
 @property (nonatomic, assign, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
 @property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;
 @property (nonatomic, assign, getter=asyncdisplaykit_isAsyncTransactionContainer, setter = asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;

@@ -1,6 +1,6 @@
 //
 //  ASUICollectionViewTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 8/18/16.
 //  Copyright © 2016 Facebook. All rights reserved.
