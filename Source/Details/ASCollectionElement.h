@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASDisplayNode;
+@protocol ASRangeManagedNode;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,13 +29,13 @@ AS_SUBCLASSING_RESTRICTED
 //TODO change this to be a generic "kind" or "elementKind" that exposes `nil` for row kind
 @property (nonatomic, readonly, copy, nullable) NSString *supplementaryElementKind;
 @property (nonatomic, assign) ASSizeRange constrainedSize;
-@property (nonatomic, weak) ASDisplayNode *owningNode;
+@property (nonatomic, readonly, weak) id<ASRangeManagedNode> owningNode;
 @property (nonatomic, assign) ASPrimitiveTraitCollection traitCollection;
 
 - (instancetype)initWithNodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(nullable NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize
-                       owningNode:(ASDisplayNode *)owningNode
+                       owningNode:(id<ASRangeManagedNode>)owningNode
                   traitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**

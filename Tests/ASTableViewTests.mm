@@ -61,7 +61,7 @@
 - (instancetype)__initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
   
-  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] eventLog:nil];
+  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil eventLog:nil];
 }
 
 - (ASTestDataController *)testDataController

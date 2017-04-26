@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nullable) ASCollectionElement *collectionElement;
 
-@property (nonatomic, weak, nullable) ASDisplayNode *owningNode;
+@property (weak, nullable) id<ASRangeManagedNode> owningNode;
 
 @property (nonatomic, assign) BOOL shouldUseUIKitCell;
 

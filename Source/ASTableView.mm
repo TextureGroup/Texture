@@ -127,7 +127,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 #pragma mark -
 #pragma mark ASTableView
 
-@interface ASTableView () <ASRangeControllerDataSource, ASRangeControllerDelegate, ASDataControllerSource, _ASTableViewCellDelegate, ASCellNodeInteractionDelegate, ASDelegateProxyInterceptor, ASBatchFetchingScrollView, ASDataControllerEnvironmentDelegate>
+@interface ASTableView () <ASRangeControllerDataSource, ASRangeControllerDelegate, ASDataControllerSource, _ASTableViewCellDelegate, ASCellNodeInteractionDelegate, ASDelegateProxyInterceptor, ASBatchFetchingScrollView>
 {
   ASTableViewProxy *_proxyDataSource;
   ASTableViewProxy *_proxyDelegate;
@@ -266,8 +266,22 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 #pragma mark -
 #pragma mark Lifecycle
 
-- (void)configureWithDataControllerClass:(Class)dataControllerClass eventLog:(ASEventLog *)eventLog
+- (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
+  return [self _initWithFrame:frame style:style dataControllerClass:nil owningNode:nil eventLog:nil];
+}
+
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode eventLog:(ASEventLog *)eventLog
+{
+  if (!(self = [super initWithFrame:frame style:style])) {
+    return nil;
+  }
+  _cellsForVisibilityUpdates = [NSMutableSet set];
+  _cellsForLayoutUpdates = [NSMutableSet set];
+  if (!dataControllerClass) {
+    dataControllerClass = [[self class] dataControllerClass];
+  }
+  
   _layoutController = [[ASTableLayoutController alloc] initWithTableView:self];
   
   _rangeController = [[ASRangeController alloc] init];
@@ -275,13 +289,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   _rangeController.dataSource = self;
   _rangeController.delegate = self;
   
-  _dataController = [[dataControllerClass alloc] initWithDataSource:self eventLog:eventLog];
+  _dataController = [[dataControllerClass alloc] initWithDataSource:self node:tableNode eventLog:eventLog];
   _dataController.delegate = _rangeController;
-  _dataController.environmentDelegate = self;
-
+  
   _leadingScreensForBatching = 2.0;
   _batchContext = [[ASBatchContext alloc] init];
-
+  
   _automaticallyAdjustsContentOffset = NO;
   
   _nodesConstrainedWidth = self.bounds.size.width;
@@ -293,25 +306,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   super.dataSource = (id<UITableViewDataSource>)_proxyDataSource;
   
   [self registerClass:_ASTableViewCell.class forCellReuseIdentifier:kCellReuseIdentifier];
-}
-
-- (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
-{
-  return [self _initWithFrame:frame style:style dataControllerClass:nil eventLog:nil];
-}
-
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass eventLog:(ASEventLog *)eventLog
-{
-  if (!(self = [super initWithFrame:frame style:style])) {
-    return nil;
-  }
-  _cellsForVisibilityUpdates = [NSMutableSet set];
-  _cellsForLayoutUpdates = [NSMutableSet set];
-  if (!dataControllerClass) {
-    dataControllerClass = [[self class] dataControllerClass];
-  }
-  
-  [self configureWithDataControllerClass:dataControllerClass eventLog:eventLog];
   
   if (!AS_AT_LEAST_IOS9) {
     _retainedLayer = self.layer;
@@ -1692,13 +1686,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
 
   return (fabs(rect.size.height - size.height) < FLT_EPSILON);
-}
-
-#pragma mark - ASDataControllerEnvironmentDelegate
-
-- (id<ASTraitEnvironment>)dataControllerEnvironment
-{
-  return self.tableNode;
 }
 
 #pragma mark - _ASTableViewCellDelegate

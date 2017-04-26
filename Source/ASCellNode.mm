@@ -44,12 +44,6 @@
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
   BOOL _suspendInteractionDelegate;
-
-  struct {
-    unsigned int isTableNode:1;
-    unsigned int isCollectionNode:1;
-  } _owningNodeType;
-
 }
 
 @end
@@ -165,19 +159,6 @@
   }
 }
 
-- (void)setOwningNode:(ASDisplayNode *)owningNode
-{
-  _owningNode = owningNode;
-
-  memset(&_owningNodeType, 0, sizeof(_owningNodeType));
-
-  if ([owningNode isKindOfClass:[ASTableNode class]]) {
-    _owningNodeType.isTableNode      = 1;
-  } else if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
-    _owningNodeType.isCollectionNode = 1;
-  }
-}
-
 - (void)__setSelectedFromUIKit:(BOOL)selected;
 {
   if (selected != _selected) {
@@ -198,15 +179,7 @@
 
 - (NSIndexPath *)indexPath
 {
-  ASDisplayNodeAssertMainThread();
-
-  if (_owningNodeType.isTableNode) {
-    return [(ASTableNode *)self.owningNode indexPathForNode:self];
-  } else if (_owningNodeType.isCollectionNode) {
-    return [(ASCollectionNode *)self.owningNode indexPathForNode:self];
-  }
-
-  return nil;
+  return [self.owningNode indexPathForNode:self];
 }
 
 - (UIViewController *)viewController
