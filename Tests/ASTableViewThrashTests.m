@@ -1,6 +1,6 @@
 //
 //  ASTableViewThrashTests.m
-//  AsyncDisplayKit
+//  Texture
 //
 //  Created by Adlai Holler on 6/21/16.
 //  Copyright © 2016 Facebook. All rights reserved.
