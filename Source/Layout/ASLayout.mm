@@ -142,7 +142,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
-                              position:CGPointNull
+                              position:ASPointNull
                             sublayouts:sublayouts];
 }
 
@@ -150,7 +150,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
-                              position:CGPointNull
+                              position:ASPointNull
                             sublayouts:nil];
 }
 
