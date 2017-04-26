@@ -154,7 +154,7 @@ If you set `INFINITY` as a value in the `UIEdgeInsets`, the inset spec will just
 {
   ...
   UIEdgeInsets *insets = UIEdgeInsetsMake(10, 10, 10, 10);
-  ASInsetLayoutSpec *headerWithInset = insetLayoutSpecWithInsets:insets child:textNode];
+  ASInsetLayoutSpec *headerWithInset = [ASInsetLayoutSpec insetLayoutSpecWithInsets:insets child:textNode];
   ...
 }
 </pre>
