@@ -88,7 +88,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  * @return The supplementary element kind, or @c nil if this node does not represent a supplementary element.
  */
 //TODO change this to be a generic "kind" or "elementKind" that exposes `nil` for row kind
-@property (copy, readonly, nullable) NSString *supplementaryElementKind;
+@property (atomic, copy, readonly, nullable) NSString *supplementaryElementKind;
 
 /*
  * The layout attributes currently assigned to this node, if any.
@@ -115,7 +115,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  * The current index path of this cell node, or @c nil if this node is
  * not a valid item inside a table node or collection node.
  */
-@property (readonly, nullable) NSIndexPath *indexPath;
+@property (atomic, readonly, nullable) NSIndexPath *indexPath;
 
 /**
  * The backing view controller, or @c nil if the node wasn't initialized with backing view controller
@@ -127,7 +127,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 /**
  * The table- or collection-node that this cell is a member of, if any.
  */
-@property (weak, readonly, nullable) id<ASRangeManagedNode> owningNode;
+@property (atomic, weak, readonly, nullable) id<ASRangeManagedNode> owningNode;
 
 /*
  * ASCellNode must forward touch events in order for UITableView and UICollectionView tap handling to work. Overriding
