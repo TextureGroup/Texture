@@ -351,7 +351,7 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
 {
   if (self.yogaParent) {
     if (ASHierarchyStateIncludesYogaLayoutMeasuring(self.hierarchyState) == NO) {
-      [self setNeedsLayoutFromAbove];
+      [self _setNeedsLayoutFromAbove];
     }
     return;
   }
