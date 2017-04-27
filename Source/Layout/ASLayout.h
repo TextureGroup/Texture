@@ -24,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
 
-extern CGPoint const CGPointNull;
+extern CGPoint const ASPointNull; // {NAN, NAN}
 
-extern BOOL CGPointIsNull(CGPoint point);
+extern BOOL ASPointIsNull(CGPoint point);
 
 /**
  * Safely calculates the layout of the given root layoutElement by guarding against nil nodes.
