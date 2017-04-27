@@ -26,9 +26,9 @@
 @interface ASNodeController<__covariant DisplayNodeType : ASDisplayNode *> : NSObject <ASInterfaceStateDelegate>
 
 #if INVERT_NODE_CONTROLLER_OWNERSHIP
-@property (nonatomic, strong) DisplayNodeType node;
-#else
 @property (nonatomic, weak) DisplayNodeType node;
+#else
+@property (nonatomic, strong) DisplayNodeType node;
 #endif
 
 - (void)loadNode;
