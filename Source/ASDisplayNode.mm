@@ -2767,6 +2767,8 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
       _subnodes = [[NSMutableArray alloc] init];
     }
     [_subnodes insertObject:subnode atIndex:subnodeIndex];
+  
+  BOOL nodeWasLoaded = [self _locked_isNodeLoaded];
   __instanceLock__.unlock();
   
   // This call will apply our .hierarchyState to the new subnode.
@@ -2786,6 +2788,22 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     }
   } else if (self.nodeLoaded) {
     // If not rasterizing, and node is loaded insert the subview/sublayer now.
+    
+    if (nodeWasLoaded == NO && sublayerIndex == NSNotFound) {
+      // In this case the node was loaded while setting the _setSupernode. We have to grab the sublayer index again
+      __instanceLock__.lock();
+      NSInteger idx = [_subnodes indexOfObjectIdenticalTo:subnode];
+      if (_layer && idx == 0) {
+        sublayerIndex = 0;
+      } else if (_layer) {
+        ASDisplayNode *positionInRelationTo = (_subnodes.count > 0 && idx > 0) ? _subnodes[idx - 1] : nil;
+        if (positionInRelationTo) {
+          sublayerIndex = incrementIfFound([_layer.sublayers indexOfObjectIdenticalTo:positionInRelationTo.layer]);
+        }
+      }
+      __instanceLock__.unlock();
+    }
+    
     [self _insertSubnodeSubviewOrSublayer:subnode atIndex:sublayerIndex];
   } // Otherwise we will insert subview/sublayer when we get loaded
 
