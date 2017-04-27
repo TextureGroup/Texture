@@ -18,6 +18,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
@@ -213,17 +214,6 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutSize(AS
           NSStringFromASDimension(size.height)];
 }
 
-#pragma mark - ASEdgeInsets
-
-typedef struct {
-  ASDimension top;
-  ASDimension left;
-  ASDimension bottom;
-  ASDimension right;
-} ASEdgeInsets;
-
-extern ASEdgeInsets const ASEdgeInsetsZero;
-
 #pragma mark - ASSizeRange
 
 /**
@@ -307,6 +297,26 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeEqualToSizeRange(ASSi
  * Returns a string representation of a size range
  */
 extern AS_WARN_UNUSED_RESULT NSString *NSStringFromASSizeRange(ASSizeRange sizeRange);
+
+#if YOGA
+
+#pragma mark - ASEdgeInsets
+
+typedef struct {
+  ASDimension top;
+  ASDimension left;
+  ASDimension bottom;
+  ASDimension right;
+  ASDimension start;
+  ASDimension end;
+  ASDimension horizontal;
+  ASDimension vertical;
+  ASDimension all;
+} ASEdgeInsets;
+
+extern ASEdgeInsets const ASEdgeInsetsZero;
+
+#endif
 
 NS_ASSUME_NONNULL_END
 ASDISPLAYNODE_EXTERN_C_END

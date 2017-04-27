@@ -794,6 +794,9 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _bridge_prologue_write;
   if (AS_AT_LEAST_IOS9) {
     _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
+#if YOGA
+    [self semanticContentAttributeDidChange:semanticContentAttribute];
+#endif
   }
 }
 

@@ -147,10 +147,15 @@ float yogaDimensionToPercent(ASDimension dimension)
 ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets)
 {
   switch (edge) {
-    case YGEdgeLeft:   return insets.left;
-    case YGEdgeTop:    return insets.top;
-    case YGEdgeRight:  return insets.right;
-    case YGEdgeBottom: return insets.bottom;
+    case YGEdgeLeft:          return insets.left;
+    case YGEdgeTop:           return insets.top;
+    case YGEdgeRight:         return insets.right;
+    case YGEdgeBottom:        return insets.bottom;
+    case YGEdgeStart:         return insets.start;
+    case YGEdgeEnd:           return insets.end;
+    case YGEdgeHorizontal:    return insets.horizontal;
+    case YGEdgeVertical:      return insets.vertical;
+    case YGEdgeAll:           return insets.all;
     default: ASDisplayNodeCAssert(NO, @"YGEdge other than ASEdgeInsets is not supported.");
       return ASDimensionAuto;
   }
@@ -314,10 +319,9 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
 
 - (void)setYogaMeasureFuncIfNeeded
 {
-  // Manual size calculation via calculateSizeThatFits:
-  // This will be used for ASTextNode, as well as any other leaf node that has no layout spec.
-  if ((self.methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == NO
-      && self.layoutSpecBlock == NULL &&  self.yogaChildren.count == 0) {
+  // Size calculation via calculateSizeThatFits: or layoutSpecThatFits:
+  // This will be used for ASTextNode, as well as any other node that has no Yoga children
+  if (self.yogaChildren.count == 0) {
     YGNodeRef yogaNode = self.yogaNode; // Use property to assign Ref if needed.
     YGNodeSetContext(yogaNode, (__bridge void *)self);
     YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
@@ -333,8 +337,24 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
   }
 }
 
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
+{
+  if (AS_AT_LEAST_IOS9) {
+    UIUserInterfaceLayoutDirection layoutDirection =
+                         [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
+    self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
+                                             ? YGDirectionLTR : YGDirectionRTL);
+  }
+}
+
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
+  if (self.yogaParent) {
+    if (ASHierarchyStateIncludesYogaLayoutMeasuring(self.hierarchyState) == NO) {
+      [self _setNeedsLayoutFromAbove];
+    }
+    return;
+  }
   if (ASHierarchyStateIncludesYogaLayoutMeasuring(self.hierarchyState)) {
     ASDisplayNodeAssert(NO, @"A Yoga layout is being performed by a parent; children must not perform their own until it is done! %@", [self displayNodeRecursiveDescription]);
     return;
@@ -356,14 +376,14 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     ASLayoutElementStyle *style = node.style;
     YGNodeRef yogaNode = node.yogaNode;
 
-    YGNodeStyleSetDirection     (yogaNode, YGDirectionInherit);
+    YGNodeStyleSetDirection     (yogaNode, style.direction);
 
     YGNodeStyleSetFlexWrap      (yogaNode, style.flexWrap);
     YGNodeStyleSetFlexGrow      (yogaNode, style.flexGrow);
     YGNodeStyleSetFlexShrink    (yogaNode, style.flexShrink);
     YGNODE_STYLE_SET_DIMENSION  (yogaNode, FlexBasis, style.flexBasis);
 
-    YGNodeStyleSetFlexDirection (yogaNode, yogaFlexDirection(style.direction));
+    YGNodeStyleSetFlexDirection (yogaNode, yogaFlexDirection(style.flexDirection));
     YGNodeStyleSetJustifyContent(yogaNode, yogaJustifyContent(style.justifyContent));
     YGNodeStyleSetAlignSelf     (yogaNode, yogaAlignSelf(style.alignSelf));
     ASStackLayoutAlignItems alignItems = style.alignItems;
@@ -378,12 +398,12 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     ASEdgeInsets border   = style.border;
 
     YGEdge edge = YGEdgeLeft;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Position, dimensionForEdgeWithEdgeInsets(edge, position), edge);
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Margin, dimensionForEdgeWithEdgeInsets(edge, margin), edge);
       YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(yogaNode, Padding, dimensionForEdgeWithEdgeInsets(edge, padding), edge);
       YGNODE_STYLE_SET_FLOAT_WITH_EDGE(yogaNode, Border, dimensionForEdgeWithEdgeInsets(edge, border), edge);
-      edge = (edge == YGEdgeLeft ? YGEdgeTop : (edge == YGEdgeTop ? YGEdgeRight : YGEdgeBottom));
+      edge = (YGEdge)(edge + 1);
     }
 
     CGFloat aspectRatio = style.aspectRatio;
@@ -406,7 +426,6 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     [node setYogaMeasureFuncIfNeeded];
 
     /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
-     void YGNodeStyleSetFlexDirection(YGNodeRef node, YGFlexDirection flexDirection);
      void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
      void YGNodeStyleSetFlex(YGNodeRef node, float flex);
      */
