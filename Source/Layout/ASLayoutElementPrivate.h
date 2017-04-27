@@ -49,16 +49,17 @@ extern void ASLayoutElementClearCurrentContext();
 #define ASLayoutElementLayoutCalculationDefaults \
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize\
 {\
-  _Pragma("clang diagnostic push")\
-  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")\
-  /* For now we just call the deprecated measureWithSizeRange: method to not break old API */ \
-  return [self measureWithSizeRange:constrainedSize]; \
-  _Pragma("clang diagnostic pop")\
-} \
+  return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
+}\
 \
 - (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize\
 {\
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
+}\
+\
+- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize\
+{\
+  return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];\
 }\
 \
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize\
@@ -68,7 +69,6 @@ extern void ASLayoutElementClearCurrentContext();
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, ASLayoutElementSizeResolve(self.style.size, parentSize));\
   return [self calculateLayoutThatFits:resolvedRange];\
 }\
-
 
 #pragma mark - ASLayoutElementFinalLayoutElement
 /**

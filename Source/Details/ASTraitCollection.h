@@ -101,6 +101,16 @@ ASDISPLAYNODE_EXTERN_C_END
 
 @end
 
+#define ASPrimitiveTraitCollectionDefaults \
+- (ASPrimitiveTraitCollection)primitiveTraitCollection\
+{\
+  return _primitiveTraitCollection;\
+}\
+- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
+{\
+  _primitiveTraitCollection = traitCollection;\
+}\
+
 #define ASPrimitiveTraitCollectionDeprecatedImplementation \
 - (ASEnvironmentTraitCollection)environmentTraitCollection\
 {\
