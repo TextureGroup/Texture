@@ -67,10 +67,6 @@ NSString *NSStringFromASDimension(ASDimension dimension)
 
 ASLayoutSize const ASLayoutSizeAuto = {ASDimensionAuto, ASDimensionAuto};
 
-#pragma mark - ASEdgeInsets
-
-ASEdgeInsets const ASEdgeInsetsZero = {};
-
 #pragma mark - ASSizeRange
 
 ASSizeRange const ASSizeRangeZero = {};
@@ -115,3 +111,8 @@ NSString *NSStringFromASSizeRange(ASSizeRange sizeRange)
           NSStringFromCGSize(sizeRange.min),
           NSStringFromCGSize(sizeRange.max)];
 }
+
+#if YOGA
+#pragma mark - Yoga - ASEdgeInsets
+ASEdgeInsets const ASEdgeInsetsZero = {};
+#endif

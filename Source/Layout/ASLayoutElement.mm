@@ -150,7 +150,8 @@ do {\
   std::atomic<CGPoint> _layoutPosition;
 
 #if YOGA
-  std::atomic<ASStackLayoutDirection> _direction;
+  std::atomic<ASStackLayoutDirection> _flexDirection;
+  std::atomic<YGDirection> _direction;
   std::atomic<CGFloat> _spacing;
   std::atomic<ASStackLayoutJustifyContent> _justifyContent;
   std::atomic<ASStackLayoutAlignItems> _alignItems;
@@ -600,7 +601,8 @@ do {\
 
 #if YOGA
 
-- (ASStackLayoutDirection)direction           { return _direction.load(); }
+- (ASStackLayoutDirection)flexDirection       { return _flexDirection.load(); }
+- (YGDirection)direction                      { return _direction.load(); }
 - (CGFloat)spacing                            { return _spacing.load(); }
 - (ASStackLayoutJustifyContent)justifyContent { return _justifyContent.load(); }
 - (ASStackLayoutAlignItems)alignItems         { return _alignItems.load(); }
@@ -612,7 +614,8 @@ do {\
 - (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
 - (YGWrap)flexWrap                            { return _flexWrap.load(); }
 
-- (void)setDirection:(ASStackLayoutDirection)direction         { _direction.store(direction); }
+- (void)setFlexDirection:(ASStackLayoutDirection)flexDirection { _flexDirection.store(flexDirection); }
+- (void)setDirection:(YGDirection)direction                    { _direction.store(direction); }
 - (void)setSpacing:(CGFloat)spacing                            { _spacing.store(spacing); }
 - (void)setJustifyContent:(ASStackLayoutJustifyContent)justify { _justifyContent.store(justify); }
 - (void)setAlignItems:(ASStackLayoutAlignItems)alignItems      { _alignItems.store(alignItems); }

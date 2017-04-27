@@ -46,7 +46,7 @@ AS_SUBCLASSING_RESTRICTED
  * @param elementToLayoutArrtibutesMap Map between elements to their layout attributes. The map may contain all elements, or a subset of them and will be updated later. 
  * Also, it should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
  */
-- (instancetype)initWithElements:(ASElementMap *)elements contentSize:(CGSize)contentSize elementToLayoutArrtibutesMap:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)attrsMap NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithElements:(ASElementMap *)elements contentSize:(CGSize)contentSize elementToLayoutArrtibutesMap:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)elementToLayoutArrtibutesMap NS_DESIGNATED_INITIALIZER;
 
 /**
  * Convenience initializer.

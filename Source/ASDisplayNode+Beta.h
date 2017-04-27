@@ -176,12 +176,14 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 // These methods should not normally be called directly.
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
 @end
 
 @interface ASLayoutElementStyle (Yoga)
 
-@property (nonatomic, assign, readwrite) ASStackLayoutDirection direction;
+@property (nonatomic, assign, readwrite) ASStackLayoutDirection flexDirection;
+@property (nonatomic, assign, readwrite) YGDirection direction;
 @property (nonatomic, assign, readwrite) CGFloat spacing;
 @property (nonatomic, assign, readwrite) ASStackLayoutJustifyContent justifyContent;
 @property (nonatomic, assign, readwrite) ASStackLayoutAlignItems alignItems;
