@@ -1,3 +1,4 @@
 [
-  "^plans"
+  "^plans/",
+  "^docs/"
 ]
