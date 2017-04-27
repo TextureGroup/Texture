@@ -1,4 +1,5 @@
 [
   "^plans/",
-  "^docs/"
+  "^docs/",
+  "^CI/exculde-from-build.json"
 ]
