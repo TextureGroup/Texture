@@ -27,9 +27,9 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRectTable.h>
 
-CGPoint const CGPointNull = {NAN, NAN};
+CGPoint const ASPointNull = {NAN, NAN};
 
-extern BOOL CGPointIsNull(CGPoint point)
+extern BOOL ASPointIsNull(CGPoint point)
 {
   return isnan(point.x) && isnan(point.y);
 }
@@ -87,7 +87,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
   if (self) {
 #if DEBUG
     for (ASLayout *sublayout in sublayouts) {
-      ASDisplayNodeAssert(CGPointIsNull(sublayout.position) == NO, @"Invalid position is not allowed in sublayout.");
+      ASDisplayNodeAssert(ASPointIsNull(sublayout.position) == NO, @"Invalid position is not allowed in sublayout.");
     }
 #endif
     
@@ -104,7 +104,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
     }
     _size = size;
     
-    if (CGPointIsNull(position) == NO) {
+    if (ASPointIsNull(position) == NO) {
       _position = CGPointMake(ASCeilPixelValue(position.x), ASCeilPixelValue(position.y));
     } else {
       _position = position;
@@ -149,7 +149,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
-                              position:CGPointNull
+                              position:ASPointNull
                             sublayouts:sublayouts];
 }
 
@@ -157,7 +157,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
-                              position:CGPointNull
+                              position:ASPointNull
                             sublayouts:nil];
 }
 

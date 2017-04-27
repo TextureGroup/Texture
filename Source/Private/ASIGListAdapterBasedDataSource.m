@@ -23,7 +23,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <objc/runtime.h>
 
-typedef IGListSectionController<IGListSectionType, ASSectionController> ASIGSectionController;
+typedef IGListSectionController<ASSectionController> ASIGSectionController;
 
 /// The optional methods that a class implements from ASSectionController.
 /// Note: Bitfields are not supported by NSValue so we can't use them.
