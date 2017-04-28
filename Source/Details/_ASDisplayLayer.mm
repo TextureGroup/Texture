@@ -40,10 +40,10 @@
   return _displaySuspended.load();
 }
 
-- (void)setDisplaySuspended:(BOOL)newValue
+- (void)setDisplaySuspended:(BOOL)suspended
 {
-  BOOL oldValue = _displaySuspended.exchange(newValue);
-  if (oldValue == newValue) {
+  BOOL wasSuspended = _displaySuspended.exchange(suspended);
+  if (wasSuspended == suspended) {
     return;
   }
   
@@ -51,8 +51,10 @@
   [self cancelAsyncDisplay];
   
   // If they unsuspended, trigger another display (bypassing logic in [self setNeedsDisplay])
-  if (!newValue) {
-    [super setNeedsDisplay];
+  if (!suspended) {
+    ASPerformBlockOnMainThread(^{
+      [super setNeedsDisplay];
+    });
   }
 }
 
@@ -185,8 +187,6 @@
 
 - (void)cancelAsyncDisplay
 {
-  ASDisplayNodeAssertMainThread();
-
   [_asyncdisplaykit_node cancelDisplayAsyncLayer:self];
 }
 
