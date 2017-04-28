@@ -65,7 +65,7 @@ static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
 // We have to forward declare the protocol as this place otherwise it will not compile compiling with an Base SDK < iOS 10
 @protocol CALayerDelegate;
 
-@interface ASDisplayNode () <UIGestureRecognizerDelegate, _ASDisplayLayerDelegate, _ASTransitionContextCompletionDelegate>
+@interface ASDisplayNode () <UIGestureRecognizerDelegate, _ASTransitionContextCompletionDelegate>
 
 /**
  * See ASDisplayNodeInternal.h for ivars
@@ -413,7 +413,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Synchronous nodes may not be able to call the hierarchy notifications, so only enforce for regular nodes.
   ASDisplayNodeAssert(_flags.synchronous || !ASInterfaceStateIncludesVisible(_interfaceState), @"Node should always be marked invisible before deallocating. Node: %@", self);
   
-  self.asyncLayer.asyncDelegate = nil;
   _view.asyncdisplaykit_node = nil;
   _layer.asyncdisplaykit_node = nil;
 
@@ -646,8 +645,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     _layer = _view.layer;
   }
   _layer.asyncdisplaykit_node = self;
-  
-  self._locked_asyncLayer.asyncDelegate = self;
 }
 
 - (void)_didLoad

@@ -21,6 +21,7 @@
 //
 
 #import <atomic>
+#import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
@@ -31,7 +32,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol _ASDisplayLayerDelegate;
 @class _ASDisplayLayer;
 @class _ASPendingState;
 @class ASSentinel;
@@ -63,7 +63,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
 
-@interface ASDisplayNode ()
+@interface ASDisplayNode () <_ASDisplayLayerDelegate>
 {
 @package
   _ASPendingState *_pendingViewState;

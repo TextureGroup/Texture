@@ -20,13 +20,14 @@
 #import <AsyncDisplayKit/ASBlockTypes.h>
 
 @class ASDisplayNode;
-@protocol _ASDisplayLayerDelegate;
 
 @interface _ASDisplayLayer : CALayer
 
 /**
  @discussion This property overrides the CALayer category method which implements this via associated objects.
  This should result in much better performance for _ASDisplayLayers.
+ 
+ @note This should be set immediately after the view/layer is initialized, and never changed.
  */
 @property (nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
 
@@ -35,7 +36,7 @@
 
  @default YES (note that this might change for subclasses)
  */
-@property (nonatomic, assign) BOOL displaysAsynchronously;
+@property (atomic, assign) BOOL displaysAsynchronously;
 
 /**
  @summary Cancels any pending async display.
@@ -51,13 +52,6 @@
  @desc This is exposed here for tests only.
  */
 + (dispatch_queue_t)displayQueue;
-
-/**
- @summary Delegate for asynchronous display of the layer.
-
- @desc The asyncDelegate will have the opportunity to override the methods related to async display.
- */
-@property (nonatomic, weak) id<_ASDisplayLayerDelegate> asyncDelegate;
 
 /**
  @summary Suspends both asynchronous and synchronous display of the receiver if YES.

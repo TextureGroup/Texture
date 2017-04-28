@@ -17,98 +17,62 @@
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 
-#import <objc/runtime.h>
-
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 @implementation _ASDisplayLayer
 {
-  ASDN::Mutex _asyncDelegateLock;
-  // We can take this lock when we're setting displaySuspended and in setNeedsDisplay, so to not deadlock, this is recursive
-  ASDN::RecursiveMutex _displaySuspendedLock;
-  BOOL _displaySuspended;
+  std::atomic<BOOL> _displaySuspended;
   BOOL _attemptedDisplayWhileZeroSized;
 
   struct {
-    BOOL delegateDidChangeBounds:1;
+    BOOL didChangeBounds:1;
   } _delegateFlags;
+}
+@synthesize displaysAsynchronously = _displaysAsynchronously;
 
-  id<_ASDisplayLayerDelegate> __weak _asyncDelegate;
+#pragma mark - Properties
+
+- (BOOL)isDisplaySuspended
+{
+  return _displaySuspended.load();
 }
 
-@dynamic displaysAsynchronously;
-
-#pragma mark -
-#pragma mark Lifecycle
-
-- (instancetype)init
+- (void)setDisplaySuspended:(BOOL)newValue
 {
-  if ((self = [super init])) {
-
-    self.opaque = YES;
+  BOOL oldValue = _displaySuspended.exchange(newValue);
+  if (oldValue == newValue) {
+    return;
   }
-  return self;
-}
-
-#pragma mark -
-#pragma mark Properties
-
-- (id<_ASDisplayLayerDelegate>)asyncDelegate
-{
-  ASDN::MutexLocker l(_asyncDelegateLock);
-  return _asyncDelegate;
+  
+  // Either way, cancel async display.
+  [self cancelAsyncDisplay];
+  
+  // If they unsuspended, trigger another display (bypassing logic in [self setNeedsDisplay])
+  if (!newValue) {
+    [super setNeedsDisplay];
+  }
 }
 
 - (void)setDelegate:(id)delegate
 {
   [super setDelegate:delegate];
-  _delegateFlags.delegateDidChangeBounds = [delegate respondsToSelector:@selector(layer:didChangeBoundsWithOldValue:newValue:)];
-}
-
-- (void)setAsyncDelegate:(id<_ASDisplayLayerDelegate>)asyncDelegate
-{
-  ASDisplayNodeAssert(!asyncDelegate || [asyncDelegate isKindOfClass:[ASDisplayNode class]], @"_ASDisplayLayer is inherently coupled to ASDisplayNode and cannot be used with another asyncDelegate.  Please rethink what you are trying to do.");
-  ASDN::MutexLocker l(_asyncDelegateLock);
-  _asyncDelegate = asyncDelegate;
-}
-
-- (BOOL)isDisplaySuspended
-{
-  ASDN::MutexLocker l(_displaySuspendedLock);
-  return _displaySuspended;
-}
-
-- (void)setDisplaySuspended:(BOOL)displaySuspended
-{
-  ASDN::MutexLocker l(_displaySuspendedLock);
-  if (_displaySuspended != displaySuspended) {
-    _displaySuspended = displaySuspended;
-    if (!displaySuspended) {
-      // If resuming display, trigger a display now.
-      [self setNeedsDisplay];
-    } else {
-      // If suspending display, cancel any current async display so that we don't have contents set on us when it's finished.
-      [self cancelAsyncDisplay];
-    }
-  }
+  _delegateFlags.didChangeBounds = [delegate respondsToSelector:@selector(layer:didChangeBoundsWithOldValue:newValue:)];
 }
 
 - (void)setBounds:(CGRect)bounds
 {
-  if (_delegateFlags.delegateDidChangeBounds) {
+  if (_delegateFlags.didChangeBounds) {
     CGRect oldBounds = self.bounds;
     [super setBounds:bounds];
-    self.asyncdisplaykit_node.threadSafeBounds = bounds;
+    _asyncdisplaykit_node.threadSafeBounds = bounds;
     [(id<ASCALayerExtendedDelegate>)self.delegate layer:self didChangeBoundsWithOldValue:oldBounds newValue:bounds];
     
   } else {
     [super setBounds:bounds];
-    self.asyncdisplaykit_node.threadSafeBounds = bounds;
+    _asyncdisplaykit_node.threadSafeBounds = bounds;
   }
 
   if (_attemptedDisplayWhileZeroSized && CGRectIsEmpty(bounds) == NO && self.needsDisplayOnBoundsChange == NO) {
@@ -136,24 +100,21 @@
   ASDisplayNodeAssertMainThread();
   [super layoutSublayers];
 
-  [self.asyncdisplaykit_node __layout];
+  [_asyncdisplaykit_node __layout];
 }
 
 - (void)setNeedsDisplay
 {
   ASDisplayNodeAssertMainThread();
-
-  _displaySuspendedLock.lock();
   
   // FIXME: Reconsider whether we should cancel a display in progress.
   // We should definitely cancel a display that is scheduled, but unstarted display.
   [self cancelAsyncDisplay];
 
   // Short circuit if display is suspended. When resumed, we will setNeedsDisplay at that time.
-  if (!_displaySuspended) {
+  if (!self.displaySuspended) {
     [super setNeedsDisplay];
   }
-  _displaySuspendedLock.unlock();
 }
 
 #pragma mark -
@@ -175,13 +136,14 @@
 {
   if ([key isEqualToString:@"displaysAsynchronously"]) {
     return @YES;
+  } else if ([key isEqualToString:@"opaque"]) {
+    return @YES;
   } else {
     return [super defaultValueForKey:key];
   }
 }
 
-#pragma mark -
-#pragma mark Display
+#pragma mark - Display
 
 - (void)displayImmediately
 {
@@ -205,7 +167,7 @@
   ASDisplayNodeAssertMainThread();
   [self _hackResetNeedsDisplay];
 
-  if (self.isDisplaySuspended) {
+  if (self.displaySuspended) {
     return;
   }
 
@@ -217,29 +179,15 @@
   if (CGRectIsEmpty(self.bounds)) {
     _attemptedDisplayWhileZeroSized = YES;
   }
-
-  id<_ASDisplayLayerDelegate> NS_VALID_UNTIL_END_OF_SCOPE strongAsyncDelegate;
-  {
-    _asyncDelegateLock.lock();
-    strongAsyncDelegate = _asyncDelegate;
-    _asyncDelegateLock.unlock();
-  }
   
-  [strongAsyncDelegate displayAsyncLayer:self asynchronously:asynchronously];
+  [_asyncdisplaykit_node displayAsyncLayer:self asynchronously:asynchronously];
 }
 
 - (void)cancelAsyncDisplay
 {
   ASDisplayNodeAssertMainThread();
 
-  id<_ASDisplayLayerDelegate> NS_VALID_UNTIL_END_OF_SCOPE strongAsyncDelegate;
-  {
-    _asyncDelegateLock.lock();
-    strongAsyncDelegate = _asyncDelegate;
-    _asyncDelegateLock.unlock();
-  }
-
-  [strongAsyncDelegate cancelDisplayAsyncLayer:self];
+  [_asyncdisplaykit_node cancelDisplayAsyncLayer:self];
 }
 
 // e.g. <MYTextNodeLayer: 0xFFFFFF; node = <MYTextNode: 0xFFFFFFE; name = "Username node for user 179">>

@@ -122,7 +122,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 + (Class)viewClass;
 
 // Thread safe way to access the bounds of the node
-@property (nonatomic, assign) CGRect threadSafeBounds;
+@property (atomic, assign) CGRect threadSafeBounds;
 
 // delegate to inform of ASInterfaceState changes (used by ASNodeController)
 @property (nonatomic, weak) id<ASInterfaceStateDelegate> interfaceStateDelegate;
