@@ -20,16 +20,37 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASPageTable.h>
 
-@implementation ASCollectionLayoutState
+@implementation NSMapTable (ASCollectionLayoutConvenience)
 
-- (instancetype)initWithElements:(ASElementMap *)elements layout:(ASLayout *)layout
++ (NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)elementToLayoutAttributesTable
 {
-  NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *attrsMap = [NSMapTable mapTableWithKeyOptions:(NSMapTableObjectPointerPersonality | NSMapTableWeakMemory) valueOptions:NSMapTableStrongMemory];
+  return [NSMapTable mapTableWithKeyOptions:(NSMapTableWeakMemory | NSMapTableObjectPointerPersonality) valueOptions:NSMapTableStrongMemory];
+}
+
+@end
+
+@implementation ASCollectionLayoutState {
+  NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
+  ASPageTable<id, NSMutableSet<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
+}
+
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout
+{
+  ASElementMap *elements = context.elements;
+  NSMapTable *table = [NSMapTable elementToLayoutAttributesTable];
+  
   for (ASLayout *sublayout in layout.sublayouts) {
     ASCollectionElement *element = ((ASCellNode *)sublayout.layoutElement).collectionElement;
+    if (element == nil) {
+      ASDisplayNodeFailAssert(@"Element not found!");
+      continue;
+    }
+    
     NSIndexPath *indexPath = [elements indexPathForElement:element];
     NSString *supplementaryElementKind = element.supplementaryElementKind;
     
@@ -41,21 +62,74 @@
     }
     
     attrs.frame = sublayout.frame;
-    [attrsMap setObject:attrs forKey:element];
+    [table setObject:attrs forKey:element];
   }
 
-  return [self initWithElements:elements contentSize:layout.size elementToLayoutArrtibutesMap:attrsMap];
+  return [self initWithContext:context contentSize:layout.size elementToLayoutAttributesTable:table];
 }
 
-- (instancetype)initWithElements:(ASElementMap *)elements contentSize:(CGSize)contentSize elementToLayoutArrtibutesMap:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)attrsMap
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
 {
   self = [super init];
   if (self) {
-    _elements = elements;
+    _context = context;
     _contentSize = contentSize;
-    _elementToLayoutArrtibutesMap = attrsMap;
+    _contentRect = CGRectMake(0.0f, 0.0f, contentSize.width, contentSize.height);
+    _elementToLayoutAttributesTable = table;
+    _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator pageSize:context.viewportSize];
   }
   return self;
+}
+
+- (NSArray<UICollectionViewLayoutAttributes *> *)allLayoutAttributes
+{
+  return [_elementToLayoutAttributesTable.objectEnumerator allObjects];
+}
+
+- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
+{
+  CGSize pageSize = _context.viewportSize;
+  NSPointerArray *pages = ASPageCoordinatesForPagesThatIntersectRect(rect, _contentSize, pageSize);
+  if (pages.count == 0) {
+    return nil;
+  }
+  
+  NSMutableArray<UICollectionViewLayoutAttributes *> *results = [NSMutableArray array];
+  for (id pagePtr in pages) {
+    ASPageCoordinate page = (ASPageCoordinate)pagePtr;
+    NSSet<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
+    if (allAttrs.count > 0) {
+      CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
+      
+      if (CGRectContainsRect(rect, pageRect)) {
+        [results addObjectsFromArray:[allAttrs allObjects]];
+      } else {
+        for (UICollectionViewLayoutAttributes *attrs in allAttrs) {
+          if (CGRectIntersectsRect(rect, attrs.frame)) {
+            [results addObject:attrs];
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASCollectionElement *element = [_context.elements elementForItemAtIndexPath:indexPath];
+  return [_elementToLayoutAttributesTable objectForKey:element];
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
+{
+  ASCollectionElement *element = [_context.elements supplementaryElementOfKind:elementKind atIndexPath:indexPath];
+  return [_elementToLayoutAttributesTable objectForKey:element];
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForElement:(ASCollectionElement *)element
+{
+  return [_elementToLayoutAttributesTable objectForKey:element];
 }
 
 @end

@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract Returns any additional information needed for a coming layout pass with the given elements.
  *
+ * @param elements The elements to be laid out later.
+ *
  * @discussion The returned object must support equality and hashing (i.e `-isEqual:` and `-hash` must be properly implemented).
  *
  * @discussion This method will be called on main thread.
