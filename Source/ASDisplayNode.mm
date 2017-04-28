@@ -541,28 +541,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return result;
 }
 
-#pragma mark - Loading / Unloading
-
-- (void)__unloadNode
-{
-  ASDisplayNodeAssertMainThread();
-  ASDisplayNodeAssert([self isNodeLoaded], @"Implementation shouldn't call __unloadNode if not loaded: %@", self);
-  ASDisplayNodeAssert(_flags.synchronous == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be unloaded. Node: %@", self);
-  ASDN::MutexLocker l(__instanceLock__);
-
-  if (_flags.layerBacked) {
-    _pendingViewState = [_ASPendingState pendingViewStateFromLayer:_layer];
-  } else {
-    _pendingViewState = [_ASPendingState pendingViewStateFromView:_view];
-  }
-  
-  [_view removeFromSuperview];
-  _view = nil;
-  if (_flags.layerBacked)
-    _layer.delegate = nil;
-  [_layer removeFromSuperlayer];
-  _layer = nil;
-}
+#pragma mark - Loading
 
 - (BOOL)_locked_shouldLoadViewOrLayer
 {
@@ -1972,60 +1951,41 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
 - (BOOL)shouldRasterizeDescendants
 {
   ASDN::MutexLocker l(__instanceLock__);
-  ASDisplayNodeAssert(!((_hierarchyState & ASHierarchyStateRasterized) && _flags.shouldRasterizeDescendants),
-                      @"Subnode of a rasterized node should not have redundant shouldRasterizeDescendants enabled");
   return _flags.shouldRasterizeDescendants;
 }
 
-- (void)setShouldRasterizeDescendants:(BOOL)shouldRasterize
+- (void)setShouldRasterizeDescendants
 {
-  ASDisplayNodeAssertThreadAffinity(self);
-  BOOL rasterizedFromSelfOrAncestor = NO;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    
-    if (_flags.shouldRasterizeDescendants == shouldRasterize)
-      return;
-    
-    _flags.shouldRasterizeDescendants = shouldRasterize;
-    rasterizedFromSelfOrAncestor = shouldRasterize || ASHierarchyStateIncludesRasterized(_hierarchyState);
+  ASDN::MutexLocker l(__instanceLock__);
+  // Already rasterized from self.
+  if (_flags.shouldRasterizeDescendants) {
+    return;
   }
-  
-  if (self.isNodeLoaded) {
-    // Recursively tear down or build up subnodes.
-    // TODO: When disabling rasterization, preserve rasterized backing store as placeholderImage
-    // while the newly materialized subtree finishes rendering.  Then destroy placeholderImage to save memory.
-    [self recursivelyClearContents];
-    
-    ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode *node) {
-      if (rasterizedFromSelfOrAncestor) {
-        [node enterHierarchyState:ASHierarchyStateRasterized];
-        if (node.isNodeLoaded) {
-          [node __unloadNode];
-        }
-      } else {
-        [node exitHierarchyState:ASHierarchyStateRasterized];
-        // We can avoid eagerly loading this node. We will load it on-demand as usual.
-      }
-    });
-    if (!rasterizedFromSelfOrAncestor) {
-      // If we are not going to rasterize at all, go ahead and set up our view hierarchy.
-      [self _addSubnodeViewsAndLayers];
+
+  // If rasterized from above, bail.
+  if (ASHierarchyStateIncludesRasterized(_hierarchyState)) {
+    ASDisplayNodeFailAssert(@"Subnode of a rasterized node should not have redundant -setShouldRasterizeDescendants.");
+    return;
+  }
+
+  // Ensure not loaded.
+  if ([self _locked_isNodeLoaded]) {
+    ASDisplayNodeFailAssert(@"Cannot call %@ on loaded node: %@", NSStringFromSelector(_cmd), self);
+    return;
+  }
+
+  // Ensure no loaded subnodes
+  for (ASDisplayNode *subnode in _subnodes) {
+    if (subnode.nodeLoaded) {
+      ASDisplayNodeFailAssert(@"Cannot call %@ on node %@ with loaded subnode %@", NSStringFromSelector(_cmd), self, subnode);
+      return;
     }
-    
-    if (ASInterfaceStateIncludesVisible(self.interfaceState)) {
-      // TODO: Change this to recursivelyEnsureDisplay - but need a variant that does not skip
-      // nodes that have shouldBypassEnsureDisplay set (such as image nodes) so they are rasterized.
-      [self recursivelyDisplayImmediately];
-    }
-  } else {
-    ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode *node) {
-      if (rasterizedFromSelfOrAncestor) {
-        [node enterHierarchyState:ASHierarchyStateRasterized];
-      } else {
-        [node exitHierarchyState:ASHierarchyStateRasterized];
-      }
-    });
+  }
+  _flags.shouldRasterizeDescendants = YES;
+
+  // Tell subnodes that now they're in a rasterized hierarchy (while holding lock!)
+  for (ASDisplayNode *subnode in _subnodes) {
+    [subnode enterHierarchyState:ASHierarchyStateRasterized];
   }
 }
 
@@ -2619,7 +2579,7 @@ ASDISPLAYNODE_INLINE BOOL canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subn
 }
 
 /// Returns if node is a member of a rasterized tree
-ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
+ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return (node.shouldRasterizeDescendants || (node.hierarchyState & ASHierarchyStateRasterized));
 }
 
@@ -2744,6 +2704,12 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     return;
   }
 
+  BOOL isRasterized = subtreeIsRasterized(self);
+  if (isRasterized && subnode.nodeLoaded) {
+    ASDisplayNodeFailAssert(@"Cannot add loaded node %@ to rasterized subtree of node %@", ASObjectDescriptionMakeTiny(subnode), ASObjectDescriptionMakeTiny(self));
+    return;
+  }
+
   __instanceLock__.lock();
     NSUInteger subnodesCount = _subnodes.count;
   __instanceLock__.unlock();
@@ -2773,15 +2739,10 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
   // If we are a managed hierarchy, as in ASCellNode trees, it will also apply our .interfaceState.
   [subnode _setSupernode:self];
 
-  // If this subnode will be rasterized, update its hierarchy state & enter hierarchy if needed
-  if (nodeIsInRasterizedTree(self)) {
-    ASDisplayNodePerformBlockOnEveryNodeBFS(subnode, ^(ASDisplayNode * _Nonnull node) {
-      [node enterHierarchyState:ASHierarchyStateRasterized];
-      if (node.isNodeLoaded) {
-        [node __unloadNode];
-      }
-    });
-    if (self.isInHierarchy) {
+  // If this subnode will be rasterized, enter hierarchy if needed
+  // TODO: Move this into _setSupernode: ?
+  if (isRasterized) {
+    if (self.inHierarchy) {
       [subnode __enterHierarchy];
     }
   } else if (self.nodeLoaded) {
@@ -2910,7 +2871,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     
     // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
     // hierarchy and none of this could possibly work.
-    if (nodeIsInRasterizedTree(self) == NO) {
+    if (subtreeIsRasterized(self) == NO) {
       if (_layer) {
         sublayerIndex = [_layer.sublayers indexOfObjectIdenticalTo:oldSubnode.layer];
         ASDisplayNodeAssert(sublayerIndex != NSNotFound, @"Somehow oldSubnode's supernode is self, yet we could not find it in our layers to replace");
@@ -2956,7 +2917,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     
     // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
     // hierarchy and none of this could possibly work.
-    if (nodeIsInRasterizedTree(self) == NO) {
+    if (subtreeIsRasterized(self) == NO) {
       if (_layer) {
         belowSublayerIndex = [_layer.sublayers indexOfObjectIdenticalTo:below.layer];
         ASDisplayNodeAssert(belowSublayerIndex != NSNotFound, @"Somehow below's supernode is self, yet we could not find it in our layers to reference");
@@ -3020,7 +2981,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     
     // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
     // hierarchy and none of this could possibly work.
-    if (nodeIsInRasterizedTree(self) == NO) {
+    if (subtreeIsRasterized(self) == NO) {
       if (_layer) {
         aboveSublayerIndex = [_layer.sublayers indexOfObjectIdenticalTo:above.layer];
         ASDisplayNodeAssert(aboveSublayerIndex != NSNotFound, @"Somehow above's supernode is self, yet we could not find it in our layers to replace");
@@ -3078,7 +3039,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
     
     // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
     // hierarchy and none of this could possibly work.
-    if (nodeIsInRasterizedTree(self) == NO) {
+    if (subtreeIsRasterized(self) == NO) {
       // Account for potentially having other subviews
       if (_layer && idx == 0) {
         sublayerIndex = 0;

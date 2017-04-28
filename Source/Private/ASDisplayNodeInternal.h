@@ -286,10 +286,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 /**
- * This is a non-deprecated internal declaration of the property. Public declaration
- * is in ASDisplayNode+Beta.h
+ * Whether this node rasterizes its descendants. See -setShouldRasterizeDescendants.
  */
-@property (nonatomic, assign) BOOL shouldRasterizeDescendants;
+@property (atomic, readonly) BOOL shouldRasterizeDescendants;
 
 - (void)nodeViewDidAddGestureRecognizer;
 
