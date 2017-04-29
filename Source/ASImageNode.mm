@@ -32,7 +32,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASEqualityHashHelpers.h>
+#import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASWeakMap.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 
@@ -100,19 +100,26 @@ struct ASImageNodeDrawParameters {
 
 - (NSUInteger)hash
 {
-  NSUInteger subhashes[] = {
-    // Profiling shows that the work done in UIImage's `hash` is on the order of 0.005ms on an A5 processor
-    // and isn't proportional to the size of the image.
-    [_image hash],
-    ASHashFromCGSize(_backingSize),
-    ASHashFromCGRect(_imageDrawRect),
-    AS::hash<BOOL>()(_isOpaque),
-    [_backgroundColor hash],
-    AS::hash<void *>()((void*)_preContextBlock),
-    AS::hash<void *>()((void*)_postContextBlock),
-    AS::hash<void *>()((void*)_imageModificationBlock),
+  struct {
+    NSUInteger imageHash;
+    CGSize backingSize;
+    CGRect imageDrawRect;
+    BOOL isOpaque;
+    NSUInteger backgroundColorHash;
+    void *preContextBlock;
+    void *postContextBlock;
+    void *imageModificationBlock;
+  } data = {
+    _image.hash,
+    _backingSize,
+    _imageDrawRect,
+    _isOpaque,
+    _backgroundColor.hash,
+    (void *)_preContextBlock,
+    (void *)_postContextBlock,
+    (void *)_imageModificationBlock
   };
-  return ASIntegerArrayHash(subhashes, sizeof(subhashes) / sizeof(subhashes[0]));
+  return ASHashBytes(&data, sizeof(data));
 }
 
 @end

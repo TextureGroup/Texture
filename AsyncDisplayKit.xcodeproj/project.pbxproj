@@ -390,8 +390,8 @@
 		DECBD6E81BE56E1900CF4905 /* ASButtonNode.h in Headers */ = {isa = PBXBuildFile; fileRef = DECBD6E51BE56E1900CF4905 /* ASButtonNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DECBD6EA1BE56E1900CF4905 /* ASButtonNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = DECBD6E61BE56E1900CF4905 /* ASButtonNode.mm */; };
 		DEFAD8131CC48914000527C4 /* ASVideoNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEEC47E01C20C2DD00EC1693 /* ASVideoNode.mm */; };
-		E516FC7F1E9FE24200714FF4 /* ASEqualityHashHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = E516FC7D1E9FE24200714FF4 /* ASEqualityHashHelpers.h */; };
-		E516FC801E9FE24200714FF4 /* ASEqualityHashHelpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = E516FC7E1E9FE24200714FF4 /* ASEqualityHashHelpers.mm */; };
+		E516FC7F1E9FE24200714FF4 /* ASHashing.h in Headers */ = {isa = PBXBuildFile; fileRef = E516FC7D1E9FE24200714FF4 /* ASHashing.h */; };
+		E516FC801E9FE24200714FF4 /* ASHashing.m in Sources */ = {isa = PBXBuildFile; fileRef = E516FC7E1E9FE24200714FF4 /* ASHashing.m */; };
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
 		E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */ = {isa = PBXBuildFile; fileRef = E5711A2A1C840C81009619D4 /* ASCollectionElement.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E5711A301C840C96009619D4 /* ASCollectionElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5711A2D1C840C96009619D4 /* ASCollectionElement.mm */; };
@@ -824,8 +824,8 @@
 		DEC146B51C37A16A004A0EE7 /* ASCollectionInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASCollectionInternal.m; path = Details/ASCollectionInternal.m; sourceTree = "<group>"; };
 		DECBD6E51BE56E1900CF4905 /* ASButtonNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASButtonNode.h; sourceTree = "<group>"; };
 		DECBD6E61BE56E1900CF4905 /* ASButtonNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASButtonNode.mm; sourceTree = "<group>"; };
-		E516FC7D1E9FE24200714FF4 /* ASEqualityHashHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASEqualityHashHelpers.h; sourceTree = "<group>"; };
-		E516FC7E1E9FE24200714FF4 /* ASEqualityHashHelpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASEqualityHashHelpers.mm; sourceTree = "<group>"; };
+		E516FC7D1E9FE24200714FF4 /* ASHashing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASHashing.h; sourceTree = "<group>"; };
+		E516FC7E1E9FE24200714FF4 /* ASHashing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASHashing.m; sourceTree = "<group>"; };
 		E52405B21C8FEF03004DC8E7 /* ASLayoutTransition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutTransition.mm; sourceTree = "<group>"; };
 		E52405B41C8FEF16004DC8E7 /* ASLayoutTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutTransition.h; sourceTree = "<group>"; };
 		E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutElement.mm; sourceTree = "<group>"; };
@@ -1278,8 +1278,8 @@
 				058D0A0C195D050800B7D73C /* ASDisplayNodeInternal.h */,
 				6959433D1D70815300B0EE1F /* ASDisplayNodeLayout.h */,
 				6959433C1D70815300B0EE1F /* ASDisplayNodeLayout.mm */,
-				E516FC7D1E9FE24200714FF4 /* ASEqualityHashHelpers.h */,
-				E516FC7E1E9FE24200714FF4 /* ASEqualityHashHelpers.mm */,
+				E516FC7D1E9FE24200714FF4 /* ASHashing.h */,
+				E516FC7E1E9FE24200714FF4 /* ASHashing.m */,
 				6900C5F31E8072DA00BCD75C /* ASImageNode+Private.h */,
 				68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */,
 				058D0A0D195D050800B7D73C /* ASImageNode+CGExtras.h */,
@@ -1603,7 +1603,7 @@
 				254C6B791BF94DF4003EC431 /* ASTextKitEntityAttribute.h in Headers */,
 				CC3B20841C3F76D600798563 /* ASPendingStateController.h in Headers */,
 				DE6EA3231C14000600183B10 /* ASDisplayNode+FrameworkPrivate.h in Headers */,
-				E516FC7F1E9FE24200714FF4 /* ASEqualityHashHelpers.h in Headers */,
+				E516FC7F1E9FE24200714FF4 /* ASHashing.h in Headers */,
 				9C70F20F1CDBE9FF007D6C76 /* ASLayoutManager.h in Headers */,
 				6947B0C31E36B5040007C478 /* ASStackPositionedLayout.h in Headers */,
 				DBABFAFC1C6A8D2F0039EA4A /* _ASTransitionContext.h in Headers */,
@@ -1961,7 +1961,7 @@
 				CCA282B91E9EA8E40037E8B7 /* AsyncDisplayKit+Tips.m in Sources */,
 				636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */,
 				B350623D1B010EFD0018CF92 /* _ASAsyncTransaction.mm in Sources */,
-				E516FC801E9FE24200714FF4 /* ASEqualityHashHelpers.mm in Sources */,
+				E516FC801E9FE24200714FF4 /* ASHashing.m in Sources */,
 				6947B0C51E36B5040007C478 /* ASStackPositionedLayout.mm in Sources */,
 				B35062401B010EFD0018CF92 /* _ASAsyncTransactionContainer.m in Sources */,
 				AC026B721BD57DBF00BBC17E /* _ASHierarchyChangeSet.mm in Sources */,
