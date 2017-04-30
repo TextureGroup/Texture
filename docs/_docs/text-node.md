@@ -148,3 +148,60 @@ In a similar way, you can react to long presses and highlighting with the follow
 `– textNode:shouldLongPressLinkAttribute:value:atPoint:`
 
 
+### Incorrect maximum number of lines with line spacing
+
+Using a `NSParagraphStyle` with a non-default `lineSpacing` can cause problems if multiline text with a maximum number of lines is wanted. For example see the following code:
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
+<div class = "code">
+<pre lang="objc" class="objcCode">
+// ...
+NSString *someLongString = ...;
+
+NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+paragraphStyle.lineSpacing = 10.0;
+
+UIFont *font = [UIFont fontWithName:@"SomeFontName" size:15];
+
+NSDictionary *attributes = @{
+	NSFontAttributeName : font,
+	NSParagraphStyleAttributeName: paragraphStyle
+};
+
+ASTextNode *textNode = [[ASTextNode alloc] init];
+textNode.maximumNumberOfLines = 4;
+textNode.attributedText = [[NSAttributedString	alloc] initWithString:someLongString
+																												   attributes:attributes];
+// ...
+</pre>
+
+<pre lang="swift" class = "swiftCode hidden">
+TODO
+</pre>
+</div>
+</div>
+
+`ASTextNode` uses Text Kit internally to calculate the amount to shrink that results in the max number of lines. Unfortunately in certain cases this will result that the text will shrink too much and in the example above instead of 4, 3 lines of text and a weird gap at the bottom will show up. To get around this issue for now, you have to set the `truncationMode` explicitly to `NSLineBreakByTruncatingTail` on the text node:
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
+<div class = "code">
+<pre lang="objc" class="objcCode">
+// ...
+ASTextNode *textNode = [[ASTextNode alloc] init];
+textNode.maximumNumberOfLines = 4;
+textNode.truncationMode = NSLineBreakByTruncatingTail;
+textNode.attributedText = [[NSAttributedString	alloc] initWithString:someLongString
+																												   attributes:attributes];
+// ...
+</pre>
+
+<pre lang="swift" class = "swiftCode hidden">
+TODO
+</pre>
+</div>
+</div>
+```
