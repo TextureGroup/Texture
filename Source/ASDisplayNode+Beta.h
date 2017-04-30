@@ -158,7 +158,7 @@ typedef struct {
  * Note: You cannot add subnodes whose layers/views are already loaded to a rasterized node.
  * Note: You cannot call this method after the receiver's layer/view is loaded.
  */
-- (void)setShouldRasterizeDescendants;
+- (void)enableSubtreeRasterization;
 
 @end
 

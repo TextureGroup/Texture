@@ -1948,23 +1948,23 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   self._locked_asyncLayer.displaysAsynchronously = displaysAsynchronously;
 }
 
-- (BOOL)shouldRasterizeDescendants
+- (BOOL)rasterizesSubtree
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return _flags.shouldRasterizeDescendants;
+  return _flags.rasterizesSubtree;
 }
 
-- (void)setShouldRasterizeDescendants
+- (void)enableSubtreeRasterization
 {
   ASDN::MutexLocker l(__instanceLock__);
   // Already rasterized from self.
-  if (_flags.shouldRasterizeDescendants) {
+  if (_flags.rasterizesSubtree) {
     return;
   }
 
   // If rasterized from above, bail.
   if (ASHierarchyStateIncludesRasterized(_hierarchyState)) {
-    ASDisplayNodeFailAssert(@"Subnode of a rasterized node should not have redundant -setShouldRasterizeDescendants.");
+    ASDisplayNodeFailAssert(@"Subnode of a rasterized node should not have redundant -enableSubtreeRasterization.");
     return;
   }
 
@@ -1975,13 +1975,15 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   }
 
   // Ensure no loaded subnodes
-  for (ASDisplayNode *subnode in _subnodes) {
-    if (subnode.nodeLoaded) {
-      ASDisplayNodeFailAssert(@"Cannot call %@ on node %@ with loaded subnode %@", NSStringFromSelector(_cmd), self, subnode);
+  ASDisplayNode *loadedSubnode = ASDisplayNodeFindFirstSubnode(self, ^BOOL(ASDisplayNode * _Nonnull node) {
+    return node.nodeLoaded;
+  });
+  if (loadedSubnode != nil) {
+      ASDisplayNodeFailAssert(@"Cannot call %@ on node %@ with loaded subnode %@", NSStringFromSelector(_cmd), self, loadedSubnode);
       return;
-    }
   }
-  _flags.shouldRasterizeDescendants = YES;
+
+  _flags.rasterizesSubtree = YES;
 
   // Tell subnodes that now they're in a rasterized hierarchy (while holding lock!)
   for (ASDisplayNode *subnode in _subnodes) {
@@ -2067,7 +2069,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
 {
   ASDN::MutexLocker l(__instanceLock__);
   
-  return _flags.implementsDrawRect || _flags.implementsImageDisplay || _flags.shouldRasterizeDescendants ||
+  return _flags.implementsDrawRect || _flags.implementsImageDisplay || _flags.rasterizesSubtree ||
   _flags.implementsInstanceDrawRect || _flags.implementsInstanceImageDisplay;
 }
 
@@ -2250,7 +2252,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
   // Set the flag on the node.  If this is a pure layer (no node) then this has no effect (plain layers don't support preventing/cancelling display).
   node.displaySuspended = flag;
 
-  if (layer && !node.shouldRasterizeDescendants) {
+  if (layer && !node.rasterizesSubtree) {
     // If there is a layer, recurse down the layer hierarchy to set the flag on descendants.  This will cover both layer-based and node-based children.
     for (CALayer *sublayer in layer.sublayers) {
       _recursivelySetDisplaySuspended(nil, sublayer, flag);
@@ -2580,7 +2582,7 @@ ASDISPLAYNODE_INLINE BOOL canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subn
 
 /// Returns if node is a member of a rasterized tree
 ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
-  return (node.shouldRasterizeDescendants || (node.hierarchyState & ASHierarchyStateRasterized));
+  return (node.rasterizesSubtree || (node.hierarchyState & ASHierarchyStateRasterized));
 }
 
 // NOTE: This method must be dealloc-safe (should not retain self).
@@ -2617,8 +2619,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
                                                         : oldSupernode.hierarchyState);
     
     // Rasterized state
-    BOOL parentWasOrIsRasterized        = (newSupernode ? newSupernode.shouldRasterizeDescendants
-                                                        : oldSupernode.shouldRasterizeDescendants);
+    BOOL parentWasOrIsRasterized        = (newSupernode ? newSupernode.rasterizesSubtree
+                                                        : oldSupernode.rasterizesSubtree);
     if (parentWasOrIsRasterized) {
       stateToEnterOrExit |= ASHierarchyStateRasterized;
     }
@@ -3365,7 +3367,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   // Entered rasterization state.
   if (newState & ASHierarchyStateRasterized) {
-    ASDisplayNodeAssert(_flags.synchronous == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be added to subtree of node with shouldRasterizeDescendants=YES. Node: %@", self);
+    ASDisplayNodeAssert(_flags.synchronous == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be added to subtree of node with subtree rasterization enabled. Node: %@", self);
   }
   
   // Entered or exited range managed state.

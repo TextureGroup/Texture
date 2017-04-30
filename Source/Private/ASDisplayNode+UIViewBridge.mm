@@ -319,12 +319,12 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     ASPerformBlockOnMainThread(^{
       // The below operation must be performed on the main thread to ensure against an extremely rare deadlock, where a parent node
       // begins materializing the view / layer hierarchy (locking itself or a descendant) while this node walks up
-      // the tree and requires locking that node to access .shouldRasterizeDescendants.
+      // the tree and requires locking that node to access .rasterizesSubtree.
       // For this reason, this method should be avoided when possible.  Use _hierarchyState & ASHierarchyStateRasterized.
       ASDisplayNodeAssertMainThread();
       ASDisplayNode *rasterizedContainerNode = self.supernode;
       while (rasterizedContainerNode) {
-        if (rasterizedContainerNode.shouldRasterizeDescendants) {
+        if (rasterizedContainerNode.rasterizesSubtree) {
           break;
         }
         rasterizedContainerNode = rasterizedContainerNode.supernode;

@@ -77,7 +77,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
     unsigned viewEverHadAGestureRecognizerAttached:1;
     unsigned layerBacked:1;
     unsigned displaysAsynchronously:1;
-    unsigned shouldRasterizeDescendants:1;
+    unsigned rasterizesSubtree:1;
     unsigned shouldBypassEnsureDisplay:1;
     unsigned displaySuspended:1;
     unsigned shouldAnimateSizeChanges:1;
@@ -286,9 +286,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 /**
- * Whether this node rasterizes its descendants. See -setShouldRasterizeDescendants.
+ * Whether this node rasterizes its descendants. See -enableSubtreeRasterization.
  */
-@property (atomic, readonly) BOOL shouldRasterizeDescendants;
+@property (atomic, readonly) BOOL rasterizesSubtree;
 
 - (void)nodeViewDidAddGestureRecognizer;
 

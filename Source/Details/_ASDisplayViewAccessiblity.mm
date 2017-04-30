@@ -91,7 +91,7 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
   ASDisplayNodePerformBlockOnEveryNodeBFS(node, ^(ASDisplayNode * _Nonnull currentNode) {
-    // For every subnode that is layer backed or it's supernode has shouldRasterizeDescendants enabled
+    // For every subnode that is layer backed or it's supernode has subtree rasterization enabled
     // we have to create a UIAccessibilityElement as no view for this node exists
     if (currentNode != containerNode && currentNode.isAccessibilityElement) {
       UIAccessibilityElement *accessibilityElement = [ASAccessibilityElement accessibilityElementWithContainer:container node:currentNode containerNode:containerNode];
@@ -108,7 +108,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
   ASDisplayNode *node = view.asyncdisplaykit_node;
   
   // Handle rasterize case
-  if (node.shouldRasterizeDescendants) {
+  if (node.rasterizesSubtree) {
     CollectUIAccessibilityElementsForNode(node, node, view, elements);
     return;
   }

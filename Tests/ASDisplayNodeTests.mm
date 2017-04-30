@@ -1977,7 +1977,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  [supernode setShouldRasterizeDescendants];
+  [supernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -1995,7 +1995,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenAddedToContainerThatIsInHierarchy
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  [supernode setShouldRasterizeDescendants];
+  [supernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
 
@@ -2013,7 +2013,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatRasterizingWrapperNodesIsNotAllowed
 {
   ASDisplayNode *rasterizedSupernode = [[ASDisplayNode alloc] init];
-  [rasterizedSupernode setShouldRasterizeDescendants];
+  [rasterizedSupernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] initWithViewBlock:^UIView * _Nonnull{
     return [[UIView alloc] init];
   }];
@@ -2068,7 +2068,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 {
   ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
   node.debugName = @"Node";
-  [node setShouldRasterizeDescendants];
+  [node enableSubtreeRasterization];
   
   ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   subnode.debugName = @"Subnode";

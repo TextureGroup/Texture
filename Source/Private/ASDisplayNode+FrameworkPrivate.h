@@ -43,7 +43,7 @@ typedef NS_OPTIONS(NSUInteger, ASHierarchyState)
 {
   /** The node may or may not have a supernode, but no supernode has a special hierarchy-influencing option enabled. */
   ASHierarchyStateNormal                  = 0,
-  /** The node has a supernode with .shouldRasterizeDescendants = YES.
+  /** The node has a supernode with .rasterizesSubtree = YES.
       Note: the root node of the rasterized subtree (the one with the property set on it) will NOT have this state set. */
   ASHierarchyStateRasterized              = 1 << 0,
   /** The node or one of its supernodes is managed by a class like ASRangeController.  Most commonly, these nodes are
