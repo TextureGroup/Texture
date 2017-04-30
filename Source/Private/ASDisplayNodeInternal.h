@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 struct ASDisplayNodeFlags;
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
-BOOL ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(ASDisplayNodeFlags flags);
+BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLayerBacked);
 
 /// Get the pending view state for the node, creating one if needed.
 _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
@@ -73,7 +73,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
   struct ASDisplayNodeFlags {
     // public properties
-    unsigned synchronous:1;
     unsigned viewEverHadAGestureRecognizerAttached:1;
     unsigned layerBacked:1;
     unsigned displaysAsynchronously:1;
@@ -207,6 +206,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
 /// Bitmask to check which methods an object overrides.
 @property (nonatomic, assign, readonly) ASDisplayNodeMethodOverrides methodOverrides;
+
+/// Atomic BOOL that indicates whether the node wraps a synchronous layer or view class.
+@property (atomic, assign, readwrite, getter=isSynchronous) BOOL synchronous;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view
