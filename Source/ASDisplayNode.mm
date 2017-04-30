@@ -100,9 +100,9 @@ BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector)
 
 // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - we have to be sure to set certain properties
 // like setFrame: and setBackgroundColor: directly to the UIView and not apply it to the layer only.
-BOOL ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(ASDisplayNodeFlags flags)
+BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLayerBacked)
 {
-  return flags.synchronous && !flags.layerBacked;
+  return isSynchronous && !isLayerBacked;
 }
 
 _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
@@ -314,7 +314,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssert([viewClass isSubclassOfClass:[UIView class]], @"should initialize with a subclass of UIView");
 
   _viewClass = viewClass;
-  _flags.synchronous = ![viewClass isSubclassOfClass:[_ASDisplayView class]];
+  setFlag(Synchronous, ![viewClass isSubclassOfClass:[_ASDisplayView class]]);
 
   return self;
 }
@@ -328,8 +328,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssert([layerClass isSubclassOfClass:[CALayer class]], @"should initialize with a subclass of CALayer");
 
   _layerClass = layerClass;
-  _flags.synchronous = ![layerClass isSubclassOfClass:[_ASDisplayLayer class]];
   _flags.layerBacked = YES;
+  setFlag(Synchronous, ![layerClass isSubclassOfClass:[_ASDisplayLayer class]]);
 
   return self;
 }
@@ -378,7 +378,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssertNotNil(viewBlock, @"should initialize with a valid block that returns a UIView");
 
   _viewBlock = viewBlock;
-  _flags.synchronous = YES;
+  setFlag(Synchronous, YES);
 }
 
 - (void)setLayerBlock:(ASDisplayNodeLayerBlock)layerBlock
@@ -387,8 +387,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssertNotNil(layerBlock, @"should initialize with a valid block that returns a CALayer");
 
   _layerBlock = layerBlock;
-  _flags.synchronous = YES;
   _flags.layerBacked = YES;
+  setFlag(Synchronous, YES);
 }
 
 - (void)onDidLoad:(ASDisplayNodeDidLoadBlock)body
@@ -411,7 +411,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _flags.isDeallocating = YES;
 
   // Synchronous nodes may not be able to call the hierarchy notifications, so only enforce for regular nodes.
-  ASDisplayNodeAssert(_flags.synchronous || !ASInterfaceStateIncludesVisible(_interfaceState), @"Node should always be marked invisible before deallocating. Node: %@", self);
+  ASDisplayNodeAssert(checkFlag(Synchronous) || !ASInterfaceStateIncludesVisible(_interfaceState), @"Node should always be marked invisible before deallocating. Node: %@", self);
   
   self.asyncLayer.asyncDelegate = nil;
   _view.asyncdisplaykit_node = nil;
@@ -547,7 +547,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert([self isNodeLoaded], @"Implementation shouldn't call __unloadNode if not loaded: %@", self);
-  ASDisplayNodeAssert(_flags.synchronous == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be unloaded. Node: %@", self);
+  ASDisplayNodeAssert(checkFlag(Synchronous) == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be unloaded. Node: %@", self);
   ASDN::MutexLocker l(__instanceLock__);
 
   if (_flags.layerBacked) {
@@ -583,7 +583,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
   
   // Special handling of wrapping UIKit components
-  if (_flags.synchronous) {
+  if (checkFlag(Synchronous)) {
     // UIImageView layers. More details on the flags
     if ([_viewClass isSubclassOfClass:[UIImageView class]]) {
       _flags.canClearContentsOfLayer = NO;
@@ -805,8 +805,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (BOOL)isSynchronous
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _flags.synchronous;
+  return checkFlag(Synchronous);
 }
 
 - (void)setLayerBacked:(BOOL)isLayerBacked
@@ -836,7 +835,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 - (BOOL)supportsLayerBacking
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return !_flags.synchronous && !_flags.viewEverHadAGestureRecognizerAttached && _viewClass == [_ASDisplayView class] && _layerClass == [_ASDisplayLayer class];
+  return !checkFlag(Synchronous) && !_flags.viewEverHadAGestureRecognizerAttached && _viewClass == [_ASDisplayView class] && _layerClass == [_ASDisplayLayer class];
 }
 
 - (BOOL)shouldAnimateSizeChanges
@@ -1948,7 +1947,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
  */
 - (BOOL)_locked_displaysAsynchronously
 {
-  return _flags.synchronous == NO && _flags.displaysAsynchronously;
+  return checkFlag(Synchronous) == NO && _flags.displaysAsynchronously;
 }
 
 - (void)setDisplaysAsynchronously:(BOOL)displaysAsynchronously
@@ -1958,7 +1957,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   ASDN::MutexLocker l(__instanceLock__);
 
   // Can't do this for synchronous nodes (using layers that are not _ASDisplayLayer and so we can't control display prevention/cancel)
-  if (_flags.synchronous) {
+  if (checkFlag(Synchronous)) {
     return;
   }
 
@@ -2052,7 +2051,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
 - (void)displayImmediately
 {
   ASDisplayNodeAssertMainThread();
-  ASDisplayNodeAssert(!_flags.synchronous, @"this method is designed for asynchronous mode only");
+  ASDisplayNodeAssert(!checkFlag(Synchronous), @"this method is designed for asynchronous mode only");
 
   [self.asyncLayer displayImmediately];
 }
@@ -2073,7 +2072,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
     BOOL nowDisplay = ASInterfaceStateIncludesDisplay(_interfaceState);
     // FIXME: This should not need to recursively display, so create a non-recursive variant.
     // The semantics of setNeedsDisplay (as defined by CALayer behavior) are not recursive.
-    if (_layer != nil && !_flags.synchronous && nowDisplay && [self _implementsDisplay]) {
+    if (_layer != nil && !checkFlag(Synchronous) && nowDisplay && [self _implementsDisplay]) {
       shouldScheduleForDisplay = YES;
     }
   }
@@ -2317,7 +2316,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
   __instanceLock__.lock();
 
   // Can't do this for synchronous nodes (using layers that are not _ASDisplayLayer and so we can't control display prevention/cancel)
-  if (_flags.synchronous || _flags.displaySuspended == flag) {
+  if (checkFlag(Synchronous) || _flags.displaySuspended == flag) {
     __instanceLock__.unlock();
     return;
   }
@@ -3406,7 +3405,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
   
   // Entered rasterization state.
   if (newState & ASHierarchyStateRasterized) {
-    ASDisplayNodeAssert(_flags.synchronous == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be added to subtree of node with shouldRasterizeDescendants=YES. Node: %@", self);
+    ASDisplayNodeAssert(checkFlag(Synchronous) == NO, @"Node created using -initWithViewBlock:/-initWithLayerBlock: cannot be added to subtree of node with shouldRasterizeDescendants=YES. Node: %@", self);
   }
   
   // Entered or exited range managed state.
@@ -3907,7 +3906,7 @@ ASDISPLAYNODE_INLINE BOOL nodeIsInRasterizedTree(ASDisplayNode *node) {
   if (_flags.layerBacked) {
     [_pendingViewState applyToLayer:self.layer];
   } else {
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(_flags);
+    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
     [_pendingViewState applyToView:self.view withSpecialPropertiesHandling:specialPropertiesHandling];
   }
 
