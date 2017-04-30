@@ -241,7 +241,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
   // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
   struct ASDisplayNodeFlags flags = _flags;
-  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(flags);
+  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(self.isSynchronous, flags.layerBacked);
 
   BOOL nodeLoaded = __loaded(self);
   BOOL isMainThread = ASDisplayNodeThreadIsMain();
@@ -635,7 +635,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   if (shouldApply) {
     CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
     
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(_flags);
+    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(self.isSynchronous, _flags.layerBacked);
     if (specialPropertiesHandling) {
         _view.backgroundColor = newBackgroundColor;
     } else {
