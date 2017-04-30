@@ -1145,17 +1145,19 @@ ASLayoutElementFinalLayoutElementDefault
   ASDN::MutexLocker l(__instanceLock__);
 
 #if YOGA /* YOGA */
-  if (ASHierarchyStateIncludesYogaLayoutEnabled(_hierarchyState) == YES &&
-      ASHierarchyStateIncludesYogaLayoutMeasuring(_hierarchyState) == NO) {
-    ASDN::MutexUnlocker ul(__instanceLock__);
-    [self calculateLayoutFromYogaRoot:constrainedSize];
-  }
+  if (ASHierarchyStateIncludesYogaLayoutEnabled(_hierarchyState) == YES) {
+    if (ASHierarchyStateIncludesYogaLayoutMeasuring(_hierarchyState) == NO && self.yogaCalculatedLayout == nil) {
+      ASDN::MutexUnlocker ul(__instanceLock__);
+      [self calculateLayoutFromYogaRoot:constrainedSize];
+    }
 
-  if (ASHierarchyStateIncludesYogaLayoutEnabled(_hierarchyState) == YES && self.yogaCalculatedLayout) {
-    return self.yogaCalculatedLayout;
+    // The call above may set yogaCalculatedLayout, even if it tested as nil to enter it.
+    if (self.yogaCalculatedLayout && self.yogaChildren.count > 0) {
+      return self.yogaCalculatedLayout;
+    }
   }
 #endif /* YOGA */
-
+  
   // Manual size calculation via calculateSizeThatFits:
   if (((_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) ||
       (_layoutSpecBlock != NULL)) == NO) {

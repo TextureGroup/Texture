@@ -335,6 +335,7 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
   if (YGNodeGetMeasureFunc(yogaNode)) {
     YGNodeMarkDirty(yogaNode);
   }
+  self.yogaCalculatedLayout = nil;
 }
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
@@ -350,7 +351,7 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
   if (self.yogaParent) {
-    if (ASHierarchyStateIncludesYogaLayoutMeasuring(self.hierarchyState) == NO) {
+    if (self.yogaCalculatedLayout == nil) {
       [self _setNeedsLayoutFromAbove];
     }
     return;

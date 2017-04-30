@@ -6,3 +6,4 @@
 - Fix potential deadlock in ASControlNode [Garrett Moon](https://github.com/garrettmoon)
 - [Yoga Beta] Improvements to the experimental support for Yoga layout [Scott Goodson](appleguy)
 - Update the rasterization API and un-deprecate it. [Adlai Holler](https://github.com/Adlai-Holler)[#82](https://github.com/TextureGroup/Texture/pull/49)
+- Simplified & optimized hashing code. [Adlai Holler](https://github.com/Adlai-Holler) [#86](https://github.com/TextureGroup/Texture/pull/86)

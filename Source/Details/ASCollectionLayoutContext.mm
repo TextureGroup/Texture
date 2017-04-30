@@ -21,7 +21,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASEqualityHashHelpers.h>
+#import <AsyncDisplayKit/ASHashing.h>
 
 @implementation ASCollectionLayoutContext
 
@@ -57,12 +57,16 @@
 
 - (NSUInteger)hash
 {
-  NSUInteger subhashes[] = {
-    ASHashFromCGSize(_viewportSize),
-    [_elements hash],
+  struct {
+    CGSize viewportSize;
+    NSUInteger elementsHash;
+    NSUInteger addlInfoHash;
+  } data = {
+    _viewportSize,
+    _elements.hash,
     [_additionalInfo hash]
   };
-  return ASIntegerArrayHash(subhashes, sizeof(subhashes) / sizeof(subhashes[0]));
+  return ASHashBytes(&data, sizeof(data));
 }
 
 @end
