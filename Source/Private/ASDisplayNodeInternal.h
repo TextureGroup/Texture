@@ -55,6 +55,16 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 6
 };
 
+typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
+{
+  Synchronous = 1 << 0,
+};
+
+#define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
+// Returns the old value of the flag as a BOOL.
+#define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
+                              : _atomicFlags.fetch_and(~flag)) & flag) != 0)
+
 FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
 FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
 
@@ -70,6 +80,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
   UIView *_view;
   CALayer *_layer;
+
+  std::atomic<ASDisplayNodeAtomicFlags> _atomicFlags;
 
   struct ASDisplayNodeFlags {
     // public properties
@@ -206,9 +218,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
 /// Bitmask to check which methods an object overrides.
 @property (nonatomic, assign, readonly) ASDisplayNodeMethodOverrides methodOverrides;
-
-/// Atomic BOOL that indicates whether the node wraps a synchronous layer or view class.
-@property (atomic, assign, readwrite, getter=isSynchronous) BOOL synchronous;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view
