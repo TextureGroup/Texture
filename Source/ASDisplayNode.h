@@ -215,8 +215,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @return NO if the node wraps a _ASDisplayView, YES otherwise.
  */
-@property (nonatomic, readonly, assign, getter=isSynchronous) BOOL synchronous;
-
+@property (atomic, readonly, assign, getter=isSynchronous) BOOL synchronous;
 
 /** @name Getting view and layer */
 
