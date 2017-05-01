@@ -19,6 +19,7 @@
 #import <UIKit/UIGeometry.h>
 
 @protocol ASLayoutElement;
+@protocol ASTraitEnvironment;
 @class ASLayoutElementStyle;
 
 #pragma mark - ASLayoutElementContext

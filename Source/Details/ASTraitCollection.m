@@ -22,10 +22,14 @@
 
 #pragma mark - ASPrimitiveTraitCollection
 
-extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> root, ASPrimitiveTraitCollection traitCollection) {
-  ASLayoutElementPerformBlockOnEveryElement(root, ^(id<ASLayoutElement>  _Nonnull element) {
+extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
+  if (element) {
     element.primitiveTraitCollection = traitCollection;
-  });
+  }
+  
+  for (id<ASLayoutElement> subelement in element.sublayoutElements) {
+    ASTraitCollectionPropagateDown(subelement, traitCollection);
+  }
 }
 
 ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault()
