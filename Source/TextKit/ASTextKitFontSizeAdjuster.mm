@@ -153,25 +153,29 @@
     // 2. The entire text fits in the given constrained size.
     
     NSString *str = textStorage.string;
-    NSArray *words = [str componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    NSString *longestWordNeedingResize = @"";
+    NSArray *words = [str componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSUInteger location = 0; // Keep track of location to skip already evaluated text
+    CGSize longestWordSize = CGSizeZero;
     for (NSString *word in words) {
-      if ([word length] > [longestWordNeedingResize length]) {
-        longestWordNeedingResize = word;
+      if(word.length == 0) {
+        continue;
       }
+      
+      NSRange wordRange = [str rangeOfString:word options:0 range:NSMakeRange(location, str.length - location)];
+      NSAttributedString *attrString = [textStorage attributedSubstringFromRange:wordRange];
+      CGSize wordSize = [attrString boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+      
+      if (wordSize.width > longestWordSize.width) {
+        longestWordSize = wordSize;
+      }
+      
+      location = wordRange.location + wordRange.length;
     }
     
     // check to see if we may need to shrink for any of these things
-    BOOL longestWordFits = [longestWordNeedingResize length] ? NO : YES;
+    BOOL longestWordFits = CGSizeEqualToSize(longestWordSize, CGSizeZero) ? YES : NO;
     BOOL maxLinesFits = _attributes.maximumNumberOfLines > 0 ? NO : YES;
     BOOL heightFits = isinf(_constrainedSize.height) ? YES : NO;
-
-    CGSize longestWordSize = CGSizeZero;
-    if (longestWordFits == NO) {
-        NSRange longestWordRange = [str rangeOfString:longestWordNeedingResize];
-        NSAttributedString *attrString = [textStorage attributedSubstringFromRange:longestWordRange];
-        longestWordSize = [attrString boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
-    }
     
     // we may need to shrink for some reason, so let's iterate through our scale factors to see if we actually need to shrink
     // Note: the first scale factor in the array is 1.0 so will make sure that things don't fit without shrinking
