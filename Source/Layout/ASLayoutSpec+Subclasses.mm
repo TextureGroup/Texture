@@ -56,27 +56,13 @@
 
 @implementation ASLayoutSpec (Subclassing)
 
-#pragma mark - Final layoutElement
-
-- (id<ASLayoutElement>)layoutElementToAddFromLayoutElement:(id<ASLayoutElement, ASLayoutElementFinalLayoutElement>)child
-{
-  if (self.isFinalLayoutElement == NO) {
-    id<ASLayoutElement> finalLayoutElement = [child finalLayoutElement];
-    if (finalLayoutElement != child) {
-      finalLayoutElement.primitiveTraitCollection = child.primitiveTraitCollection;
-      return finalLayoutElement;
-    }
-  }
-  return child;
-}
-
 #pragma mark - Child with index
 
 - (void)setChild:(id<ASLayoutElement>)child atIndex:(NSUInteger)index
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
   
-  id<ASLayoutElement> layoutElement = child ? [self layoutElementToAddFromLayoutElement:child] : [ASNullLayoutSpec null];
+  id<ASLayoutElement> layoutElement = child ?: [ASNullLayoutSpec null];
   
   if (child) {
     if (_childrenArray.count < index) {

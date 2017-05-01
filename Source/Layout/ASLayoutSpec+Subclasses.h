@@ -26,27 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASLayoutSpec (Subclassing)
 
 /**
- * Helper method for finalLayoutElement support
- *
- * @warning If you are getting recursion crashes here after implementing finalLayoutElement, make sure
- * that you are setting isFinalLayoutElement flag to YES. This must be one BEFORE adding a child
- * to the new ASLayoutElement.
- *
- * For example:
- * - (id<ASLayoutElement>)finalLayoutElement
- * {
- *   ASInsetLayoutSpec *insetSpec = [[ASInsetLayoutSpec alloc] init];
- *   insetSpec.insets = UIEdgeInsetsMake(10,10,10,10);
- *   insetSpec.isFinalLayoutElement = YES;
- *   [insetSpec setChild:self];
- *   return insetSpec;
- * }
- *
- * @see finalLayoutElement
- */
-- (id<ASLayoutElement>)layoutElementToAddFromLayoutElement:(id<ASLayoutElement>)child;
-
-/**
  * Adds a child with the given identifier to this layout spec.
  *
  * @param child A child to be added.

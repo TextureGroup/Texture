@@ -866,8 +866,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return !self.isNodeLoaded;
 }
 
-ASLayoutElementFinalLayoutElementDefault
-
 #pragma mark <ASDebugNameProvider>
 
 - (NSString *)debugName
