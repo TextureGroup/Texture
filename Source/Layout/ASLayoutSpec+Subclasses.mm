@@ -58,7 +58,7 @@
 
 #pragma mark - Final layoutElement
 
-- (id<ASLayoutElement>)layoutElementToAddFromLayoutElement:(id<ASLayoutElement, ASTraitEnvironment, ASLayoutElementFinalLayoutElement>)child
+- (id<ASLayoutElement>)layoutElementToAddFromLayoutElement:(id<ASLayoutElement, ASLayoutElementFinalLayoutElement>)child
 {
   if (self.isFinalLayoutElement == NO) {
     id<ASLayoutElement> finalLayoutElement = [child finalLayoutElement];

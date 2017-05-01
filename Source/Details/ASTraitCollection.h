@@ -89,7 +89,6 @@ ASDISPLAYNODE_EXTERN_C_END
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
- * Returns an NaSObject-representation of the environment's ASEnvironmentDisplayTraits
  */
 - (ASTraitCollection *)asyncTraitCollection;
 
