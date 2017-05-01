@@ -77,7 +77,7 @@
   CGRect frame;
   
   // If this is the root container node, use a frame with a zero origin to draw into. If not, calculate the correct frame using the node's position, transform and anchorPoint.
-  if (self.shouldRasterizeDescendants) {
+  if (self.rasterizesSubtree) {
     frame = CGRectMake(0.0f, 0.0f, bounds.size.width, bounds.size.height);
   } else {
     CGPoint position = self.position;
@@ -169,7 +169,7 @@
   
   // We always create a graphics context, unless a -display method is used, OR if we are a subnode drawing into a rasterized parent.
   BOOL shouldCreateGraphicsContext = (flags.implementsInstanceImageDisplay == NO && flags.implementsImageDisplay == NO && rasterizing == NO);
-  BOOL shouldBeginRasterizing = (rasterizing == NO && flags.shouldRasterizeDescendants);
+  BOOL shouldBeginRasterizing = (rasterizing == NO && flags.rasterizesSubtree);
   BOOL usesInstanceMethodDisplay = (flags.implementsInstanceDrawRect || flags.implementsInstanceImageDisplay);
   BOOL usesImageDisplay = (flags.implementsImageDisplay || flags.implementsInstanceImageDisplay);
   BOOL usesDrawRect = (flags.implementsDrawRect || flags.implementsInstanceDrawRect);

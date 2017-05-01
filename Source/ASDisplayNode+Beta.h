@@ -136,11 +136,11 @@ typedef struct {
 + (void)setRangeModeForMemoryWarnings:(ASLayoutRangeMode)rangeMode;
 
 /**
- * @abstract Whether to draw all descendant nodes' layers/views into this node's layer/view's backing store.
+ * @abstract Whether to draw all descendent nodes' contents into this node's layer's backing store.
  *
  * @discussion
- * When set to YES, causes all descendant nodes' layers/views to be drawn directly into this node's layer/view's backing
- * store.  Defaults to NO.
+ * When called, causes all descendent nodes' contents to be drawn directly into this node's layer's backing
+ * store.
  *
  * If a node's descendants are static (never animated or never change attributes after creation) then that node is a
  * good candidate for rasterization.  Rasterizing descendants has two main benefits:
@@ -154,8 +154,11 @@ typedef struct {
  *
  * Note: this has nothing to do with -[CALayer shouldRasterize], which doesn't work with ASDisplayNode's asynchronous
  * rendering model.
+ *
+ * Note: You cannot add subnodes whose layers/views are already loaded to a rasterized node.
+ * Note: You cannot call this method after the receiver's layer/view is loaded.
  */
-@property (nonatomic, assign) BOOL shouldRasterizeDescendants ASDISPLAYNODE_DEPRECATED_MSG("Deprecated in version 2.2");
+- (void)enableSubtreeRasterization;
 
 @end
 

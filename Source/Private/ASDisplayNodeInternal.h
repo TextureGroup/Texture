@@ -88,7 +88,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
     unsigned viewEverHadAGestureRecognizerAttached:1;
     unsigned layerBacked:1;
     unsigned displaysAsynchronously:1;
-    unsigned shouldRasterizeDescendants:1;
+    unsigned rasterizesSubtree:1;
     unsigned shouldBypassEnsureDisplay:1;
     unsigned displaySuspended:1;
     unsigned shouldAnimateSizeChanges:1;
@@ -297,10 +297,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 /**
- * This is a non-deprecated internal declaration of the property. Public declaration
- * is in ASDisplayNode+Beta.h
+ * Whether this node rasterizes its descendants. See -enableSubtreeRasterization.
  */
-@property (nonatomic, assign) BOOL shouldRasterizeDescendants;
+@property (atomic, readonly) BOOL rasterizesSubtree;
 
 - (void)nodeViewDidAddGestureRecognizer;
 
