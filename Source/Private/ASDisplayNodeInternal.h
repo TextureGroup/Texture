@@ -127,6 +127,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
 
+  // Set this to nil whenever you modify _subnodes
+  NSArray<ASDisplayNode *> *_cachedSubnodes;
+
   ASLayoutElementStyle *_style;
   ASPrimitiveTraitCollection _primitiveTraitCollection;
 

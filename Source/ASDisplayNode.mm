@@ -430,8 +430,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     [self _scheduleIvarsForMainDeallocation];
   }
 
-  _subnodes = nil;
-
 #if YOGA
   if (_yogaNode != NULL) {
     YGNodeFree(_yogaNode);
@@ -1411,17 +1409,15 @@ ASLayoutElementFinalLayoutElementDefault
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   
   ASLayout *layout;
-  NSArray<ASDisplayNode *> *subnodes;
   {
     ASDN::MutexLocker l(__instanceLock__);
-    if (_calculatedDisplayNodeLayout->isDirty() || _subnodes.count == 0) {
+    if (_calculatedDisplayNodeLayout->isDirty()) {
       return;
     }
     layout = _calculatedDisplayNodeLayout->layout;
-    subnodes = [_subnodes copy];
   }
   
-  for (ASDisplayNode *node in subnodes) {
+  for (ASDisplayNode *node in self.subnodes) {
     CGRect frame = [layout frameForElement:node];
     if (CGRectIsNull(frame)) {
       // There is no frame for this node in our layout.
@@ -2675,7 +2671,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (NSArray *)subnodes
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return ([_subnodes copy] ?: @[]);
+  if (_cachedSubnodes == nil) {
+    _cachedSubnodes = [_subnodes copy];
+  }
+  return _cachedSubnodes ?: @[];
 }
 
 /*
@@ -2736,6 +2735,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       _subnodes = [[NSMutableArray alloc] init];
     }
     [_subnodes insertObject:subnode atIndex:subnodeIndex];
+    _cachedSubnodes = nil;
   __instanceLock__.unlock();
   
   // This call will apply our .hierarchyState to the new subnode.
@@ -3071,6 +3071,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
   __instanceLock__.lock();
     [_subnodes removeObjectIdenticalTo:subnode];
+    _cachedSubnodes = nil;
   __instanceLock__.unlock();
 
   [subnode _setSupernode:nil];
@@ -4058,13 +4059,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   } else {
     return [_view convertRect:self.threadSafeBounds toView:nil];
   }
-}
-
-#pragma mark - NSFastEnumeration
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
-{
-  return [self.subnodes countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 #pragma mark - ASPrimitiveTraitCollection
