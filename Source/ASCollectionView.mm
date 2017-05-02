@@ -92,6 +92,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   NSMutableSet *_cellsForVisibilityUpdates;
   NSMutableSet *_cellsForLayoutUpdates;
   id<ASCollectionViewLayoutFacilitatorProtocol> _layoutFacilitator;
+  CGFloat _leadingScreensForBatching;
+  BOOL _inverted;
   
   NSUInteger _superBatchUpdateCount;
   BOOL _isDeallocating;
@@ -1387,6 +1389,26 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 }
 
 #pragma mark - Scroll Direction.
+
+- (BOOL)inverted
+{
+  return _inverted;
+}
+
+- (void)setInverted:(BOOL)inverted
+{
+  _inverted = inverted;
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  _leadingScreensForBatching = leadingScreensForBatching;
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  return _leadingScreensForBatching;
+}
 
 - (ASScrollDirection)scrollDirection
 {

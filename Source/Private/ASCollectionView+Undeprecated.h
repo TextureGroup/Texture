@@ -65,6 +65,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout;
 
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+
+@property (nonatomic, assign) BOOL inverted;
+
+@property (nonatomic, readonly) ASScrollDirection scrollDirection;
+
+@property (nonatomic, readonly) ASScrollDirection scrollableDirections;
+
+@property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
+
 /**
  * Tuning parameters for a range type in full mode.
  *
