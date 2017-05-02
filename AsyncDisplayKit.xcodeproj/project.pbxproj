@@ -302,12 +302,8 @@
 		B350625D1B0111740018CF92 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943141A1575670030A7D0 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943121A1575630030A7D0 /* AssetsLibrary.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C78F7E2B1BF7809800CDEAFC /* ASTableNode.h in Headers */ = {isa = PBXBuildFile; fileRef = B0F880581BEAEC7500D17647 /* ASTableNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CC034A011E5FAF9700626263 /* ASElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC0349FF1E5FAF9700626263 /* ASElementMap.h */; };
-		CC034A021E5FAF9700626263 /* ASElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A001E5FAF9700626263 /* ASElementMap.m */; };
 		CC034A091E60BEB400626263 /* ASDisplayNode+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */; };
-		CC034A0D1E60C3D500626263 /* ASRectTable.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A0B1E60C3D500626263 /* ASRectTable.h */; };
-		CC034A0E1E60C3D500626263 /* ASRectTable.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A0C1E60C3D500626263 /* ASRectTable.m */; };
 		CC034A101E60C9BF00626263 /* ASRectTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A0F1E60C9BF00626263 /* ASRectTableTests.m */; };
 		CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */; };
 		CC034A141E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A121E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m */; };
@@ -730,12 +726,8 @@
 		B30BF6511C5964B0004FCD53 /* ASLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASLayoutManager.m; path = TextKit/ASLayoutManager.m; sourceTree = "<group>"; };
 		B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AsyncDisplayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDC2D162BD55A807C1475DA5 /* Pods-AsyncDisplayKitTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.profile.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.profile.xcconfig"; sourceTree = "<group>"; };
-		CC0349FF1E5FAF9700626263 /* ASElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASElementMap.h; sourceTree = "<group>"; };
-		CC034A001E5FAF9700626263 /* ASElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASElementMap.m; sourceTree = "<group>"; };
 		CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Convenience.h"; sourceTree = "<group>"; };
 		CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ASDisplayNode+Convenience.m"; sourceTree = "<group>"; };
-		CC034A0B1E60C3D500626263 /* ASRectTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASRectTable.h; sourceTree = "<group>"; };
-		CC034A0C1E60C3D500626263 /* ASRectTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASRectTable.m; sourceTree = "<group>"; };
 		CC034A0F1E60C9BF00626263 /* ASRectTableTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASRectTableTests.m; sourceTree = "<group>"; };
 		CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AsyncDisplayKit+IGListKitMethods.h"; sourceTree = "<group>"; };
 		CC034A121E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AsyncDisplayKit+IGListKitMethods.m"; sourceTree = "<group>"; };
