@@ -2673,6 +2673,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDN::MutexLocker l(__instanceLock__);
   if (_cachedSubnodes == nil) {
     _cachedSubnodes = [_subnodes copy];
+  } else {
+    ASDisplayNodeAssert(ASObjectIsEqual(_cachedSubnodes, _subnodes), @"Expected _subnodes and _cachedSubnodes to have the same contents.");
   }
   return _cachedSubnodes ?: @[];
 }
