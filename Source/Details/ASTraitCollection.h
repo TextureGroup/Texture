@@ -21,6 +21,7 @@
 
 @class ASTraitCollection;
 @protocol ASLayoutElement;
+@protocol ASTraitEnvironment;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -63,7 +64,7 @@ extern NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollecti
  * This function will walk the layout element hierarchy and updates the layout element trait collection for every
  * layout element within the hierarchy.
  */
-extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> root, ASPrimitiveTraitCollection traitCollection);
+extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
 
 /// For backward compatibility reasons we redefine the old layout element trait collection struct name
 #define ASEnvironmentTraitCollection ASPrimitiveTraitCollection
@@ -88,7 +89,6 @@ ASDISPLAYNODE_EXTERN_C_END
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
- * Returns an NSObject-representation of the environment's ASEnvironmentDisplayTraits
  */
 - (ASTraitCollection *)asyncTraitCollection;
 

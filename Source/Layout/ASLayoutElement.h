@@ -42,16 +42,6 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
   ASLayoutElementTypeDisplayNode
 };
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-
-/**
- This function will walk the layout element hierarchy. It does run the block on the node provided
- directly to the function call.
- */
-extern void ASLayoutElementPerformBlockOnEveryElement(id<ASLayoutElement> root, void(^block)(id<ASLayoutElement> element));
-
-ASDISPLAYNODE_EXTERN_C_END
-
 #pragma mark - ASLayoutElement
 
 /**
@@ -70,7 +60,7 @@ ASDISPLAYNODE_EXTERN_C_END
  * access to the options via convenience properties. If you are creating custom layout spec, then you can
  * extend the backing layout options class to accommodate any new layout options.
  */
-@protocol ASLayoutElement <ASLayoutElementExtensibility, ASLayoutElementFinalLayoutElement, ASTraitEnvironment>
+@protocol ASLayoutElement <ASLayoutElementExtensibility, ASTraitEnvironment>
 
 #pragma mark - Getter
 
