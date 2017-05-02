@@ -1,5 +1,5 @@
 //
-//  ASTableViewTests.m
+//  ASTableViewTests.mm
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -61,7 +61,7 @@
 - (instancetype)__initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
   
-  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] eventLog:nil];
+  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil eventLog:nil];
 }
 
 - (ASTestDataController *)testDataController

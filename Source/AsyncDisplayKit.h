@@ -43,6 +43,7 @@
 #import <AsyncDisplayKit/ASCollectionViewLayoutInspector.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASRangeManagingNode.h>
 #import <AsyncDisplayKit/ASSectionContext.h>
 
 #import <AsyncDisplayKit/ASElementMap.h>

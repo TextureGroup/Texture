@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class ASElementMap;
 @class ASLayout;
 @class _ASHierarchyChangeSet;
+@protocol ASRangeManagingNode;
 @protocol ASTraitEnvironment;
 @protocol ASSectionContext;
 
@@ -93,12 +94,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
 - (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
 
 - (nullable id<ASSectionContext>)dataController:(ASDataController *)dataController contextForSection:(NSInteger)section;
-
-@end
-
-@protocol ASDataControllerEnvironmentDelegate
-
-- (nullable id<ASTraitEnvironment>)dataControllerEnvironment;
 
 @end
 
@@ -160,17 +155,30 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 @interface ASDataController : NSObject
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ * The node that owns this data controller, if any.
+ *
+ * NOTE: Soon we will drop support for using ASTableView/ASCollectionView without the node, so this will be non-null.
+ */
+@property (nonatomic, nullable, weak, readonly) id<ASRangeManagingNode> node;
 
 /**
  * The map that is currently displayed. The "UIKit index space."
+ *
+ * This property will only be changed on the main thread.
  */
-@property (nonatomic, strong, readonly) ASElementMap *visibleMap;
+@property (atomic, copy, readonly) ASElementMap *visibleMap;
 
 /**
  * The latest map fetched from the data source. May be more recent than @c visibleMap.
+ *
+ * This property will only be changed on the main thread.
  */
-@property (nonatomic, strong, readonly) ASElementMap *pendingMap;
+@property (atomic, copy, readonly) ASElementMap *pendingMap;
 
 /**
  Data source for fetching data info.
@@ -186,11 +194,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
  Delegate to notify when data is updated.
  */
 @property (nonatomic, weak) id<ASDataControllerDelegate> delegate;
-
-/**
- *
- */
-@property (nonatomic, weak) id<ASDataControllerEnvironmentDelegate> environmentDelegate;
 
 /**
  * Delegate for preparing layouts. Main thead only.

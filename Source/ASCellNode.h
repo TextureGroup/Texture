@@ -20,6 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ASCellNode, ASTextNode;
+@protocol ASRangeManagingNode;
 
 typedef NSUInteger ASCellNodeAnimation;
 
@@ -87,7 +88,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  * @return The supplementary element kind, or @c nil if this node does not represent a supplementary element.
  */
 //TODO change this to be a generic "kind" or "elementKind" that exposes `nil` for row kind
-@property (nonatomic, copy, readonly, nullable) NSString *supplementaryElementKind;
+@property (atomic, copy, readonly, nullable) NSString *supplementaryElementKind;
 
 /*
  * The layout attributes currently assigned to this node, if any.
@@ -113,10 +114,8 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 /**
  * The current index path of this cell node, or @c nil if this node is
  * not a valid item inside a table node or collection node.
- *
- * @note This property must be accessed on the main thread.
  */
-@property (nonatomic, readonly, nullable) NSIndexPath *indexPath;
+@property (atomic, readonly, nullable) NSIndexPath *indexPath;
 
 /**
  * The backing view controller, or @c nil if the node wasn't initialized with backing view controller
@@ -126,10 +125,9 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 
 
 /**
- * The owning node (ASCollectionNode/ASTableNode) of this cell node, or @c nil if this node is
- * not a valid item inside a table node or collection node or if those nodes are nil.
+ * The table- or collection-node that this cell is a member of, if any.
  */
-@property (weak, nonatomic, readonly, nullable) ASDisplayNode *owningNode;
+@property (atomic, weak, readonly, nullable) id<ASRangeManagingNode> owningNode;
 
 /*
  * ASCellNode must forward touch events in order for UITableView and UICollectionView tap handling to work. Overriding

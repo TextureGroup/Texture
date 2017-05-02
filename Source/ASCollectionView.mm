@@ -80,7 +80,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma mark -
 #pragma mark ASCollectionView.
 
-@interface ASCollectionView () <ASRangeControllerDataSource, ASRangeControllerDelegate, ASDataControllerSource, ASCellNodeInteractionDelegate, ASDelegateProxyInterceptor, ASBatchFetchingScrollView, ASDataControllerEnvironmentDelegate, ASCALayerExtendedDelegate, UICollectionViewDelegateFlowLayout> {
+@interface ASCollectionView () <ASRangeControllerDataSource, ASRangeControllerDelegate, ASDataControllerSource, ASCellNodeInteractionDelegate, ASDelegateProxyInterceptor, ASBatchFetchingScrollView, ASCALayerExtendedDelegate, UICollectionViewDelegateFlowLayout> {
   ASCollectionViewProxy *_proxyDataSource;
   ASCollectionViewProxy *_proxyDelegate;
   
@@ -250,10 +250,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout
 {
-  return [self _initWithFrame:frame collectionViewLayout:layout layoutFacilitator:nil eventLog:nil];
+  return [self _initWithFrame:frame collectionViewLayout:layout layoutFacilitator:nil owningNode:nil eventLog:nil];
 }
 
-- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator eventLog:(ASEventLog *)eventLog
+- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(ASCollectionNode *)owningNode eventLog:(ASEventLog *)eventLog
 {
   if (!(self = [super initWithFrame:frame collectionViewLayout:layout]))
     return nil;
@@ -273,9 +273,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   _rangeController.delegate = self;
   _rangeController.layoutController = _layoutController;
   
-  _dataController = [[ASDataController alloc] initWithDataSource:self eventLog:eventLog];
+  _dataController = [[ASDataController alloc] initWithDataSource:self node:owningNode eventLog:eventLog];
   _dataController.delegate = _rangeController;
-  _dataController.environmentDelegate = self;
   
   _batchContext = [[ASBatchContext alloc] init];
   
@@ -1647,11 +1646,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   CGRect rect = attributes.frame;
   return CGSizeEqualToSizeWithIn(rect.size, size, FLT_EPSILON);
   
-}
-
-- (id<ASTraitEnvironment>)dataControllerEnvironment
-{
-  return self.collectionNode;
 }
 
 #pragma mark - ASDataControllerSource optional methods

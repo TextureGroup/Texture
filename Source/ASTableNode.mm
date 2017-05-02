@@ -80,7 +80,7 @@
     [self setViewBlock:^{
       // Variable will be unused if event logging is off.
       __unused __typeof__(self) strongSelf = weakSelf;
-      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
     }];
   }
   return self;

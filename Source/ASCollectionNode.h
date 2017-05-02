@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>
+#import <AsyncDisplayKit/ASRangeManagingNode.h>
 
 @protocol ASCollectionViewLayoutFacilitatorProtocol;
 @protocol ASCollectionDelegate;
@@ -32,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  * ASCollectionNode is a node based class that wraps an ASCollectionView. It can be used
  * as a subnode of another node, and provide room for many (great) features and improvements later on.
  */
-@interface ASCollectionNode : ASDisplayNode <ASRangeControllerUpdateRangeProtocol>
+@interface ASCollectionNode : ASDisplayNode <ASRangeControllerUpdateRangeProtocol, ASRangeManagingNode>
 
 - (instancetype)init NS_UNAVAILABLE;
 

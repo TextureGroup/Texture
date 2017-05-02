@@ -40,7 +40,7 @@
  *
  * @param eventLog An event log passed through to the data controller.
  */
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass eventLog:(ASEventLog *)eventLog;
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode eventLog:(ASEventLog *)eventLog;
 
 /// Set YES and we'll log every time we call [super insertRows…] etc
 @property (nonatomic) BOOL test_enableSuperUpdateCallLogging;

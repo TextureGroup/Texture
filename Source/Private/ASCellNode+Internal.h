@@ -72,9 +72,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong, nullable) UICollectionViewLayoutAttributes *layoutAttributes;
 
-@property (weak, nullable) ASCollectionElement *collectionElement;
+@property (atomic, weak, nullable) ASCollectionElement *collectionElement;
 
-@property (nonatomic, weak, nullable) ASDisplayNode *owningNode;
+@property (atomic, weak, nullable) id<ASRangeManagingNode> owningNode;
 
 @property (nonatomic, assign) BOOL shouldUseUIKitCell;
 
