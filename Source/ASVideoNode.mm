@@ -108,6 +108,9 @@ static NSString * const kRate = @"rate";
   [self addTarget:self action:@selector(tapped) forControlEvents:ASControlNodeEventTouchUpInside];
   _lastPlaybackTime = kCMTimeZero;
   
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+  
   return self;
 }
 
@@ -714,6 +717,13 @@ static NSString * const kRate = @"rate";
 
 #pragma mark - Playback observers
 
+- (void)applicationDidBecomeActive:(NSNotification *)notification
+{
+  if (self.shouldBePlaying && self.isVisible) {
+    [self play];
+  }
+}
+
 - (void)didPlayToEnd:(NSNotification *)notification
 {
   self.playerState = ASVideoNodePlayerStateFinished;
@@ -825,6 +835,9 @@ static NSString * const kRate = @"rate";
   _timeObserver = nil;
   [self removePlayerItemObservers:_currentPlayerItem];
   [self removePlayerObservers:_player];
+
+  NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+  [notificationCenter removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 @end
