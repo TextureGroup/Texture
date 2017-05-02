@@ -17,27 +17,35 @@
 
 #import <AsyncDisplayKit/ASTextKitAttributes.h>
 
-#import <AsyncDisplayKit/ASEqualityHashHelpers.h>
-
-#include <functional>
+#import <AsyncDisplayKit/ASHashing.h>
 
 NSString *const ASTextKitTruncationAttributeName = @"ck_truncation";
 NSString *const ASTextKitEntityAttributeName = @"ck_entity";
 
 size_t ASTextKitAttributes::hash() const
 {
-  NSUInteger subhashes[] = {
+  struct {
+    NSUInteger attrStringHash;
+    NSUInteger truncationStringHash;
+    NSUInteger avoidTrunactionSetHash;
+    NSLineBreakMode lineBreakMode;
+    NSUInteger maximumNumberOfLines;
+    NSUInteger exclusionPathsHash;
+    CGSize shadowOffset;
+    NSUInteger shadowColorHash;
+    CGFloat shadowOpacity;
+    CGFloat shadowRadius;
+  } data = {
     [attributedString hash],
     [truncationAttributedString hash],
     [avoidTailTruncationSet hash],
-    std::hash<NSInteger>()(lineBreakMode),
-    std::hash<NSInteger>()(maximumNumberOfLines),
+    lineBreakMode,
+    maximumNumberOfLines,
     [exclusionPaths hash],
-    std::hash<CGFloat>()(shadowOffset.width),
-    std::hash<CGFloat>()(shadowOffset.height),
+    shadowOffset,
     [shadowColor hash],
-    std::hash<CGFloat>()(shadowOpacity),
-    std::hash<CGFloat>()(shadowRadius),
+    shadowOpacity,
+    shadowRadius,
   };
-  return ASIntegerArrayHash(subhashes, sizeof(subhashes) / sizeof(subhashes[0]));
+  return ASHashBytes(&data, sizeof(data));
 }

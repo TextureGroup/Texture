@@ -185,8 +185,6 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @param body The work to be performed when the node is loaded.
  *
  * @precondition The node is not already loaded.
- * @note This will only be called the next time the node is loaded. If the node is later added to a subtree of a node
- *    that has `shouldRasterizeDescendants=YES`, and is unloaded, this block will not be called if it is loaded again.
  */
 - (void)onDidLoad:(ASDisplayNodeDidLoadBlock)body;
 
@@ -217,8 +215,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @return NO if the node wraps a _ASDisplayView, YES otherwise.
  */
-@property (nonatomic, readonly, assign, getter=isSynchronous) BOOL synchronous;
-
+@property (atomic, readonly, assign, getter=isSynchronous) BOOL synchronous;
 
 /** @name Getting view and layer */
 

@@ -51,6 +51,26 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return __val; \
   }
 
+#define UITABLEVIEW_RESPONDS_TO_SELECTOR() \
+  ({ \
+    static BOOL superResponds; \
+    static dispatch_once_t onceToken; \
+    dispatch_once(&onceToken, ^{ \
+      superResponds = [UITableView instancesRespondToSelector:_cmd]; \
+    }); \
+    superResponds; \
+  })
+
+@interface UITableView (ScrollViewDelegate)
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView;
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView;
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView;
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset;
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
+
+@end
+
 #pragma mark -
 #pragma mark ASCellNode<->UITableViewCell bridging.
 
@@ -1167,6 +1187,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+  if (scrollView != self && UITABLEVIEW_RESPONDS_TO_SELECTOR()) {
+    [super scrollViewDidScroll:scrollView];
+    return;
+  }
   // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
@@ -1186,6 +1210,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
 {
+  if (scrollView != self && UITABLEVIEW_RESPONDS_TO_SELECTOR()) {
+    [super scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
+    return;
+  }
   CGPoint contentOffset = scrollView.contentOffset;
   _deceleratingVelocity = CGPointMake(
     contentOffset.x - ((targetContentOffset != NULL) ? targetContentOffset->x : 0),
@@ -1204,6 +1232,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+  if (scrollView != self && UITABLEVIEW_RESPONDS_TO_SELECTOR()) {
+    [super scrollViewDidEndDecelerating:scrollView];
+    return;
+  }
   _deceleratingVelocity = CGPointZero;
 
   if (_asyncDelegateFlags.scrollViewDidEndDecelerating) {
@@ -1213,6 +1245,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+  if (scrollView != self && UITABLEVIEW_RESPONDS_TO_SELECTOR()) {
+    [super scrollViewWillBeginDragging:scrollView];
+    return;
+  }
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging
                                           inScrollView:scrollView
@@ -1225,6 +1261,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+  if (scrollView != self && UITABLEVIEW_RESPONDS_TO_SELECTOR()) {
+    [super scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    return;
+  }
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventDidEndDragging
                                           inScrollView:scrollView

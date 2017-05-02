@@ -241,7 +241,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
   // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
   struct ASDisplayNodeFlags flags = _flags;
-  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(flags);
+  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
 
   BOOL nodeLoaded = __loaded(self);
   BOOL isMainThread = ASDisplayNodeThreadIsMain();
@@ -319,12 +319,12 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     ASPerformBlockOnMainThread(^{
       // The below operation must be performed on the main thread to ensure against an extremely rare deadlock, where a parent node
       // begins materializing the view / layer hierarchy (locking itself or a descendant) while this node walks up
-      // the tree and requires locking that node to access .shouldRasterizeDescendants.
+      // the tree and requires locking that node to access .rasterizesSubtree.
       // For this reason, this method should be avoided when possible.  Use _hierarchyState & ASHierarchyStateRasterized.
       ASDisplayNodeAssertMainThread();
       ASDisplayNode *rasterizedContainerNode = self.supernode;
       while (rasterizedContainerNode) {
-        if (rasterizedContainerNode.shouldRasterizeDescendants) {
+        if (rasterizedContainerNode.rasterizesSubtree) {
           break;
         }
         rasterizedContainerNode = rasterizedContainerNode.supernode;
@@ -635,7 +635,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   if (shouldApply) {
     CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
     
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(_flags);
+    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
     if (specialPropertiesHandling) {
         _view.backgroundColor = newBackgroundColor;
     } else {

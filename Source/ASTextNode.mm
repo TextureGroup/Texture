@@ -34,7 +34,7 @@
 #import <AsyncDisplayKit/ASLayout.h>
 
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/ASEqualityHashHelpers.h>
+#import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 /**
@@ -68,7 +68,14 @@ struct ASTextNodeDrawParameter {
 
 - (NSUInteger)hash
 {
-  return _attributes.hash() ^ ASHashFromCGSize(_constrainedSize);
+  struct {
+    size_t attributesHash;
+    CGSize constrainedSize;
+  } data = {
+    _attributes.hash(),
+    _constrainedSize
+  };
+  return ASHashBytes(&data, sizeof(data));
 }
 
 - (BOOL)isEqual:(ASTextNodeRendererKey *)object

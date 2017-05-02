@@ -16,8 +16,29 @@
 //
 
 #import "ASNodeController+Beta.h"
-
 #import "ASDisplayNode+FrameworkPrivate.h"
+
+#if INVERT_NODE_CONTROLLER_OWNERSHIP
+
+@interface ASDisplayNode (ASNodeController)
+@property (nonatomic, strong) ASNodeController *asdkNodeController;
+@end
+
+@implementation ASDisplayNode (ASNodeController)
+
+- (ASNodeController *)asdkNodeController
+{
+  return objc_getAssociatedObject(self, @selector(asdkNodeController));
+}
+
+- (void)setAsdkNodeController:(ASNodeController *)asdkNodeController
+{
+  objc_setAssociatedObject(self, @selector(asdkNodeController), asdkNodeController, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@end
+
+#endif
 
 @implementation ASNodeController
 
@@ -49,6 +70,9 @@
 {
   _node = node;
   _node.interfaceStateDelegate = self;
+#if INVERT_NODE_CONTROLLER_OWNERSHIP
+  _node.asdkNodeController = self;
+#endif
 }
 
 // subclass overrides

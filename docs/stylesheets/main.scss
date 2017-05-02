@@ -84,10 +84,12 @@ a {
     width: 90%;
     margin: 0 auto;
     clear: both;
+
+    &:after { content: ""; display: table; clear: both; }
 }
 
 header {
-    padding: 30px 0 10px 0;
+    padding: 30px 0 0 0;
     background: #f8f8f8;
 
     h1 {
@@ -96,7 +98,6 @@ header {
     }
 
     nav {
-        margin-top: 10px;
         font-size: 18px;
 
         ul {
@@ -113,6 +114,10 @@ header {
             }
         }
     }
+}
+
+#logo {
+    margin: 0;
 }
 
 .hero {

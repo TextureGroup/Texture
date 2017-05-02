@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 struct ASDisplayNodeFlags;
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
-BOOL ASDisplayNodeNeedsSpecialPropertiesHandlingForFlags(ASDisplayNodeFlags flags);
+BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLayerBacked);
 
 /// Get the pending view state for the node, creating one if needed.
 _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
@@ -54,6 +54,16 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideFetchData          = 1 << 5,
   ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 6
 };
+
+typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
+{
+  Synchronous = 1 << 0,
+};
+
+#define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
+// Returns the old value of the flag as a BOOL.
+#define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
+                              : _atomicFlags.fetch_and(~flag)) & flag) != 0)
 
 FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
 FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
@@ -71,13 +81,14 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   UIView *_view;
   CALayer *_layer;
 
+  std::atomic<ASDisplayNodeAtomicFlags> _atomicFlags;
+
   struct ASDisplayNodeFlags {
     // public properties
-    unsigned synchronous:1;
     unsigned viewEverHadAGestureRecognizerAttached:1;
     unsigned layerBacked:1;
     unsigned displaysAsynchronously:1;
-    unsigned shouldRasterizeDescendants:1;
+    unsigned rasterizesSubtree:1;
     unsigned shouldBypassEnsureDisplay:1;
     unsigned displaySuspended:1;
     unsigned shouldAnimateSizeChanges:1;
@@ -286,10 +297,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 /**
- * This is a non-deprecated internal declaration of the property. Public declaration
- * is in ASDisplayNode+Beta.h
+ * Whether this node rasterizes its descendants. See -enableSubtreeRasterization.
  */
-@property (nonatomic, assign) BOOL shouldRasterizeDescendants;
+@property (atomic, readonly) BOOL rasterizesSubtree;
 
 - (void)nodeViewDidAddGestureRecognizer;
 
