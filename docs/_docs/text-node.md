@@ -214,7 +214,12 @@ textNode.attributedText = [[NSAttributedString	alloc] initWithString:someLongStr
 </pre>
 
 <pre lang="swift" class = "swiftCode hidden">
-TODO
+// ...
+let textNode = ASTextNode()
+textNode.maximumNumberOfLines = 4
+textNode.truncationMode = NSLineBreakByTruncatingTail
+textNode.attributedText = NSAttributedString(string: someLongString, attributes: attributes)
+//...
 </pre>
 </div>
 </div>
