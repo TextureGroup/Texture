@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class ASElementMap;
 @class ASLayout;
 @class _ASHierarchyChangeSet;
-@protocol ASRangeManagedNode;
+@protocol ASRangeManagingNode;
 @protocol ASTraitEnvironment;
 @protocol ASSectionContext;
 
@@ -155,7 +155,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 @interface ASDataController : NSObject
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagedNode>)node eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -164,7 +164,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * NOTE: Soon we will drop support for using ASTableView/ASCollectionView without the node, so this will be non-null.
  */
-@property (nonatomic, nullable, weak, readonly) id<ASRangeManagedNode> node;
+@property (nonatomic, nullable, weak, readonly) id<ASRangeManagingNode> node;
 
 /**
  * The map that is currently displayed. The "UIKit index space."

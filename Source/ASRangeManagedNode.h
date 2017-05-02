@@ -1,5 +1,5 @@
 //
-//  ASRangeManagedNode.h
+//  ASRangeManagingNode.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Basically ASTableNode or ASCollectionNode.
  */
-@protocol ASRangeManagedNode <NSObject, ASTraitEnvironment>
+@protocol ASRangeManagingNode <NSObject, ASTraitEnvironment>
 
 /**
  * Retrieve the index path for the given node, if it's a member of this container.

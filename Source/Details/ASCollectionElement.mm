@@ -34,7 +34,7 @@
 - (instancetype)initWithNodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize
-                       owningNode:(id<ASRangeManagedNode>)owningNode
+                       owningNode:(id<ASRangeManagingNode>)owningNode
                   traitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   NSAssert(nodeBlock != nil, @"Node block must not be nil");

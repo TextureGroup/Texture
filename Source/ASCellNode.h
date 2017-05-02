@@ -20,7 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ASCellNode, ASTextNode;
-@protocol ASRangeManagedNode;
+@protocol ASRangeManagingNode;
 
 typedef NSUInteger ASCellNodeAnimation;
 
@@ -127,7 +127,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 /**
  * The table- or collection-node that this cell is a member of, if any.
  */
-@property (atomic, weak, readonly, nullable) id<ASRangeManagedNode> owningNode;
+@property (atomic, weak, readonly, nullable) id<ASRangeManagingNode> owningNode;
 
 /*
  * ASCellNode must forward touch events in order for UITableView and UICollectionView tap handling to work. Overriding

@@ -27,7 +27,7 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASMainSerialQueue.h>
 #import <AsyncDisplayKit/ASMutableElementMap.h>
-#import <AsyncDisplayKit/ASRangeManagedNode.h>
+#import <AsyncDisplayKit/ASRangeManagingNode.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASSection.h>
@@ -94,7 +94,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagedNode>)node eventLog:(ASEventLog *)eventLog
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(ASEventLog *)eventLog
 {
   if (!(self = [super init])) {
     return nil;
@@ -384,7 +384,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   
   LOG(@"Populating elements of kind: %@, for index paths: %@", kind, indexPaths);
   id<ASDataControllerSource> dataSource = self.dataSource;
-  id<ASRangeManagedNode> node = self.node;
+  id<ASRangeManagingNode> node = self.node;
   for (NSIndexPath *indexPath in indexPaths) {
     ASCellNodeBlock nodeBlock;
     if (isRowKind) {
