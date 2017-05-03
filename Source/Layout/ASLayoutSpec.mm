@@ -71,10 +71,6 @@
   return YES;
 }
 
-#pragma mark - Final LayoutElement
-
-ASLayoutElementFinalLayoutElementDefault
-
 #pragma mark - Style
 
 - (ASLayoutElementStyle *)style
@@ -109,10 +105,7 @@ ASLayoutElementLayoutCalculationDefaults
   ASDisplayNodeAssert(_childrenArray.count < 2, @"This layout spec does not support more than one child. Use the setChildren: or the setChild:AtIndex: API");
  
   if (child) {
-    id<ASLayoutElement> finalLayoutElement = [self layoutElementToAddFromLayoutElement:child];
-    if (finalLayoutElement) {
-      _childrenArray[0] = finalLayoutElement;
-    }
+    _childrenArray[0] = child;
   } else {
     if (_childrenArray.count) {
       [_childrenArray removeObjectAtIndex:0];
@@ -138,7 +131,7 @@ ASLayoutElementLayoutCalculationDefaults
   NSUInteger i = 0;
   for (id<ASLayoutElement> child in children) {
     ASDisplayNodeAssert([child conformsToProtocol:NSProtocolFromString(@"ASLayoutElement")], @"Child %@ of spec %@ is not an ASLayoutElement!", child, self);
-    _childrenArray[i] = [self layoutElementToAddFromLayoutElement:child];
+    _childrenArray[i] = child;
     i += 1;
   }
 }

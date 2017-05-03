@@ -70,45 +70,6 @@ extern void ASLayoutElementClearCurrentContext();
   return [self calculateLayoutThatFits:resolvedRange];\
 }\
 
-#pragma mark - ASLayoutElementFinalLayoutElement
-/**
- *  The base protocol for ASLayoutElementFinalLayoutElement. Generally the methods/properties in this class do not need to be
- *  called by the end user and are only called internally. However, there may be a case where the methods are useful.
- */
-@protocol ASLayoutElementFinalLayoutElement <NSObject>
-
-/**
- *  @abstract This method can be used to give the user a chance to wrap an ASLayoutElement in an ASLayoutSpec 
- *  just before it is added to a parent ASLayoutSpec. For example, if you wanted an ASTextNode that was always 
- *  inside of an ASInsetLayoutSpec, you could subclass ASTextNode and implement finalLayoutElement so that it wraps
- *  itself in an inset spec.
- *
- *  Note that any ASLayoutElement other than self that is returned MUST set isFinalLayoutElement to YES. Make sure
- *  to do this BEFORE adding a child to the ASLayoutElement.
- *
- *  @return The layoutElement that will be added to the parent layout spec. Defaults to self.
- */
-- (id<ASLayoutElement>)finalLayoutElement;
-
-/**
- *  A flag to indicate that this ASLayoutElement was created in finalLayoutElement. This MUST be set to YES
- *  before adding a child to this layoutElement.
- */
-@property (nonatomic, assign) BOOL isFinalLayoutElement;
-
-@end
-
-// Default implementation for ASLayoutElementPrivate that can be used in classes that comply to ASLayoutElementPrivate
-
-#define ASLayoutElementFinalLayoutElementDefault \
-\
-@synthesize isFinalLayoutElement = _isFinalLayoutElement;\
-\
-- (id<ASLayoutElement>)finalLayoutElement\
-{\
-    return self;\
-}\
-
 
 #pragma mark - ASLayoutElementExtensibility
 
