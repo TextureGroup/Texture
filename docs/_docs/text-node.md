@@ -24,7 +24,7 @@ _node.attributedText = string;
 </pre>
 
 <pre lang="swift" class = "swiftCode hidden">
-let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 12.0)] 
+let attrs = [NSFontAttributeName: UIFont(name: "HelveticaNeue", size: 12.0)]
 let string = NSAttributedString(string: "Hey, here's some text.", attributes: attrs)
 
 node = ASTextNode()
@@ -47,7 +47,7 @@ In any case where you need your text node to fit into a space that is smaller th
 <pre lang="objc" class="objcCode">
 _textNode = [[ASTextNode alloc] init];
 _textNode.attributedText = string;
-_textNode.truncationAttributedText = [[NSAttributedString alloc] 
+_textNode.truncationAttributedText = [[NSAttributedString alloc]
 												initWithString:@"¶¶¶"];
 </pre>
 
@@ -59,7 +59,7 @@ textNode.truncationAttributedText = NSAttributedString(string: "¶¶¶")
 </div>
 </div>
 
-This results in something like: 
+This results in something like:
 
 <img width = "300" src = "/static/images/textNodeTruncation.png"/>
 
@@ -131,7 +131,7 @@ Conforming to `ASTextNodeDelegate` allows your class to react to various events 
 <pre lang="swift" class = "swiftCode hidden">
 func textNode(_ textNode: ASTextNode, tappedLinkAttribute attribute: String, value: Any, at point: CGPoint, textRange: NSRange) {
     guard let url = value as? URL else { return }
-    
+
     // the link was tapped, open it
     UIApplication.shared.openURL(url)
 }
@@ -148,3 +148,79 @@ In a similar way, you can react to long presses and highlighting with the follow
 `– textNode:shouldLongPressLinkAttribute:value:atPoint:`
 
 
+### Incorrect maximum number of lines with line spacing
+
+Using a `NSParagraphStyle` with a non-default `lineSpacing` can cause problems if multiline text with a maximum number of lines is wanted. For example see the following code:
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
+<div class = "code">
+<pre lang="objc" class="objcCode">
+// ...
+NSString *someLongString = @"...";
+
+NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+paragraphStyle.lineSpacing = 10.0;
+
+UIFont *font = [UIFont fontWithName:@"SomeFontName" size:15];
+
+NSDictionary *attributes = @{
+	NSFontAttributeName : font,
+	NSParagraphStyleAttributeName: paragraphStyle
+};
+
+ASTextNode *textNode = [[ASTextNode alloc] init];
+textNode.maximumNumberOfLines = 4;
+textNode.attributedText = [[NSAttributedString	alloc] initWithString:someLongString
+																												   attributes:attributes];
+// ...
+</pre>
+
+<pre lang="swift" class = "swiftCode hidden">
+let someLongString = "..."
+
+let paragraphStyle = NSMutableParagraphStyle()
+paragraphStyle.lineSpacing = 10.0
+
+let font = UIFont(name: "SomeFontName", size: 15.0)
+
+let attributes = [
+    NSFontAttributeName: font,
+    NSParagraphStyleAttributeName: paragraphStyle
+]
+
+let textNode = ASTextNode()
+textNode.maximumNumberOfLines = 4
+textNode.attributedText = NSAttributedString(string: someLongString, attributes: attributes)
+</pre>
+</div>
+</div>
+
+`ASTextNode` uses Text Kit internally to calculate the amount to shrink needed to result in the specified maximum number of lines. Unfortunately, in certain cases this will result in the text shrinking too much in the above example; Instead of 4 lines of text, 3 lines of text and a weird gap at the bottom will show up. To get around this issue for now, you have to set the `truncationMode` explicitly to `NSLineBreakByTruncatingTail` on the text node:
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
+<div class = "code">
+<pre lang="objc" class="objcCode">
+// ...
+ASTextNode *textNode = [[ASTextNode alloc] init];
+textNode.maximumNumberOfLines = 4;
+textNode.truncationMode = NSLineBreakByTruncatingTail;
+textNode.attributedText = [[NSAttributedString	alloc] initWithString:someLongString
+																												   attributes:attributes];
+// ...
+</pre>
+
+<pre lang="swift" class = "swiftCode hidden">
+// ...
+let textNode = ASTextNode()
+textNode.maximumNumberOfLines = 4
+textNode.truncationMode = NSLineBreakByTruncatingTail
+textNode.attributedText = NSAttributedString(string: someLongString, attributes: attributes)
+//...
+</pre>
+</div>
+</div>
+```
