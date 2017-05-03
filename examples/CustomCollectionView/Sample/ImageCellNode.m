@@ -34,8 +34,9 @@
 
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
 {
+  CGSize imageSize = self.image.size;
   return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero
-                                                child:[ASRatioLayoutSpec ratioLayoutSpecWithRatio:self.image.size.height/self.image.size.width
+                                                child:[ASRatioLayoutSpec ratioLayoutSpecWithRatio:imageSize.height/imageSize.width
                                                                                             child:_imageNode]];
 }
 

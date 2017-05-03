@@ -53,6 +53,7 @@
   ASElementMap *elements = context.elements;
   CGFloat top = 0;
   
+  // TODO use +[NSMapTable elementToLayoutAttributesTable]
   NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *attrsMap = [NSMapTable mapTableWithKeyOptions:(NSMapTableObjectPointerPersonality | NSMapTableWeakMemory) valueOptions:NSMapTableStrongMemory];
   NSMutableArray *columnHeights = [NSMutableArray array];
   
@@ -98,6 +99,7 @@
       
       attrs.frame = frame;
       [attrsMap setObject:attrs forKey:element];
+      // TODO Profile and avoid boxing if there are significant retain/release overheads
       columnHeights[section][columnIndex] = @(CGRectGetMaxY(frame) + _interItemSpacing.bottom);
     }
     
