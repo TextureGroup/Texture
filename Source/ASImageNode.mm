@@ -313,7 +313,7 @@ struct ASImageNodeDrawParameters {
   };
 }
 
-- (UIImage *)displayWithParameters:(id<NSObject> *)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
+- (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
   UIImage *image = self.image;
   if (image == nil) {
