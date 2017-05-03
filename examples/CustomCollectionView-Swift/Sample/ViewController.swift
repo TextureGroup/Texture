@@ -2,37 +2,40 @@
 //  ViewController.swift
 //  Sample
 //
-//  Created by Rajeev Gupta on 11/9/16.
-//
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under the BSD-style license found in the
 //  LICENSE file in the root directory of this source tree. An additional grant
 //  of patent rights can be found in the PATENTS file in the same directory.
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 //
 
 import UIKit
 import AsyncDisplayKit
 
-class ViewController: UIViewController, MosaicCollectionViewLayoutDelegate, ASCollectionDataSource, ASCollectionDelegate {
+class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLayoutDelegate, ASCollectionDataSource, ASCollectionDelegate {
   
   var _sections = [[UIImage]]()
-  let _collectionNode: ASCollectionNode!
+  let _collectionNode: ASCollectionNode
   let _layoutInspector = MosaicCollectionViewLayoutInspector()
   let kNumberOfImages: UInt = 14
-  
-  required init?(coder aDecoder: NSCoder) {
+
+  init() {
     let layout = MosaicCollectionViewLayout()
     layout.numberOfColumns = 3;
     layout.headerHeight = 44;
     _collectionNode = ASCollectionNode(frame: CGRect.zero, collectionViewLayout: layout)
-    super.init(coder: aDecoder)
+    super.init(node: _collectionNode)
     layout.delegate = self
 
     _sections.append([]);
@@ -48,12 +51,14 @@ class ViewController: UIViewController, MosaicCollectionViewLayoutDelegate, ASCo
     
     _collectionNode.dataSource = self;
     _collectionNode.delegate = self;
-    _collectionNode.view.layoutInspector = _layoutInspector
     _collectionNode.backgroundColor = UIColor.white
-    _collectionNode.view.isScrollEnabled = true
     _collectionNode.registerSupplementaryNode(ofKind: UICollectionElementKindSectionHeader)
   }
   
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+    
   deinit {
     _collectionNode.dataSource = nil;
     _collectionNode.delegate = nil;
@@ -61,13 +66,10 @@ class ViewController: UIViewController, MosaicCollectionViewLayoutDelegate, ASCo
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    self.view.addSubnode(_collectionNode!)
+    _collectionNode.view.layoutInspector = _layoutInspector
+    _collectionNode.view.isScrollEnabled = true
   }
-  
-  override func viewWillLayoutSubviews() {
-    _collectionNode.frame = self.view.bounds;
-  }
-  
+
   func collectionNode(_ collectionNode: ASCollectionNode, nodeForItemAt indexPath: IndexPath) -> ASCellNode {
     let image = _sections[indexPath.section][indexPath.item]
     return ImageCellNode(with: image)
