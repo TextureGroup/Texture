@@ -69,7 +69,7 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
   }
 }
 
-NSArray *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
+NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
   NSMutableArray *result = [NSMutableArray array];
   NSInteger section = 0;
