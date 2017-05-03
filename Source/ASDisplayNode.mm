@@ -859,39 +859,14 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     + (ASDisplayNodeSubclassOverridesSelector(self.class, @selector(calculateLayoutThatFits:)) ? 1 : 0)) <= 1, \
     @"Subclass %@ must at least provide a layoutSpecBlock or override at most one of the three layout methods: calculateLayoutThatFits:, layoutSpecThatFits:, or calculateSizeThatFits:", NSStringFromClass(self.class))
 
-#pragma mark <ASLayoutElement>
-
-- (ASLayoutElementStyle *)style
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  if (_style == nil) {
-    _style = [[ASLayoutElementStyle alloc] init];
-  }
-  return _style;
-}
-
-- (ASLayoutElementType)layoutElementType
-{
-  return ASLayoutElementTypeDisplayNode;
-}
+#pragma mark <ASLayoutElementTransition>
 
 - (BOOL)canLayoutAsynchronous
 {
   return !self.isNodeLoaded;
 }
 
-- (NSArray<id<ASLayoutElement>> *)sublayoutElements
-{
-  return self.subnodes;
-}
-
-- (instancetype)styledWithBlock:(AS_NOESCAPE void (^)(__kindof ASLayoutElementStyle *style))styleBlock
-{
-  styleBlock(self.style);
-  return self;
-}
-
-ASLayoutElementFinalLayoutElementDefault
+#pragma mark <ASDebugNameProvider>
 
 - (NSString *)debugName
 {
@@ -905,47 +880,6 @@ ASLayoutElementFinalLayoutElementDefault
   if (!ASObjectIsEqual(_debugName, debugName)) {
     _debugName = [debugName copy];
   }
-}
-
-#pragma mark Measurement Pass
-
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  // For now we just call the deprecated measureWithSizeRange: method to not break old API
-  return [self measureWithSizeRange:constrainedSize];
-#pragma clang diagnostic pop
-}
-
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
-{
-  ASDN::MutexLocker l(__instanceLock__);
- 
-  // If one or multiple layout transitions are in flight it still can happen that layout information is requested
-  // on other threads. As the pending and calculated layout to be updated in the layout transition in here just a
-  // layout calculation wil be performed without side effect
-  if ([self _isLayoutTransitionInvalid]) {
-    return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];
-  }
-
-  if (_calculatedDisplayNodeLayout->isValidForConstrainedSizeParentSize(constrainedSize, parentSize)) {
-    ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
-    // Our calculated layout is suitable for this constrainedSize, so keep using it and
-    // invalidate any pending layout that has been generated in the past.
-    _pendingDisplayNodeLayout = nullptr;
-    return _calculatedDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
-  }
-  
-  // Create a pending display node layout for the layout pass
-  _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(
-    [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize],
-    constrainedSize,
-    parentSize
-  );
-  
-  ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
-  return _pendingDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
 }
 
 #pragma mark Layout Pass
@@ -1296,7 +1230,6 @@ ASLayoutElementFinalLayoutElementDefault
   
   _calculatedDisplayNodeLayout = displayNodeLayout;
 }
-
 
 - (CGSize)calculatedSize
 {
@@ -4063,45 +3996,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   }
 }
 
-#pragma mark - ASPrimitiveTraitCollection
-
-- (ASPrimitiveTraitCollection)primitiveTraitCollection
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  return _primitiveTraitCollection;
-}
-
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
-{
-  __instanceLock__.lock();
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
-    _primitiveTraitCollection = traitCollection;
-    ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
-    __instanceLock__.unlock();
-    
-    [self asyncTraitCollectionDidChange];
-    return;
-  }
-  
-  __instanceLock__.unlock();
-}
-
-- (ASTraitCollection *)asyncTraitCollection
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
-}
+#pragma mark - Trait Collection Hooks
 
 - (void)asyncTraitCollectionDidChange
 {
   // Subclass override
 }
-
-ASPrimitiveTraitCollectionDeprecatedImplementation
-
-#pragma mark - ASLayoutElementStyleExtensibility
-
-ASLayoutElementStyleExtensibilityForwarding
 
 #if TARGET_OS_TV
 #pragma mark - UIFocusEnvironment Protocol (tvOS)
@@ -4136,23 +4036,125 @@ ASLayoutElementStyleExtensibilityForwarding
 }
 #endif
 
-#pragma mark - Deprecated
+@end
 
-// This methods cannot be moved into the category ASDisplayNode (Deprecated). So they need to be declared in ASDisplayNode until removed
+#pragma mark - ASDisplayNode (ASLayoutElement)
+
+@implementation ASDisplayNode (ASLayoutElement)
+
+#pragma mark <ASLayoutElement>
+
+- (ASLayoutElementStyle *)style
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  if (_style == nil) {
+    _style = [[ASLayoutElementStyle alloc] init];
+  }
+  return _style;
+}
+
+- (ASLayoutElementType)layoutElementType
+{
+  return ASLayoutElementTypeDisplayNode;
+}
+
+- (NSArray<id<ASLayoutElement>> *)sublayoutElements
+{
+  return self.subnodes;
+}
+
+#pragma mark Measurement Pass
+
+- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  // For now we just call the deprecated measureWithSizeRange: method to not break old API
+  return [self measureWithSizeRange:constrainedSize];
+#pragma clang diagnostic pop
+}
 
 - (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize
 {
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];
 }
 
-- (BOOL)usesImplicitHierarchyManagement
+- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
 {
-  return self.automaticallyManagesSubnodes;
+  ASDN::MutexLocker l(__instanceLock__);
+ 
+  // If one or multiple layout transitions are in flight it still can happen that layout information is requested
+  // on other threads. As the pending and calculated layout to be updated in the layout transition in here just a
+  // layout calculation wil be performed without side effect
+  if ([self _isLayoutTransitionInvalid]) {
+    return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];
+  }
+
+  if (_calculatedDisplayNodeLayout->isValidForConstrainedSizeParentSize(constrainedSize, parentSize)) {
+    ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
+    // Our calculated layout is suitable for this constrainedSize, so keep using it and
+    // invalidate any pending layout that has been generated in the past.
+    _pendingDisplayNodeLayout = nullptr;
+    return _calculatedDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
+  }
+  
+  // Create a pending display node layout for the layout pass
+  _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(
+    [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize],
+    constrainedSize,
+    parentSize
+  );
+  
+  ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
+  return _pendingDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
 }
 
-- (void)setUsesImplicitHierarchyManagement:(BOOL)enabled
+#pragma mark ASLayoutElementStyleExtensibility
+
+ASLayoutElementStyleExtensibilityForwarding
+
+#pragma mark ASPrimitiveTraitCollection
+
+- (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
-  self.automaticallyManagesSubnodes = enabled;
+  ASDN::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
+}
+
+- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+{
+  __instanceLock__.lock();
+  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
+    _primitiveTraitCollection = traitCollection;
+    ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
+    __instanceLock__.unlock();
+    
+    [self asyncTraitCollectionDidChange];
+    return;
+  }
+  
+  __instanceLock__.unlock();
+}
+
+- (ASTraitCollection *)asyncTraitCollection
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
+}
+
+ASPrimitiveTraitCollectionDeprecatedImplementation
+
+@end
+
+
+#pragma mark - ASDisplayNode (ASLayoutElementStylability)
+
+@implementation ASDisplayNode (ASLayoutElementStylability)
+
+- (instancetype)styledWithBlock:(AS_NOESCAPE void (^)(__kindof ASLayoutElementStyle *style))styleBlock
+{
+  styleBlock(self.style);
+  return self;
 }
 
 @end
@@ -4296,6 +4298,16 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
   ASLayoutSize size = self.style.preferredLayoutSize;
   BOOL isPoints = (size.width.unit == ASDimensionUnitPoints && size.height.unit == ASDimensionUnitPoints);
   return isPoints ? CGSizeMake(size.width.value, size.height.value) : CGSizeZero;
+}
+
+- (BOOL)usesImplicitHierarchyManagement
+{
+  return self.automaticallyManagesSubnodes;
+}
+
+- (void)setUsesImplicitHierarchyManagement:(BOOL)enabled
+{
+  self.automaticallyManagesSubnodes = enabled;
 }
 
 - (CGSize)measure:(CGSize)constrainedSize

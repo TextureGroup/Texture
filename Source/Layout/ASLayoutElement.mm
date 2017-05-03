@@ -29,17 +29,6 @@
   #import YOGA_HEADER_PATH
 #endif
 
-extern void ASLayoutElementPerformBlockOnEveryElement(id<ASLayoutElement> element, void(^block)(id<ASLayoutElement> element))
-{
-  if (element) {
-    block(element);
-  }
-
-  for (id<ASLayoutElement> subelement in element.sublayoutElements) {
-    ASLayoutElementPerformBlockOnEveryElement(subelement, block);
-  }
-}
-
 #pragma mark - ASLayoutElementContext
 
 CGFloat const ASLayoutElementParentDimensionUndefined = NAN;

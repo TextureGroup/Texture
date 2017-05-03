@@ -30,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - ASLayoutElementTransition
 
 /**
- * Extend the layout element protocol to check if a the element can layout asynchronously.
+ * Objects conform to this project returns if it's possible to layout asynchronous
  */
-@protocol ASLayoutElementTransition <ASLayoutElement>
+@protocol ASLayoutElementTransition <NSObject>
 
 /**
  * @abstract Returns if the layoutElement can be used to layout in an asynchronous way on a background thread.

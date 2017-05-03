@@ -121,7 +121,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : NSObject <ASLayoutElement, ASLayoutElementStylability>
+@interface ASDisplayNode : NSObject
 
 /** @name Initializing a node object */
 
@@ -297,23 +297,6 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 
 /** @name Managing dimensions */
-
-/**
- * @abstract Asks the node to return a layout based on given size range.
- *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
- *
- * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
- *
- * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
- * constraint and the result.
- *
- * @warning Subclasses must not override this; it caches results from -calculateLayoutThatFits:.  Calling this method may
- * be expensive if result is not cached.
- *
- * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
- */
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize;
 
 /**
  * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
@@ -752,6 +735,31 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 // Accessibility identification support
 @property (nonatomic, copy, nullable)   NSString *accessibilityIdentifier;
+
+@end
+
+@interface ASDisplayNode (ASLayoutElement) <ASLayoutElement>
+
+/**
+ * @abstract Asks the node to return a layout based on given size range.
+ *
+ * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ *
+ * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
+ *
+ * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
+ * constraint and the result.
+ *
+ * @warning Subclasses must not override this; it caches results from -calculateLayoutThatFits:.  Calling this method may
+ * be expensive if result is not cached.
+ *
+ * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
+ */
+- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize;
+
+@end
+
+@interface ASDisplayNode (ASLayoutElementStylability) <ASLayoutElementStylability>
 
 @end
 

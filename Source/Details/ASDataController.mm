@@ -334,7 +334,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
  *
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
  * @param sections The sections that should be populated by new elements
- * @param owningNode The node that owns the new elements.
  * @param traitCollection The trait collection needed to initialize elements
  * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
  */
@@ -360,7 +359,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
  * @param map The map to insert the elements into.
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
  * @param indexPaths The index paths at which new elements should be populated
- * @param owningNode The node that owns the new elements.
  * @param traitCollection The trait collection needed to initialize elements
  * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
  */

@@ -294,16 +294,13 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (nullable ASDisplayNode *)_supernodeWithClass:(Class)supernodeClass checkViewHierarchy:(BOOL)checkViewHierarchy;
 
 /**
- *  Convenience method to access this node's trait collection struct. Externally, users should interact
- *  with the trait collection via ASTraitCollection
- */
-- (ASPrimitiveTraitCollection)primitiveTraitCollection;
-
-/**
  * Whether this node rasterizes its descendants. See -enableSubtreeRasterization.
  */
 @property (atomic, readonly) BOOL rasterizesSubtree;
 
+/**
+ * Called if a gesture recognizer was attached to an _ASDisplayView
+ */
 - (void)nodeViewDidAddGestureRecognizer;
 
 @end
