@@ -107,8 +107,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
     // methods at all instead it throws away the contents of the layer and nothing will show up.
     unsigned canCallSetNeedsDisplayOfLayer:1;
 
-    // whether custom drawing is enabled
-    unsigned implementsInstanceDrawRect:1;
     unsigned implementsDrawRect:1;
     unsigned implementsImageDisplay:1;
     unsigned implementsDrawParameters:1;

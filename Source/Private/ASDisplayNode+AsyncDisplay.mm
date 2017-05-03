@@ -170,9 +170,8 @@
   // We always create a graphics context, unless a -display method is used, OR if we are a subnode drawing into a rasterized parent.
   BOOL shouldCreateGraphicsContext = (flags.implementsImageDisplay == NO && rasterizing == NO);
   BOOL shouldBeginRasterizing = (rasterizing == NO && flags.rasterizesSubtree);
-  BOOL usesInstanceMethodDisplay = (flags.implementsInstanceDrawRect);
-  BOOL usesImageDisplay = (flags.implementsImageDisplay);
-  BOOL usesDrawRect = (flags.implementsDrawRect || flags.implementsInstanceDrawRect);
+  BOOL usesImageDisplay = flags.implementsImageDisplay;
+  BOOL usesDrawRect = flags.implementsDrawRect;
   
   if (usesImageDisplay == NO && usesDrawRect == NO && shouldBeginRasterizing == NO) {
     // Early exit before requesting more expensive properties like bounds and opaque from the layer.
@@ -195,8 +194,6 @@
   }
   
   ASDisplayNodeAssert(contentsScaleForDisplay != 0.0, @"Invalid contents scale");
-  ASDisplayNodeAssert(usesInstanceMethodDisplay == NO || (flags.implementsDrawRect == NO && flags.implementsImageDisplay == NO),
-                      @"Node %@ should not implement both class and instance method display or draw", self);
   ASDisplayNodeAssert(rasterizing || !(_hierarchyState & ASHierarchyStateRasterized),
                       @"Rasterized descendants should never display unless being drawn into the rasterized container.");
 
@@ -254,15 +251,10 @@
         willDisplayNodeContentWithRenderingContext(currentContext, drawParameters);
       }
       
-      // Decide if we use a class or instance method to draw or display.
-      id object = usesInstanceMethodDisplay ? self : [self class];
-      
       if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
-        image = [object displayWithParameters:drawParameters
-                                  isCancelled:isCancelledBlock];
+        image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
       } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
-        [object drawRect:bounds withParameters:drawParameters
-             isCancelled:isCancelledBlock isRasterizing:rasterizing];
+        [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
       }
       
       if (didDisplayNodeContentWithRenderingContext != nil) {
