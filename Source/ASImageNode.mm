@@ -53,6 +53,8 @@ struct ASImageNodeDrawParameters {
   CGRect cropRect;
   CGRect cropDisplayBounds;
   asimagenode_modification_block_t imageModificationBlock;
+  ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
+  ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 };
 
 /**
@@ -65,8 +67,8 @@ struct ASImageNodeDrawParameters {
 @property CGRect imageDrawRect;
 @property BOOL isOpaque;
 @property (nonatomic, strong) UIColor *backgroundColor;
-@property (nonatomic, copy) ASDisplayNodeContextModifier preContextBlock;
-@property (nonatomic, copy) ASDisplayNodeContextModifier postContextBlock;
+@property (nonatomic, copy) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
+@property (nonatomic, copy) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 @property (nonatomic, copy) asimagenode_modification_block_t imageModificationBlock;
 
 @end
@@ -90,8 +92,8 @@ struct ASImageNodeDrawParameters {
       && CGRectEqualToRect(_imageDrawRect, other.imageDrawRect)
       && _isOpaque == other.isOpaque
       && [_backgroundColor isEqual:other.backgroundColor]
-      && _preContextBlock == other.preContextBlock
-      && _postContextBlock == other.postContextBlock
+      && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
+      && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
       && _imageModificationBlock == other.imageModificationBlock;
   } else {
     return NO;
@@ -106,8 +108,8 @@ struct ASImageNodeDrawParameters {
     CGRect imageDrawRect;
     BOOL isOpaque;
     NSUInteger backgroundColorHash;
-    void *preContextBlock;
-    void *postContextBlock;
+    void *willDisplayNodeContentWithRenderingContext;
+    void *didDisplayNodeContentWithRenderingContext;
     void *imageModificationBlock;
   } data = {
     _image.hash,
@@ -115,8 +117,8 @@ struct ASImageNodeDrawParameters {
     _imageDrawRect,
     _isOpaque,
     _backgroundColor.hash,
-    (void *)_preContextBlock,
-    (void *)_postContextBlock,
+    (void *)_willDisplayNodeContentWithRenderingContext,
+    (void *)_didDisplayNodeContentWithRenderingContext,
     (void *)_imageModificationBlock
   };
   return ASHashBytes(&data, sizeof(data));
@@ -299,7 +301,9 @@ struct ASImageNodeDrawParameters {
     .forcedSize = _forcedSize,
     .cropRect = _cropRect,
     .cropDisplayBounds = _cropDisplayBounds,
-    .imageModificationBlock = _imageModificationBlock
+    .imageModificationBlock = _imageModificationBlock,
+    .willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext,
+    .didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext
   };
   
   return nil;
@@ -335,12 +339,12 @@ struct ASImageNodeDrawParameters {
   CGRect cropDisplayBounds         = drawParameter.cropDisplayBounds;
   CGRect cropRect                  = drawParameter.cropRect;
   asimagenode_modification_block_t imageModificationBlock    = drawParameter.imageModificationBlock;
+  ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext = drawParameter.willDisplayNodeContentWithRenderingContext;
+  ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext = drawParameter.didDisplayNodeContentWithRenderingContext;
   
   BOOL hasValidCropBounds = cropEnabled && !CGRectIsEmpty(cropDisplayBounds);
   CGRect bounds = (hasValidCropBounds ? cropDisplayBounds : drawParameterBounds);
   
-  ASDisplayNodeContextModifier preContextBlock = self.willDisplayNodeContentWithRenderingContext;
-  ASDisplayNodeContextModifier postContextBlock = self.didDisplayNodeContentWithRenderingContext;
   
   ASDisplayNodeAssert(contentsScale > 0, @"invalid contentsScale at display time");
   
@@ -401,8 +405,8 @@ struct ASImageNodeDrawParameters {
   contentsKey.imageDrawRect = imageDrawRect;
   contentsKey.isOpaque = isOpaque;
   contentsKey.backgroundColor = backgroundColor;
-  contentsKey.preContextBlock = preContextBlock;
-  contentsKey.postContextBlock = postContextBlock;
+  contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
+  contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
 
   if (isCancelled()) {
@@ -466,8 +470,8 @@ static ASDN::Mutex cacheLock;
   BOOL contextIsClean = YES;
   
   CGContextRef context = UIGraphicsGetCurrentContext();
-  if (context && key.preContextBlock) {
-    key.preContextBlock(context);
+  if (context && key.willDisplayNodeContentWithRenderingContext) {
+    key.willDisplayNodeContentWithRenderingContext(context);
     contextIsClean = NO;
   }
   
@@ -498,8 +502,8 @@ static ASDN::Mutex cacheLock;
     [image drawInRect:key.imageDrawRect blendMode:blendMode alpha:1];
   }
   
-  if (context && key.postContextBlock) {
-    key.postContextBlock(context);
+  if (context && key.didDisplayNodeContentWithRenderingContext) {
+    key.didDisplayNodeContentWithRenderingContext(context);
   }
 
   // The following `UIGraphicsGetImageFromCurrentImageContext` call will commonly take more than 20ms on an
@@ -541,7 +545,6 @@ static ASDN::Mutex cacheLock;
       NSString *scaleString            = [NSString stringWithFormat:@"%.2fx", pixelCountRatio];
       _debugLabelNode.attributedText   = [[NSAttributedString alloc] initWithString:scaleString attributes:[self debugLabelAttributes]];
       _debugLabelNode.hidden           = NO;
-      //[self setNeedsLayout];
     } else {
       _debugLabelNode.hidden           = YES;
       _debugLabelNode.attributedText   = nil;
