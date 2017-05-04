@@ -336,7 +336,7 @@ NS_ASSUME_NONNULL_END
   for (id pagePtr in unmeasuredAttrsTable) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [[unmeasuredAttrsTable objectForPage:page] allObjects];
-    // Calcualte the page's rect but only if it's going to be used.
+    // Calculate the page's rect but only if it's going to be used.
     CGRect pageRect = hasBlockingRect ? ASPageCoordinateGetPageRect(page, pageSize) : CGRectZero;
     
     if (hasBlockingRect && CGRectContainsRect(blockingRect, pageRect)) {
