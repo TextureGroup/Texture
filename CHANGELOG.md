@@ -10,3 +10,4 @@
 - Simplified & optimized hashing code. [Adlai Holler](https://github.com/Adlai-Holler) [#86](https://github.com/TextureGroup/Texture/pull/86)
 - Improve the performance & safety of ASDisplayNode subnodes. [Adlai Holler](https://github.com/Adlai-Holler) [#223](https://github.com/TextureGroup/Texture/pull/223)
 - Remove finalLayoutElement [Michael Schneider] (https://github.com/maicki)[#96](https://github.com/TextureGroup/Texture/pull/96)
+- Add ASPageTable - A map table for fast retrieval of objects within a certain page [Huy Nguyen](https://github.com/nguyenhuy)

@@ -31,16 +31,12 @@
 
 - (instancetype)init
 {
-  self = [super init];
-  if (self) {
-    _scrollableDirections = ASScrollDirectionVerticalDirections;
-  }
-  return self;
+  return [self initWithScrollableDirections:ASScrollDirectionVerticalDirections];
 }
 
 - (instancetype)initWithScrollableDirections:(ASScrollDirection)scrollableDirections
 {
-  self = [self init];
+  self = [super init];
   if (self) {
     _scrollableDirections = scrollableDirections;
   }
@@ -71,9 +67,9 @@
   ASElementMap *elements = context.elements;
   NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
   if (children.count == 0) {
-    return [[ASCollectionLayoutState alloc] initWithElements:elements
-                                                 contentSize:CGSizeZero
-                                elementToLayoutArrtibutesMap:[NSMapTable weakToStrongObjectsMapTable]];
+    return [[ASCollectionLayoutState alloc] initWithContext:context
+                                                contentSize:CGSizeZero
+                             elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   }
   
   ASStackLayoutSpec *stackSpec = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
@@ -85,7 +81,7 @@
                                                                         children:children];
   stackSpec.concurrent = YES;
   ASLayout *layout = [stackSpec layoutThatFits:[self sizeRangeThatFits:context.viewportSize]];
-  return [[ASCollectionLayoutState alloc] initWithElements:elements layout:layout];
+  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout];
 }
 
 @end

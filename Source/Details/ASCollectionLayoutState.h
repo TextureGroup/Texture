@@ -19,45 +19,83 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-@class ASElementMap, ASCollectionElement, ASLayout;
+@class ASCollectionLayoutContext, ASLayout, ASCollectionElement;
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface NSMapTable (ASCollectionLayoutConvenience)
+
++ (NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)elementToLayoutAttributesTable;
+
+@end
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionLayoutState : NSObject
 
-/// The elements used to calculate this object
-@property (nonatomic, strong, readonly) ASElementMap *elements;
+/// The context used to calculate this object
+@property (nonatomic, strong, readonly) ASCollectionLayoutContext *context;
 
+/// The final content size of the collection's layout
 @property (nonatomic, assign, readonly) CGSize contentSize;
-
-/// Element to layout attributes map. Should use weak pointers for elements.
-@property (nonatomic, strong, readonly) NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *elementToLayoutArrtibutesMap;
 
 - (instancetype)init __unavailable;
 
 /**
  * Designated initializer.
  *
- * @param elements The elements used to calculate this object
+ * @param context The context used to calculate this object
  *
  * @param contentSize The content size of the collection's layout
  *
- * @param elementToLayoutArrtibutesMap Map between elements to their layout attributes. The map may contain all elements, or a subset of them and will be updated later. 
- * Also, it should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
+ * @param table A map between elements to their layout attributes. It may contain all elements, or a subset of them that will be updated later.
+ * It should be initialized using +[NSMapTable elementToLayoutAttributesTable] convenience initializer.
  */
-- (instancetype)initWithElements:(ASElementMap *)elements contentSize:(CGSize)contentSize elementToLayoutArrtibutesMap:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)elementToLayoutArrtibutesMap NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
 
 /**
  * Convenience initializer.
  *
- * @param elements The elements used to calculate this object
+ * @param context The context used to calculate this object
  *
- * @param layout The layout describes size and position of all elements, or a subset of them and will be updated later.
+ * @param layout The layout describes size and position of all elements, or a subset of them and will be updated over time.
  *
- * @discussion The sublayouts that describe position of elements must be direct children of the root layout object parameter.
  */
-- (instancetype)initWithElements:(ASElementMap *)elements layout:(ASLayout *)layout;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout;
+
+/**
+ * Returns all layout attributes present in this object.
+ */
+- (NSArray<UICollectionViewLayoutAttributes *> *)allLayoutAttributes;
+
+/**
+ * Returns layout attributes of elements in the specified rect.
+ *
+ * @param rect The rect containing the target elements.
+ */
+- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect;
+
+/**
+ * Returns layout attributes of the element at the specified index path.
+ *
+ * @param indexPath The index path of the item.
+ */
+- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath;
+
+/**
+ * Returns layout attributes of the specified supplementary element.
+ *
+ * @param kind A string that identifies the type of the supplementary element.
+ *
+ * @param indexPath The index path of the element.
+ */
+- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+
+/**
+ * Returns layout attributes of the specified element.
+ *
+ * @element The element.
+ */
+- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForElement:(ASCollectionElement *)element;
 
 @end
 

@@ -389,6 +389,8 @@
 		DEFAD8131CC48914000527C4 /* ASVideoNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEEC47E01C20C2DD00EC1693 /* ASVideoNode.mm */; };
 		E516FC7F1E9FE24200714FF4 /* ASHashing.h in Headers */ = {isa = PBXBuildFile; fileRef = E516FC7D1E9FE24200714FF4 /* ASHashing.h */; };
 		E516FC801E9FE24200714FF4 /* ASHashing.m in Sources */ = {isa = PBXBuildFile; fileRef = E516FC7E1E9FE24200714FF4 /* ASHashing.m */; };
+		E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */; };
+		E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */; };
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
 		E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */ = {isa = PBXBuildFile; fileRef = E5711A2A1C840C81009619D4 /* ASCollectionElement.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E5711A301C840C96009619D4 /* ASCollectionElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5711A2D1C840C96009619D4 /* ASCollectionElement.mm */; };
@@ -822,6 +824,8 @@
 		E516FC7E1E9FE24200714FF4 /* ASHashing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASHashing.m; sourceTree = "<group>"; };
 		E52405B21C8FEF03004DC8E7 /* ASLayoutTransition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutTransition.mm; sourceTree = "<group>"; };
 		E52405B41C8FEF16004DC8E7 /* ASLayoutTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutTransition.h; sourceTree = "<group>"; };
+		E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPageTable.h; sourceTree = "<group>"; };
+		E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPageTable.m; sourceTree = "<group>"; };
 		E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutElement.mm; sourceTree = "<group>"; };
 		E5711A2A1C840C81009619D4 /* ASCollectionElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionElement.h; sourceTree = "<group>"; };
 		E5711A2D1C840C96009619D4 /* ASCollectionElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionElement.mm; sourceTree = "<group>"; };
@@ -1479,6 +1483,8 @@
 				E58E9E411E941D74004CFC59 /* ASCollectionLayoutDelegate.h */,
 				E58E9E3D1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.h */,
 				E58E9E3E1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m */,
+				E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */,
+				E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */,
 			);
 			name = "Collection Layout";
 			sourceTree = "<group>";
@@ -1547,6 +1553,7 @@
 				B35061F71B010EFD0018CF92 /* ASCollectionViewProtocols.h in Headers */,
 				68FC85E31CE29B7E00EDD713 /* ASTabBarController.h in Headers */,
 				B35061FA1B010EFD0018CF92 /* ASControlNode+Subclasses.h in Headers */,
+				E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */,
 				B35061F81B010EFD0018CF92 /* ASControlNode.h in Headers */,
 				B35062171B010EFD0018CF92 /* ASDataController.h in Headers */,
 				34EFC75B1B701BAF00AD841F /* ASDimension.h in Headers */,
@@ -2056,6 +2063,7 @@
 				509E68601B3AED8E009B9150 /* ASScrollDirection.m in Sources */,
 				B35062091B010EFD0018CF92 /* ASScrollNode.mm in Sources */,
 				8BDA5FC81CDBDF95007D13B2 /* ASVideoPlayerNode.mm in Sources */,
+				E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */,
 				34EFC7721B701D0300AD841F /* ASStackLayoutSpec.mm in Sources */,
 				7AB338661C55B3420055FDE8 /* ASRelativeLayoutSpec.mm in Sources */,
 				696F01EE1DD2AF450049FBD5 /* ASEventLog.mm in Sources */,
