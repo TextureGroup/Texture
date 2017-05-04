@@ -143,11 +143,9 @@ static struct ASDisplayNodeFlags GetASDisplayNodeFlags(Class c, ASDisplayNode *i
   if (instance) {
     flags.implementsDrawParameters = ([instance respondsToSelector:@selector(drawParametersForAsyncLayer:)] ? 1 : 0);
     flags.implementsInstanceDrawRect = ([instance respondsToSelector:@selector(drawRect:withParameters:isCancelled:isRasterizing:)] ? 1 : 0);
-    flags.implementsInstanceImageDisplay = ([instance respondsToSelector:@selector(displayWithParameters:isCancelled:)] ? 1 : 0);
   } else {
     flags.implementsDrawParameters = ([c instancesRespondToSelector:@selector(drawParametersForAsyncLayer:)] ? 1 : 0);
     flags.implementsInstanceDrawRect = ([c instancesRespondToSelector:@selector(drawRect:withParameters:isCancelled:isRasterizing:)] ? 1 : 0);
-    flags.implementsInstanceImageDisplay = ([c instancesRespondToSelector:@selector(displayWithParameters:isCancelled:)] ? 1 : 0);
   }
   return flags;
 }
@@ -832,6 +830,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 - (CGRect)threadSafeBounds
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return _threadSafeBounds;
+}
+
+- (CGRect)_locked_threadSafeBounds
+{
   return _threadSafeBounds;
 }
 
@@ -2001,8 +2004,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
 {
   ASDN::MutexLocker l(__instanceLock__);
   
-  return _flags.implementsDrawRect || _flags.implementsImageDisplay || _flags.rasterizesSubtree ||
-  _flags.implementsInstanceDrawRect || _flags.implementsInstanceImageDisplay;
+  return _flags.implementsDrawRect || _flags.implementsImageDisplay || _flags.rasterizesSubtree || _flags.implementsInstanceDrawRect;
 }
 
 // Track that a node will be displayed as part of the current node hierarchy.

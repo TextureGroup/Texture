@@ -110,7 +110,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
     // whether custom drawing is enabled
     unsigned implementsInstanceDrawRect:1;
     unsigned implementsDrawRect:1;
-    unsigned implementsInstanceImageDisplay:1;
     unsigned implementsImageDisplay:1;
     unsigned implementsDrawParameters:1;
 

@@ -168,10 +168,10 @@
   flags = _flags;
   
   // We always create a graphics context, unless a -display method is used, OR if we are a subnode drawing into a rasterized parent.
-  BOOL shouldCreateGraphicsContext = (flags.implementsInstanceImageDisplay == NO && flags.implementsImageDisplay == NO && rasterizing == NO);
+  BOOL shouldCreateGraphicsContext = (flags.implementsImageDisplay == NO && rasterizing == NO);
   BOOL shouldBeginRasterizing = (rasterizing == NO && flags.rasterizesSubtree);
-  BOOL usesInstanceMethodDisplay = (flags.implementsInstanceDrawRect || flags.implementsInstanceImageDisplay);
-  BOOL usesImageDisplay = (flags.implementsImageDisplay || flags.implementsInstanceImageDisplay);
+  BOOL usesInstanceMethodDisplay = (flags.implementsInstanceDrawRect);
+  BOOL usesImageDisplay = (flags.implementsImageDisplay);
   BOOL usesDrawRect = (flags.implementsDrawRect || flags.implementsInstanceDrawRect);
   
   if (usesImageDisplay == NO && usesDrawRect == NO && shouldBeginRasterizing == NO) {

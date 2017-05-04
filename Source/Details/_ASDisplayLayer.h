@@ -125,12 +125,6 @@
  */
 - (void)drawRect:(CGRect)bounds withParameters:(id <NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
 
-/**
- * @abstract instance version of display class method
- * @see displayWithParameters:isCancelled class method
- */
-- (UIImage *)displayWithParameters:(id <NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled;
-
 // Called on the main thread only
 
 /**
