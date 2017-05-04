@@ -53,13 +53,13 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
     return nil;
   }
   
-  NSPointerArray *results = [NSPointerArray pointerArrayWithOptions:(NSPointerFunctionsIntegerPersonality | NSPointerFunctionsOpaqueMemory)];
+  NSPointerArray *result = [NSPointerArray pointerArrayWithOptions:(NSPointerFunctionsIntegerPersonality | NSPointerFunctionsOpaqueMemory)];
   
   ASPageCoordinate minPage = ASPageCoordinateForPageThatContainsPoint(CGPointMake(CGRectGetMinX(rect), CGRectGetMinY(rect)), pageSize);
   ASPageCoordinate maxPage = ASPageCoordinateForPageThatContainsPoint(CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)), pageSize);
   if (minPage == maxPage) {
-    [results addPointer:(void *)minPage];
-    return results;
+    [result addPointer:(void *)minPage];
+    return result;
   }
   
   NSUInteger minX = ASPageCoordinateGetX(minPage);
@@ -70,11 +70,11 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
   for (NSUInteger x = minX; x <= maxX; x++) {
     for (NSUInteger y = minY; y <= maxY; y++) {
       ASPageCoordinate page = ASPageCoordinateMake(x, y);
-      [results addPointer:(void *)page];
+      [result addPointer:(void *)page];
     }
   }
   
-  return results;
+  return result;
 }
 
 @implementation NSMapTable (ASPageTableMethods)
@@ -110,14 +110,15 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
   return [self pageTableWithValuePointerFunctions:weakObjectPointerFuncs];
 }
 
-+ (ASPageTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize
++ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize
 {
   ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (UICollectionViewLayoutAttributes *attrs in layoutAttributesEnumerator) {
+    // TODO this attrs may span multiple pages. Make sure we include all of the pages
     ASPageCoordinate page = ASPageCoordinateForPageThatContainsPoint(attrs.frame.origin, pageSize);
-    NSMutableSet<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
+    NSMutableArray<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
     if (attrsInPage == nil) {
-      attrsInPage = [NSMutableSet set];
+      attrsInPage = [NSMutableArray array];
       [result setObject:attrsInPage forPage:page];
     }
     [attrsInPage addObject:attrs];

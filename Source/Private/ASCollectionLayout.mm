@@ -119,17 +119,15 @@
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
   ASDisplayNodeAssertMainThread();
-  if (CGRectIsEmpty(rect) || (! CGRectIntersectsRect(_layout.contentRect, rect))) {
-    return @[];
-  }
+  NSArray<UICollectionViewLayoutAttributes *> *result = [_layout layoutAttributesForElementsInRect:rect];
   
-  NSArray<UICollectionViewLayoutAttributes *> *results = [_layout layoutAttributesForElementsInRect:rect];
   ASElementMap *elements = _layout.context.elements;
-  for (UICollectionViewLayoutAttributes *attrs in results) {
+  for (UICollectionViewLayoutAttributes *attrs in result) {
     ASCollectionElement *element = [elements elementForLayoutAttributes:attrs];
     [ASCollectionLayout setSize:attrs.frame.size toElement:element];
   }
-  return results;
+  
+  return result;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath

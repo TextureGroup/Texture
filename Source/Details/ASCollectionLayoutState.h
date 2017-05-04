@@ -38,9 +38,6 @@ AS_SUBCLASSING_RESTRICTED
 /// The final content size of the collection's layout
 @property (nonatomic, assign, readonly) CGSize contentSize;
 
-/// The final content rect calculated from content size
-@property (nonatomic, assign, readonly) CGRect contentRect;
-
 - (instancetype)init __unavailable;
 
 /**
@@ -75,7 +72,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param rect The rect containing the target elements.
  */
-- (nullable NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect;
+- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect;
 
 /**
  * Returns layout attributes of the element at the specified index path.

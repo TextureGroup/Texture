@@ -36,7 +36,7 @@
 
 @implementation ASCollectionLayoutState {
   NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
-  ASPageTable<id, NSMutableSet<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
+  ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
 }
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout
@@ -74,7 +74,6 @@
   if (self) {
     _context = context;
     _contentSize = contentSize;
-    _contentRect = CGRectMake(0.0f, 0.0f, contentSize.width, contentSize.height);
     _elementToLayoutAttributesTable = table;
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator pageSize:context.viewportSize];
   }
@@ -91,28 +90,29 @@
   CGSize pageSize = _context.viewportSize;
   NSPointerArray *pages = ASPageCoordinatesForPagesThatIntersectRect(rect, _contentSize, pageSize);
   if (pages.count == 0) {
-    return nil;
+    return @[];
   }
   
-  NSMutableArray<UICollectionViewLayoutAttributes *> *results = [NSMutableArray array];
+  // TODO make sure items in the result are unique (use mutable set)
+  NSMutableArray<UICollectionViewLayoutAttributes *> *result = [NSMutableArray array];
   for (id pagePtr in pages) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSSet<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
+    NSArray<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
     if (allAttrs.count > 0) {
       CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
       
       if (CGRectContainsRect(rect, pageRect)) {
-        [results addObjectsFromArray:[allAttrs allObjects]];
+        [result addObjectsFromArray:allAttrs];
       } else {
         for (UICollectionViewLayoutAttributes *attrs in allAttrs) {
           if (CGRectIntersectsRect(rect, attrs.frame)) {
-            [results addObject:attrs];
+            [result addObject:attrs];
           }
         }
       }
     }
   }
-  return results;
+  return result;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath

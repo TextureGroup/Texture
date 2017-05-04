@@ -91,14 +91,14 @@ typedef NSMapTable ASPageTable;
  *
  * @param pageSize The size of each page.
  */
-+ (ASPageTable<id, NSMutableSet<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize;
++ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize;
 
 /**
  * Retrieves the object for a given page, or nil if the page is not found.
  *
  * @param page A page to lookup the object for.
  */
-- (ObjectType)objectForPage:(ASPageCoordinate)page;
+- (nullable ObjectType)objectForPage:(ASPageCoordinate)page;
 
 /**
  * Sets the given object for the associated page.
