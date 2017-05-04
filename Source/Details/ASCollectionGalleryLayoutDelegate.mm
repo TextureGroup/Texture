@@ -77,7 +77,6 @@ NS_ASSUME_NONNULL_END
   return self;
 }
 
-ASLayoutElementFinalLayoutElementDefault
 ASLayoutElementStyleExtensibilityForwarding
 ASPrimitiveTraitCollectionDefaults
 ASPrimitiveTraitCollectionDeprecatedImplementation
@@ -124,10 +123,10 @@ AS_SUBCLASSING_RESTRICTED
 @interface _ASGalleryLayoutStateAdditionInfo : NSObject
 
 /// Sets unmeasured layout attributes to this object.
-- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes withPageSize:(CGSize)pageSize;
+- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
 
 /// Removes and returns unmeasured layout attributes that intersect the specified rect
-- (nullable ASPageTable<id, NSSet<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
+- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
 
 @end
 
@@ -135,16 +134,16 @@ NS_ASSUME_NONNULL_END
 
 @implementation _ASGalleryLayoutStateAdditionInfo {
   ASDN::Mutex __instanceLock__;
-  ASPageTable<id, NSMutableSet<UICollectionViewLayoutAttributes *> *> *_pageToUnmeasuredLayoutAttributesTable;
+  ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToUnmeasuredLayoutAttributesTable;
 }
 
-- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes withPageSize:(CGSize)pageSize
+- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
 {
   ASDN::MutexLocker l(__instanceLock__);
-  _pageToUnmeasuredLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:layoutAttributes pageSize:pageSize];
+  _pageToUnmeasuredLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:layoutAttributes contentSize:contentSize pageSize:pageSize];
 }
 
-- (ASPageTable<id, NSSet<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
+- (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
 {
   if (CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, pageSize) || CGSizeEqualToSize(CGSizeZero, contentSize)) {
     return nil;
@@ -163,45 +162,44 @@ NS_ASSUME_NONNULL_END
   }
   
   // Step 2: Filter out attributes in these pages that intersect the specified rect. Remove them from the internal table as we go
-  ASPageTable *results = [ASPageTable pageTableForStrongObjectPointers];
+  ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (id pagePtr in pagesInRect) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSMutableSet *attrsInPage = [_pageToUnmeasuredLayoutAttributesTable objectForPage:page];
-    NSUInteger attrsCount = attrsInPage.count;
+    NSMutableArray *attrsInPage = [_pageToUnmeasuredLayoutAttributesTable objectForPage:page];
     
-    if (attrsCount > 0) {
-      NSMutableSet *interesectingAttrsInPage = nil;
+    if (NSUInteger attrsCount = attrsInPage.count > 0) {
+      NSMutableArray *interesectingAttrsInPage = nil;
       
       CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
       if (CGRectContainsRect(rect, pageRect)) {
         // The page fits well within the specified rect. Simply return all attributes in this page.
-        interesectingAttrsInPage = [attrsInPage copy];
+        // Don't need to make a copy of attrsInPage here because it will be removed from the page table soon anyway.
+        interesectingAttrsInPage = attrsInPage;
       } else {
         // The page intersects the specified rect. Some attributes in this page are to be returned, some are not.
         for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
           if (CGRectIntersectsRect(rect, attrs.frame)) {
             if (interesectingAttrsInPage == nil) {
-              interesectingAttrsInPage = [NSMutableSet set];
+              interesectingAttrsInPage = [NSMutableArray array];
             }
             [interesectingAttrsInPage addObject:attrs];
           }
         }
       }
       
-      NSUInteger interesectingAttrsCount = interesectingAttrsInPage.count;
-      if (interesectingAttrsCount > 0) {
-        [results setObject:interesectingAttrsInPage forPage:page];
+      if (NSUInteger interesectingAttrsCount = interesectingAttrsInPage.count > 0) {
+        [result setObject:interesectingAttrsInPage forPage:page];
         if (attrsCount == interesectingAttrsCount) {
           // All attributes in this page intersect the specified rect. Remove the whole page.
           [_pageToUnmeasuredLayoutAttributesTable removeObjectForPage:page];
         } else {
-          [attrsInPage minusSet:interesectingAttrsInPage];
+          [attrsInPage removeObjectsInArray:interesectingAttrsInPage];
         }
       }
     }
   }
   
-  return results;
+  return result;
 }
 
 @end
@@ -259,12 +257,13 @@ NS_ASSUME_NONNULL_END
                                                                                          layout:layout
                                                                                  additionalInfo:[[_ASGalleryLayoutStateAdditionInfo alloc] init]
                                                                                 getElementBlock:getElementBlock];
-  if (CGSizeEqualToSize(collectionLayout.contentSize, CGSizeZero)) {
+  CGSize contentSize = collectionLayout.contentSize;
+  if (CGSizeEqualToSize(contentSize, CGSizeZero)) {
     return collectionLayout;
   }
   
   // Step 3: Since _ASGalleryLayoutItem is a dummy layout object, register all elements as unmeasured.
-  [collectionLayout.additionalInfo setUnmeasuredLayoutAttributes:[collectionLayout allLayoutAttributes] withPageSize:pageSize];
+  [collectionLayout.additionalInfo setUnmeasuredLayoutAttributes:[collectionLayout allLayoutAttributes] contentSize:contentSize pageSize:pageSize];
   
   // Step 4: Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
   // TODO Consider content offset of the collection node
@@ -278,7 +277,7 @@ NS_ASSUME_NONNULL_END
 - (void)ensureLayoutAttributesForElementsInRect:(CGRect)rect withLayout:(ASCollectionLayoutState *)layout
 {
   ASDisplayNodeAssertMainThread();
-  if (CGRectIsEmpty(rect) || (! CGRectIntersectsRect(layout.contentRect, rect))) {
+  if (CGRectIsEmpty(rect)) {
     return;
   }
   
@@ -309,7 +308,8 @@ NS_ASSUME_NONNULL_END
   ASDisplayNodeAssert(! hasBlockingRect || CGRectContainsRect(rect, blockingRect), @"Blocking rect, if specified, must be within the other (outer) rect");
   
   // Step 1: Clamp the specified rects between the bounds of content rect
-  CGRect contentRect = layout.contentRect;
+  CGSize contentSize = layout.contentSize;
+  CGRect contentRect = CGRectMake(0, 0, contentSize.width, contentSize.height);
   rect = CGRectIntersection(contentRect, rect);
   if (CGRectIsNull(rect)) {
     return;
@@ -322,15 +322,17 @@ NS_ASSUME_NONNULL_END
   // Step 2: Get layout attributes of all unmeasured elements within the specified outer rect
   ASCollectionLayoutContext *context = layout.context;
   CGSize pageSize = context.viewportSize;
-  ASPageTable *unmeasuredAttrsTable = [layout.additionalInfo getAndRemoveUnmeasuredLayoutAttributesInRect:rect contentSize:layout.contentSize pageSize:pageSize];
+  ASPageTable *unmeasuredAttrsTable = [layout.additionalInfo getAndRemoveUnmeasuredLayoutAttributesInRect:rect contentSize:contentSize pageSize:pageSize];
   if (unmeasuredAttrsTable.count == 0) {
     // No unmeasured elements in this rect! Bail early
     return;
   }
   
   // Step 3: Split all those attributes into blocking and non-blocking buckets
-  NSMutableArray<UICollectionViewLayoutAttributes *> *blockingAttrs = hasBlockingRect ? [NSMutableArray array] : nil;
-  NSMutableArray<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableArray array];
+  // Use an ordered set here because some items may span multiple pages and they will be accessed by indexes.
+  NSMutableOrderedSet<UICollectionViewLayoutAttributes *> *blockingAttrs = hasBlockingRect ? [NSMutableOrderedSet orderedSet] : nil;
+  // Use a set here because some items may span multiple pages
+  NSMutableSet<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableSet set];
   for (id pagePtr in unmeasuredAttrsTable) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [[unmeasuredAttrsTable objectForPage:page] allObjects];
