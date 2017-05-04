@@ -1,5 +1,5 @@
 //
-//  ASPageTable.mm
+//  ASPageTable.m
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
