@@ -110,18 +110,22 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
   return [self pageTableWithValuePointerFunctions:weakObjectPointerFuncs];
 }
 
-+ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize
++ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
 {
   ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (UICollectionViewLayoutAttributes *attrs in layoutAttributesEnumerator) {
-    // TODO this attrs may span multiple pages. Make sure we include all of the pages
-    ASPageCoordinate page = ASPageCoordinateForPageThatContainsPoint(attrs.frame.origin, pageSize);
-    NSMutableArray<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
-    if (attrsInPage == nil) {
-      attrsInPage = [NSMutableArray array];
-      [result setObject:attrsInPage forPage:page];
+    // This attrs may span multiple pages. Make sure it's registered to all of them
+    NSPointerArray *pages = ASPageCoordinatesForPagesThatIntersectRect(attrs.frame, contentSize, pageSize);
+    
+    for (id pagePtr in pages) {
+      ASPageCoordinate page = (ASPageCoordinate)pagePtr;
+      NSMutableArray<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
+      if (attrsInPage == nil) {
+        attrsInPage = [NSMutableArray array];
+        [result setObject:attrsInPage forPage:page];
+      }
+      [attrsInPage addObject:attrs];
     }
-    [attrsInPage addObject:attrs];
   }  
   return result;
 }

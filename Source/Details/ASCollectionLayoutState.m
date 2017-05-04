@@ -75,7 +75,7 @@
     _context = context;
     _contentSize = contentSize;
     _elementToLayoutAttributesTable = table;
-    _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator pageSize:context.viewportSize];
+    _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator contentSize:contentSize pageSize:context.viewportSize];
   }
   return self;
 }
@@ -93,8 +93,8 @@
     return @[];
   }
   
-  // TODO make sure items in the result are unique (use mutable set)
-  NSMutableArray<UICollectionViewLayoutAttributes *> *result = [NSMutableArray array];
+  // Use a mutable set here because some items may span multiple pages
+  NSMutableSet<UICollectionViewLayoutAttributes *> *result = [NSMutableSet set];
   for (id pagePtr in pages) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSArray<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
@@ -112,7 +112,7 @@
       }
     }
   }
-  return result;
+  return [result allObjects];
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath

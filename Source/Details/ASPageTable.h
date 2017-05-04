@@ -53,7 +53,7 @@ extern CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSiz
  *
  * @param rect The rect intersecting the target pages.
  *
- * @param contentRect The combined rect of all pages.
+ * @param contentSize The combined size of all pages.
  *
  * @param pageSize The size of each page.
  */
@@ -89,9 +89,11 @@ typedef NSMapTable ASPageTable;
  *
  * @param layoutAttributesEnumerator The layout attributes to build from
  *
+ * @param contentSize The combined size of all pages.
+ *
  * @param pageSize The size of each page.
  */
-+ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator pageSize:(CGSize)pageSize;
++ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
 
 /**
  * Retrieves the object for a given page, or nil if the page is not found.
