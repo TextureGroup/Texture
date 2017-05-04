@@ -40,6 +40,8 @@
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 @property (nonatomic, assign) BOOL allowsMultipleSelectionDuringEditing;
 @property (nonatomic, assign) BOOL inverted;
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
 @end
 
 @implementation _ASTablePendingState
@@ -53,6 +55,8 @@
     _allowsMultipleSelection = NO;
     _allowsMultipleSelectionDuringEditing = NO;
     _inverted = NO;
+    _leadingScreensForBatching = 2;
+    _automaticallyAdjustsContentOffset = NO;
   }
   return self;
 }
@@ -201,6 +205,48 @@
     return _pendingState.inverted;
   } else {
     return self.view.inverted;
+  }
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.leadingScreensForBatching = leadingScreensForBatching;
+  } else {
+    ASDisplayNodeAssert(self.nodeLoaded, @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.leadingScreensForBatching = leadingScreensForBatching;
+  }
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.leadingScreensForBatching;
+  } else {
+    return self.view.leadingScreensForBatching;
+  }
+}
+
+- (void)setAutomaticallyAdjustsContentOffset:(BOOL)automaticallyAdjustsContentOffset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.automaticallyAdjustsContentOffset = automaticallyAdjustsContentOffset;
+  } else {
+    ASDisplayNodeAssert(self.nodeLoaded, @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.automaticallyAdjustsContentOffset = automaticallyAdjustsContentOffset;
+  }
+}
+
+- (BOOL)automaticallyAdjustsContentOffset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.automaticallyAdjustsContentOffset;
+  } else {
+    return self.view.automaticallyAdjustsContentOffset;
   }
 }
 

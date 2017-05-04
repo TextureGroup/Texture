@@ -42,11 +42,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) id <ASTableDelegate>   delegate;
 @property (weak, nonatomic) id <ASTableDataSource> dataSource;
 
+/**
+ * The number of screens left to scroll before the delegate -tableNode:beginBatchFetchingWithContext: is called.
+ *
+ * Defaults to two screenfuls.
+ */
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+
 /*
  * A Boolean value that determines whether the table will be flipped.
  * If the value of this property is YES, the first cell node will be at the bottom of the table (as opposed to the top by default). This is useful for chat/messaging apps. The default value is NO.
  */
 @property (nonatomic, assign) BOOL inverted;
+
+/**
+ * YES to automatically adjust the contentOffset when cells are inserted or deleted above
+ * visible cells, maintaining the users' visible scroll position.
+ *
+ * @note This is only applied to non-animated updates. For animated updates, there is no way to
+ * synchronize or "cancel out" the appearance of a scroll due to UITableView API limitations.
+ *
+ * default is NO.
+ */
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
+
 /*
  * A Boolean value that determines whether users can select a row.
  * If the value of this property is YES (the default), users can select rows. If you set it to NO, they cannot select rows. Setting this property affects cell selection only when the table view is not in editing mode. If you want to restrict selection of cells in editing mode, use `allowsSelectionDuringEditing`.

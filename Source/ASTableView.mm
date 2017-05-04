@@ -161,11 +161,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // When we update our data controller in response to an interactive move,
   // we don't want to tell the table view about the change (it knows!)
   BOOL _updatingInResponseToInteractiveMove;
+  BOOL _inverted;
 
   // The top cell node that was visible before the update.
   __weak ASCellNode *_contentOffsetAdjustmentTopVisibleNode;
   // The y-offset of the top visible row's origin before the update.
   CGFloat _contentOffsetAdjustmentTopVisibleNodeOffset;
+  CGFloat _leadingScreensForBatching;
+  BOOL _automaticallyAdjustsContentOffset;
   
   CGPoint _deceleratingVelocity;
   
@@ -1273,6 +1276,38 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (_asyncDelegateFlags.scrollViewDidEndDragging) {
     [_asyncDelegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
   }
+}
+
+#pragma mark - Misc
+
+- (BOOL)inverted
+{
+  return _inverted;
+}
+
+- (void)setInverted:(BOOL)inverted
+{
+  _inverted = inverted;
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  return _leadingScreensForBatching;
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  _leadingScreensForBatching = leadingScreensForBatching;
+}
+
+- (BOOL)automaticallyAdjustsContentOffset
+{
+  return _automaticallyAdjustsContentOffset;
+}
+
+- (void)setAutomaticallyAdjustsContentOffset:(BOOL)automaticallyAdjustsContentOffset
+{
+  _automaticallyAdjustsContentOffset = automaticallyAdjustsContentOffset;
 }
 
 #pragma mark - Scroll Direction

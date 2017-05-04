@@ -45,6 +45,8 @@
 @property (nonatomic, assign) BOOL allowsSelection; // default is YES
 @property (nonatomic, assign) BOOL allowsMultipleSelection; // default is NO
 @property (nonatomic, assign) BOOL inverted; //default is NO
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
 @end
 
 @implementation _ASCollectionPendingState
@@ -272,6 +274,44 @@
     return _pendingState.inverted;
   } else {
     return self.view.inverted;
+  }
+}
+
+- (void)setLayoutInspector:(id<ASCollectionViewLayoutInspecting>)layoutInspector
+{
+  if ([self pendingState]) {
+    _pendingState.layoutInspector = layoutInspector;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.layoutInspector = layoutInspector;
+  }
+}
+
+- (id<ASCollectionViewLayoutInspecting>)layoutInspector
+{
+  if ([self pendingState]) {
+    return _pendingState.layoutInspector;
+  } else {
+    return self.view.layoutInspector;
+  }
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  if ([self pendingState]) {
+    _pendingState.leadingScreensForBatching = leadingScreensForBatching;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.leadingScreensForBatching = leadingScreensForBatching;
+  }
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  if ([self pendingState]) {
+    return _pendingState.leadingScreensForBatching;
+  } else {
+    return self.view.leadingScreensForBatching;
   }
 }
 

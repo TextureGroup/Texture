@@ -44,6 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style;
 
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
+
+@property (nonatomic, assign) BOOL inverted;
+
 /**
  * Tuning parameters for a range type in full mode.
  *
