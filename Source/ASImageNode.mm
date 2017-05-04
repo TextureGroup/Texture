@@ -257,7 +257,7 @@ struct ASImageNodeDrawParameters {
         [self addSubnode:_debugLabelNode];
       });
     }
-    
+
   } else {
     self.contents = nil;
   }
@@ -356,19 +356,6 @@ struct ASImageNodeDrawParameters {
   CGSize imageSize = image.size;
   CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
   CGSize boundsSizeInPixels = CGSizeMake(std::floor(bounds.size.width * contentsScale), std::floor(bounds.size.height * contentsScale));
-  
-  if (_debugLabelNode) {
-    CGFloat pixelCountRatio            = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
-    if (pixelCountRatio != 1.0) {
-      NSString *scaleString            = [NSString stringWithFormat:@"%.2fx", pixelCountRatio];
-      _debugLabelNode.attributedText   = [[NSAttributedString alloc] initWithString:scaleString attributes:[self debugLabelAttributes]];
-      _debugLabelNode.hidden           = NO;
-      [self setNeedsLayout];
-    } else {
-      _debugLabelNode.hidden           = YES;
-      _debugLabelNode.attributedText   = nil;
-    }
-  }
   
   BOOL contentModeSupported = contentMode == UIViewContentModeScaleAspectFill ||
                               contentMode == UIViewContentModeScaleAspectFit ||
@@ -540,7 +527,26 @@ static ASDN::Mutex cacheLock;
   __instanceLock__.lock();
     void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
     UIImage *image = _image;
+    BOOL hasDebugLabel = (_debugLabelNode != nil);
   __instanceLock__.unlock();
+
+  // Update the debug label if necessary
+  if (hasDebugLabel) {
+    // For debugging purposes we don't care about locking for now
+    CGSize imageSize = image.size;
+    CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
+    CGSize boundsSizeInPixels = CGSizeMake(std::floor(self.bounds.size.width * self.contentsScale), std::floor(self.bounds.size.height * self.contentsScale));
+    CGFloat pixelCountRatio            = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
+    if (pixelCountRatio != 1.0) {
+      NSString *scaleString            = [NSString stringWithFormat:@"%.2fx", pixelCountRatio];
+      _debugLabelNode.attributedText   = [[NSAttributedString alloc] initWithString:scaleString attributes:[self debugLabelAttributes]];
+      _debugLabelNode.hidden           = NO;
+      //[self setNeedsLayout];
+    } else {
+      _debugLabelNode.hidden           = YES;
+      _debugLabelNode.attributedText   = nil;
+    }
+  }
   
   // If we've got a block to perform after displaying, do it.
   if (image && displayCompletionBlock) {
