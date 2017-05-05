@@ -60,8 +60,9 @@
 #endif
 
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
+NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 
-// Forward declare CALayerDelegate protocol as the iOS 10 SDK moves CALayerDelegate from a formal delegate to a protocol.
+// Forward declare CALayerDelegate protocol as the iOS 10 SDK moves CALayerDelegate from an informal delegate to a protocol.
 // We have to forward declare the protocol as this place otherwise it will not compile compiling with an Base SDK < iOS 10
 @protocol CALayerDelegate;
 
@@ -281,6 +282,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
   _contentsScaleForDisplay = ASScreenScale();
+  _drawingPriority = ASDefaultDrawingPriority;
   
   _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
   
@@ -2230,36 +2232,6 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
     });
   }
 }
-
-NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
-static const char *ASDisplayNodeDrawingPriorityKey = "ASDrawingPriority";
-
-- (void)setDrawingPriority:(NSInteger)drawingPriority
-{
-  ASDisplayNodeAssertThreadAffinity(self);
-  ASDN::MutexLocker l(__instanceLock__);
-
-  if (drawingPriority == ASDefaultDrawingPriority) {
-    _flags.hasCustomDrawingPriority = NO;
-    objc_setAssociatedObject(self, ASDisplayNodeDrawingPriorityKey, nil, OBJC_ASSOCIATION_ASSIGN);
-  } else {
-    _flags.hasCustomDrawingPriority = YES;
-    objc_setAssociatedObject(self, ASDisplayNodeDrawingPriorityKey, @(drawingPriority), OBJC_ASSOCIATION_RETAIN);
-  }
-}
-
-- (NSInteger)drawingPriority
-{
-  ASDisplayNodeAssertThreadAffinity(self);
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  if (!_flags.hasCustomDrawingPriority) {
-    return ASDefaultDrawingPriority;
-  } else {
-    return [objc_getAssociatedObject(self, ASDisplayNodeDrawingPriorityKey) integerValue];
-  }
-}
-
 
 #pragma mark <_ASDisplayLayerDelegate>
 

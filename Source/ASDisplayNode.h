@@ -505,7 +505,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @discussion Defaults to ASDefaultDrawingPriority. There may be multiple drawing threads, and some of them may
  * decide to perform operations in queued order (regardless of drawingPriority)
  */
-@property (nonatomic, assign) NSInteger drawingPriority;
+@property (atomic, assign) NSInteger drawingPriority;
 
 /** @name Hit Testing */
 
