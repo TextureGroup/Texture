@@ -30,7 +30,7 @@
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASTableNode.h>
+#import <AsyncDisplayKit/ASTableNode+Beta.h>
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASTableLayoutController.h>
@@ -1225,7 +1225,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
   if (targetContentOffset != NULL) {
     ASDisplayNodeAssert(_batchContext != nil, @"Batch context should exist");
-    [self _beginBatchFetchingIfNeededWithContentOffset:*targetContentOffset];
+    [self _beginBatchFetchingIfNeededWithContentOffset:*targetContentOffset velocity:velocity];
   }
   
   if (_asyncDelegateFlags.scrollViewWillEndDragging) {
@@ -1381,6 +1381,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
 }
 
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return self.tableNode.batchFetchingDelegate;
+}
+
 - (void)_scheduleCheckForBatchFetchingForNumberOfChanges:(NSUInteger)changes
 {
   // Prevent fetching will continually trigger in a loop after reaching end of content and no new content was provided
@@ -1402,12 +1407,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return;
   }
   
-  [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset];
+  [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset velocity:CGPointZero];
 }
 
-- (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset
+- (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset)) {
+  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity)) {
     [self _beginBatchFetching];
   }
 }
