@@ -111,6 +111,7 @@
 {
   ASDN::RecursiveMutex _environmentStateLock;
   Class _collectionViewClass;
+  id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 @property (nonatomic) _ASCollectionPendingState *pendingState;
 @end
@@ -440,6 +441,16 @@
     return ((ASCollectionLayout *)layout).layoutDelegate;
   }
   return nil;
+}
+
+- (void)setBatchFetchingDelegate:(id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  _batchFetchingDelegate = batchFetchingDelegate;
+}
+
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return _batchFetchingDelegate;
 }
 
 #pragma mark - Range Tuning
