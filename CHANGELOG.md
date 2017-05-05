@@ -12,3 +12,5 @@
 - Move more properties from ASTableView, ASCollectionView to their respective node classes. [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove finalLayoutElement [Michael Schneider] (https://github.com/maicki)[#96](https://github.com/TextureGroup/Texture/pull/96)
 - Add ASPageTable - A map table for fast retrieval of objects within a certain page [Huy Nguyen](https://github.com/nguyenhuy)
+- Add new public `-supernodes`, `-supernodesIncludingSelf`, and `-supernodeOfClass:includingSelf:` methods. [Adlai Holler](https://github.com/Adlai-Holler)[#246](https://github.com/TextureGroup/Texture/pull/246)
+- Improve our handling supernode traversal to avoid loading layers and fix assertion failures you might hit in debug. [Adlai Holler](https://github.com/Adlai-Holler)[#246](https://github.com/TextureGroup/Texture/pull/246)
