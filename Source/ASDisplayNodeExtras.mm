@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 
 #import <queue>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
@@ -138,24 +139,21 @@ extern void ASDisplayNodePerformBlockOnEverySubnode(ASDisplayNode *node, BOOL tr
 
 ASDisplayNode *ASDisplayNodeFindFirstSupernode(ASDisplayNode *node, BOOL (^block)(ASDisplayNode *node))
 {
-  CALayer *layer = node.layer;
-
-  while (layer) {
-    node = ASLayerToDisplayNode(layer);
-    if (block(node)) {
-      return node;
+  // This function has historically started with `self` but the name suggests
+  // that it wouldn't. Perhaps we should change the behavior.
+  for (ASDisplayNode *ancestor in node.supernodesIncludingSelf) {
+    if (block(ancestor)) {
+      return ancestor;
     }
-    layer = layer.superlayer;
   }
-
   return nil;
 }
 
 __kindof ASDisplayNode *ASDisplayNodeFindFirstSupernodeOfClass(ASDisplayNode *start, Class c)
 {
-  return ASDisplayNodeFindFirstSupernode(start, ^(ASDisplayNode *n) {
-    return [n isKindOfClass:c];
-  });
+  // This function has historically started with `self` but the name suggests
+  // that it wouldn't. Perhaps we should change the behavior.
+  return [start supernodeOfClass:c includingSelf:YES];
 }
 
 static void _ASCollectDisplayNodes(NSMutableArray *array, CALayer *layer)
