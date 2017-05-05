@@ -165,13 +165,13 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   {
     ASDN::MutexLocker l(__instanceLock__);
     
-    ASDisplayNodeAssert(_imageWasSetExternally == NO, @"Setting a URL to an ASNetworkImageNode after setting an image changes its behavior from an ASImageNode to an ASNetworkImageNode. If this is what you want, set the image to nil first.");
-    
-    _imageWasSetExternally = NO;
-    
     if (ASObjectIsEqual(URL, _URL)) {
       return;
     }
+    
+    ASDisplayNodeAssert(_imageWasSetExternally == NO, @"Setting a URL to an ASNetworkImageNode after setting an image changes its behavior from an ASImageNode to an ASNetworkImageNode. If this is what you want, set the image to nil first.");
+    
+    _imageWasSetExternally = NO;
     
     [self _locked_cancelImageDownloadWithResumePossibility:NO];
 
