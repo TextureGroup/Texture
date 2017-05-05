@@ -75,7 +75,4 @@ typedef NS_ENUM(NSUInteger, ASAsyncTransactionContainerState) {
 @property (nonatomic, readonly, strong, nullable) CALayer *asyncdisplaykit_parentTransactionContainer;
 @end
 
-@interface UIView (ASAsyncTransactionContainer) <ASAsyncTransactionContainer>
-@end
-
 NS_ASSUME_NONNULL_END

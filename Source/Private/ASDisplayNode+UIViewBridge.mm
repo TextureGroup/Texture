@@ -1022,13 +1022,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)asyncdisplaykit_isAsyncTransactionContainer
 {
   _bridge_prologue_read;
-  return _getFromViewOrLayer(asyncdisplaykit_isAsyncTransactionContainer, asyncdisplaykit_isAsyncTransactionContainer);
+  return _getFromLayer(asyncdisplaykit_isAsyncTransactionContainer);
 }
 
 - (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)asyncTransactionContainer
 {
   _bridge_prologue_write;
-  _setToViewOrLayer(asyncdisplaykit_asyncTransactionContainer, asyncTransactionContainer, asyncdisplaykit_asyncTransactionContainer, asyncTransactionContainer);
+  _setToLayer(asyncdisplaykit_asyncTransactionContainer, asyncTransactionContainer);
 }
 
 - (ASAsyncTransactionContainerState)asyncdisplaykit_asyncTransactionContainerState

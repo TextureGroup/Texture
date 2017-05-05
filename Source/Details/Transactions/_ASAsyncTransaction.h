@@ -90,7 +90,7 @@ extern NSInteger const ASDefaultTransactionPriority;
  The state of the transaction.
  @see ASAsyncTransactionState
  */
-@property (readonly, assign) ASAsyncTransactionState state;
+@property (atomic, readonly, assign) ASAsyncTransactionState state;
 
 /**
  @summary Adds a synchronous operation to the transaction.  The execution block will be executed immediately.

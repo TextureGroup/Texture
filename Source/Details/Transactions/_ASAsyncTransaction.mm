@@ -28,8 +28,6 @@
 #import <mutex>
 #import <stdatomic.h>
 
-#define ASAsyncTransactionAssertMainThread() NSAssert(0 != pthread_main_np(), @"This method must be called on the main thread");
-
 NSInteger const ASDefaultTransactionPriority = 0;
 
 @interface ASAsyncTransactionOperation : NSObject
@@ -369,11 +367,6 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
   return atomic_load(&_state);
 }
 
-- (void)setState:(ASAsyncTransactionState)state
-{
-  atomic_store(&_state, state);
-}
-
 #pragma mark - Transaction Management
 
 - (void)addAsyncOperationWithBlock:(asyncdisplaykit_async_transaction_async_operation_block_t)block
@@ -391,7 +384,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
                              queue:(dispatch_queue_t)queue
                         completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion
 {
-  ASAsyncTransactionAssertMainThread();
+  ASDisplayNodeAssertMainThread();
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You can only add operations to open transactions");
 
   [self _ensureTransactionData];
@@ -426,7 +419,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
                         queue:(dispatch_queue_t)queue
                    completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion
 {
-  ASAsyncTransactionAssertMainThread();
+  ASDisplayNodeAssertMainThread();
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You can only add operations to open transactions");
 
   [self _ensureTransactionData];
@@ -453,16 +446,16 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (void)cancel
 {
-  ASAsyncTransactionAssertMainThread();
-  NSAssert(self.state != ASAsyncTransactionStateOpen, @"You can only cancel a committed or already-canceled transaction");
-  self.state = ASAsyncTransactionStateCanceled;
+  ASDisplayNodeAssertMainThread();
+  __unused ASAsyncTransactionState oldState = atomic_exchange(&_state, ASAsyncTransactionStateCanceled);
+  NSAssert(oldState != ASAsyncTransactionStateOpen, @"You can only cancel a committed or already-canceled transaction");
 }
 
 - (void)commit
 {
-  ASAsyncTransactionAssertMainThread();
-  NSAssert(self.state == ASAsyncTransactionStateOpen, @"You cannot double-commit a transaction");
-  self.state = ASAsyncTransactionStateCommitted;
+  ASDisplayNodeAssertMainThread();
+  __unused ASAsyncTransactionState oldState = atomic_exchange(&_state, ASAsyncTransactionStateCommitted);
+  NSAssert(oldState == ASAsyncTransactionStateOpen, @"You cannot double-commit a transaction");
   
   if ([_operations count] == 0) {
     // Fast path: if a transaction was opened, but no operations were added, execute completion block synchronously.
@@ -475,7 +468,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
     _group->notify(_callbackQueue, ^{
       // _callbackQueue is the main queue in current practice (also asserted in -waitUntilComplete).
       // This code should be reviewed before taking on significantly different use cases.
-      ASAsyncTransactionAssertMainThread();
+      ASDisplayNodeAssertMainThread();
       [self completeTransaction];
     });
   }
@@ -483,27 +476,26 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (void)completeTransaction
 {
-  ASAsyncTransactionState state = self.state;
-  if (state != ASAsyncTransactionStateComplete) {
-    BOOL isCanceled = (state == ASAsyncTransactionStateCanceled);
-    for (ASAsyncTransactionOperation *operation in _operations) {
-      [operation callAndReleaseCompletionBlock:isCanceled];
-    }
-    
-    // Always set state to Complete, even if we were cancelled, to block any extraneous
-    // calls to this method that may have been scheduled for the next runloop
-    // (e.g. if we needed to force one in this runloop with -waitUntilComplete, but another was already scheduled)
-    self.state = ASAsyncTransactionStateComplete;
-
-    if (_completionBlock) {
-      _completionBlock(self, isCanceled);
-    }
+  // Always set state to Complete, even if we were cancelled, to block any extraneous
+  // calls to this method that may have been scheduled for the next runloop
+  // (e.g. if we needed to force one in this runloop with -waitUntilComplete, but another was already scheduled)
+  ASAsyncTransactionState oldState = atomic_exchange(&_state, ASAsyncTransactionStateComplete);
+  if (oldState == ASAsyncTransactionStateComplete) {
+    return;
+  }
+  
+  BOOL isCanceled = (oldState == ASAsyncTransactionStateCanceled);
+  for (ASAsyncTransactionOperation *operation in _operations) {
+    [operation callAndReleaseCompletionBlock:isCanceled];
+  }
+  if (_completionBlock) {
+    _completionBlock(self, isCanceled);
   }
 }
 
 - (void)waitUntilComplete
 {
-  ASAsyncTransactionAssertMainThread();
+  ASDisplayNodeAssertMainThread();
   if (self.state != ASAsyncTransactionStateComplete) {
     if (_group) {
       NSAssert(_callbackQueue == dispatch_get_main_queue(), nil);
