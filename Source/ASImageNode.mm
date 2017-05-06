@@ -413,8 +413,11 @@ struct ASImageNodeDrawParameters {
     return nil;
   }
 
-  ASWeakMapEntry<UIImage *> *entry = [self.class contentsForkey:contentsKey isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled];
-  if (entry == nil) {  // If nil, we were cancelled.
+  ASWeakMapEntry<UIImage *> *entry = [self.class contentsForkey:contentsKey
+                                                 drawParameters:parameter
+                                                    isCancelled:isCancelled];
+  // If nil, we were cancelled.
+  if (entry == nil) {
     return nil;
   }
   
@@ -428,7 +431,7 @@ struct ASImageNodeDrawParameters {
 static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 static ASDN::Mutex cacheLock;
 
-+ (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
++ (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
   {
     ASDN::MutexLocker l(cacheLock);
@@ -443,7 +446,7 @@ static ASDN::Mutex cacheLock;
   }
 
   // cache miss
-  UIImage *contents = [self createContentsForkey:key isCancelled:isCancelled];
+  UIImage *contents = [self createContentsForkey:key drawParameters:drawParameters isCancelled:isCancelled];
   if (contents == nil) { // If nil, we were cancelled
     return nil;
   }
@@ -454,7 +457,7 @@ static ASDN::Mutex cacheLock;
   }
 }
 
-+ (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
++ (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
   // The following `UIGraphicsBeginImageContextWithOptions` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
@@ -471,7 +474,7 @@ static ASDN::Mutex cacheLock;
   
   CGContextRef context = UIGraphicsGetCurrentContext();
   if (context && key.willDisplayNodeContentWithRenderingContext) {
-    key.willDisplayNodeContentWithRenderingContext(context);
+    key.willDisplayNodeContentWithRenderingContext(context, drawParameters);
     contextIsClean = NO;
   }
   
@@ -503,7 +506,7 @@ static ASDN::Mutex cacheLock;
   }
   
   if (context && key.didDisplayNodeContentWithRenderingContext) {
-    key.didDisplayNodeContentWithRenderingContext(context);
+    key.didDisplayNodeContentWithRenderingContext(context, drawParameters);
   }
 
   // The following `UIGraphicsGetImageFromCurrentImageContext` call will commonly take more than 20ms on an
@@ -517,7 +520,7 @@ static ASDN::Mutex cacheLock;
   
   UIGraphicsEndImageContext();
   
-  if (key.imageModificationBlock != NULL) {
+  if (key.imageModificationBlock) {
     result = key.imageModificationBlock(result);
   }
   
