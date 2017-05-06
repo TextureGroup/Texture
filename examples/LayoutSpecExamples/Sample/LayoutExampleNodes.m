@@ -125,7 +125,7 @@
     
     _photoNode = [[ASNetworkImageNode alloc] init];
     _photoNode.URL = [NSURL URLWithString:@"http://asyncdisplaykit.org/static/images/layout-examples-photo-with-inset-text-overlay-photo.png"];
-    _photoNode.willDisplayNodeContentWithRenderingContext = ^(CGContextRef context) {
+    _photoNode.willDisplayNodeContentWithRenderingContext = ^(CGContextRef context, id drawParameters) {
       CGRect bounds = CGContextGetClipBoundingBox(context);
       [[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:10] addClip];
     };

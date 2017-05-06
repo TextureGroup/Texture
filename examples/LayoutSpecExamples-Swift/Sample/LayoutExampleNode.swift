@@ -74,7 +74,7 @@ class PhotoWithInsetTextOverlay : LayoutExampleNode {
     backgroundColor = .clear
 
     photoNode.url = URL(string: "http://asyncdisplaykit.org/static/images/layout-examples-photo-with-inset-text-overlay-photo.png")
-    photoNode.willDisplayNodeContentWithRenderingContext = { context in
+    photoNode.willDisplayNodeContentWithRenderingContext = { context, drawParameters in
       let bounds = context.boundingBoxOfClipPath
       UIBezierPath(roundedRect: bounds, cornerRadius: 10).addClip()
     }
