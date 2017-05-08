@@ -251,7 +251,7 @@
       // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
       // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
       if (willDisplayNodeContentWithRenderingContext != nil) {
-        willDisplayNodeContentWithRenderingContext(currentContext);
+        willDisplayNodeContentWithRenderingContext(currentContext, drawParameters);
       }
       
       // Decide if we use a class or instance method to draw or display.
@@ -266,7 +266,7 @@
       }
       
       if (didDisplayNodeContentWithRenderingContext != nil) {
-        didDisplayNodeContentWithRenderingContext(currentContext);
+        didDisplayNodeContentWithRenderingContext(currentContext, drawParameters);
       }
       
       if (shouldCreateGraphicsContext) {

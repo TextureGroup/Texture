@@ -56,7 +56,7 @@ typedef void (^ASDisplayNodeDidLoadBlock)(__kindof ASDisplayNode * node);
 /**
  * ASDisplayNode will / did render node content in context.
  */
-typedef void (^ASDisplayNodeContextModifier)(CGContextRef context);
+typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable drawParameters);
 
 /**
  * ASDisplayNode layout spec block. This block can be used instead of implementing layoutSpecThatFits: in subclass
