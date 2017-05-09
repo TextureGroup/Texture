@@ -14,3 +14,6 @@
 - Add ASPageTable - A map table for fast retrieval of objects within a certain page [Huy Nguyen](https://github.com/nguyenhuy)
 - Add new public `-supernodes`, `-supernodesIncludingSelf`, and `-supernodeOfClass:includingSelf:` methods. [Adlai Holler](https://github.com/Adlai-Holler)[#246](https://github.com/TextureGroup/Texture/pull/246)
 - Improve our handling supernode traversal to avoid loading layers and fix assertion failures you might hit in debug. [Adlai Holler](https://github.com/Adlai-Holler)[#246](https://github.com/TextureGroup/Texture/pull/246)
+- [ASDisplayNode] Pass drawParameter in rendering context callbacks [Michael Schneider](https://github.com/maicki)[#248](https://github.com/TextureGroup/Texture/pull/248)
+- [ASTextNode] Move to class method of drawRect:withParameters:isCancelled:isRasterizing: for drawing [Michael Schneider] (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)
+- [ASDisplayNode] Remove instance:-drawRect:withParameters:isCancelled:isRasterizing: (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)

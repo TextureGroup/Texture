@@ -239,7 +239,7 @@ extern ASSizeRange const ASSizeRangeUnconstrained;
  */
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeHasSignificantArea(ASSizeRange sizeRange)
 {
-  static CGFloat const limit = 0.1;
+  static CGFloat const limit = 0.1f;
   return (sizeRange.max.width > limit && sizeRange.max.height > limit);
 }
 

@@ -109,7 +109,7 @@
  @param isCancelledBlock Execute this block to check whether the current drawing operation has been cancelled to avoid unnecessary work. A return value of YES means cancel drawing and return.
  @param isRasterizing YES if the layer is being rasterized into another layer, in which case drawRect: probably wants to avoid doing things like filling its bounds with a zero-alpha color to clear the backing store.
  */
-+ (void)drawRect:(CGRect)bounds withParameters:(id<NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
++ (void)drawRect:(CGRect)bounds withParameters:(id)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
 
 /**
  @summary Delegate override to provide new layer contents as a UIImage.
@@ -118,18 +118,6 @@
  @return A UIImage with contents that are ready to display on the main thread. Make sure that the image is already decoded before returning it here.
  */
 + (UIImage *)displayWithParameters:(id<NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock;
-
-/**
- * @abstract instance version of drawRect class method
- * @see drawRect:withParameters:isCancelled:isRasterizing class method
- */
-- (void)drawRect:(CGRect)bounds withParameters:(id <NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
-
-/**
- * @abstract instance version of display class method
- * @see displayWithParameters:isCancelled class method
- */
-- (UIImage *)displayWithParameters:(id <NSObject>)parameters isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled;
 
 // Called on the main thread only
 
