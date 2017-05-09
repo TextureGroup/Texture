@@ -3908,11 +3908,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [result addObject:@{ @"alpha" : @(_pendingViewState.alpha) }];
     [result addObject:@{ @"frame" : [NSValue valueWithCGRect:_pendingViewState.frame] }];
   }
-  
-  // Check supernode so that if we are cell node we don't find self.
-  ASCellNode *cellNode = ASDisplayNodeFindFirstSupernodeOfClass(self.supernode, [ASCellNode class]);
-  if (cellNode != nil) {
-    [result addObject:@{ @"cellNode" : ASObjectDescriptionMakeTiny(cellNode) }];
+
+  if (ASDisplayNodeThreadIsMain()) {
+    // Check supernode so that if we are cell node we don't find self.
+    ASCellNode *cellNode = ASDisplayNodeFindFirstSupernodeOfClass(self.supernode, [ASCellNode class]);
+    if (cellNode != nil) {
+      [result addObject:@{ @"cellNode" : ASObjectDescriptionMakeTiny(cellNode) }];
+    }
   }
   
   [result addObject:@{ @"interfaceState" : NSStringFromASInterfaceState(self.interfaceState)} ];

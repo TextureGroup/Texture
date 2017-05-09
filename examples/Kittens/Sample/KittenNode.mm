@@ -35,6 +35,7 @@ static const CGFloat kInnerPadding = 10.0f;
   
   ASNetworkImageNode *_imageNode;
   ASTextNode *_textNode;
+  ASDisplayNode *_separator;
   ASDisplayNode *_divider;
   BOOL _isImageEnlarged;
   BOOL _swappedTextAndImage;
@@ -101,7 +102,12 @@ static const CGFloat kInnerPadding = 10.0f;
   _textNode = [[ASTextNode alloc] init];
   _textNode.attributedText = [[NSAttributedString alloc] initWithString:[self kittyIpsum] attributes:[self textStyle]];
   [self addSubnode:_textNode];
-  
+
+  // hairline vertical divider
+  _separator = [[ASDisplayNode alloc] init];
+  _separator.backgroundColor = [UIColor grayColor];
+  [self addSubnode:_separator];
+
   // hairline cell separator
   _divider = [[ASDisplayNode alloc] init];
   _divider.backgroundColor = [UIColor lightGrayColor];
@@ -151,6 +157,10 @@ static const CGFloat kInnerPadding = 10.0f;
   // Shrink the text node in case the image + text gonna be too wide
   _textNode.style.flexShrink = 1.0;
 
+  // Vertical separator between image and text - match height of the tallest item in the stack.
+  _separator.style.flexBasis = ASDimensionMake(1.0);
+  _separator.style.alignSelf = ASStackLayoutAlignSelfStretch;
+
   // Configure stack
   ASStackLayoutSpec *stackLayoutSpec =
   [ASStackLayoutSpec
@@ -158,7 +168,7 @@ static const CGFloat kInnerPadding = 10.0f;
    spacing:kInnerPadding
    justifyContent:ASStackLayoutJustifyContentStart
    alignItems:ASStackLayoutAlignItemsStart
-   children:_swappedTextAndImage ? @[_textNode, _imageNode] : @[_imageNode, _textNode]];
+   children:_swappedTextAndImage ? @[_textNode, _separator, _imageNode] : @[_imageNode, _separator, _textNode]];
   
   // Add inset
   return [ASInsetLayoutSpec
