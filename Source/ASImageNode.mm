@@ -148,7 +148,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   void (^_displayCompletionBlock)(BOOL canceled);
   
   // Drawing
-  //ASImageNodeDrawParameters _drawParameter;
   ASTextNode *_debugLabelNode;
   
   // Cropping.
@@ -439,8 +438,6 @@ static ASDN::Mutex cacheLock;
     }
     ASWeakMapEntry *entry = [cache entryForKey:key];
     if (entry != nil) {
-      // cache hit
-        NSLog(@"cache hit");
       return entry;
     }
   }
