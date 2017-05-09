@@ -14,3 +14,4 @@
 - Add ASPageTable - A map table for fast retrieval of objects within a certain page [Huy Nguyen](https://github.com/nguyenhuy)
 - [ASDisplayNode] Pass drawParameter in rendering context callbacks [Michael Schneider](https://github.com/maicki)[#248](https://github.com/TextureGroup/Texture/pull/248)
 - [ASTextNode] Move to class method of drawRect:withParameters:isCancelled:isRasterizing: for drawing [Michael Schneider] (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)
+- [ASDisplayNode] Remove instance:-drawRect:withParameters:isCancelled:isRasterizing: (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)
