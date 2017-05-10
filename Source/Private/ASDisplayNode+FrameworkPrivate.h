@@ -163,6 +163,8 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (BOOL)supportsRangeManagedInterfaceState;
 
+- (BOOL)_locked_displaysAsynchronously;
+
 // The two methods below will eventually be exposed, but their names are subject to change.
 /**
  * @abstract Ensure that all rendering is complete for this node and its descendants.
@@ -224,6 +226,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState;
 
+@end
+
+
+@interface ASDisplayNode (ASLayoutInternal)
+
 /**
  * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
  *
@@ -238,11 +245,19 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (void)_rootNodeDidInvalidateSize;
 
-/**
- * @abstract Subclass hook for nodes that are acting as root nodes. This method is called after measurement
- * finished in a layout transition but before the measurement completion handler is called
- */
+- (void)_locked_measureNodeWithBoundsIfNecessary:(CGRect)bounds;
+- (void)_layoutSublayouts;
+
+- (ASSizeRange)_locked_constrainedSizeForLayoutPass;
+@end
+
+@interface ASDisplayNode (ASLayoutTransitionInternal)
+
+@property (atomic, assign) int32_t pendingTransitionID;
 - (void)_layoutTransitionMeasurementDidFinish;
+- (BOOL)_isLayoutTransitionInvalid;
+- (void)_pendingLayoutTransitionDidComplete;
+- (void)_completePendingLayoutTransition;
 
 @end
 

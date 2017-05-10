@@ -295,44 +295,6 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 @property (nonatomic, class, copy) ASDisplayNodeNonFatalErrorBlock nonFatalErrorBlock;
 
-
-/** @name Managing dimensions */
-
-/**
- * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
- * implement layoutSpecThatFits:
- *
- * @return A block that takes a constrainedSize ASSizeRange argument, and must return an ASLayoutSpec that includes all
- * of the subnodes to position in the layout. This input-output relationship is identical to the subclass override
- * method -layoutSpecThatFits:
- *
- * @warning Subclasses that implement -layoutSpecThatFits: must not also use .layoutSpecBlock. Doing so will trigger
- * an exception. A future version of the framework may support using both, calling them serially, with the
- * .layoutSpecBlock superseding any values set by the method override.
- *
- * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
- */
-@property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
-
-/** 
- * @abstract Return the calculated size.
- *
- * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
- * calling -measure: on them in -calculateLayoutThatFits.
- *
- * @return Size already calculated by -calculateLayoutThatFits:.
- *
- * @warning Subclasses must not override this; it returns the last cached measurement and is never expensive.
- */
-@property (nonatomic, readonly, assign) CGSize calculatedSize;
-
-/** 
- * @abstract Return the constrained size range used for calculating layout.
- *
- * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
- */
-@property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout;
-
 /** @name Managing the nodes hierarchy */
 
 
@@ -589,7 +551,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 /**
  * Convenience methods for debugging.
  */
-@interface ASDisplayNode (Debugging) <ASLayoutElementAsciiArtProtocol, ASDebugNameProvider>
+@interface ASDisplayNode (Debugging) <ASDebugNameProvider>
 
 /**
  * @abstract Return a description of the node hierarchy.
@@ -599,7 +561,6 @@ extern NSInteger const ASDefaultDrawingPriority;
 - (NSString *)displayNodeRecursiveDescription AS_WARN_UNUSED_RESULT;
 
 @end
-
 
 /**
  * ## UIView bridge
@@ -759,7 +720,52 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-@interface ASDisplayNode (ASLayoutElementStylability) <ASLayoutElementStylability>
+@interface ASDisplayNode (LayoutElementStylability) <ASLayoutElementStylability>
+
+@end
+
+@interface ASDisplayNode (ASLayoutElementAsciiArtProtocol) <ASLayoutElementAsciiArtProtocol>
+@end
+
+@interface ASDisplayNode (Layout)
+
+/** @name Managing dimensions */
+
+/**
+ * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
+ * implement layoutSpecThatFits:
+ *
+ * @return A block that takes a constrainedSize ASSizeRange argument, and must return an ASLayoutSpec that includes all
+ * of the subnodes to position in the layout. This input-output relationship is identical to the subclass override
+ * method -layoutSpecThatFits:
+ *
+ * @warning Subclasses that implement -layoutSpecThatFits: must not also use .layoutSpecBlock. Doing so will trigger
+ * an exception. A future version of the framework may support using both, calling them serially, with the
+ * .layoutSpecBlock superseding any values set by the method override.
+ *
+ * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
+ */
+@property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
+
+/** 
+ * @abstract Return the calculated size.
+ *
+ * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
+ * calling -measure: on them in -calculateLayoutThatFits.
+ *
+ * @return Size already calculated by -calculateLayoutThatFits:.
+ *
+ * @warning Subclasses must not override this; it returns the last cached measurement and is never expensive.
+ */
+@property (nonatomic, readonly, assign) CGSize calculatedSize;
+
+/** 
+ * @abstract Return the constrained size range used for calculating layout.
+ *
+ * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
+ */
+@property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout;
+
 
 @end
 
