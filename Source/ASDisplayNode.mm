@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
+#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
@@ -600,9 +601,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return layer;
 }
 
-- (void)_locked_loadViewOrLayerIsLayerBacked:(BOOL)isLayerBacked
+- (void)_locked_loadViewOrLayer
 {
-  if (isLayerBacked) {
+  if (_flags.layerBacked) {
     TIME_SCOPED(_debugTimeToCreateView);
     _layer = [self _locked_layerToLoad];
     static int ASLayerDelegateAssociationKey;
@@ -692,7 +693,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   // Loading a view needs to happen on the main thread
   ASDisplayNodeAssertMainThread();
-  [self _locked_loadViewOrLayerIsLayerBacked:isLayerBacked];
+  [self _locked_loadViewOrLayer];
   
   // FIXME: Ideally we'd call this as soon as the node receives -setNeedsLayout
   // but automatic subnode management would require us to modify the node tree
@@ -727,20 +728,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return _layer;
   }
   
-  BOOL isLayerBacked = _flags.layerBacked;
-  if (!isLayerBacked) {
-    // No need for the lock and call the view explicitly in case it needs to be loaded first
-    ASDN::MutexUnlocker u(__instanceLock__);
-    return self.view.layer;
-  }
-  
   if (![self _locked_shouldLoadViewOrLayer]) {
     return nil;
   }
   
   // Loading a layer needs to happen on the main thread
   ASDisplayNodeAssertMainThread();
-  [self _locked_loadViewOrLayerIsLayerBacked:isLayerBacked];
+  [self _locked_loadViewOrLayer];
   
   // FIXME: Ideally we'd call this as soon as the node receives -setNeedsLayout
   // but automatic subnode management would require us to modify the node tree
@@ -3909,8 +3903,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [result addObject:@{ @"frame" : [NSValue valueWithCGRect:_pendingViewState.frame] }];
   }
   
-  // Check supernode so that if we are cell node we don't find self.
-  ASCellNode *cellNode = ASDisplayNodeFindFirstSupernodeOfClass(self.supernode, [ASCellNode class]);
+  // Check supernode so that if we are a cell node we don't find self.
+  ASCellNode *cellNode = [self supernodeOfClass:[ASCellNode class] includingSelf:NO];
   if (cellNode != nil) {
     [result addObject:@{ @"cellNode" : ASObjectDescriptionMakeTiny(cellNode) }];
   }
