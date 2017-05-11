@@ -21,14 +21,14 @@
 @protocol ASVideoNodeDelegate;
 
 typedef NS_ENUM(NSInteger, ASVideoNodePlayerState) {
-    ASVideoNodePlayerStateUnknown,
-    ASVideoNodePlayerStateInitialLoading,
-    ASVideoNodePlayerStateReadyToPlay,
-    ASVideoNodePlayerStatePlaybackLikelyToKeepUpButNotPlaying,
-    ASVideoNodePlayerStatePlaying,
-    ASVideoNodePlayerStateLoading,
-    ASVideoNodePlayerStatePaused,
-    ASVideoNodePlayerStateFinished
+  ASVideoNodePlayerStateUnknown,
+  ASVideoNodePlayerStateInitialLoading,
+  ASVideoNodePlayerStateReadyToPlay,
+  ASVideoNodePlayerStatePlaybackLikelyToKeepUpButNotPlaying,
+  ASVideoNodePlayerStatePlaying,
+  ASVideoNodePlayerStateLoading,
+  ASVideoNodePlayerStatePaused,
+  ASVideoNodePlayerStateFinished
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -148,12 +148,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)videoNodeDidRecoverFromStall:(ASVideoNode *)videoNode;
 /**
- * @abstract Delegate method invoked when an error occurs while trying to play a video
+ * @abstract Delegate method invoked when an error occurs while trying trying to load an asset
  * @param videoNode The videoNode.
- * @param currentItem The error that occurs
+ * @param key The key of value that failed to load.
+ * @param asset The asset.
+ * @param error The error that occurs.
  */
-- (void)videoNodeDidFailToInitAssetFor:(ASVideoNode *)videoNode withError:(NSError *)error;
-
+- (void)videoNode:(ASVideoNode *)videoNode didFailToLoadValueForKey:(NSString *)key asset:(AVAsset *)asset error:(NSError *)error;
 
 @end
 
@@ -164,4 +165,3 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
-
