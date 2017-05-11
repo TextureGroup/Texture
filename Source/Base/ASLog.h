@@ -15,6 +15,8 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
 #pragma once
 
 
@@ -34,6 +36,7 @@
 // It's valuable to support trace signposts on iOS 9, because A5 devices don't support iOS 10.
 #ifndef DBG_MACH_CHUD
 #define DBG_MACH_CHUD 0x0A
+#define DBG_FUNC_NONE 0
 #define DBG_FUNC_START 1
 #define DBG_FUNC_END 2
 #define DBG_APPS 33
