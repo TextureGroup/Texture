@@ -693,7 +693,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param attributes  A dictionary containing the attributes to set, or nil to remove all attributes.
  */
 - (void)as_setAttributes:(nullable NSDictionary<NSString *, id> *)attributes;
-- (void)setYy_attributes:(nullable NSDictionary<NSString *, id> *)attributes;
+- (void)setAs_attributes:(nullable NSDictionary<NSString *, id> *)attributes;
 
 /**
  Sets an attribute with the given name and value to the entire text string.

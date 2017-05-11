@@ -643,10 +643,10 @@ return style. _attr_;
 @implementation NSMutableAttributedString (ASText)
 
 - (void)as_setAttributes:(NSDictionary *)attributes {
-  [self setYy_attributes:attributes];
+  [self setAs_attributes:attributes];
 }
 
-- (void)setYy_attributes:(NSDictionary *)attributes {
+- (void)setAs_attributes:(NSDictionary *)attributes {
   if (attributes == (id)[NSNull null]) attributes = nil;
   [self setAttributes:@{} range:NSMakeRange(0, self.length)];
   [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
@@ -670,7 +670,7 @@ return style. _attr_;
 
 #pragma mark - Property Setter
 
-- (void)setYy_font:(UIFont *)font {
+- (void)setAs_font:(UIFont *)font {
   /*
    In iOS7 and later, UIFont is toll-free bridged to CTFontRef,
    although Apple does not mention it in documentation.
@@ -683,79 +683,79 @@ return style. _attr_;
   [self as_setFont:font range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_kern:(NSNumber *)kern {
+- (void)setAs_kern:(NSNumber *)kern {
   [self as_setKern:kern range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_color:(UIColor *)color {
+- (void)setAs_color:(UIColor *)color {
   [self as_setColor:color range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_backgroundColor:(UIColor *)backgroundColor {
+- (void)setAs_backgroundColor:(UIColor *)backgroundColor {
   [self as_setBackgroundColor:backgroundColor range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_strokeWidth:(NSNumber *)strokeWidth {
+- (void)setAs_strokeWidth:(NSNumber *)strokeWidth {
   [self as_setStrokeWidth:strokeWidth range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_strokeColor:(UIColor *)strokeColor {
+- (void)setAs_strokeColor:(UIColor *)strokeColor {
   [self as_setStrokeColor:strokeColor range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_shadow:(NSShadow *)shadow {
+- (void)setAs_shadow:(NSShadow *)shadow {
   [self as_setShadow:shadow range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_strikethroughStyle:(NSUnderlineStyle)strikethroughStyle {
+- (void)setAs_strikethroughStyle:(NSUnderlineStyle)strikethroughStyle {
   [self as_setStrikethroughStyle:strikethroughStyle range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_strikethroughColor:(UIColor *)strikethroughColor {
+- (void)setAs_strikethroughColor:(UIColor *)strikethroughColor {
   [self as_setStrikethroughColor:strikethroughColor range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_underlineStyle:(NSUnderlineStyle)underlineStyle {
+- (void)setAs_underlineStyle:(NSUnderlineStyle)underlineStyle {
   [self as_setUnderlineStyle:underlineStyle range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_underlineColor:(UIColor *)underlineColor {
+- (void)setAs_underlineColor:(UIColor *)underlineColor {
   [self as_setUnderlineColor:underlineColor range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_ligature:(NSNumber *)ligature {
+- (void)setAs_ligature:(NSNumber *)ligature {
   [self as_setLigature:ligature range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textEffect:(NSString *)textEffect {
+- (void)setAs_textEffect:(NSString *)textEffect {
   [self as_setTextEffect:textEffect range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_obliqueness:(NSNumber *)obliqueness {
+- (void)setAs_obliqueness:(NSNumber *)obliqueness {
   [self as_setObliqueness:obliqueness range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_expansion:(NSNumber *)expansion {
+- (void)setAs_expansion:(NSNumber *)expansion {
   [self as_setExpansion:expansion range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_baselineOffset:(NSNumber *)baselineOffset {
+- (void)setAs_baselineOffset:(NSNumber *)baselineOffset {
   [self as_setBaselineOffset:baselineOffset range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_verticalGlyphForm:(BOOL)verticalGlyphForm {
+- (void)setAs_verticalGlyphForm:(BOOL)verticalGlyphForm {
   [self as_setVerticalGlyphForm:verticalGlyphForm range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_language:(NSString *)language {
+- (void)setAs_language:(NSString *)language {
   [self as_setLanguage:language range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_writingDirection:(NSArray *)writingDirection {
+- (void)setAs_writingDirection:(NSArray *)writingDirection {
   [self as_setWritingDirection:writingDirection range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_paragraphStyle:(NSParagraphStyle *)paragraphStyle {
+- (void)setAs_paragraphStyle:(NSParagraphStyle *)paragraphStyle {
   /*
    NSParagraphStyle is NOT toll-free bridged to CTParagraphStyleRef.
    
@@ -767,91 +767,91 @@ return style. _attr_;
   [self as_setParagraphStyle:paragraphStyle range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_alignment:(NSTextAlignment)alignment {
+- (void)setAs_alignment:(NSTextAlignment)alignment {
   [self as_setAlignment:alignment range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_baseWritingDirection:(NSWritingDirection)baseWritingDirection {
+- (void)setAs_baseWritingDirection:(NSWritingDirection)baseWritingDirection {
   [self as_setBaseWritingDirection:baseWritingDirection range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_lineSpacing:(CGFloat)lineSpacing {
+- (void)setAs_lineSpacing:(CGFloat)lineSpacing {
   [self as_setLineSpacing:lineSpacing range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_paragraphSpacing:(CGFloat)paragraphSpacing {
+- (void)setAs_paragraphSpacing:(CGFloat)paragraphSpacing {
   [self as_setParagraphSpacing:paragraphSpacing range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_paragraphSpacingBefore:(CGFloat)paragraphSpacingBefore {
+- (void)setAs_paragraphSpacingBefore:(CGFloat)paragraphSpacingBefore {
   [self as_setParagraphSpacing:paragraphSpacingBefore range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_firstLineHeadIndent:(CGFloat)firstLineHeadIndent {
+- (void)setAs_firstLineHeadIndent:(CGFloat)firstLineHeadIndent {
   [self as_setFirstLineHeadIndent:firstLineHeadIndent range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_headIndent:(CGFloat)headIndent {
+- (void)setAs_headIndent:(CGFloat)headIndent {
   [self as_setHeadIndent:headIndent range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_tailIndent:(CGFloat)tailIndent {
+- (void)setAs_tailIndent:(CGFloat)tailIndent {
   [self as_setTailIndent:tailIndent range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_lineBreakMode:(NSLineBreakMode)lineBreakMode {
+- (void)setAs_lineBreakMode:(NSLineBreakMode)lineBreakMode {
   [self as_setLineBreakMode:lineBreakMode range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_minimumLineHeight:(CGFloat)minimumLineHeight {
+- (void)setAs_minimumLineHeight:(CGFloat)minimumLineHeight {
   [self as_setMinimumLineHeight:minimumLineHeight range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_maximumLineHeight:(CGFloat)maximumLineHeight {
+- (void)setAs_maximumLineHeight:(CGFloat)maximumLineHeight {
   [self as_setMaximumLineHeight:maximumLineHeight range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_lineHeightMultiple:(CGFloat)lineHeightMultiple {
+- (void)setAs_lineHeightMultiple:(CGFloat)lineHeightMultiple {
   [self as_setLineHeightMultiple:lineHeightMultiple range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_hyphenationFactor:(float)hyphenationFactor {
+- (void)setAs_hyphenationFactor:(float)hyphenationFactor {
   [self as_setHyphenationFactor:hyphenationFactor range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_defaultTabInterval:(CGFloat)defaultTabInterval {
+- (void)setAs_defaultTabInterval:(CGFloat)defaultTabInterval {
   [self as_setDefaultTabInterval:defaultTabInterval range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_tabStops:(NSArray *)tabStops {
+- (void)setAs_tabStops:(NSArray *)tabStops {
   [self as_setTabStops:tabStops range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textShadow:(ASTextShadow *)textShadow {
+- (void)setAs_textShadow:(ASTextShadow *)textShadow {
   [self as_setTextShadow:textShadow range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textInnerShadow:(ASTextShadow *)textInnerShadow {
+- (void)setAs_textInnerShadow:(ASTextShadow *)textInnerShadow {
   [self as_setTextInnerShadow:textInnerShadow range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textUnderline:(ASTextDecoration *)textUnderline {
+- (void)setAs_textUnderline:(ASTextDecoration *)textUnderline {
   [self as_setTextUnderline:textUnderline range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textStrikethrough:(ASTextDecoration *)textStrikethrough {
+- (void)setAs_textStrikethrough:(ASTextDecoration *)textStrikethrough {
   [self as_setTextStrikethrough:textStrikethrough range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textBorder:(ASTextBorder *)textBorder {
+- (void)setAs_textBorder:(ASTextBorder *)textBorder {
   [self as_setTextBorder:textBorder range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textBackgroundBorder:(ASTextBorder *)textBackgroundBorder {
+- (void)setAs_textBackgroundBorder:(ASTextBorder *)textBackgroundBorder {
   [self as_setTextBackgroundBorder:textBackgroundBorder range:NSMakeRange(0, self.length)];
 }
 
-- (void)setYy_textGlyphTransform:(CGAffineTransform)textGlyphTransform {
+- (void)setAs_textGlyphTransform:(CGAffineTransform)textGlyphTransform {
   [self as_setTextGlyphTransform:textGlyphTransform range:NSMakeRange(0, self.length)];
 }
 

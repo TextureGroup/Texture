@@ -142,7 +142,7 @@ extern const CGSize ASTextContainerMaxSize;
  │ [--------Line9--------]  │  <- Row6
  └──────────────────────────┘
  */
-@interface ASTextLayout : NSObject <NSCoding>
+@interface ASTextLayout : NSObject <NSCopying>
 
 
 #pragma mark - Generate text layout
