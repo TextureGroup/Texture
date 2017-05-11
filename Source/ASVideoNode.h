@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param videoNode The video node.
  * @param state player state that is going to be set.
  * @discussion Delegate method invoked when player changes it's state to
- * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused 
+ * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused
  * and asks delegate if state change is valid
  */
 - (BOOL)videoNode:(ASVideoNode*)videoNode shouldChangePlayerStateTo:(ASVideoNodePlayerState)state;
@@ -147,6 +147,14 @@ NS_ASSUME_NONNULL_BEGIN
  * @param videoNode The videoNode
  */
 - (void)videoNodeDidRecoverFromStall:(ASVideoNode *)videoNode;
+/**
+ * @abstract Delegate method invoked when an error occurs while trying trying to load an asset
+ * @param videoNode The videoNode.
+ * @param key The key of value that failed to load.
+ * @param asset The asset.
+ * @param error The error that occurs.
+ */
+- (void)videoNode:(ASVideoNode *)videoNode didFailToLoadValueForKey:(NSString *)key asset:(AVAsset *)asset error:(NSError *)error;
 
 @end
 

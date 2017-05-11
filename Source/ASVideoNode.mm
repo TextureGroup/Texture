@@ -153,6 +153,7 @@ static NSString * const kRate = @"rate";
     AVKeyValueStatus keyStatus = [asset statusOfValueForKey:key error:&error];
     if (keyStatus == AVKeyValueStatusFailed) {
       NSLog(@"Asset loading failed with error: %@", error);
+      [self.delegate videoNode:self didFailToLoadValueForKey:key asset:asset error:error];
     }
   }
   
