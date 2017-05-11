@@ -21,14 +21,14 @@
 @protocol ASVideoNodeDelegate;
 
 typedef NS_ENUM(NSInteger, ASVideoNodePlayerState) {
-  ASVideoNodePlayerStateUnknown,
-  ASVideoNodePlayerStateInitialLoading,
-  ASVideoNodePlayerStateReadyToPlay,
-  ASVideoNodePlayerStatePlaybackLikelyToKeepUpButNotPlaying,
-  ASVideoNodePlayerStatePlaying,
-  ASVideoNodePlayerStateLoading,
-  ASVideoNodePlayerStatePaused,
-  ASVideoNodePlayerStateFinished
+    ASVideoNodePlayerStateUnknown,
+    ASVideoNodePlayerStateInitialLoading,
+    ASVideoNodePlayerStateReadyToPlay,
+    ASVideoNodePlayerStatePlaybackLikelyToKeepUpButNotPlaying,
+    ASVideoNodePlayerStatePlaying,
+    ASVideoNodePlayerStateLoading,
+    ASVideoNodePlayerStatePaused,
+    ASVideoNodePlayerStateFinished
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param videoNode The video node.
  * @param state player state that is going to be set.
  * @discussion Delegate method invoked when player changes it's state to
- * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused 
+ * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused
  * and asks delegate if state change is valid
  */
 - (BOOL)videoNode:(ASVideoNode*)videoNode shouldChangePlayerStateTo:(ASVideoNodePlayerState)state;
@@ -147,6 +147,13 @@ NS_ASSUME_NONNULL_BEGIN
  * @param videoNode The videoNode
  */
 - (void)videoNodeDidRecoverFromStall:(ASVideoNode *)videoNode;
+/**
+ * @abstract Delegate method invoked when an error occurs while trying to play a video
+ * @param videoNode The videoNode.
+ * @param currentItem The error that occurs
+ */
+- (void)videoNodeDidFailToInitAssetFor:(ASVideoNode *)videoNode withError:(NSError *)error;
+
 
 @end
 
@@ -157,3 +164,4 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
