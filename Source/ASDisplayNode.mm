@@ -118,6 +118,8 @@ _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
   return result;
 }
 
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+
 /**
  *  Returns ASDisplayNodeFlags for the given class/instance. instance MAY BE NIL.
  *
@@ -188,7 +190,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return overrides;
 }
 
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED
 + (void)initialize
 {
   if (self != [ASDisplayNode class]) {
