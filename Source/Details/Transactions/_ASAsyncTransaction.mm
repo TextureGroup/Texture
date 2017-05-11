@@ -253,9 +253,9 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
         Operation operation = entry.popNextOperation(respectPriority);
         lock.unlock();
         if (operation._block) {
-          ASProfilingSignpostStart(3, operation._block);
+//          ASProfilingSignpostStart(3, operation._block);
           operation._block();
-          ASProfilingSignpostEnd(3, operation._block);
+//          ASProfilingSignpostEnd(3, operation._block);
         }
         operation._group->leave();
         operation._block = nil; // the block must be freed while mutex is unlocked

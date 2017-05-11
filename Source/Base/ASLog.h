@@ -19,6 +19,16 @@
 
 #pragma once
 
+#define PROFILE 1
+
+typedef enum : uint32_t {
+  BottomSpinnerOnScreen = 0,
+  BatchNetworkRequest = 1,
+  BatchUpdate = 2,
+  ChangeSetUpdate = 3,
+  MasonryLayoutPrepare = 4,
+  ImageNetworkRequest = 5
+} SignpostCode;
 
 #define ASMultiplexImageNodeLogDebug(...)
 #define ASMultiplexImageNodeCLogDebug(...)
@@ -53,9 +63,19 @@
   AS_AT_LEAST_IOS10 ? kdebug_signpost_start((uint32_t)x, (uintptr_t)y, 0, 0, (uint32_t)(x % 4)) \
                     : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, x) | DBG_FUNC_START, (uintptr_t)y, 0, 0, (uint32_t)(x % 4));
 
+#define ASProfilingSignpostStartWithAllArgs(code, arg1, arg2, arg3, arg4) \
+  AS_AT_LEAST_IOS10 ? kdebug_signpost_start((uint32_t)code, (uintptr_t)arg1, (uintptr_t)arg2, (uintptr_t)arg3, (uintptr_t)arg4) \
+                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, code) | DBG_FUNC_START, (uintptr_t)arg1, (uintptr_t)arg2, (uintptr_t)arg3, (uintptr_t)arg4);
+
+
 #define ASProfilingSignpostEnd(x, y) \
   AS_AT_LEAST_IOS10 ? kdebug_signpost_end((uint32_t)x, (uintptr_t)y, 0, 0, (uint32_t)(x % 4)) \
                     : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, x) | DBG_FUNC_END, (uintptr_t)y, 0, 0, (uint32_t)(x % 4));
+
+#define ASProfilingSignpostEndWithAllArgs(code, arg1, arg2, arg3, arg4) \
+  AS_AT_LEAST_IOS10 ? kdebug_signpost_end((uint32_t)code, (uintptr_t)arg1, (uintptr_t)arg2, (uintptr_t)arg3, (uintptr_t)arg4) \
+                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, code) | DBG_FUNC_END, (uintptr_t)arg1, (uintptr_t)arg2, (uintptr_t)arg3, (uintptr_t)arg4);
+
 #else
 
 #define ASProfilingSignpost(x)

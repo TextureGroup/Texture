@@ -223,7 +223,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     [self _setVisibleNodes:newVisibleNodes];
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
-  ASProfilingSignpostStart(1, self);
+//  ASProfilingSignpostStart(1, self);
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];

@@ -168,7 +168,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     return;
   }
 
-  ASProfilingSignpostStart(2, _dataSource);
+//  ASProfilingSignpostStart(2, _dataSource);
   
   if (batchSize == 0) {
     batchSize = [[ASDataController class] parallelProcessorCount] * kASDataControllerSizingCountPerProcessor;

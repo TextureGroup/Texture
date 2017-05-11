@@ -252,7 +252,7 @@ static void runLoopSourceCallback(void *info) {
       return;
     }
     
-    ASProfilingSignpostStart(0, self);
+//    ASProfilingSignpostStart(0, self);
 
     // Snatch the next batch of items.
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
