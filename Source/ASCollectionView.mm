@@ -715,7 +715,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (indexPath.item == NSNotFound) {
     return indexPath;
   } else {
-    return [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
+    return [_dataController.pendingMap convertIndexPath:indexPath fromMap:_dataController.visibleMap];
   }
 }
 
