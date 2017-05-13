@@ -720,14 +720,14 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-@interface ASDisplayNode (LayoutElementStylability) <ASLayoutElementStylability>
+@interface ASDisplayNode (ASLayoutElementStylability) <ASLayoutElementStylability>
 
 @end
 
 @interface ASDisplayNode (ASLayoutElementAsciiArtProtocol) <ASLayoutElementAsciiArtProtocol>
 @end
 
-@interface ASDisplayNode (Layout)
+@interface ASDisplayNode (ASLayout)
 
 /** @name Managing dimensions */
 
@@ -769,7 +769,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-@interface ASDisplayNode (LayoutTransitioning)
+@interface ASDisplayNode (ASLayoutTransitioning)
 
 /**
  * @abstract The amount of time it takes to complete the default transition animation. Default is 0.2.
@@ -843,7 +843,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 /*
  * ASDisplayNode support for automatic subnode management.
  */
-@interface ASDisplayNode (AutomaticSubnodeManagement)
+@interface ASDisplayNode (ASAutomaticSubnodeManagement)
 
 /**
  * @abstract A boolean that shows whether the node automatically inserts and removes nodes based on the presence or

@@ -229,7 +229,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 @end
 
 
-@interface ASDisplayNode (ASLayoutInternal)
+@interface ASDisplayNode (ASsLayoutInternal)
 
 /**
  * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
@@ -245,19 +245,47 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (void)_rootNodeDidInvalidateSize;
 
+/**
+ * This method will confirm that the layout is up to date (and update if needed).
+ * Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
+ */
 - (void)_locked_measureNodeWithBoundsIfNecessary:(CGRect)bounds;
+
+/**
+ * Layout all of the subnodes based on the sublayouts
+ */
 - (void)_layoutSublayouts;
 
-- (ASSizeRange)_locked_constrainedSizeForLayoutPass;
 @end
 
 @interface ASDisplayNode (ASLayoutTransitionInternal)
 
+/**
+ * Sentinel of the current layout transition
+ */
 @property (atomic, assign) int32_t pendingTransitionID;
-- (void)_layoutTransitionMeasurementDidFinish;
+
+/**
+ * If one or multiple layout transitions are in flight this methods returns if the current layout transition that
+ * happens in in this particular thread was invalidated through another thread is starting a transition for this node
+ */
 - (BOOL)_isLayoutTransitionInvalid;
-- (void)_pendingLayoutTransitionDidComplete;
+
+/**
+ * Internal method that can be overriden by subclasses to add specific behavior after the measurement of a layout
+ * transition did finish.
+ */
+- (void)_layoutTransitionMeasurementDidFinish;
+
+/**
+ * Informs the node that hte pending layout transition did complete
+ */
 - (void)_completePendingLayoutTransition;
+
+/**
+ * Called if the pending layout transition did complete
+ */
+- (void)_pendingLayoutTransitionDidComplete;
 
 @end
 

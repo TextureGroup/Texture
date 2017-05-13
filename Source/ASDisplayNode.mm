@@ -79,7 +79,6 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 
 @dynamic layoutElementType;
 
-@synthesize debugName = _debugName;
 @synthesize threadSafeBounds = _threadSafeBounds;
 
 static BOOL suppressesInvalidCollectionUpdateExceptions = NO;

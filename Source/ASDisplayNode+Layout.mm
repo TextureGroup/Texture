@@ -191,9 +191,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 @end
 
 #pragma mark -
-#pragma mark - ASDisplayNode (LayoutElementStylability)
+#pragma mark - ASDisplayNode (ASLayoutElementStylability)
 
-@implementation ASDisplayNode (LayoutElementStylability)
+@implementation ASDisplayNode (ASLayoutElementStylability)
 
 - (instancetype)styledWithBlock:(AS_NOESCAPE void (^)(__kindof ASLayoutElementStyle *style))styleBlock
 {
