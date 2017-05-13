@@ -27,12 +27,10 @@
 #define AUTO_TAIL_LOADING_NUM_SCREENFULS  2.5
 
 @interface PhotoFeedNodeController () <ASTableDelegate, ASTableDataSource>
+@property (nonatomic, strong) ASTableNode *tableNode;
 @end
 
 @implementation PhotoFeedNodeController
-{
-  ASTableNode *_tableNode;
-}
 
 #pragma mark - Lifecycle
 
@@ -60,7 +58,7 @@
 {
   [super loadView];
   
-  _tableNode.view.leadingScreensForBatching = AUTO_TAIL_LOADING_NUM_SCREENFULS;  // overriding default of 2.0
+  self.tableNode.leadingScreensForBatching = AUTO_TAIL_LOADING_NUM_SCREENFULS;  // overriding default of 2.0
 }
 
 - (void)loadPageWithContext:(ASBatchContext *)context

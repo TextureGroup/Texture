@@ -25,12 +25,12 @@
 {
   BOOL squareImageRequested = (size.width == size.height) ? YES : NO;
   
-  NSUInteger imageParameterID;
   if (squareImageRequested) {
-    imageParameterID = [self imageParameterForSquareCroppedSize:size];
+    NSUInteger imageParameterID = [self imageParameterForSquareCroppedSize:size];
+    return [NSString stringWithFormat:@"&image_size=%lu", (long)imageParameterID];
+  } else {
+    return @"";
   }
-  
-  return [NSString stringWithFormat:@"&image_size=%lu", (long)imageParameterID];
 }
 
 // 500px standard cropped image sizes
