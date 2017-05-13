@@ -17,7 +17,6 @@
 
 #import <AsyncDisplayKit/ASTextNode2.h>
 
-#include <mutex>
 #import <tgmath.h>
 #import <deque>
 
@@ -38,7 +37,7 @@
 
 @interface ASTextCacheValue : NSObject {
   @package
-  std::mutex _m;
+  ASDN::Mutex _m;
   std::deque<std::tuple<CGSize, ASTextLayout *>> _layouts;
 }
 @end
@@ -146,7 +145,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   NSString *plainString = [[self.attributedText string] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
   if (plainString.length > 50) {
-    plainString = [[plainString substringToIndex:50] stringByAppendingString:@"\u2026"];
+    plainString = [[plainString substringToIndex:50] stringByAppendingString:@"…"];
   }
   return plainString;
 }
@@ -172,14 +171,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 }
 
 #pragma mark - ASDisplayNode
-
-- (void)clearContents
-{
-  // We discard the backing store and renderer to prevent the very large
-  // memory overhead of maintaining these for all text nodes.  They can be
-  // regenerated when layout is necessary.
-  [super clearContents];      // ASDisplayNode will set layer.contents = nil
-}
 
 - (void)didLoad
 {
@@ -251,26 +242,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self setNeedsDisplay];
   
   return layout.textBoundingSize;
-  
-  
-  //	ASTextKitRenderer *renderer = [self _rendererWithBoundsSlow:{.size = constrainedSize}];
-  //	CGSize size = renderer.size;
-  //	if (_attributedText.length > 0) {
-  //		self.style.ascender = [[self class] ascenderWithAttributedString:_attributedText];
-  //		self.style.descender = [[_attributedText attribute:NSFontAttributeName atIndex:_attributedText.length - 1 effectiveRange:NULL] descender];
-  //		if (renderer.currentScaleFactor > 0 && renderer.currentScaleFactor < 1.0) {
-  //			// while not perfect, this is a good estimate of what the ascender of the scaled font will be.
-  //			self.style.ascender *= renderer.currentScaleFactor;
-  //			self.style.descender *= renderer.currentScaleFactor;
-  //		}
-  //	}
-  //
-  //	// Add the constrained size back textContainerInset
-  //	size.width += (_textContainerInset.left + _textContainerInset.right);
-  //	size.height += (_textContainerInset.top + _textContainerInset.bottom);
-  //
-  //	return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
-  //					  std::fmin(size.height, originalConstrainedSize.height));
 }
 
 #pragma mark - Modifying User Text
@@ -409,7 +380,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
                                            text:(NSAttributedString *)text
 
 {
-  static std::mutex layoutCacheLock;
+  static ASDN::Mutex layoutCacheLock;
   static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
@@ -417,7 +388,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   });
   
   ASTextCacheValue *cacheValue = ({
-    std::lock_guard<std::mutex> lock(layoutCacheLock);
+    ASDN::MutexLocker lock(layoutCacheLock);
     cacheValue = [textLayoutCache objectForKey:text];
     if (cacheValue == nil) {
       cacheValue = [[ASTextCacheValue alloc] init];
@@ -428,7 +399,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
-    std::lock_guard<std::mutex> lock(cacheValue->_m);
+    ASDN::MutexLocker lock(cacheValue->_m);
     for (auto &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
@@ -478,7 +449,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   // Store the result in the cache.
   {
-    std::lock_guard<std::mutex> lock(cacheValue->_m);
+    ASDN::MutexLocker lock(cacheValue->_m);
     cacheValue->_layouts.push_front(std::make_tuple(container.size, layout));
     if (cacheValue->_layouts.size() > 3) {
       cacheValue->_layouts.pop_back();
@@ -955,22 +926,22 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
   _truncationMode = truncationMode;
   
-  ASTextTruncationType yyType;
+  ASTextTruncationType truncationType;
   switch (truncationMode) {
     case NSLineBreakByTruncatingHead:
-      yyType = ASTextTruncationTypeStart;
+      truncationType = ASTextTruncationTypeStart;
       break;
     case NSLineBreakByTruncatingTail:
-      yyType = ASTextTruncationTypeEnd;
+      truncationType = ASTextTruncationTypeEnd;
       break;
     case NSLineBreakByTruncatingMiddle:
-      yyType = ASTextTruncationTypeMiddle;
+      truncationType = ASTextTruncationTypeMiddle;
       break;
     default:
-      yyType = ASTextTruncationTypeNone;
+      truncationType = ASTextTruncationTypeNone;
   }
 		
-  _textContainer.truncationType = yyType;
+  _textContainer.truncationType = truncationType;
   
   [self setNeedsDisplay];
 }

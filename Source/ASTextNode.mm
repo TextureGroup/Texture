@@ -264,14 +264,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 #pragma mark - ASDisplayNode
 
-- (void)clearContents
-{
-  // We discard the backing store and renderer to prevent the very large
-  // memory overhead of maintaining these for all text nodes.  They can be
-  // regenerated when layout is necessary.
-  [super clearContents];      // ASDisplayNode will set layer.contents = nil
-}
-
 - (void)didLoad
 {
   [super didLoad];
@@ -1399,7 +1391,6 @@ static BOOL _hasAllocatedNode;
     
     // They must call this before allocating any text nodes.
     ASDisplayNodeAssertFalse(_hasAllocatedNode);
-    ASDisplayNodeAssert(_experimentOptions == 0, @"Can't call +setExperimentOptions: more than once.");
     
     _experimentOptions = options;
     
