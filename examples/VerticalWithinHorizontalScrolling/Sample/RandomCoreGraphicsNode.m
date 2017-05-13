@@ -22,7 +22,7 @@
 
 @implementation RandomCoreGraphicsNode
 
-@synthesize indexPath=_indexPath;
+@synthesize indexPath = _indexPath;
 
 + (UIColor *)randomColor
 {
@@ -48,8 +48,7 @@
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (CFArrayRef)colors, locations);
   
-  CGGradientDrawingOptions drawingOptions;
-  CGContextDrawLinearGradient(ctx, gradient, CGPointZero, CGPointMake(bounds.size.width, bounds.size.height), drawingOptions);
+  CGContextDrawLinearGradient(ctx, gradient, CGPointZero, CGPointMake(bounds.size.width, bounds.size.height), 0);
   
   CGGradientRelease(gradient);
   CGColorSpaceRelease(colorSpace);
@@ -69,8 +68,19 @@
 
 - (void)setIndexPath:(NSIndexPath *)indexPath
 {
-  _indexPath = indexPath;
-  _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:[indexPath description] attributes:nil];
+  @synchronized (self) {
+    _indexPath = indexPath;
+    _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:[indexPath description] attributes:nil];
+  }
+}
+
+- (NSIndexPath *)indexPath
+{
+  NSIndexPath *indexPath = nil;
+  @synchronized (self) {
+    indexPath = _indexPath;
+  }
+  return indexPath;
 }
 
 - (void)layout

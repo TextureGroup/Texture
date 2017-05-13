@@ -24,6 +24,6 @@
   ASTextNode *_indexPathTextNode;
 }
 
-@property (nonatomic) NSIndexPath *indexPath;
+@property NSIndexPath *indexPath;
 
 @end
