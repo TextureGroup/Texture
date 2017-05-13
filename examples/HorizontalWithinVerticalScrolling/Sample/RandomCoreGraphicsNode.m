@@ -46,8 +46,7 @@
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (CFArrayRef)colors, locations);
   
-  CGGradientDrawingOptions drawingOptions;
-  CGContextDrawLinearGradient(ctx, gradient, CGPointZero, CGPointMake(bounds.size.width, bounds.size.height), drawingOptions);
+  CGContextDrawLinearGradient(ctx, gradient, CGPointZero, CGPointMake(bounds.size.width, bounds.size.height), 0);
   
   CGGradientRelease(gradient);
   CGColorSpaceRelease(colorSpace);

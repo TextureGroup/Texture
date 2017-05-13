@@ -84,7 +84,7 @@ static const CGFloat kHorizontalSectionPadding = 10.0f;
   [super viewDidLoad];
   
   // set any collectionView properties here (once the node's backing view is loaded)
-  _collectionNode.view.leadingScreensForBatching = 2;
+  _collectionNode.leadingScreensForBatching = 2;
   [self fetchMoreCatsWithCompletion:nil];
 }
 

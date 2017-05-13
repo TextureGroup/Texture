@@ -49,9 +49,10 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
       }
     }
     
+    _collectionNode.backgroundColor = UIColor.white
     _collectionNode.dataSource = self;
     _collectionNode.delegate = self;
-    _collectionNode.backgroundColor = UIColor.white
+    _collectionNode.layoutInspector = _layoutInspector
     _collectionNode.registerSupplementaryNode(ofKind: UICollectionElementKindSectionHeader)
   }
   
@@ -66,7 +67,6 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    _collectionNode.view.layoutInspector = _layoutInspector
     _collectionNode.view.isScrollEnabled = true
   }
 
