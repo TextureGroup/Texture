@@ -17,3 +17,4 @@
 - [ASDisplayNode] Pass drawParameter in rendering context callbacks [Michael Schneider](https://github.com/maicki)[#248](https://github.com/TextureGroup/Texture/pull/248)
 - [ASTextNode] Move to class method of drawRect:withParameters:isCancelled:isRasterizing: for drawing [Michael Schneider] (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)
 - [ASDisplayNode] Remove instance:-drawRect:withParameters:isCancelled:isRasterizing: (https://github.com/maicki)[#232](https://github.com/TextureGroup/Texture/pull/232)
+- [ASTextNode] Add an experimental new implementation. See `+[ASTextNode setExperimentOptions:]`. [Adlai Holler](https://github.com/Adlai-Holler)[#259](https://github.com/TextureGroup/Texture/pull/259)
