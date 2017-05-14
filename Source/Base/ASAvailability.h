@@ -40,6 +40,10 @@
   #define YOGA __has_include(YOGA_HEADER_PATH)
 #endif
 
+#ifndef YOGA_TREE_CONTIGUOUS
+  #define YOGA_TREE_CONTIGUOUS 0 // YOGA // Enabled by default when Yoga is used.
+#endif
+
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)
 #define AS_IG_LIST_KIT __has_include(<IGListKit/IGListKit.h>)
 
