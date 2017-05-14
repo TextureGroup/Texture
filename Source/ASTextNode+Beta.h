@@ -21,6 +21,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_OPTIONS(NSUInteger, ASTextNodeExperimentOptions) {
+  // All subclass instances use the experimental implementation.
+  ASTextNodeExperimentSubclasses = 1 << 0,
+  // Random instances of ASTextNode (50% chance) (not subclasses) use experimental impl.
+  // Useful for profiling with apps that have no custom text node subclasses.
+  ASTextNodeExperimentRandomInstances = 1 << 1,
+  // All instances of ASTextNode itself use experimental implementation. Supersedes `.randomInstances`.
+  ASTextNodeExperimentAllInstances = 1 << 2,
+  // Add highlighting etc. for debugging.
+  ASTextNodeExperimentDebugging = 1 << 3
+};
+
 @interface ASTextNode ()
 
 /**
@@ -37,6 +49,19 @@ NS_ASSUME_NONNULL_BEGIN
  ASTextNode will clip the left and right of the string "judar" if it's rendered in an italicised font.
  */
 @property (nonatomic, assign) UIEdgeInsets textContainerInset;
+
+/**
+ * Opt in to an experimental implementation of text node. The implementation may improve performance and correctness,
+ * but may not support all features and has not been thoroughly tested in production.
+ *
+ * @precondition You may not call this after allocating any text nodes. You may only call this once.
+ */
++ (void)setExperimentOptions:(ASTextNodeExperimentOptions)options;
+
+/**
+ * Returns YES if this node is using the experimental implementation. NO otherwise. Will not change.
+ */
+@property (atomic, readonly) BOOL usingExperiment;
 
 @end
 

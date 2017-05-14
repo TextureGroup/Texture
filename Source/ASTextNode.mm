@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextNode.h>
+#import <AsyncDisplayKit/ASTextNode2.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
 #include <mutex>
@@ -262,14 +263,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 }
 
 #pragma mark - ASDisplayNode
-
-- (void)clearContents
-{
-  // We discard the backing store and renderer to prevent the very large
-  // memory overhead of maintaining these for all text nodes.  They can be
-  // regenerated when layout is necessary.
-  [super clearContents];      // ASDisplayNode will set layer.contents = nil
-}
 
 - (void)didLoad
 {
@@ -1385,6 +1378,70 @@ static NSAttributedString *DefaultTruncationAttributedString()
   [lock unlock];
 }
 #endif
+
+static ASDN::Mutex _experimentLock;
+static ASTextNodeExperimentOptions _experimentOptions;
+static BOOL _hasAllocatedNode;
+
++ (void)setExperimentOptions:(ASTextNodeExperimentOptions)options
+{
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    ASDN::MutexLocker lock(_experimentLock);
+    
+    // They must call this before allocating any text nodes.
+    ASDisplayNodeAssertFalse(_hasAllocatedNode);
+    
+    _experimentOptions = options;
+    
+    // Set superclass of all subclasses to ASTextNode2
+    if (options & ASTextNodeExperimentSubclasses) {
+      unsigned int classCount;
+      Class originalClass = [ASTextNode class];
+      Class newClass = [ASTextNode2 class];
+      Class *classes = objc_copyClassList(&classCount);
+      for (int i = 0; i < classCount; i++) {
+        Class c = classes[i];
+        if (class_getSuperclass(c) == originalClass) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+          class_setSuperclass(c, newClass);
+#pragma clang diagnostic pop
+        }
+      }
+      free(classes);
+    }
+    
+    if (options & ASTextNodeExperimentDebugging) {
+      [ASTextNode2 enableDebugging];
+    }
+  });
+}
+
++ (id)allocWithZone:(struct _NSZone *)zone
+{
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    ASDN::MutexLocker lock(_experimentLock);
+    _hasAllocatedNode = YES;
+  });
+  
+  // All instances || (random instances && rand() != 0)
+  BOOL useExperiment = (_experimentOptions & ASTextNodeExperimentAllInstances)
+		|| ((_experimentOptions & ASTextNodeExperimentRandomInstances)
+        && (arc4random_uniform(2) != 0));
+  
+  if (useExperiment) {
+    return (ASTextNode *)[ASTextNode2 allocWithZone:zone];
+  } else {
+    return [super allocWithZone:zone];
+  }
+}
+
+- (BOOL)usingExperiment
+{
+  return NO;
+}
 
 @end
 
