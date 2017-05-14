@@ -118,6 +118,8 @@ _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
   return result;
 }
 
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+
 /**
  *  Returns ASDisplayNodeFlags for the given class/instance. instance MAY BE NIL.
  *
@@ -190,8 +192,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 + (void)initialize
 {
-  [super initialize];
-  
   if (self != [ASDisplayNode class]) {
     
     // Subclasses should never override these. Use unused to prevent warnings
@@ -228,8 +228,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
   
-  
-#if DEBUG
+
   // Check if subnodes where modified during the creation of the layout
   if (self == [ASDisplayNode class]) {
     __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
@@ -243,9 +242,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
       return layoutElement;
     });
   }
-#endif
-
 }
+#endif
 
 + (void)load
 {
