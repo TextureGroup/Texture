@@ -118,8 +118,6 @@ _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
   return result;
 }
 
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED
-
 /**
  *  Returns ASDisplayNodeFlags for the given class/instance. instance MAY BE NIL.
  *
@@ -192,6 +190,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 + (void)initialize
 {
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
   if (self != [ASDisplayNode class]) {
     
     // Subclasses should never override these. Use unused to prevent warnings
@@ -205,7 +204,20 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(layoutThatFits:parentSize:)), @"Subclass %@ must not override layoutThatFits:parentSize method. Instead override calculateLayoutThatFits:.", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearContents)), @"Subclass %@ must not override recursivelyClearContents method.", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearPreloadedData)), @"Subclass %@ must not override recursivelyClearFetchedData method.", classString);
+  } else {
+    // Check if subnodes where modified during the creation of the layout
+	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
+		  NSArray *oldSubnodes = _self.subnodes;
+		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
+		  NSArray *subnodes = _self.subnodes;
+		  ASDisplayNodeAssert(oldSubnodes.count == subnodes.count, @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
+		  for (NSInteger i = 0; i < oldSubnodes.count; i++) {
+			  ASDisplayNodeAssert(oldSubnodes[i] == subnodes[i], @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
+		  }
+		  return layoutElement;
+	  });
   }
+#endif
 
   // Below we are pre-calculating values per-class and dynamically adding a method (_staticInitialize) to populate these values
   // when each instance is constructed. These values don't change for each class, so there is significant performance benefit
@@ -227,23 +239,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   });
 
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
-  
-
-  // Check if subnodes where modified during the creation of the layout
-  if (self == [ASDisplayNode class]) {
-    __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
-      NSArray *oldSubnodes = _self.subnodes;
-      ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
-      NSArray *subnodes = _self.subnodes;
-      ASDisplayNodeAssert(oldSubnodes.count == subnodes.count, @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
-      for (NSInteger i = 0; i < oldSubnodes.count; i++) {
-        ASDisplayNodeAssert(oldSubnodes[i] == subnodes[i], @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
-      }
-      return layoutElement;
-    });
-  }
 }
-#endif
 
 + (void)load
 {
