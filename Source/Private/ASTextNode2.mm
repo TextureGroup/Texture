@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
@@ -30,13 +31,80 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
 
-@interface ASTextCacheValue : NSObject {
-  @package
-  ASDN::Mutex _m;
-  std::deque<std::tuple<CGSize, ASTextLayout *>> _layouts;
-}
+// TODO: This is more like ASTextNode2State
+@interface ASTextNode2DrawParameters : NSObject
+// Note these properties aren't `copy`. Do your own copying.
+@property (nonatomic, strong) NSAttributedString *attributedText;
+@property (nonatomic, strong) NSAttributedString *truncationToken;
+@property (nonatomic, strong) NSAttributedString *additionalTruncationMessage;
+@property (nonatomic, strong) ASTextContainer *textContainer;
+// The shadow to apply, if any.
+@property (nonatomic, strong) NSShadow *shadow;
+@property (nonatomic) NSLineBreakMode lineBreakMode;
+@property (nonatomic, strong) UIColor *backgroundColor;
+
+@property (nonatomic, strong) NSAttributedString *processedAttributedText;
 @end
-@implementation ASTextCacheValue
+
+@implementation ASTextNode2DrawParameters
+
+@end
+
+@interface ASTextNode2CacheKey : NSObject
+- (instancetype)initForResultWithLayout:(ASTextLayout *)layout;
+- (instancetype)initForQueryWithParameters:(ASTextNode2DrawParameters *)parameters;
+@property (nonatomic, strong, readonly) NSAttributedString *attributedString;
+@property (nonatomic, strong, readonly) ASTextContainer *textContainer;
+@property (nonatomic, readonly) ASSizeRange resultSizeRange;
+@property (nonatomic, readonly) CGSize querySize;
+@end
+@implementation ASTextNode2CacheKey
+
+- (instancetype)initForResultWithLayout:(ASTextLayout *)layout
+{
+  if (self = [super init]) {
+    _textContainer = layout.container;
+    _attributedString = layout.text;
+    _resultSizeRange = ASSizeRangeMakeLoosely(_textContainer.size, layout.textBoundingSize);
+  }
+  return self;
+}
+
+- (instancetype)initForQueryWithParameters:(ASTextNode2DrawParameters *)parameters
+{
+  if (self = [super init]) {
+    _textContainer = parameters.textContainer;
+    _attributedString = parameters.processedAttributedText;
+    _querySize = _textContainer.size;
+  }
+  return self;
+}
+
+- (NSUInteger)hash
+{
+  // Just use attributed string for hash. Previously we included container attributes
+  // in the hash but it actually deteriorated cache performance (more collisions).
+  return _attributedString.hash;
+}
+
+- (BOOL)isEqual:(id)object
+{
+  ASDisplayNodeAssert([object isKindOfClass:[ASTextNode2CacheKey class]], @"Unexpected object: %@", object);
+  ASTextNode2CacheKey *otherKey = object;
+  if (![_attributedString isEqualToAttributedString:otherKey->_attributedString] || ![_textContainer isEqualToContainerExcludingSize:otherKey->_textContainer]) {
+    return NO;
+  }
+  
+  ASDisplayNodeAssert(CGSizeEqualToSize(_querySize, CGSizeZero), @"Query-key should not be on the left-hand side of isEqual:.");
+  
+  BOOL otherIsResult = CGSizeEqualToSize(otherKey->_querySize, CGSizeZero);
+  if (otherIsResult) {
+    return ASSizeRangeEqualToSizeRange(_resultSizeRange, otherKey->_resultSizeRange);
+  } else {
+    return ASSizeRangeContainsSize(_resultSizeRange, otherKey->_querySize);
+  }
+}
+
 @end
 
 /**
@@ -60,11 +128,14 @@ static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
 @interface ASTextNode2 () <UIGestureRecognizerDelegate>
-
+@property (atomic, strong) ASTextNode2DrawParameters *displayedParameters;
 @end
 
 @implementation ASTextNode2 {
   ASTextContainer *_textContainer;
+  
+  // Only modified on main thread.
+  ASTextNode2DrawParameters *_parametersForCurrentDisplay;
   
   CGSize _shadowOffset;
   CGColorRef _shadowColor;
@@ -225,16 +296,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
   ASDisplayNodeAssert(constrainedSize.height >= 0, @"Constrained height for text (%f) is too short", constrainedSize.height);
   
-  ASTextContainer *container = [_textContainer copy];
-  NSAttributedString *attributedText = self.attributedText;
-  container.size = constrainedSize;
-  [self _ensureTruncationText];
-  
-  NSMutableAttributedString *mutableText = [attributedText mutableCopy];
-  [self prepareAttributedStringForDrawing:mutableText];
-  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
-  
-  [self setNeedsDisplay];
+  ASTextNode2DrawParameters *params = [self textNodeDrawParameters];
+  params.textContainer.size = constrainedSize;
+  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithParameters:params];
   
   return layout.textBoundingSize;
 }
@@ -355,110 +419,99 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 #pragma mark - Drawing
 
-- (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
+// NOTE: This should be called something like `-drawParameters` but that's actually a (dumb) private ASDisplayNode method.
+- (ASTextNode2DrawParameters *)textNodeDrawParameters
 {
-  [self _ensureTruncationText];
-  ASTextContainer *copiedContainer = [_textContainer copy];
-  copiedContainer.size = self.bounds.size;
-  NSMutableAttributedString *mutableText = [self.attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
-  [self prepareAttributedStringForDrawing:mutableText];
-  return @{
-           @"container": copiedContainer,
-           @"text": mutableText
-           };
+  auto drawParams = [[ASTextNode2DrawParameters alloc] init];
+  drawParams.attributedText = self.attributedText;
+  drawParams.textContainer = [_textContainer copy];
+  drawParams.truncationToken = self.truncationAttributedText;
+  drawParams.additionalTruncationMessage = self.additionalTruncationMessage;
+  drawParams.lineBreakMode = self.truncationMode;
+  drawParams.backgroundColor = self.backgroundColor;
+  drawParams.shadow = [ASTextNode2 shadowWithOffset:self.shadowOffset color:self.shadowColor radius:self.shadowRadius opacity:self.shadowOpacity];
+  
+  // TODO: Actually process this, somewhere else.
+  drawParams.processedAttributedText = self.attributedText;
+  return drawParams;
 }
 
+- (ASTextNode2DrawParameters *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
+{
+  auto params = [self textNodeDrawParameters];
+  _parametersForCurrentDisplay = params;
+  return params;
+}
+
+- (void)displayDidFinish
+{
+  [super displayDidFinish];
+  ASDisplayNodeAssertNotNil(_parametersForCurrentDisplay, @"Expected to have parameters for current display when display finishes.");
+  _displayedParameters = _parametersForCurrentDisplay;
+  _parametersForCurrentDisplay = nil;
+}
+
++ (NSShadow *)shadowWithOffset:(CGSize)offset color:(CGColorRef)color radius:(CGFloat)radius opacity:(CGFloat)opacity
+{
+  CGFloat baseOpacity = CGColorGetAlpha(color);
+  CGFloat totalOpacity = baseOpacity * opacity;
+  if (totalOpacity <= 0 || (radius == 0 && CGSizeEqualToSize(offset, CGSizeZero))) {
+    return nil;
+  }
+  auto shadow = [[NSShadow alloc] init];
+  shadow.shadowOffset = offset;
+  if (opacity != 1) {
+    color = CGColorCreateCopyWithAlpha(color, totalOpacity);
+  }
+  shadow.shadowColor = [UIColor colorWithCGColor:color];
+  shadow.shadowBlurRadius = radius;
+  return shadow;
+}
+
+#define ENABLE_ASTEXT_CACHE_LOG 0
 /**
  * If it can't find a compatible layout, this method creates one.
  */
-+ (ASTextLayout *)compatibleLayoutWithContainer:(ASTextContainer *)container
-                                           text:(NSAttributedString *)text
-
++ (ASTextLayout *)compatibleLayoutWithParameters:(ASTextNode2DrawParameters *)drawParameters
 {
-  static ASDN::Mutex layoutCacheLock;
-  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
+  static NSCache<ASTextNode2CacheKey *, ASTextLayout *> *textLayoutCache2;
+#if ENABLE_ASTEXT_CACHE_LOG
+  static std::atomic<int32_t> cacheHits;
+  static std::atomic<int32_t> cacheQueries;
+#endif
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    textLayoutCache = [[NSCache alloc] init];
+    textLayoutCache2 = [[NSCache alloc] init];
   });
   
-  ASTextCacheValue *cacheValue = ({
-    ASDN::MutexLocker lock(layoutCacheLock);
-    cacheValue = [textLayoutCache objectForKey:text];
-    if (cacheValue == nil) {
-      cacheValue = [[ASTextCacheValue alloc] init];
-      [textLayoutCache setObject:cacheValue forKey:text];
-    }
-    cacheValue;
-  });
-  
-  CGRect containerBounds = (CGRect){ .size = container.size };
-  {
-    ASDN::MutexLocker lock(cacheValue->_m);
-    for (auto &t : cacheValue->_layouts) {
-      CGSize constrainedSize = std::get<0>(t);
-      ASTextLayout *layout = std::get<1>(t);
-      
-      CGSize layoutSize = layout.textBoundingSize;
-      // 1. CoreText can return frames that are narrower than the constrained width, for obvious reasons.
-      // 2. CoreText can return frames that are slightly wider than the constrained width, for some reason.
-      //    We have to trust that somehow it's OK to try and draw within our size constraint, despite the return value.
-      // 3. Thus, those two values (constrained width & returned width) form a range, where
-      //    intermediate values in that range will be snapped. Thus, we can use a given layout as long as our
-      //    width is in that range, between the min and max of those two values.
-      CGRect minRect = CGRectMake(0, 0, MIN(layoutSize.width, constrainedSize.width), MIN(layoutSize.height, constrainedSize.height));
-      if (!CGRectContainsRect(containerBounds, minRect)) {
-        continue;
-      }
-      CGRect maxRect = CGRectMake(0, 0, MAX(layoutSize.width, constrainedSize.width), MAX(layoutSize.height, constrainedSize.height));
-      if (!CGRectContainsRect(maxRect, containerBounds)) {
-        continue;
-      }
-      
-      // Now check container params.
-      ASTextContainer *otherContainer = layout.container;
-      if (!UIEdgeInsetsEqualToEdgeInsets(container.insets, otherContainer.insets)) {
-        continue;
-      }
-      if (!ASObjectIsEqual(container.exclusionPaths, otherContainer.exclusionPaths)) {
-        continue;
-      }
-      if (container.maximumNumberOfRows != otherContainer.maximumNumberOfRows) {
-        continue;
-      }
-      if (container.truncationType != otherContainer.truncationType) {
-        continue;
-      }
-      if (!ASObjectIsEqual(container.truncationToken, otherContainer.truncationToken)) {
-        continue;
-      }
-      // TODO: When we get a cache hit, move this entry to the front (LRU).
-      return layout;
-    }
+#if ENABLE_ASTEXT_CACHE_LOG
+  if (cacheQueries.load() % 5 == 0) {
+    NSLog(@"%g", cacheHits.load() / (float)cacheQueries.load());
+  }
+  cacheQueries += 1;
+#endif
+  auto cacheKey = [[ASTextNode2CacheKey alloc] initForQueryWithParameters:drawParameters];
+  ASTextLayout *cachedLayout = [textLayoutCache2 objectForKey:cacheKey];
+  if (cachedLayout != nil) {
+#if ENABLE_ASTEXT_CACHE_LOG
+    cacheHits += 1;
+#endif
+    return cachedLayout;
   }
   
   // Cache Miss.
   
   // Compute the text layout.
-  ASTextLayout *layout = [ASTextLayout layoutWithContainer:container text:text];
-  
-  // Store the result in the cache.
-  {
-    ASDN::MutexLocker lock(cacheValue->_m);
-    cacheValue->_layouts.push_front(std::make_tuple(container.size, layout));
-    if (cacheValue->_layouts.size() > 3) {
-      cacheValue->_layouts.pop_back();
-    }
-  }
-  
+  ASTextLayout *layout = [ASTextLayout layoutWithContainer:drawParameters.textContainer text:drawParameters.processedAttributedText];
+  ASTextNode2CacheKey *key = [[ASTextNode2CacheKey alloc] initForResultWithLayout:layout];
+  [textLayoutCache2 setObject:layout forKey:key];
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
++ (void)drawRect:(CGRect)bounds withParameters:(ASTextNode2DrawParameters *)drawParams isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
 {
-  ASTextContainer *container = layoutDict[@"container"];
-  NSAttributedString *text = layoutDict[@"text"];
-  ASTextLayout *layout = [self compatibleLayoutWithContainer:container text:text];
+  drawParams.textContainer.size = bounds.size;
+  ASTextLayout *layout = [self compatibleLayoutWithParameters:drawParams];
   
   if (isCancelledBlock()) {
     return;
@@ -943,8 +996,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)isTruncated
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  return NO;
+  return ([ASTextNode2 compatibleLayoutWithParameters:self.displayedParameters].truncatedLine != nil);
 }
 
 - (NSUInteger)maximumNumberOfLines

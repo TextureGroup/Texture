@@ -13,7 +13,9 @@
 #import "ASTextUtilities.h"
 #import "ASTextAttribute.h"
 #import "NSAttributedString+ASText.h"
+#import "ASEqualityHelpers.h"
 #import "ASInternalHelpers.h"
+#import "ASHashing.h"
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -177,6 +179,54 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   _truncationToken = [aDecoder decodeObjectForKey:@"truncationToken"];
   _linePositionModifier = [aDecoder decodeObjectForKey:@"linePositionModifier"];
   return self;
+}
+
+- (BOOL)isEqual:(id)object
+{
+  __auto_type container = ASDynamicCast(object, ASTextContainer);
+  return container != nil && [self isEqualToContainerExcludingSize:container] && CGSizeEqualToSize(self.size, container.size);
+}
+
+typedef struct {
+  UIEdgeInsets insets;
+  NSUInteger pathHash;
+  NSUInteger exclusionPathsHash;
+  BOOL fillEvenOdd;
+  CGFloat pathLineWidth;
+  BOOL verticalForm;
+  NSUInteger maximumNumberOfRows;
+  ASTextTruncationType truncationType;
+  NSUInteger truncationTokenHash;
+  NSUInteger linePositionModifierHash;
+} ASTextLayoutPrimitiveData;
+
+- (ASTextLayoutPrimitiveData)primitiveData
+{
+  dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+  ASTextLayoutPrimitiveData result = {
+    _insets,
+    _path.hash,
+    _exclusionPaths.hash,
+    _pathFillEvenOdd,
+    _pathLineWidth,
+    _verticalForm,
+    _maximumNumberOfRows,
+    _truncationType,
+    _truncationToken.hash,
+    _linePositionModifier.hash
+  };
+  dispatch_semaphore_signal(_lock);
+  return result;
+}
+
+- (BOOL)isEqualToContainerExcludingSize:(ASTextContainer *)container
+{
+  ASTextLayoutPrimitiveData data = self.primitiveData;
+  ASTextLayoutPrimitiveData otherData = container.primitiveData;
+  if (memcmp(&data, &otherData, sizeof(ASTextLayoutPrimitiveData)) != 0) {
+    return NO;
+  }
+  return ASObjectIsEqual(self.exclusionPaths, container.exclusionPaths) && ASObjectIsEqual(self.truncationToken, container.truncationToken) && ASObjectIsEqual(self.linePositionModifier, container.linePositionModifier);
 }
 
 #define Getter(...) \

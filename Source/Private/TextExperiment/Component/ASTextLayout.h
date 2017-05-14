@@ -96,6 +96,9 @@ extern const CGSize ASTextContainerMaxSize;
 /// This modifier is applied to the lines before the layout is completed,
 /// give you a chance to modify the line position. Default is nil.
 @property (nullable, copy) id<ASTextLinePositionModifier> linePositionModifier;
+
+- (BOOL)isEqualToContainerExcludingSize:(ASTextContainer *)container;
+
 @end
 
 

@@ -262,6 +262,16 @@ ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRang
   return sizeRange;
 }
 
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMakeLoosely(CGSize a, CGSize b)
+{
+  ASSizeRange result;
+  result.min.width = MIN(a.width, b.width);
+  result.min.height = MIN(a.height, b.height);
+  result.max.width = MAX(a.width, b.width);
+  result.max.height = MAX(a.height, b.height);
+  return result;
+}
+
 /**
  * Creates an ASSizeRange with provided size as both min and max.
  */
@@ -277,6 +287,14 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT CGSize ASSizeRangeClamp(ASSizeRange s
 {
   return CGSizeMake(MAX(sizeRange.min.width, MIN(sizeRange.max.width, size.width)),
                     MAX(sizeRange.min.height, MIN(sizeRange.max.height, size.height)));
+}
+
+/**
+ * Returns whether the given size is contained in the given size range.
+ */
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeContainsSize(ASSizeRange sizeRange, CGSize size)
+{
+  return CGSizeEqualToSize(ASSizeRangeClamp(sizeRange, size), size);
 }
 
 /**
