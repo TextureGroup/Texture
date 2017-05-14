@@ -22,7 +22,6 @@
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
-#import <map>
 #import <atomic>
 
 #if YOGA
@@ -62,39 +61,39 @@ ASLayoutElementContext ASLayoutElementContextMake(int32_t transitionID)
   return _ASLayoutElementContextMake(transitionID);
 }
 
-// Note: This is a non-recursive static lock. If it needs to be recursive, use ASDISPLAYNODE_MUTEX_RECURSIVE_INITIALIZER
-static ASDN::StaticMutex _layoutElementContextLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
-static std::map<mach_port_t, ASLayoutElementContext> layoutElementContextMap;
+pthread_key_t ASLayoutElementContextKey;
 
-static inline mach_port_t ASLayoutElementGetCurrentContextKey()
+// pthread_key_create must be called before the key can be used. This function does that.
+void ASLayoutElementContextEnsureKey()
 {
-  return pthread_mach_thread_np(pthread_self());
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    pthread_key_create(&ASLayoutElementContextKey, free);
+  });
 }
 
 void ASLayoutElementSetCurrentContext(struct ASLayoutElementContext context)
 {
-  const mach_port_t key = ASLayoutElementGetCurrentContextKey();
-  ASDN::StaticMutexLocker l(_layoutElementContextLock);
-  layoutElementContextMap[key] = context;
+  ASLayoutElementContextEnsureKey();
+  ASDisplayNodeCAssert(pthread_getspecific(ASLayoutElementContextKey) == NULL, @"Nested ASLayoutElementContexts aren't supported.");
+  pthread_setspecific(ASLayoutElementContextKey, new ASLayoutElementContext(context));
 }
 
 struct ASLayoutElementContext ASLayoutElementGetCurrentContext()
 {
-  const mach_port_t key = ASLayoutElementGetCurrentContextKey();
-  ASDN::StaticMutexLocker l(_layoutElementContextLock);
-  const auto it = layoutElementContextMap.find(key);
-  if (it != layoutElementContextMap.end()) {
-    // Found an interator with above key. "it->first" is the key itself, "it->second" is the context value.
-    return it->second;
-  }
-  return ASLayoutElementContextNull;
+  ASLayoutElementContextEnsureKey();
+  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
+  return (heapCtx ? *heapCtx : ASLayoutElementContextNull);
 }
 
 void ASLayoutElementClearCurrentContext()
 {
-  const mach_port_t key = ASLayoutElementGetCurrentContextKey();
-  ASDN::StaticMutexLocker l(_layoutElementContextLock);
-  layoutElementContextMap.erase(key);
+  ASLayoutElementContextEnsureKey();
+  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
+  if (heapCtx != NULL) {
+    delete heapCtx;
+  }
+  pthread_setspecific(ASLayoutElementContextKey, NULL);
 }
 
 #pragma mark - ASLayoutElementStyle
