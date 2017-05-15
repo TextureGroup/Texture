@@ -124,7 +124,7 @@
     self.backgroundColor = [UIColor clearColor];
     
     _photoNode = [[ASNetworkImageNode alloc] init];
-    _photoNode.URL = [NSURL URLWithString:@"http://asyncdisplaykit.org/static/images/layout-examples-photo-with-inset-text-overlay-photo.png"];
+    _photoNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-inset-text-overlay-photo.png"];
     _photoNode.willDisplayNodeContentWithRenderingContext = ^(CGContextRef context, id drawParameters) {
       CGRect bounds = CGContextGetClipBoundingBox(context);
       [[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:10] addClip];
@@ -168,10 +168,10 @@
   
   if (self) {
     _photoNode = [[ASNetworkImageNode alloc] init];
-    _photoNode.URL = [NSURL URLWithString:@"http://asyncdisplaykit.org/static/images/layout-examples-photo-with-outset-icon-overlay-photo.png"];
+    _photoNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-photo.png"];
     
     _iconNode = [[ASNetworkImageNode alloc] init];
-    _iconNode.URL = [NSURL URLWithString:@"http://asyncdisplaykit.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png"];
+    _iconNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png"];
     
     [_iconNode setImageModificationBlock:^UIImage *(UIImage *image) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
       CGSize profileImageSize = CGSizeMake(60, 60);
