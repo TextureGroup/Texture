@@ -229,7 +229,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 @end
 
 
-@interface ASDisplayNode (ASsLayoutInternal)
+@interface ASDisplayNode (ASLayoutInternal)
 
 /**
  * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
