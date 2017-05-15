@@ -229,7 +229,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 @end
 
 
-@interface ASDisplayNode (ASsLayoutInternal)
+@interface ASDisplayNode (ASLayoutInternal)
 
 /**
  * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
@@ -259,11 +259,6 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 @end
 
 @interface ASDisplayNode (ASLayoutTransitionInternal)
-
-/**
- * Sentinel of the current layout transition
- */
-@property (atomic, assign) int32_t pendingTransitionID;
 
 /**
  * If one or multiple layout transitions are in flight this methods returns if the current layout transition that
