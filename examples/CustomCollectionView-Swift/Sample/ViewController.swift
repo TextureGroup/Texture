@@ -45,8 +45,8 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     }
     
     _collectionNode.backgroundColor = UIColor.white
-    _collectionNode.dataSource = self;
-    _collectionNode.delegate = self;
+    _collectionNode.dataSource = self
+    _collectionNode.delegate = self
     _collectionNode.layoutInspector = _layoutInspector
     _collectionNode.registerSupplementaryNode(ofKind: UICollectionElementKindSectionHeader)
   }
@@ -55,11 +55,6 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     fatalError("init(coder:) has not been implemented")
   }
     
-  deinit {
-    _collectionNode.dataSource = nil;
-    _collectionNode.delegate = nil;
-  }
-  
   override func viewDidLoad() {
     super.viewDidLoad()
     _collectionNode.view.isScrollEnabled = true
@@ -79,7 +74,7 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     let textInsets = UIEdgeInsets(top: 11, left: 0, bottom: 11, right: 0)
     let textCellNode = ASTextCellNode(attributes: textAttributes as! [AnyHashable : Any], insets: textInsets)
     textCellNode.text = String(format: "Section %zd", indexPath.section + 1)
-    return textCellNode;
+    return textCellNode
   }
   
 
