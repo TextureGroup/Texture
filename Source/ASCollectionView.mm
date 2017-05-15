@@ -1968,16 +1968,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [self setNeedsLayout];
 }
 
-- (void)nodeDidRelayout:(ASCellNode *)node sizeChanged:(BOOL)sizeChanged
-{
-  ASDisplayNodeAssertMainThread();
-  
-  if (!sizeChanged) {
-    return;
-  }
-  [self nodesDidRelayout:@[node]];
-}
-
 - (void)nodesDidRelayout:(NSArray<ASCellNode *> *)nodes
 {
   ASDisplayNodeAssertMainThread();

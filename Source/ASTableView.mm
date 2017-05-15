@@ -1829,21 +1829,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [self setNeedsLayout];
 }
 
-- (void)nodeDidRelayout:(ASCellNode *)node sizeChanged:(BOOL)sizeChanged
-{
-  ASDisplayNodeAssertMainThread();
-
-  if (!sizeChanged || _queuedNodeHeightUpdate || _remeasuringCellNodes) {
-    return;
-  }
-
-  _queuedNodeHeightUpdate = YES;
-  [self performSelector:@selector(requeryNodeHeights)
-             withObject:nil
-             afterDelay:0
-                inModes:@[ NSRunLoopCommonModes ]];
-}
-
 // Cause UITableView to requery for the new height of this node
 - (void)requeryNodeHeights
 {
