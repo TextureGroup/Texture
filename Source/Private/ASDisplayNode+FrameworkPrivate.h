@@ -261,11 +261,6 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 @interface ASDisplayNode (ASLayoutTransitionInternal)
 
 /**
- * Sentinel of the current layout transition
- */
-@property (atomic, assign) int32_t pendingTransitionID;
-
-/**
  * If one or multiple layout transitions are in flight this methods returns if the current layout transition that
  * happens in in this particular thread was invalidated through another thread is starting a transition for this node
  */

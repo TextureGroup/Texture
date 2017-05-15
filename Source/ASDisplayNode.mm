@@ -916,7 +916,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     
     // If a current layout transition is in progress there is no need to do a measurement and layout pass in here as
     // this is supposed to happen within the layout transition process
-    if (_transitionInProgress) {
+    if (_transitionID != ASLayoutElementContextInvalidTransitionID) {
       return;
     }
     
@@ -1807,15 +1807,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       // This is especially important as with automatic subnode management, adding subnodes can happen while a transition
       // is in fly
       if (ASHierarchyStateIncludesLayoutPending(stateToEnterOrExit)) {
-        int32_t pendingTransitionId = newSupernode.pendingTransitionID;
+        int32_t pendingTransitionId = newSupernode->_pendingTransitionID;
         if (pendingTransitionId != ASLayoutElementContextInvalidTransitionID) {
           {
-            ASDN::MutexLocker l(__instanceLock__);
             _pendingTransitionID = pendingTransitionId;
             
             // Propagate down the new pending transition id
             ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
-              node.pendingTransitionID = pendingTransitionId;
+              node->_pendingTransitionID = pendingTransitionId;
             });
           }
         }
