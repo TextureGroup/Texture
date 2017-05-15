@@ -29,6 +29,7 @@
 
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASTextCaching.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
 
 // TODO: This is more like ASTextNode2State
@@ -48,60 +49,36 @@
 
 @implementation ASTextNode2DrawParameters
 
-@end
-
-@interface ASTextNode2CacheKey : NSObject
-- (instancetype)initForResultWithLayout:(ASTextLayout *)layout;
-- (instancetype)initForQueryWithParameters:(ASTextNode2DrawParameters *)parameters;
-@property (nonatomic, strong, readonly) NSAttributedString *attributedString;
-@property (nonatomic, strong, readonly) ASTextContainer *textContainer;
-@property (nonatomic, readonly) ASSizeRange resultSizeRange;
-@property (nonatomic, readonly) CGSize querySize;
-@end
-@implementation ASTextNode2CacheKey
-
-- (instancetype)initForResultWithLayout:(ASTextLayout *)layout
+- (NSAttributedString *)processedAttributedText
 {
-  if (self = [super init]) {
-    _textContainer = layout.container;
-    _attributedString = layout.text;
-    _resultSizeRange = ASSizeRangeMakeLoosely(_textContainer.size, layout.textBoundingSize);
-  }
-  return self;
-}
-
-- (instancetype)initForQueryWithParameters:(ASTextNode2DrawParameters *)parameters
-{
-  if (self = [super init]) {
-    _textContainer = parameters.textContainer;
-    _attributedString = parameters.processedAttributedText;
-    _querySize = _textContainer.size;
-  }
-  return self;
-}
-
-- (NSUInteger)hash
-{
-  // Just use attributed string for hash. Previously we included container attributes
-  // in the hash but it actually deteriorated cache performance (more collisions).
-  return _attributedString.hash;
-}
-
-- (BOOL)isEqual:(id)object
-{
-  ASDisplayNodeAssert([object isKindOfClass:[ASTextNode2CacheKey class]], @"Unexpected object: %@", object);
-  ASTextNode2CacheKey *otherKey = object;
-  if (![_attributedString isEqualToAttributedString:otherKey->_attributedString] || ![_textContainer isEqualToContainerExcludingSize:otherKey->_textContainer]) {
-    return NO;
-  }
+  @synchronized (self) {
+    if (_processedAttributedText) {
+      return _processedAttributedText;
+    }
   
-  ASDisplayNodeAssert(CGSizeEqualToSize(_querySize, CGSizeZero), @"Query-key should not be on the left-hand side of isEqual:.");
-  
-  BOOL otherIsResult = CGSizeEqualToSize(otherKey->_querySize, CGSizeZero);
-  if (otherIsResult) {
-    return ASSizeRangeEqualToSizeRange(_resultSizeRange, otherKey->_resultSizeRange);
-  } else {
-    return ASSizeRangeContainsSize(_resultSizeRange, otherKey->_querySize);
+    NSMutableAttributedString *attributedString = [_attributedText mutableCopy];
+    // Apply paragraph style if needed
+    [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
+      if (style == nil || style.lineBreakMode == _lineBreakMode) {
+        return;
+      }
+      
+      NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
+      paragraphStyle.lineBreakMode = _lineBreakMode;
+      [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
+    }];
+    
+    // Apply background color if needed
+    UIColor *backgroundColor = self.backgroundColor;
+    if (CGColorGetAlpha(backgroundColor.CGColor) > 0) {
+      [attributedString addAttribute:NSBackgroundColorAttributeName value:backgroundColor range:NSMakeRange(0, attributedString.length)];
+    }
+    
+    // Apply shadow if needed
+    if (_shadow != nil) {
+      [attributedString addAttribute:NSShadowAttributeName value:_shadow range:NSMakeRange(0, attributedString.length)];
+    }
+    _processedAttributedText = [attributedString copy];
   }
 }
 
@@ -128,7 +105,7 @@ static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
 @interface ASTextNode2 () <UIGestureRecognizerDelegate>
-@property (atomic, strong) ASTextNode2DrawParameters *displayedParameters;
+@property (atomic, strong) ASTextLayout *displayedTextLayout;
 @end
 
 @implementation ASTextNode2 {
@@ -145,6 +122,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
+  std::atomic<NSAttributedString *> _additionalTruncationMessage;
   
   NSString *_highlightedLinkAttributeName;
   id _highlightedLinkAttributeValue;
@@ -274,22 +252,30 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return YES;
 }
 
+#define ASDeclareGetter(source, type, getterName) \
+- (type)getterName \
+{\
+  return source;\
+}
+
+#define ASDeclareSetter(expr, type, setterName, equal, sideEffect)\
+- (void)setterName(type)value \
+{ \
+  BOOL sameValue = equal(expr, value); \
+  if (sameValue) { \
+    return; \
+  }\
+  expr = value; \
+  sideEffect;\
+} \
+
+#define ASDeclareReadwrite(expr, type, setterName, getterName, equal, sideEffect) \
+  ASDeclareGetter(expr, type, getterName) \
+  ASDeclareSetter(expr, type, setterName, equal, sideEffect)
+
+ASDeclareReadwrite(_textContainer.insets, UIEdgeInsets, setTextContainerInset:, textContainerInset, UIEdgeInsetsEqualToEdgeInsets, [self setNeedsLayout]);
+
 #pragma mark - Layout and Sizing
-
-- (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
-{
-  BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(_textContainer.insets, textContainerInset);
-  _textContainer.insets = textContainerInset;
-  
-  if (needsUpdate) {
-    [self setNeedsLayout];
-  }
-}
-
-- (UIEdgeInsets)textContainerInset
-{
-  return _textContainer.insets;
-}
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
@@ -298,7 +284,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   ASTextNode2DrawParameters *params = [self textNodeDrawParameters];
   params.textContainer.size = constrainedSize;
-  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithParameters:params];
+  ASTextLayout *layout = [ASTextLayoutCache layoutForText:params.processedAttributedText container:params.textContainer];
   
   return layout.textBoundingSize;
 }
@@ -382,41 +368,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedStringForDrawing:(NSMutableAttributedString *)attributedString
-{
-  ASDN::MutexLocker lock(__instanceLock__);
- 
-  // Apply paragraph style if needed
-  [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
-    if (style == nil || style.lineBreakMode == _truncationMode) {
-      return;
-    }
-    
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineBreakMode = _truncationMode;
-    [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-  }];
-  
-  // Apply background color if needed
-  UIColor *backgroundColor = self.backgroundColor;
-  if (CGColorGetAlpha(backgroundColor.CGColor) > 0) {
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:backgroundColor range:NSMakeRange(0, attributedString.length)];
-  }
-  
-  // Apply shadow if needed
-  if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
-    NSShadow *shadow = [[NSShadow alloc] init];
-    if (_shadowOpacity != 1) {
-      shadow.shadowColor = [UIColor colorWithCGColor:CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor))];
-    } else {
-      shadow.shadowColor = [UIColor colorWithCGColor:_shadowColor];
-    }
-    shadow.shadowOffset = _shadowOffset;
-    shadow.shadowBlurRadius = _shadowRadius;
-    [attributedString addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, attributedString.length)];
-  }
-}
-
 #pragma mark - Drawing
 
 // NOTE: This should be called something like `-drawParameters` but that's actually a (dumb) private ASDisplayNode method.
@@ -447,7 +398,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   [super displayDidFinish];
   ASDisplayNodeAssertNotNil(_parametersForCurrentDisplay, @"Expected to have parameters for current display when display finishes.");
-  _displayedParameters = _parametersForCurrentDisplay;
+  _displayedTextLayout = [ASTextLayoutCache layoutForText:_parametersForCurrentDisplay.processedAttributedText container:_parametersForCurrentDisplay.textContainer];
   _parametersForCurrentDisplay = nil;
 }
 
@@ -468,50 +419,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return shadow;
 }
 
-#define ENABLE_ASTEXT_CACHE_LOG 0
-/**
- * If it can't find a compatible layout, this method creates one.
- */
-+ (ASTextLayout *)compatibleLayoutWithParameters:(ASTextNode2DrawParameters *)drawParameters
-{
-  static NSCache<ASTextNode2CacheKey *, ASTextLayout *> *textLayoutCache2;
-#if ENABLE_ASTEXT_CACHE_LOG
-  static std::atomic<int32_t> cacheHits;
-  static std::atomic<int32_t> cacheQueries;
-#endif
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    textLayoutCache2 = [[NSCache alloc] init];
-  });
-  
-#if ENABLE_ASTEXT_CACHE_LOG
-  if (cacheQueries.load() % 5 == 0) {
-    NSLog(@"%g", cacheHits.load() / (float)cacheQueries.load());
-  }
-  cacheQueries += 1;
-#endif
-  auto cacheKey = [[ASTextNode2CacheKey alloc] initForQueryWithParameters:drawParameters];
-  ASTextLayout *cachedLayout = [textLayoutCache2 objectForKey:cacheKey];
-  if (cachedLayout != nil) {
-#if ENABLE_ASTEXT_CACHE_LOG
-    cacheHits += 1;
-#endif
-    return cachedLayout;
-  }
-  
-  // Cache Miss.
-  
-  // Compute the text layout.
-  ASTextLayout *layout = [ASTextLayout layoutWithContainer:drawParameters.textContainer text:drawParameters.processedAttributedText];
-  ASTextNode2CacheKey *key = [[ASTextNode2CacheKey alloc] initForResultWithLayout:layout];
-  [textLayoutCache2 setObject:layout forKey:key];
-  return layout;
-}
-
 + (void)drawRect:(CGRect)bounds withParameters:(ASTextNode2DrawParameters *)drawParams isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
 {
   drawParams.textContainer.size = bounds.size;
-  ASTextLayout *layout = [self compatibleLayoutWithParameters:drawParams];
+  ASTextLayout *layout = [ASTextLayoutCache layoutForText:drawParams.processedAttributedText container:drawParams.textContainer];
   
   if (isCancelledBlock()) {
     return;
@@ -541,7 +452,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
    inAdditionalTruncationMessage:(out BOOL *)inAdditionalTruncationMessageOut
                  forHighlighting:(BOOL)highlighting
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  auto range = [self.displayedTextLayout textRangeAtPoint:point];
   return nil;
 }
 
@@ -579,20 +490,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 }
 
 #pragma mark - Highlighting
-
-- (ASTextNodeHighlightStyle)highlightStyle
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  return _highlightStyle;
-}
-
-- (void)setHighlightStyle:(ASTextNodeHighlightStyle)highlightStyle
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  _highlightStyle = highlightStyle;
-}
 
 - (NSRange)highlightRange
 {
@@ -928,14 +825,6 @@ static NSAttributedString *DefaultTruncationAttributedString()
   return defaultTruncationAttributedString;
 }
 
-- (void)_ensureTruncationText
-{
-  if (_textContainer.truncationToken == nil) {
-    ASDN::MutexLocker l(__instanceLock__);
-    _textContainer.truncationToken = [self _locked_composedTruncationText];
-  }
-}
-
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
   {
@@ -956,7 +845,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
   {
     ASDN::MutexLocker l(__instanceLock__);
     
-    if (ASObjectIsEqual(_additionalTruncationMessage, additionalTruncationMessage)) {
+    if (ASObjectIsEqual(_additionalTruncationMessage.load(), additionalTruncationMessage)) {
       return;
     }
     
@@ -996,7 +885,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)isTruncated
 {
-  return ([ASTextNode2 compatibleLayoutWithParameters:self.displayedParameters].truncatedLine != nil);
+  return (_displayedTextLayout.truncatedLine != nil);
 }
 
 - (NSUInteger)maximumNumberOfLines

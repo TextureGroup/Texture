@@ -339,6 +339,8 @@
 		CC57EAF71E3939350034C595 /* ASCollectionView+Undeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CC57EAF81E3939450034C595 /* ASTableView+Undeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = CC512B841DAC45C60054848E /* ASTableView+Undeprecated.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CC58AA4B1E398E1D002C8CB4 /* ASBlockTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = CC58AA4A1E398E1D002C8CB4 /* ASBlockTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CC5BE2891EC9174B0077A1A8 /* ASTextCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = CC5BE2871EC9174B0077A1A8 /* ASTextCaching.h */; };
+		CC5BE28A1EC9174B0077A1A8 /* ASTextCaching.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5BE2881EC9174B0077A1A8 /* ASTextCaching.m */; };
 		CC6AA2DA1E9F03B900978E87 /* ASDisplayNode+Ancestry.h in Headers */ = {isa = PBXBuildFile; fileRef = CC6AA2D81E9F03B900978E87 /* ASDisplayNode+Ancestry.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC6AA2DB1E9F03B900978E87 /* ASDisplayNode+Ancestry.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6AA2D91E9F03B900978E87 /* ASDisplayNode+Ancestry.m */; };
 		CC7FD9E11BB5F750005CCB2B /* ASPhotosFrameworkImageRequestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC7FD9E01BB5F750005CCB2B /* ASPhotosFrameworkImageRequestTests.m */; };
@@ -790,6 +792,8 @@
 		CC55A7101E52A0F200594372 /* ASResponderChainEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASResponderChainEnumerator.m; sourceTree = "<group>"; };
 		CC57EAF91E394EA40034C595 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC58AA4A1E398E1D002C8CB4 /* ASBlockTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASBlockTypes.h; sourceTree = "<group>"; };
+		CC5BE2871EC9174B0077A1A8 /* ASTextCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextCaching.h; sourceTree = "<group>"; };
+		CC5BE2881EC9174B0077A1A8 /* ASTextCaching.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTextCaching.m; sourceTree = "<group>"; };
 		CC6AA2D81E9F03B900978E87 /* ASDisplayNode+Ancestry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ASDisplayNode+Ancestry.h"; path = "Base/ASDisplayNode+Ancestry.h"; sourceTree = "<group>"; };
 		CC6AA2D91E9F03B900978E87 /* ASDisplayNode+Ancestry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "ASDisplayNode+Ancestry.m"; path = "Base/ASDisplayNode+Ancestry.m"; sourceTree = "<group>"; };
 		CC7FD9DC1BB5E962005CCB2B /* ASPhotosFrameworkImageRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPhotosFrameworkImageRequest.h; sourceTree = "<group>"; };
@@ -1487,6 +1491,8 @@
 		CCCCCCC11EC3EF060087FE10 /* TextExperiment */ = {
 			isa = PBXGroup;
 			children = (
+				CC5BE2871EC9174B0077A1A8 /* ASTextCaching.h */,
+				CC5BE2881EC9174B0077A1A8 /* ASTextCaching.m */,
 				CCCCCCC21EC3EF060087FE10 /* Component */,
 				CCCCCCCB1EC3EF060087FE10 /* String */,
 				CCCCCCD01EC3EF060087FE10 /* Utility */,
@@ -1642,6 +1648,7 @@
 				B35062581B010F070018CF92 /* ASAvailability.h in Headers */,
 				DE84918D1C8FFF2B003D89E9 /* ASRunLoopQueue.h in Headers */,
 				CC0F88621E4281E200576FED /* ASSectionController.h in Headers */,
+				CC5BE2891EC9174B0077A1A8 /* ASTextCaching.h in Headers */,
 				A2763D7A1CBDD57D00A9ADBD /* ASPINRemoteImageDownloader.h in Headers */,
 				34EFC7611B701C9C00AD841F /* ASBackgroundLayoutSpec.h in Headers */,
 				B35062591B010F070018CF92 /* ASBaseDefines.h in Headers */,
@@ -2099,6 +2106,7 @@
 				DBDB83971C6E879900D0098C /* ASPagerFlowLayout.m in Sources */,
 				E5B078001E69F4EB00C24B5B /* ASElementMap.m in Sources */,
 				9C8898BC1C738BA800D6B02E /* ASTextKitFontSizeAdjuster.mm in Sources */,
+				CC5BE28A1EC9174B0077A1A8 /* ASTextCaching.m in Sources */,
 				690ED59B1E36D118000627C0 /* ASImageNode+tvOS.m in Sources */,
 				CCCCCCD81EC3EF060087FE10 /* ASTextInput.m in Sources */,
 				34EFC7621B701CA400AD841F /* ASBackgroundLayoutSpec.mm in Sources */,

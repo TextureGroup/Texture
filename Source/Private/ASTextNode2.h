@@ -177,7 +177,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  @abstract The style to use when highlighting text.
  */
-@property (nonatomic, assign) ASTextNodeHighlightStyle highlightStyle;
+@property (atomic, assign) ASTextNodeHighlightStyle highlightStyle;
 
 /**
  @abstract The range of text highlighted by the receiver. Changes to this property are not animated by default.
