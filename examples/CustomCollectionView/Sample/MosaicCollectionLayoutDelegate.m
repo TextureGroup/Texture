@@ -108,7 +108,7 @@
   
   CGFloat contentHeight = [[[columnHeights lastObject] firstObject] floatValue];
   CGSize contentSize = CGSizeMake(layoutWidth, contentHeight);
-  return [[ASCollectionLayoutState alloc] initWithElements:elements contentSize:contentSize elementToLayoutArrtibutesMap:attrsMap];
+  return [[ASCollectionLayoutState alloc] initWithContext:context contentSize:contentSize elementToLayoutAttributesTable:attrsMap];
 }
 
 - (CGFloat)_widthForSection:(NSUInteger)section withLayoutWidth:(CGFloat)layoutWidth
