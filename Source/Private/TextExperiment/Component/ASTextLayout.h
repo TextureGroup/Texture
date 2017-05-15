@@ -58,7 +58,7 @@ extern const CGSize ASTextContainerMaxSize;
 /// Creates a container with the specified size and insets. @param size The size. @param insets The text insets.
 + (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets;
 
-/// Creates a container with the specified path. @param size The path.
+/// Creates a container with the specified path. @param path The path.
 + (instancetype)containerWithPath:(nullable UIBezierPath *)path;
 
 /// The constrained size. (if the size is larger than ASTextContainerMaxSize, it will be clipped)
