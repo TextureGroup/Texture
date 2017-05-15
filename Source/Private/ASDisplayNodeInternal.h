@@ -73,7 +73,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
 
-@interface ASDisplayNode ()
+@interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
 @package
   _ASPendingState *_pendingViewState;
@@ -133,6 +133,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
   // This is the desired contentsScale, not the scale at which the layer's contents should be displayed
   CGFloat _contentsScaleForDisplay;
+  ASDisplayNodeMethodOverrides _methodOverrides;
 
   UIEdgeInsets _hitTestSlop;
   
@@ -146,6 +147,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSTimeInterval _defaultLayoutTransitionDuration;
   NSTimeInterval _defaultLayoutTransitionDelay;
   UIViewAnimationOptions _defaultLayoutTransitionOptions;
+  
+  ASLayoutSpecBlock _layoutSpecBlock;
 
   int32_t _transitionID;
   BOOL _transitionInProgress;
@@ -162,6 +165,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   Class _layerClass; // nil -> _ASDisplayLayer
   
   UIImage *_placeholderImage;
+  BOOL _placeholderEnabled;
   CALayer *_placeholderLayer;
 
   // keeps track of nodes/subnodes that have not finished display, used with placeholders
@@ -200,6 +204,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
   ASLayout *_yogaCalculatedLayout;
 #endif
+  
+  NSString *_debugName;
 
 #if TIME_DISPLAYNODE_OPS
 @public

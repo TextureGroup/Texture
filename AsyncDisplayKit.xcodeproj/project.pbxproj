@@ -157,6 +157,7 @@
 		698DFF441E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 698DFF431E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		698DFF471E36B7E9002891F1 /* ASLayoutSpecUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 698DFF461E36B7E9002891F1 /* ASLayoutSpecUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		69B225671D72535E00B25B22 /* ASDisplayNodeLayoutTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 69B225661D72535E00B25B22 /* ASDisplayNodeLayoutTests.mm */; };
+		69BCE3D91EC6513B007DCCAD /* ASDisplayNode+Layout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */; };
 		69CB62AC1CB8165900024920 /* _ASDisplayViewAccessiblity.h in Headers */ = {isa = PBXBuildFile; fileRef = 69CB62A91CB8165900024920 /* _ASDisplayViewAccessiblity.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		69CB62AE1CB8165900024920 /* _ASDisplayViewAccessiblity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 69CB62AA1CB8165900024920 /* _ASDisplayViewAccessiblity.mm */; };
 		69E0E8A71D356C9400627613 /* ASEqualityHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -649,6 +650,7 @@
 		699B83501E3C1BA500433FA4 /* ASLayoutSpecTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASLayoutSpecTests.m; sourceTree = "<group>"; };
 		69B225661D72535E00B25B22 /* ASDisplayNodeLayoutTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDisplayNodeLayoutTests.mm; sourceTree = "<group>"; };
 		69B225681D7265DA00B25B22 /* ASXCTExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASXCTExtensions.h; sourceTree = "<group>"; };
+		69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+Layout.mm"; sourceTree = "<group>"; };
 		69CB62A91CB8165900024920 /* _ASDisplayViewAccessiblity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASDisplayViewAccessiblity.h; sourceTree = "<group>"; };
 		69CB62AA1CB8165900024920 /* _ASDisplayViewAccessiblity.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _ASDisplayViewAccessiblity.mm; sourceTree = "<group>"; };
 		69F10C851C84C35D0026140C /* ASRangeControllerUpdateRangeProtocol+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASRangeControllerUpdateRangeProtocol+Beta.h"; sourceTree = "<group>"; };
@@ -1017,6 +1019,7 @@
 				058D09DA195D050800B7D73C /* ASDisplayNode+Subclasses.h */,
 				CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */,
 				CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */,
+				69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */,
 				058D09DB195D050800B7D73C /* ASDisplayNodeExtras.h */,
 				058D09DC195D050800B7D73C /* ASDisplayNodeExtras.mm */,
 				0587F9BB1A7309ED00AFF0BA /* ASEditableTextNode.h */,
@@ -2171,6 +2174,7 @@
 				CCA282C91E9EB64B0037E8B7 /* ASDisplayNodeTipState.m in Sources */,
 				509E68601B3AED8E009B9150 /* ASScrollDirection.m in Sources */,
 				B35062091B010EFD0018CF92 /* ASScrollNode.mm in Sources */,
+				69BCE3D91EC6513B007DCCAD /* ASDisplayNode+Layout.mm in Sources */,
 				8BDA5FC81CDBDF95007D13B2 /* ASVideoPlayerNode.mm in Sources */,
 				E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */,
 				34EFC7721B701D0300AD841F /* ASStackLayoutSpec.mm in Sources */,
