@@ -22,3 +22,4 @@
 - [ASVideoNode] Added error reporing to ASVideoNode and it's delegate [#260](https://github.com/TextureGroup/Texture/pull/260)
 - [ASCollectionNode] Fixed conversion of item index paths between node & view. [Adlai Holler](https://github.com/Adlai-Holler) [#262](https://github.com/TextureGroup/Texture/pull/262)
 - [Layout] Extract layout implementation code into it's own subcategories [Michael Schneider] (https://github.com/maicki)[#272](https://github.com/TextureGroup/Texture/pull/272)
+- [Fix] Fix a potential crash when cell nodes that need layout are deleted during the same runloop.  [Adlai Holler](https://github.com/Adlai-Holler) [#279](https://github.com/TextureGroup/Texture/pull/279)
