@@ -22,3 +22,4 @@
 - [ASVideoNode] Added error reporing to ASVideoNode and it's delegate [#260](https://github.com/TextureGroup/Texture/pull/260)
 - [ASCollectionNode] Fixed conversion of item index paths between node & view. [Adlai Holler](https://github.com/Adlai-Holler) [#262](https://github.com/TextureGroup/Texture/pull/262)
 - [Layout] Extract layout implementation code into it's own subcategories [Michael Schneider] (https://github.com/maicki)[#272](https://github.com/TextureGroup/Texture/pull/272)
+- [Batch fetching] Add ASBatchFetchingDelegate that takes scroll velocity and remaining time into account [Huy Nguyen](https://github.com/nguyenhuy) [#281](https://github.com/TextureGroup/Texture/pull/281)
