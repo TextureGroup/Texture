@@ -71,7 +71,8 @@ extern NSString * const ASCollectionInvalidUpdateException;
 - (NSUInteger)numberOfSectionsInDataController:(ASDataController *)dataController;
 
 /**
- Returns if the collection element size matches a given size
+ Returns if the collection element size matches a given size.
+ @precondition The element is present in the data controller's visible map.
  */
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size;
 
