@@ -234,7 +234,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (void)__setNeedsDisplay;
 
 /**
- * Called from [CALayer layoutSublayers:]. Executes the layout pass for the node
+ * Called whenever the node needs to layout its subnodes and, if it's already loaded, its subviews. Executes the layout pass for the node
+ *
+ * This method is thread-safe but asserts thread affinity.
  */
 - (void)__layout;
 
