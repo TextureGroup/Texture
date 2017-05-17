@@ -1088,9 +1088,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (void)layout
 {
+  // Hook for subclasses
   ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
-  // Subclass hook
 }
 
 #pragma mark Layout Transition
