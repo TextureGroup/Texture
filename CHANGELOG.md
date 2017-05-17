@@ -24,4 +24,5 @@
 - [Layout] Extract layout implementation code into it's own subcategories [Michael Schneider] (https://github.com/maicki)[#272](https://github.com/TextureGroup/Texture/pull/272)
 - [Fix] Fix a potential crash when cell nodes that need layout are deleted during the same runloop.  [Adlai Holler](https://github.com/Adlai-Holler) [#279](https://github.com/TextureGroup/Texture/pull/279)
 - [Batch fetching] Add ASBatchFetchingDelegate that takes scroll velocity and remaining time into account [Huy Nguyen](https://github.com/nguyenhuy) [#281](https://github.com/TextureGroup/Texture/pull/281)
+- [Layout] Ensure -layout and -layoutDidFinish are called only if a node is loaded. [Huy Nguyen](https://github.com/nguyenhuy) [#285](https://github.com/TextureGroup/Texture/pull/285)
 
