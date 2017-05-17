@@ -1755,6 +1755,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size
 {
   NSIndexPath *indexPath = [self indexPathForNode:element.node];
+  if (indexPath == nil) {
+    ASDisplayNodeFailAssert(@"Data controller should not ask for presented size for element that is not presented.");
+    return YES;
+  }
   CGRect rect = [self rectForRowAtIndexPath:indexPath];
   
   /**

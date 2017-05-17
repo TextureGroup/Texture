@@ -1669,9 +1669,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size
 {
   NSIndexPath *indexPath = [self indexPathForNode:element.node];
+  if (indexPath == nil) {
+    ASDisplayNodeFailAssert(@"Data controller should not ask for presented size for element that is not presented.");
+    return YES;
+  }
   UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
-  CGRect rect = attributes.frame;
-  return CGSizeEqualToSizeWithIn(rect.size, size, FLT_EPSILON);
+  return CGSizeEqualToSizeWithIn(attributes.size, size, FLT_EPSILON);
   
 }
 
