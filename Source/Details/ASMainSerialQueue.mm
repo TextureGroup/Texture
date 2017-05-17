@@ -22,8 +22,8 @@
 
 @interface ASMainSerialQueue ()
 {
-  ASDN::Mutex _serialQueueLock;
-  NSMutableArray *_blocks;
+  ASAtomic<NSArray *, NSMutableArray *> *_blocks;
+  std::atomic<BOOL> _scheduledOnMainQueue;
 }
 
 @end
@@ -36,45 +36,99 @@
     return nil;
   }
   
-  _blocks = [[NSMutableArray alloc] init];
+  _blocks = [ASAtomic atomicWithValue:[NSMutableArray array]];
   return self;
 }
 
 - (void)performBlockOnMainThread:(dispatch_block_t)block
 {
-  ASDN::MutexLocker l(_serialQueueLock);
-  [_blocks addObject:block];
-  {
-    ASDN::MutexUnlocker u(_serialQueueLock);
-    [self runBlocks];
+  // If we're already on the main thread, just run now and return.
+  if (ASDisplayNodeThreadIsMain()) {
+    block();
+    return;
+  }
+  
+  // If we're off-main, add the block to `_blocks` and ensure that we're scheduled to run `_blocks` ASAP.
+  [_blocks accessWithBlock:^(NSMutableArray * _Nonnull mutableValue) {
+    [mutableValue addObject:block];
+  }];
+  
+  if (!_scheduledOnMainQueue.exchange(YES)) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      _scheduledOnMainQueue = NO;
+      [self flushAllBlocks];
+    });
   }
 }
 
-- (void)runBlocks
+- (void)flushAllBlocks
 {
-  dispatch_block_t mainThread = ^{
-    do {
-      ASDN::MutexLocker l(_serialQueueLock);
-      dispatch_block_t block;
-      if (_blocks.count > 0) {
-        block = _blocks[0];
-        [_blocks removeObjectAtIndex:0];
-      } else {
-        break;
-      }
-      {
-        ASDN::MutexUnlocker u(_serialQueueLock);
-        block();
-      }
-    } while (true);
-  };
-  
-  ASPerformBlockOnMainThread(mainThread);
+  ASDisplayNodeAssertMainThread();
+  NSArray *batch;
+  do {
+    batch = [_blocks readAndUpdate:^(NSMutableArray * _Nonnull mutableValue) {
+      [mutableValue removeAllObjects];
+    }];
+    for (dispatch_block_t block in batch) {
+      block();
+    }
+  } while (batch.count > 0);
 }
 
 - (NSString *)description
 {
   return [[super description] stringByAppendingFormat:@" Blocks: %@", _blocks];
+}
+
+@end
+
+@implementation ASAtomic {
+  ASDN::Mutex _mutex;
+  id _value;
+}
+
++ (instancetype)atomicWithValue:(id)value
+{
+  ASAtomic *atomic = [[ASAtomic alloc] init];
+  atomic->_value = value;
+  return atomic;
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+
+- (void)accessWithBlock:(__kindof id<NSCopying>  _Nonnull (^)(__kindof id<NSCopying> _Nonnull))block
+{
+  ASDN::MutexLocker locker (_mutex);
+  block(_value);
+}
+
+- (id<NSCopying>)readAndUpdate:(void(^)(__kindof id<NSCopying> _Nonnull))block
+#pragma clang diagnostic pop
+{
+  id oldValue;
+  
+  {
+    ASDN::MutexLocker locker (_mutex);
+    oldValue = [_value copy];
+    if (block) {
+      block(_value);
+    }
+  }
+  
+  return oldValue;
+}
+
+- (id)value
+{
+  ASDN::MutexLocker locker(_mutex);
+  return [_value copy];
+}
+
+- (void)setValue:(id)value
+{
+  ASDN::MutexLocker locker(_mutex);
+  _value = value;
 }
 
 @end

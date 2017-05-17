@@ -18,9 +18,47 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 AS_SUBCLASSING_RESTRICTED
 @interface ASMainSerialQueue : NSObject
 
 - (void)performBlockOnMainThread:(dispatch_block_t)block;
 
+- (void)flushAllBlocks;
+
 @end
+
+
+/**
+ * A shortcut to read one property from an atomic without copying the whole value.
+ *
+ * For example, `NSUInteger c = ASAtomicAccessOneProperty(myAtomicArray, count);`
+ * The slower form would be `NSUInteger c = myAtomicArray.value.count;`
+ */
+#define ASAtomicAccessOneProperty(instance, getterName) ({ \
+  __block __typeof([instance.value getterName]) __value; \
+  [instance accessWithBlock:^(id mutableValue) { \
+    __value = [mutableValue getterName]; \
+  }]; \
+  __value; \
+})
+
+#define ASAtomicArrayType(T) ASAtomic<NSArray<T *> *, NSMutableArray<T *> *>
+
+/**
+ * An atomic object container designed for classes that have mutable instances. 
+ */
+@interface ASAtomic<CopiedType : id<NSCopying>, MutableType : id<NSCopying>> : NSObject
+
++ (instancetype)atomicWithValue:(MutableType)value;
+
+- (void)accessWithBlock:(AS_NOESCAPE void (^)(MutableType mutableValue))block;
+
+- (CopiedType)readAndUpdate:(nullable AS_NOESCAPE void (^)(MutableType mutableValue))block;
+
+@property (atomic, copy, readonly) CopiedType value;
+
+@end
+
+NS_ASSUME_NONNULL_END
