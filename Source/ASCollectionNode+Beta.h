@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASCollectionNode.h>
 
-@protocol ASCollectionViewLayoutFacilitatorProtocol, ASCollectionLayoutDelegate;
+@protocol ASCollectionViewLayoutFacilitatorProtocol, ASCollectionLayoutDelegate, ASBatchFetchingDelegate;
 @class ASElementMap;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, readonly) ASElementMap *visibleElements;
 
 @property (strong, readonly, nullable) id<ASCollectionLayoutDelegate> layoutDelegate;
+
+@property (nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 

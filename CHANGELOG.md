@@ -23,3 +23,5 @@
 - [ASCollectionNode] Fixed conversion of item index paths between node & view. [Adlai Holler](https://github.com/Adlai-Holler) [#262](https://github.com/TextureGroup/Texture/pull/262)
 - [Layout] Extract layout implementation code into it's own subcategories [Michael Schneider] (https://github.com/maicki)[#272](https://github.com/TextureGroup/Texture/pull/272)
 - [Fix] Fix a potential crash when cell nodes that need layout are deleted during the same runloop.  [Adlai Holler](https://github.com/Adlai-Holler) [#279](https://github.com/TextureGroup/Texture/pull/279)
+- [Batch fetching] Add ASBatchFetchingDelegate that takes scroll velocity and remaining time into account [Huy Nguyen](https://github.com/nguyenhuy) [#281](https://github.com/TextureGroup/Texture/pull/281)
+
