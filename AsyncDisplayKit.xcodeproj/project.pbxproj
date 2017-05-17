@@ -138,6 +138,7 @@
 		690ED59B1E36D118000627C0 /* ASImageNode+tvOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 690ED5951E36D118000627C0 /* ASImageNode+tvOS.m */; };
 		692510141E74FB44003F2DD0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 692510131E74FB44003F2DD0 /* Default-568h@2x.png */; };
 		692BE8D71E36B65B00C86D87 /* ASLayoutSpecPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 692BE8D61E36B65B00C86D87 /* ASLayoutSpecPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		693A1DCA1ECC944E00D0C9D2 /* IGListAdapter+AsyncDisplayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6947B0BE1E36B4E30007C478 /* ASStackUnpositionedLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 6947B0BC1E36B4E30007C478 /* ASStackUnpositionedLayout.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6947B0C01E36B4E30007C478 /* ASStackUnpositionedLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6947B0BD1E36B4E30007C478 /* ASStackUnpositionedLayout.mm */; };
 		6947B0C31E36B5040007C478 /* ASStackPositionedLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 6947B0C11E36B5040007C478 /* ASStackPositionedLayout.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -306,7 +307,7 @@
 		CC034A091E60BEB400626263 /* ASDisplayNode+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */; };
 		CC034A101E60C9BF00626263 /* ASRectTableTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A0F1E60C9BF00626263 /* ASRectTableTests.m */; };
-		CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */; };
+		CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A141E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A121E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m */; };
 		CC051F1F1D7A286A006434CB /* ASCALayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC051F1E1D7A286A006434CB /* ASCALayerTests.m */; };
 		CC0AEEA41D66316E005D1C78 /* ASUICollectionViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0AEEA31D66316E005D1C78 /* ASUICollectionViewTests.m */; };
@@ -1607,6 +1608,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */,
+				693A1DCA1ECC944E00D0C9D2 /* IGListAdapter+AsyncDisplayKit.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
@@ -1735,7 +1738,6 @@
 				DEC146B71C37A16A004A0EE7 /* ASCollectionInternal.h in Headers */,
 				68B8A4E21CBDB958007E4543 /* ASWeakProxy.h in Headers */,
 				9F98C0271DBE29FC00476D92 /* ASControlTargetAction.h in Headers */,
-				CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */,
 				690ED5961E36D118000627C0 /* ASControlNode+tvOS.h in Headers */,
 				695943401D70815300B0EE1F /* ASDisplayNodeLayout.h in Headers */,
 				0442850E1BAA64EC00D16268 /* ASTwoDimensionalArrayUtils.h in Headers */,
