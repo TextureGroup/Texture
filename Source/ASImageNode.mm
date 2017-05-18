@@ -129,7 +129,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     _image.hash,
     _backingSize,
     _imageDrawRect,
-    _isOpaque,
+    (NSUInteger)_isOpaque,
     _backgroundColor.hash,
     (void *)_willDisplayNodeContentWithRenderingContext,
     (void *)_didDisplayNodeContentWithRenderingContext,
