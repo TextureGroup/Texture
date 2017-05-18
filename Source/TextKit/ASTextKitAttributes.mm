@@ -24,6 +24,8 @@ NSString *const ASTextKitEntityAttributeName = @"ck_entity";
 
 size_t ASTextKitAttributes::hash() const
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic warning "-Wpadded"
   struct {
     NSUInteger attrStringHash;
     NSUInteger truncationStringHash;
@@ -35,6 +37,7 @@ size_t ASTextKitAttributes::hash() const
     NSUInteger shadowColorHash;
     CGFloat shadowOpacity;
     CGFloat shadowRadius;
+#pragma clang diagnostic pop
   } data = {
     [attributedString hash],
     [truncationAttributedString hash],

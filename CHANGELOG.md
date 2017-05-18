@@ -12,3 +12,4 @@
 - Move more properties from ASTableView, ASCollectionView to their respective node classes. [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove finalLayoutElement [Michael Schneider] (https://github.com/maicki)[#96](https://github.com/TextureGroup/Texture/pull/96)
 - Add ASPageTable - A map table for fast retrieval of objects within a certain page [Huy Nguyen](https://github.com/nguyenhuy)
+- [Fix] Fix a major regression in our image node contents caching. [Adlai Holler](https://github.com/Adlai-Holler) [#287](https://github.com/TextureGroup/Texture/pull/287)

@@ -102,15 +102,18 @@ struct ASImageNodeDrawParameters {
 
 - (NSUInteger)hash
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic warning "-Wpadded"
   struct {
     NSUInteger imageHash;
     CGSize backingSize;
     CGRect imageDrawRect;
-    BOOL isOpaque;
+    NSInteger isOpaque;
     NSUInteger backgroundColorHash;
     void *willDisplayNodeContentWithRenderingContext;
     void *didDisplayNodeContentWithRenderingContext;
     void *imageModificationBlock;
+#pragma clang diagnostic pop
   } data = {
     _image.hash,
     _backingSize,

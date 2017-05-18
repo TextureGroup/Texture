@@ -68,9 +68,12 @@ struct ASTextNodeDrawParameter {
 
 - (NSUInteger)hash
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic warning "-Wpadded"
   struct {
     size_t attributesHash;
     CGSize constrainedSize;
+#pragma clang diagnostic pop
   } data = {
     _attributes.hash(),
     _constrainedSize
