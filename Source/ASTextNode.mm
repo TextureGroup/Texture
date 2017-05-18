@@ -968,12 +968,13 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   [super touchesBegan:touches withEvent:event];
 
   CGPoint point = [[touches anyObject] locationInView:self.view];
-
+  // We need to consider text container insets while handling touches because with insets set any link attribute tap won't be handled correctly as scanner will have a wrong idea where to look for a link
+  CGPoint insetsConsideredPoint = CGPointMake(point.x - self.textContainerInset.left - self.textContainerInset.right, point.y - self.textContainerInset.top - self.textContainerInset.bottom);
   NSRange range = NSMakeRange(0, 0);
   NSString *linkAttributeName = nil;
   BOOL inAdditionalTruncationMessage = NO;
 
-  id linkAttributeValue = [self _linkAttributeValueAtPoint:point
+  id linkAttributeValue = [self _linkAttributeValueAtPoint:insetsConsideredPoint
                                              attributeName:&linkAttributeName
                                                      range:&range
                              inAdditionalTruncationMessage:&inAdditionalTruncationMessage
