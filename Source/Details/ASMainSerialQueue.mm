@@ -24,6 +24,7 @@
 {
   ASDN::Mutex _serialQueueLock;
   NSMutableArray *_blocks;
+  std::atomic<BOOL> _scheduledOnMainQueue;
 }
 
 @end
@@ -42,34 +43,39 @@
 
 - (void)performBlockOnMainThread:(dispatch_block_t)block
 {
-  ASDN::MutexLocker l(_serialQueueLock);
-  [_blocks addObject:block];
   {
-    ASDN::MutexUnlocker u(_serialQueueLock);
-    [self runBlocks];
+    ASDN::MutexLocker l(_serialQueueLock);
+    [_blocks addObject:block];
+  }
+  
+  // Schedule a flush if needed.
+  if (!_scheduledOnMainQueue.exchange(YES)) {
+    ASPerformBlockOnMainThread(^{
+      _scheduledOnMainQueue = NO;
+      [self runBlocks];
+    });
   }
 }
 
 - (void)runBlocks
 {
-  dispatch_block_t mainThread = ^{
-    do {
+  ASDisplayNodeAssertMainThread();
+  while (true) {
+    // Grab all our blocks and run them, repeat until none are enqueued.
+    NSArray<dispatch_block_t> *batch;
+    {
       ASDN::MutexLocker l(_serialQueueLock);
-      dispatch_block_t block;
-      if (_blocks.count > 0) {
-        block = _blocks[0];
-        [_blocks removeObjectAtIndex:0];
-      } else {
+      if (_blocks.count == 0) {
         break;
       }
-      {
-        ASDN::MutexUnlocker u(_serialQueueLock);
-        block();
-      }
-    } while (true);
-  };
-  
-  ASPerformBlockOnMainThread(mainThread);
+      batch = _blocks;
+      _blocks = [[NSMutableArray alloc] init];
+    }
+    
+    for (dispatch_block_t block in batch) {
+      block();
+    }
+  }
 }
 
 - (NSString *)description
