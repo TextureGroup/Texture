@@ -95,8 +95,10 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
   CGFloat triggerDistance = viewLength * leadingScreens;
   CGFloat remainingDistance = contentLength - viewLength - offset;
   BOOL result = remainingDistance <= triggerDistance;
-  
-  if (delegate != nil && (velocityLength = round(fabs(velocityLength))) > 0) {
+
+  if (delegate != nil && velocityLength > 0.0) {
+    // Don't need to get absolute value of remaining time
+    // because both remainingDistance and velocityLength are positive when scrolling toward tail
     NSTimeInterval remainingTime = remainingDistance / (velocityLength * 1000);
     result = [delegate shouldFetchBatchWithRemainingTime:remainingTime hint:result];
   }
