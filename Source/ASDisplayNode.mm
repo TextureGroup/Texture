@@ -902,8 +902,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssertThreadAffinity(self);
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   
+  BOOL loaded = NO;
   {
     ASDN::MutexLocker l(__instanceLock__);
+    loaded = [self _locked_isNodeLoaded];
     CGRect bounds = _threadSafeBounds;
     
     if (CGRectEqualToRect(bounds, CGRectZero)) {
@@ -930,10 +932,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   [self _layoutSublayouts];
   
-  ASPerformBlockOnMainThread(^{
-    [self layout];
-    [self layoutDidFinish];
-  });
+  // Per API contract, `-layout` and `-layoutDidFinish` are called only if the node is loaded. 
+  if (loaded) {
+    ASPerformBlockOnMainThread(^{
+      [self layout];
+      [self layoutDidFinish];
+    });
+  }
 }
 
 - (void)layoutDidFinish
@@ -941,6 +946,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Hook for subclasses
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
+  ASDisplayNodeAssertTrue(self.isNodeLoaded);
 }
 
 #pragma mark Calculation
@@ -1082,8 +1088,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (void)layout
 {
+  // Hook for subclasses
   ASDisplayNodeAssertMainThread();
-  // Subclass hook
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
+  ASDisplayNodeAssertTrue(self.isNodeLoaded);
 }
 
 #pragma mark Layout Transition

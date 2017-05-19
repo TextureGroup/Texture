@@ -293,7 +293,6 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
 }
 
-/// Needs to be called with lock held
 - (void)_locked_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
   // Check if we are a subnode in a layout transition.
