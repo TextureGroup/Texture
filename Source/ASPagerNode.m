@@ -103,7 +103,12 @@
 
 - (NSInteger)currentPageIndex
 {
-  return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+  switch (_flowLayout.scrollDirection) {
+    case UICollectionViewScrollDirectionHorizontal:
+      return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+    case UICollectionViewScrollDirectionVertical:
+      return (self.view.contentOffset.y / CGRectGetHeight(self.view.bounds));
+  }
 }
 
 #pragma mark - Helpers
