@@ -58,6 +58,7 @@ static NSString * const kRate = @"rate";
     unsigned int delegateVideoNodeDidSetCurrentItem:1;
     unsigned int delegateVideoNodeDidStallAtTimeInterval:1;
     unsigned int delegateVideoNodeDidRecoverFromStall:1;
+    unsigned int delegateVideoNodeDidFailToLoadValueForKey:1;
   } _delegateFlags;
   
   BOOL _shouldBePlaying;
@@ -153,7 +154,9 @@ static NSString * const kRate = @"rate";
     AVKeyValueStatus keyStatus = [asset statusOfValueForKey:key error:&error];
     if (keyStatus == AVKeyValueStatusFailed) {
       NSLog(@"Asset loading failed with error: %@", error);
-      [self.delegate videoNode:self didFailToLoadValueForKey:key asset:asset error:error];
+      if (_delegateFlags.delegateVideoNodeDidFailToLoadValueForKey) {
+        [self.delegate videoNode:self didFailToLoadValueForKey:key asset:asset error:error];
+      }
     }
   }
   
@@ -604,6 +607,7 @@ static NSString * const kRate = @"rate";
     _delegateFlags.delegateVideoNodeDidSetCurrentItem = [delegate respondsToSelector:@selector(videoNode:didSetCurrentItem:)];
     _delegateFlags.delegateVideoNodeDidStallAtTimeInterval = [delegate respondsToSelector:@selector(videoNode:didStallAtTimeInterval:)];
     _delegateFlags.delegateVideoNodeDidRecoverFromStall = [delegate respondsToSelector:@selector(videoNodeDidRecoverFromStall:)];
+    _delegateFlags.delegateVideoNodeDidFailToLoadValueForKey = [delegate respondsToSelector:@selector(videoNode:didFailToLoadValueForKey:asset:error:)];
   }
 }
 

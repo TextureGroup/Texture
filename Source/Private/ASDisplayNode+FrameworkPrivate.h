@@ -163,6 +163,8 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (BOOL)supportsRangeManagedInterfaceState;
 
+- (BOOL)_locked_displaysAsynchronously;
+
 // The two methods below will eventually be exposed, but their names are subject to change.
 /**
  * @abstract Ensure that all rendering is complete for this node and its descendants.
@@ -224,6 +226,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState;
 
+@end
+
+
+@interface ASDisplayNode (ASLayoutInternal)
+
 /**
  * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
  *
@@ -239,10 +246,41 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 - (void)_rootNodeDidInvalidateSize;
 
 /**
- * @abstract Subclass hook for nodes that are acting as root nodes. This method is called after measurement
- * finished in a layout transition but before the measurement completion handler is called
+ * This method will confirm that the layout is up to date (and update if needed).
+ * Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
+ */
+- (void)_locked_measureNodeWithBoundsIfNecessary:(CGRect)bounds;
+
+/**
+ * Layout all of the subnodes based on the sublayouts
+ */
+- (void)_layoutSublayouts;
+
+@end
+
+@interface ASDisplayNode (ASLayoutTransitionInternal)
+
+/**
+ * If one or multiple layout transitions are in flight this methods returns if the current layout transition that
+ * happens in in this particular thread was invalidated through another thread is starting a transition for this node
+ */
+- (BOOL)_isLayoutTransitionInvalid;
+
+/**
+ * Internal method that can be overriden by subclasses to add specific behavior after the measurement of a layout
+ * transition did finish.
  */
 - (void)_layoutTransitionMeasurementDidFinish;
+
+/**
+ * Informs the node that hte pending layout transition did complete
+ */
+- (void)_completePendingLayoutTransition;
+
+/**
+ * Called if the pending layout transition did complete
+ */
+- (void)_pendingLayoutTransitionDidComplete;
 
 @end
 

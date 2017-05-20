@@ -34,6 +34,11 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  *    _bounds.size
  *  };
  *  return ASHashBytes(&data, sizeof(data));
+ *
+ * @warning: If a struct has padding, any fields that are intiailized in {} 
+ *   will have garbage data for their padding, which will break this hash! Either
+ *   use `pragma clang diagnostic warning "-Wpadded"` around your struct definition
+ *   or manually initialize the fields of your struct (`myStruct.x = 7;` etc).
  */
 NSUInteger ASHashBytes(void *bytes, size_t length);
 

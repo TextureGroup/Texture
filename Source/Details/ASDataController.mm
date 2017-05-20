@@ -717,10 +717,20 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
   
   id<ASDataControllerSource> dataSource = self.dataSource;
+  auto visibleMap = self.visibleMap;
+  auto pendingMap = self.pendingMap;
   for (ASCellNode *node in nodes) {
-    ASSizeRange constrainedSize = [self constrainedSizeForElement:node.collectionElement inElementMap:_pendingMap];
+    auto element = node.collectionElement;
+    // Ensure the element is present in both maps or skip it. If it's not in the visible map,
+    // then we can't check the presented size. If it's not in the pending map, we can't get the constrained size.
+    // This will only happen if the element has been deleted, so the specifics of this behavior aren't important.
+    if ([visibleMap indexPathForElement:element] == nil || [pendingMap indexPathForElement:element] == nil) {
+      continue;
+    }
+
+    ASSizeRange constrainedSize = [self constrainedSizeForElement:element inElementMap:pendingMap];
     [self _layoutNode:node withConstrainedSize:constrainedSize];
-    BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:node.collectionElement matchesSize:node.frame.size];
+    BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:element matchesSize:node.frame.size];
     if (! matchesSize) {
       [nodesSizesChanged addObject:node];
     }
