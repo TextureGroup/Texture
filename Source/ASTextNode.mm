@@ -771,18 +771,16 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
           UIEdgeInsets shadowPadding = renderer.shadower.shadowPadding;
           CGRect rendererRect = ASTextNodeAdjustRenderRectForShadowPadding(rectValue.CGRectValue, shadowPadding);
 
-          // The rects returned from renderer don't have `textContainerInset`,
-          // as well as they are using the `constrainedSize` for layout,
-          // so we can simply increase the rect by insets to get the full blown layout.
-          rendererRect.size.width += _textContainerInset.left + _textContainerInset.right;
-          rendererRect.size.height += _textContainerInset.top + _textContainerInset.bottom;
-
+          // We don't need to add textContainerInset values to the rendererRect
+          // because we'll get wrong highlighted area
           CGRect highlightedRect = [self.layer convertRect:rendererRect toLayer:highlightTargetLayer];
-
+            
           // We set our overlay layer's frame to the bounds of the highlight target layer.
           // Offset highlight rects to avoid double-counting target layer's bounds.origin.
-          highlightedRect.origin.x -= highlightTargetLayer.bounds.origin.x;
-          highlightedRect.origin.y -= highlightTargetLayer.bounds.origin.y;
+          // Consider text container insets.
+          highlightedRect.origin.x -= highlightTargetLayer.bounds.origin.x - _textContainerInset.left;
+          highlightedRect.origin.y -= highlightTargetLayer.bounds.origin.y - _textContainerInset.top;
+
           [converted addObject:[NSValue valueWithCGRect:highlightedRect]];
         }
 
