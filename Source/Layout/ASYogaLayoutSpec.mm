@@ -10,17 +10,13 @@
 
 #if !YOGA_TREE_CONTIGUOUS /* !YOGA_TREE_CONTIGUOUS */
 
+#import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
 #define YOGA_LAYOUT_LOGGING 0
-
-@interface ASYogaLayoutSpec : ASLayoutSpec
-@property (nonatomic, strong, nonnull) ASDisplayNode *rootNode;
-@property (nonatomic, strong, nullable) NSArray *yogaChildren;
-@end
 
 @implementation ASYogaLayoutSpec
 
@@ -47,11 +43,11 @@
   }
 }
 
-- (void)setupYogaNode:(YGNodeRef)yogaNode forNode:(ASDisplayNode *)node withParentYogaNode:(YGNodeRef)parentYogaNode
+- (void)setupYogaNode:(YGNodeRef)yogaNode forElement:(id <ASLayoutElement>)element withParentYogaNode:(YGNodeRef)parentYogaNode
 {
-  ASLayoutElementStyle *style = node.style;
+  ASLayoutElementStyle *style = element.style;
 
-  YGNodeSetContext(yogaNode, (__bridge void *)node);
+  YGNodeSetContext(yogaNode, (__bridge void *)element);
 
   YGNodeStyleSetDirection     (yogaNode, style.direction);
 
@@ -104,26 +100,27 @@
     YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
   }
 
-  /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
-   void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
-   void YGNodeStyleSetFlex(YGNodeRef node, float flex);
-   */
+  // TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT: YGNodeStyleSetOverflow, YGNodeStyleSetFlex
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)rootConstrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+                     restrictedToSize:(ASLayoutElementSize)layoutElementSize
+                 relativeToParentSize:(CGSize)parentSize
 {
+  ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(layoutElementSize, parentSize);
+  const ASSizeRange rootConstrainedSize = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
+
   YGNodeRef rootYogaNode = YGNodeNew();
 
-  // Apply the constrainedSize as a base, known frame of reference.
-  // If the root node also has style.*Size set, these will be overridden below.
   // YGNodeCalculateLayout currently doesn't offer the ability to pass a minimum size (max is passed there).
+  // Apply the constrainedSize.min directly to the root node so that layout accounts for it.
   YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.width));
   YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
 
-  [self setupYogaNode:rootYogaNode forNode:self.rootNode withParentYogaNode:NULL];
-  for (ASDisplayNode *subnode in self.yogaChildren) {
+  [self setupYogaNode:rootYogaNode forElement:self.rootNode withParentYogaNode:NULL];
+  for (id <ASLayoutElement> child in self.children) {
     YGNodeRef yogaNode = YGNodeNew();
-    [self setupYogaNode:yogaNode forNode:subnode withParentYogaNode:rootYogaNode];
+    [self setupYogaNode:yogaNode forElement:child withParentYogaNode:rootYogaNode];
   }
 
   // It is crucial to use yogaFloat... to convert CGFLOAT_MAX into YGUndefined here.

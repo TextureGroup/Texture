@@ -1,9 +1,13 @@
 //
 //  ASYogaUtilities.mm
-//  AsyncDisplayKit
+//  Texture
 //
-//  Created by Scott Goodson on 5/7/17.
-//  Copyright © 2017 Facebook. All rights reserved.
+//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASYogaUtilities.h>
@@ -109,16 +113,26 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
                                       float height, YGMeasureMode heightMode)
 {
   id <ASLayoutElement> layoutElement = (__bridge id <ASLayoutElement>)YGNodeGetContext(yogaNode);
+  ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)], @"Yoga context must be <ASLayoutElement>");
+
   ASSizeRange sizeRange;
   sizeRange.min = CGSizeZero;
   sizeRange.max = CGSizeMake(width, height);
   if (widthMode == YGMeasureModeExactly) {
     sizeRange.min.width = sizeRange.max.width;
+  } else {
+    // Mode is (YGMeasureModeAtMost | YGMeasureModeUndefined)
+    ASDimension minWidth = layoutElement.style.minWidth;
+    sizeRange.min.width = (minWidth.unit == ASDimensionUnitPoints ? yogaDimensionToPoints(minWidth) : 0.0);
   }
   if (heightMode == YGMeasureModeExactly) {
     sizeRange.min.height = sizeRange.max.height;
+  } else {
+    // Mode is (YGMeasureModeAtMost | YGMeasureModeUndefined)
+    ASDimension minHeight = layoutElement.style.minHeight;
+    sizeRange.min.height = (minHeight.unit == ASDimensionUnitPoints ? yogaDimensionToPoints(minHeight) : 0.0);
   }
-  ASDisplayNodeCAssert([layoutElement isKindOfClass:[ASDisplayNode class]], @"!");
+
   CGSize size = [[layoutElement layoutThatFits:sizeRange] size];
   return (YGSize){ .width = (float)size.width, .height = (float)size.height };
 }
