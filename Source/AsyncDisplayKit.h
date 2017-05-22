@@ -55,11 +55,6 @@
 #import <AsyncDisplayKit/ASSectionController.h>
 #import <AsyncDisplayKit/ASSupplementaryNodeSource.h>
 
-#if AS_IG_LIST_KIT
-#import <AsyncDisplayKit/IGListAdapter+AsyncDisplayKit.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+IGListKitMethods.h>
-#endif
-
 #import <AsyncDisplayKit/ASScrollNode.h>
 
 #import <AsyncDisplayKit/ASPagerFlowLayout.h>
@@ -128,3 +123,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 
 #import <AsyncDisplayKit/ASCollectionNode+Beta.h>
+
+#import <AsyncDisplayKit/IGListAdapter+AsyncDisplayKit.h>
+#import <AsyncDisplayKit/AsyncDisplayKit+IGListKitMethods.h>
