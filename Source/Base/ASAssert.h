@@ -69,9 +69,11 @@
 #define ASDisplayNodeErrorDomain @"ASDisplayNodeErrorDomain"
 #define ASDisplayNodeNonFatalErrorCode 1
 
-#define ASDisplayNodeAssertNonFatal(condition, desc, ...)                                                                         \
-  ASDisplayNodeAssert(condition, desc, ##__VA_ARGS__);                                                                            \
-  if (condition ==  NO) {                                                                                                         \
+/// Returns YES if assertion passed, NO otherwise.
+#define ASDisplayNodeAssertNonFatal(condition, desc, ...) ({                                                                      \
+  BOOL __evaluated = condition;                                                                                                   \
+  if (__evaluated == NO) {                                                                                                        \
+    ASDisplayNodeFailAssert(desc, ##__VA_ARGS__);                                                                                 \
     ASDisplayNodeNonFatalErrorBlock block = [ASDisplayNode nonFatalErrorBlock];                                                   \
     if (block != nil) {                                                                                                           \
       NSDictionary *userInfo = nil;                                                                                               \
@@ -81,4 +83,6 @@
       NSError *error = [NSError errorWithDomain:ASDisplayNodeErrorDomain code:ASDisplayNodeNonFatalErrorCode userInfo:userInfo];  \
       block(error);                                                                                                               \
     }                                                                                                                             \
-  }
+  }                                                                                                                               \
+  __evaluated;                                                                                                                    \
+})                                                                                                                                \
