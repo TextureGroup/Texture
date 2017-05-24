@@ -181,6 +181,7 @@
     view.inverted                = pendingState.inverted;
     view.allowsSelection         = pendingState.allowsSelection;
     view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.layoutInspector         = pendingState.layoutInspector;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
