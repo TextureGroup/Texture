@@ -33,7 +33,7 @@
 // If Yoga is available, make it available anywhere we use ASAvailability.
 // This reduces Yoga-specific code in other files.
 #ifndef YOGA_HEADER_PATH
-  #define YOGA_HEADER_PATH <Yoga/Yoga.h>
+  #define YOGA_HEADER_PATH <yoga/Yoga.h>
 #endif
 
 #ifndef YOGA
