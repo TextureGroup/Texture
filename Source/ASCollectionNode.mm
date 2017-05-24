@@ -428,6 +428,16 @@
   }
 }
 
+- (ASScrollDirection)scrollDirection
+{
+  return [self isNodeLoaded] ? self.view.scrollDirection : ASScrollDirectionNone;
+}
+
+- (ASScrollDirection)scrollableDirections
+{
+  return [self isNodeLoaded] ? self.view.scrollableDirections : ASScrollDirectionNone;
+}
+
 - (ASElementMap *)visibleElements
 {
   ASDisplayNodeAssertMainThread();
