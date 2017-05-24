@@ -100,7 +100,7 @@
 
 - (void)setBounds:(CGRect)bounds
 {
-  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsCGRectValidForLayout(bounds), @"Attempt to set invalid bounds %@ on %@.", NSStringFromCGRect(bounds), self);
+  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsCGRectValidForLayout(bounds), @"Caught attempt to set invalid bounds %@ on %@.", NSStringFromCGRect(bounds), self);
   if (!valid) {
     return;
   }
