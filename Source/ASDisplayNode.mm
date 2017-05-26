@@ -1049,11 +1049,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED
-  if (ASIsCGSizeValidForSize(constrainedSize) == NO) {
-    NSLog(@"Cannot calculate size of node: constrainedSize is infinite and node does not override -calculateSizeThatFits: or specify a preferredSize. Try setting style.preferredSize. Node: %@", [self displayNodeRecursiveDescription]);
-  }
-#endif
+  ASDisplayNodeLogEvent(self, @"calculateSizeThatFits: with constrainedSize: %@", NSStringFromCGSize(constrainedSize));
 
   return ASIsCGSizeValidForSize(constrainedSize) ? constrainedSize : CGSizeZero;
 }
