@@ -180,6 +180,10 @@
 		8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B0768B21CE752EC002E1453 /* ASDefaultPlaybackButton.m */; };
 		8BDA5FC71CDBDF91007D13B2 /* ASVideoPlayerNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BDA5FC31CDBDDE1007D13B2 /* ASVideoPlayerNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BDA5FC81CDBDF95007D13B2 /* ASVideoPlayerNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8BDA5FC41CDBDDE1007D13B2 /* ASVideoPlayerNode.mm */; };
+		9019FBBD1ED8061D00C45F72 /* ASYogaLayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = 9019FBB91ED8061D00C45F72 /* ASYogaLayoutSpec.h */; };
+		9019FBBE1ED8061D00C45F72 /* ASYogaLayoutSpec.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9019FBBA1ED8061D00C45F72 /* ASYogaLayoutSpec.mm */; };
+		9019FBBF1ED8061D00C45F72 /* ASYogaUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 9019FBBB1ED8061D00C45F72 /* ASYogaUtilities.h */; };
+		9019FBC01ED8061D00C45F72 /* ASYogaUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9019FBBC1ED8061D00C45F72 /* ASYogaUtilities.mm */; };
 		90FC784F1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm in Sources */ = {isa = PBXBuildFile; fileRef = 90FC784E1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm */; };
 		92DD2FE61BF4D05E0074C9DD /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92DD2FE51BF4D05E0074C9DD /* MapKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */; };
@@ -676,6 +680,10 @@
 		8B0768B21CE752EC002E1453 /* ASDefaultPlaybackButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDefaultPlaybackButton.m; sourceTree = "<group>"; };
 		8BDA5FC31CDBDDE1007D13B2 /* ASVideoPlayerNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASVideoPlayerNode.h; sourceTree = "<group>"; };
 		8BDA5FC41CDBDDE1007D13B2 /* ASVideoPlayerNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASVideoPlayerNode.mm; sourceTree = "<group>"; };
+		9019FBB91ED8061D00C45F72 /* ASYogaLayoutSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASYogaLayoutSpec.h; sourceTree = "<group>"; };
+		9019FBBA1ED8061D00C45F72 /* ASYogaLayoutSpec.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASYogaLayoutSpec.mm; sourceTree = "<group>"; };
+		9019FBBB1ED8061D00C45F72 /* ASYogaUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASYogaUtilities.h; sourceTree = "<group>"; };
+		9019FBBC1ED8061D00C45F72 /* ASYogaUtilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASYogaUtilities.mm; sourceTree = "<group>"; };
 		90FC784E1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+Yoga.mm"; sourceTree = "<group>"; };
 		92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMapNode.h; sourceTree = "<group>"; };
 		92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMapNode.mm; sourceTree = "<group>"; };
@@ -1481,6 +1489,10 @@
 				9C49C36E1B853957000B0DD5 /* ASStackLayoutElement.h */,
 				ACF6ED161B17843500DA7C62 /* ASStackLayoutSpec.h */,
 				ACF6ED171B17843500DA7C62 /* ASStackLayoutSpec.mm */,
+				9019FBB91ED8061D00C45F72 /* ASYogaLayoutSpec.h */,
+				9019FBBA1ED8061D00C45F72 /* ASYogaLayoutSpec.mm */,
+				9019FBBB1ED8061D00C45F72 /* ASYogaUtilities.h */,
+				9019FBBC1ED8061D00C45F72 /* ASYogaUtilities.mm */,
 			);
 			path = Layout;
 			sourceTree = "<group>";
@@ -1643,6 +1655,7 @@
 				B35062571B010F070018CF92 /* ASAssert.h in Headers */,
 				CCBBBF5D1EB161760069AA91 /* ASRangeManagingNode.h in Headers */,
 				B35062581B010F070018CF92 /* ASAvailability.h in Headers */,
+				9019FBBF1ED8061D00C45F72 /* ASYogaUtilities.h in Headers */,
 				DE84918D1C8FFF2B003D89E9 /* ASRunLoopQueue.h in Headers */,
 				CC0F88621E4281E200576FED /* ASSectionController.h in Headers */,
 				A2763D7A1CBDD57D00A9ADBD /* ASPINRemoteImageDownloader.h in Headers */,
@@ -1751,6 +1764,7 @@
 				CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */,
 				83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */,
 				E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */,
+				9019FBBD1ED8061D00C45F72 /* ASYogaLayoutSpec.h in Headers */,
 				6947B0BE1E36B4E30007C478 /* ASStackUnpositionedLayout.h in Headers */,
 				CC4C2A771D88E3BF0039ACAB /* ASTraceEvent.h in Headers */,
 				254C6B7B1BF94DF4003EC431 /* ASTextKitRenderer+Positioning.h in Headers */,
@@ -2086,6 +2100,7 @@
 				AC026B721BD57DBF00BBC17E /* _ASHierarchyChangeSet.mm in Sources */,
 				B35062421B010EFD0018CF92 /* _ASAsyncTransactionGroup.m in Sources */,
 				CCA282BD1E9EABDD0037E8B7 /* ASTipProvider.m in Sources */,
+				9019FBC01ED8061D00C45F72 /* ASYogaUtilities.mm in Sources */,
 				B350624A1B010EFD0018CF92 /* _ASCoreAnimationExtras.mm in Sources */,
 				68EE0DC01C1B4ED300BA1B99 /* ASMainSerialQueue.mm in Sources */,
 				B35062101B010EFD0018CF92 /* _ASDisplayLayer.mm in Sources */,
@@ -2167,6 +2182,7 @@
 				6907C25A1DC4ECFE00374C66 /* ASObjectDescriptionHelpers.m in Sources */,
 				B35062051B010EFD0018CF92 /* ASMultiplexImageNode.mm in Sources */,
 				B35062251B010EFD0018CF92 /* ASMutableAttributedStringBuilder.m in Sources */,
+				9019FBBE1ED8061D00C45F72 /* ASYogaLayoutSpec.mm in Sources */,
 				B35062071B010EFD0018CF92 /* ASNetworkImageNode.mm in Sources */,
 				34EFC76D1B701CF100AD841F /* ASOverlayLayoutSpec.mm in Sources */,
 				044285101BAA64EC00D16268 /* ASTwoDimensionalArrayUtils.m in Sources */,

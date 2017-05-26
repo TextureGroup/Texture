@@ -8,6 +8,7 @@
 
 #import <AsyncDisplayKit/ASAvailability.h>
 
+#if YOGA /* YOGA */
 #if !YOGA_TREE_CONTIGUOUS /* !YOGA_TREE_CONTIGUOUS */
 
 #import <AsyncDisplayKit/ASYogaLayoutSpec.h>
@@ -117,6 +118,13 @@
   YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.width));
   YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
 
+  // It's crucial to set these values. YGNodeCalculateLayout has unusual behavior for its width and height parameters:
+  // 1. If no maximum size set, infer this means YGMeasureModeExactly. Even if a small minWidth & minHeight are set,
+  //    these will never be used because the output size of the root will always exactly match this value.
+  // 2. If a maximum size is set, infer that this means YGMeasureModeAtMost, and allow down to the min* values in output.
+  YGNodeStyleSetMaxWidthPercent(rootYogaNode, 100.0);
+  YGNodeStyleSetMaxHeightPercent(rootYogaNode, 100.0);
+
   [self setupYogaNode:rootYogaNode forElement:self.rootNode withParentYogaNode:NULL];
   for (id <ASLayoutElement> child in self.children) {
     YGNodeRef yogaNode = YGNodeNew();
@@ -151,3 +159,4 @@
 @end
 
 #endif /* !YOGA_TREE_CONTIGUOUS */
+#endif /* YOGA */

@@ -119,7 +119,7 @@
   self.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
     ASYogaLayoutSpec *spec = [[ASYogaLayoutSpec alloc] init];
     spec.rootNode = weakSelf;
-    spec.yogaChildren = weakSelf.yogaChildren;
+    spec.children = weakSelf.yogaChildren;
     return spec;
   };
 #endif

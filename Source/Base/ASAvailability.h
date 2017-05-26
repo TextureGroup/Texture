@@ -41,7 +41,7 @@
 #endif
 
 #ifndef YOGA_TREE_CONTIGUOUS
-  #define YOGA_TREE_CONTIGUOUS 0 // YOGA // Enabled by default when Yoga is used.
+  #define YOGA_TREE_CONTIGUOUS 0
 #endif
 
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)
