@@ -404,8 +404,14 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _flags.isDeallocating = YES;
 
   // Synchronous nodes may not be able to call the hierarchy notifications, so only enforce for regular nodes.
-  ASDisplayNodeAssert(checkFlag(Synchronous) || !ASInterfaceStateIncludesVisible(_interfaceState), @"Node should always be marked invisible before deallocating. Node: %@", self);
-  
+  // TODO: This condition should be an assertion, but a workaround is in place until the root issue is fixed:
+  // https://github.com/TextureGroup/Texture/issues/145
+#if DEBUG
+  if (checkFlag(Synchronous) == NO && ASInterfaceStateIncludesVisible(_interfaceState) == YES) {
+    NSLog(@"Node should always be marked invisible before deallocating. Node: %@", self);
+  }
+#endif
+
   self.asyncLayer.asyncDelegate = nil;
   _view.asyncdisplaykit_node = nil;
   _layer.asyncdisplaykit_node = nil;
