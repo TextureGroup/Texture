@@ -82,7 +82,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 @interface _ASTableViewCell : UITableViewCell
 @property (nonatomic, weak) id<_ASTableViewCellDelegate> delegate;
-@property (nonatomic, weak) ASCellNode *node;
+@property (nonatomic, strong, readonly) ASCellNode *node;
+@property (nonatomic, strong) ASCollectionElement *element;
 @end
 
 @implementation _ASTableViewCell
@@ -101,9 +102,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [super didTransitionToState:state];
 }
 
-- (void)setNode:(ASCellNode *)node
+- (ASCellNode *)node
 {
-  _node = node;
+  return self.element.node;
+}
+
+- (void)setElement:(ASCollectionElement *)element
+{
+  _element = element;
+  ASCellNode *node = element.node;
   
   if (node) {
     self.backgroundColor = node.backgroundColor;
@@ -126,19 +133,19 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
   [super setSelected:selected animated:animated];
-  [_node __setSelectedFromUIKit:selected];
+  [self.node __setSelectedFromUIKit:selected];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
 {
   [super setHighlighted:highlighted animated:animated];
-  [_node __setHighlightedFromUIKit:highlighted];
+  [self.node __setHighlightedFromUIKit:highlighted];
 }
 
 - (void)prepareForReuse
 {
-  // Need to clear node pointer before UIKit calls setSelected:NO / setHighlighted:NO on its cells
-  self.node = nil;
+  // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
+  self.element = nil;
   [super prepareForReuse];
 }
 
@@ -185,6 +192,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   BOOL _queuedNodeHeightUpdate;
   BOOL _isDeallocating;
   NSMutableSet *_cellsForVisibilityUpdates;
+  
+  // CountedSet because UIKit may display the same element in multiple cells e.g. during animations.
+  NSCountedSet<ASCollectionElement *> *_visibleElements;
   
   BOOL _remeasuringCellNodes;
   NSMutableSet *_cellsForLayoutUpdates;
@@ -317,6 +327,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   _leadingScreensForBatching = 2.0;
   _batchContext = [[ASBatchContext alloc] init];
+  _visibleElements = [[NSCountedSet alloc] init];
   
   _automaticallyAdjustsContentOffset = NO;
   
@@ -898,11 +909,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   _ASTableViewCell *cell = [self dequeueReusableCellWithIdentifier:kCellReuseIdentifier forIndexPath:indexPath];
   cell.delegate = self;
 
-  ASCellNode *node = [_dataController.visibleMap elementForItemAtIndexPath:indexPath].node;
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  cell.element = element;
+  ASCellNode *node = element.node;
   if (node) {
     [_rangeController configureContentView:cell.contentView forCellNode:node];
-
-    cell.node = node;
   }
 
   return cell;
@@ -965,7 +976,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNode *cellNode = [cell node];
+  ASCollectionElement *element = cell.element;
+  [_visibleElements addObject:element];
+  ASCellNode *cellNode = element.node;
   cellNode.scrollView = tableView;
 
   ASDisplayNodeAssertNotNil(cellNode, @"Expected node associated with cell that will be displayed not to be nil. indexPath: %@", indexPath);
@@ -991,7 +1004,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNode *cellNode = [cell node];
+  ASCollectionElement *element = cell.element;
+  [_visibleElements removeObject:element];
+  ASCellNode *cellNode = element.node;
 
   [_rangeController setNeedsUpdate];
 
@@ -1439,36 +1454,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (ASRangeController *)rangeController
 {
-    return _rangeController;
+  return _rangeController;
 }
 
 - (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
 {
-  ASDisplayNodeAssertMainThread();
-  
-  CGRect bounds = self.bounds;
-  // Calling indexPathsForVisibleRows will trigger UIKit to call reloadData if it never has, which can result
-  // in incorrect layout if performed at zero size.  We can use the fact that nothing can be visible at zero size to return fast.
-  if (CGRectIsEmpty(bounds)) {
-    return @[];
-  }
-
-  NSArray *visibleIndexPaths = self.indexPathsForVisibleRows;
-
-  // In some cases (grouped-style tables with particular geometry) indexPathsForVisibleRows will return extra index paths.
-  // This is a very serious issue because we rely on the fact that any node that is marked Visible is hosted inside of a cell,
-  // or else we may not mark it invisible before the node is released. See testIssue2252.
-  // Calling indexPathForCell: and cellForRowAtIndexPath: are both pretty expensive – this is the quickest approach we have.
-  // It would be possible to cache this NSPredicate as an ivar, but that would require unsafeifying self and calling @c bounds
-  // for each item. Since the performance cost is pretty small, prefer simplicity.
-  if (self.style == UITableViewStyleGrouped && visibleIndexPaths.count != self.visibleCells.count) {
-    visibleIndexPaths = [visibleIndexPaths filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSIndexPath *indexPath, NSDictionary<NSString *,id> * _Nullable bindings) {
-      return CGRectIntersectsRect(bounds, [self rectForRowAtIndexPath:indexPath]);
-    }]];
-  }
-
-  ASElementMap *map = _dataController.visibleMap;
-  return ASArrayByFlatMapping(visibleIndexPaths, NSIndexPath *indexPath, [map elementForItemAtIndexPath:indexPath]);
+  return _visibleElements.allObjects;
 }
 
 - (ASScrollDirection)scrollDirectionForRangeController:(ASRangeController *)rangeController
