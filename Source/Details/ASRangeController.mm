@@ -42,6 +42,7 @@
   BOOL _rangeIsValid;
   BOOL _needsRangeUpdate;
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
+  NSHashTable<ASCellNode *> *_visibleNodes;
   ASLayoutRangeMode _currentRangeMode;
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
@@ -152,7 +153,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (_needsRangeUpdate) {
     _needsRangeUpdate = NO;
       
-    [self _updateInterfaceStates];
+    [self _updateVisibleNodeIndexPaths];
   }
 }
 
@@ -182,7 +183,25 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   }
 }
 
-- (void)_updateInterfaceStates
+// Clear the visible bit from any nodes that disappeared since last update.
+// Currently we guarantee that nodes will not be marked visible when deallocated,
+// but it's OK to be in e.g. the preload range. So for the visible bit specifically,
+// we add this extra mechanism to account for e.g. deleted items.
+//
+// NOTE: There is a minor risk here, if a node is transferred from one range controller
+// to another before the first rc updates and clears the node out of this set. It's a pretty
+// wild scenario that I doubt happens in practice.
+- (void)_setVisibleNodes:(NSHashTable *)newVisibleNodes
+{
+  for (ASCellNode *node in _visibleNodes) {
+    if (![newVisibleNodes containsObject:node] && node.isVisible) {
+      [node exitInterfaceState:ASInterfaceStateVisible];
+    }
+  }
+  _visibleNodes = newVisibleNodes;
+}
+
+- (void)_updateVisibleNodeIndexPaths
 {
   ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
   if (!_layoutController || !_dataSource) {
@@ -198,7 +217,12 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   // TODO: Consider if we need to use this codepath, or can rely on something more similar to the data & display ranges
   // Example: ... = [_layoutController indexPathsForScrolling:scrollDirection rangeType:ASLayoutRangeTypeVisible];
   NSSet<ASCollectionElement *> *visibleElements = [NSSet setWithArray:[_dataSource visibleElementsForRangeController:self]];
-  
+  NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
+
+  if (visibleElements.count == 0) { // if we don't have any visibleNodes currently (scrolled before or after content)...
+    [self _setVisibleNodes:newVisibleNodes];
+    return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
+  }
   ASProfilingSignpostStart(1, self);
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
@@ -331,6 +355,9 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     ASCellNode *node = [map elementForItemAtIndexPath:indexPath].nodeIfAllocated;
     if (node != nil) {
       ASDisplayNodeAssert(node.hierarchyState & ASHierarchyStateRangeManaged, @"All nodes reaching this point should be range-managed, or interfaceState may be incorrectly reset.");
+      if (ASInterfaceStateIncludesVisible(interfaceState)) {
+        [newVisibleNodes addObject:node];
+      }
       // Skip the many method calls of the recursive operation if the top level cell node already has the right interfaceState.
       if (node.interfaceState != interfaceState) {
 #if ASRangeControllerLoggingEnabled
@@ -349,6 +376,8 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       }
     }
   }
+
+  [self _setVisibleNodes:newVisibleNodes];
   
   // TODO: This code is for debugging only, but would be great to clean up with a delegate method implementation.
   if (ASDisplayNode.shouldShowRangeDebugOverlay) {
@@ -464,6 +493,9 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 - (void)dataController:(ASDataController *)dataController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
   ASDisplayNodeAssertMainThread();
+  if (changeSet.includesReloadData) {
+    [self _setVisibleNodes:nil];
+  }
   [_delegate rangeController:self willUpdateWithChangeSet:changeSet];
 }
 
