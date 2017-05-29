@@ -181,6 +181,7 @@
     view.inverted                = pendingState.inverted;
     view.allowsSelection         = pendingState.allowsSelection;
     view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.layoutInspector         = pendingState.layoutInspector;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
@@ -425,6 +426,16 @@
   } else {
     return self.view.collectionViewLayout;
   }
+}
+
+- (ASScrollDirection)scrollDirection
+{
+  return [self isNodeLoaded] ? self.view.scrollDirection : ASScrollDirectionNone;
+}
+
+- (ASScrollDirection)scrollableDirections
+{
+  return [self isNodeLoaded] ? self.view.scrollableDirections : ASScrollDirectionNone;
 }
 
 - (ASElementMap *)visibleElements
