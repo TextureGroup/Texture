@@ -1,9 +1,13 @@
 //
 //  ASYogaLayoutSpec.mm
-//  AsyncDisplayKit
+//  Texture
 //
-//  Created by Scott Goodson on 5/6/17.
-//  Copyright © 2017 Facebook. All rights reserved.
+//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
@@ -44,11 +48,19 @@
   }
 }
 
+- (void)destroyYogaNode:(YGNodeRef)yogaNode
+{
+  // Release the __bridge_retained Context object.
+  __unused id <ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
+  YGNodeFree(yogaNode);
+}
+
 - (void)setupYogaNode:(YGNodeRef)yogaNode forElement:(id <ASLayoutElement>)element withParentYogaNode:(YGNodeRef)parentYogaNode
 {
   ASLayoutElementStyle *style = element.style;
 
-  YGNodeSetContext(yogaNode, (__bridge void *)element);
+  // Retain the Context object. This must be explicitly released with a __bridge_transfer; YGNodeFree() is not sufficient.
+  YGNodeSetContext(yogaNode, (__bridge_retained void *)element);
 
   YGNodeStyleSetDirection     (yogaNode, style.direction);
 
@@ -152,6 +164,12 @@
   }
   NSLog(@"rootConstraint = (%@, %@), layout = %@, sublayouts = %@", NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max), layout, layout.sublayouts);
 #endif
+
+  while(YGNodeGetChildCount(rootYogaNode) > 0) {
+    YGNodeRef yogaNode = YGNodeGetChild(rootYogaNode, 0);
+    [self destroyYogaNode:yogaNode];
+  }
+  [self destroyYogaNode:rootYogaNode];
 
   return layout;
 }

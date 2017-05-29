@@ -31,12 +31,95 @@
 
 #pragma mark - ASDisplayNode+Yoga
 
+#if YOGA_TREE_CONTIGUOUS
+
 @interface ASDisplayNode (YogaInternal)
 @property (nonatomic, weak) ASDisplayNode *yogaParent;
 @property (nonatomic, assign) YGNodeRef yogaNode;
 @end
 
+#endif /* YOGA_TREE_CONTIGUOUS */
+
 @implementation ASDisplayNode (Yoga)
+
+- (void)setYogaChildren:(NSArray *)yogaChildren
+{
+  for (ASDisplayNode *child in _yogaChildren) {
+    // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
+    // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
+    [self removeYogaChild:child];
+  }
+  _yogaChildren = nil;
+  for (ASDisplayNode *child in yogaChildren) {
+    [self addYogaChild:child];
+  }
+}
+
+- (NSArray *)yogaChildren
+{
+  return _yogaChildren;
+}
+
+- (void)addYogaChild:(ASDisplayNode *)child
+{
+  if (child == nil) {
+    return;
+  }
+  if (_yogaChildren == nil) {
+    _yogaChildren = [NSMutableArray array];
+  }
+
+  // Clean up state in case this child had another parent.
+  [self removeYogaChild:child];
+  [_yogaChildren addObject:child];
+
+#if YOGA_TREE_CONTIGUOUS
+  // YGNodeRef insertion is done in setParent:
+  child.yogaParent = self;
+  self.hierarchyState |= ASHierarchyStateYogaLayoutEnabled;
+#else
+  // When using non-contiguous Yoga layout, each level in the node hierarchy independently uses an ASYogaLayoutSpec
+  __weak ASDisplayNode *weakSelf = self;
+  self.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+    ASYogaLayoutSpec *spec = [[ASYogaLayoutSpec alloc] init];
+    spec.rootNode = weakSelf;
+    spec.children = weakSelf.yogaChildren;
+    return spec;
+  };
+#endif
+}
+
+- (void)removeYogaChild:(ASDisplayNode *)child
+{
+  if (child == nil) {
+    return;
+  }
+  [_yogaChildren removeObjectIdenticalTo:child];
+
+#if YOGA_TREE_CONTIGUOUS
+  // YGNodeRef removal is done in setParent:
+  child.yogaParent = nil;
+  if (_yogaChildren.count == 0 && self.yogaParent == nil) {
+    self.hierarchyState &= ~ASHierarchyStateYogaLayoutEnabled;
+  }
+#else
+  if (_yogaChildren.count == 0) {
+    self.layoutSpecBlock = nil;
+  }
+#endif
+}
+
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
+{
+  if (AS_AT_LEAST_IOS9) {
+    UIUserInterfaceLayoutDirection layoutDirection =
+    [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
+    self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
+                            ? YGDirectionLTR : YGDirectionRTL);
+  }
+}
+
+#if YOGA_TREE_CONTIGUOUS /* YOGA_TREE_CONTIGUOUS */
 
 - (void)setYogaNode:(YGNodeRef)yogaNode
 {
@@ -77,82 +160,6 @@
 {
   return _yogaParent;
 }
-
-- (void)setYogaChildren:(NSArray *)yogaChildren
-{
-  for (ASDisplayNode *child in _yogaChildren) {
-    // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
-    // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
-    [self removeYogaChild:child];
-  }
-  _yogaChildren = nil;
-  for (ASDisplayNode *child in yogaChildren) {
-    [self addYogaChild:child];
-  }
-}
-
-- (NSArray *)yogaChildren
-{
-  return _yogaChildren;
-}
-
-- (void)addYogaChild:(ASDisplayNode *)child
-{
-  if (child == nil) {
-    return;
-  }
-  if (_yogaChildren == nil) {
-    _yogaChildren = [NSMutableArray array];
-  }
-
-  // Clean up state in case this child had another parent.
-  [self removeYogaChild:child];
-
-  // YGNodeRef insertion is done in setParent:
-  child.yogaParent = self;
-  [_yogaChildren addObject:child];
-
-  self.hierarchyState |= ASHierarchyStateYogaLayoutEnabled;
-
-#if !YOGA_TREE_CONTIGUOUS
-  __weak ASDisplayNode *weakSelf = self;
-  self.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    ASYogaLayoutSpec *spec = [[ASYogaLayoutSpec alloc] init];
-    spec.rootNode = weakSelf;
-    spec.children = weakSelf.yogaChildren;
-    return spec;
-  };
-#endif
-}
-
-- (void)removeYogaChild:(ASDisplayNode *)child
-{
-  if (child == nil) {
-    return;
-  }
-  // YGNodeRef removal is done in setParent:
-  child.yogaParent = nil;
-  [_yogaChildren removeObjectIdenticalTo:child];
-
-  if (_yogaChildren.count == 0 && self.yogaParent == nil) {
-    self.hierarchyState &= ~ASHierarchyStateYogaLayoutEnabled;
-#if !YOGA_TREE_CONTIGUOUS
-    self.layoutSpecBlock = nil;
-#endif
-  }
-}
-
-- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
-{
-  if (AS_AT_LEAST_IOS9) {
-    UIUserInterfaceLayoutDirection layoutDirection =
-    [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
-    self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
-                            ? YGDirectionLTR : YGDirectionRTL);
-  }
-}
-
-#if YOGA_TREE_CONTIGUOUS /* YOGA_TREE_CONTIGUOUS */
 
 - (void)setYogaCalculatedLayout:(ASLayout *)yogaCalculatedLayout
 {
