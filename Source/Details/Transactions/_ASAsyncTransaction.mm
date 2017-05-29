@@ -28,8 +28,6 @@
 #import <mutex>
 #import <stdatomic.h>
 
-#define ASAsyncTransactionAssertMainThread() NSAssert(0 != pthread_main_np(), @"This method must be called on the main thread");
-
 NSInteger const ASDefaultTransactionPriority = 0;
 
 @interface ASAsyncTransactionOperation : NSObject
@@ -57,7 +55,7 @@ NSInteger const ASDefaultTransactionPriority = 0;
 {
   if (_operationCompletionBlock) {
     _operationCompletionBlock(self.value, canceled);
-    // Guarantee that _operationCompletionBlock is released on _callbackQueue:
+    // Guarantee that _operationCompletionBlock is released on _sourceQueue:
     self.operationCompletionBlock = nil;
   }
 }
@@ -333,19 +331,23 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
   ASAsyncTransactionQueue::Group *_group;
   NSMutableArray<ASAsyncTransactionOperation *> *_operations;
   _Atomic(ASAsyncTransactionState) _state;
+  char _sourceQueueKey;
 }
 
 #pragma mark -
 #pragma mark Lifecycle
 
-- (instancetype)initWithCallbackQueue:(dispatch_queue_t)callbackQueue
-                      completionBlock:(void(^)(_ASAsyncTransaction *, BOOL))completionBlock
+- (instancetype)initWithSourceQueue:(dispatch_queue_t)sourceQueue
+                    completionBlock:(void(^)(_ASAsyncTransaction *, BOOL))completionBlock
 {
   if ((self = [self init])) {
-    if (callbackQueue == NULL) {
-      callbackQueue = dispatch_get_main_queue();
+    if (sourceQueue == NULL) {
+      sourceQueue = dispatch_get_main_queue();
     }
-    _callbackQueue = callbackQueue;
+    if (sourceQueue != dispatch_get_main_queue()) {
+      dispatch_queue_set_specific(sourceQueue, &_sourceQueueKey, (void *)kCFNull, NULL);
+    }
+    _sourceQueue = sourceQueue;
     _completionBlock = completionBlock;
 
     _state = ATOMIC_VAR_INIT(ASAsyncTransactionStateOpen);
@@ -355,11 +357,12 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (void)dealloc
 {
-  // Uncommitted transactions break our guarantees about releasing completion blocks on callbackQueue.
+  // Uncommitted transactions break our guarantees about releasing completion blocks on source queue.
   NSAssert(self.state != ASAsyncTransactionStateOpen, @"Uncommitted ASAsyncTransactions are not allowed");
   if (_group) {
     _group->release();
   }
+  dispatch_queue_set_specific(_sourceQueue, &_sourceQueueKey, NULL, NULL);
 }
 
 #pragma mark - Properties
@@ -391,7 +394,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
                              queue:(dispatch_queue_t)queue
                         completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion
 {
-  ASAsyncTransactionAssertMainThread();
+  NSAssert([self isOnSourceQueue], @"Can only add operations from the source queue.");
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You can only add operations to open transactions");
 
   [self _ensureTransactionData];
@@ -402,7 +405,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
     @autoreleasepool {
       if (self.state != ASAsyncTransactionStateCanceled) {
         _group->enter();
-        block(^(id<NSObject> value){
+        block(^(id value){
           operation.value = value;
           _group->leave();
         });
@@ -426,7 +429,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
                         queue:(dispatch_queue_t)queue
                    completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion
 {
-  ASAsyncTransactionAssertMainThread();
+  NSAssert([self isOnSourceQueue], @"Can only add operations from the source queue.");
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You can only add operations to open transactions");
 
   [self _ensureTransactionData];
@@ -445,7 +448,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 - (void)addCompletionBlock:(asyncdisplaykit_async_transaction_completion_block_t)completion
 {
   __weak __typeof__(self) weakSelf = self;
-  [self addOperationWithBlock:^(){return (id<NSObject>)nil;} queue:_callbackQueue completion:^(id<NSObject> value, BOOL canceled) {
+  [self addOperationWithBlock:^(){return (id)nil;} queue:_sourceQueue completion:^(id<NSObject> value, BOOL canceled) {
     __typeof__(self) strongSelf = weakSelf;
     completion(strongSelf, canceled);
   }];
@@ -453,14 +456,13 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (void)cancel
 {
-  ASAsyncTransactionAssertMainThread();
   NSAssert(self.state != ASAsyncTransactionStateOpen, @"You can only cancel a committed or already-canceled transaction");
   self.state = ASAsyncTransactionStateCanceled;
 }
 
 - (void)commit
 {
-  ASAsyncTransactionAssertMainThread();
+  NSAssert([self isOnSourceQueue], @"Cannot commit unless on source queue.");
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You cannot double-commit a transaction");
   self.state = ASAsyncTransactionStateCommitted;
   
@@ -472,10 +474,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
   } else {
     NSAssert(_group != NULL, @"If there are operations, dispatch group should have been created");
     
-    _group->notify(_callbackQueue, ^{
-      // _callbackQueue is the main queue in current practice (also asserted in -waitUntilComplete).
-      // This code should be reviewed before taking on significantly different use cases.
-      ASAsyncTransactionAssertMainThread();
+    _group->notify(_sourceQueue, ^{
       [self completeTransaction];
     });
   }
@@ -483,17 +482,17 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (void)completeTransaction
 {
-  ASAsyncTransactionState state = self.state;
-  if (state != ASAsyncTransactionStateComplete) {
-    BOOL isCanceled = (state == ASAsyncTransactionStateCanceled);
+  NSAssert([self isOnSourceQueue], @"Cannot commit unless on source queue.");
+  
+  // Always set state to Complete, even if we were cancelled, to block any extraneous
+  // calls to this method that may have been scheduled for the next runloop
+  // (e.g. if we needed to force one in this runloop with -waitUntilComplete, but another was already scheduled)
+  ASAsyncTransactionState priorState = atomic_exchange(&_state, ASAsyncTransactionStateComplete);
+  if (priorState != ASAsyncTransactionStateComplete) {
+    BOOL isCanceled = (priorState == ASAsyncTransactionStateCanceled);
     for (ASAsyncTransactionOperation *operation in _operations) {
       [operation callAndReleaseCompletionBlock:isCanceled];
     }
-    
-    // Always set state to Complete, even if we were cancelled, to block any extraneous
-    // calls to this method that may have been scheduled for the next runloop
-    // (e.g. if we needed to force one in this runloop with -waitUntilComplete, but another was already scheduled)
-    self.state = ASAsyncTransactionStateComplete;
 
     if (_completionBlock) {
       _completionBlock(self, isCanceled);
@@ -501,12 +500,20 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
   }
 }
 
+- (BOOL)isOnSourceQueue
+{
+  if (_sourceQueue == dispatch_get_main_queue()) {
+    return ASDisplayNodeThreadIsMain();
+  } else {
+    return dispatch_get_specific(&_sourceQueueKey) != NULL;
+  }
+}
+
 - (void)waitUntilComplete
 {
-  ASAsyncTransactionAssertMainThread();
+  NSAssert([self isOnSourceQueue], @"Cannot wait unless on source queue.");
   if (self.state != ASAsyncTransactionStateComplete) {
     if (_group) {
-      NSAssert(_callbackQueue == dispatch_get_main_queue(), nil);
       _group->wait();
       
       // At this point, the asynchronous operation may have completed, but the runloop

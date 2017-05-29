@@ -97,7 +97,7 @@ static const char *ASAsyncTransactionIsContainerKey = "ASTransactionIsContainer"
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    transaction = [[_ASAsyncTransaction alloc] initWithCallbackQueue:dispatch_get_main_queue() completionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+    transaction = [[_ASAsyncTransaction alloc] initWithSourceQueue:dispatch_get_main_queue() completionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
       __strong CALayer *self = weakSelf;
       if (self == nil) {
         return;
