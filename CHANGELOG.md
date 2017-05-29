@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [Yoga] Implement ASYogaLayoutSpec, a simplified integration strategy for Yoga-powered layout calculation. [Scott Goodson](https://github.com/appleguy)
 - Fixed an issue where calls to setNeedsDisplay and setNeedsLayout would stop working on loaded nodes. [Garrett Moon](https://github.com/garrettmoon)
 - [ASTextKitFontSizeAdjuster] [Ricky Cancro] Replace use of NSAttributedString's boundingRectWithSize:options:context: with NSLayoutManager's boundingRectForGlyphRange:inTextContainer:
 - Add support for IGListKit post-removal-of-IGListSectionType, in preparation for IGListKit 3.0.0 release. [Adlai Holler](https://github.com/Adlai-Holler) [#49](https://github.com/TextureGroup/Texture/pull/49)

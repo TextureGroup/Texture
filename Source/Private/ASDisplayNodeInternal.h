@@ -198,9 +198,14 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSInteger _layoutComputationNumberOfPasses;
 
 #if YOGA
-  YGNodeRef _yogaNode;
-  ASDisplayNode *_yogaParent;
+  // Only ASDisplayNodes are supported in _yogaChildren currently. This means that it is necessary to
+  // create ASDisplayNodes to make a stack layout when using Yoga.
+  // However, the implementation is mostly ready for id <ASLayoutElement>, with a few areas requiring updates.
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
+#endif
+#if YOGA_TREE_CONTIGUOUS
+  YGNodeRef _yogaNode;
+  __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
 #endif
   
