@@ -915,7 +915,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
     layer.edgeAntialiasingMask = edgeAntialiasingMask;
 
   if (flags.setAsyncTransactionContainer)
-    view.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+    layer.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
 
   if (flags.setOpaque)
     ASDisplayNodeAssert(view.layer.opaque == opaque, @"Didn't set opaque as desired");
