@@ -170,11 +170,11 @@ ASLayoutElementStyleExtensibilityForwarding
 
 #pragma mark - Framework Private
 
-- (nullable NSSet<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree
+- (nullable NSHashTable<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree
 {
-  NSMutableSet *result = nil;
+  NSHashTable *result = nil;
   NSUInteger count = 0;
-  [self _findDuplicatedElementsInSubtreeWithWorkingSet:[[NSMutableSet alloc] init] workingCount:&count result:&result];
+  [self _findDuplicatedElementsInSubtreeWithWorkingSet:[NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality] workingCount:&count result:&result];
   return result;
 }
 
@@ -185,7 +185,7 @@ ASLayoutElementStyleExtensibilityForwarding
  * @param workingCount The current count of the set for use in the recursion.
  * @param result The set into which to put the result. This initially points to @c nil to save time if no duplicates exist.
  */
-- (void)_findDuplicatedElementsInSubtreeWithWorkingSet:(NSMutableSet<id<ASLayoutElement>> *)workingSet workingCount:(NSUInteger *)workingCount result:(NSMutableSet<id<ASLayoutElement>>  * _Nullable *)result
+- (void)_findDuplicatedElementsInSubtreeWithWorkingSet:(NSHashTable<id<ASLayoutElement>> *)workingSet workingCount:(NSUInteger *)workingCount result:(NSHashTable<id<ASLayoutElement>>  * _Nullable *)result
 {
   Class layoutSpecClass = [ASLayoutSpec class];
 
@@ -200,7 +200,7 @@ ASLayoutElementStyleExtensibilityForwarding
     BOOL objectAlreadyExisted = (newCount != oldCount + 1);
     if (objectAlreadyExisted) {
       if (*result == nil) {
-        *result = [[NSMutableSet alloc] init];
+        *result = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
       }
       [*result addObject:child];
     } else {

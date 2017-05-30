@@ -191,13 +191,13 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   CGFloat _nodesConstrainedWidth;
   BOOL _queuedNodeHeightUpdate;
   BOOL _isDeallocating;
-  NSMutableSet *_cellsForVisibilityUpdates;
+  NSHashTable<_ASTableViewCell *> *_cellsForVisibilityUpdates;
   
   // CountedSet because UIKit may display the same element in multiple cells e.g. during animations.
   NSCountedSet<ASCollectionElement *> *_visibleElements;
   
   BOOL _remeasuringCellNodes;
-  NSMutableSet *_cellsForLayoutUpdates;
+  NSHashTable<ASCellNode *> *_cellsForLayoutUpdates;
 
   // See documentation on same property in ASCollectionView
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
@@ -309,8 +309,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (!(self = [super initWithFrame:frame style:style])) {
     return nil;
   }
-  _cellsForVisibilityUpdates = [NSMutableSet set];
-  _cellsForLayoutUpdates = [NSMutableSet set];
+  _cellsForVisibilityUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
+  _cellsForLayoutUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
   if (!dataControllerClass) {
     dataControllerClass = [[self class] dataControllerClass];
   }
@@ -686,7 +686,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray<ASCellNode *> *)visibleNodes
 {
-  NSArray<ASCollectionElement *> *elements = [self visibleElementsForRangeController:_rangeController];
+  auto elements = [self visibleElementsForRangeController:_rangeController];
   return ASArrayByFlatMapping(elements, ASCollectionElement *e, e.node);
 }
 
@@ -1457,9 +1457,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return _rangeController;
 }
 
-- (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
+- (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
 {
-  return _visibleElements.allObjects;
+  return ASPointerTableByFlatMapping(_visibleElements, id element, element);
 }
 
 - (ASScrollDirection)scrollDirectionForRangeController:(ASRangeController *)rangeController

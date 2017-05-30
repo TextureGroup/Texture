@@ -216,7 +216,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
   // TODO: Consider if we need to use this codepath, or can rely on something more similar to the data & display ranges
   // Example: ... = [_layoutController indexPathsForScrolling:scrollDirection rangeType:ASLayoutRangeTypeVisible];
-  NSSet<ASCollectionElement *> *visibleElements = [NSSet setWithArray:[_dataSource visibleElementsForRangeController:self]];
+  auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
   if (visibleElements.count == 0) { // if we don't have any visibleNodes currently (scrolled before or after content)...
@@ -255,14 +255,14 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   // Check if both Display and Preload are unique. If they are, we load them with a single fetch from the layout controller for performance.
   BOOL optimizedLoadingOfBothRanges = (equalDisplayPreload == NO && equalDisplayVisible == NO && emptyDisplayRange == NO);
 
-  NSSet<ASCollectionElement *> *displayElements = nil;
-  NSSet<ASCollectionElement *> *preloadElements = nil;
+  NSHashTable<ASCollectionElement *> *displayElements = nil;
+  NSHashTable<ASCollectionElement *> *preloadElements = nil;
   
   if (optimizedLoadingOfBothRanges) {
     [_layoutController allElementsForScrolling:scrollDirection rangeMode:rangeMode displaySet:&displayElements preloadSet:&preloadElements map:map];
   } else {
     if (emptyDisplayRange == YES) {
-      displayElements = [NSSet set];
+      displayElements = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
     } if (equalDisplayVisible == YES) {
       displayElements = visibleElements;
     } else {

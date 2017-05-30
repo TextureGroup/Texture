@@ -90,8 +90,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionViewLayoutController *_layoutController;
   id<ASCollectionViewLayoutInspecting> _defaultLayoutInspector;
   __weak id<ASCollectionViewLayoutInspecting> _layoutInspector;
-  NSMutableSet *_cellsForVisibilityUpdates;
-  NSMutableSet *_cellsForLayoutUpdates;
+  NSHashTable<_ASCollectionViewCell *> *_cellsForVisibilityUpdates;
+  NSHashTable<ASCellNode *> *_cellsForLayoutUpdates;
   id<ASCollectionViewLayoutFacilitatorProtocol> _layoutFacilitator;
   CGFloat _leadingScreensForBatching;
   BOOL _inverted;
@@ -299,8 +299,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   _registeredSupplementaryKinds = [NSMutableSet set];
   _visibleElements = [[NSCountedSet alloc] init];
   
-  _cellsForVisibilityUpdates = [NSMutableSet set];
-  _cellsForLayoutUpdates = [NSMutableSet set];
+  _cellsForVisibilityUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
+  _cellsForLayoutUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
   self.backgroundColor = [UIColor whiteColor];
   
   [self registerClass:[_ASCollectionViewCell class] forCellWithReuseIdentifier:kReuseIdentifier];
@@ -1827,9 +1827,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return result;
 }
 
-- (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
+- (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
 {
-  return _visibleElements.allObjects;
+  return ASPointerTableByFlatMapping(_visibleElements, id element, element);
 }
 
 - (ASElementMap *)elementMapForRangeController:(ASRangeController *)rangeController

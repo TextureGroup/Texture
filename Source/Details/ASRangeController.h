@@ -114,9 +114,9 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * @param rangeController Sender.
  *
- * @return an array of elements corresponding to the data currently visible onscreen (i.e., the visible range).
+ * @return an table of elements corresponding to the data currently visible onscreen (i.e., the visible range).
  */
-- (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController;
+- (nullable NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController;
 
 /**
  * @param rangeController Sender.

@@ -236,6 +236,20 @@
 })
 
 /**
+ * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
+ */
+#define ASPointerTableByFlatMapping(collection, decl, work) ({ \
+  NSHashTable *t = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality]; \
+  for (decl in collection) {\
+    id result = work; \
+    if (result != nil) { \
+      [t addObject:result]; \
+    } \
+  } \
+  t; \
+})
+
+/**
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
 #define ASArrayByFlatMapping(collection, decl, work) ({ \
