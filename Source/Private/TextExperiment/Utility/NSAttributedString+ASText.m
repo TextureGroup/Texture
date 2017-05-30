@@ -9,10 +9,10 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import "NSAttributedString+ASText.h"
-#import "NSParagraphStyle+ASText.h"
-#import "ASTextRunDelegate.h"
-#import "ASTextUtilities.h"
+#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
+#import <AsyncDisplayKit/ASTextRunDelegate.h>
+#import <AsyncDisplayKit/ASTextUtilities.h>
 #import <CoreFoundation/CoreFoundation.h>
 
 
@@ -119,7 +119,7 @@
 
 - (NSUnderlineStyle)as_strikethroughStyleAtIndex:(NSUInteger)index {
   NSNumber *style = [self as_attribute:NSStrikethroughStyleAttributeName atIndex:index];
-  return style.integerValue;
+  return (NSUnderlineStyle)style.integerValue;
 }
 
 - (UIColor *)as_strikethroughColor {
@@ -136,7 +136,7 @@
 
 - (NSUnderlineStyle)as_underlineStyleAtIndex:(NSUInteger)index {
   NSNumber *style = [self as_attribute:NSUnderlineStyleAttributeName atIndex:index];
-  return style.integerValue;
+  return (NSUnderlineStyle)style.integerValue;
 }
 
 - (UIColor *)as_underlineColor {
@@ -1188,9 +1188,9 @@ style. _attr_ = _attr_; \
     CFStringRef cfStr = (__bridge CFStringRef)str;
     BOOL needFree = NO;
     UniChar *chars = NULL;
-    chars = (void *)CFStringGetCharactersPtr(cfStr);
+    chars = (UniChar *)CFStringGetCharactersPtr(cfStr);
     if (!chars) {
-      chars = malloc(str.length * sizeof(UniChar));
+      chars = (UniChar *)malloc(str.length * sizeof(UniChar));
       if (chars) {
         needFree = YES;
         CFStringGetCharacters(cfStr, CFRangeMake(0, str.length), chars);

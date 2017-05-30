@@ -12,7 +12,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
-#import "ASTextAttribute.h"
+#import <AsyncDisplayKit/ASTextAttribute.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

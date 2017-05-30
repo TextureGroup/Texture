@@ -1125,12 +1125,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   cell.layoutAttributes = nil;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(_ASCollectionReusableView *)view forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
+- (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)view forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   // This is a safeguard similar to the behavior for cells in -[ASCollectionView collectionView:willDisplayCell:forItemAtIndexPath:]
   // It ensures _ASCollectionReusableView receives layoutAttributes and calls applyLayoutAttributes.
-  if (view.layoutAttributes == nil) {
-    view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
+  if (_ASCollectionReusableView *reusableView = ASDynamicCast(view, _ASCollectionReusableView)) {
+    if (reusableView.layoutAttributes == nil) {
+      reusableView.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
+    }
   }
   
   if (_asyncDelegateFlags.collectionNodeWillDisplaySupplementaryElement) {
