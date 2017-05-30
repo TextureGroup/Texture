@@ -42,7 +42,7 @@
   BOOL _rangeIsValid;
   BOOL _needsRangeUpdate;
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
-  ASWeakSet<ASCellNode *> *_visibleNodes;
+  NSHashTable<ASCellNode *> *_visibleNodes;
   ASLayoutRangeMode _currentRangeMode;
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
@@ -191,7 +191,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 // NOTE: There is a minor risk here, if a node is transferred from one range controller
 // to another before the first rc updates and clears the node out of this set. It's a pretty
 // wild scenario that I doubt happens in practice.
-- (void)_setVisibleNodes:(ASWeakSet *)newVisibleNodes
+- (void)_setVisibleNodes:(NSHashTable *)newVisibleNodes
 {
   for (ASCellNode *node in _visibleNodes) {
     if (![newVisibleNodes containsObject:node] && node.isVisible) {
@@ -217,7 +217,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   // TODO: Consider if we need to use this codepath, or can rely on something more similar to the data & display ranges
   // Example: ... = [_layoutController indexPathsForScrolling:scrollDirection rangeType:ASLayoutRangeTypeVisible];
   NSSet<ASCollectionElement *> *visibleElements = [NSSet setWithArray:[_dataSource visibleElementsForRangeController:self]];
-  ASWeakSet *newVisibleNodes = [[ASWeakSet alloc] init];
+  NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
   if (visibleElements.count == 0) { // if we don't have any visibleNodes currently (scrolled before or after content)...
     [self _setVisibleNodes:newVisibleNodes];

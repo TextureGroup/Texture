@@ -105,6 +105,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   NSMutableSet *_registeredSupplementaryKinds;
   
+  // CountedSet because UIKit may display the same element in multiple cells e.g. during animations.
+  NSCountedSet<ASCollectionElement *> *_visibleElements;
+  
   CGPoint _deceleratingVelocity;
 
   BOOL _zeroContentInsets;
@@ -294,6 +297,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   super.dataSource = (id<UICollectionViewDataSource>)_proxyDataSource;
   
   _registeredSupplementaryKinds = [NSMutableSet set];
+  _visibleElements = [[NSCountedSet alloc] init];
   
   _cellsForVisibilityUpdates = [NSMutableSet set];
   _cellsForLayoutUpdates = [NSMutableSet set];
@@ -997,7 +1001,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   
   UICollectionReusableView *view = nil;
-  ASCellNode *node = [_dataController.visibleMap supplementaryElementOfKind:kind atIndexPath:indexPath].node;
+  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:kind atIndexPath:indexPath];
+  ASCellNode *node = element.node;
 
   BOOL shouldDequeueExternally = _asyncDataSourceFlags.interopViewForSupplementaryElement && (_asyncDataSourceFlags.interopAlwaysDequeue || node.shouldUseUIKitCell);
   if (shouldDequeueExternally) {
@@ -1009,7 +1014,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   
   if (_ASCollectionReusableView *reusableView = ASDynamicCast(view, _ASCollectionReusableView)) {
-    reusableView.node = node;
+    reusableView.element = element;
   }
   
   if (node) {
@@ -1022,7 +1027,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   UICollectionViewCell *cell = nil;
-  ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  ASCellNode *node = element.node;
 
   BOOL shouldDequeueExternally = _asyncDataSourceFlags.interopAlwaysDequeue || (_asyncDataSourceFlags.interop && node.shouldUseUIKitCell);
   if (shouldDequeueExternally) {
@@ -1031,30 +1037,33 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     cell = [self dequeueReusableCellWithReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
   }
 
-  ASDisplayNodeAssert(node != nil, @"Cell node should exist. indexPath = %@, collectionDataSource = %@", indexPath, self);
+  ASDisplayNodeAssert(element != nil, @"Element should exist. indexPath = %@, collectionDataSource = %@", indexPath, self);
 
   if (_ASCollectionViewCell *asCell = ASDynamicCast(cell, _ASCollectionViewCell)) {
-    asCell.node = node;
+    asCell.element = element;
     [_rangeController configureContentView:cell.contentView forCellNode:node];
   }
   
   return cell;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(_ASCollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)rawCell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopWillDisplayCell) {
-    [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:cell forItemAtIndexPath:indexPath];
+    [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:indexPath];
   }
 
   // Since _ASCollectionViewCell is not available for subclassing, this is faster than isKindOfClass:
   // We must exit early here, because only _ASCollectionViewCell implements the -node accessor method.
-  if ([cell class] != [_ASCollectionViewCell class]) {
+  if ([rawCell class] != [_ASCollectionViewCell class]) {
     [_rangeController setNeedsUpdate];
     return;
   }
+  auto cell = (_ASCollectionViewCell *)rawCell;
   
-  ASCellNode *cellNode = [cell node];
+  ASCollectionElement *element = cell.element;
+  [_visibleElements addObject:element];
+  ASCellNode *cellNode = element.node;
   cellNode.scrollView = collectionView;
 
   // Update the selected background view in collectionView:willDisplayCell:forItemAtIndexPath: otherwise it could be to
@@ -1090,21 +1099,24 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(_ASCollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)rawCell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopDidEndDisplayingCell) {
-    [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:cell forItemAtIndexPath:indexPath];
+    [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:indexPath];
   }
 
   // Since _ASCollectionViewCell is not available for subclassing, this is faster than isKindOfClass:
   // We must exit early here, because only _ASCollectionViewCell implements the -node accessor method.
-  if ([cell class] != [_ASCollectionViewCell class]) {
+  if ([rawCell class] != [_ASCollectionViewCell class]) {
     [_rangeController setNeedsUpdate];
     return;
   }
+  auto cell = (_ASCollectionViewCell *)rawCell;
   
-  ASCellNode *cellNode = [cell node];
-  ASDisplayNodeAssertNotNil(cellNode, @"Expected node associated with removed cell not to be nil.");
+  ASCollectionElement *element = cell.element;
+  [_visibleElements removeObject:element];
+  ASDisplayNodeAssertNotNil(element, @"Expected element associated with removed cell not to be nil.");
+  ASCellNode *cellNode = element.node;
 
   if (_asyncDelegateFlags.collectionNodeDidEndDisplayingItem) {
     if (ASCollectionNode *collectionNode = self.collectionNode) {
@@ -1125,16 +1137,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   cell.layoutAttributes = nil;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)view forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
+- (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)rawView forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
+  if (rawView.class != [_ASCollectionReusableView class]) {
+    return;
+  }
+  auto view = (_ASCollectionReusableView *)rawView;
+  
+  [_visibleElements addObject:view.element];
   // This is a safeguard similar to the behavior for cells in -[ASCollectionView collectionView:willDisplayCell:forItemAtIndexPath:]
   // It ensures _ASCollectionReusableView receives layoutAttributes and calls applyLayoutAttributes.
-  if (_ASCollectionReusableView *reusableView = ASDynamicCast(view, _ASCollectionReusableView)) {
-    if (reusableView.layoutAttributes == nil) {
-      reusableView.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
-    }
+  if (view.layoutAttributes == nil) {
+    view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
   }
-  
+
   if (_asyncDelegateFlags.collectionNodeWillDisplaySupplementaryElement) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
     ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
@@ -1143,8 +1159,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)view forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)rawView forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
+  if (rawView.class != [_ASCollectionReusableView class]) {
+    return;
+  }
+  auto view = (_ASCollectionReusableView *)rawView;
+
+  [_visibleElements removeObject:view.element];
   if (_asyncDelegateFlags.collectionNodeDidEndDisplayingSupplementaryElement) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
     ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
@@ -1807,35 +1829,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
 {
-  if (CGRectIsEmpty(self.bounds)) {
-    return @[];
-  }
-
-  ASElementMap *map = _dataController.visibleMap;
-  NSMutableArray<ASCollectionElement *> *result = [NSMutableArray array];
-
-  // Visible items
-  for (NSIndexPath *indexPath in self.indexPathsForVisibleItems) {
-    ASCollectionElement *element = [map elementForItemAtIndexPath:indexPath];
-    if (element != nil) {
-      [result addObject:element];
-    } else {
-      ASDisplayNodeFailAssert(@"Couldn't find 'visible' item at index path %@ in map %@", indexPath, map);
-    }
-  }
-
-  // Visible supplementary elements
-  for (NSString *kind in map.supplementaryElementKinds) {
-    for (NSIndexPath *indexPath in [self asdk_indexPathsForVisibleSupplementaryElementsOfKind:kind]) {
-      ASCollectionElement *element = [map supplementaryElementOfKind:kind atIndexPath:indexPath];
-      if (element != nil) {
-        [result addObject:element];
-      } else {
-        ASDisplayNodeFailAssert(@"Couldn't find 'visible' supplementary element of kind %@ at index path %@ in map %@", kind, indexPath, map);
-      }
-    }
-  }
-  return result;
+  return _visibleElements.allObjects;
 }
 
 - (ASElementMap *)elementMapForRangeController:(ASRangeController *)rangeController

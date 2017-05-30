@@ -18,14 +18,21 @@
 #import "_ASCollectionViewCell.h"
 #import "ASCellNode+Internal.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASCollectionElement.h>
 
 @implementation _ASCollectionViewCell
 
-- (void)setNode:(ASCellNode *)node
+- (ASCellNode *)node
+{
+  return self.element.node;
+}
+
+- (void)setElement:(ASCollectionElement *)element
 {
   ASDisplayNodeAssertMainThread();
+  ASCellNode *node = element.node;
   node.layoutAttributes = _layoutAttributes;
-  _node = node;
+  _element = element;
   
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
@@ -34,27 +41,27 @@
 - (void)setSelected:(BOOL)selected
 {
   [super setSelected:selected];
-  [_node __setSelectedFromUIKit:selected];
+  [self.node __setSelectedFromUIKit:selected];
 }
 
 - (void)setHighlighted:(BOOL)highlighted
 {
   [super setHighlighted:highlighted];
-  [_node __setHighlightedFromUIKit:highlighted];
+  [self.node __setHighlightedFromUIKit:highlighted];
 }
 
 - (void)setLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _layoutAttributes = layoutAttributes;
-  _node.layoutAttributes = layoutAttributes;
+  self.node.layoutAttributes = layoutAttributes;
 }
 
 - (void)prepareForReuse
 {
   self.layoutAttributes = nil;
 
-  // Need to clear node pointer before UIKit calls setSelected:NO / setHighlighted:NO on its cells
-  self.node = nil;
+  // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
+  self.element = nil;
   [super prepareForReuse];
 }
 
