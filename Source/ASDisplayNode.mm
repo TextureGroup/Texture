@@ -1002,7 +1002,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASLayoutSpec *layoutSpec = (ASLayoutSpec *)layoutElement;
   
 #if AS_DEDUPE_LAYOUT_SPEC_TREE
-    NSSet *duplicateElements = [layoutSpec findDuplicatedElementsInSubtree];
+    NSHashTable *duplicateElements = [layoutSpec findDuplicatedElementsInSubtree];
     if (duplicateElements.count > 0) {
       ASDisplayNodeFailAssert(@"Node %@ returned a layout spec that contains the same elements in multiple positions. Elements: %@", self, duplicateElements);
       // Use an empty layout spec to avoid crashes

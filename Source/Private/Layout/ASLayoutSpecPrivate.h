@@ -27,10 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
   NSMutableArray *_childrenArray;
 }
 
+#if DEBUG
 /**
  * Recursively search the subtree for elements that occur more than once.
  */
-- (nullable NSSet<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree;
+- (nullable NSHashTable<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree;
+#endif
 
 @end
 

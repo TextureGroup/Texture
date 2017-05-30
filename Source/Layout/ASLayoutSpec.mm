@@ -170,6 +170,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 #pragma mark - Framework Private
 
+#if DEBUG
 - (nullable NSHashTable<id<ASLayoutElement>> *)findDuplicatedElementsInSubtree
 {
   NSHashTable *result = nil;
@@ -212,6 +213,7 @@ ASLayoutElementStyleExtensibilityForwarding
     }
   }
 }
+#endif
 
 #pragma mark - Debugging
 
