@@ -171,15 +171,18 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 @interface ASDisplayNode (Yoga)
 
 @property (nonatomic, strong, nullable) NSArray *yogaChildren;
-@property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;
 
+- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
+
+#if YOGA_TREE_CONTIGUOUS
+@property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
 // These methods should not normally be called directly.
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
-- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
+#endif
 
 @end
 

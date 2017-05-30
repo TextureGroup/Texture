@@ -423,7 +423,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     [self _scheduleIvarsForMainDeallocation];
   }
 
-#if YOGA
+#if YOGA_TREE_CONTIGUOUS
   if (_yogaNode != NULL) {
     YGNodeFree(_yogaNode);
   }
@@ -892,7 +892,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     _pendingDisplayNodeLayout->invalidate();
   }
 
-#if YOGA
+#if YOGA_TREE_CONTIGUOUS
   [self invalidateCalculatedYogaLayout];
 #endif
 }
@@ -966,7 +966,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   ASDN::MutexLocker l(__instanceLock__);
 
-#if YOGA /* YOGA */
+#if YOGA_TREE_CONTIGUOUS /* YOGA */
   if (ASHierarchyStateIncludesYogaLayoutEnabled(_hierarchyState) == YES) {
     if (ASHierarchyStateIncludesYogaLayoutMeasuring(_hierarchyState) == NO && self.yogaCalculatedLayout == nil) {
       ASDN::MutexUnlocker ul(__instanceLock__);

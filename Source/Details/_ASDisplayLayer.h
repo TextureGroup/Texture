@@ -53,11 +53,11 @@
 + (dispatch_queue_t)displayQueue;
 
 /**
- @summary Delegate for asynchronous display of the layer.
+ @summary Delegate for asynchronous display of the layer. This should be the node (default) unless you REALLY know what you're doing.
 
  @desc The asyncDelegate will have the opportunity to override the methods related to async display.
  */
-@property (nonatomic, weak) id<_ASDisplayLayerDelegate> asyncDelegate;
+@property (atomic, weak) id<_ASDisplayLayerDelegate> asyncDelegate;
 
 /**
  @summary Suspends both asynchronous and synchronous display of the receiver if YES.
