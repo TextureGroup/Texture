@@ -9,9 +9,8 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import "ASTextLine.h"
-#import "ASTextUtilities.h"
-
+#import <AsyncDisplayKit/ASTextLine.h>
+#import <AsyncDisplayKit/ASTextUtilities.h>
 
 @implementation ASTextLine {
   CGFloat _firstGlyphPos; // first glyph position for baseline, typically 0.
@@ -41,7 +40,7 @@
       _range = NSMakeRange(range.location, range.length);
       if (CTLineGetGlyphCount(_CTLine) > 0) {
         CFArrayRef runs = CTLineGetGlyphRuns(_CTLine);
-        CTRunRef run = CFArrayGetValueAtIndex(runs, 0);
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, 0);
         CGPoint pos;
         CTRunGetPositions(run, CFRangeMake(0, 1), &pos);
         _firstGlyphPos = pos.x;
@@ -83,7 +82,7 @@
   NSMutableArray *attachmentRanges = [NSMutableArray new];
   NSMutableArray *attachmentRects = [NSMutableArray new];
   for (NSUInteger r = 0; r < runCount; r++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     CFIndex glyphCount = CTRunGetGlyphCount(run);
     if (glyphCount == 0) continue;
     NSDictionary *attrs = (id)CTRunGetAttributes(run);

@@ -9,7 +9,7 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import "ASTextRunDelegate.h"
+#import <AsyncDisplayKit/ASTextRunDelegate.h>
 
 static void DeallocCallback(void *ref) {
   ASTextRunDelegate *self = (__bridge_transfer ASTextRunDelegate *)(ref);
@@ -60,7 +60,7 @@ static CGFloat GetWidthCallback(void *ref) {
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.ascent = self.ascent;
   one.descent = self.descent;
   one.width = self.width;

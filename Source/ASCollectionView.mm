@@ -1150,7 +1150,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (view.layoutAttributes == nil) {
     view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
   }
-  
+
   if (_asyncDelegateFlags.collectionNodeWillDisplaySupplementaryElement) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
     ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
