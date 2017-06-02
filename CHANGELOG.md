@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- Fixed an issue where GIFs with placeholders never had their placeholders uncover the GIF. [Garrett Moon](https://github.com/garrettmoon)
 - [Yoga] Implement ASYogaLayoutSpec, a simplified integration strategy for Yoga-powered layout calculation. [Scott Goodson](https://github.com/appleguy)
 - Fixed an issue where calls to setNeedsDisplay and setNeedsLayout would stop working on loaded nodes. [Garrett Moon](https://github.com/garrettmoon)
 - [ASTextKitFontSizeAdjuster] [Ricky Cancro] Replace use of NSAttributedString's boundingRectWithSize:options:context: with NSLayoutManager's boundingRectForGlyphRange:inTextContainer:

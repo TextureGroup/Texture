@@ -309,7 +309,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 - (BOOL)placeholderShouldPersist
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return (self.image == nil && _URL != nil);
+  return (self.image == nil && self.animatedImage == nil && _URL != nil);
 }
 
 /* displayWillStart in ASMultiplexImageNode has a very similar implementation. Changes here are likely necessary
