@@ -257,7 +257,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (BOOL)placeholderShouldPersist
 {
-  return (self.image == nil && self.imageIdentifiers.count > 0);
+  return (self.image == nil && self.animatedImage == nil && self.imageIdentifiers.count > 0);
 }
 
 /* displayWillStart in ASNetworkImageNode has a very similar implementation. Changes here are likely necessary

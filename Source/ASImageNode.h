@@ -148,6 +148,9 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
  *
  * @discussion Set this to an object which conforms to ASAnimatedImageProtocol
  * to have the ASImageNode playback an animated image.
+ * @warning this method should not be overridden, it may not always be called as
+ * another method is used internally. If you need to know when the animatedImage
+ * is set, override @c animatedImageSet:previousAnimatedImage:
  */
 @property (nullable, nonatomic, strong) id <ASAnimatedImageProtocol> animatedImage;
 
@@ -167,6 +170,15 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
  * in a scroll view), which may improve scroll performance in some use cases.
  */
 @property (nonatomic, strong) NSString *animatedImageRunLoopMode;
+
+/**
+ * @abstract Method called when animated image has been set
+ *
+ * @discussion This method is for subclasses to override so they can know if an animated image
+ * has been set on the node.
+ * @warning this method is called with the node's lock held.
+ */
+- (void)animatedImageSet:(id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(id <ASAnimatedImageProtocol>)previousAnimatedImage;
 
 @end
 
