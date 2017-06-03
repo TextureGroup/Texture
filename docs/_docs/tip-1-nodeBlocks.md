@@ -88,7 +88,7 @@ collectionNode:nodeBlockForItemAtIndexPath:
 </div>
 
 
-We reccommend that you use nodeBlocks. Using the nodeBlock method allows table and collections to request blocks for each cell node, and execute them **concurrently** across multiple threads, which allows us to **parallelize the allocation costs** (in addition to layout measurement). 
+We recommend that you use nodeBlocks. Using the nodeBlock method allows table and collections to request blocks for each cell node, and execute them **concurrently** across multiple threads, which allows us to **parallelize the allocation costs** (in addition to layout measurement). 
 
 This leaves our main thread more free to handle touch events and other time sensitive work, keeping our user's taps happy and responsive. 
 
