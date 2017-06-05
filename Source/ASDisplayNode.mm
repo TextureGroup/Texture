@@ -854,10 +854,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark - Layout
 
-#if DEBUG
-  #define AS_DEDUPE_LAYOUT_SPEC_TREE 1
-#endif
-
 // At most a layoutSpecBlock or one of the three layout methods is overridden
 #define __ASDisplayNodeCheckForLayoutMethodOverrides \
     ASDisplayNodeAssert(_layoutSpecBlock != NULL || \
