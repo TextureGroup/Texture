@@ -817,11 +817,54 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
 }
 
+- (void)_assertSubnodeState
+{
+  // Verify that any orphaned nodes are removed.
+  // This can occur in rare cases if main thread layout is flushed while a background layout is calculating.
+
+  if (self.automaticallyManagesSubnodes == NO) {
+    return;
+  }
+
+  NSArray *subnodes = [self subnodes];
+  NSArray *sublayouts = _calculatedDisplayNodeLayout->layout.sublayouts;
+
+  auto currentSubnodes = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
+                                                     capacity:subnodes.count];
+  auto layoutSubnodes  = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
+                                                     capacity:sublayouts.count];;
+  for (ASDisplayNode *subnode in subnodes) {
+    [currentSubnodes addObject:subnode];
+  }
+
+  for (ASLayout *sublayout in sublayouts) {
+    id <ASLayoutElement> layoutElement = sublayout.layoutElement;
+    ASDisplayNodeAssert([layoutElement isKindOfClass:[ASDisplayNode class]],
+                        @"All calculatedLayouts should be flattened and only contain nodes!");
+    [layoutSubnodes addObject:(ASDisplayNode *)layoutElement];
+  }
+
+  // Verify that all subnodes that occur in the current ASLayout tree are present in .subnodes array.
+  if ([layoutSubnodes isSubsetOfHashTable:currentSubnodes] == NO) {
+    // Note: This should be converted to an assertion after confirming it is rare.
+    NSLog(@"Warning: node's layout includes subnodes that have not been added: node = %@, subnodes = %@, subnodes in layout = %@", self, currentSubnodes, layoutSubnodes);
+  }
+
+  // Verify that everything in the .subnodes array is present in the ASLayout tree (and correct it if not).
+  [currentSubnodes minusHashTable:layoutSubnodes];
+  for (ASDisplayNode *orphanedSubnode in currentSubnodes) {
+    NSLog(@"Automatically removing orphaned subnode %@, from parent %@", orphanedSubnode, self);
+    [orphanedSubnode removeFromSupernode];
+  }
+}
+
 - (void)_pendingLayoutTransitionDidComplete
 {
+  [self _assertSubnodeState];
+
   // Subclass hook
   [self calculatedLayoutDidChange];
-  
+
   // Grab lock after calling out to subclass
   ASDN::MutexLocker l(__instanceLock__);
 
