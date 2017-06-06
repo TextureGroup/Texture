@@ -76,11 +76,16 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 
 @dynamic frame, type;
 
-static BOOL static_retainsSublayoutLayoutElements = NO;
+static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(NO);
 
 + (void)setShouldRetainSublayoutLayoutElements:(BOOL)shouldRetain
 {
-  static_retainsSublayoutLayoutElements = shouldRetain;
+  static_retainsSublayoutLayoutElements.store(shouldRetain);
+}
+
++ (BOOL)shouldRetainSublayoutLayoutElements
+{
+  return static_retainsSublayoutLayoutElements.load();
 }
 
 - (instancetype)initWithLayoutElement:(id<ASLayoutElement>)layoutElement
@@ -125,7 +130,7 @@ static BOOL static_retainsSublayoutLayoutElements = NO;
     }
     
     _flattened = NO;
-    self.retainSublayoutLayoutElements = static_retainsSublayoutLayoutElements;
+    self.retainSublayoutLayoutElements = [ASLayout shouldRetainSublayoutLayoutElements];
   }
   
   return self;

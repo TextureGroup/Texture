@@ -82,7 +82,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 @synthesize threadSafeBounds = _threadSafeBounds;
 
 static BOOL suppressesInvalidCollectionUpdateExceptions = NO;
-static BOOL storesUnflattenedLayouts = NO;
+static std::atomic_bool storesUnflattenedLayouts = ATOMIC_VAR_INIT(NO);
 
 + (BOOL)suppressesInvalidCollectionUpdateExceptions
 {
@@ -1042,7 +1042,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   // Return the (original) unflattened layout if it needs to be stored. The layout will be flattened later on (@see _locked_setCalculatedDisplayNodeLayout:).
   // Otherwise, flatten it right away.
-  if (! storesUnflattenedLayouts) {
+  if (! [ASDisplayNode shouldStoreUnflattenedLayouts]) {
     layout = [layout filteredNodeLayoutTree];
   }
   
@@ -3296,16 +3296,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 + (void)setShouldStoreUnflattenedLayouts:(BOOL)shouldStore
 {
-  storesUnflattenedLayouts = shouldStore;
+  storesUnflattenedLayouts.store(shouldStore);
 }
 
 + (BOOL)shouldStoreUnflattenedLayouts
 {
-  return storesUnflattenedLayouts;
+  return storesUnflattenedLayouts.load();
 }
 
 - (ASLayout *)unflattenedCalculatedLayout
 {
+  ASDN::MutexLocker l(__instanceLock__);
   return _unflattenedLayout;
 }
 

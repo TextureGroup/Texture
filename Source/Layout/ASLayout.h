@@ -177,10 +177,16 @@ ASDISPLAYNODE_EXTERN_C_END
 @interface ASLayout (Debugging)
 
 /**
- * Set to YES to tell all ASLayout instances to retain their sublayouts. Defaults to NO.
- * Can be overridden at instance level. 
+ * Set to YES to tell all ASLayout instances to retain their sublayout elements. Defaults to NO.
+ * Can be overridden at instance level.
  */
 + (void)setShouldRetainSublayoutLayoutElements:(BOOL)shouldRetain;
+
+/**
+ * Whether or not ASLayout instances should retain their sublayout elements.
+ * Can be overridden at instance level.
+ */
++ (BOOL)shouldRetainSublayoutLayoutElements;
 
 /**
  * Recrusively output the description of the layout tree.
