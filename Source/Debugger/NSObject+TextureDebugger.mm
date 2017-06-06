@@ -1,5 +1,5 @@
 //
-//  NSObject+TextureDebugger.m
+//  NSObject+TextureDebugger.mm
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.

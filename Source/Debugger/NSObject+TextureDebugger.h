@@ -1,5 +1,5 @@
 //
-//  NSObject+PDDOMNode.h
+//  NSObject+TextureDebugger.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.

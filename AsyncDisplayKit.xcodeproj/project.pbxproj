@@ -444,8 +444,6 @@
 		E5EEAABD1EE7527D00FC07DA /* TDDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */; };
 		E5EEAAC01EE7527D00FC07DA /* TDElementDomainController.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */; };
 		E5EEAAC11EE7527D00FC07DA /* TDElementDomainController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */; };
-		E5EEAAC21EE7527D00FC07DA /* TDElementPropsDomainController.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */; };
-		E5EEAAC31EE7527D00FC07DA /* TDElementPropsDomainController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */; };
 		E5EEAAC41EE7527D00FC07DA /* TDDOMContext.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */; };
 		E5EEAAC51EE7527D00FC07DA /* TDDOMContext.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */; };
 		F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */; };
@@ -918,8 +916,6 @@
 		E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDDebugger.m; path = Debugger/TDDebugger.m; sourceTree = "<group>"; };
 		E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDElementDomainController.h; path = Debugger/TDElementDomainController.h; sourceTree = "<group>"; };
 		E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDElementDomainController.m; path = Debugger/TDElementDomainController.m; sourceTree = "<group>"; };
-		E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDElementPropsDomainController.h; path = Debugger/TDElementPropsDomainController.h; sourceTree = "<group>"; };
-		E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDElementPropsDomainController.m; path = Debugger/TDElementPropsDomainController.m; sourceTree = "<group>"; };
 		E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDDOMContext.h; path = Debugger/TDDOMContext.h; sourceTree = "<group>"; };
 		E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDDOMContext.m; path = Debugger/TDDOMContext.m; sourceTree = "<group>"; };
 		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1623,8 +1619,6 @@
 				E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */,
 				E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */,
 				E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */,
-				E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */,
-				E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */,
 				E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */,
 				E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */,
 			);
@@ -1764,7 +1758,6 @@
 				254C6B771BF94DF4003EC431 /* ASTextKitAttributes.h in Headers */,
 				254C6B7D1BF94DF4003EC431 /* ASTextKitShadower.h in Headers */,
 				690ED58E1E36BCA6000627C0 /* ASLayoutElementStylePrivate.h in Headers */,
-				E5EEAAC21EE7527D00FC07DA /* TDElementPropsDomainController.h in Headers */,
 				CC55A70D1E529FA200594372 /* UIResponder+AsyncDisplayKit.h in Headers */,
 				254C6B731BF94DF4003EC431 /* ASTextKitCoreTextAdditions.h in Headers */,
 				254C6B7A1BF94DF4003EC431 /* ASTextKitRenderer.h in Headers */,
@@ -2261,7 +2254,6 @@
 				696F01EE1DD2AF450049FBD5 /* ASEventLog.mm in Sources */,
 				9C70F2051CDA4F06007D6C76 /* ASTraitCollection.m in Sources */,
 				83A7D95B1D44547700BF333E /* ASWeakMap.m in Sources */,
-				E5EEAAC31EE7527D00FC07DA /* TDElementPropsDomainController.m in Sources */,
 				CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */,
 				E58E9E431E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m in Sources */,
 				DE84918E1C8FFF9F003D89E9 /* ASRunLoopQueue.mm in Sources */,
