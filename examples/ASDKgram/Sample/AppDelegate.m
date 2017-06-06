@@ -23,6 +23,7 @@
 #import "PhotoFeedListKitViewController.h"
 #import "WindowWithStatusBarUnderlay.h"
 #import "Utilities.h"
+#import <AsyncDisplaykit/TDDebugger.h>
 
 @interface AppDelegate () <UITabBarControllerDelegate>
 @end
@@ -75,6 +76,10 @@
   // iOS8 hides the status bar in landscape orientation, this forces the status bar hidden status to NO
   [application setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
   [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+  
+  TDDebugger *debugger = [TDDebugger defaultInstance];
+  [debugger enableLayoutElementDebuggingWithApplication:application];;
+  [debugger connectToURL:[NSURL URLWithString:@"ws://localhost:9000/device"]];
   
   return YES;
 }

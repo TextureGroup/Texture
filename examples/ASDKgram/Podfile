@@ -1,6 +1,8 @@
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '8.0'
 target 'Sample' do
-	pod 'Texture/IGListKit', :path => '../..'
-	pod 'Texture/PINRemoteImage', :path => '../..'
+  pod 'PonyDebugger', :git => 'git@github.com:nguyenhuy/PonyDebugger.git', :branch => 'master'
+  pod 'Texture/IGListKit', :path => '../..'
+  pod 'Texture/PINRemoteImage', :path => '../..'
+  pod 'Texture/Debugger', :path => '../..'
 end

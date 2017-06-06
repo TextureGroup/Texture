@@ -436,6 +436,18 @@
 		E5C347B31ECB40AA00EC4BE4 /* ASTableNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */; };
 		E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */ = {isa = PBXBuildFile; fileRef = E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5E281761E71C845006B67C2 /* ASCollectionLayoutState.m in Sources */ = {isa = PBXBuildFile; fileRef = E5E281751E71C845006B67C2 /* ASCollectionLayoutState.m */; };
+		E5EEAAB81EE7527D00FC07DA /* NSObject+TextureDebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */; };
+		E5EEAAB91EE7527D00FC07DA /* NSObject+TextureDebugger.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */; };
+		E5EEAABA1EE7527D00FC07DA /* PDDOMTypes+UIKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */; };
+		E5EEAABB1EE7527D00FC07DA /* PDDOMTypes+UIKit.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */; };
+		E5EEAABC1EE7527D00FC07DA /* TDDebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */; };
+		E5EEAABD1EE7527D00FC07DA /* TDDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */; };
+		E5EEAAC01EE7527D00FC07DA /* TDElementDomainController.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */; };
+		E5EEAAC11EE7527D00FC07DA /* TDElementDomainController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */; };
+		E5EEAAC21EE7527D00FC07DA /* TDElementPropsDomainController.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */; };
+		E5EEAAC31EE7527D00FC07DA /* TDElementPropsDomainController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */; };
+		E5EEAAC41EE7527D00FC07DA /* TDDOMContext.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */; };
+		E5EEAAC51EE7527D00FC07DA /* TDDOMContext.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */; };
 		F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */; };
 /* End PBXBuildFile section */
 
@@ -898,6 +910,18 @@
 		E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASTableNode+Beta.h"; sourceTree = "<group>"; };
 		E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutState.h; sourceTree = "<group>"; };
 		E5E281751E71C845006B67C2 /* ASCollectionLayoutState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionLayoutState.m; sourceTree = "<group>"; };
+		E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+TextureDebugger.h"; path = "Debugger/NSObject+TextureDebugger.h"; sourceTree = "<group>"; };
+		E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSObject+TextureDebugger.mm"; path = "Debugger/NSObject+TextureDebugger.mm"; sourceTree = "<group>"; };
+		E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "PDDOMTypes+UIKit.h"; path = "Debugger/PDDOMTypes+UIKit.h"; sourceTree = "<group>"; };
+		E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "PDDOMTypes+UIKit.m"; path = "Debugger/PDDOMTypes+UIKit.m"; sourceTree = "<group>"; };
+		E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDDebugger.h; path = Debugger/TDDebugger.h; sourceTree = "<group>"; };
+		E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDDebugger.m; path = Debugger/TDDebugger.m; sourceTree = "<group>"; };
+		E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDElementDomainController.h; path = Debugger/TDElementDomainController.h; sourceTree = "<group>"; };
+		E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDElementDomainController.m; path = Debugger/TDElementDomainController.m; sourceTree = "<group>"; };
+		E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDElementPropsDomainController.h; path = Debugger/TDElementPropsDomainController.h; sourceTree = "<group>"; };
+		E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDElementPropsDomainController.m; path = Debugger/TDElementPropsDomainController.m; sourceTree = "<group>"; };
+		E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDDOMContext.h; path = Debugger/TDDOMContext.h; sourceTree = "<group>"; };
+		E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDDOMContext.m; path = Debugger/TDDOMContext.m; sourceTree = "<group>"; };
 		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDisplayNodeExtrasTests.m; sourceTree = "<group>"; };
 		FB07EABBCF28656C6297BC2D /* Pods-AsyncDisplayKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1086,6 +1110,7 @@
 				058D0A01195D050800B7D73C /* Private */,
 				AC6456051B0A333200CF11B8 /* Layout */,
 				257754661BED245B00737CA5 /* TextKit */,
+				E56FF9AD1EC9A75D008C34EC /* Debugger */,
 				690ED5911E36D118000627C0 /* tvOS */,
 				058D09B2195D04C000B7D73C /* Supporting Files */,
 			);
@@ -1587,6 +1612,25 @@
 			path = Debug;
 			sourceTree = "<group>";
 		};
+		E56FF9AD1EC9A75D008C34EC /* Debugger */ = {
+			isa = PBXGroup;
+			children = (
+				E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */,
+				E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */,
+				E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */,
+				E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */,
+				E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */,
+				E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */,
+				E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */,
+				E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */,
+				E5EEAAB41EE7527D00FC07DA /* TDElementPropsDomainController.h */,
+				E5EEAAB51EE7527D00FC07DA /* TDElementPropsDomainController.m */,
+				E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */,
+				E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */,
+			);
+			name = Debugger;
+			sourceTree = "<group>";
+		};
 		E5B077EB1E6843AF00C24B5B /* Collection Layout */ = {
 			isa = PBXGroup;
 			children = (
@@ -1626,6 +1670,8 @@
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
 				CCCCCCE31EC3EF060087FE10 /* NSParagraphStyle+ASText.h in Headers */,
+				E5EEAABC1EE7527D00FC07DA /* TDDebugger.h in Headers */,
+				E5EEAAC01EE7527D00FC07DA /* TDElementDomainController.h in Headers */,
 				E58E9E441E941D74004CFC59 /* ASCollectionLayoutContext.h in Headers */,
 				E58E9E421E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.h in Headers */,
 				696F01EC1DD2AF450049FBD5 /* ASEventLog.h in Headers */,
@@ -1640,6 +1686,7 @@
 				69F10C871C84C35D0026140C /* ASRangeControllerUpdateRangeProtocol+Beta.h in Headers */,
 				B350623C1B010EFD0018CF92 /* _ASAsyncTransaction.h in Headers */,
 				68355B411CB57A6C001D4E68 /* ASImageContainerProtocolCategories.h in Headers */,
+				E5EEAAB81EE7527D00FC07DA /* NSObject+TextureDebugger.h in Headers */,
 				7630FFA81C9E267E007A7C0E /* ASVideoNode.h in Headers */,
 				B350623F1B010EFD0018CF92 /* _ASAsyncTransactionContainer.h in Headers */,
 				B13CA1011C52004900E031AB /* ASCollectionNode+Beta.h in Headers */,
@@ -1661,6 +1708,7 @@
 				A2763D7A1CBDD57D00A9ADBD /* ASPINRemoteImageDownloader.h in Headers */,
 				34EFC7611B701C9C00AD841F /* ASBackgroundLayoutSpec.h in Headers */,
 				B35062591B010F070018CF92 /* ASBaseDefines.h in Headers */,
+				E5EEAAC41EE7527D00FC07DA /* TDDOMContext.h in Headers */,
 				B35062131B010EFD0018CF92 /* ASBasicImageDownloader.h in Headers */,
 				B35062151B010EFD0018CF92 /* ASBatchContext.h in Headers */,
 				B35061F31B010EFD0018CF92 /* ASCellNode.h in Headers */,
@@ -1716,6 +1764,7 @@
 				254C6B771BF94DF4003EC431 /* ASTextKitAttributes.h in Headers */,
 				254C6B7D1BF94DF4003EC431 /* ASTextKitShadower.h in Headers */,
 				690ED58E1E36BCA6000627C0 /* ASLayoutElementStylePrivate.h in Headers */,
+				E5EEAAC21EE7527D00FC07DA /* TDElementPropsDomainController.h in Headers */,
 				CC55A70D1E529FA200594372 /* UIResponder+AsyncDisplayKit.h in Headers */,
 				254C6B731BF94DF4003EC431 /* ASTextKitCoreTextAdditions.h in Headers */,
 				254C6B7A1BF94DF4003EC431 /* ASTextKitRenderer.h in Headers */,
@@ -1781,6 +1830,7 @@
 				CC3B208A1C3F7A5400798563 /* ASWeakSet.h in Headers */,
 				B35062041B010EFD0018CF92 /* ASMultiplexImageNode.h in Headers */,
 				DECBD6E81BE56E1900CF4905 /* ASButtonNode.h in Headers */,
+				E5EEAABA1EE7527D00FC07DA /* PDDOMTypes+UIKit.h in Headers */,
 				B35062241B010EFD0018CF92 /* ASMutableAttributedStringBuilder.h in Headers */,
 				B13CA0F81C519EBA00E031AB /* ASCollectionViewLayoutFacilitatorProtocol.h in Headers */,
 				B35062061B010EFD0018CF92 /* ASNetworkImageNode.h in Headers */,
@@ -2091,6 +2141,7 @@
 				B30BF6541C59D889004FCD53 /* ASLayoutManager.m in Sources */,
 				690C35671E0567C600069B91 /* ASDimensionDeprecated.mm in Sources */,
 				92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */,
+				E5EEAABD1EE7527D00FC07DA /* TDDebugger.m in Sources */,
 				CCA282B91E9EA8E40037E8B7 /* AsyncDisplayKit+Tips.m in Sources */,
 				636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */,
 				B350623D1B010EFD0018CF92 /* _ASAsyncTransaction.mm in Sources */,
@@ -2185,6 +2236,7 @@
 				9019FBBE1ED8061D00C45F72 /* ASYogaLayoutSpec.mm in Sources */,
 				B35062071B010EFD0018CF92 /* ASNetworkImageNode.mm in Sources */,
 				34EFC76D1B701CF100AD841F /* ASOverlayLayoutSpec.mm in Sources */,
+				E5EEAABB1EE7527D00FC07DA /* PDDOMTypes+UIKit.m in Sources */,
 				044285101BAA64EC00D16268 /* ASTwoDimensionalArrayUtils.m in Sources */,
 				CCCCCCDE1EC3EF060087FE10 /* ASTextAttribute.m in Sources */,
 				CCA282B51E9EA7310037E8B7 /* ASTipsController.m in Sources */,
@@ -2193,6 +2245,7 @@
 				68FC85E61CE29B9400EDD713 /* ASNavigationController.m in Sources */,
 				CC4C2A791D88E3BF0039ACAB /* ASTraceEvent.m in Sources */,
 				34EFC76F1B701CF700AD841F /* ASRatioLayoutSpec.mm in Sources */,
+				E5EEAAC51EE7527D00FC07DA /* TDDOMContext.m in Sources */,
 				254C6B8B1BF94F8A003EC431 /* ASTextKitShadower.mm in Sources */,
 				254C6B851BF94F8A003EC431 /* ASTextKitAttributes.mm in Sources */,
 				90FC784F1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm in Sources */,
@@ -2208,6 +2261,7 @@
 				696F01EE1DD2AF450049FBD5 /* ASEventLog.mm in Sources */,
 				9C70F2051CDA4F06007D6C76 /* ASTraitCollection.m in Sources */,
 				83A7D95B1D44547700BF333E /* ASWeakMap.m in Sources */,
+				E5EEAAC31EE7527D00FC07DA /* TDElementPropsDomainController.m in Sources */,
 				CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */,
 				E58E9E431E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m in Sources */,
 				DE84918E1C8FFF9F003D89E9 /* ASRunLoopQueue.mm in Sources */,
@@ -2226,6 +2280,7 @@
 				509E68661B3AEDD7009B9150 /* CoreGraphics+ASConvenience.m in Sources */,
 				254C6B871BF94F8A003EC431 /* ASTextKitEntityAttribute.m in Sources */,
 				34566CB31BC1213700715E6B /* ASPhotosFrameworkImageRequest.m in Sources */,
+				E5EEAAC11EE7527D00FC07DA /* TDElementDomainController.m in Sources */,
 				254C6B831BF94F8A003EC431 /* ASTextKitCoreTextAdditions.m in Sources */,
 				CCCCCCE21EC3EF060087FE10 /* ASTextUtilities.m in Sources */,
 				CC55A70E1E529FA200594372 /* UIResponder+AsyncDisplayKit.m in Sources */,
@@ -2235,6 +2290,7 @@
 				044284FD1BAA365100D16268 /* UICollectionViewLayout+ASConvenience.m in Sources */,
 				CC0F885B1E42807F00576FED /* ASCollectionViewFlowLayoutInspector.m in Sources */,
 				690ED5981E36D118000627C0 /* ASControlNode+tvOS.m in Sources */,
+				E5EEAAB91EE7527D00FC07DA /* NSObject+TextureDebugger.mm in Sources */,
 				254C6B8A1BF94F8A003EC431 /* ASTextKitRenderer+TextChecking.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
