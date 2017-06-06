@@ -29,6 +29,7 @@
 - [Fix] Fix a potential crash when cell nodes that need layout are deleted during the same runloop.  [Adlai Holler](https://github.com/Adlai-Holler) [#279](https://github.com/TextureGroup/Texture/pull/279)
 - [Batch fetching] Add ASBatchFetchingDelegate that takes scroll velocity and remaining time into account [Huy Nguyen](https://github.com/nguyenhuy) [#281](https://github.com/TextureGroup/Texture/pull/281)
 - [Fix] Fix a major regression in our image node contents caching. [Adlai Holler](https://github.com/Adlai-Holler) [#287](https://github.com/TextureGroup/Texture/pull/287)
-- [Fix] Fixed a bug where ASVideoNodeDelegate error reporting callback would crash an app because of not responding to selector. [Sergey Petrachkov](https://github.com/Petrachkov) [#291](https://github.com/TextureGroup/Texture/issues/291)
+- [ASTextNode] Fix a bug where ASTextNode with textInsets set would not correctly handle link taps. [Sergey Petrachkov](https://github.com/SergeyPetrachkov) [#255](https://github.com/TextureGroup/Texture/issues/255)
+- [Fix] Fixed a bug where ASVideoNodeDelegate error reporting callback would crash an app because of not responding to selector. [Sergey Petrachkov](https://github.com/SergeyPetrachkov) [#291](https://github.com/TextureGroup/Texture/issues/291)
 - [IGListKit] Add IGListKit headers to public section of Xcode project [Michael Schneider] (https://github.com/maicki)[#286](https://github.com/TextureGroup/Texture/pull/286)
 - [Layout] Ensure -layout and -layoutDidFinish are called only if a node is loaded. [Huy Nguyen](https://github.com/nguyenhuy) [#285](https://github.com/TextureGroup/Texture/pull/285)
