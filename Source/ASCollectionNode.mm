@@ -45,6 +45,7 @@
 @property (nonatomic, assign) BOOL allowsSelection; // default is YES
 @property (nonatomic, assign) BOOL allowsMultipleSelection; // default is NO
 @property (nonatomic, assign) BOOL inverted; //default is NO
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 @property (nonatomic, assign) CGFloat leadingScreensForBatching;
 @property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
 @end
@@ -175,13 +176,14 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
-    self.pendingState            = nil;
-    view.asyncDelegate           = pendingState.delegate;
-    view.asyncDataSource         = pendingState.dataSource;
-    view.inverted                = pendingState.inverted;
-    view.allowsSelection         = pendingState.allowsSelection;
-    view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
-    view.layoutInspector         = pendingState.layoutInspector;
+    view.asyncDelegate              = pendingState.delegate;
+    view.asyncDataSource            = pendingState.dataSource;
+    view.inverted                   = pendingState.inverted;
+    view.allowsSelection            = pendingState.allowsSelection;
+    view.allowsMultipleSelection    = pendingState.allowsMultipleSelection;
+    view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
+    view.layoutInspector            = pendingState.layoutInspector;
+    self.pendingState               = nil;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
@@ -466,12 +468,20 @@
 
 - (BOOL)usesSynchronousDataLoading
 {
-  return self.view.usesSynchronousDataLoading;
+  if ([self pendingState]) {
+    return _pendingState.usesSynchronousDataLoading; 
+  } else {
+    return self.view.usesSynchronousDataLoading;
+  }
 }
 
 - (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
 {
-  self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+  if ([self pendingState]) {
+    _pendingState.usesSynchronousDataLoading = usesSynchronousDataLoading; 
+  } else {
+    self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+  }
 }
 
 #pragma mark - Range Tuning
