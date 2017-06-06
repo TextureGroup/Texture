@@ -486,7 +486,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     _initialReloadDataHasBeenCalled = YES;
   }
   
-  NSTimeInterval transactionQueueFlushDuration;
+  NSTimeInterval transactionQueueFlushDuration = 0.0f;
   {
     ASDN::ScopeTimer t(transactionQueueFlushDuration);
     dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
@@ -503,7 +503,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   [self invalidateDataSourceItemCounts];
   
   // Log events
-  ASDataControllerLogEvent(self, @"triggeredUpdate (waited on editing queue for %@ms): %@", transactionQueueFlushDuration * 1000, changeSet);
+  ASDataControllerLogEvent(self, @"triggeredUpdate (waited on editing queue for %fms): %@", transactionQueueFlushDuration * 1000, changeSet);
 #if ASEVENTLOG_ENABLE
   NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
   [changeSet addCompletionHandler:^(BOOL finished) {
