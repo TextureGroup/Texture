@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASDataController.h>
 
 #import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
+#import <AsyncDisplayKit/_ASScopeTimer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
@@ -485,7 +486,11 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     _initialReloadDataHasBeenCalled = YES;
   }
   
-  dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+  NSTimeInterval transactionQueueFlushDuration;
+  {
+    ASDN::ScopeTimer t(transactionQueueFlushDuration);
+    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+  }
   
   // If the initial reloadData has not been called, just bail because we don't have our old data source counts.
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
@@ -498,7 +503,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   [self invalidateDataSourceItemCounts];
   
   // Log events
-  ASDataControllerLogEvent(self, @"triggeredUpdate: %@", changeSet);
+  ASDataControllerLogEvent(self, @"triggeredUpdate (waited on editing queue for %@ms): %@", transactionQueueFlushDuration * 1000, changeSet);
 #if ASEVENTLOG_ENABLE
   NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
   [changeSet addCompletionHandler:^(BOOL finished) {
