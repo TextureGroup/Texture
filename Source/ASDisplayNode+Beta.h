@@ -21,7 +21,7 @@
 #import <AsyncDisplayKit/ASEventLog.h>
 
 #if YOGA
-  @import yoga;
+  #import YOGA_HEADER_PATH
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
