@@ -582,6 +582,10 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       }];
     }];
   });
+  
+  if (_usesSynchronousDataLoading) {
+    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+  }
 }
 
 /**

@@ -227,6 +227,11 @@ extern NSString * const ASCollectionInvalidUpdateException;
 @property (nonatomic, strong, readonly) ASEventLog *eventLog;
 #endif
 
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
+
 /** @name Data Updating */
 
 - (void)updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;

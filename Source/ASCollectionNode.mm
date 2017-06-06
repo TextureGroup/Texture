@@ -464,6 +464,16 @@
   return _batchFetchingDelegate;
 }
 
+- (BOOL)usesSynchronousDataLoading
+{
+  return self.view.usesSynchronousDataLoading;
+}
+
+- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
+{
+  self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+}
+
 #pragma mark - Range Tuning
 
 - (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
