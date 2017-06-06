@@ -767,6 +767,16 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return visibleNodes;
 }
 
+- (BOOL)usesSynchronousDataLoading
+{
+  return self.dataController.usesSynchronousDataLoading;
+}
+
+- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
+{
+  self.dataController.usesSynchronousDataLoading = usesSynchronousDataLoading;
+}
+
 #pragma mark Internal
 
 - (void)_configureCollectionViewLayout:(nonnull UICollectionViewLayout *)layout

@@ -582,6 +582,10 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       }];
     }];
   });
+  
+  if (_usesSynchronousDataLoading) {
+    [self waitUntilAllUpdatesAreCommitted];
+  }
 }
 
 /**

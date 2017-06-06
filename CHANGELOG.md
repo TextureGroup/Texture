@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- Add a synchronous mode to ASCollectionNode, for colletion view data source debugging. [Hannah Troisi](https://github.com/hannahmbanana)
 - [ASDisplayNode+Layout] Add check for orphaned nodes after layout transition to clean up. #336. [Scott Goodson](https://github.com/appleguy)
 - Fixed an issue where GIFs with placeholders never had their placeholders uncover the GIF. [Garrett Moon](https://github.com/garrettmoon)
 - [Yoga] Implement ASYogaLayoutSpec, a simplified integration strategy for Yoga-powered layout calculation. [Scott Goodson](https://github.com/appleguy)
