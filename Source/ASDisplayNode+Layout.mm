@@ -911,6 +911,12 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   ASDisplayNodeAssertTrue(displayNodeLayout->layout.size.width >= 0.0);
   ASDisplayNodeAssertTrue(displayNodeLayout->layout.size.height >= 0.0);
   
+  // Flatten the layout if it wasn't done before (@see -calculateLayoutThatFits:).
+  if (ASDisplayNode.shouldStoreUnflattenedLayouts) {
+    _unflattenedLayout = displayNodeLayout->layout;
+    displayNodeLayout->layout = [_unflattenedLayout filteredNodeLayoutTree];
+  }
+  
   _calculatedDisplayNodeLayout = displayNodeLayout;
 }
 

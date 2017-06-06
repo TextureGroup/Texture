@@ -98,7 +98,7 @@ extern ASDisplayNode * _Nullable ASLayerToDisplayNode(CALayer * _Nullable layer)
 extern ASDisplayNode * _Nullable ASViewToDisplayNode(UIView * _Nullable view) AS_WARN_UNUSED_RESULT;
 
 /**
- Given a node, returns the root of the node heirarchy (where supernode == nil)
+ Given a node, returns the root of the node hierarchy (where supernode == nil)
  */
 extern ASDisplayNode *ASDisplayNodeUltimateParentOfNode(ASDisplayNode *node) AS_WARN_UNUSED_RESULT;
 

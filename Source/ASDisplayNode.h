@@ -554,6 +554,19 @@ extern NSInteger const ASDefaultDrawingPriority;
 @interface ASDisplayNode (Debugging) <ASDebugNameProvider>
 
 /**
+ * Whether ASDisplayNode should store their unflattened layouts. The layout can be accessed via `-unflattenedCalculatedLayout`.
+ * Flattened layouts use less memory and are faster to lookup, while unflattened ones are useful for debugging
+ * because they reserve original information.
+ *
+ * Defaults to NO.
+ */
++ (void)setShouldStoreUnflattenedLayouts:(BOOL)shouldStore;
+
++ (BOOL)shouldStoreUnflattenedLayouts;
+
+@property (nonatomic, strong, readonly, nullable) ASLayout *unflattenedCalculatedLayout;
+
+/**
  * @abstract Return a description of the node hierarchy.
  *
  * @discussion For debugging: (lldb) po [node displayNodeRecursiveDescription]

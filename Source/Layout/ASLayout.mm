@@ -76,6 +76,13 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 
 @dynamic frame, type;
 
+static BOOL static_retainsSublayoutLayoutElements = NO;
+
++ (void)setShouldRetainSublayoutLayoutElements:(BOOL)shouldRetain
+{
+  static_retainsSublayoutLayoutElements = shouldRetain;
+}
+
 - (instancetype)initWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                  size:(CGSize)size
                              position:(CGPoint)position
@@ -118,7 +125,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
     }
     
     _flattened = NO;
-    _retainSublayoutLayoutElements = NO;
+    self.retainSublayoutLayoutElements = static_retainsSublayoutLayoutElements;
   }
   
   return self;

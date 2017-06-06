@@ -82,6 +82,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 @synthesize threadSafeBounds = _threadSafeBounds;
 
 static BOOL suppressesInvalidCollectionUpdateExceptions = NO;
+static BOOL storesUnflattenedLayouts = NO;
 
 + (BOOL)suppressesInvalidCollectionUpdateExceptions
 {
@@ -887,6 +888,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (_pendingDisplayNodeLayout != nullptr) {
     _pendingDisplayNodeLayout->invalidate();
   }
+  
+  _unflattenedLayout = nil;
 
 #if YOGA_TREE_CONTIGUOUS
   [self invalidateCalculatedYogaLayout];
@@ -1013,7 +1016,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   // Manually propagate the trait collection here so that any layoutSpec children of layoutSpec will get a traitCollection
   {
-    
     ASDN::SumScopeTimer t(_layoutSpecTotalTime, measureLayoutSpec);
     ASTraitCollectionPropagateDown(layoutElement, self.primitiveTraitCollection);
   }
@@ -1038,7 +1040,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
   ASDisplayNodeLogEvent(self, @"computedLayout: %@", layout);
 
-  return [layout filteredNodeLayoutTree];
+  // Return the (original) unflattened layout if it needs to be stored. The layout will be flattened later on (@see _locked_setCalculatedDisplayNodeLayout:).
+  // Otherwise, flatten it right away.
+  if (! storesUnflattenedLayouts) {
+    layout = [layout filteredNodeLayoutTree];
+  }
+  
+  return layout;
 }
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
@@ -3285,6 +3293,21 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 #pragma mark - ASDisplayNode (Debugging)
 
 @implementation ASDisplayNode (Debugging)
+
++ (void)setShouldStoreUnflattenedLayouts:(BOOL)shouldStore
+{
+  storesUnflattenedLayouts = shouldStore;
+}
+
++ (BOOL)shouldStoreUnflattenedLayouts
+{
+  return storesUnflattenedLayouts;
+}
+
+- (ASLayout *)unflattenedCalculatedLayout
+{
+  return _unflattenedLayout;
+}
 
 - (NSString *)displayNodeRecursiveDescription
 {
