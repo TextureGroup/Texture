@@ -72,7 +72,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 /**
  * @abstract A size constraint that should apply to this ASLayoutElement.
  */
-@property (nonatomic, assign, readonly) ASLayoutElementStyle *style;
+@property (nonatomic, strong, readonly) ASLayoutElementStyle *style;
 
 /**
  * @abstract Returns all children of an object which class conforms to the ASLayoutElement protocol

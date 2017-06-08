@@ -646,12 +646,12 @@ extern NSInteger const ASDefaultDrawingPriority;
 #if TARGET_OS_IOS
 @property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
 #endif
-@property (nonatomic, assign, nullable) CGColorRef shadowColor;                // default=opaque rgb black
+@property (nonatomic, nullable)         CGColorRef shadowColor;                // default=opaque rgb black
 @property (nonatomic, assign)           CGFloat shadowOpacity;                 // default=0.0
 @property (nonatomic, assign)           CGSize shadowOffset;                   // default=(0, -3)
 @property (nonatomic, assign)           CGFloat shadowRadius;                  // default=3
 @property (nonatomic, assign)           CGFloat borderWidth;                   // default=0
-@property (nonatomic, assign, nullable) CGColorRef borderColor;                // default=opaque rgb black
+@property (nonatomic, nullable)         CGColorRef borderColor;                // default=opaque rgb black
 
 // UIResponder methods
 // By default these fall through to the underlying view, but can be overridden.

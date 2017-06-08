@@ -122,7 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @warning Subclasses must not override this; it returns the last cached layout and is never expensive.
  */
-@property (nullable, nonatomic, readonly, assign) ASLayout *calculatedLayout;
+@property (nullable, nonatomic, readonly, strong) ASLayout *calculatedLayout;
 
 #pragma mark - View Lifecycle
 /** @name View Lifecycle */
