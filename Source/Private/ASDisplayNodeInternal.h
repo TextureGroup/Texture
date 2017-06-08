@@ -211,6 +211,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   
   NSString *_debugName;
 
+#pragma mark - ASDisplayNode (Debugging)
+  ASLayout *_unflattenedLayout;
+
 #if TIME_DISPLAYNODE_OPS
 @public
   NSTimeInterval _debugTimeToCreateView;
