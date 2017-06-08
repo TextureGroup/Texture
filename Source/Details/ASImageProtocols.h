@@ -163,7 +163,7 @@ withDownloadIdentifier:(id)downloadIdentifier;
 /**
  @abstract A block which receives the cover image. Should be called when the objects cover image is ready.
  */
-@property (nonatomic, copy, readwrite) void (^coverImageReadyCallback)(UIImage *coverImage);
+@property (nonatomic, readwrite) void (^coverImageReadyCallback)(UIImage *coverImage);
 
 /**
  @abstract Returns whether the supplied data contains a supported animated image format.
