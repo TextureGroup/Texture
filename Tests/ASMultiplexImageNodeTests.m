@@ -16,7 +16,6 @@
 //
 
 #import <OCMock/OCMock.h>
-#import <OCMock/NSInvocation+OCMAdditions.h>
 
 #import <AsyncDisplayKit/ASImageProtocols.h>
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
@@ -123,9 +122,11 @@
   // Mock the cache to do a cache-hit for the test image URL.
   [[[_mockCache stub] andDo:^(NSInvocation *inv) {
     // Params are URL, callbackQueue, completion
-    NSArray *URL = [inv getArgumentAtIndexAsObject:2];
+    __unsafe_unretained NSArray *URL;
+    [inv getArgument:&URL atIndex:2];
 
-    ASImageCacherCompletion completionBlock = [inv getArgumentAtIndexAsObject:4];
+    __unsafe_unretained ASImageCacherCompletion completionBlock;
+    [inv getArgument:&completionBlock atIndex:4];
 
     // Call the completion block with our test image and URL.
     NSURL *testImageURL = [self _testImageURL];
@@ -235,7 +236,8 @@
   imageNode.dataSource = mockDataSource;
   __block NSUInteger loadedImageCount = 0;
   [[[mockDataSource stub] andDo:^(NSInvocation *inv) {
-    id requestedIdentifier = [inv getArgumentAtIndexAsObject:3];
+    __unsafe_unretained id requestedIdentifier;
+    [inv getArgument:&requestedIdentifier atIndex:3];
 
     NSInteger requestedIdentifierValue = [requestedIdentifier intValue];
 
@@ -264,7 +266,8 @@
   // Mock a cache miss.
   id mockCache = [OCMockObject mockForProtocol:@protocol(ASImageCacheProtocol)];
   [[[mockCache stub] andDo:^(NSInvocation *inv) {
-    ASImageCacherCompletion completion = [inv getArgumentAtIndexAsObject:4];
+    __unsafe_unretained ASImageCacherCompletion completion;
+    [inv getArgument:&completion atIndex:4];
     completion(nil);
   }] cachedImageWithURL:[OCMArg any] callbackQueue:[OCMArg any] completion:[OCMArg any]];
 
@@ -273,11 +276,13 @@
   const CGFloat mockedProgress = 0.5;
   [[[mockDownloader stub] andDo:^(NSInvocation *inv) {
     // Simulate progress.
-    ASImageDownloaderProgress progressBlock = [inv getArgumentAtIndexAsObject:4];
+    __unsafe_unretained ASImageDownloaderProgress progressBlock;
+    [inv getArgument:&progressBlock atIndex:4];
     progressBlock(mockedProgress);
 
     // Simulate completion.
-    ASImageDownloaderCompletion completionBlock = [inv getArgumentAtIndexAsObject:5];
+    __unsafe_unretained ASImageDownloaderCompletion completionBlock;
+    [inv getArgument:&completionBlock atIndex:5];
     completionBlock([self _testImage], nil, nil);
   }] downloadImageWithURL:[OCMArg any] callbackQueue:[OCMArg any] downloadProgress:[OCMArg any] completion:[OCMArg any]];
 

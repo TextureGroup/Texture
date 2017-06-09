@@ -9,7 +9,6 @@
 #import <XCTest/XCTest.h>
 
 #import <OCMock/OCMock.h>
-#import <OCMock/NSInvocation+OCMAdditions.h>
 
 /**
  * Tests that confirm what we know about Core Animation behavior.
