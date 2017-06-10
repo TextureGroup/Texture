@@ -192,7 +192,10 @@ do {\
 
 - (void)setSize:(ASLayoutElementSize)size
 {
-  _size.store(size);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize = size;
+  });
+  // No CallDelegate method as ASLayoutElementSize is currently internal.
 }
 
 #pragma mark - ASLayoutElementStyleSizeForwarding
