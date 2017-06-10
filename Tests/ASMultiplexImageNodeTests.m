@@ -61,7 +61,9 @@
   [super setUp];
 
   mockCache = OCMStrictProtocolMock(@protocol(ASImageCacheProtocol));
+  [mockCache setExpectationOrderMatters:YES];
   mockDownloader = OCMStrictProtocolMock(@protocol(ASImageDownloaderProtocol));
+  [mockDownloader setExpectationOrderMatters:YES];
   imageNode = [[ASMultiplexImageNode alloc] initWithCache:mockCache downloader:mockDownloader];
 
   mockDataSource = OCMStrictProtocolMock(@protocol(ASMultiplexImageNodeDataSource));
