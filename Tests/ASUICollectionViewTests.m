@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
+#import "NSInvocation+ASTestHelpers.h"
 
 @interface ASUICollectionViewTests : XCTestCase
 
@@ -85,8 +86,7 @@
   id dataSource = [OCMockObject niceMockForProtocol:@protocol(UICollectionViewDataSource)];
   __block id view = nil;
   [[[dataSource expect] andDo:^(NSInvocation *invocation) {
-    __unsafe_unretained NSIndexPath *indexPath;
-    [invocation getArgument:&indexPath atIndex:4];
+    NSIndexPath *indexPath = [invocation as_argumentAtIndexAsObject:4];
     view = [cv dequeueReusableSupplementaryViewOfKind:@"SuppKind" withReuseIdentifier:@"ReuseID" forIndexPath:indexPath];
     [invocation setReturnValue:&view];
   }] collectionView:cv viewForSupplementaryElementOfKind:@"SuppKind" atIndexPath:indexPath];
@@ -112,8 +112,7 @@
 
   // Setup empty data source – 0 sections, 0 items
   [[[dataSource stub] andDo:^(NSInvocation *invocation) {
-    __unsafe_unretained NSIndexPath *indexPath;
-    [invocation getArgument:&indexPath atIndex:3];
+    NSIndexPath *indexPath = [invocation as_argumentAtIndexAsObject:3];
     __autoreleasing UICollectionViewCell *view = [cv dequeueReusableCellWithReuseIdentifier:@"CellID" forIndexPath:indexPath];
     [invocation setReturnValue:&view];
   }] collectionView:cv cellForItemAtIndexPath:OCMOCK_ANY];
