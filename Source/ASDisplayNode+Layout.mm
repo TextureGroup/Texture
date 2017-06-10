@@ -317,10 +317,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   [self cancelLayoutTransition];
   
   BOOL didCreateNewContext = NO;
-  ASLayoutElementContext context = ASLayoutElementGetCurrentContext();
-  if (ASLayoutElementContextIsNull(context)) {
-    context = ASLayoutElementContextMake(ASLayoutElementContextDefaultTransitionID);
-    ASLayoutElementSetCurrentContext(context);
+  ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
+  if (context == nil) {
+    context = [[ASLayoutElementContext alloc] init];
+    ASLayoutElementPushContext(context);
     didCreateNewContext = YES;
   }
   
@@ -341,7 +341,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   if (didCreateNewContext) {
-    ASLayoutElementClearCurrentContext();
+    ASLayoutElementPopContext();
   }
   
   // If our new layout's desired size for self doesn't match current size, ask our parent to update it.
@@ -457,8 +457,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 {
   ASDN::MutexLocker l(__instanceLock__);
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
-    ASLayoutElementContext context = ASLayoutElementGetCurrentContext();
-    if (ASLayoutElementContextIsNull(context) || _pendingTransitionID != context.transitionID) {
+    ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
+    if (context == nil || _pendingTransitionID != context.transitionID) {
       return YES;
     }
   }
@@ -546,8 +546,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     ASLayout *newLayout;
     {
       ASDN::MutexLocker l(__instanceLock__);
-      
-      ASLayoutElementSetCurrentContext(ASLayoutElementContextMake(transitionID));
+
+      ASLayoutElementContext *ctx = [[ASLayoutElementContext alloc] init];
+      ctx.transitionID = transitionID;
+      ASLayoutElementPushContext(ctx);
 
       BOOL automaticallyManagesSubnodesDisabled = (self.automaticallyManagesSubnodes == NO);
       self.automaticallyManagesSubnodes = YES; // Temporary flag for 1.9.x
@@ -558,7 +560,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
         self.automaticallyManagesSubnodes = NO; // Temporary flag for 1.9.x
       }
       
-      ASLayoutElementClearCurrentContext();
+      ASLayoutElementPopContext();
     }
     
     if (isCancelled()) {
