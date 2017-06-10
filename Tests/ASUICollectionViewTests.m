@@ -95,13 +95,15 @@
   cv.dataSource = dataSource;
   if (shouldFail) {
     XCTAssertThrowsSpecificNamed([cv layoutIfNeeded], NSException, NSInternalInconsistencyException);
-  } else {
-    [cv layoutIfNeeded];
-    XCTAssertEqualObjects(attr, [cv layoutAttributesForSupplementaryElementOfKind:@"SuppKind" atIndexPath:indexPath]);
-    XCTAssertEqual(view, [cv supplementaryViewForElementKind:@"SuppKind" atIndexPath:indexPath]);
-    [dataSource verify];
-    [layoutMock verify];
+    // Early return because behavior after exception is thrown is undefined.
+    return;
   }
+
+  [cv layoutIfNeeded];
+  XCTAssertEqualObjects(attr, [cv layoutAttributesForSupplementaryElementOfKind:@"SuppKind" atIndexPath:indexPath]);
+  XCTAssertEqual(view, [cv supplementaryViewForElementKind:@"SuppKind" atIndexPath:indexPath]);
+  [dataSource verify];
+  [layoutMock verify];
 }
 
 - (void)testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
