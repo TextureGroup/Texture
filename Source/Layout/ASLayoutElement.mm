@@ -117,6 +117,13 @@ NSString * const ASLayoutElementStyleDescenderProperty = @"ASLayoutElementStyleD
 
 NSString * const ASLayoutElementStyleLayoutPositionProperty = @"ASLayoutElementStyleLayoutPositionProperty";
 
+#define ASLayoutElementStyleSetSizeWithScope(x) \
+  __instanceLock__.lock(); \
+  ASLayoutElementSize newSize = _size.load(); \
+  { x } \
+  _size.store(newSize); \
+  __instanceLock__.unlock();
+
 #define ASLayoutElementStyleCallDelegate(propertyName)\
 do {\
   [_delegate style:self propertyDidChange:propertyName];\
@@ -197,9 +204,9 @@ do {\
 
 - (void)setWidth:(ASDimension)width
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.width = width;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = width;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
 }
 
@@ -210,9 +217,9 @@ do {\
 
 - (void)setHeight:(ASDimension)height
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.height = height;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.height = height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
 
@@ -223,9 +230,9 @@ do {\
 
 - (void)setMinWidth:(ASDimension)minWidth
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.minWidth = minWidth;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = minWidth;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
 }
 
@@ -236,9 +243,9 @@ do {\
 
 - (void)setMaxWidth:(ASDimension)maxWidth
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.maxWidth = maxWidth;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = maxWidth;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
 }
 
@@ -249,9 +256,9 @@ do {\
 
 - (void)setMinHeight:(ASDimension)minHeight
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.minHeight = minHeight;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minHeight = minHeight;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
 
@@ -262,23 +269,21 @@ do {\
 
 - (void)setMaxHeight:(ASDimension)maxHeight
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.maxHeight = maxHeight;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxHeight = maxHeight;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }
 
 
 #pragma mark - ASLayoutElementStyleSizeHelpers
 
-// We explicitly not call the setter for (max/min) width and height to avoid locking overhead
-
 - (void)setPreferredSize:(CGSize)preferredSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.width = ASDimensionMakeWithPoints(preferredSize.width);
-  newSize.height = ASDimensionMakeWithPoints(preferredSize.height);
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = ASDimensionMakeWithPoints(preferredSize.width);
+    newSize.height = ASDimensionMakeWithPoints(preferredSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
@@ -301,20 +306,20 @@ do {\
 
 - (void)setMinSize:(CGSize)minSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.minWidth = ASDimensionMakeWithPoints(minSize.width);
-  newSize.minHeight = ASDimensionMakeWithPoints(minSize.height);
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = ASDimensionMakeWithPoints(minSize.width);
+    newSize.minHeight = ASDimensionMakeWithPoints(minSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
 
 - (void)setMaxSize:(CGSize)maxSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.maxWidth = ASDimensionMakeWithPoints(maxSize.width);
-  newSize.maxHeight = ASDimensionMakeWithPoints(maxSize.height);
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = ASDimensionMakeWithPoints(maxSize.width);
+    newSize.maxHeight = ASDimensionMakeWithPoints(maxSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }
@@ -327,10 +332,10 @@ do {\
 
 - (void)setPreferredLayoutSize:(ASLayoutSize)preferredLayoutSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.width = preferredLayoutSize.width;
-  newSize.height = preferredLayoutSize.height;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = preferredLayoutSize.width;
+    newSize.height = preferredLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
@@ -343,10 +348,10 @@ do {\
 
 - (void)setMinLayoutSize:(ASLayoutSize)minLayoutSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.minWidth = minLayoutSize.width;
-  newSize.minHeight = minLayoutSize.height;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = minLayoutSize.width;
+    newSize.minHeight = minLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
@@ -359,10 +364,10 @@ do {\
 
 - (void)setMaxLayoutSize:(ASLayoutSize)maxLayoutSize
 {
-  ASLayoutElementSize newSize = _size.load();
-  newSize.maxWidth = maxLayoutSize.width;
-  newSize.maxHeight = maxLayoutSize.height;
-  _size.store(newSize);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = maxLayoutSize.width;
+    newSize.maxHeight = maxLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }
