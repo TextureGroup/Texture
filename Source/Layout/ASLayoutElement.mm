@@ -52,7 +52,7 @@ pthread_key_t ASLayoutElementContextKey;
 
 static void ASLayoutElementDestructor(void *p) {
   if (p != NULL) {
-  	ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
+    ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
     CFBridgingRelease(p);
   }
 };
@@ -62,7 +62,6 @@ void ASLayoutElementContextEnsureKey()
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    // NOTE: NULL destructorm means that if a thread
     pthread_key_create(&ASLayoutElementContextKey, ASLayoutElementDestructor);
   });
 }
