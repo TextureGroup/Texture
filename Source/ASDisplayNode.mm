@@ -3224,7 +3224,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (NSString *)debugDescription
 {
-  return ASObjectDescriptionMake(self, [self propertiesForDebugDescription]);
+  ASPushMainThreadAssertionsDisabled();
+  auto result = ASObjectDescriptionMake(self, [self propertiesForDebugDescription]);
+  ASPopMainThreadAssertionsDisabled();
+  return result;
 }
 
 // This should only be called for debugging. It's not thread safe and it doesn't assert.
