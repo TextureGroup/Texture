@@ -1647,7 +1647,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         return cell;
       };
     } else {
-      ASDisplayNodeFailAssert(@"ASCollection could not get a node block for row at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
+      ASDisplayNodeFailAssert(@"ASCollection could not get a node block for item at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
       block = ^{
         return [[ASCellNode alloc] init];
       };
