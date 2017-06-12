@@ -118,6 +118,15 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 @property (atomic, readonly, nullable) NSIndexPath *indexPath;
 
 /**
+ * BETA: API is under development. We will attempt to provide an easy migration pathway for any changes.
+ *
+ * The view-model currently assigned to this node, if any.
+ *
+ * This property may be set off the main thread, but it will never be set in parallel. 
+ */
+@property (atomic, nullable) id viewModel;
+
+/**
  * The backing view controller, or @c nil if the node wasn't initialized with backing view controller
  * @note This property must be accessed on the main thread.
  */
