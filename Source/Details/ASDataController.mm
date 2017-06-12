@@ -503,12 +503,14 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   [self invalidateDataSourceItemCounts];
   
   // Log events
-  ASDataControllerLogEvent(self, @"triggeredUpdate (waited on editing queue for %fms): %@", transactionQueueFlushDuration * 1000, changeSet);
 #if ASEVENTLOG_ENABLE
+  ASDataControllerLogEvent(self, @"updateWithChangeSet waited on previous update for %fms. changeSet: %@",
+                           transactionQueueFlushDuration * 1000.0f, changeSet);
+  NSTimeInterval changeSetStartTime = CACurrentMediaTime();
   NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
   [changeSet addCompletionHandler:^(BOOL finished) {
-    ASDataControllerLogEvent(self, @"finishedUpdate: %@", changeSetDescription);
-  }];
+    ASDataControllerLogEvent(self, @"finishedUpdate in %fms: %@",
+                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);  }];
 #endif
   
   // Attempt to mark the update completed. This is when update validation will occur inside the changeset.
