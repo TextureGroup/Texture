@@ -127,7 +127,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSArray<ASDisplayNode *> *_cachedSubnodes;
 
   ASLayoutElementStyle *_style;
-  ASPrimitiveTraitCollection _primitiveTraitCollection;
+  std::atomic<ASPrimitiveTraitCollection> _primitiveTraitCollection;
 
   std::atomic_uint _displaySentinel;
 
