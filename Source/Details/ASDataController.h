@@ -76,6 +76,8 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size;
 
+- (nullable id)dataController:(ASDataController *)dataController viewModelForItemAtIndexPath:(NSIndexPath *)indexPath;
+
 @optional
 
 /**
