@@ -8,7 +8,7 @@
 - Fixed an issue where calls to setNeedsDisplay and setNeedsLayout would stop working on loaded nodes. [Garrett Moon](https://github.com/garrettmoon)
 - Migrated unit tests to OCMock 3.4 (from 2.2) and improved the multiplex image node tests. [Adlai Holler](https://github.com/Adlai-Holler)
 
-##2.3.3
+## 2.3.3
 - [ASTextKitFontSizeAdjuster] Replace use of NSAttributedString's boundingRectWithSize:options:context: with NSLayoutManager's boundingRectForGlyphRange:inTextContainer: [Ricky Cancro](https://github.com/rcancro)
 - Add support for IGListKit post-removal-of-IGListSectionType, in preparation for IGListKit 3.0.0 release. [Adlai Holler](https://github.com/Adlai-Holler) [#49](https://github.com/TextureGroup/Texture/pull/49)
 - Fix `__has_include` check in ASLog.h [Philipp Smorygo](Philipp.Smorygo@jetbrains.com)
