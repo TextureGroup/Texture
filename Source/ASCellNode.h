@@ -122,7 +122,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  *
  * The view-model currently assigned to this node, if any.
  *
- * This property may be set off the main thread, but it will never be set in parallel. 
+ * This property may be set off the main thread, but this method will never be invoked concurrently on the 
  */
 @property (atomic, nullable) id viewModel;
 

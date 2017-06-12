@@ -50,7 +50,7 @@ const CGFloat kSoldOutGBHeight = 50.0;
 {
   self = [super init];
   if (self != nil) {
-    _viewModel = viewModel;
+    self.viewModel = viewModel;
     [self setup];
     [self updateLabels];
     [self updateBackgroundColor];
