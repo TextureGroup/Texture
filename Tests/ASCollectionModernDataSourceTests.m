@@ -188,15 +188,14 @@
 
 - (void)expectNodeBlockMethodForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNodeBlock nodeBlock = ^{
+  OCMExpect([mockDataSource collectionNode:collectionNode nodeBlockForItemAtIndexPath:indexPath])
+  .andReturn((ASCellNodeBlock)^{
     ASCellNode *node = [ASTestCellNode new];
     // Generating multiple partial mocks of the same class is not thread-safe.
     @synchronized (NSNull.null) {
       return OCMPartialMock(node);
     }
-  };
-  OCMExpect([mockDataSource collectionNode:collectionNode nodeBlockForItemAtIndexPath:indexPath])
-  .andReturn(nodeBlock);
+  });
 }
 
 /// Asserts that counts match and all view-models are up-to-date between us and collectionNode.
