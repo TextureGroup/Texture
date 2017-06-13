@@ -118,8 +118,6 @@
   [mockCellNode setExpectationOrderMatters:YES];
   OCMExpect([mockCellNode canUpdateToViewModel:viewModel])
   .andReturn(YES);
-  OCMExpect([mockCellNode setViewModel:viewModel])
-  .andForwardToRealObject();
 
   [self performUpdateReloadingItems:@{ reloadedPath: viewModel }
                      reloadMappings:@{ reloadedPath: [NSIndexPath indexPathForItem:0 inSection:0] }
