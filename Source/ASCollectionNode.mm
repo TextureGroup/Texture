@@ -590,6 +590,12 @@
   return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].node;
 }
 
+- (id)viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self reloadDataInitiallyIfNeeded];
+  return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].viewModel;
+}
+
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
 {
   return [self.dataController.pendingMap indexPathForElement:cellNode.collectionElement];

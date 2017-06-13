@@ -384,6 +384,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   id<ASDataControllerSource> dataSource = self.dataSource;
   id<ASRangeManagingNode> node = self.node;
   for (NSIndexPath *indexPath in indexPaths) {
+    id viewModel = [dataSource dataController:self viewModelForItemAtIndexPath:indexPath];
+
     ASCellNodeBlock nodeBlock;
     if (isRowKind) {
       nodeBlock = [dataSource dataController:self nodeBlockAtIndexPath:indexPath];
@@ -396,7 +398,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
     }
     
-    ASCollectionElement *element = [[ASCollectionElement alloc] initWithNodeBlock:nodeBlock
+    ASCollectionElement *element = [[ASCollectionElement alloc] initWithViewModel:viewModel
+                                                                        nodeBlock:nodeBlock
                                                          supplementaryElementKind:isRowKind ? nil : kind
                                                                   constrainedSize:constrainedSize
                                                                        owningNode:node

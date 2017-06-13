@@ -31,69 +31,62 @@
 
 #pragma mark - ASLayoutElementContext
 
+@implementation ASLayoutElementContext
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _transitionID = ASLayoutElementContextDefaultTransitionID;
+  }
+  return self;
+}
+
+@end
+
 CGFloat const ASLayoutElementParentDimensionUndefined = NAN;
 CGSize const ASLayoutElementParentSizeUndefined = {ASLayoutElementParentDimensionUndefined, ASLayoutElementParentDimensionUndefined};
 
 int32_t const ASLayoutElementContextInvalidTransitionID = 0;
 int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContextInvalidTransitionID + 1;
 
-static inline ASLayoutElementContext _ASLayoutElementContextMake(int32_t transitionID)
-{
-  struct ASLayoutElementContext context;
-  context.transitionID = transitionID;
-  return context;
-}
-
-static inline BOOL _IsValidTransitionID(int32_t transitionID)
-{
-  return transitionID > ASLayoutElementContextInvalidTransitionID;
-}
-
-struct ASLayoutElementContext const ASLayoutElementContextNull = _ASLayoutElementContextMake(ASLayoutElementContextInvalidTransitionID);
-
-BOOL ASLayoutElementContextIsNull(struct ASLayoutElementContext context)
-{
-  return !_IsValidTransitionID(context.transitionID);
-}
-
-ASLayoutElementContext ASLayoutElementContextMake(int32_t transitionID)
-{
-  NSCAssert(_IsValidTransitionID(transitionID), @"Invalid transition ID");
-  return _ASLayoutElementContextMake(transitionID);
-}
-
 pthread_key_t ASLayoutElementContextKey;
+
+static void ASLayoutElementDestructor(void *p) {
+  if (p != NULL) {
+    ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
+    CFBridgingRelease(p);
+  }
+};
 
 // pthread_key_create must be called before the key can be used. This function does that.
 void ASLayoutElementContextEnsureKey()
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    pthread_key_create(&ASLayoutElementContextKey, free);
+    pthread_key_create(&ASLayoutElementContextKey, ASLayoutElementDestructor);
   });
 }
 
-void ASLayoutElementSetCurrentContext(struct ASLayoutElementContext context)
+void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
   ASLayoutElementContextEnsureKey();
-  ASDisplayNodeCAssert(pthread_getspecific(ASLayoutElementContextKey) == NULL, @"Nested ASLayoutElementContexts aren't supported.");
-  pthread_setspecific(ASLayoutElementContextKey, new ASLayoutElementContext(context));
+  // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
+  ASDisplayNodeCAssertNil(ASLayoutElementGetCurrentContext(), @"Nested ASLayoutElementContexts aren't supported.");
+  pthread_setspecific(ASLayoutElementContextKey, CFBridgingRetain(context));
 }
 
-struct ASLayoutElementContext ASLayoutElementGetCurrentContext()
+ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 {
   ASLayoutElementContextEnsureKey();
-  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
-  return (heapCtx ? *heapCtx : ASLayoutElementContextNull);
+  // Don't retain here. Caller will retain if it wants to!
+  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
 }
 
-void ASLayoutElementClearCurrentContext()
+void ASLayoutElementPopContext()
 {
   ASLayoutElementContextEnsureKey();
-  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
-  if (heapCtx != NULL) {
-    delete heapCtx;
-  }
+  ASDisplayNodeCAssertNotNil(ASLayoutElementGetCurrentContext(), @"Attempt to pop context when there wasn't a context!");
+  CFBridgingRelease(pthread_getspecific(ASLayoutElementContextKey));
   pthread_setspecific(ASLayoutElementContextKey, NULL);
 }
 
