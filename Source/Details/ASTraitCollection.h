@@ -104,11 +104,11 @@ ASDISPLAYNODE_EXTERN_C_END
 #define ASPrimitiveTraitCollectionDefaults \
 - (ASPrimitiveTraitCollection)primitiveTraitCollection\
 {\
-return _primitiveTraitCollection.load();\
+  return _primitiveTraitCollection.load();\
 }\
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
 {\
-_primitiveTraitCollection.store(traitCollection);\
+  _primitiveTraitCollection = traitCollection;\
 }\
 
 #define ASPrimitiveTraitCollectionDeprecatedImplementation \

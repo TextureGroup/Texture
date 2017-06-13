@@ -104,7 +104,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
-    _primitiveTraitCollection.store(traitCollection);
+    _primitiveTraitCollection = traitCollection;
     ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
 
     [self asyncTraitCollectionDidChange];

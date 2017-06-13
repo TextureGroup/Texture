@@ -55,7 +55,7 @@
   }
   
   _isMutable = YES;
-  _primitiveTraitCollection.store(ASPrimitiveTraitCollectionMakeDefault());
+  _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
   _childrenArray = [[NSMutableArray alloc] init];
   
   return self;
