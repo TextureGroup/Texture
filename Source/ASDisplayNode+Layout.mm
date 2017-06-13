@@ -343,11 +343,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   if (didCreateNewContext) {
     ASLayoutElementPopContext();
   }
-  
+
+  CGSize layoutSize = nextLayout->layout.size;
+
   // If our new layout's desired size for self doesn't match current size, ask our parent to update it.
   // This can occur for either pre-calculated or newly-calculated layouts.
   if (nextLayout->requestedLayoutFromAbove == NO
-      && CGSizeEqualToSize(boundsSizeForLayout, nextLayout->layout.size) == NO) {
+      && (fabs(boundsSizeForLayout.width - layoutSize.width) < 1.0 && fabs(boundsSizeForLayout.height - layoutSize.height) < 1.0) == NO) {
     // The layout that we have specifies that this node (self) would like to be a different size
     // than it currently is.  Because that size has been computed within the constrainedSize, we
     // expect that calling setNeedsLayoutFromAbove will result in our parent resizing us to this.
