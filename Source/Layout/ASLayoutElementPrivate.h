@@ -23,26 +23,25 @@
 
 #pragma mark - ASLayoutElementContext
 
-struct ASLayoutElementContext {
-  int32_t transitionID;
-};
+NS_ASSUME_NONNULL_BEGIN
+
+AS_SUBCLASSING_RESTRICTED
+@interface ASLayoutElementContext : NSObject
+@property (nonatomic) int32_t transitionID;
+@end
 
 extern int32_t const ASLayoutElementContextInvalidTransitionID;
 
 extern int32_t const ASLayoutElementContextDefaultTransitionID;
 
-extern struct ASLayoutElementContext const ASLayoutElementContextNull;
+// Does not currently support nesting – there must be no current context.
+extern void ASLayoutElementPushContext(ASLayoutElementContext * context);
 
-extern BOOL ASLayoutElementContextIsNull(struct ASLayoutElementContext context);
+extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext();
 
-extern struct ASLayoutElementContext ASLayoutElementContextMake(int32_t transitionID);
+extern void ASLayoutElementPopContext();
 
-extern void ASLayoutElementSetCurrentContext(struct ASLayoutElementContext context);
-
-extern struct ASLayoutElementContext ASLayoutElementGetCurrentContext();
-
-extern void ASLayoutElementClearCurrentContext();
-
+NS_ASSUME_NONNULL_END
 
 #pragma mark - ASLayoutElementLayoutDefaults
 

@@ -2260,4 +2260,23 @@ static bool stringContainsPointer(NSString *description, id p) {
   ASXCTAssertEqualPoints([node convertPoint:node.bounds.origin toNode:nil], expectedOrigin);
 }
 
+- (void)testThatItIsAllowedToRetrieveDebugDescriptionIncludingVCOffMainThread
+{
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  UIViewController *vc = [[UIViewController alloc] init];
+  [vc.view addSubnode:node];
+  dispatch_group_t g = dispatch_group_create();
+  dispatch_group_enter(g);
+  __block NSString *debugDescription;
+  [NSThread detachNewThreadWithBlock:^{
+    debugDescription = [node debugDescription];
+    dispatch_group_leave(g);
+  }];
+  dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+  // Ensure the debug description contains the VC string.
+  // Have to split into two lines because XCTAssert macro can't handle the stringWithFormat:.
+  BOOL hasVC = [debugDescription containsString:[NSString stringWithFormat:@"%p", vc]];
+  XCTAssert(hasVC);
+}
+
 @end

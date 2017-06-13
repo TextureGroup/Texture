@@ -30,69 +30,62 @@
 
 #pragma mark - ASLayoutElementContext
 
+@implementation ASLayoutElementContext
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _transitionID = ASLayoutElementContextDefaultTransitionID;
+  }
+  return self;
+}
+
+@end
+
 CGFloat const ASLayoutElementParentDimensionUndefined = NAN;
 CGSize const ASLayoutElementParentSizeUndefined = {ASLayoutElementParentDimensionUndefined, ASLayoutElementParentDimensionUndefined};
 
 int32_t const ASLayoutElementContextInvalidTransitionID = 0;
 int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContextInvalidTransitionID + 1;
 
-static inline ASLayoutElementContext _ASLayoutElementContextMake(int32_t transitionID)
-{
-  struct ASLayoutElementContext context;
-  context.transitionID = transitionID;
-  return context;
-}
-
-static inline BOOL _IsValidTransitionID(int32_t transitionID)
-{
-  return transitionID > ASLayoutElementContextInvalidTransitionID;
-}
-
-struct ASLayoutElementContext const ASLayoutElementContextNull = _ASLayoutElementContextMake(ASLayoutElementContextInvalidTransitionID);
-
-BOOL ASLayoutElementContextIsNull(struct ASLayoutElementContext context)
-{
-  return !_IsValidTransitionID(context.transitionID);
-}
-
-ASLayoutElementContext ASLayoutElementContextMake(int32_t transitionID)
-{
-  NSCAssert(_IsValidTransitionID(transitionID), @"Invalid transition ID");
-  return _ASLayoutElementContextMake(transitionID);
-}
-
 pthread_key_t ASLayoutElementContextKey;
+
+static void ASLayoutElementDestructor(void *p) {
+  if (p != NULL) {
+    ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
+    CFBridgingRelease(p);
+  }
+};
 
 // pthread_key_create must be called before the key can be used. This function does that.
 void ASLayoutElementContextEnsureKey()
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    pthread_key_create(&ASLayoutElementContextKey, free);
+    pthread_key_create(&ASLayoutElementContextKey, ASLayoutElementDestructor);
   });
 }
 
-void ASLayoutElementSetCurrentContext(struct ASLayoutElementContext context)
+void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
   ASLayoutElementContextEnsureKey();
-  ASDisplayNodeCAssert(pthread_getspecific(ASLayoutElementContextKey) == NULL, @"Nested ASLayoutElementContexts aren't supported.");
-  pthread_setspecific(ASLayoutElementContextKey, new ASLayoutElementContext(context));
+  // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
+  ASDisplayNodeCAssertNil(ASLayoutElementGetCurrentContext(), @"Nested ASLayoutElementContexts aren't supported.");
+  pthread_setspecific(ASLayoutElementContextKey, CFBridgingRetain(context));
 }
 
-struct ASLayoutElementContext ASLayoutElementGetCurrentContext()
+ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 {
   ASLayoutElementContextEnsureKey();
-  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
-  return (heapCtx ? *heapCtx : ASLayoutElementContextNull);
+  // Don't retain here. Caller will retain if it wants to!
+  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
 }
 
-void ASLayoutElementClearCurrentContext()
+void ASLayoutElementPopContext()
 {
   ASLayoutElementContextEnsureKey();
-  auto heapCtx = (ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
-  if (heapCtx != NULL) {
-    delete heapCtx;
-  }
+  ASDisplayNodeCAssertNotNil(ASLayoutElementGetCurrentContext(), @"Attempt to pop context when there wasn't a context!");
+  CFBridgingRelease(pthread_getspecific(ASLayoutElementContextKey));
   pthread_setspecific(ASLayoutElementContextKey, NULL);
 }
 
@@ -117,6 +110,13 @@ NSString * const ASLayoutElementStyleDescenderProperty = @"ASLayoutElementStyleD
 
 NSString * const ASLayoutElementStyleLayoutPositionProperty = @"ASLayoutElementStyleLayoutPositionProperty";
 
+#define ASLayoutElementStyleSetSizeWithScope(x) \
+  __instanceLock__.lock(); \
+  ASLayoutElementSize newSize = _size.load(); \
+  { x } \
+  _size.store(newSize); \
+  __instanceLock__.unlock();
+
 #define ASLayoutElementStyleCallDelegate(propertyName)\
 do {\
   [_delegate style:self propertyDidChange:propertyName];\
@@ -124,9 +124,9 @@ do {\
 
 @implementation ASLayoutElementStyle {
   ASDN::RecursiveMutex __instanceLock__;
-  ASLayoutElementSize _size;
   ASLayoutElementStyleExtensions _extensions;
   
+  std::atomic<ASLayoutElementSize> _size;
   std::atomic<CGFloat> _spacingBefore;
   std::atomic<CGFloat> _spacingAfter;
   std::atomic<CGFloat> _flexGrow;
@@ -180,185 +180,190 @@ do {\
 
 - (ASLayoutElementSize)size
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size;
+  return _size.load();
 }
 
 - (void)setSize:(ASLayoutElementSize)size
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size = size;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize = size;
+  });
+  // No CallDelegate method as ASLayoutElementSize is currently internal.
 }
 
 #pragma mark - ASLayoutElementStyleSizeForwarding
 
 - (ASDimension)width
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.width;
+  return _size.load().width;
 }
 
 - (void)setWidth:(ASDimension)width
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.width = width;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = width;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
 }
 
 - (ASDimension)height
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.height;
+  return _size.load().height;
 }
 
 - (void)setHeight:(ASDimension)height
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.height = height;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.height = height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
 
 - (ASDimension)minWidth
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.minWidth;
+  return _size.load().minWidth;
 }
 
 - (void)setMinWidth:(ASDimension)minWidth
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.minWidth = minWidth;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = minWidth;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
 }
 
 - (ASDimension)maxWidth
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.maxWidth;
+  return _size.load().maxWidth;
 }
 
 - (void)setMaxWidth:(ASDimension)maxWidth
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.maxWidth = maxWidth;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = maxWidth;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
 }
 
 - (ASDimension)minHeight
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.minHeight;
+  return _size.load().minHeight;
 }
 
 - (void)setMinHeight:(ASDimension)minHeight
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.minHeight = minHeight;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minHeight = minHeight;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
 
 - (ASDimension)maxHeight
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _size.maxHeight;
+  return _size.load().maxHeight;
 }
 
 - (void)setMaxHeight:(ASDimension)maxHeight
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.maxHeight = maxHeight;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxHeight = maxHeight;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }
 
 
 #pragma mark - ASLayoutElementStyleSizeHelpers
 
-// We explicitly not call the setter for (max/min) width and height to avoid locking overhead
-
 - (void)setPreferredSize:(CGSize)preferredSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.width = ASDimensionMakeWithPoints(preferredSize.width);
-  _size.height = ASDimensionMakeWithPoints(preferredSize.height);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = ASDimensionMakeWithPoints(preferredSize.width);
+    newSize.height = ASDimensionMakeWithPoints(preferredSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
 
 - (CGSize)preferredSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  if (_size.width.unit == ASDimensionUnitFraction) {
-    NSCAssert(NO, @"Cannot get preferredSize of element with fractional width. Width: %@.", NSStringFromASDimension(_size.width));
+  ASLayoutElementSize size = _size.load();
+  if (size.width.unit == ASDimensionUnitFraction) {
+    NSCAssert(NO, @"Cannot get preferredSize of element with fractional width. Width: %@.", NSStringFromASDimension(size.width));
     return CGSizeZero;
   }
   
-  if (_size.height.unit == ASDimensionUnitFraction) {
-    NSCAssert(NO, @"Cannot get preferredSize of element with fractional height. Height: %@.", NSStringFromASDimension(_size.height));
+  if (size.height.unit == ASDimensionUnitFraction) {
+    NSCAssert(NO, @"Cannot get preferredSize of element with fractional height. Height: %@.", NSStringFromASDimension(size.height));
     return CGSizeZero;
   }
   
-  return CGSizeMake(_size.width.value, _size.height.value);
+  return CGSizeMake(size.width.value, size.height.value);
 }
 
 - (void)setMinSize:(CGSize)minSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.minWidth = ASDimensionMakeWithPoints(minSize.width);
-  _size.minHeight = ASDimensionMakeWithPoints(minSize.height);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = ASDimensionMakeWithPoints(minSize.width);
+    newSize.minHeight = ASDimensionMakeWithPoints(minSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
 
 - (void)setMaxSize:(CGSize)maxSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.maxWidth = ASDimensionMakeWithPoints(maxSize.width);
-  _size.maxHeight = ASDimensionMakeWithPoints(maxSize.height);
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = ASDimensionMakeWithPoints(maxSize.width);
+    newSize.maxHeight = ASDimensionMakeWithPoints(maxSize.height);
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }
 
 - (ASLayoutSize)preferredLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return ASLayoutSizeMake(_size.width, _size.height);
+  ASLayoutElementSize size = _size.load();
+  return ASLayoutSizeMake(size.width, size.height);
 }
 
 - (void)setPreferredLayoutSize:(ASLayoutSize)preferredLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.width = preferredLayoutSize.width;
-  _size.height = preferredLayoutSize.height;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.width = preferredLayoutSize.width;
+    newSize.height = preferredLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
 }
 
 - (ASLayoutSize)minLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return ASLayoutSizeMake(_size.minWidth, _size.minHeight);
+  ASLayoutElementSize size = _size.load();
+  return ASLayoutSizeMake(size.minWidth, size.minHeight);
 }
 
 - (void)setMinLayoutSize:(ASLayoutSize)minLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.minWidth = minLayoutSize.width;
-  _size.minHeight = minLayoutSize.height;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.minWidth = minLayoutSize.width;
+    newSize.minHeight = minLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
 }
 
 - (ASLayoutSize)maxLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return ASLayoutSizeMake(_size.maxWidth, _size.maxHeight);
+  ASLayoutElementSize size = _size.load();
+  return ASLayoutSizeMake(size.maxWidth, size.maxHeight);
 }
 
 - (void)setMaxLayoutSize:(ASLayoutSize)maxLayoutSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _size.maxWidth = maxLayoutSize.width;
-  _size.maxHeight = maxLayoutSize.height;
+  ASLayoutElementStyleSetSizeWithScope({
+    newSize.maxWidth = maxLayoutSize.width;
+    newSize.maxHeight = maxLayoutSize.height;
+  });
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
   ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
 }

@@ -76,6 +76,8 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size;
 
+- (nullable id)dataController:(ASDataController *)dataController viewModelForItemAtIndexPath:(NSIndexPath *)indexPath;
+
 @optional
 
 /**
@@ -226,6 +228,11 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 @property (nonatomic, strong, readonly) ASEventLog *eventLog;
 #endif
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 
 /** @name Data Updating */
 
