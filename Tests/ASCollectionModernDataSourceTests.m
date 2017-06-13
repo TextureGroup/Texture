@@ -199,6 +199,7 @@
   .andReturn(nodeBlock);
 }
 
+/// Asserts that counts match and all view-models are up-to-date between us and collectionNode.
 - (void)assertCollectionNodeContent
 {
   // Assert section count
@@ -237,12 +238,17 @@
     [reloadedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
       sections[key.section][key.item] = obj;
     }];
+    
+    // Deletion paths, sorted descending
     for (NSIndexPath *indexPath in [deletedItems sortedArrayUsingSelector:@selector(compare:)].reverseObjectEnumerator) {
       [sections[indexPath.section] removeObjectAtIndex:indexPath.item];
     }
-    [insertedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-      [sections[key.section] insertObject:obj atIndex:key.item];
-    }];
+    
+    // Insertion paths, sorted ascending.
+    NSArray *insertionsSortedAcending = [insertedItems.allKeys sortedArrayUsingSelector:@selector(compare:)];
+    for (NSIndexPath *indexPath in insertionsSortedAcending) {
+      [sections[indexPath.section] insertObject:insertedItems[indexPath] atIndex:indexPath.item];
+    }
     
     // Then update the collection node.
     [collectionNode reloadItemsAtIndexPaths:reloadedItems.allKeys];
@@ -251,24 +257,27 @@
     
     // Before the commit, lay out our expectations.
     
-    // It loads the new counts
+    // Expect it to load the new counts.
     [self expectDataSourceCountMethods];
     
-    // It loads view models and node blocks as needed for reloaded & inserted items.
-    [reloadedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, id  _Nonnull obj, BOOL * _Nonnull stop) {
-      NSIndexPath *newIndexPath = reloadMappings[oldIndexPath];
-      [self expectViewModelMethodForItemAtIndexPath:newIndexPath viewModel:obj];
-      if (![skippedReloadIndexPaths containsObject:oldIndexPath]) {
-        [self expectNodeBlockMethodForItemAtIndexPath:newIndexPath];
-      }
+    // Combine reloads + inserts and expect them to load content for all of them, in ascending order.
+    NSMutableDictionary<NSIndexPath *, id> *insertsPlusReloads = [NSMutableDictionary dictionary];
+    [insertsPlusReloads addEntriesFromDictionary:insertedItems];
+    [reloadedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+      insertsPlusReloads[reloadMappings[key]] = obj;
     }];
     
-    [insertedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull newIndexPath, id  _Nonnull obj, BOOL * _Nonnull stop) {
-      [self expectViewModelMethodForItemAtIndexPath:newIndexPath viewModel:obj];
-      [self expectNodeBlockMethodForItemAtIndexPath:newIndexPath];
-    }];
+    for (NSIndexPath *indexPath in [insertsPlusReloads.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+      [self expectViewModelMethodForItemAtIndexPath:indexPath viewModel:insertsPlusReloads[indexPath]];
+      NSIndexPath *oldIndexPath = [reloadMappings allKeysForObject:indexPath].firstObject;
+      BOOL isSkippedReload = oldIndexPath && [skippedReloadIndexPaths containsObject:oldIndexPath];
+      if (!isSkippedReload) {
+        [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
+      }
+    }
   } completion:nil];
 
+  // Assert that the counts and view models are all correct now.
   [self assertCollectionNodeContent];
 }
 
