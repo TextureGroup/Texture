@@ -222,7 +222,7 @@
  * Updates the collection node, with expectations and assertions about the call-order and the correctness of the
  * new data. You should update the data source _before_ calling this method.
  *
- * indexPathsForPreservedNodes are the old index paths for nodes that should use -canUpdateToViewModel: instead of being refetched.
+ * skippedReloadIndexPaths are the old index paths for nodes that should use -canUpdateToViewModel: instead of being refetched.
  */
 - (void)performUpdateReloadingItems:(NSDictionary<NSIndexPath *, id> *)reloadedItems
                      reloadMappings:(NSDictionary<NSIndexPath *, NSIndexPath *> *)reloadMappings
