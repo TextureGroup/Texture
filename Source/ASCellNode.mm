@@ -177,6 +177,11 @@
   }
 }
 
+- (BOOL)canUpdateToViewModel:(id)viewModel
+{
+  return [self.viewModel class] == [viewModel class];
+}
+
 - (NSIndexPath *)indexPath
 {
   return [self.owningNode indexPathForNode:self];

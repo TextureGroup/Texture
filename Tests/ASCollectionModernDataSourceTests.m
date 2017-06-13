@@ -18,7 +18,9 @@
 #import "ASTestCase.h"
 
 @interface ASCollectionModernDataSourceTests : ASTestCase
+@end
 
+@interface ASTestCellNode : ASCellNode
 @end
 
 @implementation ASCollectionModernDataSourceTests {
@@ -61,6 +63,7 @@
 
 - (void)tearDown
 {
+  [collectionNode waitUntilAllUpdatesAreCommitted];
   OCMVerifyAll(mockDataSource);
   [super tearDown];
 }
@@ -79,10 +82,11 @@
   // Reload at (0, 0)
   NSIndexPath *reloadedPath = [NSIndexPath indexPathForItem:0 inSection:0];
 
-  sections[reloadedPath.section][reloadedPath.item] = [NSObject new];
-  [self performUpdateInvalidatingItems:@[ reloadedPath ] block:^{
-    [collectionNode reloadItemsAtIndexPaths:@[ reloadedPath ]];
-  }];
+  [self performUpdateReloadingItems:@{ reloadedPath: [NSObject new] }
+                     reloadMappings:@{ reloadedPath: reloadedPath }
+                     insertingItems:nil
+                      deletingItems:nil
+            skippedReloadIndexPaths:nil];
 }
 
 - (void)testInsertingAnItem
@@ -92,10 +96,36 @@
   // Insert at (1, 0)
   NSIndexPath *insertedPath = [NSIndexPath indexPathForItem:0 inSection:1];
 
-  [sections[insertedPath.section] insertObject:[NSObject new] atIndex:insertedPath.item];
-  [self performUpdateInvalidatingItems:@[ insertedPath ] block:^{
-    [collectionNode insertItemsAtIndexPaths:@[ insertedPath ]];
-  }];
+  [self performUpdateReloadingItems:nil
+                     reloadMappings:nil
+                     insertingItems:@{ insertedPath: [NSObject new] }
+                      deletingItems:nil
+            skippedReloadIndexPaths:nil];
+}
+
+- (void)testReloadingAnItemWithACompatibleViewModel
+{
+  [self loadInitialData];
+
+  // Reload and delete together, for good measure.
+  NSIndexPath *reloadedPath = [NSIndexPath indexPathForItem:1 inSection:0];
+  NSIndexPath *deletedPath = [NSIndexPath indexPathForItem:0 inSection:0];
+
+  id viewModel = [NSObject new];
+
+  // Cell node should get -canUpdateToViewModel:
+  id mockCellNode = [collectionNode nodeForItemAtIndexPath:reloadedPath];
+  [mockCellNode setExpectationOrderMatters:YES];
+  OCMExpect([mockCellNode canUpdateToViewModel:viewModel])
+  .andReturn(YES);
+
+  [self performUpdateReloadingItems:@{ reloadedPath: viewModel }
+                     reloadMappings:@{ reloadedPath: [NSIndexPath indexPathForItem:0 inSection:0] }
+                     insertingItems:nil
+                      deletingItems:@[ deletedPath ]
+            skippedReloadIndexPaths:@[ reloadedPath ]];
+  
+  OCMVerifyAll(mockCellNode);
 }
 
 #pragma mark - Helpers
@@ -114,7 +144,8 @@
       // For each item:
       for (NSInteger i = 0; i < items.count; i++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:section];
-        [self expectContentMethodsForItemAtIndexPath:indexPath];
+        [self expectViewModelMethodForItemAtIndexPath:indexPath viewModel:items[i]];
+        [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
       }
     }
   }
@@ -147,16 +178,25 @@
   }
 }
 
-// Expects viewModelForItemAtIndexPath: and nodeBlockForItemAtIndexPath:
-- (void)expectContentMethodsForItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)expectViewModelMethodForItemAtIndexPath:(NSIndexPath *)indexPath viewModel:(id)viewModel
 {
-  id viewModel = sections[indexPath.section][indexPath.item];
   OCMExpect([mockDataSource collectionNode:collectionNode viewModelForItemAtIndexPath:indexPath])
   .andReturn(viewModel);
-  OCMExpect([mockDataSource collectionNode:collectionNode nodeBlockForItemAtIndexPath:indexPath])
-  .andReturn((ASCellNodeBlock)^{ return [ASCellNode new]; });
 }
 
+- (void)expectNodeBlockMethodForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  OCMExpect([mockDataSource collectionNode:collectionNode nodeBlockForItemAtIndexPath:indexPath])
+  .andReturn((ASCellNodeBlock)^{
+    ASCellNode *node = [ASTestCellNode new];
+    // Generating multiple partial mocks of the same class is not thread-safe.
+    @synchronized (NSNull.null) {
+      return OCMPartialMock(node);
+    }
+  });
+}
+
+/// Asserts that counts match and all view-models are up-to-date between us and collectionNode.
 - (void)assertCollectionNodeContent
 {
   // Assert section count
@@ -182,21 +222,70 @@
  * Updates the collection node, with expectations and assertions about the call-order and the correctness of the
  * new data. You should update the data source _before_ calling this method.
  *
- * invalidatedIndexPaths are the items we expect to get refetched (reloaded/inserted).
+ * skippedReloadIndexPaths are the old index paths for nodes that should use -canUpdateToViewModel: instead of being refetched.
  */
-- (void)performUpdateInvalidatingItems:(NSArray<NSIndexPath *> *)invalidatedIndexPaths block:(void(^)())update
+- (void)performUpdateReloadingItems:(NSDictionary<NSIndexPath *, id> *)reloadedItems
+                     reloadMappings:(NSDictionary<NSIndexPath *, NSIndexPath *> *)reloadMappings
+                     insertingItems:(NSDictionary<NSIndexPath *, id> *)insertedItems
+                      deletingItems:(NSArray<NSIndexPath *> *)deletedItems
+            skippedReloadIndexPaths:(NSArray<NSIndexPath *> *)skippedReloadIndexPaths
 {
-  // When we do an edit, it'll read the new counts
-  [self expectDataSourceCountMethods];
+  [collectionNode performBatchUpdates:^{
+    // First update our data source.
+    [reloadedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+      sections[key.section][key.item] = obj;
+    }];
+    
+    // Deletion paths, sorted descending
+    for (NSIndexPath *indexPath in [deletedItems sortedArrayUsingSelector:@selector(compare:)].reverseObjectEnumerator) {
+      [sections[indexPath.section] removeObjectAtIndex:indexPath.item];
+    }
+    
+    // Insertion paths, sorted ascending.
+    NSArray *insertionsSortedAcending = [insertedItems.allKeys sortedArrayUsingSelector:@selector(compare:)];
+    for (NSIndexPath *indexPath in insertionsSortedAcending) {
+      [sections[indexPath.section] insertObject:insertedItems[indexPath] atIndex:indexPath.item];
+    }
+    
+    // Then update the collection node.
+    [collectionNode reloadItemsAtIndexPaths:reloadedItems.allKeys];
+    [collectionNode deleteItemsAtIndexPaths:deletedItems];
+    [collectionNode insertItemsAtIndexPaths:insertedItems.allKeys];
+    
+    // Before the commit, lay out our expectations.
+    
+    // Expect it to load the new counts.
+    [self expectDataSourceCountMethods];
+    
+    // Combine reloads + inserts and expect them to load content for all of them, in ascending order.
+    NSMutableDictionary<NSIndexPath *, id> *insertsPlusReloads = [NSMutableDictionary dictionary];
+    [insertsPlusReloads addEntriesFromDictionary:insertedItems];
+    [reloadedItems enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+      insertsPlusReloads[reloadMappings[key]] = obj;
+    }];
+    
+    for (NSIndexPath *indexPath in [insertsPlusReloads.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+      [self expectViewModelMethodForItemAtIndexPath:indexPath viewModel:insertsPlusReloads[indexPath]];
+      NSIndexPath *oldIndexPath = [reloadMappings allKeysForObject:indexPath].firstObject;
+      BOOL isSkippedReload = oldIndexPath && [skippedReloadIndexPaths containsObject:oldIndexPath];
+      if (!isSkippedReload) {
+        [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
+      }
+    }
+  } completion:nil];
 
-  // Then it'll load the contents for inserted/reloaded items.
-  for (NSIndexPath *indexPath in invalidatedIndexPaths) {
-    [self expectContentMethodsForItemAtIndexPath:indexPath];
-  }
-
-  [collectionNode performBatchUpdates:update completion:nil];
-
+  // Assert that the counts and view models are all correct now.
   [self assertCollectionNodeContent];
+}
+
+@end
+
+@implementation ASTestCellNode
+
+- (BOOL)canUpdateToViewModel:(id)viewModel
+{
+  // Our tests default to NO for migrating view models. We use OCMExpect to return YES when we specifically want to.
+  return NO;
 }
 
 @end
