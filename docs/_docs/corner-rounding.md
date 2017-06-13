@@ -33,7 +33,7 @@ There are only three things to consider when picking a corner rounding strategy:
 
 Movement **underneath the corner** is any movement behind the corner.  For example, as a rounded-corner collection cell scrolls over a background, the background will move underneath and out from under the corners.  
 
-To describe movement **through the corner,** imagine a small rounded-corner scroll view containing a much larger photo.  As you zoom and pan the photo inside of the scroll view, the photo will move through the corners of the of the scroll view. 
+To describe movement **through the corner,** imagine a small rounded-corner scroll view containing a much larger photo.  As you zoom and pan the photo inside of the scroll view, the photo will move through the corners of the scroll view. 
 
 <img src="/static/images/corner-rounding-movement.png" width="60%" height="60%">
 
