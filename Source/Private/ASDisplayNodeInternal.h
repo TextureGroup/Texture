@@ -29,6 +29,8 @@
 #import <AsyncDisplayKit/_ASTransitionContext.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 
+#define _pendingDisplayNodeLayout ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol _ASDisplayLayerDelegate;

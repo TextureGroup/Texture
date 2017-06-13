@@ -76,19 +76,19 @@
     ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
     // Our calculated layout is suitable for this constrainedSize, so keep using it and
     // invalidate any pending layout that has been generated in the past.
-    ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout = nullptr;
+    _pendingDisplayNodeLayout = nullptr;
     return _calculatedDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
   }
   
   // Create a pending display node layout for the layout pass
-  ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(
+  _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(
     [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize],
     constrainedSize,
     parentSize
   );
   
-  ASDisplayNodeAssertNotNil(ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->layout should not be nil! %@", self);
-  return ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
+  ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
+  return _pendingDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
 }
 
 #pragma mark ASLayoutElementStyleExtensibility
@@ -178,8 +178,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (CGSize)calculatedSize
 {
   ASDN::MutexLocker l(__instanceLock__);
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout != nullptr) {
-    return ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->layout.size;
+  if (_pendingDisplayNodeLayout != nullptr) {
+    return _pendingDisplayNodeLayout->layout.size;
   }
   return _calculatedDisplayNodeLayout->layout.size;
 }
@@ -187,8 +187,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (ASSizeRange)constrainedSizeForCalculatedLayout
 {
   ASDN::MutexLocker l(__instanceLock__);
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout != nullptr) {
-    return ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->constrainedSize;
+  if (_pendingDisplayNodeLayout != nullptr) {
+    return _pendingDisplayNodeLayout->constrainedSize;
   }
   return _calculatedDisplayNodeLayout->constrainedSize;
 }
@@ -253,8 +253,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
   // Figure out constrainedSize to use
   ASSizeRange constrainedSize = ASSizeRangeMake(boundsSizeForLayout);
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout != nullptr) {
-    constrainedSize = ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->constrainedSize;
+  if (_pendingDisplayNodeLayout != nullptr) {
+    constrainedSize = _pendingDisplayNodeLayout->constrainedSize;
   } else if (_calculatedDisplayNodeLayout->layout != nil) {
     constrainedSize = _calculatedDisplayNodeLayout->constrainedSize;
   }
@@ -304,9 +304,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
   
-  // Prefer ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
+  // Prefer _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
   // If there is no _pending, check if _calculated is valid to reuse (avoiding recalculation below).
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout == nullptr) {
+  if (_pendingDisplayNodeLayout == nullptr) {
     if (_calculatedDisplayNodeLayout->isDirty() == NO
         && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
             || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
@@ -326,7 +326,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   // Figure out previous and pending layouts for layout transition
-  std::shared_ptr<ASDisplayNodeLayout> nextLayout = ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout;
+  std::shared_ptr<ASDisplayNodeLayout> nextLayout = _pendingDisplayNodeLayout;
   #define layoutSizeDifferentFromBounds !CGSizeEqualToSize(nextLayout->layout.size, boundsSizeForLayout)
   
   // nextLayout was likely created by a call to layoutThatFits:, check if it is valid and can be applied.
@@ -381,19 +381,19 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.threadSafeBounds.size);
   
   // Checkout if constrained size of pending or calculated display node layout can be used
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout != nullptr
-      && (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->requestedLayoutFromAbove
-           || CGSizeEqualToSize(ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
+  if (_pendingDisplayNodeLayout != nullptr
+      && (_pendingDisplayNodeLayout->requestedLayoutFromAbove
+           || CGSizeEqualToSize(_pendingDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
     // We assume the size from the last returned layoutThatFits: layout was applied so use the pending display node
     // layout constrained size
-    return ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->constrainedSize;
+    return _pendingDisplayNodeLayout->constrainedSize;
   } else if (_calculatedDisplayNodeLayout->layout != nil
              && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
                  || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
     // We assume the  _calculatedDisplayNodeLayout is still valid and the frame is not different
     return _calculatedDisplayNodeLayout->constrainedSize;
   } else {
-    // In this case neither the ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout or the _calculatedDisplayNodeLayout constrained size can
+    // In this case neither the _pendingDisplayNodeLayout or the _calculatedDisplayNodeLayout constrained size can
     // be reused, so the current bounds is used. This is usual the case if a frame was set manually that differs to
     // the one returned from layoutThatFits: or layoutThatFits: was never called
     return ASSizeRangeMake(boundsSizeForLayout);

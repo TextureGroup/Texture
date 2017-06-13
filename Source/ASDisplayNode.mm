@@ -280,7 +280,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
   
   _calculatedDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>();
-  ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout = nullptr;
+  _pendingDisplayNodeLayout = nullptr;
   
   _defaultLayoutTransitionDuration = 0.2;
   _defaultLayoutTransitionDelay = 0.0;
@@ -886,8 +886,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // This will cause the next layout pass to compute a new layout instead of returning
   // the cached layout in case the constrained or parent size did not change
   _calculatedDisplayNodeLayout->invalidate();
-  if (ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout != nullptr) {
-    ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout->invalidate();
+  if (_pendingDisplayNodeLayout != nullptr) {
+    _pendingDisplayNodeLayout->invalidate();
   }
   
   _unflattenedLayout = nil;
@@ -925,7 +925,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
     [self _locked_measureNodeWithBoundsIfNecessary:bounds];
-    ASLayoutElementGetCurrentContext().pendingDisplayNodeLayout = nullptr;
+    _pendingDisplayNodeLayout = nullptr;
     
     [self _locked_layoutPlaceholderIfNecessary];
   }
