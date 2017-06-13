@@ -16,6 +16,8 @@
 //
 
 #import <AsyncDisplayKit/ASTableNode.h>
+#import <AsyncDisplayKit/ASTableNode+Beta.h>
+
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASTableViewInternal.h>
@@ -68,6 +70,7 @@
 @interface ASTableNode ()
 {
   ASDN::RecursiveMutex _environmentStateLock;
+  id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 
 @property (nonatomic, strong) _ASTablePendingState *pendingState;
@@ -379,6 +382,16 @@
   } else {
     return self.view.allowsMultipleSelectionDuringEditing;
   }
+}
+
+- (void)setBatchFetchingDelegate:(id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  _batchFetchingDelegate = batchFetchingDelegate;
+}
+
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return _batchFetchingDelegate;
 }
 
 #pragma mark ASRangeControllerUpdateRangeProtocol

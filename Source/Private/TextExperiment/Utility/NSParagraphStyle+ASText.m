@@ -9,8 +9,8 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import "NSParagraphStyle+ASText.h"
-#import "ASTextAttribute.h"
+#import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
+#import <AsyncDisplayKit/ASTextAttribute.h>
 #import <CoreText/CoreText.h>
 
 // Dummy class for category
@@ -92,7 +92,7 @@
   if (CTParagraphStyleGetValueForSpecifier(CTStyle, kCTParagraphStyleSpecifierTabStops, sizeof(CFArrayRef), &tabStops)) {
     NSMutableArray *tabs = [NSMutableArray new];
     [((__bridge NSArray *)(tabStops))enumerateObjectsUsingBlock : ^(id obj, NSUInteger idx, BOOL *stop) {
-      CTTextTabRef ctTab = (__bridge CFTypeRef)obj;
+      CTTextTabRef ctTab = (__bridge CTTextTabRef)obj;
       
       NSTextTab *tab = [[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentFromCTTextAlignment(CTTextTabGetAlignment(ctTab)) location:CTTextTabGetLocation(ctTab) options:(__bridge id)CTTextTabGetOptions(ctTab)];
       [tabs addObject:tab];
@@ -111,7 +111,7 @@
 }
 
 - (CTParagraphStyleRef)as_CTStyle CF_RETURNS_RETAINED {
-  CTParagraphStyleSetting set[kCTParagraphStyleSpecifierCount] = { 0 };
+  CTParagraphStyleSetting set[kCTParagraphStyleSpecifierCount] = { };
   int count = 0;
   
 #pragma clang diagnostic push
@@ -193,7 +193,7 @@
   NSInteger numTabs = self.tabStops.count;
   if (numTabs) {
     [self.tabStops enumerateObjectsUsingBlock: ^(NSTextTab *tab, NSUInteger idx, BOOL *stop) {
-      CTTextTabRef ctTab = CTTextTabCreate(NSTextAlignmentToCTTextAlignment(tab.alignment), tab.location, (__bridge CFTypeRef)tab.options);
+      CTTextTabRef ctTab = CTTextTabCreate(NSTextAlignmentToCTTextAlignment(tab.alignment), tab.location, (__bridge CFDictionaryRef)tab.options);
       [tabs addObject:(__bridge id)ctTab];
       CFRelease(ctTab);
     }];

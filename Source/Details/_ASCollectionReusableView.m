@@ -17,29 +17,35 @@
 
 #import "_ASCollectionReusableView.h"
 #import "ASCellNode+Internal.h"
+#import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @implementation _ASCollectionReusableView
 
-- (void)setNode:(ASCellNode *)node
+- (ASCellNode *)node
+{
+  return self.element.node;
+}
+
+- (void)setElement:(ASCollectionElement *)element
 {
   ASDisplayNodeAssertMainThread();
-  node.layoutAttributes = _layoutAttributes;
-  _node = node;
+  element.node.layoutAttributes = _layoutAttributes;
+  _element = element;
 }
 
 - (void)setLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _layoutAttributes = layoutAttributes;
-  _node.layoutAttributes = layoutAttributes;
+  self.node.layoutAttributes = layoutAttributes;
 }
 
 - (void)prepareForReuse
 {
   self.layoutAttributes = nil;
   
-  // Need to clear node pointer before UIKit calls setSelected:NO / setHighlighted:NO on its cells
-  self.node = nil;
+  // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
+  self.element = nil;
   [super prepareForReuse];
 }
 

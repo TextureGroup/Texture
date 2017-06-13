@@ -56,6 +56,9 @@
 /// Side Effect: Registers the node with the shared ASPendingStateController if
 /// the property cannot be immediately applied and the node does not already have pending changes.
 /// This function must be called with the node's lock already held (after _bridge_prologue_write).
+/// *warning* the lock should *not* be released until the pending state is updated if this method
+/// returns NO. Otherwise, the pending state can be scheduled and flushed *before* you get a chance
+/// to apply it.
 ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNode *node) {
   BOOL loaded = __loaded(node);
   if (ASDisplayNodeThreadIsMain()) {
@@ -313,6 +316,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     isRasterized = _hierarchyState & ASHierarchyStateRasterized;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
     viewOrLayer = _view ?: _layer;
+    
+    if (isRasterized == NO && shouldApply == NO) {
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) setNeedsDisplay];
+    }
   }
   
   if (isRasterized) {
@@ -337,9 +345,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       // message to the view/layer first. This is because __setNeedsDisplay calls as scheduleNodeForDisplay,
       // which may call -displayIfNeeded. We want to ensure the needsDisplay flag is set now, and then cleared.
       [viewOrLayer setNeedsDisplay];
-    } else {
-      _bridge_prologue_write;
-      [ASDisplayNodeGetPendingState(self) setNeedsDisplay];
     }
     [self __setNeedsDisplay];
   }
@@ -355,6 +360,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
     loaded = __loaded(self);
     viewOrLayer = _view ?: _layer;
+    if (shouldApply == NO && loaded) {
+      // The node is loaded but we're not on main.
+      // We will call [self __setNeedsLayout] when we apply the pending state.
+      // We need to call it on main if the node is loaded to support automatic subnode management.
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) setNeedsLayout];
+    }
   }
   
   if (shouldApply) {
@@ -363,13 +375,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     // the view or layer to ensure that measurement and implicitly added subnodes have been handled.
     [self __setNeedsLayout];
     [viewOrLayer setNeedsLayout];
-  } else if (loaded) {
-    // The node is loaded but we're not on main.
-    // We will call [self __setNeedsLayout] when we apply the pending state.
-    // We need to call it on main if the node is loaded to support automatic subnode management.
-    _bridge_prologue_write;
-    [ASDisplayNodeGetPendingState(self) setNeedsLayout];
-  } else {
+  } else if (loaded == NO) {
     // The node is not loaded and we're not on main.
     [self __setNeedsLayout];
   }
@@ -385,19 +391,20 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
     loaded = __loaded(self);
     viewOrLayer = _view ?: _layer;
+    if (shouldApply == NO && loaded) {
+      // The node is loaded but we're not on main.
+      // We will call layoutIfNeeded on the view or layer when we apply the pending state. __layout will in turn be called on us (see -[_ASDisplayLayer layoutSublayers]).
+      // We need to call it on main if the node is loaded to support automatic subnode management.
+      // We can't release the lock before applying to pending state, or it may be flushed before it can be applied.
+      [ASDisplayNodeGetPendingState(self) layoutIfNeeded];
+    }
   }
   
   if (shouldApply) {
     // The node is loaded and we're on main.
     // Message the view or layer which in turn will call __layout on us (see -[_ASDisplayLayer layoutSublayers]).
     [viewOrLayer layoutIfNeeded];
-  } else if (loaded) {
-    // The node is loaded but we're not on main.
-    // We will call layoutIfNeeded on the view or layer when we apply the pending state. __layout will in turn be called on us (see -[_ASDisplayLayer layoutSublayers]).
-    // We need to call it on main if the node is loaded to support automatic subnode management.
-    _bridge_prologue_write;
-    [ASDisplayNodeGetPendingState(self) layoutIfNeeded];
-  } else {
+  } else if (loaded == NO) {
     // The node is not loaded and we're not on main.
     [self __layout];
   }

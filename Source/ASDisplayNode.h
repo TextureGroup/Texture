@@ -554,6 +554,30 @@ extern NSInteger const ASDefaultDrawingPriority;
 @interface ASDisplayNode (Debugging) <ASDebugNameProvider>
 
 /**
+ * Set to YES to tell all ASDisplayNode instances to store their unflattened layouts.
+ *
+ * The layout can be accessed via `-unflattenedCalculatedLayout`.
+ *
+ * Flattened layouts use less memory and are faster to lookup. On the other hand, unflattened layouts are useful for debugging
+ * because they preserve original information.
+ */
++ (void)setShouldStoreUnflattenedLayouts:(BOOL)shouldStore;
+
+/**
+ * Whether or not ASDisplayNode instances should store their unflattened layouts. 
+ *
+ * The layout can be accessed via `-unflattenedCalculatedLayout`.
+ * 
+ * Flattened layouts use less memory and are faster to lookup. On the other hand, unflattened layouts are useful for debugging
+ * because they preserve original information.
+ *
+ * Defaults to NO.
+ */
++ (BOOL)shouldStoreUnflattenedLayouts;
+
+@property (nonatomic, strong, readonly, nullable) ASLayout *unflattenedCalculatedLayout;
+
+/**
  * @abstract Return a description of the node hierarchy.
  *
  * @discussion For debugging: (lldb) po [node displayNodeRecursiveDescription]
@@ -646,12 +670,12 @@ extern NSInteger const ASDefaultDrawingPriority;
 #if TARGET_OS_IOS
 @property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
 #endif
-@property (nonatomic, assign, nullable) CGColorRef shadowColor;                // default=opaque rgb black
+@property (nonatomic, nullable)         CGColorRef shadowColor;                // default=opaque rgb black
 @property (nonatomic, assign)           CGFloat shadowOpacity;                 // default=0.0
 @property (nonatomic, assign)           CGSize shadowOffset;                   // default=(0, -3)
 @property (nonatomic, assign)           CGFloat shadowRadius;                  // default=3
 @property (nonatomic, assign)           CGFloat borderWidth;                   // default=0
-@property (nonatomic, assign, nullable) CGColorRef borderColor;                // default=opaque rgb black
+@property (nonatomic, nullable)         CGColorRef borderColor;                // default=opaque rgb black
 
 // UIResponder methods
 // By default these fall through to the underlying view, but can be overridden.

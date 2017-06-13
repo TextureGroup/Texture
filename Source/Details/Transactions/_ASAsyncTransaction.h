@@ -25,8 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^asyncdisplaykit_async_transaction_completion_block_t)(_ASAsyncTransaction *completedTransaction, BOOL canceled);
 typedef id<NSObject> _Nullable(^asyncdisplaykit_async_transaction_operation_block_t)(void);
-typedef void(^asyncdisplaykit_async_transaction_operation_completion_block_t)(id<NSObject> _Nullable value, BOOL canceled);
-typedef void(^asyncdisplaykit_async_transaction_complete_async_operation_block_t)(id<NSObject> _Nullable value);
+typedef void(^asyncdisplaykit_async_transaction_operation_completion_block_t)(id _Nullable value, BOOL canceled);
+typedef void(^asyncdisplaykit_async_transaction_complete_async_operation_block_t)(id _Nullable value);
 typedef void(^asyncdisplaykit_async_transaction_async_operation_block_t)(asyncdisplaykit_async_transaction_complete_async_operation_block_t completeOperationBlock);
 
 /**
@@ -62,12 +62,9 @@ extern NSInteger const ASDefaultTransactionPriority;
 /**
  @summary Initialize a transaction that can start collecting async operations.
 
- @see initWithCallbackQueue:commitBlock:completionBlock:executeConcurrently:
- @param callbackQueue The dispatch queue that the completion blocks will be called on. Default is the main queue.
  @param completionBlock A block that is called when the transaction is completed.
  */
-- (instancetype)initWithCallbackQueue:(nullable dispatch_queue_t)callbackQueue
-                      completionBlock:(nullable asyncdisplaykit_async_transaction_completion_block_t)completionBlock;
+- (instancetype)initWithCompletionBlock:(nullable asyncdisplaykit_async_transaction_completion_block_t)completionBlock;
 
 /**
  @summary Block the main thread until the transaction is complete, including callbacks.
@@ -75,11 +72,6 @@ extern NSInteger const ASDefaultTransactionPriority;
  @desc This must be called on the main thread.
  */
 - (void)waitUntilComplete;
-
-/**
- The dispatch queue that the completion blocks will be called on.
- */
-@property (nonatomic, readonly, strong) dispatch_queue_t callbackQueue;
 
 /**
  A block that is called when the transaction is completed.

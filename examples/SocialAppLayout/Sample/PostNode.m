@@ -184,6 +184,7 @@
         [self addSubnode:_optionsNode];
 
         for (ASDisplayNode *node in self.subnodes) {
+            // ASTextNode with embedded links doesn't support layer backing
             if (node.supportsLayerBacking) {
                 node.layerBacked = YES;
             }

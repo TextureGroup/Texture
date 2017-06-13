@@ -54,14 +54,14 @@ typedef struct ASRangeGeometry ASRangeGeometry;
   return self;
 }
 
-- (NSSet<ASCollectionElement *> *)elementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType map:(ASElementMap *)map
+- (NSHashTable<ASCollectionElement *> *)elementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType map:(ASElementMap *)map
 {
   ASRangeTuningParameters tuningParameters = [self tuningParametersForRangeMode:rangeMode rangeType:rangeType];
   CGRect rangeBounds = [self rangeBoundsWithScrollDirection:scrollDirection rangeTuningParameters:tuningParameters];
   return [self elementsWithinRangeBounds:rangeBounds map:map];
 }
 
-- (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSSet<ASCollectionElement *> *__autoreleasing  _Nullable *)displaySet preloadSet:(NSSet<ASCollectionElement *> *__autoreleasing  _Nullable *)preloadSet map:(ASElementMap *)map
+- (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)displaySet preloadSet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)preloadSet map:(ASElementMap *)map
 {
   if (displaySet == NULL || preloadSet == NULL) {
     return;
@@ -74,9 +74,10 @@ typedef struct ASRangeGeometry ASRangeGeometry;
   
   CGRect unionBounds = CGRectUnion(displayBounds, preloadBounds);
   NSArray *layoutAttributes = [_collectionViewLayout layoutAttributesForElementsInRect:unionBounds];
+  NSInteger count = layoutAttributes.count;
 
-  NSMutableSet<ASCollectionElement *> *display = [NSMutableSet setWithCapacity:layoutAttributes.count];
-  NSMutableSet<ASCollectionElement *> *preload = [NSMutableSet setWithCapacity:layoutAttributes.count];
+  __auto_type display = [[NSHashTable<ASCollectionElement *> alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:count];
+  __auto_type preload = [[NSHashTable<ASCollectionElement *> alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:count];
 
   for (UICollectionViewLayoutAttributes *la in layoutAttributes) {
     // Manually filter out elements that don't intersect the range bounds.
@@ -105,10 +106,10 @@ typedef struct ASRangeGeometry ASRangeGeometry;
   return;
 }
 
-- (NSSet<ASCollectionElement *> *)elementsWithinRangeBounds:(CGRect)rangeBounds map:(ASElementMap *)map
+- (NSHashTable<ASCollectionElement *> *)elementsWithinRangeBounds:(CGRect)rangeBounds map:(ASElementMap *)map
 {
   NSArray *layoutAttributes = [_collectionViewLayout layoutAttributesForElementsInRect:rangeBounds];
-  NSMutableSet<ASCollectionElement *> *elementSet = [NSMutableSet setWithCapacity:layoutAttributes.count];
+  NSHashTable<ASCollectionElement *> *elementSet = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:layoutAttributes.count];
   
   for (UICollectionViewLayoutAttributes *la in layoutAttributes) {
     // Manually filter out elements that don't intersect the range bounds.

@@ -45,6 +45,7 @@
 @property (nonatomic, assign) BOOL allowsSelection; // default is YES
 @property (nonatomic, assign) BOOL allowsMultipleSelection; // default is NO
 @property (nonatomic, assign) BOOL inverted; //default is NO
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 @property (nonatomic, assign) CGFloat leadingScreensForBatching;
 @property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
 @end
@@ -111,6 +112,7 @@
 {
   ASDN::RecursiveMutex _environmentStateLock;
   Class _collectionViewClass;
+  id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 @property (nonatomic) _ASCollectionPendingState *pendingState;
 @end
@@ -174,12 +176,14 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
-    self.pendingState            = nil;
-    view.asyncDelegate           = pendingState.delegate;
-    view.asyncDataSource         = pendingState.dataSource;
-    view.inverted                = pendingState.inverted;
-    view.allowsSelection         = pendingState.allowsSelection;
-    view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.asyncDelegate              = pendingState.delegate;
+    view.asyncDataSource            = pendingState.dataSource;
+    view.inverted                   = pendingState.inverted;
+    view.allowsSelection            = pendingState.allowsSelection;
+    view.allowsMultipleSelection    = pendingState.allowsMultipleSelection;
+    view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
+    view.layoutInspector            = pendingState.layoutInspector;
+    self.pendingState               = nil;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
@@ -426,6 +430,16 @@
   }
 }
 
+- (ASScrollDirection)scrollDirection
+{
+  return [self isNodeLoaded] ? self.view.scrollDirection : ASScrollDirectionNone;
+}
+
+- (ASScrollDirection)scrollableDirections
+{
+  return [self isNodeLoaded] ? self.view.scrollableDirections : ASScrollDirectionNone;
+}
+
 - (ASElementMap *)visibleElements
 {
   ASDisplayNodeAssertMainThread();
@@ -440,6 +454,34 @@
     return ((ASCollectionLayout *)layout).layoutDelegate;
   }
   return nil;
+}
+
+- (void)setBatchFetchingDelegate:(id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  _batchFetchingDelegate = batchFetchingDelegate;
+}
+
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return _batchFetchingDelegate;
+}
+
+- (BOOL)usesSynchronousDataLoading
+{
+  if ([self pendingState]) {
+    return _pendingState.usesSynchronousDataLoading; 
+  } else {
+    return self.view.usesSynchronousDataLoading;
+  }
+}
+
+- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
+{
+  if ([self pendingState]) {
+    _pendingState.usesSynchronousDataLoading = usesSynchronousDataLoading; 
+  } else {
+    self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+  }
 }
 
 #pragma mark - Range Tuning
@@ -546,6 +588,12 @@
 {
   [self reloadDataInitiallyIfNeeded];
   return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].node;
+}
+
+- (id)viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self reloadDataInitiallyIfNeeded];
+  return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].viewModel;
 }
 
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode

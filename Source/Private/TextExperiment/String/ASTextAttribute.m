@@ -121,7 +121,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.string = self.string;
   return one;
 }
@@ -148,7 +148,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.deleteConfirm = self.deleteConfirm;
   return one;
 }
@@ -208,7 +208,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.color = self.color;
   one.radius = self.radius;
   one.offset = self.offset;
@@ -255,7 +255,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.style = self.style;
   one.width = self.width;
   one.color = self.color;
@@ -314,7 +314,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.lineStyle = self.lineStyle;
   one.strokeWidth = self.strokeWidth;
   one.strokeColor = self.strokeColor;
@@ -352,7 +352,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   if ([self.content respondsToSelector:@selector(copy)]) {
     one.content = [self.content copy];
   } else {
@@ -390,7 +390,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 }
 
 - (id)copyWithZone:(NSZone *)zone {
-  typeof(self) one = [self.class new];
+  __typeof__(self) one = [self.class new];
   one.attributes = self.attributes.mutableCopy;
   return one;
 }

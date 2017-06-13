@@ -9,11 +9,11 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import "ASTextLayout.h"
-#import "ASTextUtilities.h"
-#import "ASTextAttribute.h"
-#import "NSAttributedString+ASText.h"
-#import "ASInternalHelpers.h"
+#import <AsyncDisplayKit/ASTextLayout.h>
+#import <AsyncDisplayKit/ASTextUtilities.h>
+#import <AsyncDisplayKit/ASTextAttribute.h>
+#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -173,7 +173,7 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   _pathLineWidth = [aDecoder decodeDoubleForKey:@"pathLineWidth"];
   _verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
   _maximumNumberOfRows = [aDecoder decodeIntegerForKey:@"maximumNumberOfRows"];
-  _truncationType = [aDecoder decodeIntegerForKey:@"truncationType"];
+  _truncationType = (ASTextTruncationType)[aDecoder decodeIntegerForKey:@"truncationType"];
   _truncationToken = [aDecoder decodeObjectForKey:@"truncationToken"];
   _linePositionModifier = [aDecoder decodeObjectForKey:@"linePositionModifier"];
   return self;
@@ -389,6 +389,14 @@ dispatch_semaphore_signal(_lock);
   NSUInteger maximumNumberOfRows = 0;
   BOOL constraintSizeIsExtended = NO;
   CGRect constraintRectBeforeExtended = {0};
+#define FAIL_AND_RETURN {\
+  if (cgPath) CFRelease(cgPath); \
+  if (ctSetter) CFRelease(ctSetter); \
+  if (ctFrame) CFRelease(ctFrame); \
+  if (lineOrigins) free(lineOrigins); \
+  if (lineRowsEdge) free(lineRowsEdge); \
+  if (lineRowsIndex) free(lineRowsIndex); \
+  return nil; }
   
   text = text.mutableCopy;
   container = container.copy;
@@ -425,7 +433,7 @@ dispatch_semaphore_signal(_lock);
   
   // set cgPath and cgPathBox
   if (container.path == nil && container.exclusionPaths.count == 0) {
-    if (container.size.width <= 0 || container.size.height <= 0) goto fail;
+    if (container.size.width <= 0 || container.size.height <= 0) FAIL_AND_RETURN
     CGRect rect = (CGRect) {CGPointZero, container.size };
     if (needFixLayoutSizeBug) {
       constraintSizeIsExtended = YES;
@@ -472,7 +480,7 @@ dispatch_semaphore_signal(_lock);
     }
     cgPath = path;
   }
-  if (!cgPath) goto fail;
+  if (!cgPath) FAIL_AND_RETURN
   
   // frame setter config
   frameAttrs = [NSMutableDictionary dictionary];
@@ -487,16 +495,16 @@ dispatch_semaphore_signal(_lock);
   }
   
   // create CoreText objects
-  ctSetter = CTFramesetterCreateWithAttributedString((CFTypeRef)text);
-  if (!ctSetter) goto fail;
-  ctFrame = CTFramesetterCreateFrame(ctSetter, ASTextCFRangeFromNSRange(range), cgPath, (CFTypeRef)frameAttrs);
-  if (!ctFrame) goto fail;
+  ctSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)text);
+  if (!ctSetter) FAIL_AND_RETURN
+  ctFrame = CTFramesetterCreateFrame(ctSetter, ASTextCFRangeFromNSRange(range), cgPath, (CFDictionaryRef)frameAttrs);
+  if (!ctFrame) FAIL_AND_RETURN
   lines = [NSMutableArray new];
   ctLines = CTFrameGetLines(ctFrame);
   lineCount = CFArrayGetCount(ctLines);
   if (lineCount > 0) {
-    lineOrigins = malloc(lineCount * sizeof(CGPoint));
-    if (lineOrigins == NULL) goto fail;
+    lineOrigins = (CGPoint *)malloc(lineCount * sizeof(CGPoint));
+    if (lineOrigins == NULL) FAIL_AND_RETURN
     CTFrameGetLineOrigins(ctFrame, CFRangeMake(0, lineCount), lineOrigins);
   }
   
@@ -514,7 +522,7 @@ dispatch_semaphore_signal(_lock);
   // calculate line frame
   NSUInteger lineCurrentIdx = 0;
   for (NSUInteger i = 0; i < lineCount; i++) {
-    CTLineRef ctLine = CFArrayGetValueAtIndex(ctLines, i);
+    CTLineRef ctLine = (CTLineRef)CFArrayGetValueAtIndex(ctLines, i);
     CFArrayRef ctRuns = CTLineGetGlyphRuns(ctLine);
     if (!ctRuns || CFArrayGetCount(ctRuns) == 0) continue;
     
@@ -605,10 +613,10 @@ dispatch_semaphore_signal(_lock);
       }
     }
     
-    lineRowsEdge = calloc(rowCount, sizeof(ASRowEdge));
-    if (lineRowsEdge == NULL) goto fail;
-    lineRowsIndex = calloc(rowCount, sizeof(NSUInteger));
-    if (lineRowsIndex == NULL) goto fail;
+    lineRowsEdge = (ASRowEdge *)calloc(rowCount, sizeof(ASRowEdge));
+    if (lineRowsEdge == NULL) FAIL_AND_RETURN
+    lineRowsIndex = (NSUInteger *)calloc(rowCount, sizeof(NSUInteger));
+    if (lineRowsIndex == NULL) FAIL_AND_RETURN
     NSInteger lastRowIdx = -1;
     CGFloat lastHead = 0;
     CGFloat lastFoot = 0;
@@ -689,11 +697,11 @@ dispatch_semaphore_signal(_lock);
         NSUInteger runCount = CFArrayGetCount(runs);
         NSMutableDictionary *attrs = nil;
         if (runCount > 0) {
-          CTRunRef run = CFArrayGetValueAtIndex(runs, runCount - 1);
+          CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, runCount - 1);
           attrs = (id)CTRunGetAttributes(run);
           attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
           [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
-          CTFontRef font = (__bridge CFTypeRef)attrs[(id)kCTFontAttributeName];
+          CTFontRef font = (__bridge CTFontRef)attrs[(id)kCTFontAttributeName];
           CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
           UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
           if (uiFont) {
@@ -762,7 +770,7 @@ dispatch_semaphore_signal(_lock);
       NSMutableArray *lineRunRanges = [NSMutableArray new];
       line.verticalRotateRange = lineRunRanges;
       for (NSUInteger r = 0; r < runCount; r++) {
-        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
         NSMutableArray *runRanges = [NSMutableArray new];
         [lineRunRanges addObject:runRanges];
         NSUInteger glyphCount = CTRunGetGlyphCount(run);
@@ -773,7 +781,7 @@ dispatch_semaphore_signal(_lock);
         CFRange runStrRange = CTRunGetStringRange(run);
         runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
         CFDictionaryRef runAttrs = CTRunGetAttributes(run);
-        CTFontRef font = CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
+        CTFontRef font = (CTFontRef)CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
         BOOL isColorGlyph = ASTextCTFontContainsColorBitmapGlyphs(font);
         
         NSUInteger prevIdx = 0;
@@ -879,15 +887,6 @@ dispatch_semaphore_signal(_lock);
   CFRelease(ctFrame);
   if (lineOrigins) free(lineOrigins);
   return layout;
-  
-fail:
-  if (cgPath) CFRelease(cgPath);
-  if (ctSetter) CFRelease(ctSetter);
-  if (ctFrame) CFRelease(ctFrame);
-  if (lineOrigins) free(lineOrigins);
-  if (lineRowsEdge) free(lineRowsEdge);
-  if (lineRowsIndex) free(lineRowsIndex);
-  return nil;
 }
 
 + (NSArray *)layoutWithContainers:(NSArray *)containers text:(NSAttributedString *)text {
@@ -1019,7 +1018,7 @@ fail:
   if (!line || !position) return NULL;
   CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
   for (NSUInteger i = 0, max = CFArrayGetCount(runs); i < max; i++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, i);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, i);
     CFRange range = CTRunGetStringRange(run);
     if (position.affinity == ASTextAffinityBackward) {
       if (range.location < position.offset && position.offset <= range.location + range.length) {
@@ -1086,14 +1085,14 @@ fail:
   if (!line) return NO;
   CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
   for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     NSUInteger glyphCount = CTRunGetGlyphCount(run);
     if (glyphCount == 0) continue;
     CFRange range = CTRunGetStringRange(run);
     if (range.length <= 1) continue;
     if (position <= range.location || position >= range.location + range.length) continue;
     CFDictionaryRef attrs = CTRunGetAttributes(run);
-    CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+    CTFontRef font = (CTFontRef)CFDictionaryGetValue(attrs, kCTFontAttributeName);
     if (!ASTextCTFontContainsColorBitmapGlyphs(font)) continue;
     
     // Here's Emoji runs (larger than 1 unichar), and position is inside the range.
@@ -1133,7 +1132,7 @@ fail:
   BOOL RTL = NO;
   CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
   for (NSUInteger r = 0, max = CFArrayGetCount(runs); r < max; r++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     CGPoint glyphPosition;
     CTRunGetPositions(run, CFRangeMake(0, 1), &glyphPosition);
     if (_container.verticalForm) {
@@ -1293,13 +1292,13 @@ fail:
    */
   CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
   for (NSUInteger r = 0, max = CFArrayGetCount(runs); r < max; r++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     CFRange range = CTRunGetStringRange(run);
     if (range.location <= idx && idx < range.location + range.length) {
       NSUInteger glyphCount = CTRunGetGlyphCount(run);
       if (glyphCount == 0) break;
       CFDictionaryRef attrs = CTRunGetAttributes(run);
-      CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+      CTFontRef font = (CTFontRef)CFDictionaryGetValue(attrs, kCTFontAttributeName);
       if (!ASTextCTFontContainsColorBitmapGlyphs(font)) break;
       
       CFIndex indices[glyphCount];
@@ -2180,10 +2179,10 @@ static void ASTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *u
   CGFloat maxUnderlinePos = 0;
   CGFloat maxLineThickness = 0;
   for (NSUInteger i = 0, max = CFArrayGetCount(runs); i < max; i++) {
-    CTRunRef run = CFArrayGetValueAtIndex(runs, i);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, i);
     CFDictionaryRef attrs = CTRunGetAttributes(run);
     if (attrs) {
-      CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
+      CTFontRef font = (CTFontRef)CFDictionaryGetValue(attrs, kCTFontAttributeName);
       if (font) {
         CGFloat xHeight = CTFontGetXHeight(font);
         if (xHeight > maxXHeight) maxXHeight = xHeight;
@@ -2204,7 +2203,7 @@ static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, 
   BOOL runTextMatrixIsID = CGAffineTransformIsIdentity(runTextMatrix);
   
   CFDictionaryRef runAttrs = CTRunGetAttributes(run);
-  NSValue *glyphTransformValue = CFDictionaryGetValue(runAttrs, (__bridge const void *)(ASTextGlyphTransformAttributeName));
+  NSValue *glyphTransformValue = (NSValue *)CFDictionaryGetValue(runAttrs, (__bridge const void *)(ASTextGlyphTransformAttributeName));
   if (!isVertical && !glyphTransformValue) { // draw run
     if (!runTextMatrixIsID) {
       CGContextSaveGState(context);
@@ -2216,7 +2215,7 @@ static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, 
       CGContextRestoreGState(context);
     }
   } else { // draw glyph
-    CTFontRef runFont = CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
+    CTFontRef runFont = (CTFontRef)CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
     if (!runFont) return;
     NSUInteger glyphCount = CTRunGetGlyphCount(run);
     if (glyphCount <= 0) return;
@@ -2228,7 +2227,7 @@ static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, 
     
     CGColorRef fillColor = (CGColorRef)CFDictionaryGetValue(runAttrs, kCTForegroundColorAttributeName);
     fillColor = ASTextGetCGColor(fillColor);
-    NSNumber *strokeWidth = CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
+    NSNumber *strokeWidth = (NSNumber *)CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
     
     CGContextSaveGState(context); {
       CGContextSetFillColorWithColor(context, fillColor);
@@ -2593,7 +2592,7 @@ static void ASTextDrawText(ASTextLayout *layout, CGContextRef context, CGSize si
       CGFloat posY = size.height - line.position.y;
       CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
       for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextSetTextPosition(context, posX, posY);
         ASTextDrawRun(line, run, context, size, isVertical, lineRunRanges[r], verticalOffset);
@@ -2623,7 +2622,7 @@ static void ASTextDrawBlockBorder(ASTextLayout *layout, CGContextRef context, CG
     if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
     CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
     for (NSInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-      CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+      CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
       CFIndex glyphCount = CTRunGetGlyphCount(run);
       if (glyphCount == 0) continue;
       NSDictionary *attrs = (id)CTRunGetAttributes(run);
@@ -2707,7 +2706,7 @@ static void ASTextDrawBorder(ASTextLayout *layout, CGContextRef context, CGSize 
         if (r >= rMax) break;
       }
       
-      CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+      CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
       CFIndex glyphCount = CTRunGetGlyphCount(run);
       if (glyphCount == 0) continue;
       
@@ -2730,7 +2729,7 @@ static void ASTextDrawBorder(ASTextLayout *layout, CGContextRef context, CGSize 
         
         CGRect extLineRect = CGRectNull;
         for (NSInteger rr = (ll == l) ? r : 0, rrMax = CFArrayGetCount(iRuns); rr < rrMax; rr++) {
-          CTRunRef iRun = CFArrayGetValueAtIndex(iRuns, rr);
+          CTRunRef iRun = (CTRunRef)CFArrayGetValueAtIndex(iRuns, rr);
           NSDictionary *iAttrs = (id)CTRunGetAttributes(iRun);
           ASTextBorder *iBorder = iAttrs[borderKey];
           if (![border isEqual:iBorder]) {
@@ -2828,7 +2827,7 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
     if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
     CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
     for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-      CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+      CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
       CFIndex glyphCount = CTRunGetGlyphCount(run);
       if (glyphCount == 0) continue;
       
@@ -3015,7 +3014,7 @@ static void ASTextDrawShadow(ASTextLayout *layout, CGContextRef context, CGSize 
       CGFloat linePosY = size.height - line.position.y;
       CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
       for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextSetTextPosition(context, linePosX, linePosY);
         NSDictionary *attrs = (id)CTRunGetAttributes(run);
@@ -3066,7 +3065,7 @@ static void ASTextDrawInnerShadow(ASTextLayout *layout, CGContextRef context, CG
     CGFloat linePosY = size.height - line.position.y;
     CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
     for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-      CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+      CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
       if (CTRunGetGlyphCount(run) == 0) continue;
       CGContextSetTextMatrix(context, CGAffineTransformIdentity);
       CGContextSetTextPosition(context, linePosX, linePosY);
@@ -3084,7 +3083,7 @@ static void ASTextDrawInnerShadow(ASTextLayout *layout, CGContextRef context, CG
         if (runImageBounds.size.width < 0.1 || runImageBounds.size.height < 0.1) continue;
         
         CFDictionaryRef runAttrs = CTRunGetAttributes(run);
-        NSValue *glyphTransformValue = CFDictionaryGetValue(runAttrs, (__bridge const void *)(ASTextGlyphTransformAttributeName));
+        NSValue *glyphTransformValue = (NSValue *)CFDictionaryGetValue(runAttrs, (__bridge const void *)(ASTextGlyphTransformAttributeName));
         if (glyphTransformValue) {
           runImageBounds = CGRectMake(0, 0, size.width, size.height);
         }
@@ -3229,7 +3228,7 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
     if (op.CTRunFillColor || op.CTRunBorderColor || op.CTRunNumberColor || op.CGGlyphFillColor || op.CGGlyphBorderColor) {
       CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
       for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
+        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
         CFIndex glyphCount = CTRunGetGlyphCount(run);
         if (glyphCount == 0) continue;
         
