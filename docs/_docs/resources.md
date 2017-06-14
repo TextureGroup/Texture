@@ -21,7 +21,7 @@ If you are new to Texture, we recommend that you start with the <a href="https:/
 
 ### Videos
 <ul>
-  <li><a href = "https://www.youtube.com/watch?v=0bOdPUvSzG0">AsyncDisplayKit 2.0: Defining the 7th Abstraction Layer</a> <b>[Pinterest HQ 2016]</b></li>
+  <li><a href = "https://www.youtube.com/watch?v=64Wgt_Uf50o">AsyncDisplayKit 2.0: Defining the 7th Abstraction Layer</a> <b>[Pinterest HQ 2016]</b></li>
   <li><a href = "https://www.youtube.com/watch?v=sqkinHYXTuc">Layout at Scale with AsyncDisplayKit 2.0</a> <b>[NSMeetup 2016]</b></li>
   <li><a href = "https://youtu.be/yuDqvE5n_1g">ASCollectionNode</a> <b>[Pinterest HQ 2016]</b></li>
   <li><a href = "https://www.youtube.com/watch?v=8ngXakpE2x8">AsyncDisplayKit State of the Code</a> <b>[WWDC 2016]</b></li>
