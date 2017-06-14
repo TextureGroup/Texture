@@ -576,11 +576,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return [_rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
 }
 
-- (ASTableNode *)tableNode
-{
-  return (ASTableNode *)ASViewToDisplayNode(self);
-}
-
 - (ASElementMap *)elementMapForRangeController:(ASRangeController *)rangeController
 {
   return _dataController.visibleMap;
