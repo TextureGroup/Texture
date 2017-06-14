@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASLayoutSpec() {
   ASDN::RecursiveMutex __instanceLock__;
-  ASPrimitiveTraitCollection _primitiveTraitCollection;
+  std::atomic <ASPrimitiveTraitCollection> _primitiveTraitCollection;
   ASLayoutElementStyle *_style;
   NSMutableArray *_childrenArray;
 }
