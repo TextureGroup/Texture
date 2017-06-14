@@ -45,7 +45,7 @@
 // in the ASDisplayNode tree (based on .yogaChildren). When disabled, ASYogaLayoutSpec is used, with a
 // disjoint Yoga tree for each level in the hierarchy. Currently, both modes are experimental.
 #ifndef YOGA_TREE_CONTIGUOUS
-  #define YOGA_TREE_CONTIGUOUS 0  // To enable, set to YOGA, as the code depends on YOGA also being set.
+  #define YOGA_TREE_CONTIGUOUS YOGA  // To enable, set to YOGA, as the code depends on YOGA also being set.
 #endif
 
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)

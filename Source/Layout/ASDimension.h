@@ -316,6 +316,8 @@ typedef struct {
 
 extern ASEdgeInsets const ASEdgeInsetsZero;
 
+extern ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets);
+
 #endif
 
 NS_ASSUME_NONNULL_END

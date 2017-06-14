@@ -270,7 +270,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 #if ASEVENTLOG_ENABLE
   _eventLog = [[ASEventLog alloc] initWithObject:self];
 #endif
-  
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
   _contentsScaleForDisplay = ASScreenScale();
@@ -423,12 +422,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeThreadIsMain() == NO) {
     [self _scheduleIvarsForMainDeallocation];
   }
-
-#if YOGA_TREE_CONTIGUOUS
-  if (_yogaNode != NULL) {
-    YGNodeFree(_yogaNode);
-  }
-#endif
 
   // TODO: Remove this? If supernode isn't already nil, this method isn't dealloc-safe anyway.
   [self _setSupernode:nil];
@@ -966,22 +959,32 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDN::MutexLocker l(__instanceLock__);
 
 #if YOGA_TREE_CONTIGUOUS /* YOGA */
-  if (ASHierarchyStateIncludesYogaLayoutEnabled(_hierarchyState) == YES) {
-    if (ASHierarchyStateIncludesYogaLayoutMeasuring(_hierarchyState) == NO && self.yogaCalculatedLayout == nil) {
-      ASDN::MutexUnlocker ul(__instanceLock__);
+  // There are several cases where Yoga could arrive here:
+  // - This node is not in a Yoga tree: it has neither a yogaParent nor yogaChildren.
+  // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
+  // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
+  // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
+  // If we're a leaf node, we are probably being called by a measure function and proceed as normal.
+  // If we're a yoga root or tree node, initiate a new Yoga calculation pass from root.
+  YGNodeRef yogaNode = _style.yogaNode;
+  BOOL hasYogaParent = (_yogaParent != nil);
+  BOOL hasYogaChildren = (_yogaChildren.count > 0);
+  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
+  if (usesYoga && (_yogaParent == nil || _yogaChildren.count > 0)) {
+    // This node has some connection to a Yoga tree.
+    ASDN::MutexUnlocker ul(__instanceLock__);
+
+    if (self.yogaLayoutInProgress == NO) {
       [self calculateLayoutFromYogaRoot:constrainedSize];
     }
-
-    // The call above may set yogaCalculatedLayout, even if it tested as nil to enter it.
-    if (self.yogaCalculatedLayout && self.yogaChildren.count > 0) {
-      return self.yogaCalculatedLayout;
-    }
+    ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
+    return _yogaCalculatedLayout;
   }
+  ASYogaLog(@"PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
 #endif /* YOGA */
   
   // Manual size calculation via calculateSizeThatFits:
-  if (((_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) ||
-      (_layoutSpecBlock != NULL)) == NO) {
+  if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0) {
     CGSize size = [self calculateSizeThatFits:constrainedSize.max];
     ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
     return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
