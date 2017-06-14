@@ -38,6 +38,10 @@
 - (ASSizeRange)_locked_constrainedSizeForLayoutPass;
 @end
 
+@interface ASLayout (YogaInternal)
+@property (nonatomic, getter=isFlattened) BOOL flattened;
+@end
+
 #endif /* YOGA_TREE_CONTIGUOUS */
 
 @implementation ASDisplayNode (Yoga)
@@ -71,9 +75,16 @@
 
   // Clean up state in case this child had another parent.
   [self removeYogaChild:child];
+
+  BOOL hadZeroChildren = (_yogaChildren.count == 0);
+
   [_yogaChildren addObject:child];
 
 #if YOGA_TREE_CONTIGUOUS
+  // Ensure any measure function is removed before inserting the YGNodeRef child.
+  if (hadZeroChildren) {
+    [self updateYogaMeasureFuncIfNeeded];
+  }
   // YGNodeRef insertion is done in setParent:
   child.yogaParent = self;
 #else
@@ -93,11 +104,17 @@
   if (child == nil) {
     return;
   }
+  
+  BOOL hadChildren = (_yogaChildren.count > 0);
   [_yogaChildren removeObjectIdenticalTo:child];
 
 #if YOGA_TREE_CONTIGUOUS
   // YGNodeRef removal is done in setParent:
   child.yogaParent = nil;
+  // Ensure any measure function is re-added after removing the YGNodeRef child.
+  if (hadChildren && _yogaChildren.count == 0) {
+    [self updateYogaMeasureFuncIfNeeded];
+  }
 #else
   if (_yogaChildren.count == 0) {
     self.layoutSpecBlock = nil;
@@ -168,7 +185,6 @@
   CGSize  size     = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
   CGPoint position = CGPointMake(YGNodeLayoutGetLeft(yogaNode), YGNodeLayoutGetTop(yogaNode));
 
-  // TODO: If it were possible to set .flattened = YES, it would be valid to do so here.
   return [ASLayout layoutWithLayoutElement:self size:size position:position sublayouts:nil];
 }
 
@@ -181,7 +197,9 @@
 
   NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:childCount];
   for (ASDisplayNode *subnode in self.yogaChildren) {
-    [sublayouts addObject:[subnode layoutForYogaNode]];
+    ASLayout *sublayout = [subnode layoutForYogaNode];
+    sublayout.flattened = YES;
+    [sublayouts addObject:sublayout];
   }
 
   // The layout for self should have position CGPointNull, but include the calculated size.
@@ -192,23 +210,12 @@
   self.yogaCalculatedLayout = layout;
 }
 
-- (void)setYogaMeasureFuncIfNeeded
+- (void)updateYogaMeasureFuncIfNeeded
 {
   // Size calculation via calculateSizeThatFits: or layoutSpecThatFits:
   // This will be used for ASTextNode, as well as any other node that has no Yoga children
-  if (self.yogaChildren.count == 0) {
-    // TODO(appleguy): Add override detection for calculateSizeThatFits: and calculateLayoutThatFits:,
-    // then we can set the MeasureFunc only for nodes that override one of the trio of measurement methods.
-    // if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0 && ...) {
-
-    YGNodeRef yogaNode = self.style.yogaNode;
-    ASDisplayNodeAssert(yogaNode, @"-[ASDisplayNode setYogaMeasureFuncIfNeeded] called with a NULL yogaNode! %@", self);
-    if (yogaNode) {
-      // TODO(appleguy): Use __bridge_transfer to retain nodes and clean up appropriately.
-      YGNodeSetContext(yogaNode, (__bridge void *)self);
-      YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
-    }
-  }
+  id <ASLayoutElement> layoutElementToMeasure = (self.yogaChildren.count == 0 ? self : nil);
+  ASLayoutElementYogaUpdateMeasureFunc(self.style.yogaNode, layoutElementToMeasure);
 }
 
 - (void)invalidateCalculatedYogaLayout
@@ -227,6 +234,7 @@
   self.yogaLayoutInProgress = YES;
 
   if (yogaParent) {
+    ASYogaLog(@"ESCALATING to Yoga root: %@", self);
     // TODO(appleguy): Consider how to get the constrainedSize for the yogaRoot when escalating manually.
     [yogaParent calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained];
     return;
@@ -237,6 +245,9 @@
   if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
     rootConstrainedSize = [self _locked_constrainedSizeForLayoutPass];
   }
+
+  ASYogaLog(@"CALCULATING at Yoga root with constraint = {%@, %@}: %@",
+            NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max) self);
 
   YGNodeRef rootYogaNode = self.style.yogaNode;
 
@@ -249,7 +260,7 @@
   YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
 
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
-    [node setYogaMeasureFuncIfNeeded];
+    [node updateYogaMeasureFuncIfNeeded];
   });
 
   // It is crucial to use yogaFloat... to convert CGFLOAT_MAX into YGUndefined here.

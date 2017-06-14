@@ -967,14 +967,20 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // If we're a leaf node, we are probably being called by a measure function and proceed as normal.
   // If we're a yoga root or tree node, initiate a new Yoga calculation pass from root.
   YGNodeRef yogaNode = _style.yogaNode;
-  if (yogaNode && (_yogaParent == nil || _yogaChildren.count > 0)) {
+  BOOL hasYogaParent = (_yogaParent != nil);
+  BOOL hasYogaChildren = (_yogaChildren.count > 0);
+  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
+  if (usesYoga && (_yogaParent == nil || _yogaChildren.count > 0)) {
     // This node has some connection to a Yoga tree.
     ASDN::MutexUnlocker ul(__instanceLock__);
+
     if (self.yogaLayoutInProgress == NO) {
       [self calculateLayoutFromYogaRoot:constrainedSize];
     }
+    ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
     return _yogaCalculatedLayout;
   }
+  ASYogaLog(@"PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
 #endif /* YOGA */
   
   // Manual size calculation via calculateSizeThatFits:
@@ -2891,9 +2897,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   // Trigger a layout pass to ensure all subnodes have the correct size to preload their content.
   // This is important for image nodes, as well as collection and table nodes.
-  if (CGRectEqualToRect(self.bounds, CGRectZero) == NO) {
-    [self layoutIfNeeded];
-  }
+  [self layoutIfNeeded];
   
   if (_methodOverrides & ASDisplayNodeMethodOverrideFetchData) {
 #pragma clang diagnostic push

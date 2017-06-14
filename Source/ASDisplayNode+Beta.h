@@ -22,6 +22,7 @@
 
 #if YOGA
   #import YOGA_HEADER_PATH
+  #import <AsyncDisplayKit/ASYogaUtilities.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

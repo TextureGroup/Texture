@@ -728,7 +728,10 @@ do {\
 - (void)destroyYogaNode
 {
   if (_yogaNode != NULL) {
+    // Release the __bridge_retained Context object.
+    ASLayoutElementYogaUpdateMeasureFunc(_yogaNode, nil);
     YGNodeFree(_yogaNode);
+    _yogaNode = NULL;
   }
 }
 

@@ -109,6 +109,27 @@ ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets)
   }
 }
 
+void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement)
+{
+  if (yogaNode == NULL) {
+    return;
+  }
+  BOOL hasMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) != NULL);
+  if (layoutElement != nil && hasMeasureFunc == NO) {
+    // TODO(appleguy): Add override detection for calculateSizeThatFits: and calculateLayoutThatFits:,
+    // then we can set the MeasureFunc only for nodes that override one of the trio of measurement methods.
+    // if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0 && ...) {
+    // Retain the Context object. This must be explicitly released with a __bridge_transfer; YGNodeFree() is not sufficient.
+    YGNodeSetContext(yogaNode, (__bridge_retained void *)layoutElement);
+    YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
+  } else if (layoutElement == nil && hasMeasureFunc == YES){
+    // Release the __bridge_retained Context object.
+    __unused id <ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
+    YGNodeSetContext(yogaNode, NULL);
+    YGNodeSetMeasureFunc(yogaNode, NULL);
+  }
+}
+
 YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasureMode widthMode,
                                       float height, YGMeasureMode heightMode)
 {
@@ -131,6 +152,14 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
     // Mode is (YGMeasureModeAtMost | YGMeasureModeUndefined)
     ASDimension minHeight = layoutElement.style.minHeight;
     sizeRange.min.height = (minHeight.unit == ASDimensionUnitPoints ? yogaDimensionToPoints(minHeight) : 0.0);
+  }
+
+  ASDisplayNodeCAssert(isnan(sizeRange.min.width) == NO && isnan(sizeRange.min.height) == NO, @"Yoga size range for measurement should not have NaN in minimum");
+  if (isnan(sizeRange.max.width)) {
+    sizeRange.max.width = CGFLOAT_MAX;
+  }
+  if (isnan(sizeRange.max.height)) {
+    sizeRange.max.height = CGFLOAT_MAX;
   }
 
   CGSize size = [[layoutElement layoutThatFits:sizeRange] size];
