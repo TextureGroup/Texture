@@ -29,7 +29,7 @@
 
 // There are many ways to format ASLayoutSpec code.  In this example, we offer two different formats:
 // A flatter, more ordinary Objective-C style; or a more structured, "visually" declarative style.
-#define YOGA_LAYOUT 1
+#define YOGA_LAYOUT 0
 #define FLAT_LAYOUT 0
 
 #define DEBUG_PHOTOCELL_LAYOUT  0

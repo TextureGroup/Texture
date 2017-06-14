@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <atomic>
 
@@ -715,14 +716,13 @@ do {\
 
 #if YOGA
 
-// Yoga recommends using Web Defaults for all new projects. This will be enabled for Texture very soon.
-/*
 + (void)initialize
 {
   [super initialize];
-  YGConfigSetUseWebDefaults(YGConfigGetDefault(), true);
+  YGConfigSetPointScaleFactor(YGConfigGetDefault(), ASScreenScale());
+  // Yoga recommends using Web Defaults for all new projects. This will be enabled for Texture very soon.
+  //YGConfigSetUseWebDefaults(YGConfigGetDefault(), true);
 }
-*/
 
 - (YGNodeRef)yogaNode
 {

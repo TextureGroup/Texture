@@ -170,12 +170,12 @@
 
 - (void)setYogaLayoutInProgress:(BOOL)yogaLayoutInProgress
 {
-  _yogaLayoutInProgress = yogaLayoutInProgress;
+  setFlag(YogaLayoutInProgress, yogaLayoutInProgress);
 }
 
 - (BOOL)yogaLayoutInProgress
 {
-  return _yogaLayoutInProgress;
+  return checkFlag(YogaLayoutInProgress);
 }
 
 - (ASLayout *)layoutForYogaNode
@@ -247,7 +247,7 @@
   }
 
   ASYogaLog(@"CALCULATING at Yoga root with constraint = {%@, %@}: %@",
-            NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max) self);
+            NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max), self);
 
   YGNodeRef rootYogaNode = self.style.yogaNode;
 
