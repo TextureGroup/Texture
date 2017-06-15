@@ -33,7 +33,7 @@ There are only three things to consider when picking a corner rounding strategy:
 
 Movement **underneath the corner** is any movement behind the corner.  For example, as a rounded-corner collection cell scrolls over a background, the background will move underneath and out from under the corners.  
 
-To describe movement **through the corner,** imagine a small rounded-corner scroll view containing a much larger photo.  As you zoom and pan the photo inside of the scroll view, the photo will move through the corners of the of the scroll view. 
+To describe movement **through the corner,** imagine a small rounded-corner scroll view containing a much larger photo.  As you zoom and pan the photo inside of the scroll view, the photo will move through the corners of the scroll view. 
 
 <img src="/static/images/corner-rounding-movement.png" width="60%" height="60%">
 
@@ -64,7 +64,7 @@ A key limitation of precomposited corners is that the corners must only touch on
 Note that Texture nodes have a special optimization of `.cornerRadius` that automatically implements precomposited corners **only when using** `.shouldRasterizeDescendants`.  It's important to think carefully before you enable rasterization, so don't use this option without first reading all about the <a href = "subtree-rasterization.html">concept</a>.
 
 <div class = "note">
-If you're looking for a simple, flat-color rounded rectangle or circle, Texture offers a variety of conveniences to provide this.  See `UIImage+ASConveniences.h` for methods to create flat-colored, rounded-corner resizable images using precomposited corners (both alpha and opaque are supported). These are great for use as placeholders for image nodes or backgrounds for ASButtonNode. <b>More precomposited corner methods will be released with Texture 2.0 release</b>.
+If you're looking for a simple, flat-color rounded rectangle or circle, Texture offers a variety of conveniences to provide this.  See `UIImage+ASConveniences.h` for methods to create flat-colored, rounded-corner resizable images using precomposited corners (both alpha and opaque are supported). These are great for use as placeholders for image nodes or backgrounds for ASButtonNode.
 </div>
 
 ### Clip Corner
@@ -79,10 +79,6 @@ Clip corners applies to two main types of corner rounding situations:
 <li>Rounded corners in situations in which the corners touch more than one node or intersect with any subnodes.</li>
 <li>Rounded corners on top of a stationary texture or photo background.  The photo clip corner method is tricky, but useful!</li>
 </ul>
-
-<div class = "note">
-<b>Check back soon! Clip corner methods may be released in Texture 2.0 release</b>.
-</div>
 
 ## Is it ever okay to use CALayer's .cornerRadius property?
 

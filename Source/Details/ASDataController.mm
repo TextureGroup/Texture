@@ -303,6 +303,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                              traitCollection:(ASPrimitiveTraitCollection)traitCollection
                             indexPathsAreNew:(BOOL)indexPathsAreNew
                        shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                                 previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
 
@@ -325,7 +326,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
 
   for (NSString *kind in [self supplementaryKindsInSections:newSections]) {
-    [self _insertElementsIntoMap:map kind:kind forSections:newSections traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+    [self _insertElementsIntoMap:map kind:kind forSections:newSections traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
   }
 }
 
@@ -342,6 +343,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                    forSections:(NSIndexSet *)sections
                traitCollection:(ASPrimitiveTraitCollection)traitCollection
          shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                     changeSet:(_ASHierarchyChangeSet *)changeSet
+                   previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
   
@@ -350,7 +353,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
   
   NSArray<NSIndexPath *> *indexPaths = [self _allIndexPathsForItemsOfKind:kind inSections:sections];
-  [self _insertElementsIntoMap:map kind:kind atIndexPaths:indexPaths traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+  [self _insertElementsIntoMap:map kind:kind atIndexPaths:indexPaths traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
 }
 
 /**
@@ -367,6 +370,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                   atIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
                traitCollection:(ASPrimitiveTraitCollection)traitCollection
          shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                     changeSet:(_ASHierarchyChangeSet *)changeSet
+                   previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
   
@@ -384,16 +389,33 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   id<ASDataControllerSource> dataSource = self.dataSource;
   id<ASRangeManagingNode> node = self.node;
   for (NSIndexPath *indexPath in indexPaths) {
-    id viewModel = [dataSource dataController:self viewModelForItemAtIndexPath:indexPath];
-
     ASCellNodeBlock nodeBlock;
+    id viewModel;
     if (isRowKind) {
-      nodeBlock = [dataSource dataController:self nodeBlockAtIndexPath:indexPath];
+      viewModel = [dataSource dataController:self viewModelForItemAtIndexPath:indexPath];
+      
+      // Get the prior element and attempt to update the existing cell node.
+      if (viewModel != nil && !changeSet.includesReloadData) {
+        NSIndexPath *oldIndexPath = [changeSet oldIndexPathForNewIndexPath:indexPath];
+        if (oldIndexPath != nil) {
+          ASCollectionElement *oldElement = [previousMap elementForItemAtIndexPath:oldIndexPath];
+          ASCellNode *oldNode = oldElement.node;
+          if ([oldNode canUpdateToViewModel:viewModel]) {
+            // Just wrap the node in a block. The collection element will -setViewModel:
+            nodeBlock = ^{
+              return oldNode;
+            };
+          }
+        }
+      }
+      if (nodeBlock == nil) {
+        nodeBlock = [dataSource dataController:self nodeBlockAtIndexPath:indexPath];
+      }
     } else {
       nodeBlock = [dataSource dataController:self supplementaryNodeBlockOfKind:kind atIndexPath:indexPath];
     }
     
-    ASSizeRange constrainedSize;
+    ASSizeRange constrainedSize = ASSizeRangeUnconstrained;
     if (shouldFetchSizeRanges) {
       constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
     }
@@ -534,14 +556,15 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
 
   // Mutable copy of current data.
-  ASMutableElementMap *mutableMap = [_pendingMap mutableCopy];
+  ASElementMap *previousMap = _pendingMap;
+  ASMutableElementMap *mutableMap = [previousMap mutableCopy];
   
   BOOL canDelegateLayout = (_layoutDelegate != nil);
 
   // Step 1: Update the mutable copies to match the data source's state
   [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
   ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
-  [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout)];
+  [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout) previousMap:previousMap];
   
   // Step 2: Clone the new data
   ASElementMap *newMap = [mutableMap copy];
@@ -644,6 +667,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                    changeSet:(_ASHierarchyChangeSet *)changeSet
              traitCollection:(ASPrimitiveTraitCollection)traitCollection
        shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                 previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
 
@@ -653,7 +677,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     NSUInteger sectionCount = [self itemCountsFromDataSource].size();
     if (sectionCount > 0) {
       NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
-      [self _insertElementsIntoMap:map sections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+      [self _insertElementsIntoMap:map sections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
     }
     // Return immediately because reloadData can't be used in conjuntion with other updates.
     return;
@@ -666,7 +690,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                                      changeSet:changeSet
                                traitCollection:traitCollection
                               indexPathsAreNew:NO
-                         shouldFetchSizeRanges:shouldFetchSizeRanges];
+                         shouldFetchSizeRanges:shouldFetchSizeRanges
+                                   previousMap:previousMap];
   }
 
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeDelete]) {
@@ -676,17 +701,18 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
   
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeInsert]) {
-    [self _insertElementsIntoMap:map sections:change.indexSet traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+    [self _insertElementsIntoMap:map sections:change.indexSet traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
   }
   
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeInsert]) {
-    [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind atIndexPaths:change.indexPaths traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+    [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind atIndexPaths:change.indexPaths traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
     // Aggressively reload supplementary nodes (#1773 & #1629)
     [self _repopulateSupplementaryNodesIntoMap:map forSectionsContainingIndexPaths:change.indexPaths
                                      changeSet:changeSet
                                traitCollection:traitCollection
                               indexPathsAreNew:YES
-                         shouldFetchSizeRanges:shouldFetchSizeRanges];
+                         shouldFetchSizeRanges:shouldFetchSizeRanges
+                                   previousMap:previousMap];
   }
 }
 
@@ -694,6 +720,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                       sections:(NSIndexSet *)sectionIndexes
                traitCollection:(ASPrimitiveTraitCollection)traitCollection
          shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                     changeSet:(_ASHierarchyChangeSet *)changeSet
+                   previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
   
@@ -703,12 +731,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
   // Items
   [map insertEmptySectionsOfItemsAtIndexes:sectionIndexes];
-  [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind forSections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+  [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind forSections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
 
   // Supplementaries
   for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
     // Step 2: Populate new elements for all sections
-    [self _insertElementsIntoMap:map kind:kind forSections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges];
+    [self _insertElementsIntoMap:map kind:kind forSections:sectionIndexes traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
   }
 }
 
