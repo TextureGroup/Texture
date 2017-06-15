@@ -723,7 +723,11 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+#if ASDISPLAYNODE_NEW_LAYOUT_SYSTEM
+@interface ASDisplayNode (ASLayoutElementBeta) <ASLayoutElement>
+#else
 @interface ASDisplayNode (ASLayoutElement) <ASLayoutElement>
+#endif
 
 /**
  * @abstract Asks the node to return a layout based on given size range.
@@ -751,7 +755,11 @@ extern NSInteger const ASDefaultDrawingPriority;
 @interface ASDisplayNode (ASLayoutElementAsciiArtProtocol) <ASLayoutElementAsciiArtProtocol>
 @end
 
+#if ASDISPLAYNODE_NEW_LAYOUT_SYSTEM
+@interface ASDisplayNode (ASLayoutBeta)
+#else
 @interface ASDisplayNode (ASLayout)
+#endif
 
 /** @name Managing dimensions */
 
@@ -775,7 +783,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
- * calling -measure: on them in -calculateLayoutThatFits.
+ * calling -layoutThatFits: on them in -calculateLayoutThatFits.
  *
  * @return Size already calculated by -calculateLayoutThatFits:.
  *

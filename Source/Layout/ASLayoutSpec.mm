@@ -41,7 +41,10 @@
 {
   [super initialize];
   if (self != [ASLayoutSpec class]) {
+#if !ASDISPLAYNODE_NEW_LAYOUT_SYSTEM
     ASDisplayNodeAssert(!ASSubclassOverridesSelector([ASLayoutSpec class], self, @selector(measureWithSizeRange:)), @"Subclass %@ must not override measureWithSizeRange: method. Instead override calculateLayoutThatFits:", NSStringFromClass(self));
+#endif
+    ASDisplayNodeAssert(!ASSubclassOverridesSelector([ASLayoutSpec class], self, @selector(layoutThatFits:)), @"Subclass %@ must not override layoutThatFits: method. Instead override calculateLayoutThatFits:", NSStringFromClass(self));
   }
 }
 

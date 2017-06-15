@@ -22,6 +22,8 @@
 #import <AsyncDisplayKit/ASAbsoluteLayoutElement.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
 @class ASLayout;
 @class ASLayoutSpec;
 @protocol ASLayoutElementStylability;
@@ -149,6 +151,8 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 #define ASLayoutable ASLayoutElement
 
+#if !ASDISPLAYNODE_NEW_LAYOUT_SYSTEM
+
 /**
  * @abstract Calculate a layout based on given size range.
  *
@@ -160,6 +164,8 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * ASLayoutSpec subclasses
  */
 - (nonnull ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize ASDISPLAYNODE_DEPRECATED_MSG("Use layoutThatFits: instead.");
+
+#endif
 
 @end
 

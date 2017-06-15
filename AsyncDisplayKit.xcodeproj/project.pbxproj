@@ -438,6 +438,8 @@
 		E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5B078001E69F4EB00C24B5B /* ASElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = E5B077FE1E69F4EB00C24B5B /* ASElementMap.m */; };
 		E5B5B9D11E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E5B5B9D01E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h */; };
+		E5C2D7B21EF31392007B865E /* ASDisplayNode+LayoutBeta.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5C2D7B11EF31392007B865E /* ASDisplayNode+LayoutBeta.mm */; };
+		E5C2D7B41EF31A85007B865E /* ASDisplayNode+LayoutCommon.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5C2D7B31EF31A85007B865E /* ASDisplayNode+LayoutCommon.mm */; };
 		E5C347B11ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C347B01ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h */; };
 		E5C347B31ECB40AA00EC4BE4 /* ASTableNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */; };
 		E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */ = {isa = PBXBuildFile; fileRef = E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -909,6 +911,8 @@
 		E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASElementMap.h; sourceTree = "<group>"; };
 		E5B077FE1E69F4EB00C24B5B /* ASElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASElementMap.m; sourceTree = "<group>"; };
 		E5B5B9D01E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionLayoutContext+Private.h"; sourceTree = "<group>"; };
+		E5C2D7B11EF31392007B865E /* ASDisplayNode+LayoutBeta.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+LayoutBeta.mm"; sourceTree = "<group>"; };
+		E5C2D7B31EF31A85007B865E /* ASDisplayNode+LayoutCommon.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+LayoutCommon.mm"; sourceTree = "<group>"; };
 		E5C347B01ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASBatchFetchingDelegate.h; sourceTree = "<group>"; };
 		E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASTableNode+Beta.h"; sourceTree = "<group>"; };
 		E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutState.h; sourceTree = "<group>"; };
@@ -1048,6 +1052,8 @@
 				CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */,
 				CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */,
 				69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */,
+				E5C2D7B11EF31392007B865E /* ASDisplayNode+LayoutBeta.mm */,
+				E5C2D7B31EF31A85007B865E /* ASDisplayNode+LayoutCommon.mm */,
 				058D09DB195D050800B7D73C /* ASDisplayNodeExtras.h */,
 				058D09DC195D050800B7D73C /* ASDisplayNodeExtras.mm */,
 				0587F9BB1A7309ED00AFF0BA /* ASEditableTextNode.h */,
@@ -2118,6 +2124,7 @@
 				CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.m in Sources */,
 				CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */,
 				8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.m in Sources */,
+				E5C2D7B41EF31A85007B865E /* ASDisplayNode+LayoutCommon.mm in Sources */,
 				B30BF6541C59D889004FCD53 /* ASLayoutManager.m in Sources */,
 				690C35671E0567C600069B91 /* ASDimensionDeprecated.mm in Sources */,
 				92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */,
@@ -2221,6 +2228,7 @@
 				B35062271B010EFD0018CF92 /* ASRangeController.mm in Sources */,
 				0442850A1BAA63FE00D16268 /* ASBatchFetching.m in Sources */,
 				68FC85E61CE29B9400EDD713 /* ASNavigationController.m in Sources */,
+				E5C2D7B21EF31392007B865E /* ASDisplayNode+LayoutBeta.mm in Sources */,
 				CC4C2A791D88E3BF0039ACAB /* ASTraceEvent.m in Sources */,
 				34EFC76F1B701CF700AD841F /* ASRatioLayoutSpec.mm in Sources */,
 				254C6B8B1BF94F8A003EC431 /* ASTextKitShadower.mm in Sources */,
