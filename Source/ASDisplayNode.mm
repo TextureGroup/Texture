@@ -990,6 +990,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
     return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
   }
+
+  [self _layoutClipCornersIfNeeded];
   
   // Size calcualtion with layout elements
   BOOL measureLayoutSpec = _measurementOptions & ASDisplayNodePerformanceMeasurementOptionLayoutSpec;
@@ -1446,6 +1448,159 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   ASDisplayNodePerformBlockOnEveryNode(nil, self, YES, ^(ASDisplayNode *node) {
     [node setNeedsDisplayAtScale:contentsScale];
   });
+}
+
+- (void)_layoutClipCornersIfNeeded
+{
+  ASDisplayNodeAssertMainThread();
+  if (_clipCornerLayers[0] == nil) {
+    return;
+  }
+  
+  CGSize boundsSize = self.bounds.size;
+  for (int idx = 0; idx < 4; idx++) {
+    BOOL isTop   = (idx == 0 || idx == 1);
+    BOOL isRight = (idx == 1 || idx == 2);
+    if (_clipCornerLayers[idx]) {
+      // Note the Core Animation coordinates are reversed for y; 0 is at the bottom.
+      _clipCornerLayers[idx].position = CGPointMake(isRight ? boundsSize.width : 0.0, isTop ? boundsSize.height : 0.0);
+      [_layer addSublayer:_clipCornerLayers[idx]];
+    }
+  }
+}
+
+- (void)_updateClipCornerLayerContentsWithRadius:(CGFloat)radius backgroundColor:(UIColor *)backgroundColor
+{
+  ASPerformBlockOnMainThread(^{
+    for (int idx = 0; idx < 4; idx++) {
+      // Layers are, in order: Top Left, Top Right, Bottom Right, Bottom Left.
+      // anchorPoint is Bottom Left at 0,0 and Top Right at 1,1.
+      BOOL isTop   = (idx == 0 || idx == 1);
+      BOOL isRight = (idx == 1 || idx == 2);
+      
+      CGSize size = CGSizeMake(radius + 1, radius + 1);
+      UIGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
+      
+      CGContextRef ctx = UIGraphicsGetCurrentContext();
+      if (isRight == YES) {
+        CGContextTranslateCTM(ctx, -radius + 1, 0);
+      }
+      if (isTop == NO) {
+        CGContextTranslateCTM(ctx, 0, -radius + 1);
+      }
+      UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
+      [roundedRect setUsesEvenOddFillRule:YES];
+      [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
+      [backgroundColor setFill];
+      [roundedRect fill];
+      
+      // No lock needed, as _clipCornerLayers is only modified on the main thread.
+      CALayer *clipCornerLayer = _clipCornerLayers[idx];
+      clipCornerLayer.contents = (id)(UIGraphicsGetImageFromCurrentImageContext().CGImage);
+      clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
+      clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 1.0 : 0.0);
+
+      UIGraphicsEndImageContext();
+    }
+    [self _layoutClipCornersIfNeeded];
+  });
+}
+
+- (void)_setClipCornerLayersVisible:(BOOL)visible
+{
+  ASPerformBlockOnMainThread(^{
+    ASDisplayNodeAssertMainThread();
+    if (visible) {
+      for (int idx = 0; idx < 4; idx++) {
+        if (_clipCornerLayers[idx] == nil) {
+          _clipCornerLayers[idx] = [[CALayer alloc] init];
+          _clipCornerLayers[idx].zPosition = 99999;
+          _clipCornerLayers[idx].delegate = self;
+        }
+      }
+      [self _updateClipCornerLayerContentsWithRadius:_cornerRadius backgroundColor:self.backgroundColor];
+    } else {
+      for (int idx = 0; idx < 4; idx++) {
+        [_clipCornerLayers[idx] removeFromSuperlayer];
+        _clipCornerLayers[idx] = nil;
+      }
+    }
+  });
+}
+
+- (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType cornerRadius:(CGFloat)newCornerRadius
+{
+  __instanceLock__.lock();
+    CGFloat oldCornerRadius = _cornerRadius;
+    ASCornerRoundingType oldRoundingType = _cornerRoundingType;
+    
+    _cornerRadius = newCornerRadius;
+    _cornerRoundingType = newRoundingType;
+  __instanceLock__.unlock();
+ 
+  ASPerformBlockOnMainThread(^{
+    ASDisplayNodeAssertMainThread();
+    
+    if (oldRoundingType != newRoundingType || oldCornerRadius != newCornerRadius) {
+      if (oldRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+        if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          self.layerCornerRadius = 0.0;
+          if (oldCornerRadius > 0.0) {
+            [self displayImmediately];
+          } else {
+            [self setNeedsDisplay]; // Async display is OK if we aren't replacing an existing .cornerRadius.
+          }
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          self.layerCornerRadius = 0.0;
+          [self _setClipCornerLayersVisible:YES];
+        }
+      }
+      else if (oldRoundingType == ASCornerRoundingTypePrecomposited) {
+        if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
+        }
+        else if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          // Corners are already precomposited, but the radius has changed.
+          // Default to async re-display.  The user may force a synchronous display if desired.
+          [self setNeedsDisplay];
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          [self _setClipCornerLayersVisible:YES];
+        }
+      }
+      else if (oldRoundingType == ASCornerRoundingTypeClipping) {
+        if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
+          [self _setClipCornerLayersVisible:NO];
+        }
+        else if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          [self _setClipCornerLayersVisible:NO];
+          [self displayImmediately];
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          // Clip corners already exist, but the radius has changed.
+          [self _updateClipCornerLayerContentsWithRadius:newCornerRadius backgroundColor:self.backgroundColor];
+        }
+      }
+      
+    }
+  });
+}
+
+- (CGFloat)cornerRadius
+{
+  return _cornerRadius;
+}
+
+- (void)setCornerRadius:(CGFloat)newCornerRadius
+{
+  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
+}
+
+- (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
+{
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRoundingType];
 }
 
 - (void)recursivelySetDisplaySuspended:(BOOL)flag

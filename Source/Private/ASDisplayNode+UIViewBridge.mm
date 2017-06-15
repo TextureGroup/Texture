@@ -183,13 +183,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToViewOrLayer(opacity, newAlpha, alpha, newAlpha);
 }
 
-- (CGFloat)cornerRadius
+- (CGFloat)layerCornerRadius
 {
   _bridge_prologue_read;
   return _getFromLayer(cornerRadius);
 }
 
-- (void)setCornerRadius:(CGFloat)newCornerRadius
+- (void)setLayerCornerRadius:(CGFloat)newCornerRadius
 {
   _bridge_prologue_write;
   _setToLayer(cornerRadius, newCornerRadius);

@@ -181,6 +181,7 @@
   
   BOOL opaque = self.opaque;
   CGRect bounds = self.bounds;
+  UIColor *backgroundColor = self.backgroundColor;
   CGFloat contentsScaleForDisplay = _contentsScaleForDisplay;
     
   __instanceLock__.unlock();
@@ -205,7 +206,7 @@
     
     // If [UIColor clearColor] or another semitransparent background color is used, include alpha channel when rasterizing.
     // Unlike CALayer drawing, we include the backgroundColor as a base during rasterization.
-    opaque = opaque && CGColorGetAlpha(self.backgroundColor.CGColor) == 1.0f;
+    opaque = opaque && CGColorGetAlpha(backgroundColor.CGColor) == 1.0f;
 
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
@@ -273,6 +274,114 @@
   }
 
   return displayBlock;
+}
+//
+//- (void)setRenderingContextBlocks
+//{
+//  CGFloat contentsScale = self.contentsScale;
+//  
+//  weakify(self);
+//  self.willDisplayNodeContentWithRenderingContext = ^(CGContextRef context) {
+//    strongify(self);
+//    CGRect bounds = CGContextGetClipBoundingBox(context);
+//    
+//    if (self.copiedPlaceholderColor) {
+//      UIBezierPath *placeholderRect = [UIBezierPath bezierPathWithRect:bounds];
+//      [self.copiedPlaceholderColor setFill];
+//      [placeholderRect fill];
+//    }
+//  };
+//  
+//  // After the image has been drawn into the drawing context
+//  self.didDisplayNodeContentWithRenderingContext = ^(CGContextRef context) {
+//    strongify(self);
+//    [PIImageNode darkenContextIfNecessary:context];
+//    
+//    if (self.snapshotDecodedContext) {
+//      self.decodedContextImage = UIGraphicsGetImageFromCurrentImageContext();
+//    }
+//    if (self.washColor) {
+//      CGRect bounds = CGContextGetClipBoundingBox(context);
+//      [self.washColor setFill];
+//      CGContextFillRect(context, CGRectMake(0, 0, bounds.size.width, bounds.size.height));
+//    }
+//    [self drawRoundedCornerOverlayWithContext:context contentsScale:contentsScale];
+//  };
+//}
+
+//- (void)drawRoundedCornerOverlayWithContext:(CGContextRef)context contentsScale:(CGFloat)contentsScale
+//{
+//}
+
+- (void)__willDisplayNodeContentWithRenderingContext:(CGContextRef)context
+{
+  
+  if (context) {
+//    __instanceLock__.lock();
+//      ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
+//      CGFloat cornerRadius = _cornerRadius;
+//    __instanceLock__.unlock();
+//    
+//    if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0) {
+//      ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
+//      // TODO: This clip path should be removed if we are rasterizing.
+//      CGRect boundingBox = CGContextGetClipBoundingBox(context);
+//      [[UIBezierPath bezierPathWithRoundedRect:boundingBox cornerRadius:cornerRadius] addClip];
+//    }
+    
+    if (_willDisplayNodeContentWithRenderingContext) {
+      _willDisplayNodeContentWithRenderingContext(context);
+    }
+  }
+
+}
+- (void)__didDisplayNodeContentWithRenderingContext:(CGContextRef)context backgroundColor:(UIColor *)backgroundColor
+{
+  if (context == NULL) {
+    return;
+  }
+  
+  if (_didDisplayNodeContentWithRenderingContext) {
+    _didDisplayNodeContentWithRenderingContext(context);
+  }
+  
+  __instanceLock__.lock();
+  ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
+  CGFloat cornerRadius = _cornerRadius;
+  CGFloat contentsScale = _contentsScaleForDisplay;
+  __instanceLock__.unlock();
+  
+  if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0) {
+    ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
+
+    CGRect bounds = CGContextGetClipBoundingBox(context);
+    
+    //we need to outset the bounds by some amount. 1 might not be enough so lets just use 5.
+    UIBezierPath *roundedHole = [UIBezierPath bezierPathWithRect:CGRectInset(bounds, -5, -5)];
+    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius * contentsScale]];
+    roundedHole.usesEvenOddFillRule = YES;
+    
+    UIBezierPath *roundedPath = nil;
+//    if (self.borderWidth != 0) {  // optimization: Don't create roundedPath and stroke if borderWidth is 0
+//      CGFloat strokeThickness = self.borderWidth * contentsScale;
+//      CGFloat strokeInset = (strokeThickness+1)/2-1;
+//      roundedPath = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(bounds, strokeInset, strokeInset)
+//                                               cornerRadius:self.cornerRadius * contentsScale];
+//      roundedPath.lineWidth = strokeThickness;
+//      [[UIColor colorWithCGColor: self.borderColor] setStroke];
+//    }
+    
+    if (backgroundColor && ![backgroundColor isEqual:[UIColor clearColor]]) {
+      [backgroundColor setFill];
+      [roundedHole fill];
+      [roundedPath stroke];  //Won't do anything if borderWidth is 0 and roundedPath is nil.
+    } else {
+      [roundedHole fillWithBlendMode:kCGBlendModeClear alpha:1.0];
+      [roundedPath strokeWithBlendMode:kCGBlendModeNormal alpha:1.0]; //Won't do anything if borderWidth is 0
+      //and roundedPath is nil.
+    }
+  }
+  
 }
 
 - (void)displayAsyncLayer:(_ASDisplayLayer *)asyncLayer asynchronously:(BOOL)asynchronously

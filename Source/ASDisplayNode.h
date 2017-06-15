@@ -100,6 +100,12 @@ typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
   ASInterfaceStateInHierarchy   = ASInterfaceStateMeasureLayout | ASInterfaceStatePreload | ASInterfaceStateDisplay | ASInterfaceStateVisible,
 };
 
+typedef NS_ENUM(NSInteger, ASCornerRoundingType) {
+  ASCornerRoundingTypeDefaultSlowCALayer,
+  ASCornerRoundingTypePrecomposited,
+  ASCornerRoundingTypeClipping
+};
+
 /**
  * Default drawing priority for display node
  */
@@ -375,6 +381,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 /** @name Drawing and Updating the View */
 
+@property (nonatomic, readwrite, assign) ASCornerRoundingType cornerRoundingType;
 
 /** 
  * @abstract Whether this node's view performs asynchronous rendering.
