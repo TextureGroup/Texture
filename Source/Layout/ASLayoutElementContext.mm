@@ -25,6 +25,7 @@
 {
   if (self = [super init]) {
     _transitionID = ASLayoutElementContextDefaultTransitionID;
+    _pendingLayoutMap = std::make_shared<std::unordered_map<void *, std::shared_ptr<ASDisplayNodeLayout>>>();
   }
   return self;
 }
@@ -77,3 +78,23 @@ void ASLayoutElementPopContext()
   CFBridgingRelease(pthread_getspecific(ASLayoutElementContextKey));
   pthread_setspecific(ASLayoutElementContextKey, NULL);
 }
+
+std::shared_ptr<ASDisplayNodeLayout> ASLayoutElementContextGetPendingLayout(ASDisplayNode *node)
+{
+  if (node == nil) {
+    return nullptr;
+  }
+  void *ptr = (__bridge void *)node;
+  return (*(ASLayoutElementGetCurrentContext().pendingLayoutMap))[ptr];
+}
+
+void ASLayoutElementContextSetPendingLayout(ASDisplayNode *node, std::shared_ptr<ASDisplayNodeLayout> layout)
+{
+  if (node != nil) {
+    void *ptr = (__bridge void *)node;
+    (*(ASLayoutElementGetCurrentContext().pendingLayoutMap))[ptr] = layout;
+  }
+}
+
+
+

@@ -15,6 +15,8 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <unordered_map>
+
 #import <AsyncDisplayKit/ASLayoutTransition.h>
 
 #pragma mark - ASLayoutElementContext
@@ -25,7 +27,7 @@ AS_SUBCLASSING_RESTRICTED
 
 @interface ASLayoutElementContext : NSObject
 @property (nonatomic) int32_t transitionID;
-@property (nonatomic, assign) std::shared_ptr<ASDisplayNodeLayout> pendingDisplayNodeLayout;
+@property (nonatomic, assign) std::shared_ptr<std::unordered_map<void *, std::shared_ptr<ASDisplayNodeLayout>>> pendingLayoutMap;
 @end
 
 extern int32_t const ASLayoutElementContextInvalidTransitionID;
@@ -36,7 +38,9 @@ extern int32_t const ASLayoutElementContextDefaultTransitionID;
 extern void ASLayoutElementPushContext(ASLayoutElementContext * context);
 
 extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext();
-
 extern void ASLayoutElementPopContext();
+
+extern std::shared_ptr<ASDisplayNodeLayout> ASLayoutElementContextGetPendingLayout(ASDisplayNode *node);
+extern void ASLayoutElementContextSetPendingLayout(ASDisplayNode *node, std::shared_ptr<ASDisplayNodeLayout> layout);
 
 NS_ASSUME_NONNULL_END
