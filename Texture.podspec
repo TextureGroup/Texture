@@ -55,6 +55,18 @@ Pod::Spec.new do |spec|
       igl.dependency 'Texture/Core'
   end
 
+  spec.subspec 'Debugger' do |db|
+      db.dependency 'PonyDebugger'
+      db.dependency 'Texture/Core'
+      db.public_header_files = [
+        'Source/Debugger/*.h',
+      ]
+    
+      db.source_files = [
+        'Source/Debugger/**/*.{h,m,mm}',
+      ]
+  end
+
   spec.subspec 'Yoga' do |yoga|
       yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
       yoga.dependency 'Yoga', '1.5.0'
