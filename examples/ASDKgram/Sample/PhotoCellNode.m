@@ -307,10 +307,19 @@
 {
 #if YOGA_LAYOUT
   [self.style yogaNodeCreateIfNeeded];
+  [_userAvatarImageNode.style yogaNodeCreateIfNeeded];
+  [_userNameLabel.style yogaNodeCreateIfNeeded];
+  [_photoImageNode.style yogaNodeCreateIfNeeded];
+  [_photoCommentsNode.style yogaNodeCreateIfNeeded];
+  [_photoLikesLabel.style yogaNodeCreateIfNeeded];
+  [_photoDescriptionLabel.style yogaNodeCreateIfNeeded];
+  [_photoLocationLabel.style yogaNodeCreateIfNeeded];
+  [_photoTimeIntervalSincePostLabel.style yogaNodeCreateIfNeeded];
 
   ASDisplayNode *headerStack = [ASDisplayNode horizontalYogaStack];
   headerStack.style.margin = ASEdgeInsetsMake(InsetForHeader);
   headerStack.style.alignItems = ASStackLayoutAlignItemsCenter;
+  headerStack.style.flexGrow = 1.0;
 
   // Avatar Image, with inset - first thing in the header stack.
   _userAvatarImageNode.style.preferredSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
@@ -331,10 +340,13 @@
     [userPhotoLocationStack addYogaChild:_photoLocationLabel];
   }
 
+/* TODO: These parameters aren't working as expected. For now the timestamp is next to the username.
   // Add a spacer to allow a flexible space between the User Name / Location stack, and the Timestamp.
   ASDisplayNode *spacer = [ASDisplayNode new];
-  spacer.style.flexGrow = 1.0;
+  spacer.style.flexShrink = 1.0;
+  spacer.style.width = ASDimensionMakeWithFraction(1.0);
   [headerStack addYogaChild:spacer];
+*/
 
   // Photo Timestamp Label.
   _photoTimeIntervalSincePostLabel.style.spacingBefore = HORIZONTAL_BUFFER;
@@ -343,11 +355,10 @@
   // Create the last stack before assembling everything: the Footer Stack contains the description and comments.
   ASDisplayNode *footerStack = [ASDisplayNode verticalYogaStack];
   footerStack.style.margin = ASEdgeInsetsMake(InsetForFooter);
-//  footerStack.style.spacing = VERTICAL_BUFFER;
+  footerStack.style.padding = ASEdgeInsetsMake(UIEdgeInsetsMake(0.0, 0.0, VERTICAL_BUFFER, 0.0));
   footerStack.yogaChildren = @[_photoLikesLabel, _photoDescriptionLabel, _photoCommentsNode];
 
   // Main Vertical Stack: contains header, large main photo with fixed aspect ratio, and footer.
-  [_photoImageNode.style yogaNodeCreateIfNeeded];
   _photoImageNode.style.aspectRatio = 1.0;
 
   ASDisplayNode *verticalStack = self;

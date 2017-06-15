@@ -17,8 +17,6 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-
 @interface UIColor (Additions)
 
 + (UIColor *)darkBlueColor;
@@ -48,12 +46,5 @@
                                           fontSize:(CGFloat)size
                                              color:(UIColor *)color
                                     firstWordColor:(UIColor *)firstWordColor;
-
-@end
-
-@interface ASDisplayNode (YogaHelpers)
-
-+ (ASDisplayNode *)verticalYogaStack;
-+ (ASDisplayNode *)horizontalYogaStack;
 
 @end

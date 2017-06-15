@@ -19,6 +19,14 @@
 
 #define ASYogaLog(...) //NSLog(__VA_ARGS__)
 
+@interface ASDisplayNode (YogaHelpers)
+
++ (ASDisplayNode *)yogaNode;
++ (ASDisplayNode *)verticalYogaStack;
++ (ASDisplayNode *)horizontalYogaStack;
+
+@end
+
 extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
 ASDISPLAYNODE_EXTERN_C_BEGIN

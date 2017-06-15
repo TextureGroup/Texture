@@ -302,25 +302,3 @@ static NSDate *parseRfc3339ToNSDate(NSString *rfc3339DateTimeString)
 }
 
 @end
-
-@implementation ASDisplayNode (YogaHelpers)
-
-+ (ASDisplayNode *)verticalYogaStack
-{
-  ASDisplayNode *stack = [[ASDisplayNode alloc] init];
-  stack.automaticallyManagesSubnodes = YES;
-  [stack.style yogaNodeCreateIfNeeded];
-  stack.style.flexDirection = ASStackLayoutDirectionVertical;
-  return stack;
-}
-
-+ (ASDisplayNode *)horizontalYogaStack
-{
-  ASDisplayNode *stack = [[ASDisplayNode alloc] init];
-  stack.automaticallyManagesSubnodes = YES;
-  [stack.style yogaNodeCreateIfNeeded];
-  stack.style.flexDirection = ASStackLayoutDirectionHorizontal;
-  return stack;
-}
-
-@end

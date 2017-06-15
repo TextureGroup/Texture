@@ -206,7 +206,6 @@
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
   ASLayout *layout = [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 
-  // TODO(appleguy): Set up _pendingDisplayNodeLayout, with a placeholder constrainedSize.
   self.yogaCalculatedLayout = layout;
 }
 
@@ -231,7 +230,6 @@
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
   ASDisplayNode *yogaParent = self.yogaParent;
-  self.yogaLayoutInProgress = YES;
 
   if (yogaParent) {
     ASYogaLog(@"ESCALATING to Yoga root: %@", self);
@@ -241,6 +239,12 @@
   }
 
   ASDN::MutexLocker l(__instanceLock__);
+
+  // Prepare all children for the layout pass with the current Yoga tree configuration.
+  ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
+    node.yogaLayoutInProgress = YES;
+    [node updateYogaMeasureFuncIfNeeded];
+  });
 
   if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
     rootConstrainedSize = [self _locked_constrainedSizeForLayoutPass];
@@ -258,10 +262,6 @@
   // TODO(appleguy): Reconcile the self.style.*Size properties with rootConstrainedSize
   YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.width));
   YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
-
-  ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
-    [node updateYogaMeasureFuncIfNeeded];
-  });
 
   // It is crucial to use yogaFloat... to convert CGFLOAT_MAX into YGUndefined here.
   YGNodeCalculateLayout(rootYogaNode,

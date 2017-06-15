@@ -14,6 +14,32 @@
 
 #if YOGA /* YOGA */
 
+@implementation ASDisplayNode (YogaHelpers)
+
++ (ASDisplayNode *)yogaNode
+{
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+  [node.style yogaNodeCreateIfNeeded];
+  return node;
+}
+
++ (ASDisplayNode *)verticalYogaStack
+{
+  ASDisplayNode *stack = [self yogaNode];
+  stack.style.flexDirection = ASStackLayoutDirectionVertical;
+  return stack;
+}
+
++ (ASDisplayNode *)horizontalYogaStack
+{
+  ASDisplayNode *stack = [self yogaNode];
+  stack.style.flexDirection = ASStackLayoutDirectionHorizontal;
+  return stack;
+}
+
+@end
+
 extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node))
 {
   if (node == nil) {
