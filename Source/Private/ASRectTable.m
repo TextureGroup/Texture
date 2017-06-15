@@ -25,7 +25,7 @@ static NSUInteger ASRectSize(const void *ptr)
 
 @implementation NSMapTable (ASRectTableMethods)
 
-+ (instancetype)rectTableWithKeyPointerFunctions:(NSPointerFunctions *)keyFuncs
++ (NSMapTable *)rectTableWithKeyPointerFunctions:(NSPointerFunctions *)keyFuncs
 {
   static NSPointerFunctions *cgRectFuncs;
   static dispatch_once_t onceToken;
@@ -37,7 +37,7 @@ static NSUInteger ASRectSize(const void *ptr)
   return [[NSMapTable alloc] initWithKeyPointerFunctions:keyFuncs valuePointerFunctions:cgRectFuncs capacity:0];
 }
 
-+ (instancetype)rectTableForStrongObjectPointers
++ (NSMapTable *)rectTableForStrongObjectPointers
 {
   static NSPointerFunctions *strongObjectPointerFuncs;
   static dispatch_once_t onceToken;
@@ -47,7 +47,7 @@ static NSUInteger ASRectSize(const void *ptr)
   return [self rectTableWithKeyPointerFunctions:strongObjectPointerFuncs];
 }
 
-+ (instancetype)rectTableForWeakObjectPointers
++ (NSMapTable *)rectTableForWeakObjectPointers
 {
   static NSPointerFunctions *weakObjectPointerFuncs;
   static dispatch_once_t onceToken;

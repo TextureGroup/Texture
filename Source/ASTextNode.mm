@@ -250,7 +250,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSMutableArray *result = [super propertiesForDescription];
   NSString *plainString = [self _plainStringForDescription];
   if (plainString.length > 0) {
-    [result insertObject:@{ @"text" : ASStringWithQuotesIfMultiword(plainString) } atIndex:0];
+    [result addObject:@{ (id)kCFNull : ASStringWithQuotesIfMultiword(plainString) }];
   }
   return result;
 }

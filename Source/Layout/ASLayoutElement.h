@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASStackLayoutElement.h>
 #import <AsyncDisplayKit/ASAbsoluteLayoutElement.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
+#import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 
 @class ASLayout;
 @class ASLayoutSpec;
@@ -60,7 +61,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * access to the options via convenience properties. If you are creating custom layout spec, then you can
  * extend the backing layout options class to accommodate any new layout options.
  */
-@protocol ASLayoutElement <ASLayoutElementExtensibility, ASTraitEnvironment>
+@protocol ASLayoutElement <ASLayoutElementExtensibility, ASTraitEnvironment, ASLayoutElementAsciiArtProtocol>
 
 #pragma mark - Getter
 
