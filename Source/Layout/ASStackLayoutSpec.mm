@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
+#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASStackPositionedLayout.h>
 #import <AsyncDisplayKit/ASStackUnpositionedLayout.h>
 
@@ -134,6 +135,8 @@
     return [ASLayout layoutWithLayoutElement:self size:constrainedSize.min];
   }
  
+  as_activity_scope_verbose(as_activity_create("Calculate stack layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_verbose(ASLayoutLog(), "Stack layout %@", self);
   // Accessing the style and size property is pretty costly we create layout spec children we use to figure
   // out the layout for each child
   const auto stackChildren = AS::map(children, [&](const id<ASLayoutElement> child) -> ASStackLayoutSpecChild {
@@ -175,6 +178,23 @@
   } else {
     _justifyContent = justifyContent(_verticalAlignment, _justifyContent);
   }
+}
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDescription
+{
+  auto result = [super propertiesForDescription];
+
+  // Add our direction
+  switch (self.direction) {
+    case ASStackLayoutDirectionVertical:
+      [result insertObject:@{ (id)kCFNull: @"vertical" } atIndex:0];
+      break;
+    case ASStackLayoutDirectionHorizontal:
+      [result insertObject:@{ (id)kCFNull: @"horizontal" } atIndex:0];
+      break;
+  }
+
+  return result;
 }
 
 @end

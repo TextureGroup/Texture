@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASBatchContext.h>
 
+#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
 
 typedef NS_ENUM(NSInteger, ASBatchContextState) {
@@ -63,6 +64,7 @@ typedef NS_ENUM(NSInteger, ASBatchContextState) {
 - (void)completeBatchFetching:(BOOL)didComplete
 {
   if (didComplete) {
+    as_log_debug(ASCollectionLog(), "Completed batch fetch with context %@", self);
     ASDN::MutexLocker l(__instanceLock__);
     _state = ASBatchContextStateCompleted;
   }

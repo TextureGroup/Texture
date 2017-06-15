@@ -96,6 +96,11 @@ AS_SUBCLASSING_RESTRICTED
  */
 - (nullable ASCollectionElement *)elementForLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes;
 
+/**
+ * A very terse description e.g. { itemCounts = [ <S0: 1> <S1: 16> ] }
+ */
+@property (atomic, readonly) NSString *smallDescription;
+
 #pragma mark - Initialization -- Only Useful to ASDataController
 
 

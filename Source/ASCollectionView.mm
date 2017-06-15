@@ -800,6 +800,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   if (_batchUpdateCount == 0) {
     _changeSet = [[_ASHierarchyChangeSet alloc] initWithOldData:[_dataController itemCountsFromDataSource]];
+    _changeSet.rootActivity = as_activity_create("Perform async collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT);
+    _changeSet.submitActivity = as_activity_create("Submit changes for collection update", _changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT);
   }
   _batchUpdateCount++;  
 }
@@ -817,6 +819,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   if (_batchUpdateCount == 0) {
     _ASHierarchyChangeSet *changeSet = _changeSet;
+
     // Nil out _changeSet before forwarding to _dataController to allow the change set to cause subsequent batch updates on the same run loop
     _changeSet = nil;
     changeSet.animated = animated;
@@ -828,8 +831,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   ASDisplayNodeAssertMainThread();
   [self beginUpdates];
-  if (updates) {
-    updates();
+  as_activity_scope(_changeSet.rootActivity);
+  {
+    as_activity_scope(_changeSet.submitActivity);
+    if (updates) {
+      updates();
+    }
   }
   [self endUpdatesAnimated:animated completion:completion];
 }
@@ -1575,10 +1582,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)_beginBatchFetching
 {
+  as_activity_scope(as_activity_create("Batch fetch for collection node", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   [_batchContext beginBatchFetching];
   if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
+      as_log_debug(ASCollectionLog(), "Beginning batch fetch for %@ with context %@", collectionNode, _batchContext);
       [_asyncDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:_batchContext];
     });
   } else if (_asyncDelegateFlags.collectionViewWillBeginBatchFetch) {
@@ -1894,9 +1903,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   
   ASPerformBlockWithoutAnimation(!changeSet.animated, ^{
-    if(changeSet.includesReloadData) {
+    as_activity_scope(as_activity_create("Commit collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
+    if (changeSet.includesReloadData) {
       _superIsPendingDataLoad = YES;
       [super reloadData];
+      as_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
     } else {
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
@@ -1933,13 +1944,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
           numberOfUpdates++;
         }
       } completion:^(BOOL finished){
+        as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
+        as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
         [_rangeController updateIfNeeded];
         [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
         [changeSet executeCompletionHandlerWithFinished:finished];
       }];
+      as_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);
       
       // Flush any range changes that happened as part of submitting the update.
+      as_activity_scope(changeSet.rootActivity);
       [_rangeController updateIfNeeded];
     }
   });

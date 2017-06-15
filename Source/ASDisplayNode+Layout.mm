@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
+#import <AsyncDisplayKit/ASLog.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 
@@ -127,12 +128,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 ASPrimitiveTraitCollectionDeprecatedImplementation
 
-@end
-
-#pragma mark -
 #pragma mark - ASLayoutElementAsciiArtProtocol
-
-@implementation ASDisplayNode (ASLayoutElementAsciiArtProtocol)
 
 - (NSString *)asciiArtString
 {
@@ -141,11 +137,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (NSString *)asciiArtName
 {
-  NSString *string = NSStringFromClass([self class]);
+  NSMutableString *result = [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
   if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"", _debugName]];
+    [result appendFormat:@" (%@)", _debugName];
   }
-  return string;
+  return result;
 }
 
 @end
@@ -222,6 +218,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
  */
 - (void)_setNeedsLayoutFromAbove
 {
+  as_activity_scope(as_activity_create("Set needs layout from above", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   ASDisplayNodeAssertThreadAffinity(self);
 
   // Mark the node for layout in the next layout pass
@@ -315,6 +312,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     }
   }
   
+  as_activity_scope(as_activity_create("Update node layout for current bounds", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->isDirty());
   // _calculatedDisplayNodeLayout is not reusable we need to transition to a new one
   [self cancelLayoutTransition];
   
@@ -332,7 +331,20 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   
   // nextLayout was likely created by a call to layoutThatFits:, check if it is valid and can be applied.
   // If our bounds size is different than it, or invalid, recalculate.  Use #define to avoid nullptr->
-  if (nextLayout == nullptr || nextLayout->isDirty() == YES || layoutSizeDifferentFromBounds) {
+  BOOL pendingLayoutApplicable = NO;
+  if (nextLayout == nullptr) {
+    as_log_verbose(ASLayoutLog(), "No pending layout.");
+  } else if (nextLayout->isDirty()) {
+    as_log_verbose(ASLayoutLog(), "Pending layout is invalid.");
+  } else if (layoutSizeDifferentFromBounds) {
+    as_log_verbose(ASLayoutLog(), "Pending layout size %@ doesn't match bounds size.", NSStringFromCGSize(nextLayout->layout.size));
+  } else {
+    as_log_verbose(ASLayoutLog(), "Using pending layout %@.", nextLayout->layout);
+    pendingLayoutApplicable = YES;
+  }
+
+  if (!pendingLayoutApplicable) {
+    as_log_verbose(ASLayoutLog(), "Measuring with previous constrained size.");
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
@@ -350,6 +362,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   // This can occur for either pre-calculated or newly-calculated layouts.
   if (nextLayout->requestedLayoutFromAbove == NO
       && CGSizeEqualToSize(boundsSizeForLayout, nextLayout->layout.size) == NO) {
+    as_log_verbose(ASLayoutLog(), "Layout size doesn't match bounds size. Requesting layout from above.");
     // The layout that we have specifies that this node (self) would like to be a different size
     // than it currently is.  Because that size has been computed within the constrainedSize, we
     // expect that calling setNeedsLayoutFromAbove will result in our parent resizing us to this.
@@ -506,10 +519,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
                 measurementCompletion:(void(^)())completion
 {
   ASDisplayNodeAssertMainThread();
+  as_activity_scope(as_activity_create("Transition node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
   
   if (constrainedSize.max.width <= 0.0 || constrainedSize.max.height <= 0.0) {
     // Using CGSizeZero for the sizeRange can cause negative values in client layout code.
     // Most likely called transitionLayout: without providing a size, before first layout pass.
+    as_log_verbose(ASLayoutLog(), "Ignoring transition due to bad size range.");
     return;
   }
     
@@ -526,9 +542,14 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   
   // Every new layout transition has a transition id associated to check in subsequent transitions for cancelling
   int32_t transitionID = [self _startNewTransition];
+  as_log_verbose(ASLayoutLog(), "Transition ID is %d", transitionID);
   // NOTE: This block captures self. It's cheaper than hitting the weak table.
   asdisplaynode_iscancelled_block_t isCancelled = ^{
-    return (BOOL)(_transitionID != transitionID);
+    BOOL result = (_transitionID != transitionID);
+    if (result) {
+      as_log_verbose(ASLayoutLog(), "Transition %d canceled, superseded by %d", transitionID, _transitionID.load());
+    }
+    return result;
   };
 
   // Move all subnodes in layout pending state for this transition
@@ -573,6 +594,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       if (isCancelled()) {
         return;
       }
+      as_activity_scope(as_activity_create("Commit layout transition", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
       ASLayoutTransition *pendingLayoutTransition;
       _ASTransitionContext *pendingLayoutTransitionContext;
       {
@@ -598,10 +620,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       }
       
       // Apply complete layout transitions for all subnodes
-      ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
-        [node _completePendingLayoutTransition];
-        node.hierarchyState &= (~ASHierarchyStateLayoutPending);
-      });
+      {
+        as_activity_scope(as_activity_create("Complete pending layout transitions for subtree", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+        ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+          [node _completePendingLayoutTransition];
+          node.hierarchyState &= (~ASHierarchyStateLayoutPending);
+        });
+      }
       
       // Measurement pass completion
       // Give the subclass a change to hook into before calling the completion block
@@ -614,7 +639,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       [pendingLayoutTransition applySubnodeInsertions];
       
       // Kick off animating the layout transition
-      [self animateLayoutTransition:pendingLayoutTransitionContext];
+      {
+        as_activity_scope(as_activity_create("Animate layout transition", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+        [self animateLayoutTransition:pendingLayoutTransitionContext];
+      }
       
       // Mark transaction as finished
       [self _finishOrCancelTransition];
@@ -805,7 +833,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
  */
 - (void)_completeLayoutTransition:(ASLayoutTransition *)layoutTransition
 {
-  // Layout transition is not supported for nodes that are not have automatic subnode management enabled
+  // Layout transition is not supported for nodes that do not have automatic subnode management enabled
   if (layoutTransition == nil || self.automaticallyManagesSubnodes == NO) {
     return;
   }
