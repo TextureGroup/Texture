@@ -98,28 +98,21 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _primitiveTraitCollection;
+  return _primitiveTraitCollection.load();
 }
 
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
-  __instanceLock__.lock();
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
+  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
     _primitiveTraitCollection = traitCollection;
     ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
-    __instanceLock__.unlock();
-    
+
     [self asyncTraitCollectionDidChange];
-    return;
   }
-  
-  __instanceLock__.unlock();
 }
 
 - (ASTraitCollection *)asyncTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
