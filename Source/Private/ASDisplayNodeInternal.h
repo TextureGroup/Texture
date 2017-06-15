@@ -58,6 +58,7 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 {
   Synchronous = 1 << 0,
+  YogaLayoutInProgress = 1 << 1,
 };
 
 #define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
@@ -204,7 +205,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
 #endif
 #if YOGA_TREE_CONTIGUOUS
-  YGNodeRef _yogaNode;
   __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
 #endif
