@@ -272,6 +272,20 @@
     };
   }
 
+  /**
+   If we're profiling, wrap the display block with signpost start and end.
+   Color the interval red if cancelled, green otherwise.
+   */
+#if AS_KDEBUG_ENABLE
+  __unsafe_unretained id ptrSelf = self;
+  displayBlock = ^{
+    ASProfilingSignpostStart(ASSignpostLayerDisplay, ptrSelf, 0);
+    id result = displayBlock();
+    ASProfilingSignpostEnd(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    return result;
+  };
+#endif
+
   return displayBlock;
 }
 

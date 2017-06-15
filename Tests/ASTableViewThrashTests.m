@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
+#import <stdatomic.h>
 
 
 // Set to 1 to use UITableView and see if the issue still exists.
@@ -40,7 +41,7 @@ static NSString *ASThrashArrayDescription(NSArray *array) {
   return str;
 }
 
-static volatile int32_t ASThrashTestItemNextID = 1;
+static atomic_uint ASThrashTestItemNextID;
 @interface ASThrashTestItem: NSObject <NSSecureCoding>
 @property (nonatomic, readonly) NSInteger itemID;
 
@@ -56,7 +57,7 @@ static volatile int32_t ASThrashTestItemNextID = 1;
 - (instancetype)init {
   self = [super init];
   if (self != nil) {
-    _itemID = OSAtomicIncrement32(&ASThrashTestItemNextID);
+    _itemID = atomic_fetch_add(&ASThrashTestItemNextID, 1);
   }
   return self;
 }
@@ -99,7 +100,7 @@ static volatile int32_t ASThrashTestItemNextID = 1;
 - (CGFloat)headerHeight;
 @end
 
-static volatile int32_t ASThrashTestSectionNextID = 1;
+static atomic_uint ASThrashTestSectionNextID = 1;
 @implementation ASThrashTestSection
 
 /// Create an array of sections with the given count
@@ -114,7 +115,7 @@ static volatile int32_t ASThrashTestSectionNextID = 1;
 - (instancetype)initWithCount:(NSInteger)count {
   self = [super init];
   if (self != nil) {
-    _sectionID = OSAtomicIncrement32(&ASThrashTestSectionNextID);
+    _sectionID = atomic_fetch_add(&ASThrashTestSectionNextID, 1);
     _items = [ASThrashTestItem itemsWithCount:count];
   }
   return self;

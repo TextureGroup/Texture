@@ -948,9 +948,29 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
+  // Use a pthread specific to mark when this method is called re-entrant on same thread.
+  // We only want one calculateLayout signpost interval per thread.
+  // This is fast enough to do it unconditionally.
+  static pthread_key_t calculateLayoutKey;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    pthread_key_create(&calculateLayoutKey, NULL);
+  });
+  BOOL isNested = pthread_getspecific(calculateLayoutKey) != NULL;
+  if (!isNested) {
+    pthread_setspecific(calculateLayoutKey, kCFBooleanTrue);
+    ASProfilingSignpostStart(ASSignpostCalculateLayout, self, 0);
+  }
+
   ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
-  return [self calculateLayoutThatFits:resolvedRange];
+  ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
+
+  if (!isNested) {
+    pthread_setspecific(calculateLayoutKey, NULL);
+    ASProfilingSignpostEnd(ASSignpostCalculateLayout, self, 0, ASSignpostColorDefault);
+  }
+  return result;
 }
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
