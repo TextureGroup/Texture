@@ -143,6 +143,29 @@ static void runLoopSourceCallback(void *info) {
   _thread = nil;
 }
 
+- (void)test_drain
+{
+  [self performSelector:@selector(_test_drain) onThread:_thread withObject:nil waitUntilDone:YES];
+}
+
+- (void)_test_drain
+{
+  while (true) {
+    @autoreleasepool {
+      _queueLock.lock();
+      std::deque<id> currentQueue = _queue;
+      _queue = std::deque<id>();
+      _queueLock.unlock();
+
+      if (currentQueue.empty()) {
+        return;
+      } else {
+        currentQueue.clear();
+      }
+    }
+  }
+}
+
 - (void)_stop
 {
   CFRunLoopStop(CFRunLoopGetCurrent());

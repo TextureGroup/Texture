@@ -370,8 +370,8 @@
 		CCA282CD1E9EB73E0037E8B7 /* ASTipNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CB1E9EB73E0037E8B7 /* ASTipNode.m */; };
 		CCA282D01E9EBF6C0037E8B7 /* ASTipsWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */; };
 		CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */; };
-		CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62D1EECC2A80060C137 /* ASAssert.m */; };
 		CCA5F62C1EEC9E9B0060C137 /* NSInvocation+ASTestHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62B1EEC9E9B0060C137 /* NSInvocation+ASTestHelpers.m */; };
+		CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62D1EECC2A80060C137 /* ASAssert.m */; };
 		CCB2F34D1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB2F34C1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m */; };
 		CCB338E41EEE11160081F21A /* OCMockObject+ASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB338E31EEE11160081F21A /* OCMockObject+ASAdditions.m */; };
 		CCB338E71EEE27760081F21A /* ASTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB338E61EEE27760081F21A /* ASTestCase.m */; };
@@ -832,9 +832,9 @@
 		CCA282CB1E9EB73E0037E8B7 /* ASTipNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTipNode.m; sourceTree = "<group>"; };
 		CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTipsWindow.h; sourceTree = "<group>"; };
 		CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTipsWindow.m; sourceTree = "<group>"; };
-		CCA5F62D1EECC2A80060C137 /* ASAssert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASAssert.m; sourceTree = "<group>"; };
 		CCA5F62A1EEC9E9B0060C137 /* NSInvocation+ASTestHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+ASTestHelpers.h"; sourceTree = "<group>"; };
 		CCA5F62B1EEC9E9B0060C137 /* NSInvocation+ASTestHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+ASTestHelpers.m"; sourceTree = "<group>"; };
+		CCA5F62D1EECC2A80060C137 /* ASAssert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASAssert.m; sourceTree = "<group>"; };
 		CCB2F34C1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDisplayNodeSnapshotTests.m; sourceTree = "<group>"; };
 		CCB338E21EEE11160081F21A /* OCMockObject+ASAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OCMockObject+ASAdditions.h"; sourceTree = "<group>"; };
 		CCB338E31EEE11160081F21A /* OCMockObject+ASAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OCMockObject+ASAdditions.m"; sourceTree = "<group>"; };
