@@ -885,7 +885,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _unflattenedLayout = nil;
 
-#if YOGA_TREE_CONTIGUOUS
+#if YOGA
   [self invalidateCalculatedYogaLayout];
 #endif
 }
@@ -959,7 +959,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   ASDN::MutexLocker l(__instanceLock__);
 
-#if YOGA_TREE_CONTIGUOUS /* YOGA */
+#if YOGA
   // There are several cases where Yoga could arrive here:
   // - This node is not in a Yoga tree: it has neither a yogaParent nor yogaChildren.
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.

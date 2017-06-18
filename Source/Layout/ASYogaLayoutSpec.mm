@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 
 #if YOGA /* YOGA */
-#if !YOGA_TREE_CONTIGUOUS /* !YOGA_TREE_CONTIGUOUS */
 
 #import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
@@ -176,5 +175,4 @@
 
 @end
 
-#endif /* !YOGA_TREE_CONTIGUOUS */
 #endif /* YOGA */

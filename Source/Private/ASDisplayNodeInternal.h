@@ -203,8 +203,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   // create ASDisplayNodes to make a stack layout when using Yoga.
   // However, the implementation is mostly ready for id <ASLayoutElement>, with a few areas requiring updates.
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
-#endif
-#if YOGA_TREE_CONTIGUOUS
   __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
 #endif
