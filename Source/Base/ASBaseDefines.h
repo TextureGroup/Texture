@@ -215,6 +215,15 @@
 #define AS_SUBCLASSING_RESTRICTED
 #endif
 
+#define ASPthreadStaticKey(dtor) ({ \
+  static dispatch_once_t onceToken; \
+  static pthread_key_t key; \
+  dispatch_once(&onceToken, ^{ \
+    pthread_key_create(&key, dtor); \
+  }); \
+  key; \
+})
+
 /// Ensure that class is of certain kind
 #define ASDynamicCast(x, c) ({ \
   id __val = x;\

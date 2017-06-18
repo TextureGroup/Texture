@@ -951,14 +951,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Use a pthread specific to mark when this method is called re-entrant on same thread.
   // We only want one calculateLayout signpost interval per thread.
   // This is fast enough to do it unconditionally.
-  static pthread_key_t calculateLayoutKey;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pthread_key_create(&calculateLayoutKey, NULL);
-  });
-  BOOL isNested = pthread_getspecific(calculateLayoutKey) != NULL;
+  auto key = ASPthreadStaticKey(NULL);
+  BOOL isNested = pthread_getspecific(key) != NULL;
   if (!isNested) {
-    pthread_setspecific(calculateLayoutKey, kCFBooleanTrue);
+    pthread_setspecific(key, kCFBooleanTrue);
     ASProfilingSignpostStart(ASSignpostCalculateLayout, self, 0);
   }
 
@@ -967,7 +963,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
 
   if (!isNested) {
-    pthread_setspecific(calculateLayoutKey, NULL);
+    pthread_setspecific(key, NULL);
     ASProfilingSignpostEnd(ASSignpostCalculateLayout, self, 0, ASSignpostColorDefault);
   }
   return result;

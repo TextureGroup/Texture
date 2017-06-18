@@ -19,7 +19,7 @@
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASLog.h>
-
+#import <QuartzCore/QuartzCore.h>
 #import <cstdlib>
 #import <deque>
 #import <vector>
@@ -201,6 +201,9 @@ static void runLoopSourceCallback(void *info) {
 @end
 
 #if AS_KDEBUG_ENABLE
+/**
+ * This is real, private CA API. Valid as of iOS 10.
+ */
 typedef enum {
   kCATransactionPhasePreLayout,
   kCATransactionPhasePreCommit,
@@ -223,11 +226,16 @@ typedef enum {
 
 + (void)registerCATransactionObservers
 {
+  static BOOL addCommitHandlerMethodExists;
   static dispatch_block_t preLayoutHandler;
   static dispatch_block_t preCommitHandler;
   static dispatch_block_t postCommitHandler;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
+    addCommitHandlerMethodExists = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
+    if (!addCommitHandlerMethodExists) {
+      NSLog(@"Private CA method %@ gone.", NSStringFromSelector(@selector(addCommitHandler:forPhase:)));
+    }
     preLayoutHandler = ^{
       ASProfilingSignpostStart(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
     };
@@ -240,14 +248,16 @@ typedef enum {
       ASProfilingSignpostEnd(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
       // Can't add new observers inside an observer. rdar://problem/31253952
       dispatch_async(dispatch_get_main_queue(), ^{
-        [self registerTransactionObservers];
+        [self registerCATransactionObservers];
       });
     };
   });
 
-  [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
-  [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
-  [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
+  if (addCommitHandlerMethodExists) {
+    [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
+    [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
+    [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
+  }
 }
 
 #endif // AS_KDEBUG_ENABLE
