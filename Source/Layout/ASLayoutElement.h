@@ -144,6 +144,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 
+- (BOOL)implementsLayoutMethod;
 
 #pragma mark - Deprecated
 

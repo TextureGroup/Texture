@@ -177,6 +177,15 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
   }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:)) ||
+      ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:
+                                                                 restrictedToSize:
+                                                             relativeToParentSize:))) {
+    overrides |= ASDisplayNodeMethodOverrideCalcLayoutThatFits;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
+    overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
+  }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(fetchData))) {
     overrides |= ASDisplayNodeMethodOverrideFetchData;
   }

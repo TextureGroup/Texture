@@ -51,8 +51,10 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideTouchesEnded       = 1 << 2,
   ASDisplayNodeMethodOverrideTouchesMoved       = 1 << 3,
   ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
-  ASDisplayNodeMethodOverrideFetchData          = 1 << 5,
-  ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 6
+  ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
+  ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
+  ASDisplayNodeMethodOverrideFetchData          = 1 << 7,
+  ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 8
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
