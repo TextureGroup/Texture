@@ -86,12 +86,12 @@ static void runLoopSourceCallback(void *info) {
         // Sometimes we release 10,000 objects at a time.  Don't hold the lock while releasing.
         std::deque<id> currentQueue = weakSelf->_queue;
         count = currentQueue.size();
-        ASProfilingSignpostStart(ASSignpostDeallocQueueDrain, count, 0);
+        ASSignpostStartCustom(ASSignpostDeallocQueueDrain, self, count);
         weakSelf->_queue = std::deque<id>();
         weakSelf->_queueLock.unlock();
         currentQueue.clear();
       }
-      ASProfilingSignpostEnd(ASSignpostDeallocQueueDrain, count, 0, ASSignpostColorDefault);
+      ASSignpostEndCustom(ASSignpostDeallocQueueDrain, self, count, ASSignpostColorDefault);
     });
     
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
@@ -226,26 +226,27 @@ typedef enum {
 
 + (void)registerCATransactionObservers
 {
-  static BOOL addCommitHandlerMethodExists;
+  static BOOL privateCAMethodsExist;
   static dispatch_block_t preLayoutHandler;
   static dispatch_block_t preCommitHandler;
   static dispatch_block_t postCommitHandler;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    addCommitHandlerMethodExists = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
-    if (!addCommitHandlerMethodExists) {
-      NSLog(@"Private CA method %@ gone.", NSStringFromSelector(@selector(addCommitHandler:forPhase:)));
+    privateCAMethodsExist = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
+    privateCAMethodsExist &= [CATransaction respondsToSelector:@selector(currentState)];
+    if (!privateCAMethodsExist) {
+      NSLog(@"Private CA methods are gone.");
     }
     preLayoutHandler = ^{
-      ASProfilingSignpostStart(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
+      ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
     };
     preCommitHandler = ^{
       int state = [CATransaction currentState];
-      ASProfilingSignpostEnd(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
-      ASProfilingSignpostStart(ASSignpostCATransactionCommit, 0, state);
+      ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
+      ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
     };
     postCommitHandler = ^{
-      ASProfilingSignpostEnd(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
+      ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
       // Can't add new observers inside an observer. rdar://problem/31253952
       dispatch_async(dispatch_get_main_queue(), ^{
         [self registerCATransactionObservers];
@@ -253,7 +254,7 @@ typedef enum {
     };
   });
 
-  if (addCommitHandlerMethodExists) {
+  if (privateCAMethodsExist) {
     [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
     [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
     [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
@@ -339,7 +340,7 @@ typedef enum {
       return;
     }
     
-    ASProfilingSignpostStart(ASSignpostRunLoopQueueBatch, self, 0);
+    ASSignpostStart(ASSignpostRunLoopQueueBatch);
 
     // Snatch the next batch of items.
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
@@ -393,7 +394,7 @@ typedef enum {
     CFRunLoopWakeUp(_runLoop);
   }
   
-  ASProfilingSignpostEnd(ASSignpostRunLoopQueueBatch, self, 0, ASSignpostColorDefault);
+  ASSignpostEnd(ASSignpostRunLoopQueueBatch);
 }
 
 - (void)enqueue:(id)object

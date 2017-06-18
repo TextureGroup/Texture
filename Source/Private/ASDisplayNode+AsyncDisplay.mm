@@ -279,9 +279,9 @@
 #if AS_KDEBUG_ENABLE
   __unsafe_unretained id ptrSelf = self;
   displayBlock = ^{
-    ASProfilingSignpostStart(ASSignpostLayerDisplay, ptrSelf, 0);
+    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
     id result = displayBlock();
-    ASProfilingSignpostEnd(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
     return result;
   };
 #endif

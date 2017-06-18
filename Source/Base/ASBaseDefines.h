@@ -224,6 +224,15 @@
   key; \
 })
 
+#define ASCreateOnce(expr) ({ \
+  static dispatch_once_t onceToken; \
+  static __typeof__(expr) staticVar; \
+  dispatch_once(&onceToken, ^{ \
+    staticVar = expr; \
+  }); \
+  staticVar; \
+})
+
 /// Ensure that class is of certain kind
 #define ASDynamicCast(x, c) ({ \
   id __val = x;\

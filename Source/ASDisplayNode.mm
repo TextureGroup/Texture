@@ -952,19 +952,19 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // We only want one calculateLayout signpost interval per thread.
   // This is fast enough to do it unconditionally.
   auto key = ASPthreadStaticKey(NULL);
-  BOOL isNested = pthread_getspecific(key) != NULL;
-  if (!isNested) {
+  BOOL isRootCall = (pthread_getspecific(key) == NULL);
+  if (isRootCall) {
     pthread_setspecific(key, kCFBooleanTrue);
-    ASProfilingSignpostStart(ASSignpostCalculateLayout, self, 0);
+    ASSignpostStart(ASSignpostCalculateLayout);
   }
 
   ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
   ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
 
-  if (!isNested) {
+  if (isRootCall) {
     pthread_setspecific(key, NULL);
-    ASProfilingSignpostEnd(ASSignpostCalculateLayout, self, 0, ASSignpostColorDefault);
+    ASSignpostEnd(ASSignpostCalculateLayout);
   }
   return result;
 }

@@ -156,7 +156,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     return;
   }
 
-  ASProfilingSignpostStart(ASSignpostDataControllerBatch, self, 0);
+  ASSignpostStart(ASSignpostDataControllerBatch);
 
   if (batchSize == 0) {
     batchSize = [[ASDataController class] parallelProcessorCount] * kASDataControllerSizingCountPerProcessor;
@@ -171,7 +171,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     batchCompletionHandler(batchedElements, nodes);
   }
 
-  ASProfilingSignpostEnd(ASSignpostDataControllerBatch, self, 0, (_dataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
+  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (_dataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
 }
 
 /**
