@@ -1675,7 +1675,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;
     }
-    if (_inverted) {
+    if (strongSelf.inverted) {
       node.transform = CATransform3DMakeScale(1, -1, 1) ;
     }
     return node;

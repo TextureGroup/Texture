@@ -40,8 +40,6 @@
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
 
-#define AS_MEASURE_AVOIDED_DATACONTROLLER_WORK 0
-
 #define RETURN_IF_NO_DATASOURCE(val) if (_dataSource == nil) { return val; }
 #define ASSERT_ON_EDITING_QUEUE ASDisplayNodeAssertNotNil(dispatch_get_specific(&kASDataControllerEditingQueueKey), @"%@ must be called on the editing transaction queue.", NSStringFromSelector(_cmd))
 
@@ -53,13 +51,6 @@ NSString * const ASDataControllerRowNodeKind = @"_ASDataControllerRowNodeKind";
 NSString * const ASCollectionInvalidUpdateException = @"ASCollectionInvalidUpdateException";
 
 typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes);
-
-#if AS_MEASURE_AVOIDED_DATACONTROLLER_WORK
-@interface ASDataController (AvoidedWorkMeasuring)
-+ (void)_didLayoutNode;
-+ (void)_expectToInsertNodes:(NSUInteger)count;
-@end
-#endif
 
 @interface ASDataController () {
   id<ASDataControllerLayoutDelegate> _layoutDelegate;
@@ -159,17 +150,14 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 - (void)batchAllocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements andLayout:(BOOL)shouldLayout batchSize:(NSInteger)batchSize batchCompletion:(ASDataControllerCompletionBlock)batchCompletionHandler
 {
   ASSERT_ON_EDITING_QUEUE;
-#if AS_MEASURE_AVOIDED_DATACONTROLLER_WORK
-    [ASDataController _expectToInsertNodes:elements.count];
-#endif
-  
+
   if (elements.count == 0 || _dataSource == nil) {
     batchCompletionHandler(@[], @[]);
     return;
   }
 
-  ASProfilingSignpostStart(2, _dataSource);
-  
+  ASSignpostStart(ASSignpostDataControllerBatch);
+
   if (batchSize == 0) {
     batchSize = [[ASDataController class] parallelProcessorCount] * kASDataControllerSizingCountPerProcessor;
   }
@@ -182,8 +170,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     NSArray<ASCellNode *> *nodes = [self _allocateNodesFromElements:batchedElements andLayout:shouldLayout];
     batchCompletionHandler(batchedElements, nodes);
   }
-  
-  ASProfilingSignpostEnd(2, _dataSource);
+
+  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (_dataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
 }
 
 /**
@@ -228,10 +216,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       if (ASSizeRangeHasSignificantArea(sizeRange)) {
         [self _layoutNode:node withConstrainedSize:sizeRange];
       }
-
-#if AS_MEASURE_AVOIDED_DATACONTROLLER_WORK
-      [ASDataController _didLayoutNode];
-#endif
     }
 
     allocatedNodeBuffer[i] = node;
@@ -836,27 +820,3 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 }
 
 @end
-
-#if AS_MEASURE_AVOIDED_DATACONTROLLER_WORK
-
-static volatile int64_t _totalExpectedItems = 0;
-static volatile int64_t _totalMeasuredNodes = 0;
-
-@implementation ASDataController (WorkMeasuring)
-
-+ (void)_didLayoutNode
-{
-    int64_t measured = OSAtomicIncrement64(&_totalMeasuredNodes);
-    int64_t expected = _totalExpectedItems;
-    if (measured % 20 == 0 || measured == expected) {
-        NSLog(@"Data controller avoided work (underestimated): %lld / %lld", measured, expected);
-    }
-}
-
-+ (void)_expectToInsertNodes:(NSUInteger)count
-{
-    OSAtomicAdd64((int64_t)count, &_totalExpectedItems);
-}
-
-@end
-#endif

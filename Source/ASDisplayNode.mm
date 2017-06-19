@@ -957,9 +957,25 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
+  // Use a pthread specific to mark when this method is called re-entrant on same thread.
+  // We only want one calculateLayout signpost interval per thread.
+  // This is fast enough to do it unconditionally.
+  auto key = ASPthreadStaticKey(NULL);
+  BOOL isRootCall = (pthread_getspecific(key) == NULL);
+  if (isRootCall) {
+    pthread_setspecific(key, kCFBooleanTrue);
+    ASSignpostStart(ASSignpostCalculateLayout);
+  }
+
   ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
-  return [self calculateLayoutThatFits:resolvedRange];
+  ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
+
+  if (isRootCall) {
+    pthread_setspecific(key, NULL);
+    ASSignpostEnd(ASSignpostCalculateLayout);
+  }
+  return result;
 }
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize

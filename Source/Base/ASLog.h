@@ -16,9 +16,45 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <Foundation/Foundation.h>
 
-#pragma once
+/// The signposts we use. Signposts are grouped by color. The SystemTrace.tracetemplate file
+/// should be kept up-to-date with these values.
+typedef NS_ENUM(uint32_t, ASSignpostName) {
+  // Collection/Table (Blue)
+  ASSignpostDataControllerBatch = 300,		// Alloc/layout nodes before collection update.
+  ASSignpostRangeControllerUpdate,				// Ranges update pass.
+  ASSignpostCollectionUpdate,							// Entire update process, from -endUpdates to [super perform…]
 
+  // Rendering (Green)
+  ASSignpostLayerDisplay = 325,						// Client display callout.
+  ASSignpostRunLoopQueueBatch,						// One batch of ASRunLoopQueue.
+
+  // Layout (Purple)
+  ASSignpostCalculateLayout = 350,				// Start of calculateLayoutThatFits to end. Max 1 per thread.
+
+  // Misc (Orange)
+  ASSignpostDeallocQueueDrain = 375,			// One chunk of dealloc queue work. arg0 is count.
+  ASSignpostCATransactionLayout,					// The CA transaction commit layout phase.
+  ASSignpostCATransactionCommit						// The CA transaction commit post-layout phase.
+};
+
+typedef NS_ENUM(uintptr_t, ASSignpostColor) {
+  ASSignpostColorBlue,
+  ASSignpostColorGreen,
+  ASSignpostColorPurple,
+  ASSignpostColorOrange,
+  ASSignpostColorRed,
+  ASSignpostColorDefault
+};
+
+static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
+  if (colorPref == ASSignpostColorDefault) {
+    return (ASSignpostColor)((name / 25) % 4);
+  } else {
+    return colorPref;
+  }
+}
 
 #define ASMultiplexImageNodeLogDebug(...)
 #define ASMultiplexImageNodeCLogDebug(...)
@@ -26,8 +62,9 @@
 #define ASMultiplexImageNodeLogError(...)
 #define ASMultiplexImageNodeCLogError(...)
 
-// Note: `<sys/kdebug_signpost.h>` only exists in Xcode 8 and later.
-#if defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)
+#define AS_KDEBUG_ENABLE defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)
+
+#if AS_KDEBUG_ENABLE
 
 #import <sys/kdebug_signpost.h>
 
@@ -45,21 +82,27 @@
 #define APPSDBG_CODE(SubClass,code) KDBG_CODE(DBG_APPS, SubClass, code)
 #endif
 
-#define ASProfilingSignpost(x) \
-  AS_AT_LEAST_IOS10 ? kdebug_signpost(x, 0, 0, 0, (uint32_t)(x % 4)) \
-                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, x) | DBG_FUNC_NONE, 0, 0, 0, (uint32_t)(x % 4));
+// Currently we'll reserve arg3.
+#define ASSignpost(name, identifier, arg2, color) \
+  AS_AT_LEAST_IOS10 ? kdebug_signpost(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
+                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_NONE, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
 
-#define ASProfilingSignpostStart(x, y) \
-  AS_AT_LEAST_IOS10 ? kdebug_signpost_start((uint32_t)x, (uintptr_t)y, 0, 0, (uint32_t)(x % 4)) \
-                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, x) | DBG_FUNC_START, (uintptr_t)y, 0, 0, (uint32_t)(x % 4));
+#define ASSignpostStartCustom(name, identifier, arg2) \
+  AS_AT_LEAST_IOS10 ? kdebug_signpost_start(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0) \
+                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_START, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0);
+#define ASSignpostStart(name) ASSignpostStartCustom(name, self, 0)
 
-#define ASProfilingSignpostEnd(x, y) \
-  AS_AT_LEAST_IOS10 ? kdebug_signpost_end((uint32_t)x, (uintptr_t)y, 0, 0, (uint32_t)(x % 4)) \
-                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, x) | DBG_FUNC_END, (uintptr_t)y, 0, 0, (uint32_t)(x % 4));
+#define ASSignpostEndCustom(name, identifier, arg2, color) \
+  AS_AT_LEAST_IOS10 ? kdebug_signpost_end(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
+                    : syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_END, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
+#define ASSignpostEnd(name) ASSignpostEndCustom(name, self, 0, ASSignpostColorDefault)
+
 #else
 
-#define ASProfilingSignpost(x)
-#define ASProfilingSignpostStart(x, y)
-#define ASProfilingSignpostEnd(x, y)
+#define ASSignpost(name, identifier, arg2, color)
+#define ASSignpostStartCustom(name, identifier, arg2)
+#define ASSignpostStart(name)
+#define ASSignpostEndCustom(name, identifier, arg2, color)
+#define ASSignpostEnd(name)
 
 #endif
