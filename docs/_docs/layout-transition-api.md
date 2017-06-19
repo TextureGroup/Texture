@@ -215,7 +215,7 @@ override func animateLayoutTransition(_ context: ASContextTransitioning) {
   if context.isAnimated() {
       
   } else {
-      super.animateLayoutTransition(contet)
+      super.animateLayoutTransition(context)
   }
 }
 </pre>
