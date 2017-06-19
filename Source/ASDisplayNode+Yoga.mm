@@ -31,8 +31,6 @@
 
 #pragma mark - ASDisplayNode+Yoga
 
-#if YOGA_TREE_CONTIGUOUS
-
 @interface ASDisplayNode (YogaInternal)
 @property (nonatomic, weak) ASDisplayNode *yogaParent;
 - (ASSizeRange)_locked_constrainedSizeForLayoutPass;
@@ -41,8 +39,6 @@
 @interface ASLayout (YogaInternal)
 @property (nonatomic, getter=isFlattened) BOOL flattened;
 @end
-
-#endif /* YOGA_TREE_CONTIGUOUS */
 
 @implementation ASDisplayNode (Yoga)
 
@@ -80,23 +76,12 @@
 
   [_yogaChildren addObject:child];
 
-#if YOGA_TREE_CONTIGUOUS
   // Ensure any measure function is removed before inserting the YGNodeRef child.
   if (hadZeroChildren) {
     [self updateYogaMeasureFuncIfNeeded];
   }
   // YGNodeRef insertion is done in setParent:
   child.yogaParent = self;
-#else
-  // When using non-contiguous Yoga layout, each level in the node hierarchy independently uses an ASYogaLayoutSpec
-  __weak ASDisplayNode *weakSelf = self;
-  self.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    ASYogaLayoutSpec *spec = [[ASYogaLayoutSpec alloc] init];
-    spec.rootNode = weakSelf;
-    spec.children = weakSelf.yogaChildren;
-    return spec;
-  };
-#endif
 }
 
 - (void)removeYogaChild:(ASDisplayNode *)child
@@ -108,18 +93,12 @@
   BOOL hadChildren = (_yogaChildren.count > 0);
   [_yogaChildren removeObjectIdenticalTo:child];
 
-#if YOGA_TREE_CONTIGUOUS
   // YGNodeRef removal is done in setParent:
   child.yogaParent = nil;
   // Ensure any measure function is re-added after removing the YGNodeRef child.
   if (hadChildren && _yogaChildren.count == 0) {
     [self updateYogaMeasureFuncIfNeeded];
   }
-#else
-  if (_yogaChildren.count == 0) {
-    self.layoutSpecBlock = nil;
-  }
-#endif
 }
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
@@ -131,8 +110,6 @@
                             ? YGDirectionLTR : YGDirectionRTL);
   }
 }
-
-#if YOGA_TREE_CONTIGUOUS /* YOGA_TREE_CONTIGUOUS */
 
 - (void)setYogaParent:(ASDisplayNode *)yogaParent
 {
@@ -291,8 +268,6 @@
   }
 #endif /* YOGA_LAYOUT_LOGGING */
 }
-
-#endif /* YOGA_TREE_CONTIGUOUS */
 
 @end
 
