@@ -710,7 +710,10 @@
 
 - (void)relayoutItems
 {
-  [self.view relayoutItems];
+  ASDisplayNodeAssertMainThread();
+  if (self.nodeLoaded) {
+  	[self.view relayoutItems];
+  }
 }
 
 - (void)beginUpdates
