@@ -151,26 +151,30 @@
 
 - (void)loadInitialData
 {
-  /// BUG: these methods are called twice in a row i.e. this for-loop shouldn't be here. https://github.com/TextureGroup/Texture/issues/351
+  // Count methods are called twice in a row for first data load.
+  // Since -reloadData is routed through our batch update system,
+  // the batch update latches the "old data source counts" if needed at -beginUpdates time
+  // and then verifies them against the "new data source counts" after the updates.
+  // This isn't ideal, but the cost is very small and the system works well.
   for (int i = 0; i < 2; i++) {
     // It reads all the counts
     [self expectDataSourceCountMethods];
+  }
 
-    // It reads each section object.
-    for (NSInteger section = 0; section < sections.count; section++) {
-      [self expectContextMethodForSection:section];
-    }
+  // It reads each section object.
+  for (NSInteger section = 0; section < sections.count; section++) {
+    [self expectContextMethodForSection:section];
+  }
 
-    // It reads the contents for each item.
-    for (NSInteger section = 0; section < sections.count; section++) {
-      NSArray *viewModels = sections[section].viewModels;
+  // It reads the contents for each item.
+  for (NSInteger section = 0; section < sections.count; section++) {
+    NSArray *viewModels = sections[section].viewModels;
 
-      // For each item:
-      for (NSInteger i = 0; i < viewModels.count; i++) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:section];
-        [self expectViewModelMethodForItemAtIndexPath:indexPath viewModel:viewModels[i]];
-        [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
-      }
+    // For each item:
+    for (NSInteger i = 0; i < viewModels.count; i++) {
+      NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:section];
+      [self expectViewModelMethodForItemAtIndexPath:indexPath viewModel:viewModels[i]];
+      [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
     }
   }
 

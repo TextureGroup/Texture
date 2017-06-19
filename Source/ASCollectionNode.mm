@@ -28,6 +28,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASSectionContext.h>
 #import <AsyncDisplayKit/ASDataController.h>
@@ -682,9 +683,17 @@
 - (void)reloadDataWithCompletion:(void (^)())completion
 {
   ASDisplayNodeAssertMainThread();
-  if (self.nodeLoaded) {
-    [self.view reloadDataWithCompletion:completion];
+  if (!self.nodeLoaded) {
+    return;
   }
+  
+  [self performBatchUpdates:^{
+    [self.view.changeSet reloadData];
+  } completion:^(BOOL finished){
+    if (completion) {
+      completion();
+    }
+  }];
 }
 
 - (void)reloadData
@@ -692,14 +701,16 @@
   [self reloadDataWithCompletion:nil];
 }
 
+- (void)reloadDataImmediately
+{
+  ASDisplayNodeAssertMainThread();
+  [self reloadData];
+  [self waitUntilAllUpdatesAreCommitted];
+}
+
 - (void)relayoutItems
 {
   [self.view relayoutItems];
-}
-
-- (void)reloadDataImmediately
-{
-  [self.view reloadDataImmediately];
 }
 
 - (void)beginUpdates
