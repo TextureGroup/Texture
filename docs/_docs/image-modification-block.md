@@ -51,6 +51,9 @@ The most efficient way to add image effects is by leveraging the `imageModificat
 
 In the following example we assume we have an avatar node that will be setup in `init` of a supernode and the image of the node should be rounded. We provide the `imageModificationBlock` and in there we call a convenience method that transforms the image passed in into a circular image and return it.
 
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
 <div class = "code">
 <pre lang="objc" class="objcCode">
 - (instancetype)init
@@ -72,13 +75,16 @@ init() {
 	}
 </pre>
 </div>
+
 </div>
 
 The actual drawing code is nicely abstracted away in an UIImage category and looks like the following:
 
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+
 <div class = "code">
 <pre lang="objc" class="objcCode">
-
 @implementation UIImage (Additions)
 - (UIImage *)makeCircularImageWithSize:(CGSize)size
 {
