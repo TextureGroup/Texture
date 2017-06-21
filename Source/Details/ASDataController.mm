@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASDataController.h>
 
 #import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
+#import <AsyncDisplayKit/_ASScopeTimer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
@@ -494,7 +495,11 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     _initialReloadDataHasBeenCalled = YES;
   }
   
-  dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+  NSTimeInterval transactionQueueFlushDuration = 0.0f;
+  {
+    ASDN::ScopeTimer t(transactionQueueFlushDuration);
+    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+  }
   
   // If the initial reloadData has not been called, just bail because we don't have our old data source counts.
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
@@ -507,11 +512,14 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   [self invalidateDataSourceItemCounts];
   
   // Log events
-  ASDataControllerLogEvent(self, @"triggeredUpdate: %@", changeSet);
 #if ASEVENTLOG_ENABLE
+  ASDataControllerLogEvent(self, @"updateWithChangeSet waited on previous update for %fms. changeSet: %@",
+                           transactionQueueFlushDuration * 1000.0f, changeSet);
+  NSTimeInterval changeSetStartTime = CACurrentMediaTime();
   NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
   [changeSet addCompletionHandler:^(BOOL finished) {
-    ASDataControllerLogEvent(self, @"finishedUpdate: %@", changeSetDescription);
+    ASDataControllerLogEvent(self, @"finishedUpdate in %fms: %@",
+                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);
   }];
 #endif
   
