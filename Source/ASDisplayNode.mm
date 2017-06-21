@@ -2006,9 +2006,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
-  ASDisplayNodeLogEvent(self, @"addSubnode: %@", subnode);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually add subnode to node with automaticallyManagesSubnodes=YES. Node: %@", subnode);
+  ASDisplayNodeLogEvent(self, @"addSubnode: %@ with automaticallyManagesSubnodes = ", subnode, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _addSubnode:subnode];
 }
 
