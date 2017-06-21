@@ -13,7 +13,6 @@
 #import "OCMockObject+ASAdditions.h"
 
 #import <OCMock/OCMock.h>
-#import "ASInternalHelpers.h"
 #import <objc/runtime.h>
 #import "ASTestCase.h"
 

@@ -83,9 +83,9 @@ fi
 
 if [ "$MODE" = "tests_listkit" ]; then
     echo "Building & testing AsyncDisplayKit+IGListKit."
-    pod install --project-directory=ASDKListKit
+    pod install --project-directory=SubspecWorkspaces/ASDKListKit
     set -o pipefail && xcodebuild \
-        -workspace ASDKListKit/ASDKListKit.xcworkspace \
+        -workspace SubspecWorkspaces/ASDKListKit/ASDKListKit.xcworkspace \
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \

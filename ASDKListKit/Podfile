@@ -1,9 +1,0 @@
-source 'https://github.com/CocoaPods/Specs.git'
-
-platform :ios, '8.0'
-target 'ASDKListKitTests' do
-	pod 'Texture/IGListKit', :path => '..'
-	pod 'IGListKit', :git => 'https://github.com/Instagram/IGListKit', :commit => '357a28e'
-	pod 'JGMethodSwizzler', :git => 'https://github.com/JonasGessner/JGMethodSwizzler', :branch => 'master'
-end
-

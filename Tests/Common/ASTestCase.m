@@ -52,7 +52,9 @@ static __weak ASTestCase *currentTestCase;
     for (unsigned int i = 0; i < ivarCount; i++) {
       Ivar ivar = ivars[i];
       NSString *key = [NSString stringWithCString:ivar_getName(ivar) encoding:NSUTF8StringEncoding];
-      [self setValue:nil forKey:key];
+      if (OCMIsObjectType(ivar_getTypeEncoding(ivar))) {
+      	[self setValue:nil forKey:key];
+      }
     }
     if (ivars) {
       free(ivars);
