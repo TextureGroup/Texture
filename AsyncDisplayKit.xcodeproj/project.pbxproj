@@ -356,6 +356,8 @@
 		CC8B05D61D73836400F54286 /* ASPerformanceTestContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8B05D51D73836400F54286 /* ASPerformanceTestContext.m */; };
 		CC8B05D81D73979700F54286 /* ASTextNodePerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8B05D71D73979700F54286 /* ASTextNodePerformanceTests.m */; };
 		CC90E1F41E383C0400FED591 /* AsyncDisplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */; };
+		CC9E98311EFA23D6009D37C5 /* ASDiffingSectionController.h in Headers */ = {isa = PBXBuildFile; fileRef = CC9E982F1EFA23D6009D37C5 /* ASDiffingSectionController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CC9E98321EFA23D6009D37C5 /* ASDiffingSectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98301EFA23D6009D37C5 /* ASDiffingSectionController.m */; };
 		CCA221D31D6FA7EF00AF6A0F /* ASViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */; };
 		CCA282B41E9EA7310037E8B7 /* ASTipsController.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282B21E9EA7310037E8B7 /* ASTipsController.h */; };
 		CCA282B51E9EA7310037E8B7 /* ASTipsController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282B31E9EA7310037E8B7 /* ASTipsController.m */; };
@@ -822,6 +824,8 @@
 		CC8B05D41D73836400F54286 /* ASPerformanceTestContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPerformanceTestContext.h; sourceTree = "<group>"; };
 		CC8B05D51D73836400F54286 /* ASPerformanceTestContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPerformanceTestContext.m; sourceTree = "<group>"; };
 		CC8B05D71D73979700F54286 /* ASTextNodePerformanceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTextNodePerformanceTests.m; sourceTree = "<group>"; };
+		CC9E982F1EFA23D6009D37C5 /* ASDiffingSectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDiffingSectionController.h; sourceTree = "<group>"; };
+		CC9E98301EFA23D6009D37C5 /* ASDiffingSectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDiffingSectionController.m; sourceTree = "<group>"; };
 		CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASViewControllerTests.m; sourceTree = "<group>"; };
 		CCA282B21E9EA7310037E8B7 /* ASTipsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTipsController.h; sourceTree = "<group>"; };
 		CCA282B31E9EA7310037E8B7 /* ASTipsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTipsController.m; sourceTree = "<group>"; };
@@ -1584,6 +1588,8 @@
 		CCE04B1D1E313E99006AEBBB /* Collection Data Adapter */ = {
 			isa = PBXGroup;
 			children = (
+				CC9E982F1EFA23D6009D37C5 /* ASDiffingSectionController.h */,
+				CC9E98301EFA23D6009D37C5 /* ASDiffingSectionController.m */,
 				CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */,
 				CCE04B2B1E314A32006AEBBB /* ASSupplementaryNodeSource.h */,
 				CCF92DCE1E315FC50019E9C6 /* IGListKit Support */,
@@ -1666,6 +1672,7 @@
 				696F01EC1DD2AF450049FBD5 /* ASEventLog.h in Headers */,
 				690C35641E055C7B00069B91 /* ASDimensionInternal.h in Headers */,
 				3917EBD41E9C2FC400D04A01 /* _ASCollectionReusableView.h in Headers */,
+				CC9E98311EFA23D6009D37C5 /* ASDiffingSectionController.h in Headers */,
 				690C356B1E05680300069B91 /* ASDimensionDeprecated.h in Headers */,
 				683489281D70DE3400327501 /* ASDisplayNode+Deprecated.h in Headers */,
 				698371DB1E4379CD00437585 /* ASNodeController+Beta.h in Headers */,
@@ -2157,6 +2164,7 @@
 				254C6B861BF94F8A003EC431 /* ASTextKitContext.mm in Sources */,
 				DBDB83971C6E879900D0098C /* ASPagerFlowLayout.m in Sources */,
 				E5B078001E69F4EB00C24B5B /* ASElementMap.m in Sources */,
+				CC9E98321EFA23D6009D37C5 /* ASDiffingSectionController.m in Sources */,
 				9C8898BC1C738BA800D6B02E /* ASTextKitFontSizeAdjuster.mm in Sources */,
 				690ED59B1E36D118000627C0 /* ASImageNode+tvOS.m in Sources */,
 				CCCCCCD81EC3EF060087FE10 /* ASTextInput.m in Sources */,

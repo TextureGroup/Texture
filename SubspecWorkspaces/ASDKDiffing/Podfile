@@ -1,0 +1,8 @@
+source 'https://github.com/CocoaPods/Specs.git'
+
+platform :ios, '8.0'
+target 'ASDKDiffingTests' do
+  pod 'Texture/Diffing', :path => '../..'
+  pod 'OCMock', '~> 3.4'
+end
+

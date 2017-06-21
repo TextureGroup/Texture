@@ -21,11 +21,16 @@
 #import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
+#import <AsyncDisplayKit/ASSectionController.h>
 
 @protocol ASCollectionViewLayoutFacilitatorProtocol;
 @protocol ASCollectionDelegate;
 @protocol ASCollectionDataSource;
+@protocol ASCollectionModernDataSource;
 @class ASCollectionView;
+#if AS_DIFFING
+@protocol IGListDiffable;
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -82,6 +87,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @note This is a convenience method which sets the asyncDatasource on the collection node's collection view.
  */
 @property (weak, nonatomic) id <ASCollectionDataSource> dataSource;
+
+/**
+ * :todoc:
+ */
+@property (weak, nonatomic) id <ASCollectionModernDataSource> modernDataSource;
 
 /**
  * The number of screens left to scroll before the delegate -collectionNode:beginBatchFetchingWithContext: is called.
@@ -477,6 +487,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT;
 
+#if AS_DIFFING
+
+/**
+ * Inform the collection node that the return value of `sectionViewModelsForCollectionNode:` has changed.
+ *
+ * The infra will requery the section view models and perform a diff.
+ */
+- (void)invalidateSections;
+
+#endif
+
 @end
 
 @interface ASCollectionNode (Deprecated)
@@ -492,6 +513,31 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreCommitted instead.");
 
 @end
+
+#if AS_DIFFING
+@protocol IGListDiffable;
+
+/**
+ * A replacement for ASCollectionDataSource based on automatic diffing of view models.
+ */
+@protocol ASCollectionModernDataSource <NSObject>
+
+/**
+ * Asks the data source for the new array of section view models for the data source.
+ *
+ * It is strongly recommended for section view models to be immutable.
+ * When the return value of this method changes, call `-invalidateSections`.
+ */
+- (NSArray<id<IGListDiffable>> *)sectionViewModelsForCollectionNode:(ASCollectionNode *)collectionNode;
+
+/**
+ * Asks the data source for a controller for the given section view model.
+ */
+- (id<ASSectionController>)collectionNode:(ASCollectionNode *)collectionNode controllerForSection:(id)sectionViewModel;
+
+@end
+
+#endif
 
 /**
  * This is a node-based UICollectionViewDataSource.

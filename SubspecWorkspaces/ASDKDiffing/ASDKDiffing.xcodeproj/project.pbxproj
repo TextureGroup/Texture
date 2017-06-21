@@ -1,0 +1,585 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5C2B0D08AE353B01DD8AFB44 /* libPods-ASDKDiffingTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D351EEAC3F60D3F2B4C6A1E5 /* libPods-ASDKDiffingTests.a */; };
+		CC9E981A1EF9F46A009D37C5 /* ASDKDiffingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98191EF9F46A009D37C5 /* ASDKDiffingTests.m */; };
+		CC9E98281EF9F6A4009D37C5 /* ASDisplayNode+OCMock.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98201EF9F6A4009D37C5 /* ASDisplayNode+OCMock.m */; };
+		CC9E98291EF9F6A4009D37C5 /* ASTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98221EF9F6A4009D37C5 /* ASTestCase.m */; };
+		CC9E982A1EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98251EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.m */; };
+		CC9E982B1EF9F6A4009D37C5 /* OCMockObject+ASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E98271EF9F6A4009D37C5 /* OCMockObject+ASAdditions.m */; };
+		CC9E982E1EFA0532009D37C5 /* ASDKDiffingFixtures.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E982D1EFA0532009D37C5 /* ASDKDiffingFixtures.m */; };
+		CC9E983B1EFA267E009D37C5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E983A1EFA267E009D37C5 /* main.m */; };
+		CC9E983E1EFA267E009D37C5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CC9E983D1EFA267E009D37C5 /* AppDelegate.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CC9E984E1EFA2683009D37C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC9E980C1EF9F44F009D37C5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC9E98361EFA267E009D37C5;
+			remoteInfo = DiffingTestHost;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C82DB0B426A86BE680F06B8 /* Pods-ASDKDiffingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ASDKDiffingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ASDKDiffingTests/Pods-ASDKDiffingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		92E6E53B4239101982E9E8A6 /* Pods-ASDKDiffingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ASDKDiffingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-ASDKDiffingTests/Pods-ASDKDiffingTests.release.xcconfig"; sourceTree = "<group>"; };
+		CC9E98161EF9F46A009D37C5 /* ASDKDiffingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ASDKDiffingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC9E98191EF9F46A009D37C5 /* ASDKDiffingTests.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = ASDKDiffingTests.m; sourceTree = "<group>"; tabWidth = 2; usesTabs = 0; };
+		CC9E981B1EF9F46A009D37C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC9E98201EF9F6A4009D37C5 /* ASDisplayNode+OCMock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ASDisplayNode+OCMock.m"; sourceTree = "<group>"; };
+		CC9E98211EF9F6A4009D37C5 /* ASTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTestCase.h; sourceTree = "<group>"; };
+		CC9E98221EF9F6A4009D37C5 /* ASTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTestCase.m; sourceTree = "<group>"; };
+		CC9E98231EF9F6A4009D37C5 /* ASXCTExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASXCTExtensions.h; sourceTree = "<group>"; };
+		CC9E98241EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+ASTestHelpers.h"; sourceTree = "<group>"; };
+		CC9E98251EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+ASTestHelpers.m"; sourceTree = "<group>"; };
+		CC9E98261EF9F6A4009D37C5 /* OCMockObject+ASAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OCMockObject+ASAdditions.h"; sourceTree = "<group>"; };
+		CC9E98271EF9F6A4009D37C5 /* OCMockObject+ASAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OCMockObject+ASAdditions.m"; sourceTree = "<group>"; };
+		CC9E982C1EFA0532009D37C5 /* ASDKDiffingFixtures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDKDiffingFixtures.h; sourceTree = "<group>"; };
+		CC9E982D1EFA0532009D37C5 /* ASDKDiffingFixtures.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDKDiffingFixtures.m; sourceTree = "<group>"; };
+		CC9E98371EFA267E009D37C5 /* DiffingTestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiffingTestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC9E983A1EFA267E009D37C5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CC9E983C1EFA267E009D37C5 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		CC9E983D1EFA267E009D37C5 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		CC9E984A1EFA267E009D37C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D351EEAC3F60D3F2B4C6A1E5 /* libPods-ASDKDiffingTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ASDKDiffingTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC9E98131EF9F46A009D37C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C2B0D08AE353B01DD8AFB44 /* libPods-ASDKDiffingTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC9E98341EFA267E009D37C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02A24BFB52264A6AAFC80F7B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D351EEAC3F60D3F2B4C6A1E5 /* libPods-ASDKDiffingTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BCE64E0F48130D23C90FA79C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				0C82DB0B426A86BE680F06B8 /* Pods-ASDKDiffingTests.debug.xcconfig */,
+				92E6E53B4239101982E9E8A6 /* Pods-ASDKDiffingTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CC9E980B1EF9F44F009D37C5 = {
+			isa = PBXGroup;
+			children = (
+				CC9E98181EF9F46A009D37C5 /* ASDKDiffingTests */,
+				CC9E98381EFA267E009D37C5 /* DiffingTestHost */,
+				CC9E98171EF9F46A009D37C5 /* Products */,
+				BCE64E0F48130D23C90FA79C /* Pods */,
+				02A24BFB52264A6AAFC80F7B /* Frameworks */,
+			);
+			indentWidth = 2;
+			sourceTree = "<group>";
+			tabWidth = 2;
+			usesTabs = 0;
+		};
+		CC9E98171EF9F46A009D37C5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E98161EF9F46A009D37C5 /* ASDKDiffingTests.xctest */,
+				CC9E98371EFA267E009D37C5 /* DiffingTestHost.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CC9E98181EF9F46A009D37C5 /* ASDKDiffingTests */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E981F1EF9F6A4009D37C5 /* Common */,
+				CC9E982C1EFA0532009D37C5 /* ASDKDiffingFixtures.h */,
+				CC9E982D1EFA0532009D37C5 /* ASDKDiffingFixtures.m */,
+				CC9E98191EF9F46A009D37C5 /* ASDKDiffingTests.m */,
+				CC9E981B1EF9F46A009D37C5 /* Info.plist */,
+			);
+			path = ASDKDiffingTests;
+			sourceTree = "<group>";
+		};
+		CC9E981F1EF9F6A4009D37C5 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E98201EF9F6A4009D37C5 /* ASDisplayNode+OCMock.m */,
+				CC9E98211EF9F6A4009D37C5 /* ASTestCase.h */,
+				CC9E98221EF9F6A4009D37C5 /* ASTestCase.m */,
+				CC9E98231EF9F6A4009D37C5 /* ASXCTExtensions.h */,
+				CC9E98241EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.h */,
+				CC9E98251EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.m */,
+				CC9E98261EF9F6A4009D37C5 /* OCMockObject+ASAdditions.h */,
+				CC9E98271EF9F6A4009D37C5 /* OCMockObject+ASAdditions.m */,
+			);
+			name = Common;
+			path = ../../../Tests/Common;
+			sourceTree = "<group>";
+		};
+		CC9E98381EFA267E009D37C5 /* DiffingTestHost */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E983C1EFA267E009D37C5 /* AppDelegate.h */,
+				CC9E983D1EFA267E009D37C5 /* AppDelegate.m */,
+				CC9E984A1EFA267E009D37C5 /* Info.plist */,
+				CC9E98391EFA267E009D37C5 /* Supporting Files */,
+			);
+			path = DiffingTestHost;
+			sourceTree = "<group>";
+		};
+		CC9E98391EFA267E009D37C5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CC9E983A1EFA267E009D37C5 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC9E98151EF9F46A009D37C5 /* ASDKDiffingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC9E981C1EF9F46A009D37C5 /* Build configuration list for PBXNativeTarget "ASDKDiffingTests" */;
+			buildPhases = (
+				8F2972FB3CBA30856D1BE3D3 /* [CP] Check Pods Manifest.lock */,
+				CC9E98121EF9F46A009D37C5 /* Sources */,
+				CC9E98131EF9F46A009D37C5 /* Frameworks */,
+				CC9E98141EF9F46A009D37C5 /* Resources */,
+				2B07374431E476290B0BAD46 /* [CP] Embed Pods Frameworks */,
+				546706FC16C480BF4944D658 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC9E984F1EFA2683009D37C5 /* PBXTargetDependency */,
+			);
+			name = ASDKDiffingTests;
+			productName = ASDKDiffingTests;
+			productReference = CC9E98161EF9F46A009D37C5 /* ASDKDiffingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC9E98361EFA267E009D37C5 /* DiffingTestHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC9E984B1EFA267E009D37C5 /* Build configuration list for PBXNativeTarget "DiffingTestHost" */;
+			buildPhases = (
+				CC9E98331EFA267E009D37C5 /* Sources */,
+				CC9E98341EFA267E009D37C5 /* Frameworks */,
+				CC9E98351EFA267E009D37C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DiffingTestHost;
+			productName = DiffingTestHost;
+			productReference = CC9E98371EFA267E009D37C5 /* DiffingTestHost.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CC9E980C1EF9F44F009D37C5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				TargetAttributes = {
+					CC9E98151EF9F46A009D37C5 = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CC9E98361EFA267E009D37C5;
+					};
+					CC9E98361EFA267E009D37C5 = {
+						CreatedOnToolsVersion = 8.3.3;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = CC9E980F1EF9F44F009D37C5 /* Build configuration list for PBXProject "ASDKDiffing" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CC9E980B1EF9F44F009D37C5;
+			productRefGroup = CC9E98171EF9F46A009D37C5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC9E98151EF9F46A009D37C5 /* ASDKDiffingTests */,
+				CC9E98361EFA267E009D37C5 /* DiffingTestHost */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CC9E98141EF9F46A009D37C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC9E98351EFA267E009D37C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2B07374431E476290B0BAD46 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ASDKDiffingTests/Pods-ASDKDiffingTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		546706FC16C480BF4944D658 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ASDKDiffingTests/Pods-ASDKDiffingTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8F2972FB3CBA30856D1BE3D3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC9E98121EF9F46A009D37C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC9E982A1EF9F6A4009D37C5 /* NSInvocation+ASTestHelpers.m in Sources */,
+				CC9E98281EF9F6A4009D37C5 /* ASDisplayNode+OCMock.m in Sources */,
+				CC9E982B1EF9F6A4009D37C5 /* OCMockObject+ASAdditions.m in Sources */,
+				CC9E981A1EF9F46A009D37C5 /* ASDKDiffingTests.m in Sources */,
+				CC9E982E1EFA0532009D37C5 /* ASDKDiffingFixtures.m in Sources */,
+				CC9E98291EF9F6A4009D37C5 /* ASTestCase.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC9E98331EFA267E009D37C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC9E983E1EFA267E009D37C5 /* AppDelegate.m in Sources */,
+				CC9E983B1EFA267E009D37C5 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC9E984F1EFA2683009D37C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC9E98361EFA267E009D37C5 /* DiffingTestHost */;
+			targetProxy = CC9E984E1EFA2683009D37C5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CC9E98101EF9F44F009D37C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		CC9E98111EF9F44F009D37C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		CC9E981D1EF9F46A009D37C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0C82DB0B426A86BE680F06B8 /* Pods-ASDKDiffingTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = ASDKDiffingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.TextureGroup.ASDKDiffingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DiffingTestHost.app/DiffingTestHost";
+			};
+			name = Debug;
+		};
+		CC9E981E1EF9F46A009D37C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 92E6E53B4239101982E9E8A6 /* Pods-ASDKDiffingTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = ASDKDiffingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = org.TextureGroup.ASDKDiffingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DiffingTestHost.app/DiffingTestHost";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CC9E984C1EFA267E009D37C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = DiffingTestHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.TextureGroup.DiffingTestHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		CC9E984D1EFA267E009D37C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = DiffingTestHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = org.TextureGroup.DiffingTestHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC9E980F1EF9F44F009D37C5 /* Build configuration list for PBXProject "ASDKDiffing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC9E98101EF9F44F009D37C5 /* Debug */,
+				CC9E98111EF9F44F009D37C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC9E981C1EF9F46A009D37C5 /* Build configuration list for PBXNativeTarget "ASDKDiffingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC9E981D1EF9F46A009D37C5 /* Debug */,
+				CC9E981E1EF9F46A009D37C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC9E984B1EFA267E009D37C5 /* Build configuration list for PBXNativeTarget "DiffingTestHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC9E984C1EFA267E009D37C5 /* Debug */,
+				CC9E984D1EFA267E009D37C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CC9E980C1EF9F44F009D37C5 /* Project object */;
+}

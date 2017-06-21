@@ -18,6 +18,9 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDimension.h>
+#if AS_DIFFING
+#import <IGListKit/IGListDiffKit.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
