@@ -510,7 +510,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
   [changeSet addCompletionHandler:^(BOOL finished) {
     ASDataControllerLogEvent(self, @"finishedUpdate in %fms: %@",
-                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);  }];
+                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);
+  }];
 #endif
   
   // Attempt to mark the update completed. This is when update validation will occur inside the changeset.
