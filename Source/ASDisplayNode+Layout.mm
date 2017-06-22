@@ -143,7 +143,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 {
   NSString *string = NSStringFromClass([self class]);
   if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"",_debugName]];
+    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"", _debugName]];
   }
   return string;
 }
@@ -864,7 +864,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (void)_pendingLayoutTransitionDidComplete
 {
+  // This assertion introduces a breaking behavior for nodes that has ASM enabled but also manually manage some subnodes.
+  // Let's gate it behind YOGA flag and remove it right after a branch cut.
+#if YOGA
   [self _assertSubnodeState];
+#endif
 
   // Subclass hook
   [self calculatedLayoutDidChange];
