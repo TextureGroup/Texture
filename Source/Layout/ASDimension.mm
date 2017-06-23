@@ -47,7 +47,6 @@ ASOVERLOADABLE ASDimension ASDimensionMake(NSString *dimension)
     }
   }
   
-  ASDisplayNodeCAssert(NO, @"Parsing dimension failed for: %@", dimension);
   return ASDimensionAuto;
 }
 
