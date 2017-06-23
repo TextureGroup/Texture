@@ -167,8 +167,11 @@ static const CGFloat kInnerPadding = 10.0f;
 {
   CGSize videoNodeSize = _isImageEnlarged ? CGSizeMake(2.0 * kImageSize, 2.0 * kImageSize)
                                           : CGSizeMake(kImageSize, kImageSize);
-  _videoNode.size = ASRelativeSizeRangeMakeWithExactCGSize(videoNodeSize);
-  _textNode.flexShrink = 1.0;
+  
+  [_videoNode.style setWidth:ASDimensionMake(videoNodeSize.width)];
+  [_videoNode.style setHeight:ASDimensionMake(videoNodeSize.height)];
+  
+  _textNode.style.flexShrink = 1.0;
   
   ASStackLayoutSpec *stackSpec = [[ASStackLayoutSpec alloc] init];
   stackSpec.direction = ASStackLayoutDirectionHorizontal;
