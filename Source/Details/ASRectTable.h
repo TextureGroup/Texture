@@ -32,7 +32,8 @@ typedef NSMapTable ASRectTable;
 /**
  * A category for creating & using map tables meant for storing CGRects.
  *
- * This category is private, so name collisions are not worth worrying about.
+ * This category is not included in the umbrella header and must be imported manually. 
+ * Because of that, name collisions are not worth worrying about.
  */
 @interface NSMapTable<KeyType, id> (ASRectTableMethods)
 
