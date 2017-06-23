@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-  spec.name         = 'Texture'
+  spec.name         = 'Texture-Weaver'
   spec.version      = '0.1'
   spec.license      =  { :type => 'BSD and Apache 2',  }
   spec.homepage     = 'http://texturegroup.org'
@@ -47,18 +47,18 @@ Pod::Spec.new do |spec|
   spec.subspec 'PINRemoteImage' do |pin|
       pin.dependency 'PINRemoteImage/iOS', '= 3.0.0-beta.10'
       pin.dependency 'PINRemoteImage/PINCache'
-      pin.dependency 'Texture/Core'
+      pin.dependency 'Texture-Weaver/Core'
   end
 
   spec.subspec 'IGListKit' do |igl|
       igl.dependency 'IGListKit', '3.0.0'
-      igl.dependency 'Texture/Core'
+      igl.dependency 'Texture-Weaver/Core'
   end
 
   spec.subspec 'Yoga' do |yoga|
       yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
       yoga.dependency 'Yoga', '1.5.0'
-      yoga.dependency 'Texture/Core'
+      yoga.dependency 'Texture-Weaver/Core'
   end
 
   # Include optional PINRemoteImage module
