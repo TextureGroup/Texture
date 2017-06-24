@@ -168,7 +168,6 @@ static const CGFloat kInnerPadding = 10.0f;
   CGSize videoNodeSize = _isImageEnlarged ? CGSizeMake(2.0 * kImageSize, 2.0 * kImageSize)
                                           : CGSizeMake(kImageSize, kImageSize);
   
-  [_videoNode.style setHeight:ASDimensionMake(videoNodeSize.height)];
   [_videoNode.style setPreferredSize:videoNodeSize];
   
   _textNode.style.flexShrink = 1.0;
