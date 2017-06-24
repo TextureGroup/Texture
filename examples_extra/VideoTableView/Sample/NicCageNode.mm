@@ -29,6 +29,9 @@ static const CGFloat kImageSize = 80.0f;
 static const CGFloat kOuterPadding = 16.0f;
 static const CGFloat kInnerPadding = 10.0f;
 
+#define kVideoURL @"https://www.w3schools.com/html/mov_bbb.mp4"
+#define kVideoStreamURL @"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"
+
 @interface NicCageNode ()
 {
   CGSize _kittenSize;
@@ -96,20 +99,20 @@ static const CGFloat kInnerPadding = 10.0f;
     case 0:
       // Construct an AVAsset from a URL
       _videoNode = [[ASVideoNode alloc] init];
-      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://www.w3schools.com/html/mov_bbb.mp4"]];
+      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:kVideoURL]];
       break;
       
     case 1:
       // Construct the video node directly from the .mp4 URL
       _videoNode = [[ASVideoNode alloc] init];
-      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://www.w3schools.com/html/mov_bbb.mp4"]];
+      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:kVideoURL]];
       break;
       
     case 2:
       // Construct the video node from an HTTP Live Streaming URL
       // URL from https://developer.apple.com/library/ios/documentation/AudioVideo/Conceptual/AVFoundationPG/Articles/02_Playback.html
       _videoNode = [[ASVideoNode alloc] init];
-      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8"]];
+      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:kVideoStreamURL]];
       break;
   }
   
