@@ -96,13 +96,13 @@ static const CGFloat kInnerPadding = 10.0f;
     case 0:
       // Construct an AVAsset from a URL
       _videoNode = [[ASVideoNode alloc] init];
-      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://files.parsetfss.com/8a8a3b0c-619e-4e4d-b1d5-1b5ba9bf2b42/tfss-753fe655-86bb-46da-89b7-aa59c60e49c0-niccage.mp4"]];
+      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://www.w3schools.com/html/mov_bbb.mp4"]];
       break;
       
     case 1:
       // Construct the video node directly from the .mp4 URL
       _videoNode = [[ASVideoNode alloc] init];
-      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://files.parsetfss.com/8a8a3b0c-619e-4e4d-b1d5-1b5ba9bf2b42/tfss-753fe655-86bb-46da-89b7-aa59c60e49c0-niccage.mp4"]];
+      _videoNode.asset = [AVAsset assetWithURL:[NSURL URLWithString:@"https://www.w3schools.com/html/mov_bbb.mp4"]];
       break;
       
     case 2:
