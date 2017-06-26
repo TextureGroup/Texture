@@ -17,8 +17,6 @@
 
 #import <AsyncDisplayKit/ASDimension.h>
 
-#import <UIKit/UIGeometry.h>
-
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
