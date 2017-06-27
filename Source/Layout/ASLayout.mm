@@ -124,9 +124,11 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
     _sublayouts = sublayouts != nil ? [sublayouts copy] : @[];
 
-    _elementToRectTable = [ASRectTable rectTableForWeakObjectPointers];
-    for (ASLayout *layout in sublayouts) {
-      [_elementToRectTable setRect:layout.frame forKey:layout.layoutElement];
+    if (_sublayouts.count > 0) {
+      _elementToRectTable = [ASRectTable rectTableForWeakObjectPointers];
+      for (ASLayout *layout in sublayouts) {
+        [_elementToRectTable setRect:layout.frame forKey:layout.layoutElement];
+      }
     }
     
     _flattened = NO;
@@ -251,7 +253,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 - (CGRect)frameForElement:(id<ASLayoutElement>)layoutElement
 {
-  return [_elementToRectTable rectForKey:layoutElement];
+  return _elementToRectTable ? [_elementToRectTable rectForKey:layoutElement] : CGRectNull;
 }
 
 - (CGRect)frame
