@@ -135,14 +135,6 @@ ASDISPLAYNODE_EXTERN_C_END
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size AS_WARN_UNUSED_RESULT;
 /**
- * Convenience initializer that creates a layout based on the values of the given layout, with a new position
- *
- * @param layout           The layout to use to create the new layout
- * @param position         The position of the new layout
- */
-+ (instancetype)layoutWithLayout:(ASLayout *)layout position:(CGPoint)position AS_WARN_UNUSED_RESULT;
-
-/**
  * Traverses the existing layout tree and generates a new tree that represents only ASDisplayNode layouts
  */
 - (ASLayout *)filteredNodeLayoutTree AS_WARN_UNUSED_RESULT;

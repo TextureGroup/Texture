@@ -42,7 +42,6 @@
     return [ASLayout layoutWithLayoutElement:layoutElement size:size sublayouts:sublayouts];
   } else {
     CGPoint position = CGPointMake(YGNodeLayoutGetLeft(yogaNode), YGNodeLayoutGetTop(yogaNode));
-    // TODO: If it were possible to set .flattened = YES, it would be valid to do so here.
     return [ASLayout layoutWithLayoutElement:layoutElement size:size position:position sublayouts:nil];
   }
 }
