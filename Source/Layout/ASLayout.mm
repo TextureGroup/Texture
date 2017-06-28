@@ -134,7 +134,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     _size = size;
     
     if (ASPointIsNull(position) == NO) {
-      _position = CGPointMake(ASCeilPixelValue(position.x), ASCeilPixelValue(position.y));
+      _position = ASCeilPointValues(position);
     } else {
       _position = position;
     }
@@ -243,7 +243,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     const CGPoint absolutePosition = context.absolutePosition;
     
     if (ASLayoutIsDisplayNodeType(layout)) {
-      if (sublayoutsCount > 0 || CGPointEqualToPoint(absolutePosition, layout.position) == NO) {
+      if (sublayoutsCount > 0 || CGPointEqualToPoint(ASCeilPointValues(absolutePosition), layout.position) == NO) {
         // Only create a new layout if the existing one can't be reused, which means it has either some sublayouts or an invalid absolute position.
         layout = [ASLayout layoutWithLayoutElement:layout.layoutElement
                                               size:layout.size
