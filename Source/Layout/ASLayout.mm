@@ -59,7 +59,7 @@ static inline NSString * descriptionIndents(NSUInteger indents)
 @property (nonatomic, getter=isFlattened) BOOL flattened;
 
 /*
- * Caches all sublayouts if set to YES or destroys the sublayout cache if set to NO. Defaults to YES
+ * Caches all sublayouts if set to YES or destroys the sublayout cache if set to NO. Defaults to NO
  */
 @property (nonatomic, assign) BOOL retainSublayoutLayoutElements;
 
