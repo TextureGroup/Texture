@@ -488,7 +488,54 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
    inAdditionalTruncationMessage:(out BOOL *)inAdditionalTruncationMessageOut
                  forHighlighting:(BOOL)highlighting
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  ASDN::MutexLocker l(__instanceLock__);
+
+  ASTextContainer *containerCopy = [_textContainer copy];
+  containerCopy.size = self.calculatedSize;
+  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
+  NSRange visibleRange = layout.visibleRange;
+  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
+
+  ASTextRange *range = [layout closestTextRangeAtPoint:point];
+
+  // For now, assume that a tap inside this text, but outside the text range is a tap on the
+  // truncation token.
+  if (![layout textRangeAtPoint:point]) {
+    *inAdditionalTruncationMessageOut = YES;
+    return nil;
+  }
+
+  NSRange effectiveRange = NSMakeRange(0, 0);
+  for (NSString *attributeName in self.linkAttributeNames) {
+    id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
+    NSString *name = attributeName;
+    if (value == nil || name == nil) {
+      // Didn't find anything
+      continue;
+    }
+
+    // If highlighting, check with delegate first. If not implemented, assume YES.
+    if (highlighting
+        && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
+      value = nil;
+      name = nil;
+    }
+
+    if (value != nil || name != nil) {
+      *rangeOut = effectiveRange;
+      if (NSMaxRange(*rangeOut) > NSMaxRange(visibleRange)) {
+        (*rangeOut).length = MAX(NSMaxRange(visibleRange) - (*rangeOut).location, 0);
+      }
+
+      if (attributeNameOut != NULL) {
+        *attributeNameOut = name;
+      }
+
+      return value;
+    }
+  }
+
   return nil;
 }
 
@@ -560,8 +607,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
+  // Set these so that link tapping works.
+  _highlightedLinkAttributeName = highlightedAttributeName;
+  _highlightedLinkAttributeValue = highlightedAttributeValue;
+
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
   // Much of the code from original ASTextNode is probably usable here.
+
   return;
 }
 
@@ -665,7 +717,37 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASDisplayNodeAssertMainThread();
 
   [super touchesBegan:touches withEvent:event];
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+
+  CGPoint point = [[touches anyObject] locationInView:self.view];
+
+  NSRange range = NSMakeRange(0, 0);
+  NSString *linkAttributeName = nil;
+  BOOL inAdditionalTruncationMessage = NO;
+
+  id linkAttributeValue = [self _linkAttributeValueAtPoint:point
+                                             attributeName:&linkAttributeName
+                                                     range:&range
+                             inAdditionalTruncationMessage:&inAdditionalTruncationMessage
+                                           forHighlighting:YES];
+
+  NSUInteger lastCharIndex = NSIntegerMax;
+  BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
+
+  if (inAdditionalTruncationMessage) {
+    NSRange visibleRange = NSMakeRange(0, 0);
+    {
+      ASDN::MutexLocker l(__instanceLock__);
+      ASTextContainer *containerCopy = [_textContainer copy];
+      containerCopy.size = self.calculatedSize;
+      ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
+      visibleRange = layout.visibleRange;
+    }
+    NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
+    [self _setHighlightRange:truncationMessageRange forAttributeName:ASTextNodeTruncationTokenAttributeName value:nil animated:YES];
+  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+    [self _setHighlightRange:range forAttributeName:linkAttributeName value:linkAttributeValue animated:YES];
+  }
+
   return;
 }
 
