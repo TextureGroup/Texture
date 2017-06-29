@@ -36,10 +36,6 @@
 - (ASSizeRange)_locked_constrainedSizeForLayoutPass;
 @end
 
-@interface ASLayout (YogaInternal)
-@property (nonatomic, getter=isFlattened) BOOL flattened;
-@end
-
 @implementation ASDisplayNode (Yoga)
 
 - (void)setYogaChildren:(NSArray *)yogaChildren
@@ -174,9 +170,7 @@
 
   NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:childCount];
   for (ASDisplayNode *subnode in self.yogaChildren) {
-    ASLayout *sublayout = [subnode layoutForYogaNode];
-    sublayout.flattened = YES;
-    [sublayouts addObject:sublayout];
+    [sublayouts addObject:[subnode layoutForYogaNode]];
   }
 
   // The layout for self should have position CGPointNull, but include the calculated size.
