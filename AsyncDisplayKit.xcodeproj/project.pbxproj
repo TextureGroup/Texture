@@ -421,6 +421,7 @@
 		DEFAD8131CC48914000527C4 /* ASVideoNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEEC47E01C20C2DD00EC1693 /* ASVideoNode.mm */; };
 		E516FC7F1E9FE24200714FF4 /* ASHashing.h in Headers */ = {isa = PBXBuildFile; fileRef = E516FC7D1E9FE24200714FF4 /* ASHashing.h */; };
 		E516FC801E9FE24200714FF4 /* ASHashing.m in Sources */ = {isa = PBXBuildFile; fileRef = E516FC7E1E9FE24200714FF4 /* ASHashing.m */; };
+		E51B78BF1F028ABF00E32604 /* ASLayoutFlatteningTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */; };
 		E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */; };
 		E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */; };
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
@@ -890,6 +891,7 @@
 		DECBD6E61BE56E1900CF4905 /* ASButtonNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASButtonNode.mm; sourceTree = "<group>"; };
 		E516FC7D1E9FE24200714FF4 /* ASHashing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASHashing.h; sourceTree = "<group>"; };
 		E516FC7E1E9FE24200714FF4 /* ASHashing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASHashing.m; sourceTree = "<group>"; };
+		E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASLayoutFlatteningTests.m; sourceTree = "<group>"; };
 		E52405B21C8FEF03004DC8E7 /* ASLayoutTransition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutTransition.mm; sourceTree = "<group>"; };
 		E52405B41C8FEF16004DC8E7 /* ASLayoutTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutTransition.h; sourceTree = "<group>"; };
 		E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPageTable.h; sourceTree = "<group>"; };
@@ -1173,6 +1175,7 @@
 				058D0A30195D057000B7D73C /* ASDisplayNodeTestsHelper.h */,
 				058D0A31195D057000B7D73C /* ASDisplayNodeTestsHelper.m */,
 				697B31591CFE4B410049936F /* ASEditableTextNodeTests.m */,
+				E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */,
 				052EE0651A159FEF002C6279 /* ASMultiplexImageNodeTests.m */,
 				058D0A32195D057000B7D73C /* ASMutableAttributedStringBuilderTests.m */,
 				3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */,
@@ -2044,6 +2047,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E51B78BF1F028ABF00E32604 /* ASLayoutFlatteningTests.m in Sources */,
 				29CDC2E21AAE70D000833CA4 /* ASBasicImageDownloaderContextTests.m in Sources */,
 				CC051F1F1D7A286A006434CB /* ASCALayerTests.m in Sources */,
 				242995D31B29743C00090100 /* ASBasicImageDownloaderTests.m in Sources */,
