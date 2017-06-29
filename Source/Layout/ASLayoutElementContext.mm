@@ -84,15 +84,39 @@ std::shared_ptr<ASDisplayNodeLayout> ASLayoutElementContextGetPendingLayout(ASDi
   if (node == nil) {
     return nullptr;
   }
-  void *ptr = (__bridge void *)node;
-  return (*(ASLayoutElementGetCurrentContext().pendingLayoutMap))[ptr];
+  
+  void *nodePointer = (__bridge void *)node;
+  std::shared_ptr<std::unordered_map<void *,
+                  std::shared_ptr<ASDisplayNodeLayout>>> pendingLayoutMap =
+                                                            ASLayoutElementGetCurrentContext().pendingLayoutMap;
+  if (pendingLayoutMap == nullptr) {
+    // WARNING: This condition should probably not be reached. It implies that the
+    // caller is asking for _pendingLayout outside of any layout operation.
+    return nullptr;
+  }
+
+  return (*(ASLayoutElementGetCurrentContext().pendingLayoutMap))[nodePointer];
 }
 
 void ASLayoutElementContextSetPendingLayout(ASDisplayNode *node, std::shared_ptr<ASDisplayNodeLayout> layout)
 {
-  if (node != nil) {
-    void *ptr = (__bridge void *)node;
-    (*(ASLayoutElementGetCurrentContext().pendingLayoutMap))[ptr] = layout;
+  if (node == nil) {
+    return;
+  }
+
+  void *nodePointer = (__bridge void *)node;
+  std::shared_ptr<std::unordered_map<void *,
+                  std::shared_ptr<ASDisplayNodeLayout>>> pendingLayoutMap =
+                                                            ASLayoutElementGetCurrentContext().pendingLayoutMap;
+
+  if (pendingLayoutMap == nullptr) {
+    return;
+  }
+
+  if (layout != nullptr) {
+    (*(pendingLayoutMap))[nodePointer] = layout;
+  } else if ((*(pendingLayoutMap))[nodePointer] != nullptr) {
+    (*(pendingLayoutMap)).erase(nodePointer);
   }
 }
 
