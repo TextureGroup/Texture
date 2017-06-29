@@ -467,15 +467,24 @@ static NSString * const kRate = @"rate";
 {
   [super didExitVisibleState];
   
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  if (_shouldBePlaying) {
+  __instanceLock__.lock();
+  // We have to cache the shouldBePlaying state here as pause will set it to NO
+  BOOL shouldBePlaying = _shouldBePlaying;
+
+  if (shouldBePlaying) {
+    __instanceLock__.unlock();
     [self pause];
+    __instanceLock__.lock();
+  }
+  
+  if (shouldBePlaying) {
     if (_player != nil && CMTIME_IS_VALID(_player.currentTime)) {
       _lastPlaybackTime = _player.currentTime;
     }
     _shouldBePlaying = YES;
   }
+
+  __instanceLock__.unlock();
 }
 
 #pragma mark - Video Properties
