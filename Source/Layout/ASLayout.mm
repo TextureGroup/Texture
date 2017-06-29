@@ -216,6 +216,8 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 - (ASLayout *)filteredNodeLayoutTree
 {
   if (ASLayoutIsFlattened(self)) {
+    // All flattened layouts must have this flag enabled
+    // to ensure sublayout elements are retained until the layouts are applied.
     self.retainSublayoutLayoutElements = YES;
     return self;
   }
@@ -261,6 +263,8 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   }
   
   ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:flattenedSublayouts];
+  // All flattened layouts must have this flag enabled
+  // to ensure sublayout elements are retained until the layouts are applied.
   layout.retainSublayoutLayoutElements = YES;
   return layout;
 }
