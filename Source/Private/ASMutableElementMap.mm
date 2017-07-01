@@ -111,26 +111,25 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   // For each element kind,
   [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supps, BOOL * _Nonnull stop) {
     
-    // For each index path of that kind,
-    [[supps copy] enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
+    // For each index path of that kind, move entries into a new dictionary.
+    // Note: it's tempting to update the dictionary in-place but because of the likely collision between old and new index paths,
+    // subtle bugs are possible. Note that this process is rare (only on section-level updates),
+    // that this work is done off-main, and that the typical supplementary element use case is just 1-per-section (header).
+    NSMutableDictionary *newSupps = [NSMutableDictionary dictionary];
+    [supps enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
       NSInteger oldSection = oldIndexPath.section;
       NSInteger newSection = [changeSet newSectionForOldSection:oldSection];
-
+      
       if (oldSection == newSection) {
-        // Index path stayed the same, do nothing.
-        return;
-      }
-      
-      // Remove the old entry.
-      [supps removeObjectForKey:oldIndexPath];
-      
-      // Add a new entry if the section wasn't deleted.
-      if (newSection != NSNotFound) {
+        // Index path stayed the same, just copy it over.
+        newSupps[oldIndexPath] = obj;
+      } else if (newSection != NSNotFound) {
         // Section index changed, move it.
         NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:oldIndexPath.item inSection:newSection];
-        supps[newIndexPath] = obj;
+        newSupps[newIndexPath] = obj;
       }
     }];
+    [supps setDictionary:newSupps];
   }];
 }
 
