@@ -17,16 +17,49 @@
 
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASCellNode.h>
 
-@class ASCellNode, ASCollectionElement;
+@class ASCollectionElement;
+
+/**
+ * Attempts to cast x to _ASCollectionViewCell, or nil if not possible.
+ *
+ * Since _ASCollectionViewCell is not available for subclassing (see below),
+ * comparing x's and _ASCollectionViewCell's classes is faster than calling -isKindOfClass: on x.
+ */
+#define ASCollectionViewCellCast(x) ({ \
+  id __var = x; \
+  ((_ASCollectionViewCell *) (x.class == [_ASCollectionViewCell class] ? __var : nil)); \
+})
+
+/**
+ * Attempts to cast x to _ASCollectionViewCell and assigns to __var. If not possible, returns the given __val.
+ *
+ * Since _ASCollectionViewCell is not available for subclassing (see below),
+ * comparing x's and _ASCollectionViewCell's classes is faster than calling -isKindOfClass: on x.
+ */
+#define ASCollectionViewCellCastOrReturn(x, __var, __val) \
+  _ASCollectionViewCell *__var = ASCollectionViewCellCast(x); \
+  if (__var == nil) { \
+    return __val; \
+  }
 
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
 @interface _ASCollectionViewCell : UICollectionViewCell
-@property (nonatomic, strong, nullable) ASCollectionElement *element;
-@property (nonatomic, strong, readonly, nullable) ASCellNode *node;
+
+/**
+ * Whether or not this cell is interested in cell node visibility events.
+ * -cellNodeVisibilityEvent:inScrollView: should be called only if this property is YES.
+ */
+@property (nonatomic, readonly) BOOL consumesCellNodeVisibilityEvents;
 @property (nonatomic, strong, nullable) UICollectionViewLayoutAttributes *layoutAttributes;
+
+- (void)setElement:(ASCollectionElement *)element;
+
+- (void)cellNodeVisibilityEvent:(ASCellNodeVisibilityEvent)event inScrollView:(UIScrollView *)scrollView;
+
 @end
 
 NS_ASSUME_NONNULL_END

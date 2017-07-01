@@ -16,15 +16,17 @@
 //
 
 #import "_ASCollectionViewCell.h"
-#import "ASCellNode+Internal.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
-@implementation _ASCollectionViewCell
+@implementation _ASCollectionViewCell {
+  ASCollectionElement *_element;
+}
 
-- (ASCellNode *)node
+- (nullable ASCellNode *)node
 {
-  return self.element.node;
+  return _element.node;
 }
 
 - (void)setElement:(ASCollectionElement *)element
@@ -36,6 +38,20 @@
   
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
+}
+
+- (BOOL)consumesCellNodeVisibilityEvents
+{
+  ASCellNode *node = self.node;
+  if (node == nil) {
+    return NO;
+  }
+  return ASSubclassOverridesSelector([ASCellNode class], [node class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));
+}
+
+- (void)cellNodeVisibilityEvent:(ASCellNodeVisibilityEvent)event inScrollView:(UIScrollView *)scrollView
+{
+  [self.node cellNodeVisibilityEvent:event inScrollView:scrollView withCellFrame:self.frame];
 }
 
 - (void)setSelected:(BOOL)selected
@@ -61,7 +77,7 @@
   self.layoutAttributes = nil;
 
   // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
-  self.element = nil;
+  _element = nil;
   [super prepareForReuse];
 }
 

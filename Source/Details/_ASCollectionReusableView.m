@@ -16,15 +16,16 @@
 //
 
 #import "_ASCollectionReusableView.h"
-#import "ASCellNode+Internal.h"
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@implementation _ASCollectionReusableView
+@implementation _ASCollectionReusableView {
+  ASCollectionElement *_element;
+}
 
-- (ASCellNode *)node
+- (nullable ASCellNode *)node
 {
-  return self.element.node;
+  return _element.node;
 }
 
 - (void)setElement:(ASCollectionElement *)element
@@ -45,7 +46,7 @@
   self.layoutAttributes = nil;
   
   // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
-  self.element = nil;
+  _element = nil;
   [super prepareForReuse];
 }
 
