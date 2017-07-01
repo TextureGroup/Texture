@@ -298,7 +298,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
   // Remove all old supplementaries from these sections
   NSIndexSet *oldSections = [NSIndexSet as_sectionsFromIndexPaths:indexPaths];
-  [map removeSupplementaryElementsInSections:oldSections];
 
   // Add in new ones with the new kinds.
   NSIndexSet *newSections;
@@ -675,6 +674,9 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     return;
   }
   
+  // Migrate old supplementary nodes to their new index paths.
+  [map migrateSupplementaryElementsWithChangeSet:changeSet];
+
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeDelete]) {
     [map removeItemsAtIndexPaths:change.indexPaths];
     // Aggressively repopulate supplementary nodes (#1773 & #1629)
@@ -688,7 +690,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeDelete]) {
     NSIndexSet *sectionIndexes = change.indexSet;
-    [map removeSupplementaryElementsInSections:sectionIndexes];
     [map removeSectionsOfItems:sectionIndexes];
   }
   

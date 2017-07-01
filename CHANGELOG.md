@@ -13,6 +13,7 @@
 - Migrated unit tests to OCMock 3.4 (from 2.2) and improved the multiplex image node tests. [Adlai Holler](https://github.com/Adlai-Holler)
 - Fix CollectionNode double-load issue. This should significantly improve performance in cases where a collection node has content immediately available on first layout i.e. not fetched from the network. [Adlai Holler](https://github.com/Adlai-Holler)
 - Overhaul layout flattening algorithm [Huy Nguyen](https://github.com/nguyenhuy) [#395](https://github.com/TextureGroup/Texture/pull/395).
+- Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.3.3
 - [ASTextKitFontSizeAdjuster] Replace use of NSAttributedString's boundingRectWithSize:options:context: with NSLayoutManager's boundingRectForGlyphRange:inTextContainer: [Ricky Cancro](https://github.com/rcancro)
