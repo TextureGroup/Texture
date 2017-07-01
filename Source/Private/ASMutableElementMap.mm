@@ -118,10 +118,14 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 
       if (oldSection == newSection) {
         // Index path stayed the same, do nothing.
-      } else if (newSection == NSNotFound) {
-        // Section was deleted, remove the supplementary element.
-        [supps removeObjectForKey:oldIndexPath];
-      } else {
+        return;
+      }
+      
+      // Remove the old entry.
+      [supps removeObjectForKey:oldIndexPath];
+      
+      // Add a new entry if the section wasn't deleted.
+      if (newSection != NSNotFound) {
         // Section index changed, move it.
         NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:oldIndexPath.item inSection:newSection];
         supps[newIndexPath] = obj;
