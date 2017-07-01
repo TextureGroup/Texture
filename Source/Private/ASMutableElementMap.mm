@@ -104,6 +104,10 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 
 - (void)migrateSupplementaryElementsWithChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
+  if (changeSet.deletedSections.count == 0 && changeSet.insertedSections.count == 0) {
+    return;
+  }
+
   // For each element kind,
   [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supps, BOOL * _Nonnull stop) {
     
