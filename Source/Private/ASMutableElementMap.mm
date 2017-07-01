@@ -1,5 +1,5 @@
 //
-//  ASMutableElementMap.m
+//  ASMutableElementMap.mm
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
+#import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 
 typedef NSMutableArray<NSMutableArray<ASCollectionElement *> *> ASMutableCollectionElementTwoDimensionalArray;
 
@@ -79,13 +80,6 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   [_sectionsOfItems removeObjectsAtIndexes:itemSections];
 }
 
-- (void)removeSupplementaryElementsInSections:(NSIndexSet *)sections
-{
-  [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supplementariesForKind, BOOL * _Nonnull stop) {
-    [supplementariesForKind removeObjectsForKeys:[sections as_filterIndexPathsBySection:supplementariesForKind]];
-  }];
-}
-
 - (void)insertEmptySectionsOfItemsAtIndexes:(NSIndexSet *)sections
 {
   [sections enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
@@ -106,6 +100,30 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
     }
     supplementariesForKind[indexPath] = element;
   }
+}
+
+- (void)migrateSupplementaryElementsWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+{
+  // For each element kind,
+  [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supps, BOOL * _Nonnull stop) {
+    
+    // For each index path of that kind,
+    [[supps copy] enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
+      NSInteger oldSection = oldIndexPath.section;
+      NSInteger newSection = [changeSet newSectionForOldSection:oldSection];
+
+      if (oldSection == newSection) {
+        // Index path stayed the same, do nothing.
+      } else if (newSection == NSNotFound) {
+        // Section was deleted, remove the supplementary element.
+        [supps removeObjectForKey:oldIndexPath];
+      } else {
+        // Section index changed, move it.
+        NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:oldIndexPath.item inSection:newSection];
+        supps[newIndexPath] = obj;
+      }
+    }];
+  }];
 }
 
 #pragma mark - Helpers
