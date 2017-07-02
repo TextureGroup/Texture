@@ -1,6 +1,12 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+
+##2.3.5
+- Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
+- Overhaul logging and add activity tracing support. [Adlai Holler](https://github.com/Adlai-Holler)
+
+##2.3.4
 - [Yoga] Rewrite YOGA_TREE_CONTIGUOUS mode with improved behavior and cleaner integration [Scott Goodson](https://github.com/appleguy)
 - [ASTraitCollection] Convert ASPrimitiveTraitCollection from lock to atomic. [Scott Goodson](https://github.com/appleguy)
 - Add a synchronous mode to ASCollectionNode, for colletion view data source debugging. [Hannah Troisi](https://github.com/hannahmbanana)
@@ -10,8 +16,7 @@
 - Fixed an issue where calls to setNeedsDisplay and setNeedsLayout would stop working on loaded nodes. [Garrett Moon](https://github.com/garrettmoon)
 - Migrated unit tests to OCMock 3.4 (from 2.2) and improved the multiplex image node tests. [Adlai Holler](https://github.com/Adlai-Holler)
 - Fix CollectionNode double-load issue. This should significantly improve performance in cases where a collection node has content immediately available on first layout i.e. not fetched from the network. [Adlai Holler](https://github.com/Adlai-Holler)
-- Overhaul layout flattening algorithm [Huy Nguyen](https://github.com/nguyenhuy) [#395](https://github.com/TextureGroup/Texture/
-- Overhaul logging and add activity tracing support. [Adlai Holler](https://github.com/Adlai-Holler)
+- Overhaul layout flattening algorithm [Huy Nguyen](https://github.com/nguyenhuy) [#395](https://github.com/TextureGroup/Texture/pull/395).
 
 ## 2.3.3
 - [ASTextKitFontSizeAdjuster] Replace use of NSAttributedString's boundingRectWithSize:options:context: with NSLayoutManager's boundingRectForGlyphRange:inTextContainer: [Ricky Cancro](https://github.com/rcancro)
