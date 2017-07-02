@@ -46,6 +46,8 @@ CGSize ASFloorSizeValues(CGSize s);
 
 CGFloat ASFloorPixelValue(CGFloat f);
 
+CGPoint ASCeilPointValues(CGPoint p);
+
 CGSize ASCeilSizeValues(CGSize s);
 
 CGFloat ASCeilPixelValue(CGFloat f);

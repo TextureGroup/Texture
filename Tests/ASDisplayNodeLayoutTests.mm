@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import "ASLayoutSpecSnapshotTestsHelper.h"
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <stdatomic.h>
 
 @interface ASDisplayNodeLayoutTests : XCTestCase
 @end
@@ -93,9 +94,9 @@
   ASButtonNode *buttonNode = [ASButtonNode new];
   [displayNode addSubnode:buttonNode];
   
-  __block size_t numberOfLayoutSpecThatFitsCalls = 0;
+  __block atomic_int numberOfLayoutSpecThatFitsCalls = ATOMIC_VAR_INIT(0);
   displayNode.layoutSpecBlock = ^(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    __sync_fetch_and_add(&numberOfLayoutSpecThatFitsCalls, 1);
+    atomic_fetch_add(&numberOfLayoutSpecThatFitsCalls, 1);
     return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:buttonNode];
   };
   
