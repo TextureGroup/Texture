@@ -11,6 +11,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextNode2.h>
+#import <AsyncDisplayKit/ASTextNode.h>  // Definition of ASTextNodeDelegate
 
 #import <tgmath.h>
 #import <deque>

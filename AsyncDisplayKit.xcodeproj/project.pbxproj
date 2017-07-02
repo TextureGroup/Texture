@@ -394,7 +394,7 @@
 		CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.m */; };
 		CCCCCCE71EC3F0FC0087FE10 /* NSAttributedString+ASText.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */; };
 		CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.m */; };
-		CCD523111EBD658C001F2191 /* ASTextNode2.h in Headers */ = {isa = PBXBuildFile; fileRef = CCD5230F1EBD658C001F2191 /* ASTextNode2.h */; };
+		CCD523111EBD658C001F2191 /* ASTextNode2.h in Headers */ = {isa = PBXBuildFile; fileRef = CCD5230F1EBD658C001F2191 /* ASTextNode2.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCD523121EBD658C001F2191 /* ASTextNode2.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCD523101EBD658C001F2191 /* ASTextNode2.mm */; };
 		CCDD148B1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */; };
 		CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
