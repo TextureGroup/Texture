@@ -143,7 +143,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 {
   NSString *string = NSStringFromClass([self class]);
   if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"", _debugName]];
+    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"",_debugName]];
   }
   return string;
 }
