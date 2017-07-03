@@ -114,13 +114,6 @@
   _viewControllerNode.frame = self.bounds;
 }
 
-- (void)layoutDidFinish
-{
-  [super layoutDidFinish];
-
-  _viewControllerNode.frame = self.bounds;
-}
-
 - (void)_rootNodeDidInvalidateSize
 {
   if (_interactionDelegate != nil) {

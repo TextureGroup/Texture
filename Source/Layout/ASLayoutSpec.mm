@@ -71,6 +71,11 @@
   return YES;
 }
 
+- (BOOL)implementsLayoutMethod
+{
+  return YES;
+}
+
 #pragma mark - Style
 
 - (ASLayoutElementStyle *)style

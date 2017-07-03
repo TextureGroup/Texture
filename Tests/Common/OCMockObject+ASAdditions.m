@@ -10,18 +10,31 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <OCMock/OCMockObject.h>
-#import "ASInternalHelpers.h"
+#import "OCMockObject+ASAdditions.h"
+
+#import <OCMock/OCMock.h>
 #import <objc/runtime.h>
+#import "ASTestCase.h"
+
+@interface ASTestCase (OCMockObjectRegistering)
+
+- (void)registerMockObject:(id)mockObject;
+
+@end
 
 @implementation OCMockObject (ASAdditions)
 
 + (void)load
 {
-  // Swap [OCProtocolMockObject respondsToSelector:] with [(self) swizzled_protocolMockRespondsToSelector:]
+  // [OCProtocolMockObject respondsToSelector:] <-> [(self) swizzled_protocolMockRespondsToSelector:]
   Method orig = class_getInstanceMethod(OCMockObject.protocolMockObjectClass, @selector(respondsToSelector:));
   Method new = class_getInstanceMethod(self, @selector(swizzled_protocolMockRespondsToSelector:));
   method_exchangeImplementations(orig, new);
+
+  // init <-> swizzled_init
+  Method origInit = class_getInstanceMethod([OCMockObject class], @selector(init));
+  Method newInit = class_getInstanceMethod(self, @selector(swizzled_init));
+  method_exchangeImplementations(origInit, newInit);
 }
 
 /// Since OCProtocolMockObject is private, use this method to get the class.
@@ -118,6 +131,15 @@
   
   // It's an optional instance or class method. Override the return value.
   return [self implementsOptionalProtocolMethod:aSelector];
+}
+
+// Whenever a mock object is initted, register it with the current test case
+// so that it gets verified and its invocations are cleared during -tearDown.
+- (instancetype)swizzled_init
+{
+  [self swizzled_init];
+  [ASTestCase.currentTestCase registerMockObject:self];
+  return self;
 }
 
 @end

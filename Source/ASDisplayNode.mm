@@ -177,6 +177,15 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
   }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:)) ||
+      ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:
+                                                                 restrictedToSize:
+                                                             relativeToParentSize:))) {
+    overrides |= ASDisplayNodeMethodOverrideCalcLayoutThatFits;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
+    overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
+  }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(fetchData))) {
     overrides |= ASDisplayNodeMethodOverrideFetchData;
   }
@@ -885,7 +894,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _unflattenedLayout = nil;
 
-#if YOGA_TREE_CONTIGUOUS
+#if YOGA
   [self invalidateCalculatedYogaLayout];
 #endif
 }
@@ -948,9 +957,25 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
+  // Use a pthread specific to mark when this method is called re-entrant on same thread.
+  // We only want one calculateLayout signpost interval per thread.
+  // This is fast enough to do it unconditionally.
+  auto key = ASPthreadStaticKey(NULL);
+  BOOL isRootCall = (pthread_getspecific(key) == NULL);
+  if (isRootCall) {
+    pthread_setspecific(key, kCFBooleanTrue);
+    ASSignpostStart(ASSignpostCalculateLayout);
+  }
+
   ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
-  return [self calculateLayoutThatFits:resolvedRange];
+  ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
+
+  if (isRootCall) {
+    pthread_setspecific(key, NULL);
+    ASSignpostEnd(ASSignpostCalculateLayout);
+  }
+  return result;
 }
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
@@ -959,7 +984,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   ASDN::MutexLocker l(__instanceLock__);
 
-#if YOGA_TREE_CONTIGUOUS /* YOGA */
+#if YOGA
   // There are several cases where Yoga could arrive here:
   // - This node is not in a Yoga tree: it has neither a yogaParent nor yogaChildren.
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
@@ -1981,9 +2006,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
-  ASDisplayNodeLogEvent(self, @"addSubnode: %@", subnode);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually add subnode to node with automaticallyManagesSubnodes=YES. Node: %@", subnode);
+  ASDisplayNodeLogEvent(self, @"addSubnode: %@ with automaticallyManagesSubnodes: %@",
+                        subnode, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _addSubnode:subnode];
 }
 
@@ -2033,9 +2057,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode
 {
-  ASDisplayNodeLogEvent(self, @"replaceSubnode: %@ withSubnode:%@", oldSubnode, replacementSubnode);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually replace old node with replacement node to node with automaticallyManagesSubnodes=YES. Old Node: %@, replacement node: %@", oldSubnode, replacementSubnode);
+  ASDisplayNodeLogEvent(self, @"replaceSubnode: %@ withSubnode: %@ with automaticallyManagesSubnodes: %@",
+                        oldSubnode, replacementSubnode, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _replaceSubnode:oldSubnode withSubnode:replacementSubnode];
 }
 
@@ -2081,9 +2104,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below
 {
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ belowSubnode:%@", subnode, below);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually insert subnode to node with automaticallyManagesSubnodes=YES. Node: %@", subnode);
+  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ belowSubnode: %@ with automaticallyManagesSubnodes: %@",
+                        subnode, below, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _insertSubnode:subnode belowSubnode:below];
 }
 
@@ -2145,9 +2167,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above
 {
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ abodeSubnode: %@", subnode, above);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually insert subnode to node with automaticallyManagesSubnodes=YES. Node: %@", subnode);
+  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ abodeSubnode: %@ with automaticallyManagesSubnodes: %@",
+                        subnode, above, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _insertSubnode:subnode aboveSubnode:above];
 }
 
@@ -2207,9 +2228,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx
 {
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ atIndex: %td", subnode, idx);
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.automaticallyManagesSubnodes == NO, @"Attempt to manually insert subnode to node with automaticallyManagesSubnodes=YES. Node: %@", subnode);
+  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ atIndex: %td with automaticallyManagesSubnodes: %@",
+                        subnode, idx, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _insertSubnode:subnode atIndex:idx];
 }
 
@@ -2270,9 +2290,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)removeFromSupernode
 {
-  // TODO: 2.0 Conversion: Reenable and fix within product code
-  //ASDisplayNodeAssert(self.supernode.automaticallyManagesSubnodes == NO, @"Attempt to manually remove subnode from node with automaticallyManagesSubnodes=YES. Node: %@", self);
-    
+  ASDisplayNodeLogEvent(self, @"removeFromSupernode with automaticallyManagesSubnodes: %@",
+                        self.automaticallyManagesSubnodes ? @"YES" : @"NO");
   [self _removeFromSupernode];
 }
 

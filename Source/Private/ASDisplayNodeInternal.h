@@ -51,8 +51,10 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideTouchesEnded       = 1 << 2,
   ASDisplayNodeMethodOverrideTouchesMoved       = 1 << 3,
   ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
-  ASDisplayNodeMethodOverrideFetchData          = 1 << 5,
-  ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 6
+  ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
+  ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
+  ASDisplayNodeMethodOverrideFetchData          = 1 << 7,
+  ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 8
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
@@ -203,8 +205,6 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   // create ASDisplayNodes to make a stack layout when using Yoga.
   // However, the implementation is mostly ready for id <ASLayoutElement>, with a few areas requiring updates.
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
-#endif
-#if YOGA_TREE_CONTIGUOUS
   __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
 #endif

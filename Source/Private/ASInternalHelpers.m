@@ -153,6 +153,11 @@ CGFloat ASFloorPixelValue(CGFloat f)
   return floor(f * scale) / scale;
 }
 
+CGPoint ASCeilPointValues(CGPoint p)
+{
+  return CGPointMake(ASCeilPixelValue(p.x), ASCeilPixelValue(p.y));
+}
+
 CGSize ASCeilSizeValues(CGSize s)
 {
   return CGSizeMake(ASCeilPixelValue(s.width), ASCeilPixelValue(s.height));

@@ -178,13 +178,11 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
-#if YOGA_TREE_CONTIGUOUS
 @property (nonatomic, assign) BOOL yogaLayoutInProgress;
 @property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
 // These methods should not normally be called directly.
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
-#endif
 
 @end
 

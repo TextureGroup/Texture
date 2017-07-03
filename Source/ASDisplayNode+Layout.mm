@@ -25,6 +25,15 @@
 
 #pragma mark <ASLayoutElement>
 
+- (BOOL)implementsLayoutMethod
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return (_methodOverrides & (ASDisplayNodeMethodOverrideLayoutSpecThatFits |
+                              ASDisplayNodeMethodOverrideCalcLayoutThatFits |
+                              ASDisplayNodeMethodOverrideCalcSizeThatFits)) != 0 || _layoutSpecBlock != nil;
+}
+
+
 - (ASLayoutElementStyle *)style
 {
   ASDN::MutexLocker l(__instanceLock__);
@@ -148,9 +157,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (void)setLayoutSpecBlock:(ASLayoutSpecBlock)layoutSpecBlock
 {
-  // For now there should never be an override of layoutSpecThatFits: / layoutElementThatFits: and a layoutSpecBlock
-  ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits), @"Overwriting layoutSpecThatFits: and providing a layoutSpecBlock block is currently not supported");
-
+  // For now there should never be an override of layoutSpecThatFits: and a layoutSpecBlock together.
+  ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits),
+                      @"Nodes with a .layoutSpecBlock must not also implement -layoutSpecThatFits:");
   ASDN::MutexLocker l(__instanceLock__);
   _layoutSpecBlock = layoutSpecBlock;
 }
@@ -855,7 +864,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (void)_pendingLayoutTransitionDidComplete
 {
+  // This assertion introduces a breaking behavior for nodes that has ASM enabled but also manually manage some subnodes.
+  // Let's gate it behind YOGA flag and remove it right after a branch cut.
+#if YOGA
   [self _assertSubnodeState];
+#endif
 
   // Subclass hook
   [self calculatedLayoutDidChange];

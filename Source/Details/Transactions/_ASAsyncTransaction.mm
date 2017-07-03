@@ -21,12 +21,10 @@
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <list>
 #import <map>
 #import <mutex>
-#import <stdatomic.h>
 
 #define ASAsyncTransactionAssertMainThread() NSAssert(0 != pthread_main_np(), @"This method must be called on the main thread");
 
@@ -254,9 +252,7 @@ void ASAsyncTransactionQueue::GroupImpl::schedule(NSInteger priority, dispatch_q
         Operation operation = entry.popNextOperation(respectPriority);
         lock.unlock();
         if (operation._block) {
-          ASProfilingSignpostStart(3, operation._block);
           operation._block();
-          ASProfilingSignpostEnd(3, operation._block);
         }
         operation._group->leave();
         operation._block = nil; // the block must be freed while mutex is unlocked
