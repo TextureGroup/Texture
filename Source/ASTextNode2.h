@@ -12,7 +12,7 @@
 
 #import <AsyncDisplayKit/ASControlNode.h>
 
-#if !ASTEXTNODE2_ENABLED
+#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 // Import this to get ASTextNodeHighlightStyle
 #import <AsyncDisplayKit/ASTextNode.h>
 #else
