@@ -490,6 +490,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASDN::MutexLocker l(__instanceLock__);
 
+  // TODO: The copy and application of size shouldn't be required, but it is currently.
+  // See discussion in https://github.com/TextureGroup/Texture/pull/396
   ASTextContainer *containerCopy = [_textContainer copy];
   containerCopy.size = self.calculatedSize;
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
@@ -506,30 +508,26 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   NSRange effectiveRange = NSMakeRange(0, 0);
-  for (NSString *attributeName in self.linkAttributeNames) {
+  for (__strong NSString *attributeName in self.linkAttributeNames) {
     id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
-    NSString *name = attributeName;
-    if (value == nil || name == nil) {
-      // Didn't find anything
+    if (value == nil) {
+      // Didn't find any links specified with this attribute.
       continue;
     }
 
     // If highlighting, check with delegate first. If not implemented, assume YES.
     if (highlighting
         && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
+        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName value:value atPoint:point]) {
       value = nil;
-      name = nil;
+      attributeName = nil;
     }
 
-    if (value != nil || name != nil) {
-      *rangeOut = effectiveRange;
-      if (NSMaxRange(*rangeOut) > NSMaxRange(visibleRange)) {
-        (*rangeOut).length = MAX(NSMaxRange(visibleRange) - (*rangeOut).location, 0);
-      }
+    if (value != nil || attributeName != nil) {
+      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
 
       if (attributeNameOut != NULL) {
-        *attributeNameOut = name;
+        *attributeNameOut = attributeName;
       }
 
       return value;
@@ -737,6 +735,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     NSRange visibleRange = NSMakeRange(0, 0);
     {
       ASDN::MutexLocker l(__instanceLock__);
+      // TODO: The copy and application of size shouldn't be required, but it is currently.
+      // See discussion in https://github.com/TextureGroup/Texture/pull/396
       ASTextContainer *containerCopy = [_textContainer copy];
       containerCopy.size = self.calculatedSize;
       ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
