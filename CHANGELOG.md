@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASTextNode2] Add initial implementation for link handling. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/396)
 
 ##2.3.4
 - [Yoga] Rewrite YOGA_TREE_CONTIGUOUS mode with improved behavior and cleaner integration [Scott Goodson](https://github.com/appleguy)
