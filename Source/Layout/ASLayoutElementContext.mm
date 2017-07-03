@@ -86,9 +86,8 @@ std::shared_ptr<ASDisplayNodeLayout> ASLayoutElementContextGetPendingLayout(ASDi
   }
   
   void *nodePointer = (__bridge void *)node;
-  std::shared_ptr<std::unordered_map<void *,
-                  std::shared_ptr<ASDisplayNodeLayout>>> pendingLayoutMap =
-                                                            ASLayoutElementGetCurrentContext().pendingLayoutMap;
+  auto pendingLayoutMap = ASLayoutElementGetCurrentContext().pendingLayoutMap;
+  
   if (pendingLayoutMap == nullptr) {
     // WARNING: This condition should probably not be reached. It implies that the
     // caller is asking for _pendingLayout outside of any layout operation.
@@ -105,9 +104,7 @@ void ASLayoutElementContextSetPendingLayout(ASDisplayNode *node, std::shared_ptr
   }
 
   void *nodePointer = (__bridge void *)node;
-  std::shared_ptr<std::unordered_map<void *,
-                  std::shared_ptr<ASDisplayNodeLayout>>> pendingLayoutMap =
-                                                            ASLayoutElementGetCurrentContext().pendingLayoutMap;
+  auto pendingLayoutMap = ASLayoutElementGetCurrentContext().pendingLayoutMap;
 
   if (pendingLayoutMap == nullptr) {
     return;
@@ -119,6 +116,3 @@ void ASLayoutElementContextSetPendingLayout(ASDisplayNode *node, std::shared_ptr
     (*(pendingLayoutMap)).erase(nodePointer);
   }
 }
-
-
-
