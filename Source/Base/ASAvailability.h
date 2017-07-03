@@ -41,6 +41,13 @@
   #define YOGA __has_include(YOGA_HEADER_PATH)
 #endif
 
+// When enabled, use ASTextNode2 for ALL instances of ASTextNode.
+// This includes what ASButtonNode uses internally, as well as all app references to ASTextNode.
+// See ASTextNode+Beta.h declaration of ASTextNodeExperimentOptions for more details.
+#ifndef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+  #define ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE 0
+#endif
+
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)
 #define AS_IG_LIST_KIT __has_include(<IGListKit/IGListKit.h>)
 

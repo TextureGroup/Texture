@@ -21,6 +21,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// When enabled, use ASTextNode2 for subclasses, random instances, or all instances of ASTextNode.
+// See ASAvailability.h declaration of ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE for a compile-time option.
 typedef NS_OPTIONS(NSUInteger, ASTextNodeExperimentOptions) {
   // All subclass instances use the experimental implementation.
   ASTextNodeExperimentSubclasses = 1 << 0,

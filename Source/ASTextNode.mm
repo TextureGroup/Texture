@@ -17,6 +17,8 @@
 
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
+
+#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
 #include <mutex>
@@ -1471,3 +1473,10 @@ static BOOL _hasAllocatedNode;
 }
 
 @end
+
+#else
+
+@implementation ASTextNode
+@end
+
+#endif

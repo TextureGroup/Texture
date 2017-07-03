@@ -15,11 +15,17 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASControlNode.h>
+#if ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+  #import <AsyncDisplayKit/ASTextNode2.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASTextNodeDelegate;
+
+#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 
 /**
  * Highlight styles.
@@ -232,6 +238,13 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 
 @end
 
+#else
+
+@interface ASTextNode : ASTextNode2
+@end
+
+#endif
+
 /**
  * @abstract Text node delegate.
  */
@@ -287,6 +300,8 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 
 @end
 
+#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+
 @interface ASTextNode (Unavailable)
 
 - (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
@@ -319,6 +334,6 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 
 @end
 
+#endif
+
 NS_ASSUME_NONNULL_END
-
-

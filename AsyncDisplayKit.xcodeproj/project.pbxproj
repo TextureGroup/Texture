@@ -184,6 +184,8 @@
 		9019FBBE1ED8061D00C45F72 /* ASYogaLayoutSpec.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9019FBBA1ED8061D00C45F72 /* ASYogaLayoutSpec.mm */; };
 		9019FBBF1ED8061D00C45F72 /* ASYogaUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 9019FBBB1ED8061D00C45F72 /* ASYogaUtilities.h */; };
 		9019FBC01ED8061D00C45F72 /* ASYogaUtilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9019FBBC1ED8061D00C45F72 /* ASYogaUtilities.mm */; };
+		909C4C751F09C98B00D6B76F /* ASTextNode2.h in Headers */ = {isa = PBXBuildFile; fileRef = 909C4C731F09C98B00D6B76F /* ASTextNode2.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		909C4C761F09C98B00D6B76F /* ASTextNode2.mm in Sources */ = {isa = PBXBuildFile; fileRef = 909C4C741F09C98B00D6B76F /* ASTextNode2.mm */; };
 		90FC784F1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm in Sources */ = {isa = PBXBuildFile; fileRef = 90FC784E1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm */; };
 		92DD2FE61BF4D05E0074C9DD /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92DD2FE51BF4D05E0074C9DD /* MapKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */; };
@@ -394,8 +396,6 @@
 		CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.m */; };
 		CCCCCCE71EC3F0FC0087FE10 /* NSAttributedString+ASText.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */; };
 		CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.m */; };
-		CCD523111EBD658C001F2191 /* ASTextNode2.h in Headers */ = {isa = PBXBuildFile; fileRef = CCD5230F1EBD658C001F2191 /* ASTextNode2.h */; };
-		CCD523121EBD658C001F2191 /* ASTextNode2.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCD523101EBD658C001F2191 /* ASTextNode2.mm */; };
 		CCDD148B1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */; };
 		CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -690,6 +690,8 @@
 		9019FBBA1ED8061D00C45F72 /* ASYogaLayoutSpec.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASYogaLayoutSpec.mm; sourceTree = "<group>"; };
 		9019FBBB1ED8061D00C45F72 /* ASYogaUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASYogaUtilities.h; sourceTree = "<group>"; };
 		9019FBBC1ED8061D00C45F72 /* ASYogaUtilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASYogaUtilities.mm; sourceTree = "<group>"; };
+		909C4C731F09C98B00D6B76F /* ASTextNode2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextNode2.h; sourceTree = "<group>"; };
+		909C4C741F09C98B00D6B76F /* ASTextNode2.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTextNode2.mm; sourceTree = "<group>"; };
 		90FC784E1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+Yoga.mm"; sourceTree = "<group>"; };
 		92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMapNode.h; sourceTree = "<group>"; };
 		92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMapNode.mm; sourceTree = "<group>"; };
@@ -862,8 +864,6 @@
 		CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSParagraphStyle+ASText.m"; sourceTree = "<group>"; };
 		CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+ASText.h"; sourceTree = "<group>"; };
 		CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+ASText.m"; sourceTree = "<group>"; };
-		CCD5230F1EBD658C001F2191 /* ASTextNode2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextNode2.h; sourceTree = "<group>"; };
-		CCD523101EBD658C001F2191 /* ASTextNode2.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTextNode2.mm; sourceTree = "<group>"; };
 		CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionModernDataSourceTests.m; sourceTree = "<group>"; };
 		CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASSectionController.h; sourceTree = "<group>"; };
 		CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IGListAdapter+AsyncDisplayKit.h"; sourceTree = "<group>"; };
@@ -1089,6 +1089,8 @@
 				058D09DF195D050800B7D73C /* ASTextNode.h */,
 				A373200E1C571B050011FC94 /* ASTextNode+Beta.h */,
 				058D09E0195D050800B7D73C /* ASTextNode.mm */,
+				909C4C731F09C98B00D6B76F /* ASTextNode2.h */,
+				909C4C741F09C98B00D6B76F /* ASTextNode2.mm */,
 				ACC945A81BA9E7A0005E1FB8 /* ASViewController.h */,
 				9CFFC6BF1CCAC73C006A6476 /* ASViewController.mm */,
 				6BDC61F51978FEA400E50D21 /* AsyncDisplayKit.h */,
@@ -1297,8 +1299,6 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				CCD5230F1EBD658C001F2191 /* ASTextNode2.h */,
-				CCD523101EBD658C001F2191 /* ASTextNode2.mm */,
 				CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */,
 				CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */,
 				CCA282C61E9EB64B0037E8B7 /* ASDisplayNodeTipState.h */,
@@ -1680,7 +1680,6 @@
 				B13CA1011C52004900E031AB /* ASCollectionNode+Beta.h in Headers */,
 				68C215581DE10D330019C4BC /* ASCollectionViewLayoutInspector.h in Headers */,
 				B35062411B010EFD0018CF92 /* _ASAsyncTransactionGroup.h in Headers */,
-				CCD523111EBD658C001F2191 /* ASTextNode2.h in Headers */,
 				B350620F1B010EFD0018CF92 /* _ASDisplayLayer.h in Headers */,
 				CCCCCCD71EC3EF060087FE10 /* ASTextInput.h in Headers */,
 				B35062111B010EFD0018CF92 /* _ASDisplayView.h in Headers */,
@@ -1818,6 +1817,7 @@
 				DECBD6E81BE56E1900CF4905 /* ASButtonNode.h in Headers */,
 				B35062241B010EFD0018CF92 /* ASMutableAttributedStringBuilder.h in Headers */,
 				B13CA0F81C519EBA00E031AB /* ASCollectionViewLayoutFacilitatorProtocol.h in Headers */,
+				909C4C751F09C98B00D6B76F /* ASTextNode2.h in Headers */,
 				B35062061B010EFD0018CF92 /* ASNetworkImageNode.h in Headers */,
 				CCA282C81E9EB64B0037E8B7 /* ASDisplayNodeTipState.h in Headers */,
 				34EFC76C1B701CED00AD841F /* ASOverlayLayoutSpec.h in Headers */,
@@ -2186,7 +2186,6 @@
 				B350624E1B010EFD0018CF92 /* ASDisplayNode+AsyncDisplay.mm in Sources */,
 				25E327591C16819500A2170C /* ASPagerNode.m in Sources */,
 				636EA1A41C7FF4EC00EE152F /* NSArray+Diffing.m in Sources */,
-				CCD523121EBD658C001F2191 /* ASTextNode2.mm in Sources */,
 				B35062501B010EFD0018CF92 /* ASDisplayNode+DebugTiming.mm in Sources */,
 				DEC146B91C37A16A004A0EE7 /* ASCollectionInternal.m in Sources */,
 				254C6B891BF94F8A003EC431 /* ASTextKitRenderer+Positioning.mm in Sources */,
@@ -2258,6 +2257,7 @@
 				34EFC7741B701D0A00AD841F /* ASAbsoluteLayoutSpec.mm in Sources */,
 				CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.m in Sources */,
 				690C35621E055C5D00069B91 /* ASDimensionInternal.mm in Sources */,
+				909C4C761F09C98B00D6B76F /* ASTextNode2.mm in Sources */,
 				68C2155A1DE10D330019C4BC /* ASCollectionViewLayoutInspector.m in Sources */,
 				DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.m in Sources */,
 				B350620B1B010EFD0018CF92 /* ASTableView.mm in Sources */,
