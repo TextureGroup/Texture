@@ -41,6 +41,7 @@
  */
 @property (nonatomic, assign, readwrite) CGSize preferredFrameSize ASDISPLAYNODE_DEPRECATED_MSG("Use .style.preferredSize instead OR set individual values with .style.height and .style.width.");
 
+#if !ASDISPLAYNODE_NEW_LAYOUT_SYSTEM
 /**
  * @abstract Asks the node to measure and return the size that best fits its subnodes.
  *
@@ -61,6 +62,8 @@
  * @deprecated Deprecated in version 2.0: Use layoutThatFits: with a constrained size of (CGSizeZero, constrainedSize) and call size on the returned ASLayout
  */
 - (CGSize)measure:(CGSize)constrainedSize ASDISPLAYNODE_DEPRECATED_MSG("Use layoutThatFits: with a constrained size of (CGSizeZero, constrainedSize) and call size on the returned ASLayout.");
+
+#endif
 
 ASLayoutElementStyleForwardingDeclaration
 

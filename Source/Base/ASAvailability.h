@@ -30,6 +30,8 @@
 #define AS_AT_LEAST_IOS9   (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_9_0)
 #define AS_AT_LEAST_IOS10  (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_10_0)
 
+#define ASDISPLAYNODE_NEW_LAYOUT_SYSTEM 0
+
 // If Yoga is available, make it available anywhere we use ASAvailability.
 // This reduces Yoga-specific code in other files.
 // NOTE: Yoga integration is experimental and not fully tested. Use with caution and test layouts carefully.
