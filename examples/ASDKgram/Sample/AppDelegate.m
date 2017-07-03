@@ -24,6 +24,12 @@
 #import "WindowWithStatusBarUnderlay.h"
 #import "Utilities.h"
 
+#define WEAVER 0
+
+#if WEAVER
+#import <Weaver/WVDebugger.h>
+#endif
+
 @interface AppDelegate () <UITabBarControllerDelegate>
 @end
 
@@ -75,7 +81,13 @@
   // iOS8 hides the status bar in landscape orientation, this forces the status bar hidden status to NO
   [application setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
   [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
-  
+
+#if WEAVER
+  WVDebugger *debugger = [WVDebugger defaultInstance];
+  [debugger enableLayoutElementDebuggingWithApplication:application];
+  [debugger autoConnect];
+#endif
+
   return YES;
 }
 
