@@ -41,11 +41,11 @@
   #define YOGA __has_include(YOGA_HEADER_PATH)
 #endif
 
-// Contiguous Yoga layout attempts to build a connected tree of YGNodeRef objects, across multiple levels
-// in the ASDisplayNode tree (based on .yogaChildren). When disabled, ASYogaLayoutSpec is used, with a
-// disjoint Yoga tree for each level in the hierarchy. Currently, both modes are experimental.
-#ifndef YOGA_TREE_CONTIGUOUS
-  #define YOGA_TREE_CONTIGUOUS 0  // To enable, set to YOGA, as the code depends on YOGA also being set.
+// When enabled, use ASTextNode2 for ALL instances of ASTextNode.
+// This includes what ASButtonNode uses internally, as well as all app references to ASTextNode.
+// See ASTextNode+Beta.h declaration of ASTextNodeExperimentOptions for more details.
+#ifndef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+  #define ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE 0
 #endif
 
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)

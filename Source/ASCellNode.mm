@@ -114,13 +114,6 @@
   _viewControllerNode.frame = self.bounds;
 }
 
-- (void)layoutDidFinish
-{
-  [super layoutDidFinish];
-
-  _viewControllerNode.frame = self.bounds;
-}
-
 - (void)_rootNodeDidInvalidateSize
 {
   if (_interactionDelegate != nil) {
@@ -175,6 +168,11 @@
     self.highlighted = highlighted;
     _suspendInteractionDelegate = NO;
   }
+}
+
+- (BOOL)canUpdateToViewModel:(id)viewModel
+{
+  return [self.viewModel class] == [viewModel class];
 }
 
 - (NSIndexPath *)indexPath

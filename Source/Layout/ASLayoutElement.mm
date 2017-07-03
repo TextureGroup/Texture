@@ -15,17 +15,19 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import "ASDisplayNode+FrameworkPrivate.h"
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <atomic>
 
 #if YOGA
   #import YOGA_HEADER_PATH
+  #import <AsyncDisplayKit/ASYogaUtilities.h>
 #endif
 
 #pragma mark - ASLayoutElementStyle
@@ -49,6 +51,21 @@ NSString * const ASLayoutElementStyleDescenderProperty = @"ASLayoutElementStyleD
 
 NSString * const ASLayoutElementStyleLayoutPositionProperty = @"ASLayoutElementStyleLayoutPositionProperty";
 
+#if YOGA
+NSString * const ASYogaFlexWrapProperty = @"ASLayoutElementStyleLayoutFlexWrapProperty";
+NSString * const ASYogaFlexDirectionProperty = @"ASYogaFlexDirectionProperty";
+NSString * const ASYogaDirectionProperty = @"ASYogaDirectionProperty";
+NSString * const ASYogaSpacingProperty = @"ASYogaSpacingProperty";
+NSString * const ASYogaJustifyContentProperty = @"ASYogaJustifyContentProperty";
+NSString * const ASYogaAlignItemsProperty = @"ASYogaAlignItemsProperty";
+NSString * const ASYogaPositionTypeProperty = @"ASYogaPositionTypeProperty";
+NSString * const ASYogaPositionProperty = @"ASYogaPositionProperty";
+NSString * const ASYogaMarginProperty = @"ASYogaMarginProperty";
+NSString * const ASYogaPaddingProperty = @"ASYogaPaddingProperty";
+NSString * const ASYogaBorderProperty = @"ASYogaBorderProperty";
+NSString * const ASYogaAspectRatioProperty = @"ASYogaAspectRatioProperty";
+#endif
+
 #define ASLayoutElementStyleSetSizeWithScope(x) \
   __instanceLock__.lock(); \
   ASLayoutElementSize newSize = _size.load(); \
@@ -58,6 +75,7 @@ NSString * const ASLayoutElementStyleLayoutPositionProperty = @"ASLayoutElementS
 
 #define ASLayoutElementStyleCallDelegate(propertyName)\
 do {\
+  [self propertyDidChange:propertyName];\
   [_delegate style:self propertyDidChange:propertyName];\
 } while(0)
 
@@ -77,9 +95,10 @@ do {\
   std::atomic<CGPoint> _layoutPosition;
 
 #if YOGA
+  YGNodeRef _yogaNode;
+  std::atomic<YGWrap> _flexWrap;
   std::atomic<ASStackLayoutDirection> _flexDirection;
   std::atomic<YGDirection> _direction;
-  std::atomic<CGFloat> _spacing;
   std::atomic<ASStackLayoutJustifyContent> _justifyContent;
   std::atomic<ASStackLayoutAlignItems> _alignItems;
   std::atomic<YGPositionType> _positionType;
@@ -88,7 +107,6 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
-  std::atomic<YGWrap> _flexWrap;
 #endif
 }
 
@@ -529,13 +547,153 @@ do {\
   return result;
 }
 
+- (void)propertyDidChange:(NSString *)propertyName
+{
+#if YOGA
+  /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
+   void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
+   void YGNodeStyleSetFlex(YGNodeRef node, float flex);
+   */
+
+  if (_yogaNode == NULL) {
+    return;
+  }
+  // Because the NSStrings used to identify each property are const, use efficient pointer comparison.
+  if (propertyName == ASLayoutElementStyleWidthProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, self.width);
+  }
+  else if (propertyName == ASLayoutElementStyleMinWidthProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinWidth, self.minWidth);
+  }
+  else if (propertyName == ASLayoutElementStyleMaxWidthProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxWidth, self.maxWidth);
+  }
+  else if (propertyName == ASLayoutElementStyleHeightProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, Height, self.height);
+  }
+  else if (propertyName == ASLayoutElementStyleMinHeightProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinHeight, self.minHeight);
+  }
+  else if (propertyName == ASLayoutElementStyleMaxHeightProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxHeight, self.maxHeight);
+  }
+  else if (propertyName == ASLayoutElementStyleFlexGrowProperty) {
+    YGNodeStyleSetFlexGrow(_yogaNode, self.flexGrow);
+  }
+  else if (propertyName == ASLayoutElementStyleFlexShrinkProperty) {
+    YGNodeStyleSetFlexShrink(_yogaNode, self.flexShrink);
+  }
+  else if (propertyName == ASLayoutElementStyleFlexBasisProperty) {
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, FlexBasis, self.flexBasis);
+  }
+  else if (propertyName == ASLayoutElementStyleAlignSelfProperty) {
+    YGNodeStyleSetAlignSelf(_yogaNode, yogaAlignSelf(self.alignSelf));
+  }
+  else if (propertyName == ASYogaFlexWrapProperty) {
+    YGNodeStyleSetFlexWrap(_yogaNode, self.flexWrap);
+  }
+  else if (propertyName == ASYogaFlexDirectionProperty) {
+    YGNodeStyleSetFlexDirection(_yogaNode, yogaFlexDirection(self.flexDirection));
+  }
+  else if (propertyName == ASYogaDirectionProperty) {
+    YGNodeStyleSetDirection(_yogaNode, self.direction);
+  }
+  else if (propertyName == ASYogaJustifyContentProperty) {
+    YGNodeStyleSetJustifyContent(_yogaNode, yogaJustifyContent(self.justifyContent));
+  }
+  else if (propertyName == ASYogaAlignItemsProperty) {
+    ASStackLayoutAlignItems alignItems = self.alignItems;
+    if (alignItems != ASStackLayoutAlignItemsNotSet) {
+      YGNodeStyleSetAlignItems(_yogaNode, yogaAlignItems(alignItems));
+    }
+  }
+  else if (propertyName == ASYogaPositionTypeProperty) {
+    YGNodeStyleSetPositionType(_yogaNode, self.positionType);
+  }
+  else if (propertyName == ASYogaPositionProperty) {
+    ASEdgeInsets position = self.position;
+    YGEdge edge = YGEdgeLeft;
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
+      YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Position, dimensionForEdgeWithEdgeInsets(edge, position), edge);
+      edge = (YGEdge)(edge + 1);
+    }
+  }
+  else if (propertyName == ASYogaMarginProperty) {
+    ASEdgeInsets margin   = self.margin;
+    YGEdge edge = YGEdgeLeft;
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
+      YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Margin, dimensionForEdgeWithEdgeInsets(edge, margin), edge);
+      edge = (YGEdge)(edge + 1);
+    }
+  }
+  else if (propertyName == ASYogaPaddingProperty) {
+    ASEdgeInsets padding  = self.padding;
+    YGEdge edge = YGEdgeLeft;
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
+      YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Padding, dimensionForEdgeWithEdgeInsets(edge, padding), edge);
+      edge = (YGEdge)(edge + 1);
+    }
+  }
+  else if (propertyName == ASYogaBorderProperty) {
+    ASEdgeInsets border   = self.border;
+    YGEdge edge = YGEdgeLeft;
+    for (int i = 0; i < YGEdgeAll + 1; ++i) {
+      YGNODE_STYLE_SET_FLOAT_WITH_EDGE(_yogaNode, Border, dimensionForEdgeWithEdgeInsets(edge, border), edge);
+      edge = (YGEdge)(edge + 1);
+    }
+  }
+  else if (propertyName == ASYogaAspectRatioProperty) {
+    CGFloat aspectRatio = self.aspectRatio;
+    if (aspectRatio > FLT_EPSILON && aspectRatio < CGFLOAT_MAX / 2.0) {
+      YGNodeStyleSetAspectRatio(_yogaNode, aspectRatio);
+    }
+  }
+#endif
+}
+
 #pragma mark - Yoga Flexbox Properties
 
 #if YOGA
 
++ (void)initialize
+{
+  [super initialize];
+  YGConfigSetPointScaleFactor(YGConfigGetDefault(), ASScreenScale());
+  // Yoga recommends using Web Defaults for all new projects. This will be enabled for Texture very soon.
+  //YGConfigSetUseWebDefaults(YGConfigGetDefault(), true);
+}
+
+- (YGNodeRef)yogaNode
+{
+  return _yogaNode;
+}
+
+- (YGNodeRef)yogaNodeCreateIfNeeded
+{
+  if (_yogaNode == NULL) {
+    _yogaNode = YGNodeNew();
+  }
+  return _yogaNode;
+}
+
+- (void)destroyYogaNode
+{
+  if (_yogaNode != NULL) {
+    // Release the __bridge_retained Context object.
+    ASLayoutElementYogaUpdateMeasureFunc(_yogaNode, nil);
+    YGNodeFree(_yogaNode);
+    _yogaNode = NULL;
+  }
+}
+
+- (void)dealloc
+{
+  [self destroyYogaNode];
+}
+
+- (YGWrap)flexWrap                            { return _flexWrap.load(); }
 - (ASStackLayoutDirection)flexDirection       { return _flexDirection.load(); }
 - (YGDirection)direction                      { return _direction.load(); }
-- (CGFloat)spacing                            { return _spacing.load(); }
 - (ASStackLayoutJustifyContent)justifyContent { return _justifyContent.load(); }
 - (ASStackLayoutAlignItems)alignItems         { return _alignItems.load(); }
 - (YGPositionType)positionType                { return _positionType.load(); }
@@ -544,22 +702,53 @@ do {\
 - (ASEdgeInsets)padding                       { return _padding.load(); }
 - (ASEdgeInsets)border                        { return _border.load(); }
 - (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
-- (YGWrap)flexWrap                            { return _flexWrap.load(); }
 
-- (void)setFlexDirection:(ASStackLayoutDirection)flexDirection { _flexDirection.store(flexDirection); }
-- (void)setDirection:(YGDirection)direction                    { _direction.store(direction); }
-- (void)setSpacing:(CGFloat)spacing                            { _spacing.store(spacing); }
-- (void)setJustifyContent:(ASStackLayoutJustifyContent)justify { _justifyContent.store(justify); }
-- (void)setAlignItems:(ASStackLayoutAlignItems)alignItems      { _alignItems.store(alignItems); }
-- (void)setPositionType:(YGPositionType)positionType           { _positionType.store(positionType); }
-- (void)setPosition:(ASEdgeInsets)position                     { _position.store(position); }
-- (void)setMargin:(ASEdgeInsets)margin                         { _margin.store(margin); }
-- (void)setPadding:(ASEdgeInsets)padding                       { _padding.store(padding); }
-- (void)setBorder:(ASEdgeInsets)border                         { _border.store(border); }
-- (void)setAspectRatio:(CGFloat)aspectRatio                    { _aspectRatio.store(aspectRatio); }
-- (void)setFlexWrap:(YGWrap)flexWrap                           { _flexWrap.store(flexWrap); }
+- (void)setFlexWrap:(YGWrap)flexWrap {
+  _flexWrap.store(flexWrap);
+  ASLayoutElementStyleCallDelegate(ASYogaFlexWrapProperty);
+}
+- (void)setFlexDirection:(ASStackLayoutDirection)flexDirection {
+  _flexDirection.store(flexDirection);
+  ASLayoutElementStyleCallDelegate(ASYogaFlexDirectionProperty);
+}
+- (void)setDirection:(YGDirection)direction {
+  _direction.store(direction);
+  ASLayoutElementStyleCallDelegate(ASYogaDirectionProperty);
+}
+- (void)setJustifyContent:(ASStackLayoutJustifyContent)justify {
+  _justifyContent.store(justify);
+  ASLayoutElementStyleCallDelegate(ASYogaJustifyContentProperty);
+}
+- (void)setAlignItems:(ASStackLayoutAlignItems)alignItems {
+  _alignItems.store(alignItems);
+  ASLayoutElementStyleCallDelegate(ASYogaAlignItemsProperty);
+}
+- (void)setPositionType:(YGPositionType)positionType {
+  _positionType.store(positionType);
+  ASLayoutElementStyleCallDelegate(ASYogaPositionTypeProperty);
+}
+- (void)setPosition:(ASEdgeInsets)position {
+  _position.store(position);
+  ASLayoutElementStyleCallDelegate(ASYogaPositionProperty);
+}
+- (void)setMargin:(ASEdgeInsets)margin {
+  _margin.store(margin);
+  ASLayoutElementStyleCallDelegate(ASYogaMarginProperty);
+}
+- (void)setPadding:(ASEdgeInsets)padding {
+  _padding.store(padding);
+  ASLayoutElementStyleCallDelegate(ASYogaPaddingProperty);
+}
+- (void)setBorder:(ASEdgeInsets)border {
+  _border.store(border);
+  ASLayoutElementStyleCallDelegate(ASYogaBorderProperty);
+}
+- (void)setAspectRatio:(CGFloat)aspectRatio {
+  _aspectRatio.store(aspectRatio);
+  ASLayoutElementStyleCallDelegate(ASYogaAspectRatioProperty);
+}
 
-#endif
+#endif /* YOGA */
 
 #pragma mark Deprecated
 

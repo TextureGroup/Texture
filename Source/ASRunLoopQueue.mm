@@ -19,7 +19,7 @@
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASLog.h>
-
+#import <QuartzCore/QuartzCore.h>
 #import <cstdlib>
 #import <deque>
 #import <vector>
@@ -78,16 +78,20 @@ static void runLoopSourceCallback(void *info) {
         return;
       }
       // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
+      NSInteger count;
       @autoreleasepool {
 #if ASRunLoopQueueLoggingEnabled
         NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
 #endif
         // Sometimes we release 10,000 objects at a time.  Don't hold the lock while releasing.
         std::deque<id> currentQueue = weakSelf->_queue;
+        count = currentQueue.size();
+        ASSignpostStartCustom(ASSignpostDeallocQueueDrain, self, count);
         weakSelf->_queue = std::deque<id>();
         weakSelf->_queueLock.unlock();
         currentQueue.clear();
       }
+      ASSignpostEndCustom(ASSignpostDeallocQueueDrain, self, count, ASSignpostColorDefault);
     });
     
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
@@ -143,6 +147,29 @@ static void runLoopSourceCallback(void *info) {
   _thread = nil;
 }
 
+- (void)test_drain
+{
+  [self performSelector:@selector(_test_drain) onThread:_thread withObject:nil waitUntilDone:YES];
+}
+
+- (void)_test_drain
+{
+  while (true) {
+    @autoreleasepool {
+      _queueLock.lock();
+      std::deque<id> currentQueue = _queue;
+      _queue = std::deque<id>();
+      _queueLock.unlock();
+
+      if (currentQueue.empty()) {
+        return;
+      } else {
+        currentQueue.clear();
+      }
+    }
+  }
+}
+
 - (void)_stop
 {
   CFRunLoopStop(CFRunLoopGetCurrent());
@@ -173,7 +200,68 @@ static void runLoopSourceCallback(void *info) {
 
 @end
 
+#if AS_KDEBUG_ENABLE
+/**
+ * This is real, private CA API. Valid as of iOS 10.
+ */
+typedef enum {
+  kCATransactionPhasePreLayout,
+  kCATransactionPhasePreCommit,
+  kCATransactionPhasePostCommit,
+} CATransactionPhase;
+
+@interface CATransaction (Private)
++ (void)addCommitHandler:(void(^)(void))block forPhase:(CATransactionPhase)phase;
++ (int)currentState;
+@end
+#endif
+
 @implementation ASRunLoopQueue
+
+#if AS_KDEBUG_ENABLE
++ (void)load
+{
+  [self registerCATransactionObservers];
+}
+
++ (void)registerCATransactionObservers
+{
+  static BOOL privateCAMethodsExist;
+  static dispatch_block_t preLayoutHandler;
+  static dispatch_block_t preCommitHandler;
+  static dispatch_block_t postCommitHandler;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    privateCAMethodsExist = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
+    privateCAMethodsExist &= [CATransaction respondsToSelector:@selector(currentState)];
+    if (!privateCAMethodsExist) {
+      NSLog(@"Private CA methods are gone.");
+    }
+    preLayoutHandler = ^{
+      ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
+    };
+    preCommitHandler = ^{
+      int state = [CATransaction currentState];
+      ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
+      ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
+    };
+    postCommitHandler = ^{
+      ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
+      // Can't add new observers inside an observer. rdar://problem/31253952
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self registerCATransactionObservers];
+      });
+    };
+  });
+
+  if (privateCAMethodsExist) {
+    [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
+    [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
+    [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
+  }
+}
+
+#endif // AS_KDEBUG_ENABLE
 
 - (instancetype)initWithRunLoop:(CFRunLoopRef)runloop retainObjects:(BOOL)retainsObjects handler:(void (^)(id _Nullable, BOOL))handlerBlock
 {
@@ -252,7 +340,7 @@ static void runLoopSourceCallback(void *info) {
       return;
     }
     
-    ASProfilingSignpostStart(0, self);
+    ASSignpostStart(ASSignpostRunLoopQueueBatch);
 
     // Snatch the next batch of items.
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
@@ -306,7 +394,7 @@ static void runLoopSourceCallback(void *info) {
     CFRunLoopWakeUp(_runLoop);
   }
   
-  ASProfilingSignpostEnd(0, self);
+  ASSignpostEnd(ASSignpostRunLoopQueueBatch);
 }
 
 - (void)enqueue:(id)object

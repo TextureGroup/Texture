@@ -3,4 +3,5 @@ platform :ios, '8.0'
 target 'Sample' do
 	pod 'Texture/IGListKit', :path => '../..'
 	pod 'Texture/PINRemoteImage', :path => '../..'
+  pod 'Texture/Yoga', :path => '../..'
 end

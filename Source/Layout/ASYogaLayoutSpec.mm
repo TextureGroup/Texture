@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 
 #if YOGA /* YOGA */
-#if !YOGA_TREE_CONTIGUOUS /* !YOGA_TREE_CONTIGUOUS */
 
 #import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
@@ -43,7 +42,6 @@
     return [ASLayout layoutWithLayoutElement:layoutElement size:size sublayouts:sublayouts];
   } else {
     CGPoint position = CGPointMake(YGNodeLayoutGetLeft(yogaNode), YGNodeLayoutGetTop(yogaNode));
-    // TODO: If it were possible to set .flattened = YES, it would be valid to do so here.
     return [ASLayout layoutWithLayoutElement:layoutElement size:size position:position sublayouts:nil];
   }
 }
@@ -176,5 +174,4 @@
 
 @end
 
-#endif /* !YOGA_TREE_CONTIGUOUS */
 #endif /* YOGA */

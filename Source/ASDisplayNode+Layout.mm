@@ -26,6 +26,15 @@
 
 #pragma mark <ASLayoutElement>
 
+- (BOOL)implementsLayoutMethod
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return (_methodOverrides & (ASDisplayNodeMethodOverrideLayoutSpecThatFits |
+                              ASDisplayNodeMethodOverrideCalcLayoutThatFits |
+                              ASDisplayNodeMethodOverrideCalcSizeThatFits)) != 0 || _layoutSpecBlock != nil;
+}
+
+
 - (ASLayoutElementStyle *)style
 {
   ASDN::MutexLocker l(__instanceLock__);
@@ -99,28 +108,21 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _primitiveTraitCollection;
+  return _primitiveTraitCollection.load();
 }
 
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
-  __instanceLock__.lock();
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
+  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
     _primitiveTraitCollection = traitCollection;
     ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
-    __instanceLock__.unlock();
-    
+
     [self asyncTraitCollectionDidChange];
-    return;
   }
-  
-  __instanceLock__.unlock();
 }
 
 - (ASTraitCollection *)asyncTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
@@ -156,9 +158,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (void)setLayoutSpecBlock:(ASLayoutSpecBlock)layoutSpecBlock
 {
-  // For now there should never be an override of layoutSpecThatFits: / layoutElementThatFits: and a layoutSpecBlock
-  ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits), @"Overwriting layoutSpecThatFits: and providing a layoutSpecBlock block is currently not supported");
-
+  // For now there should never be an override of layoutSpecThatFits: and a layoutSpecBlock together.
+  ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits),
+                      @"Nodes with a .layoutSpecBlock must not also implement -layoutSpecThatFits:");
   ASDN::MutexLocker l(__instanceLock__);
   _layoutSpecBlock = layoutSpecBlock;
 }
@@ -863,7 +865,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (void)_pendingLayoutTransitionDidComplete
 {
+  // This assertion introduces a breaking behavior for nodes that has ASM enabled but also manually manage some subnodes.
+  // Let's gate it behind YOGA flag and remove it right after a branch cut.
+#if YOGA
   [self _assertSubnodeState];
+#endif
 
   // Subclass hook
   [self calculatedLayoutDidChange];

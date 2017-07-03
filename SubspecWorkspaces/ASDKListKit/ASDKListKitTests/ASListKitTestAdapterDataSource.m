@@ -25,7 +25,7 @@
   return self.objects;
 }
 
-- (IGListSectionController <IGListSectionType> *)listAdapter:(IGListAdapter *)listAdapter sectionControllerForObject:(id)object
+- (IGListSectionController *)listAdapter:(IGListAdapter *)listAdapter sectionControllerForObject:(id)object
 {
   ASListTestSection *section = [[ASListTestSection alloc] init];
   return section;

@@ -22,6 +22,7 @@
 
 #if YOGA
   #import YOGA_HEADER_PATH
+  #import <AsyncDisplayKit/ASYogaUtilities.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -177,20 +178,21 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
-#if YOGA_TREE_CONTIGUOUS
+@property (nonatomic, assign) BOOL yogaLayoutInProgress;
 @property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
 // These methods should not normally be called directly.
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
-#endif
 
 @end
 
 @interface ASLayoutElementStyle (Yoga)
 
+- (YGNodeRef)yogaNodeCreateIfNeeded;
+@property (nonatomic, assign, readonly) YGNodeRef yogaNode;
+
 @property (nonatomic, assign, readwrite) ASStackLayoutDirection flexDirection;
 @property (nonatomic, assign, readwrite) YGDirection direction;
-@property (nonatomic, assign, readwrite) CGFloat spacing;
 @property (nonatomic, assign, readwrite) ASStackLayoutJustifyContent justifyContent;
 @property (nonatomic, assign, readwrite) ASStackLayoutAlignItems alignItems;
 @property (nonatomic, assign, readwrite) YGPositionType positionType;

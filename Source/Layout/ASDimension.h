@@ -16,8 +16,7 @@
 //
 
 #pragma once
-#import <Foundation/Foundation.h>
-#import <CoreGraphics/CoreGraphics.h>
+#import <UIKit/UIGeometry.h>
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASAssert.h>
@@ -315,6 +314,8 @@ typedef struct {
 } ASEdgeInsets;
 
 extern ASEdgeInsets const ASEdgeInsetsZero;
+
+extern ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets);
 
 #endif
 

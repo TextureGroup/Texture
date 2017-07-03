@@ -27,7 +27,7 @@
 {
   self = [super init];
   if (self) {
-    _hashTable = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory | NSPointerFunctionsObjectPointerPersonality];
+    _hashTable = [NSHashTable hashTableWithOptions:NSHashTableWeakMemory | NSHashTableObjectPointerPersonality];
   }
   return self;
 }

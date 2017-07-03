@@ -223,7 +223,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     [self _setVisibleNodes:newVisibleNodes];
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
-  ASProfilingSignpostStart(1, self);
+  ASSignpostStart(ASSignpostRangeControllerUpdate);
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];
@@ -412,7 +412,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   NSLog(@"Range update complete; modifiedIndexPaths: %@", [self descriptionWithIndexPaths:modifiedIndexPaths]);
 #endif
   
-  ASProfilingSignpostEnd(1, self);
+  ASSignpostEnd(ASSignpostRangeControllerUpdate);
 }
 
 #pragma mark - Notification observers

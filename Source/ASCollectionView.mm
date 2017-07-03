@@ -144,11 +144,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * (0 sections) we always check at least once after each update (initial reload is the first update.)
    */
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
-
-  /**
-   * The change set that we're currently building, if any.
-   */
-  _ASHierarchyChangeSet *_changeSet;
   
   /**
    * Counter used to keep track of nested batch updates.
@@ -333,31 +328,23 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma mark -
 #pragma mark Overrides.
 
-- (void)reloadDataWithCompletion:(void (^)())completion
-{
-  ASDisplayNodeAssertMainThread();
-  
-  if (! _dataController.initialReloadDataHasBeenCalled) {
-    // If this is the first reload, forward to super immediately to prevent it from triggering more "initial" loads while our data controller is working.
-    _superIsPendingDataLoad = YES;
-    [super reloadData];
-  }
-  
-  void (^batchUpdatesCompletion)(BOOL);
-  if (completion) {
-    batchUpdatesCompletion = ^(BOOL) {
-      completion();
-    };
-  }
-  
-  [self performBatchUpdates:^{
-    [_changeSet reloadData];
-  } completion:batchUpdatesCompletion];
-}
-
+/**
+ * This method is not available to be called by the public i.e.
+ * it should only be called by UICollectionView itself. UICollectionView
+ * does this e.g. during the first layout pass, or if you call -numberOfSections
+ * before its content is loaded.
+ */
 - (void)reloadData
 {
-  [self reloadDataWithCompletion:nil];
+  [super reloadData];
+
+  // UICollectionView calls -reloadData during first layoutSubviews and when the data source changes.
+  // This fires off the first load of cell nodes.
+  if (_asyncDataSource != nil && !self.dataController.initialReloadDataHasBeenCalled) {
+    [self performBatchUpdates:^{
+      [_changeSet reloadData];
+    } completion:nil];
+  }
 }
 
 - (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated
@@ -365,13 +352,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if ([self validateIndexPath:indexPath]) {
     [super scrollToItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
   }
-}
-
-- (void)reloadDataImmediately
-{
-  ASDisplayNodeAssertMainThread();
-  [self reloadData];
-  [self waitUntilAllUpdatesAreCommitted];
 }
 
 - (void)relayoutItems
@@ -1675,7 +1655,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;
     }
-    if (_inverted) {
+    if (strongSelf.inverted) {
       node.transform = CATransform3DMakeScale(1, -1, 1) ;
     }
     return node;
@@ -1721,7 +1701,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
   return CGSizeEqualToSizeWithIn(attributes.size, size, FLT_EPSILON);
-  
 }
 
 #pragma mark - ASDataControllerSource optional methods

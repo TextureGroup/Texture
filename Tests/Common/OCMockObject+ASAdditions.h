@@ -15,6 +15,10 @@
 @interface OCMockObject (ASAdditions)
 
 /**
+ * NOTE: All OCMockObjects created during an ASTestCase call OCMVerifyAll during -tearDown.
+ */
+
+/**
  * A method to manually specify which optional protocol methods should return YES
  * from -respondsToSelector:.
  *

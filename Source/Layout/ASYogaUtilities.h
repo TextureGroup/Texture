@@ -17,6 +17,17 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 
+#define ASYogaLog(...) //NSLog(__VA_ARGS__)
+
+@interface ASDisplayNode (YogaHelpers)
+
++ (ASDisplayNode *)yogaNode;
++ (ASDisplayNode *)yogaSpacerNode;
++ (ASDisplayNode *)yogaVerticalStack;
++ (ASDisplayNode *)yogaHorizontalStack;
+
+@end
+
 extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
@@ -32,6 +43,7 @@ float yogaDimensionToPoints(ASDimension dimension);
 float yogaDimensionToPercent(ASDimension dimension);
 ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
 
+void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
 YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
                                       float width, YGMeasureMode widthMode,
                                       float height, YGMeasureMode heightMode);

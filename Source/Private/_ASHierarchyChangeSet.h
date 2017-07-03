@@ -147,6 +147,14 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
  */
 - (NSUInteger)newSectionForOldSection:(NSUInteger)oldSection;
 
+/**
+ * Get the old item index path for the given new index path.
+ *
+ * @precondition The change set must be completed.
+ * @return The old index path, or nil if the given item was inserted.
+ */
+- (nullable NSIndexPath *)oldIndexPathForNewIndexPath:(NSIndexPath *)indexPath;
+
 /// Call this once the change set has been constructed to prevent future modifications to the changeset. Calling this more than once is a programmer error.
 /// NOTE: Calling this method will cause the changeset to convert all reloads into delete/insert pairs.
 - (void)markCompletedWithNewItemCounts:(std::vector<NSInteger>)newItemCounts;
