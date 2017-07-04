@@ -551,37 +551,32 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     }
   }
   
-  // Since we waited for _editingTransactionGroup at the beginning of this method, at this point we can guarantee that _pendingMap equals to _visibleMap.
-  // So if the change set is empty, we don't need to modify data and can safely schedule to notify the delegate.
-  if (changeSet.isEmpty) {
-    [_mainSerialQueue performBlockOnMainThread:^{
-      [_delegate dataController:self willUpdateWithChangeSet:changeSet];
-      [_delegate dataController:self didUpdateWithChangeSet:changeSet];
-    }];
-    return;
-  }
-
-  BOOL canDelegateLayout;
+  BOOL canDelegateLayout = (_layoutDelegate != nil);
   ASElementMap *newMap;
   id layoutContext;
   {
     as_activity_scope(as_activity_create("Latch new data for collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    // Mutable copy of current data.
-    ASElementMap *previousMap = _pendingMap;
-    ASMutableElementMap *mutableMap = [previousMap mutableCopy];
 
-    canDelegateLayout = (_layoutDelegate != nil);
+    // Step 1: Populate a new map that reflects the data source's state and use it as pendingMap
+    if (changeSet.isEmpty) {
+      // If the change set is empty, nothing has changed so we can just reuse the previous map
+      newMap = self.pendingMap;
+    } else {
+      // Mutable copy of current data.
+      ASElementMap *previousMap = self.pendingMap;
+      ASMutableElementMap *mutableMap = [previousMap mutableCopy];
 
-    // Step 1: Update the mutable copies to match the data source's state
-    [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
-    ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
-    [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout) previousMap:previousMap];
+      // Step 1.1: Update the mutable copies to match the data source's state
+      [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
+      ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
+      [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout) previousMap:previousMap];
 
-    // Step 2: Clone the new data
-    newMap = [mutableMap copy];
+      // Step 1.2: Clone the new data
+      newMap = [mutableMap copy];
+    }
     self.pendingMap = newMap;
 
-    // Step 3: Ask layout delegate for contexts
+    // Step 2: Ask layout delegate for contexts
     if (canDelegateLayout) {
       layoutContext = [_layoutDelegate layoutContextWithElements:newMap];
     }
@@ -592,7 +587,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
-    // Step 4: Allocate and layout elements if can't delegate
+    // Step 3: Allocate and layout elements if can't delegate
     NSArray<ASCollectionElement *> *elementsToProcess;
     if (canDelegateLayout) {
       // Allocate all nodes before handling them to the layout delegate.
@@ -617,7 +612,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
         as_activity_scope_leave(&preparationScope);
         [_delegate dataController:self willUpdateWithChangeSet:changeSet];
 
-        // Step 5: Deploy the new data as "completed" and inform delegate
+        // Step 4: Deploy the new data as "completed" and inform delegate
         self.visibleMap = newMap;
         
         [_delegate dataController:self didUpdateWithChangeSet:changeSet];
