@@ -15,33 +15,11 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDimension.h>
 #import <UIKit/UIGeometry.h>
+#import <AsyncDisplayKit/ASDimension.h>
 
 @protocol ASLayoutElement;
 @class ASLayoutElementStyle;
-
-#pragma mark - ASLayoutElementContext
-
-NS_ASSUME_NONNULL_BEGIN
-
-AS_SUBCLASSING_RESTRICTED
-@interface ASLayoutElementContext : NSObject
-@property (nonatomic) int32_t transitionID;
-@end
-
-extern int32_t const ASLayoutElementContextInvalidTransitionID;
-
-extern int32_t const ASLayoutElementContextDefaultTransitionID;
-
-// Does not currently support nesting – there must be no current context.
-extern void ASLayoutElementPushContext(ASLayoutElementContext * context);
-
-extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext();
-
-extern void ASLayoutElementPopContext();
-
-NS_ASSUME_NONNULL_END
 
 #pragma mark - ASLayoutElementLayoutDefaults
 

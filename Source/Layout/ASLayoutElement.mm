@@ -30,60 +30,6 @@
   #import <AsyncDisplayKit/ASYogaUtilities.h>
 #endif
 
-#pragma mark - ASLayoutElementContext
-
-@implementation ASLayoutElementContext
-
-- (instancetype)init
-{
-  if (self = [super init]) {
-    _transitionID = ASLayoutElementContextDefaultTransitionID;
-  }
-  return self;
-}
-
-@end
-
-CGFloat const ASLayoutElementParentDimensionUndefined = NAN;
-CGSize const ASLayoutElementParentSizeUndefined = {ASLayoutElementParentDimensionUndefined, ASLayoutElementParentDimensionUndefined};
-
-int32_t const ASLayoutElementContextInvalidTransitionID = 0;
-int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContextInvalidTransitionID + 1;
-
-static void ASLayoutElementDestructor(void *p) {
-  if (p != NULL) {
-    ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
-    CFBridgingRelease(p);
-  }
-};
-
-pthread_key_t ASLayoutElementContextKey()
-{
-  return ASPthreadStaticKey(ASLayoutElementDestructor);
-}
-
-void ASLayoutElementPushContext(ASLayoutElementContext *context)
-{
-  // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
-  ASDisplayNodeCAssertNil(ASLayoutElementGetCurrentContext(), @"Nested ASLayoutElementContexts aren't supported.");
-  pthread_setspecific(ASLayoutElementContextKey(), CFBridgingRetain(context));
-}
-
-ASLayoutElementContext *ASLayoutElementGetCurrentContext()
-{
-  // Don't retain here. Caller will retain if it wants to!
-  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey());
-}
-
-void ASLayoutElementPopContext()
-{
-  ASLayoutElementContextKey();
-  ASDisplayNodeCAssertNotNil(ASLayoutElementGetCurrentContext(), @"Attempt to pop context when there wasn't a context!");
-  auto key = ASLayoutElementContextKey();
-  CFBridgingRelease(pthread_getspecific(key));
-  pthread_setspecific(key, NULL);
-}
-
 #pragma mark - ASLayoutElementStyle
 
 NSString * const ASLayoutElementStyleWidthProperty = @"ASLayoutElementStyleWidthProperty";
