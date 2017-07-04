@@ -558,12 +558,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     as_activity_scope(as_activity_create("Latch new data for collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
 
     // Step 1: Populate a new map that reflects the data source's state and use it as pendingMap
+    ASElementMap *previousMap = self.pendingMap;
     if (changeSet.isEmpty) {
       // If the change set is empty, nothing has changed so we can just reuse the previous map
-      newMap = self.pendingMap;
+      newMap = previousMap;
     } else {
       // Mutable copy of current data.
-      ASElementMap *previousMap = self.pendingMap;
       ASMutableElementMap *mutableMap = [previousMap mutableCopy];
 
       // Step 1.1: Update the mutable copies to match the data source's state
