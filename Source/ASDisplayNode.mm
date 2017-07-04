@@ -1310,7 +1310,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
     }];
   });
 
-  as_log_verbose(ASRenderLog(), "%s %@", sel_getName(_cmd), node);
+  as_log_verbose(ASDisplayLog(), "%s %@", sel_getName(_cmd), node);
   [renderQueue enqueue:node];
 }
 
@@ -2339,7 +2339,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)_removeFromSupernode:(ASDisplayNode *)supernode view:(UIView *)view layer:(CALayer *)layer
 {
-  // TODO: Should we simply return early if supernode is nil? This currently gets called for every insertSubnode.
+  // Note: we continue even if supernode is nil to ensure view/layer are removed from hierarchy.
+
   if (supernode != nil) {
     as_log_verbose(ASNodeLog(), "Remove %@ from supernode %@", self, supernode);
   }
@@ -2703,7 +2704,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)recursivelySetInterfaceState:(ASInterfaceState)newInterfaceState
 {
-  as_activity_scope(as_activity_create("Recursively set interface state", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Recursively set interface state");
 
   // Instead of each node in the recursion assuming it needs to schedule itself for display,
   // setInterfaceState: skips this when handling range-managed nodes (our whole subtree has this set).
@@ -2830,8 +2831,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
   // Log this change, unless it's just the node going from {} -> {Measure} because that change happens
   // for all cell nodes and it isn't currently meaningful.
-  BOOL isJustEnteringMeasure = (oldState == ASInterfaceStateNone && newState == ASInterfaceStateMeasureLayout);
-  if (!isJustEnteringMeasure) {
+  BOOL measureChangeOnly = ((oldState | newState) == ASInterfaceStateMeasureLayout);
+  if (!measureChangeOnly) {
     as_log_verbose(ASNodeLog(), "%s %@ %@", sel_getName(_cmd), NSStringFromASInterfaceStateChange(oldState, newState), self);
   }
   

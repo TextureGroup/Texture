@@ -581,7 +581,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     return;
   }
 
-  as_activity_scope(as_activity_create("Load next image for multiplex image node", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Load next image for multiplex image node");
   as_log_verbose(ASImageLoadingLog(), "Loading image for %@ ident: %@", self, nextImageIdentifier);
   self.loadingImageIdentifier = nextImageIdentifier;
 

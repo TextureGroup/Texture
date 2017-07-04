@@ -284,7 +284,7 @@ typedef enum {
     {
       // Log a message identifying this queue into the queue's root activity.
       as_activity_scope_verbose(_rootActivity);
-      as_log_verbose(ASRenderLog(), "Created run loop queue: %@", self);
+      as_log_verbose(ASDisplayLog(), "Created run loop queue: %@", self);
     }
     
     // Self is guaranteed to outlive the observer.  Without the high cost of a weak pointer,
@@ -396,10 +396,10 @@ typedef enum {
     for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
-      as_log_verbose(ASRenderLog(), "processed %@", value);
+      as_log_verbose(ASDisplayLog(), "processed %@", value);
     }
     if (count > 1) {
-      as_log_verbose(ASRenderLog(), "processed %lu items", (unsigned long)count);
+      as_log_verbose(ASDisplayLog(), "processed %lu items", (unsigned long)count);
     }
   }
 

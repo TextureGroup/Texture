@@ -173,7 +173,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     NSArray<ASCollectionElement *> *batchedElements = [elements subarrayWithRange:batchedRange];
     NSArray<ASCellNode *> *nodes;
     {
-      as_activity_scope(as_activity_create("Data controller batch", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+      as_activity_create_for_scope("Data controller  batch");
       nodes = [self _allocateNodesFromElements:batchedElements andLayout:shouldLayout];
     }
     batchCompletionHandler(batchedElements, nodes);
@@ -561,12 +561,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     return;
   }
 
-  // Mutable copy of current data.
   BOOL canDelegateLayout;
   ASElementMap *newMap;
   id layoutContext;
   {
     as_activity_scope(as_activity_create("Latch new data for collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
+    // Mutable copy of current data.
     ASElementMap *previousMap = _pendingMap;
     ASMutableElementMap *mutableMap = [previousMap mutableCopy];
 

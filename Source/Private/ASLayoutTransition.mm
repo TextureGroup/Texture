@@ -108,7 +108,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   [self calculateSubnodeOperationsIfNeeded];
   
   // Create an activity even if no subnodes affected.
-  as_activity_scope(as_activity_create("Apply subnode insertions", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Apply subnode insertions");
   if (_insertedSubnodes.count == 0) {
     return;
   }
@@ -149,7 +149,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   }
   
   // Create an activity even if no subnodes affected.
-  as_activity_scope(as_activity_create("Calculate subnode operations", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Calculate subnode operations");
   ASLayout *previousLayout = _previousLayout->layout;
   ASLayout *pendingLayout = _pendingLayout->layout;
 

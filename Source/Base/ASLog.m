@@ -13,67 +13,25 @@
 #import <AsyncDisplayKit/ASLog.h>
 
 os_log_t ASNodeLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASNodeLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "Node");
-  });
-#endif
-  return log;
+  return ASCreateOnce((ASEnableLogs && ASNodeLogEnabled) ? as_log_create("org.TextureGroup.Texture", "Node") : OS_LOG_DISABLED);
 }
 
 os_log_t ASLayoutLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASLayoutLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "Layout");
-  });
-#endif
-  return log;
+  return ASCreateOnce((ASEnableLogs && ASLayoutLogEnabled) ? as_log_create("org.TextureGroup.Texture", "Layout") : OS_LOG_DISABLED);
 }
 
 os_log_t ASCollectionLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASCollectionLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "Collection");
-  });
-#endif
-  return log;
+  return ASCreateOnce((ASEnableLogs && ASCollectionLogEnabled) ? as_log_create("org.TextureGroup.Texture", "Collection") : OS_LOG_DISABLED);
 }
 
-os_log_t ASRenderLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASRenderLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "Render");
-  });
-#endif
-  return log;
+os_log_t ASDisplayLog() {
+  return ASCreateOnce((ASEnableLogs && ASDisplayLogEnabled) ? as_log_create("org.TextureGroup.Texture", "Display") : OS_LOG_DISABLED);
 }
 
 os_log_t ASImageLoadingLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASImageLoadingLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "ImageLoading");
-  });
-#endif
-  return log;
+  return ASCreateOnce((ASEnableLogs && ASImageLoadingLogEnabled) ? as_log_create("org.TextureGroup.Texture", "ImageLoading") : OS_LOG_DISABLED);
 }
 
 os_log_t ASMainThreadDeallocationLog() {
-  static os_log_t log;
-#if ASEnableLogs && ASMainThreadDeallocationLogEnabled
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    log = as_log_create("org.TextureGroup.Texture", "MainDealloc");
-  });
-#endif
-  return log;
+  return ASCreateOnce((ASEnableLogs && ASMainThreadDeallocationLogEnabled) ? as_log_create("org.TextureGroup.Texture", "MainDealloc") : OS_LOG_DISABLED);
 }

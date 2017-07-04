@@ -40,8 +40,8 @@ os_log_t ASNodeLog();
 os_log_t ASLayoutLog();
 
 /// Log for display-specific events e.g. display queue batches.
-#define ASRenderLogEnabled 1
-os_log_t ASRenderLog();
+#define ASDisplayLogEnabled 1
+os_log_t ASDisplayLog();
 
 /// Log for collection events e.g. reloadData, performBatchUpdates.
 #define ASCollectionLogEnabled 1
@@ -79,18 +79,11 @@ ASDISPLAYNODE_EXTERN_C_END
 #define as_activity_scope_leave(statePtr)                                 os_activity_scope_leave(statePtr)
 #define as_activity_get_identifier(activity, outParentID)                 os_activity_get_identifier(activity, outParentID)
 
-#if ASEnableVerboseLogging
-  #define as_activity_scope_verbose(activity)                             as_activity_scope(activity)
-#else
-  #define as_activity_scope_verbose(activity)
-#endif
-
 #else
 
 #define OS_ACTIVITY_NULLABLE
 #define AS_ACTIVITY_CURRENT                                               OS_ACTIVITY_NULL
 #define as_activity_scope(activity)
-#define as_activity_scope_verbose(activity)
 #define as_activity_apply(activity, block)
 #define as_activity_create(description, parent_activity, flags)           OS_ACTIVITY_NULL
 #define as_activity_scope_enter(activity, statePtr)
@@ -98,6 +91,18 @@ ASDISPLAYNODE_EXTERN_C_END
 #define as_activity_get_identifier(activity, outParentID)                 (os_activity_id_t)0
 
 #endif // OS_LOG_TARGET_HAS_10_12_FEATURES
+
+// Create activities only when verbose enabled. Doesn't materially impact performance, but good if we're cluttering up
+// activity scopes and reducing readability.
+#if ASEnableVerboseLogging
+  #define as_activity_scope_verbose(activity)                             as_activity_scope(activity)
+#else
+  #define as_activity_scope_verbose(activity)
+#endif
+
+// Convenience for: as_activity_scope(as_activity_create(description, AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT))
+#define as_activity_create_for_scope(description) \
+  as_activity_scope(as_activity_create(description, AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT))
 
 /**
  * The logging macros are not guarded by deployment-target checks like the activity macros are, but they are

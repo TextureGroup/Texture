@@ -833,6 +833,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [self beginUpdates];
   as_activity_scope(_changeSet.rootActivity);
   {
+    // Only include client code in the submit activity, the rest just lives in the root activity. 
     as_activity_scope(_changeSet.submitActivity);
     if (updates) {
       updates();
@@ -1582,7 +1583,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)_beginBatchFetching
 {
-  as_activity_scope(as_activity_create("Batch fetch for collection node", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Batch fetch for collection node");
   [_batchContext beginBatchFetching];
   if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

@@ -558,11 +558,11 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
       url = _URL;
     }
 
+
     downloadIdentifier = [_downloader downloadImageWithURL:url
                                              callbackQueue:dispatch_get_main_queue()
                                           downloadProgress:NULL
                                                 completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier) {
-                                                  as_log_verbose(ASImageLoadingLog(), "Downloaded image for %@ img: %@ url: %@", self, [imageContainer asdk_image], url);
                                                   if (finished != NULL) {
                                                     finished(imageContainer, error, downloadIdentifier);
                                                   }
@@ -671,6 +671,8 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
           return;
         }
 
+        as_log_verbose(ASImageLoadingLog(), "Downloaded image for %@ img: %@ url: %@", self, [imageContainer asdk_image], url);
+        
         // Grab the lock for the rest of the block
         ASDN::MutexLocker l(strongSelf->__instanceLock__);
         

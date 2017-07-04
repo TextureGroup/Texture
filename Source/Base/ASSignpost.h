@@ -14,21 +14,21 @@
 /// should be kept up-to-date with these values.
 typedef NS_ENUM(uint32_t, ASSignpostName) {
   // Collection/Table (Blue)
-  ASSignpostDataControllerBatch = 300,		// Alloc/layout nodes before collection update.
-  ASSignpostRangeControllerUpdate,				// Ranges update pass.
-  ASSignpostCollectionUpdate,							// Entire update process, from -endUpdates to [super perform…]
+  ASSignpostDataControllerBatch = 300,    // Alloc/layout nodes before collection update.
+  ASSignpostRangeControllerUpdate,        // Ranges update pass.
+  ASSignpostCollectionUpdate,             // Entire update process, from -endUpdates to [super perform…]
   
   // Rendering (Green)
-  ASSignpostLayerDisplay = 325,						// Client display callout.
-  ASSignpostRunLoopQueueBatch,						// One batch of ASRunLoopQueue.
+  ASSignpostLayerDisplay = 325,           // Client display callout.
+  ASSignpostRunLoopQueueBatch,            // One batch of ASRunLoopQueue.
   
   // Layout (Purple)
-  ASSignpostCalculateLayout = 350,				// Start of calculateLayoutThatFits to end. Max 1 per thread.
+  ASSignpostCalculateLayout = 350,        // Start of calculateLayoutThatFits to end. Max 1 per thread.
   
   // Misc (Orange)
-  ASSignpostDeallocQueueDrain = 375,			// One chunk of dealloc queue work. arg0 is count.
-  ASSignpostCATransactionLayout,					// The CA transaction commit layout phase.
-  ASSignpostCATransactionCommit						// The CA transaction commit post-layout phase.
+  ASSignpostDeallocQueueDrain = 375,      // One chunk of dealloc queue work. arg0 is count.
+  ASSignpostCATransactionLayout,          // The CA transaction commit layout phase.
+  ASSignpostCATransactionCommit           // The CA transaction commit post-layout phase.
 };
 
 typedef NS_ENUM(uintptr_t, ASSignpostColor) {

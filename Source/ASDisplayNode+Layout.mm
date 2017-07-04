@@ -218,7 +218,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
  */
 - (void)_setNeedsLayoutFromAbove
 {
-  as_activity_scope(as_activity_create("Set needs layout from above", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Set needs layout from above");
   ASDisplayNodeAssertThreadAffinity(self);
 
   // Mark the node for layout in the next layout pass
@@ -312,7 +312,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     }
   }
   
-  as_activity_scope(as_activity_create("Update node layout for current bounds", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Update node layout for current bounds");
   as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->isDirty());
   // _calculatedDisplayNodeLayout is not reusable we need to transition to a new one
   [self cancelLayoutTransition];
@@ -519,7 +519,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
                 measurementCompletion:(void(^)())completion
 {
   ASDisplayNodeAssertMainThread();
-  as_activity_scope(as_activity_create("Transition node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("Transition node layout");
   as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
   
   if (constrainedSize.max.width <= 0.0 || constrainedSize.max.height <= 0.0) {
@@ -594,7 +594,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       if (isCancelled()) {
         return;
       }
-      as_activity_scope(as_activity_create("Commit layout transition", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+      as_activity_create_for_scope("Commit layout transition");
       ASLayoutTransition *pendingLayoutTransition;
       _ASTransitionContext *pendingLayoutTransitionContext;
       {
@@ -621,7 +621,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       
       // Apply complete layout transitions for all subnodes
       {
-        as_activity_scope(as_activity_create("Complete pending layout transitions for subtree", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+        as_activity_create_for_scope("Complete pending layout transitions for subtree");
         ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
           [node _completePendingLayoutTransition];
           node.hierarchyState &= (~ASHierarchyStateLayoutPending);
@@ -640,7 +640,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       
       // Kick off animating the layout transition
       {
-        as_activity_scope(as_activity_create("Animate layout transition", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+        as_activity_create_for_scope("Animate layout transition");
         [self animateLayoutTransition:pendingLayoutTransitionContext];
       }
       

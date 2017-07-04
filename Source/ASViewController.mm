@@ -168,7 +168,7 @@ ASVisibilityDidMoveToParentViewController;
 
 - (void)viewWillAppear:(BOOL)animated
 {
-  as_activity_scope(as_activity_create("ASViewController will appear", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_activity_create_for_scope("ASViewController will appear");
   as_log_debug(ASNodeLog(), "View controller %@ will appear", self);
 
   [super viewWillAppear:animated];
