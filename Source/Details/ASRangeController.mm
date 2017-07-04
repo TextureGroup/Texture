@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 
@@ -203,6 +204,8 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)_updateVisibleNodeIndexPaths
 {
+  as_activity_scope_verbose(as_activity_create("Update range controller", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_verbose(ASCollectionLog(), "Updating ranges for %@", ASViewToDisplayNode(ASDynamicCast(self.delegate, UIView)));
   ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
   if (!_layoutController || !_dataSource) {
     return;

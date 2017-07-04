@@ -22,6 +22,7 @@
 
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _insertSubnode... / _removeFromSupernode.
+#import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
 #import <memory>
@@ -106,6 +107,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   ASDN::MutexSharedLocker l(__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   
+  // Create an activity even if no subnodes affected.
+  as_activity_create_for_scope("Apply subnode insertions");
   if (_insertedSubnodes.count == 0) {
     return;
   }
@@ -121,6 +124,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)applySubnodeRemovals
 {
+  as_activity_scope(as_activity_create("Apply subnode removals", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   ASDN::MutexSharedLocker l(__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
 
@@ -144,6 +148,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
   
+  // Create an activity even if no subnodes affected.
+  as_activity_create_for_scope("Calculate subnode operations");
   ASLayout *previousLayout = _previousLayout->layout;
   ASLayout *pendingLayout = _pendingLayout->layout;
 

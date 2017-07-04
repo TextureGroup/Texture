@@ -19,11 +19,10 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#define AS_LOG_VISIBILITY_CHANGES 0
 
 @implementation ASViewController
 {
@@ -169,7 +168,11 @@ ASVisibilityDidMoveToParentViewController;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  as_activity_create_for_scope("ASViewController will appear");
+  as_log_debug(ASNodeLog(), "View controller %@ will appear", self);
+
   [super viewWillAppear:animated];
+
   _ensureDisplayed = YES;
 
   // A layout pass is forced this early to get nodes like ASCollectionNode, ASTableNode etc.
@@ -191,7 +194,7 @@ ASVisibilityDepthImplementation;
 - (void)visibilityDepthDidChange
 {
   ASLayoutRangeMode rangeMode = ASLayoutRangeModeForVisibilityDepth(self.visibilityDepth);
-#if AS_LOG_VISIBILITY_CHANGES
+#if ASEnableVerboseLogging
   NSString *rangeModeString;
   switch (rangeMode) {
     case ASLayoutRangeModeMinimum:
@@ -213,7 +216,7 @@ ASVisibilityDepthImplementation;
     default:
       break;
   }
-  NSLog(@"Updating visibility of:%@ to: %@ (visibility depth: %d)", self, rangeModeString, self.visibilityDepth);
+  as_log_verbose(ASNodeLog(), "Updating visibility of %@ to: %@ (visibility depth: %zd)", self, rangeModeString, self.visibilityDepth);
 #endif
   [self updateCurrentRangeModeWithModeIfPossible:rangeMode];
 }
@@ -284,6 +287,8 @@ ASVisibilityDepthImplementation;
   ASPrimitiveTraitCollection oldTraitCollection = self.node.primitiveTraitCollection;
   
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, oldTraitCollection) == NO) {
+    as_activity_scope_verbose(as_activity_create("Propagate ASViewController trait collection", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+    as_log_debug(ASNodeLog(), "Propagating new traits for %@: %@", self, NSStringFromASPrimitiveTraitCollection(traitCollection));
     self.node.primitiveTraitCollection = traitCollection;
     
     NSArray<id<ASLayoutElement>> *children = [self.node sublayoutElements];
@@ -295,6 +300,7 @@ ASVisibilityDepthImplementation;
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // Once we've propagated all the traits, layout this node.
     // Remeasure the node with the latest constrained size – old constrained size may be incorrect.
+    as_activity_scope_verbose(as_activity_create("Layout ASViewController node with new traits", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
     [_node layoutThatFits:[self nodeConstrainedSize]];
 #pragma clang diagnostic pop
   }

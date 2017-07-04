@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <vector>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASLog.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -118,6 +119,12 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 
 /// Indicates whether the change set is empty, that is it includes neither reload data nor per item or section changes.
 @property (nonatomic, readonly) BOOL isEmpty;
+
+/// The top-level activity for this update.
+@property (nonatomic, OS_ACTIVITY_NULLABLE) os_activity_t rootActivity;
+
+/// The activity for submitting this update i.e. between -beginUpdates and -endUpdates.
+@property (nonatomic, OS_ACTIVITY_NULLABLE) os_activity_t submitActivity;
 
 - (instancetype)initWithOldData:(std::vector<NSInteger>)oldItemCounts NS_DESIGNATED_INITIALIZER;
 

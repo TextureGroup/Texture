@@ -173,6 +173,24 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 ASLayoutElementStyleExtensibilityForwarding
 
+#pragma mark - ASDescriptionProvider
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDescription
+{
+  auto result = [NSMutableArray<NSDictionary *> array];
+  if (NSArray *children = self.children) {
+    // Use tiny descriptions because these trees can get nested very deep.
+    auto tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
+    [result addObject:@{ @"children": tinyDescriptions }];
+  }
+  return result;
+}
+
+- (NSString *)description
+{
+  return ASObjectDescriptionMake(self, [self propertiesForDescription]);
+}
+
 #pragma mark - Framework Private
 
 #if AS_DEDUPE_LAYOUT_SPEC_TREE
@@ -236,6 +254,23 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
+#pragma mark - ASLayoutElementAsciiArtProtocol
+
+- (NSString *)asciiArtString
+{
+  NSArray *children = self.children.count < 2 && self.child ? @[self.child] : self.children;
+  return [ASLayoutSpec asciiArtStringForChildren:children parentName:[self asciiArtName]];
+}
+
+- (NSString *)asciiArtName
+{
+  NSMutableString *result = [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
+  if (_debugName) {
+    [result appendFormat:@" (%@)", _debugName];
+  }
+  return result;
+}
+
 @end
 
 #pragma mark - ASWrapperLayoutSpec
@@ -295,7 +330,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASLayoutSpec (Debugging)
 
-#pragma mark - ASLayoutElementAsciiArtProtocol
+#pragma mark - ASCII Art Helpers
 
 + (NSString *)asciiArtStringForChildren:(NSArray *)children parentName:(NSString *)parentName direction:(ASStackLayoutDirection)direction
 {
@@ -315,21 +350,6 @@ ASLayoutElementStyleExtensibilityForwarding
 + (NSString *)asciiArtStringForChildren:(NSArray *)children parentName:(NSString *)parentName
 {
   return [self asciiArtStringForChildren:children parentName:parentName direction:ASStackLayoutDirectionHorizontal];
-}
-
-- (NSString *)asciiArtString
-{
-  NSArray *children = self.children.count < 2 && self.child ? @[self.child] : self.children;
-  return [ASLayoutSpec asciiArtStringForChildren:children parentName:[self asciiArtName]];
-}
-
-- (NSString *)asciiArtName
-{
-  NSString *string = NSStringFromClass([self class]);
-  if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@" (debugName = %@)",_debugName]];
-  }
-  return string;
 }
 
 @end

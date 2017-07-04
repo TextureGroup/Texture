@@ -1880,10 +1880,8 @@ static bool stringContainsPointer(NSString *description, id p) {
   node.debugName = @"big troll eater name";
 
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
   [node layer];
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
 }
 
 - (void)testNameInDescriptionLayer
