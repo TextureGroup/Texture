@@ -601,7 +601,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 - (NSString *)description
 {
-  return ASObjectDescriptionMake(self, [self propertiesForDescription]);
+  return ASObjectDescriptionMakeWithoutObject([self propertiesForDescription]);
 }
 
 - (NSString *)debugDescription
@@ -612,7 +612,9 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription
 {
   NSMutableArray<NSDictionary *> *result = [NSMutableArray array];
-  [result addObject:@{ @"includesReloadData" : @(_includesReloadData) }];
+  if (_includesReloadData) {
+    [result addObject:@{ @"reloadData" : @"YES" }];
+  }
   if (_reloadSectionChanges.count > 0) {
     [result addObject:@{ @"reloadSections" : [_ASHierarchySectionChange smallDescriptionForSectionChanges:_reloadSectionChanges] }];
   }

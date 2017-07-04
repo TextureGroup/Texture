@@ -748,9 +748,6 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-@interface ASDisplayNode (ASLayoutElementAsciiArtProtocol) <ASLayoutElementAsciiArtProtocol>
-@end
-
 @interface ASDisplayNode (ASLayout)
 
 /** @name Managing dimensions */
