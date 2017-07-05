@@ -117,8 +117,14 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * Called for change set updates.
  *
  * @param changeSet The change set that includes all updates
+ *
+ * @param updates The block that performs relevant data updates.
+ *
+ * @discussion The updates block must always be executed or the data controller will get into a bad state.
+ * It should be called at the time the backing view is ready to process the updates,
+ * i.e inside the updates block of `-[UICollectionView performBatchUpdates:completion:] or after calling `-[UITableView beginUpdates]`.
  */
-- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;
+- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates;
 
 @end
 

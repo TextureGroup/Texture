@@ -1895,10 +1895,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   if (!self.asyncDataSource || _superIsPendingDataLoad) {
+    updates();
     [changeSet executeCompletionHandlerWithFinished:NO];
     return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
   }
@@ -1907,6 +1908,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     as_activity_scope(as_activity_create("Commit collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     if (changeSet.includesReloadData) {
       _superIsPendingDataLoad = YES;
+      updates();
       [super reloadData];
       as_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
@@ -1915,6 +1917,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       
       __block NSUInteger numberOfUpdates = 0;
       [self _superPerformBatchUpdates:^{
+        updates();
+
         for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
           [super reloadItemsAtIndexPaths:change.indexPaths];
           numberOfUpdates++;

@@ -610,12 +610,20 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
+        // TODO Merge the below two delegate methods
         [_delegate dataController:self willUpdateWithChangeSet:changeSet];
 
-        // Step 4: Deploy the new data as "completed" and inform delegate
-        self.visibleMap = newMap;
-        
-        [_delegate dataController:self didUpdateWithChangeSet:changeSet];
+        // Step 4: Inform the delegate
+        [_delegate dataController:self didUpdateWithChangeSet:changeSet updates:^(){
+          // Step 5: Deploy the new data as "completed"
+          //
+          // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
+          // it will not consume the batch update blocks immediately.
+          // As a result, in a short intermidate time, the view will still be relying on the old data source state.
+          // Thus, we can't just swap the new map immediately before step 4, but until this update block is executed.
+          // (https://github.com/TextureGroup/Texture/issues/378)
+          self.visibleMap = newMap;
+        }];
       }];
     }];
   });
