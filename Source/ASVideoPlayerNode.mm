@@ -681,7 +681,9 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 - (void)didTapFullScreenButton:(ASButtonNode*)node
 {
-  [_delegate didTapFullScreenButtonNode:node];
+  if (_delegateFlags.delegateDidTapFullScreenButtonNode) {
+    [_delegate didTapFullScreenButtonNode:node];
+  }
 }
 
 - (void)beginSeek
