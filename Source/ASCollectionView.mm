@@ -1074,7 +1074,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   auto cell = (_ASCollectionViewCell *)rawCell;
   
   ASCollectionElement *element = cell.element;
-  [_visibleElements addObject:element];
+  if (element) {
+    [_visibleElements addObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplayCell: %@, %@, %@", rawCell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
   cellNode.scrollView = collectionView;
 
@@ -1126,8 +1132,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   auto cell = (_ASCollectionViewCell *)rawCell;
   
   ASCollectionElement *element = cell.element;
-  [_visibleElements removeObject:element];
-  ASDisplayNodeAssertNotNil(element, @"Expected element associated with removed cell not to be nil.");
+  if (element) {
+    [_visibleElements removeObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for didEndDisplayingCell: %@, %@, %@", rawCell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
 
   if (_asyncDelegateFlags.collectionNodeDidEndDisplayingItem) {
@@ -1155,8 +1166,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
   auto view = (_ASCollectionReusableView *)rawView;
-  
-  [_visibleElements addObject:view.element];
+
+  if (view.element) {
+    [_visibleElements addObject:view.element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplaySupplementaryView: %@, %@, %@", rawView, self, indexPath);
+    return;
+  }
+
   // This is a safeguard similar to the behavior for cells in -[ASCollectionView collectionView:willDisplayCell:forItemAtIndexPath:]
   // It ensures _ASCollectionReusableView receives layoutAttributes and calls applyLayoutAttributes.
   if (view.layoutAttributes == nil) {
@@ -1178,7 +1195,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   auto view = (_ASCollectionReusableView *)rawView;
 
-  [_visibleElements removeObject:view.element];
+  if (view.element) {
+    [_visibleElements removeObject:view.element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for didEndDisplayingSupplementaryView: %@, %@, %@", rawView, self, indexPath);
+    return;
+  }
+
   if (_asyncDelegateFlags.collectionNodeDidEndDisplayingSupplementaryElement) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
     ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
