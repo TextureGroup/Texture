@@ -99,7 +99,13 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 + (void)ensureItemChanges:(NSArray<_ASHierarchyItemChange *> *)changes ofSameType:(_ASHierarchyChangeType)changeType;
 @end
 
-@interface _ASHierarchyChangeSet () 
+@interface _ASHierarchyChangeSet ()
+
+// array index is old section index, map goes oldItem -> newItem
+@property (nonatomic, strong, readonly) NSMutableArray<ASIntegerMap *> *itemMappings;
+
+// array index is new section index, map goes newItem -> oldItem
+@property (nonatomic, strong, readonly) NSMutableArray<ASIntegerMap *> *reverseItemMappings;
 
 @property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *insertItemChanges;
 @property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalInsertItemChanges;
@@ -124,6 +130,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   std::vector<NSInteger> _newItemCounts;
   void (^_completionHandler)(BOOL finished);
 }
+@synthesize sectionMapping = _sectionMapping;
+@synthesize reverseSectionMapping = _reverseSectionMapping;
+@synthesize itemMappings = _itemMappings;
+@synthesize reverseItemMappings = _reverseItemMappings;
 
 - (instancetype)init
 {
@@ -244,55 +254,121 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 - (NSUInteger)newSectionForOldSection:(NSUInteger)oldSection
 {
-  ASDisplayNodeAssertNotNil(_deletedSections, @"Cannot call %@ before `markCompleted` returns.", NSStringFromSelector(_cmd));
-  ASDisplayNodeAssertNotNil(_insertedSections, @"Cannot call %@ before `markCompleted` returns.", NSStringFromSelector(_cmd));
-  [self _ensureCompleted];
-  if ([_deletedSections containsIndex:oldSection]) {
-    return NSNotFound;
-  }
-
-  NSUInteger newIndex = oldSection - [_deletedSections countOfIndexesInRange:NSMakeRange(0, oldSection)];
-  newIndex += [_insertedSections as_indexChangeByInsertingItemsBelowIndex:newIndex];
-  return newIndex;
+  return [self.sectionMapping integerForKey:oldSection];
 }
 
 - (NSUInteger)oldSectionForNewSection:(NSUInteger)newSection
 {
+  return [self.reverseSectionMapping integerForKey:newSection];
+}
+
+- (ASIntegerMap *)sectionMapping
+{
+  ASDisplayNodeAssertNotNil(_deletedSections, @"Cannot call %s before `markCompleted` returns.", sel_getName(_cmd));
+  ASDisplayNodeAssertNotNil(_insertedSections, @"Cannot call %s before `markCompleted` returns.", sel_getName(_cmd));
   [self _ensureCompleted];
-  if ([_insertedSections containsIndex:newSection]) {
-    return NSNotFound;
+  if (_sectionMapping == nil) {
+    _sectionMapping = [ASIntegerMap mapForUpdateWithOldCount:_oldItemCounts.size() deleted:_deletedSections inserted:_insertedSections];
   }
-  
-  NSInteger oldIndex = newSection - [_insertedSections as_indexChangeByInsertingItemsBelowIndex:newSection];
-  oldIndex += [_deletedSections countOfIndexesInRange:NSMakeRange(0, oldIndex)];
-  return oldIndex;
+  return _sectionMapping;
+}
+
+- (ASIntegerMap *)reverseSectionMapping
+{
+  if (_reverseSectionMapping == nil) {
+    _reverseSectionMapping = [self.sectionMapping inverseMap];
+  }
+  return _reverseSectionMapping;
+}
+
+- (NSMutableArray *)itemMappings
+{
+  [self _ensureCompleted];
+
+  if (_itemMappings == nil) {
+    _itemMappings = [NSMutableArray array];
+    auto insertMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalInsertItemChanges];
+    auto deleteMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalDeleteItemChanges];
+    NSInteger oldSection = 0;
+    for (auto oldCount : _oldItemCounts) {
+      NSInteger newSection = [self newSectionForOldSection:oldSection];
+      ASIntegerMap *table;
+      if (newSection == NSNotFound) {
+        table = ASIntegerMap.emptyMap;
+      } else {
+        table = [ASIntegerMap mapForUpdateWithOldCount:oldCount deleted:deleteMap[@(oldSection)] inserted:insertMap[@(newSection)]];
+      }
+      _itemMappings[oldSection] = table;
+      oldSection++;
+    }
+  }
+  return _itemMappings;
+}
+
+- (NSMutableArray *)reverseItemMappings
+{
+  [self _ensureCompleted];
+
+  if (_reverseItemMappings == nil) {
+    _reverseItemMappings = [NSMutableArray array];
+    for (NSInteger newSection = 0; newSection < _newItemCounts.size(); newSection++) {
+      NSInteger oldSection = [self oldSectionForNewSection:newSection];
+      ASIntegerMap *table;
+      if (oldSection == NSNotFound) {
+        table = ASIntegerMap.emptyMap;
+      } else {
+        table = [[self itemMappingInSection:oldSection] inverseMap];
+      }
+      _reverseItemMappings[newSection] = table;
+    }
+  }
+  return _reverseItemMappings;
+}
+
+- (ASIntegerMap *)itemMappingInSection:(NSInteger)oldSection
+{
+  if (self.includesReloadData || oldSection >= _oldItemCounts.size()) {
+    return ASIntegerMap.emptyMap;
+  }
+  return self.itemMappings[oldSection];
+}
+
+- (ASIntegerMap *)reverseItemMappingInSection:(NSInteger)newSection
+{
+  if (self.includesReloadData || newSection >= _newItemCounts.size()) {
+    return ASIntegerMap.emptyMap;
+  }
+  return self.reverseItemMappings[newSection];
 }
 
 - (NSIndexPath *)oldIndexPathForNewIndexPath:(NSIndexPath *)indexPath
 {
   [self _ensureCompleted];
-  // Inserted sections return nil.
   NSInteger newSection = indexPath.section;
-  NSInteger newItem = indexPath.item;
   NSInteger oldSection = [self oldSectionForNewSection:newSection];
   if (oldSection == NSNotFound) {
     return nil;
   }
-  
-  // Inserted items return nil.
-  for (_ASHierarchyItemChange *change in _originalInsertItemChanges) {
-    if ([change.indexPaths containsObject:indexPath]) {
-      return nil;
-    }
+  NSInteger oldItem = [[self reverseItemMappingInSection:newSection] integerForKey:indexPath.item];
+  if (oldItem == NSNotFound) {
+    return nil;
   }
-  
-  // TODO: This is a pretty inefficient way to do this.
-  NSIndexSet *insertsInSection = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_insertItemChanges][@(newSection)];
-  NSIndexSet *deletesInSection = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_deleteItemChanges][@(oldSection)];
-  
-  NSInteger oldIndex = newItem - [insertsInSection as_indexChangeByInsertingItemsBelowIndex:newItem];
-  oldIndex += [deletesInSection countOfIndexesInRange:NSMakeRange(0, oldIndex)];
-  return [NSIndexPath indexPathForItem:oldIndex inSection:oldSection];
+  return [NSIndexPath indexPathForItem:oldItem inSection:oldSection];
+}
+
+- (NSIndexPath *)newIndexPathForOldIndexPath:(NSIndexPath *)indexPath
+{
+  [self _ensureCompleted];
+  NSInteger oldSection = indexPath.section;
+  NSInteger newSection = [self newSectionForOldSection:oldSection];
+  if (newSection == NSNotFound) {
+    return nil;
+  }
+  NSInteger newItem = [[self itemMappingInSection:oldSection] integerForKey:indexPath.item];
+  if (newItem == NSNotFound) {
+    return nil;
+  }
+  return [NSIndexPath indexPathForItem:newItem inSection:newSection];
 }
 
 - (void)reloadData
@@ -424,34 +500,12 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     }
     
     [_ASHierarchyItemChange ensureItemChanges:_insertItemChanges ofSameType:_ASHierarchyChangeTypeInsert];
-    NSDictionary *insertedIndexPathsMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_insertItemChanges];
-    
     [_ASHierarchyItemChange ensureItemChanges:_deleteItemChanges ofSameType:_ASHierarchyChangeTypeDelete];
-    NSDictionary *deletedIndexPathsMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_deleteItemChanges];
     
     for (_ASHierarchyItemChange *change in _reloadItemChanges) {
       NSAssert(change.changeType == _ASHierarchyChangeTypeReload, @"It must be a reload change to be in here");
-      NSMutableArray *newIndexPaths = [NSMutableArray arrayWithCapacity:change.indexPaths.count];
-      
-      // Every indexPaths in the change need to update its section and/or row
-      // depending on all the deletions and insertions
-      // For reference, when batching reloads/deletes/inserts:
-      // - delete/reload indexPaths that are passed in should all be their current indexPaths
-      // - insert indexPaths that are passed in should all be their future indexPaths after deletions
-      for (NSIndexPath *indexPath in change.indexPaths) {
-        NSUInteger section = [self newSectionForOldSection:indexPath.section];
-        NSUInteger item = indexPath.item;
-        
-        // Update row number based on deletions that are above the current row in the current section
-        NSIndexSet *indicesDeletedInSection = deletedIndexPathsMap[@(indexPath.section)];
-        item -= [indicesDeletedInSection countOfIndexesInRange:NSMakeRange(0, item)];
-        // Update row number based on insertions that are above the current row in the future section
-        NSIndexSet *indicesInsertedInSection = insertedIndexPathsMap[@(section)];
-        item += [indicesInsertedInSection as_indexChangeByInsertingItemsBelowIndex:item];
-        
-        NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
-        [newIndexPaths addObject:newIndexPath];
-      }
+
+      auto newIndexPaths = ASArrayByFlatMapping(change.indexPaths, NSIndexPath *indexPath, [self newIndexPathForOldIndexPath:indexPath]);
       
       // All reload changes are translated into deletes and inserts
       // We delete the items that needs reload together with other deleted items, at their original index

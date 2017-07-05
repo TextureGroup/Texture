@@ -75,7 +75,7 @@ static __weak ASTestCase *currentTestCase;
 
   // Go ahead and spin the run loop before finishing, so the system
   // unregisters/cleans up whatever possible.
-  [NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:NSDate.distantFuture];
+  [NSRunLoop.mainRunLoop runMode:NSDefaultRunLoopMode beforeDate:NSDate.distantPast];
   
   [super tearDown];
 }

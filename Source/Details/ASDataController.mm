@@ -703,7 +703,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   }
   
   // Migrate old supplementary nodes to their new index paths.
-  [map migrateSupplementaryElementsWithChangeSet:changeSet];
+  [map migrateSupplementaryElementsWithSectionMapping:changeSet.sectionMapping];
 
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeDelete]) {
     [map removeItemsAtIndexPaths:change.indexPaths];
