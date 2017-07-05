@@ -610,11 +610,11 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
-        // TODO Merge the below two delegate methods
+        // TODO Merge the two delegate methods below
         [_delegate dataController:self willUpdateWithChangeSet:changeSet];
 
         // Step 4: Inform the delegate
-        [_delegate dataController:self didUpdateWithChangeSet:changeSet updates:^(){
+        [_delegate dataController:self didUpdateWithChangeSet:changeSet updates:^{
           // Step 5: Deploy the new data as "completed"
           //
           // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
