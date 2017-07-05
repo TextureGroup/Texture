@@ -28,8 +28,8 @@ AS_SUBCLASSING_RESTRICTED
  * If deleted and inserted are empty, returns the identity map.
  */
 + (ASIntegerMap *)mapForUpdateWithOldCount:(NSInteger)oldCount
-                                   deleted:(NSIndexSet *)deleted
-                                  inserted:(NSIndexSet *)inserted;
+                                   deleted:(nullable NSIndexSet *)deleted
+                                  inserted:(nullable NSIndexSet *)inserted;
 
 /**
  * A singleton that maps each integer to itself. Its inverse is itself.
@@ -47,6 +47,14 @@ AS_SUBCLASSING_RESTRICTED
  * @param key A key to lookup the value for.
  */
 - (NSInteger)integerForKey:(NSInteger)key;
+
+/**
+ * Sets the value for a given key.
+ *
+ * @param value The new value.
+ * @param key The key to store the value for.
+ */
+- (void)setInteger:(NSInteger)value forKey:(NSInteger)key;
 
 /**
  * Create and return a map with the inverse mapping.

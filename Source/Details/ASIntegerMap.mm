@@ -11,6 +11,7 @@
 //
 
 #import "ASIntegerMap.h"
+#import <AsyncDisplayKit/ASAssert.h>
 #import <unordered_map>
 #import <NSIndexSet+ASHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
@@ -25,6 +26,7 @@
   std::unordered_map<NSInteger, NSInteger> _map;
   BOOL _isIdentity;
   BOOL _isEmpty;
+  BOOL _immutable; // identity map and empty mape are immutable.
 }
 
 #pragma mark - Singleton
@@ -36,6 +38,7 @@
   dispatch_once(&onceToken, ^{
     identityMap = [[ASIntegerMap alloc] init];
     identityMap->_isIdentity = YES;
+    identityMap->_immutable = YES;
   });
   return identityMap;
 }
@@ -47,6 +50,7 @@
   dispatch_once(&onceToken, ^{
     emptyMap = [[ASIntegerMap alloc] init];
     emptyMap->_isEmpty = YES;
+    emptyMap->_immutable = YES;
   });
   return emptyMap;
 }
@@ -102,6 +106,16 @@
   return result != _map.end() ? result->second : NSNotFound;
 }
 
+- (void)setInteger:(NSInteger)value forKey:(NSInteger)key
+{
+  if (_immutable) {
+    ASDisplayNodeFailAssert(@"Cannot mutate special integer map: %@", self);
+    return;
+  }
+
+  _map[key] = value;
+}
+
 - (ASIntegerMap *)inverseMap
 {
   if (_isIdentity || _isEmpty) {
@@ -119,7 +133,13 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  return self;
+  if (_immutable) {
+    return self;
+  }
+
+  auto newMap = [[ASIntegerMap allocWithZone:zone] init];
+  newMap->_map = _map;
+  return newMap;
 }
 
 #pragma mark - Description
@@ -151,6 +171,18 @@
 - (NSString *)description
 {
   return ASObjectDescriptionMakeWithoutObject([self propertiesForDescription]);
+}
+
+- (BOOL)isEqual:(id)object
+{
+  if ([super isEqual:object]) {
+    return YES;
+  }
+
+  if (auto otherMap = ASDynamicCast(object, ASIntegerMap)) {
+    return otherMap->_map == _map;
+  }
+  return NO;
 }
 
 @end
