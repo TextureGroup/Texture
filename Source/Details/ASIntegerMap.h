@@ -22,7 +22,7 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASIntegerMap : NSObject <NSCopying>
 
 /**
- * Creates an map based on the specified update to an array.
+ * Creates a map based on the specified update to an array.
  *
  * If oldCount is 0, returns the empty map.
  * If deleted and inserted are empty, returns the identity map.
@@ -33,11 +33,15 @@ AS_SUBCLASSING_RESTRICTED
 
 /**
  * A singleton that maps each integer to itself. Its inverse is itself.
+ *
+ * Note: You cannot mutate this.
  */
 @property (class, atomic, readonly) ASIntegerMap *identityMap;
 
 /**
  * A singleton that returns NSNotFound for all keys. Its inverse is itself.
+ *
+ * Note: You cannot mutate this.
  */
 @property (class, atomic, readonly) ASIntegerMap *emptyMap;
 
