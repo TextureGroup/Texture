@@ -2938,10 +2938,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   [_interfaceStateDelegate didEnterPreloadState];
   
-  // Trigger a layout pass to ensure all subnodes have the correct size to preload their content.
-  // This is important for image nodes, as well as collection and table nodes.
-  [self layoutIfNeeded];
-  
   if (_methodOverrides & ASDisplayNodeMethodOverrideFetchData) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
