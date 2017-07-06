@@ -952,7 +952,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
-  ASCellNode *cell = [self nodeForItemAtIndexPath:indexPath];
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  if (element == nil) {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:sizeForItemAtIndexPath: %@, %@, %ld", self, layout, section);
+    return CGSizeZero;
+  }
+
+  ASCellNode *cell = element.node;
   if (cell.shouldUseUIKitCell) {
     if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)]) {
       CGSize size = [(id)_asyncDelegate collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath];
@@ -960,8 +966,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       return size;
     }
   }
-  ASCollectionElement *e = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
-  return [self sizeForElement:e];
+
+  return [self sizeForElement:element];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout referenceSizeForHeaderInSection:(NSInteger)section
@@ -971,6 +977,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionHeader
                                                                             atIndexPath:indexPath];
   if (element == nil) {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:referenceSizeForHeaderInSection: %@, %@, %ld", self, layout, section);
     return CGSizeZero;
   }
 
@@ -990,6 +997,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionFooter
                                                                             atIndexPath:indexPath];
   if (element == nil) {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:referenceSizeForFooterInSection: %@, %@, %ld", self, layout, section);
     return CGSizeZero;
   }
 
