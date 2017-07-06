@@ -977,7 +977,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionHeader
                                                                             atIndexPath:indexPath];
   if (element == nil) {
-    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:referenceSizeForHeaderInSection: %@, %@, %ld", self, layout, section);
     return CGSizeZero;
   }
 
@@ -997,7 +996,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionFooter
                                                                             atIndexPath:indexPath];
   if (element == nil) {
-    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:referenceSizeForFooterInSection: %@, %@, %ld", self, layout, section);
     return CGSizeZero;
   }
 
@@ -1069,18 +1067,18 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:indexPath];
   }
 
-  // Always add the element to the visible set even if it is backed by an UIKit / non-_ASCollection* view
-  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
-  if (element) {
-    [_visibleElements addObject:element];
-  } else {
-    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplayCell: %@, %@, %@", rawCell, self, indexPath);
-    return;
-  }
-
   _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
   if (cell == nil) {
     [_rangeController setNeedsUpdate];
+    return;
+  }
+
+  ASCollectionElement *element = cell.element;
+  if (element) {
+    ASDisplayNodeAssertTrue([_dataController.visibleMap elementForItemAtIndexPath:indexPath] == element);
+    [_visibleElements addObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplayCell: %@, %@, %@", rawCell, self, indexPath);
     return;
   }
 
@@ -1126,18 +1124,18 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:indexPath];
   }
 
-  // Always remove the element from the visible set even if it is backed by an UIKit / non-_ASCollection* view
-  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
+  if (cell == nil) {
+    [_rangeController setNeedsUpdate];
+    return;
+  }
+
+  // Retrieve the element from cell instead of visible map because at this point visible map could have been updated and no longer holds the element.
+  ASCollectionElement *element = cell.element;
   if (element) {
     [_visibleElements removeObject:element];
   } else {
     ASDisplayNodeAssert(NO, @"Unexpected nil element for didEndDisplayingCell: %@, %@, %@", rawCell, self, indexPath);
-    return;
-  }
-
-  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
-  if (cell == nil) {
-    [_rangeController setNeedsUpdate];
     return;
   }
 
@@ -1164,24 +1162,27 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)rawView forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-  // Always add the element to the visible set even if it is backed by an UIKit / non-_ASCollection* view
-  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:elementKind atIndexPath:indexPath];
+  _ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView);
+  if (view == nil) {
+    return;
+  }
+
+  ASCollectionElement *element = view.element;
   if (element) {
+    ASDisplayNodeAssertTrue([_dataController.visibleMap supplementaryElementOfKind:elementKind atIndexPath:indexPath] == view.element);
     [_visibleElements addObject:element];
   } else {
     ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplaySupplementaryView: %@, %@, %@", rawView, self, indexPath);
     return;
   }
 
-  if (_ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView)) {
-    // Under iOS 10+, cells may be removed/re-added to the collection view without
-    // receiving prepareForReuse/applyLayoutAttributes, as an optimization for e.g.
-    // if the user is scrolling back and forth across a small set of items.
-    // In this case, we have to fetch the layout attributes manually.
-    // This may be possible under iOS < 10 but it has not been observed yet.
-    if (view.layoutAttributes == nil) {
-      view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
-    }
+  // Under iOS 10+, cells may be removed/re-added to the collection view without
+  // receiving prepareForReuse/applyLayoutAttributes, as an optimization for e.g.
+  // if the user is scrolling back and forth across a small set of items.
+  // In this case, we have to fetch the layout attributes manually.
+  // This may be possible under iOS < 10 but it has not been observed yet.
+  if (view.layoutAttributes == nil) {
+    view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
   }
 
   if (_asyncDelegateFlags.collectionNodeWillDisplaySupplementaryElement) {
@@ -1194,8 +1195,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)rawView forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-  // Always remove the element from the visible set even if it is backed by an UIKit / non-_ASCollection* view
-  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:elementKind atIndexPath:indexPath];
+  _ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView);
+  if (view == nil) {
+    return;
+  }
+
+  // Retrieve the element from cell instead of visible map because at this point visible map could have been updated and no longer holds the element.
+  ASCollectionElement *element = view.element;
   if (element) {
     [_visibleElements removeObject:element];
   } else {
