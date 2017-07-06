@@ -954,7 +954,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASDisplayNodeAssertMainThread();
   ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
   if (element == nil) {
-    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:sizeForItemAtIndexPath: %@, %@, %ld", self, layout, section);
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:sizeForItemAtIndexPath: %@, %@, %@", self, collectionViewLayout, indexPath);
     return CGSizeZero;
   }
 
