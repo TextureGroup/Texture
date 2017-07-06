@@ -21,7 +21,7 @@
 
 @implementation _ASCollectionReusableView
 
-- (nullable ASCellNode *)node
+- (ASCellNode *)node
 {
   return self.element.node;
 }

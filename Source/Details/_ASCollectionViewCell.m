@@ -22,7 +22,7 @@
 
 @implementation _ASCollectionViewCell
 
-- (nullable ASCellNode *)node
+- (ASCellNode *)node
 {
   return self.element.node;
 }
