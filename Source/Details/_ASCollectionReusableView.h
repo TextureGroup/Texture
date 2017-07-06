@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-@class ASCellnode, ASCollectionElement;
+@class ASCellNode, ASCollectionElement;
 
 NS_ASSUME_NONNULL_BEGIN
 
