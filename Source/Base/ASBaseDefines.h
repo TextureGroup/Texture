@@ -235,6 +235,12 @@
   ((c *) ([__val isKindOfClass:[c class]] ? __val : nil));\
 })
 
+/// Ensure that class is of certain kind, assuming it is subclass restricted
+#define ASDynamicCastStrict(x, c) ({ \
+  id __val = x;\
+  ((c *) ([__val class] == [c class] ? __val : nil));\
+})
+
 /**
  * Create a new set by mapping `collection` over `work`, ignoring nil.
  */

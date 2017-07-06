@@ -1021,7 +1021,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     view = [self dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
   }
   
-  if (_ASCollectionReusableView *reusableView = ASCollectionReusableViewCast(view)) {
+  if (_ASCollectionReusableView *reusableView = ASDynamicCastStrict(view, _ASCollectionReusableView)) {
     reusableView.element = element;
   }
   
@@ -1047,7 +1047,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   ASDisplayNodeAssert(element != nil, @"Element should exist. indexPath = %@, collectionDataSource = %@", indexPath, self);
 
-  if (_ASCollectionViewCell *asCell = ASCollectionViewCellCast(cell)) {
+  if (_ASCollectionViewCell *asCell = ASDynamicCastStrict(cell, _ASCollectionViewCell)) {
     asCell.element = element;
     [_rangeController configureContentView:cell.contentView forCellNode:node];
   }
@@ -1061,7 +1061,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:indexPath];
   }
 
-  _ASCollectionViewCell *cell = ASCollectionViewCellCast(rawCell);
+  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
   if (cell == nil) {
     [_rangeController setNeedsUpdate];
     return;
@@ -1117,7 +1117,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:indexPath];
   }
 
-  _ASCollectionViewCell *cell = ASCollectionViewCellCast(rawCell);
+  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
   if (cell == nil) {
     [_rangeController setNeedsUpdate];
     return;
@@ -1154,7 +1154,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)rawView forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:elementKind atIndexPath:indexPath]
+  _ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView);
+  if (view == nil) {
+    return;
+  }
+
+  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:elementKind atIndexPath:indexPath];
   if (element) {
     [_visibleElements addObject:element];
   } else {
@@ -1167,7 +1172,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // if the user is scrolling back and forth across a small set of items.
   // In this case, we have to fetch the layout attributes manually.
   // This may be possible under iOS < 10 but it has not been observed yet.
-  ASCollectionReusableViewCastOrReturn(rawView, view, (void)0);
   if (view.layoutAttributes == nil) {
     view.layoutAttributes = [collectionView layoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath];
   }

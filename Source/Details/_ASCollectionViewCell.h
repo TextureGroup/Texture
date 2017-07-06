@@ -21,32 +21,9 @@
 
 @class ASCollectionElement;
 
-/**
- * Attempts to cast x to _ASCollectionViewCell, or nil if not possible.
- *
- * Since _ASCollectionViewCell is not available for subclassing (see below),
- * comparing x's and _ASCollectionViewCell's classes is faster than calling -isKindOfClass: on x.
- */
-#define ASCollectionViewCellCast(x) ({ \
-  id __var = x; \
-  ((_ASCollectionViewCell *) (x.class == [_ASCollectionViewCell class] ? __var : nil)); \
-})
-
-/**
- * Attempts to cast x to _ASCollectionViewCell and assigns to __var. If not possible, returns the given __val.
- *
- * Since _ASCollectionViewCell is not available for subclassing (see below),
- * comparing x's and _ASCollectionViewCell's classes is faster than calling -isKindOfClass: on x.
- */
-#define ASCollectionViewCellCastOrReturn(x, __var, __val) \
-  _ASCollectionViewCell *__var = ASCollectionViewCellCast(x); \
-  if (__var == nil) { \
-    return __val; \
-  }
-
 NS_ASSUME_NONNULL_BEGIN
 
-AS_SUBCLASSING_RESTRICTED
+AS_SUBCLASSING_RESTRICTED // Note: ASDynamicCastStrict is used on instances of this class based on this restriction.
 @interface _ASCollectionViewCell : UICollectionViewCell
 
 /**
