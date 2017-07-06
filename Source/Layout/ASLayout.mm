@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRectTable.h>
@@ -370,6 +371,22 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     [description appendString:[self _recursiveDescriptionForLayout:sublayout level:level + 1]];
   }
   return description;
+}
+
+- (BOOL)isEqual:(id)object
+{
+  if (self == object) {
+    return YES;
+  }
+
+  if (ASLayout *layout = ASDynamicCast(object, ASLayout)) {
+    return CGSizeEqualToSize(self.size, layout.size)
+    && ((ASPointIsNull(self.position) && ASPointIsNull(layout.position))
+      || CGPointEqualToPoint(self.position, layout.position))
+    && self.layoutElement == layout.layoutElement
+    && ASObjectIsEqual(self.sublayouts, layout.sublayouts);
+  }
+  return NO;
 }
 
 @end
