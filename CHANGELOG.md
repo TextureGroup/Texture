@@ -12,6 +12,7 @@
 - [Collection/Table] Added direct support for mapping section indexes between data spaces. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/660)
 - [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
 - [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

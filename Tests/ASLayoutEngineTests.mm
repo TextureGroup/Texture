@@ -200,6 +200,8 @@
  *
  * Correct behavior, we end up at fixture 4 since it's newer.
  * Current incorrect behavior, we end up at fixture 2 and we remeasure surviving node C.
+ * Note: incorrect behavior likely introduced by the early check in __layout added in
+ * https://github.com/facebookarchive/AsyncDisplayKit/pull/2657
  */
 - (void)testASetNeedsLayoutInterferingWithTheCurrentTransition
 {
@@ -231,8 +233,11 @@
 
   // The code in this section is designed to move in time order, all on the main thread:
 
-  OCMExpect([nodeA.mock animateLayoutTransition:OCMOCK_ANY]).onMainThread();
-  OCMExpect([nodeA.mock didCompleteLayoutTransition:OCMOCK_ANY]).onMainThread();
+  // With the current behavior, the transition will continue and complete.
+  if (!enforceCorrectBehavior) {
+    OCMExpect([nodeA.mock animateLayoutTransition:OCMOCK_ANY]).onMainThread();
+    OCMExpect([nodeA.mock didCompleteLayoutTransition:OCMOCK_ANY]).onMainThread();
+  }
 
   // Trigger the layout transition.
   __block dispatch_block_t measurementCompletionBlock = nil;
@@ -468,7 +473,7 @@
  * From fixture 2:
  *   B survives with same layout
  *   C is removed
- *   D is removed
+ *   D joins with first layout
  *   E survives with same layout
  */
 - (ASTLayoutFixture *)createFixture4
@@ -492,7 +497,7 @@
   fixture.layout = layoutA;
 
   ASLayoutSpecBlock specBlockA = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ nodeB, nodeC, nodeE ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ nodeB, nodeD, nodeE ]];
   };
   [fixture.layoutSpecBlocks setObject:specBlockA forKey:nodeA];
   return fixture;
