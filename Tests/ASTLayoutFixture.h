@@ -20,8 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 AS_SUBCLASSING_RESTRICTED
 @interface ASTLayoutFixture : NSObject
 
-#pragma mark - Primitive
-
 /// The correct layout. The root should be unpositioned (same as -calculatedLayout).
 @property (nonatomic, strong, nullable) ASLayout *layout;
 
