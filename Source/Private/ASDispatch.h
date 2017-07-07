@@ -29,7 +29,12 @@ static void ASDispatchApply(size_t iterationCount, dispatch_queue_t queue, NSUIn
     threadCount = NSProcessInfo.processInfo.activeProcessorCount * 2;
   }
   dispatch_group_t group = dispatch_group_create();
-  __block atomic_size_t counter = ATOMIC_VAR_INIT(0);
+  // HACK: This is a workaround for mm files that include this in Clang4.0
+  // Omitting ATOMIC_VAR_INIT is okay in this case because the current
+  // expansion of that macro no-ops.
+  // TODO: Move this implementation into a m file so it's not compiled in C++
+  // See: https://github.com/TextureGroup/Texture/pull/426
+  __block atomic_size_t counter = 0;
   for (NSUInteger t = 0; t < threadCount; t++) {
     dispatch_group_async(group, queue, ^{
       size_t i;
