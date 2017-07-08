@@ -725,8 +725,8 @@
 		AC3C4A4F1A1139C100143C57 /* ASCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ASCollectionView.h; sourceTree = "<group>"; };
 		AC3C4A501A1139C100143C57 /* ASCollectionView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASCollectionView.mm; sourceTree = "<group>"; };
 		AC3C4A531A113EEC00143C57 /* ASCollectionViewProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewProtocols.h; sourceTree = "<group>"; };
-		AC6145401D8AFAE8003D62A2 /* ASSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASSection.h; path = ../Private/ASSection.h; sourceTree = "<group>"; };
-		AC6145421D8AFD4F003D62A2 /* ASSection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASSection.m; path = ../Private/ASSection.m; sourceTree = "<group>"; };
+		AC6145401D8AFAE8003D62A2 /* ASSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASSection.h; sourceTree = "<group>"; };
+		AC6145421D8AFD4F003D62A2 /* ASSection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASSection.m; sourceTree = "<group>"; };
 		AC6456071B0A335000CF11B8 /* ASCellNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCellNode.mm; sourceTree = "<group>"; };
 		AC7A2C161BDE11DF0093FE1A /* ASTableViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTableViewInternal.h; sourceTree = "<group>"; };
 		ACC945A81BA9E7A0005E1FB8 /* ASViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASViewController.h; sourceTree = "<group>"; };
@@ -893,8 +893,8 @@
 		DBDB83931C6E879900D0098C /* ASPagerFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPagerFlowLayout.m; sourceTree = "<group>"; };
 		DE6EA3211C14000600183B10 /* ASDisplayNode+FrameworkPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+FrameworkPrivate.h"; sourceTree = "<group>"; };
 		DE7EF4F71DFF77720082B84A /* ASDisplayNode+FrameworkSubclasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+FrameworkSubclasses.h"; sourceTree = "<group>"; };
-		DE8BEABF1C2DF3FC00D57C12 /* ASDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDelegateProxy.h; sourceTree = "<group>"; };
-		DE8BEAC01C2DF3FC00D57C12 /* ASDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDelegateProxy.m; sourceTree = "<group>"; };
+		DE8BEABF1C2DF3FC00D57C12 /* ASDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASDelegateProxy.h; path = ../Details/ASDelegateProxy.h; sourceTree = "<group>"; };
+		DE8BEAC01C2DF3FC00D57C12 /* ASDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASDelegateProxy.m; path = ../Details/ASDelegateProxy.m; sourceTree = "<group>"; };
 		DEC146B41C37A16A004A0EE7 /* ASCollectionViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewInternal.h; sourceTree = "<group>"; };
 		DEC146B51C37A16A004A0EE7 /* ASCollectionViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionViewInternal.m; sourceTree = "<group>"; };
 		DECBD6E51BE56E1900CF4905 /* ASButtonNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASButtonNode.h; sourceTree = "<group>"; };
@@ -1318,6 +1318,7 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				E524615A1F1155DB0028CB9D /* Data Controller */,
 				CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */,
 				CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */,
 				CCA282C61E9EB64B0037E8B7 /* ASDisplayNodeTipState.h */,
@@ -1452,16 +1453,12 @@
 		25B171EA1C12242700508A7A /* Data Controller */ = {
 			isa = PBXGroup;
 			children = (
-				DE8BEABF1C2DF3FC00D57C12 /* ASDelegateProxy.h */,
-				DE8BEAC01C2DF3FC00D57C12 /* ASDelegateProxy.m */,
 				464052191A3F83C40061C0BA /* ASDataController.h */,
 				4640521A1A3F83C40061C0BA /* ASDataController.mm */,
 				E5711A2A1C840C81009619D4 /* ASCollectionElement.h */,
 				E5711A2D1C840C96009619D4 /* ASCollectionElement.mm */,
 				E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */,
 				E5B077FE1E69F4EB00C24B5B /* ASElementMap.m */,
-				AC6145401D8AFAE8003D62A2 /* ASSection.h */,
-				AC6145421D8AFD4F003D62A2 /* ASSection.m */,
 			);
 			name = "Data Controller";
 			sourceTree = "<group>";
@@ -1635,6 +1632,17 @@
 				764D83D31C8EA515009B4FB8 /* AsyncDisplayKit+Debug.m */,
 			);
 			path = Debug;
+			sourceTree = "<group>";
+		};
+		E524615A1F1155DB0028CB9D /* Data Controller */ = {
+			isa = PBXGroup;
+			children = (
+				DE8BEABF1C2DF3FC00D57C12 /* ASDelegateProxy.h */,
+				DE8BEAC01C2DF3FC00D57C12 /* ASDelegateProxy.m */,
+				AC6145401D8AFAE8003D62A2 /* ASSection.h */,
+				AC6145421D8AFD4F003D62A2 /* ASSection.m */,
+			);
+			name = "Data Controller";
 			sourceTree = "<group>";
 		};
 		E5B077EB1E6843AF00C24B5B /* Collection Layout */ = {
