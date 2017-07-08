@@ -1026,6 +1026,12 @@
 			isa = PBXGroup;
 			children = (
 				CCE04B1D1E313E99006AEBBB /* Collection Data Adapter */,
+				CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */,
+				CCE04B2B1E314A32006AEBBB /* ASSupplementaryNodeSource.h */,
+				CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */,
+				CC034A121E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m */,
+				CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */,
+				CCE04B211E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.m */,
 				CC58AA4A1E398E1D002C8CB4 /* ASBlockTypes.h */,
 				DBDB83921C6E879900D0098C /* ASPagerFlowLayout.h */,
 				DBDB83931C6E879900D0098C /* ASPagerFlowLayout.m */,
@@ -1334,6 +1340,8 @@
 				CC55A7101E52A0F200594372 /* ASResponderChainEnumerator.m */,
 				6947B0BB1E36B4E30007C478 /* Layout */,
 				CCE04B2A1E313EDA006AEBBB /* Collection Data Adapter */,
+				CCBD05DF1E4147B000D18509 /* ASIGListAdapterBasedDataSource.h */,
+				CCBD05DE1E4147B000D18509 /* ASIGListAdapterBasedDataSource.m */,
 				058D0A03195D050800B7D73C /* _ASCoreAnimationExtras.h */,
 				058D0A04195D050800B7D73C /* _ASCoreAnimationExtras.mm */,
 				AC026B6D1BD57DBF00BBC17E /* _ASHierarchyChangeSet.h */,
@@ -1599,8 +1607,6 @@
 		CCE04B1D1E313E99006AEBBB /* Collection Data Adapter */ = {
 			isa = PBXGroup;
 			children = (
-				CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */,
-				CCE04B2B1E314A32006AEBBB /* ASSupplementaryNodeSource.h */,
 				CCF92DCE1E315FC50019E9C6 /* IGListKit Support */,
 			);
 			name = "Collection Data Adapter";
@@ -1609,8 +1615,6 @@
 		CCE04B2A1E313EDA006AEBBB /* Collection Data Adapter */ = {
 			isa = PBXGroup;
 			children = (
-				CCBD05DF1E4147B000D18509 /* ASIGListAdapterBasedDataSource.h */,
-				CCBD05DE1E4147B000D18509 /* ASIGListAdapterBasedDataSource.m */,
 			);
 			name = "Collection Data Adapter";
 			sourceTree = "<group>";
@@ -1618,10 +1622,6 @@
 		CCF92DCE1E315FC50019E9C6 /* IGListKit Support */ = {
 			isa = PBXGroup;
 			children = (
-				CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */,
-				CC034A121E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m */,
-				CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */,
-				CCE04B211E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.m */,
 			);
 			name = "IGListKit Support";
 			sourceTree = "<group>";
