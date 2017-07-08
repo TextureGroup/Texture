@@ -60,7 +60,7 @@ AS_SUBCLASSING_RESTRICTED
 NS_ASSUME_NONNULL_END
 
 @implementation _ASGalleryLayoutItem {
-  ASPrimitiveTraitCollection _primitiveTraitCollection;
+  std::atomic<ASPrimitiveTraitCollection> _primitiveTraitCollection;
 }
 
 @synthesize style;
@@ -105,6 +105,18 @@ ASLayoutElementLayoutCalculationDefaults
   ASDisplayNodeAssert(CGSizeEqualToSize(_itemSize, ASSizeRangeClamp(constrainedSize, _itemSize)),
                       @"Item size %@ can't fit within the bounds of constrained size %@", NSStringFromCGSize(_itemSize), NSStringFromASSizeRange(constrainedSize));
   return [ASLayout layoutWithLayoutElement:self size:_itemSize];
+}
+
+#pragma mark - ASLayoutElementAsciiArtProtocol
+
+- (NSString *)asciiArtString
+{
+  return [ASLayoutSpec asciiArtStringForChildren:@[] parentName:[self asciiArtName]];
+}
+
+- (NSString *)asciiArtName
+{
+  return [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
 }
 
 @end
