@@ -1194,6 +1194,8 @@
 				AEEC47E31C21D3D200EC1693 /* ASVideoNodeTests.m */,
 				F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */,
 				058D09C6195D04C000B7D73C /* Supporting Files */,
+				CC0F88691E4286FA00576FED /* ReferenceImages_64 */,
+				CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */,
 				052EE06A1A15A0D8002C6279 /* TestResources */,
 				2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m */,
 				69FEE53C1D95A9AF0086F066 /* ASLayoutElementStyleTests.m */,
@@ -1206,8 +1208,6 @@
 		058D09C6195D04C000B7D73C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				CC0F88691E4286FA00576FED /* ReferenceImages_64 */,
-				CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */,
 				058D09C7195D04C000B7D73C /* AsyncDisplayKitTests-Info.plist */,
 				058D09C8195D04C000B7D73C /* InfoPlist.strings */,
 			);
