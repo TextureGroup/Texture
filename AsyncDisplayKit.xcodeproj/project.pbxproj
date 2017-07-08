@@ -801,8 +801,8 @@
 		CC4981B21D1A02BE004E13CC /* ASTableViewThrashTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTableViewThrashTests.m; sourceTree = "<group>"; };
 		CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexSet+ASHelpers.h"; sourceTree = "<group>"; };
 		CC4981BB1D1C7F65004E13CC /* NSIndexSet+ASHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexSet+ASHelpers.m"; sourceTree = "<group>"; };
-		CC4C2A751D88E3BF0039ACAB /* ASTraceEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTraceEvent.h; sourceTree = "<group>"; };
-		CC4C2A761D88E3BF0039ACAB /* ASTraceEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTraceEvent.m; sourceTree = "<group>"; };
+		CC4C2A751D88E3BF0039ACAB /* ASTraceEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASTraceEvent.h; path = ../Details/ASTraceEvent.h; sourceTree = "<group>"; };
+		CC4C2A761D88E3BF0039ACAB /* ASTraceEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASTraceEvent.m; path = ../Details/ASTraceEvent.m; sourceTree = "<group>"; };
 		CC512B841DAC45C60054848E /* ASTableView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASTableView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC54A81B1D70077A00296A24 /* ASDispatch.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASDispatch.h; sourceTree = "<group>"; };
 		CC54A81D1D7008B300296A24 /* ASDispatchTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ASDispatchTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -1275,8 +1275,6 @@
 				296A0A311A951715005ACEAA /* ASScrollDirection.h */,
 				205F0E111B371BD7007741D0 /* ASScrollDirection.m */,
 				058D0A12195D050800B7D73C /* ASThread.h */,
-				CC4C2A751D88E3BF0039ACAB /* ASTraceEvent.h */,
-				CC4C2A761D88E3BF0039ACAB /* ASTraceEvent.m */,
 				9C70F2011CDA4EFA007D6C76 /* ASTraitCollection.h */,
 				9C70F2021CDA4EFA007D6C76 /* ASTraitCollection.m */,
 				CC3B20871C3F7A5400798563 /* ASWeakSet.h */,
@@ -1316,6 +1314,8 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				CC4C2A751D88E3BF0039ACAB /* ASTraceEvent.h */,
+				CC4C2A761D88E3BF0039ACAB /* ASTraceEvent.m */,
 				68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */,
 				68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */,
 				E524615A1F1155DB0028CB9D /* Data Controller */,
