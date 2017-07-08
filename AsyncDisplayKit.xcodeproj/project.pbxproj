@@ -622,8 +622,8 @@
 		68355B391CB57A5A001D4E68 /* ASPINRemoteImageDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPINRemoteImageDownloader.h; sourceTree = "<group>"; };
 		68B027791C1A79CC0041016B /* ASDisplayNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Beta.h"; sourceTree = "<group>"; };
 		68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASImageNode+AnimatedImagePrivate.h"; sourceTree = "<group>"; };
-		68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASWeakProxy.h; sourceTree = "<group>"; };
-		68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASWeakProxy.m; sourceTree = "<group>"; };
+		68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASWeakProxy.h; path = ../Details/ASWeakProxy.h; sourceTree = "<group>"; };
+		68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASWeakProxy.m; path = ../Details/ASWeakProxy.m; sourceTree = "<group>"; };
 		68C215561DE10D330019C4BC /* ASCollectionViewLayoutInspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewLayoutInspector.h; sourceTree = "<group>"; };
 		68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionViewLayoutInspector.m; sourceTree = "<group>"; };
 		68EE0DBB1C1B4ED300BA1B99 /* ASMainSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMainSerialQueue.h; sourceTree = "<group>"; };
@@ -1279,8 +1279,6 @@
 				CC4C2A761D88E3BF0039ACAB /* ASTraceEvent.m */,
 				9C70F2011CDA4EFA007D6C76 /* ASTraitCollection.h */,
 				9C70F2021CDA4EFA007D6C76 /* ASTraitCollection.m */,
-				68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */,
-				68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */,
 				CC3B20871C3F7A5400798563 /* ASWeakSet.h */,
 				CC3B20881C3F7A5400798563 /* ASWeakSet.m */,
 				205F0E1F1B376416007741D0 /* CoreGraphics+ASConvenience.h */,
@@ -1318,6 +1316,8 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */,
+				68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */,
 				E524615A1F1155DB0028CB9D /* Data Controller */,
 				CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */,
 				CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */,
