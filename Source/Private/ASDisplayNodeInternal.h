@@ -160,6 +160,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   std::shared_ptr<ASDisplayNodeLayout> _pendingDisplayNodeLayout;
   
   /// Sentinel for layout data. Incremented when we get -setNeedsLayout / -invalidateCalculatedLayout.
+  /// Starts at 1.
   std::atomic<NSUInteger> _layoutVersion;
   
   ASDisplayNodeViewBlock _viewBlock;
