@@ -83,7 +83,7 @@
 
   ASLayout *layout = nil;
   NSUInteger version = _layoutVersion;
-  if (_calculatedDisplayNodeLayout != nullptr && _calculatedDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
+  if (_calculatedDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
     ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
     layout = _calculatedDisplayNodeLayout->layout;
   } else if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
@@ -568,8 +568,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     }
     
     // Perform a full layout creation pass with passed in constrained size to create the new layout for the transition
+    NSUInteger newLayoutVersion = _layoutVersion;
     ASLayout *newLayout;
-    NSUInteger newLayoutVersion;
     {
       ASDN::MutexLocker l(__instanceLock__);
 
@@ -579,7 +579,6 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
       BOOL automaticallyManagesSubnodesDisabled = (self.automaticallyManagesSubnodes == NO);
       self.automaticallyManagesSubnodes = YES; // Temporary flag for 1.9.x
-      newLayoutVersion = _layoutVersion;
       newLayout = [self calculateLayoutThatFits:constrainedSize
                                restrictedToSize:self.style.size
                            relativeToParentSize:constrainedSize.max];

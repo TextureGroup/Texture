@@ -37,7 +37,7 @@ struct ASDisplayNodeLayout {
    * @param layout The layout to associate, usually returned from a call to -layoutThatFits:parentSize:
    * @param constrainedSize Constrained size used to create the layout
    * @param parentSize Parent size used to create the layout
-   * @param version The version of the layout data.
+   * @param version The version of the source layout data – see ASDisplayNode's _layoutVersion. 
    */
   ASDisplayNodeLayout(ASLayout *layout, ASSizeRange constrainedSize, CGSize parentSize, NSUInteger version)
   : layout(layout), constrainedSize(constrainedSize), parentSize(parentSize), requestedLayoutFromAbove(NO), version(version) {};
