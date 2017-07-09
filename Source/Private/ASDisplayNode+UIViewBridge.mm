@@ -195,6 +195,42 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(cornerRadius, newCornerRadius);
 }
 
+- (NSString *)contentsGravity
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsGravity);
+}
+
+- (void)setContentsGravity:(NSString *)newContentsGravity
+{
+  _bridge_prologue_write;
+  _setToLayer(contentsGravity, newContentsGravity);
+}
+
+- (CGRect)contentsRect
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsRect);
+}
+
+- (void)setContentsRect:(CGRect)newContentsRect
+{
+  _bridge_prologue_write;
+  _setToLayer(contentsRect, newContentsRect);
+}
+
+- (CGRect)contentsCenter
+{
+  _bridge_prologue_read;
+  return _getFromLayer(contentsCenter);
+}
+
+- (void)setContentsCenter:(CGRect)newContentsCenter
+{
+  _bridge_prologue_write;
+  _setToLayer(contentsCenter, newContentsCenter);
+}
+
 - (CGFloat)contentsScale
 {
   _bridge_prologue_read;
@@ -205,6 +241,18 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_write;
   _setToLayer(contentsScale, newContentsScale);
+}
+
+- (CGFloat)rasterizationScale
+{
+  _bridge_prologue_read;
+  return _getFromLayer(rasterizationScale);
+}
+
+- (void)setRasterizationScale:(CGFloat)newRasterizationScale
+{
+  _bridge_prologue_write;
+  _setToLayer(rasterizationScale, newRasterizationScale);
 }
 
 - (CGRect)bounds

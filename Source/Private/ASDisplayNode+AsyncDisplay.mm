@@ -341,7 +341,7 @@
       UIImage *image = (UIImage *)value;
       BOOL stretchable = (NO == UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero));
       if (stretchable) {
-        ASDisplayNodeSetupLayerContentsWithResizableImage(layer, image);
+        ASDisplayNodeSetResizableContents(layer, image);
       } else {
         layer.contentsScale = self.contentsScale;
         layer.contents = (id)image.CGImage;
