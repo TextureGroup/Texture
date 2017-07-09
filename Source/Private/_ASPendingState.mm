@@ -52,7 +52,11 @@ typedef struct {
   int setAnchorPoint:1;
   int setPosition:1;
   int setZPosition:1;
+  int setContentsGravity:1;
+  int setContentsRect:1;
+  int setContentsCenter:1;
   int setContentsScale:1;
+  int setRasterizationScale:1;
   int setTransform:1;
   int setSublayerTransform:1;
   int setUserInteractionEnabled:1;
@@ -101,7 +105,11 @@ typedef struct {
   CGPoint anchorPoint;
   CGPoint position;
   CGFloat zPosition;
+  NSString *contentsGravity;
+  CGRect contentsRect;
+  CGRect contentsCenter;
   CGFloat contentsScale;
+  CGFloat rasterizationScale;
   CATransform3D transform;
   CATransform3D sublayerTransform;
   CGColorRef shadowColor;
@@ -176,7 +184,11 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize anchorPoint=anchorPoint;
 @synthesize position=position;
 @synthesize zPosition=zPosition;
+@synthesize contentsGravity=contentsGravity;
+@synthesize contentsRect=contentsRect;
+@synthesize contentsCenter=contentsCenter;
 @synthesize contentsScale=contentsScale;
+@synthesize rasterizationScale=rasterizationScale;
 @synthesize transform=transform;
 @synthesize sublayerTransform=sublayerTransform;
 @synthesize userInteractionEnabled=userInteractionEnabled;
@@ -827,9 +839,6 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setBounds)
     view.bounds = bounds;
 
-  if (flags.setContentsScale)
-    layer.contentsScale = contentsScale;
-
   if (flags.setTransform)
     layer.transform = transform;
 
@@ -838,6 +847,21 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
   if (flags.setContents)
     layer.contents = contents;
+
+  if (flags.setContentsGravity)
+    layer.contentsGravity = contentsGravity;
+
+  if (flags.setContentsRect)
+    layer.contentsRect = contentsRect;
+
+  if (flags.setContentsCenter)
+    layer.contentsCenter = contentsCenter;
+
+  if (flags.setContentsScale)
+    layer.contentsScale = contentsScale;
+
+  if (flags.setRasterizationScale)
+    layer.rasterizationScale = rasterizationScale;
 
   if (flags.setClipsToBounds)
     view.clipsToBounds = clipsToBounds;
@@ -1037,10 +1061,14 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.position = layer.position;
   pendingState.zPosition = layer.zPosition;
   pendingState.bounds = view.bounds;
-  pendingState.contentsScale = layer.contentsScale;
   pendingState.transform = layer.transform;
   pendingState.sublayerTransform = layer.sublayerTransform;
   pendingState.contents = layer.contents;
+  pendingState.contentsGravity = layer.contentsGravity;
+  pendingState.contentsRect = layer.contentsRect;
+  pendingState.contentsCenter = layer.contentsCenter;
+  pendingState.contentsScale = layer.contentsScale;
+  pendingState.rasterizationScale = layer.rasterizationScale;
   pendingState.clipsToBounds = view.clipsToBounds;
   pendingState.backgroundColor = layer.backgroundColor;
   pendingState.tintColor = view.tintColor;
