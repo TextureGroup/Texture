@@ -248,9 +248,11 @@
   // Injected block will get run on main after bg layout calculate starts, but before measurementCompletion
   __block BOOL injectedMainThreadWorkDone = NO;
   injectedMainThreadWork = ^{
+    as_log_verbose(OS_LOG_DEFAULT, "Begin injectedMainThreadWork");
     injectedMainThreadWorkDone = YES;
 
     [fixture4 apply];
+    as_log_verbose(OS_LOG_DEFAULT, "Did apply new fixture");
 
     if (enforceCorrectBehavior) {
       // Correct measurement behavior here is unclear, may depend on whether the layouts which
@@ -261,6 +263,7 @@
       OCMExpect([nodeC.mock calculateLayoutThatFits:ASSizeRangeMake(cPendingSize)]).onMainThread();
     }
     [window layoutIfNeeded];
+    as_log_verbose(OS_LOG_DEFAULT, "End injectedMainThreadWork");
   };
 
   measurementCompletionBlock = ^{
