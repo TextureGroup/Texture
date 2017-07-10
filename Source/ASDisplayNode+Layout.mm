@@ -82,13 +82,11 @@
   }
 
   ASLayout *layout = nil;
-  if (_calculatedDisplayNodeLayout->isValidForConstrainedSizeParentSize(constrainedSize, parentSize)) {
+  NSUInteger version = _layoutVersion;
+  if (_calculatedDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
     ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
-    // Our calculated layout is suitable for this constrainedSize, so keep using it and
-    // invalidate any pending layout that has been generated in the past.
-    _pendingDisplayNodeLayout = nullptr;
     layout = _calculatedDisplayNodeLayout->layout;
-  } else if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValidForConstrainedSizeParentSize(constrainedSize, parentSize)) {
+  } else if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
     ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
     layout = _pendingDisplayNodeLayout->layout;
   } else {
@@ -96,7 +94,7 @@
     layout = [self calculateLayoutThatFits:constrainedSize
                           restrictedToSize:self.style.size
                       relativeToParentSize:parentSize];
-    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, parentSize);
+    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, parentSize, version);
     ASDisplayNodeAssertNotNil(layout, @"-[ASDisplayNode layoutThatFits:parentSize:] newly calculated layout should not be nil! %@", self);
   }
   
@@ -308,7 +306,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   // Prefer _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
   // If there is no _pending, check if _calculated is valid to reuse (avoiding recalculation below).
   if (_pendingDisplayNodeLayout == nullptr) {
-    if (_calculatedDisplayNodeLayout->isDirty() == NO
+    if (_calculatedDisplayNodeLayout->version >= _layoutVersion
         && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
             || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
       return;
@@ -337,8 +335,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   BOOL pendingLayoutApplicable = NO;
   if (nextLayout == nullptr) {
     as_log_verbose(ASLayoutLog(), "No pending layout.");
-  } else if (nextLayout->isDirty()) {
-    as_log_verbose(ASLayoutLog(), "Pending layout is invalid.");
+  } else if (nextLayout->version < _layoutVersion) {
+    as_log_verbose(ASLayoutLog(), "Pending layout is stale.");
   } else if (layoutSizeDifferentFromBounds) {
     as_log_verbose(ASLayoutLog(), "Pending layout size %@ doesn't match bounds size.", NSStringFromCGSize(nextLayout->layout.size));
   } else {
@@ -349,12 +347,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   if (!pendingLayoutApplicable) {
     as_log_verbose(ASLayoutLog(), "Measuring with previous constrained size.");
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
+    NSUInteger version = _layoutVersion;
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
     
-    nextLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, boundsSizeForLayout);
+    nextLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, boundsSizeForLayout, version);
   }
   
   if (didCreateNewContext) {
@@ -425,7 +424,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   ASLayout *layout;
   {
     ASDN::MutexLocker l(__instanceLock__);
-    if (_calculatedDisplayNodeLayout->isDirty()) {
+    if (_calculatedDisplayNodeLayout->version < _layoutVersion) {
       return;
     }
     layout = _calculatedDisplayNodeLayout->layout;
@@ -569,6 +568,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     }
     
     // Perform a full layout creation pass with passed in constrained size to create the new layout for the transition
+    NSUInteger newLayoutVersion = _layoutVersion;
     ASLayout *newLayout;
     {
       ASDN::MutexLocker l(__instanceLock__);
@@ -609,7 +609,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
         auto previousLayout = _calculatedDisplayNodeLayout;
         auto pendingLayout = std::make_shared<ASDisplayNodeLayout>(newLayout,
                                                                    constrainedSize,
-                                                                   constrainedSize.max);
+                                                                   constrainedSize.max,
+                                                                   newLayoutVersion);
         [self _locked_setCalculatedDisplayNodeLayout:pendingLayout];
         
         // Setup pending layout transition for animation
