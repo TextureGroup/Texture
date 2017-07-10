@@ -1303,7 +1303,6 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				CCE04B2A1E313EDA006AEBBB /* Collection Data Adapter */,
 				E524615A1F1155DB0028CB9D /* Data Controller */,
 				6947B0BB1E36B4E30007C478 /* Layout */,
 				CCCCCCC11EC3EF060087FE10 /* TextExperiment */,
@@ -1597,14 +1596,7 @@
 				E52461681F1165510028CB9D /* ASSupplementaryNodeSource.h */,
 				CCF92DCE1E315FC50019E9C6 /* IGListKit Support */,
 			);
-			path = "Collection Data Adapter";
-			sourceTree = "<group>";
-		};
-		CCE04B2A1E313EDA006AEBBB /* Collection Data Adapter */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "Collection Data Adapter";
+			name = "Collection Data Adapter";
 			sourceTree = "<group>";
 		};
 		CCF92DCE1E315FC50019E9C6 /* IGListKit Support */ = {
@@ -1615,7 +1607,7 @@
 				E524616D1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.h */,
 				E524616E1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.m */,
 			);
-			path = "IGListKit Support";
+			name = "IGListKit Support";
 			sourceTree = "<group>";
 		};
 		DE89C1691DCEB9CC00D49D74 /* Debug */ = {
