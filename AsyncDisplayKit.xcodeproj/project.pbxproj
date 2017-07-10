@@ -112,8 +112,6 @@
 		68355B411CB57A6C001D4E68 /* ASImageContainerProtocolCategories.h in Headers */ = {isa = PBXBuildFile; fileRef = 68355B371CB57A5A001D4E68 /* ASImageContainerProtocolCategories.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68AF37DB1CBEF4D80077BF76 /* ASImageNode+AnimatedImagePrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		68B0277B1C1A79D60041016B /* ASDisplayNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B027791C1A79CC0041016B /* ASDisplayNode+Beta.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		68B8A4E21CBDB958007E4543 /* ASWeakProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		68B8A4E41CBDB958007E4543 /* ASWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */; };
 		68C215581DE10D330019C4BC /* ASCollectionViewLayoutInspector.h in Headers */ = {isa = PBXBuildFile; fileRef = 68C215561DE10D330019C4BC /* ASCollectionViewLayoutInspector.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68C2155A1DE10D330019C4BC /* ASCollectionViewLayoutInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.m */; };
 		68EE0DBE1C1B4ED300BA1B99 /* ASMainSerialQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 68EE0DBB1C1B4ED300BA1B99 /* ASMainSerialQueue.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -427,6 +425,8 @@
 		E52461711F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E524616D1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E52461721F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.m in Sources */ = {isa = PBXBuildFile; fileRef = E524616E1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.m */; };
 		E52461741F1168800028CB9D /* ASSectionController.h in Headers */ = {isa = PBXBuildFile; fileRef = E52461731F1168800028CB9D /* ASSectionController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E53EF3531F13A81200A5BEB6 /* ASWeakProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = E53EF3521F13A7ED00A5BEB6 /* ASWeakProxy.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E53EF3541F13A82000A5BEB6 /* ASWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = E53EF3511F13A7ED00A5BEB6 /* ASWeakProxy.m */; };
 		E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */; };
 		E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */; };
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
@@ -620,8 +620,6 @@
 		68355B381CB57A5A001D4E68 /* ASImageContainerProtocolCategories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASImageContainerProtocolCategories.m; sourceTree = "<group>"; };
 		68B027791C1A79CC0041016B /* ASDisplayNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Beta.h"; sourceTree = "<group>"; };
 		68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASImageNode+AnimatedImagePrivate.h"; sourceTree = "<group>"; };
-		68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASWeakProxy.h; sourceTree = "<group>"; };
-		68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASWeakProxy.m; sourceTree = "<group>"; };
 		68C215561DE10D330019C4BC /* ASCollectionViewLayoutInspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewLayoutInspector.h; sourceTree = "<group>"; };
 		68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionViewLayoutInspector.m; sourceTree = "<group>"; };
 		68EE0DBB1C1B4ED300BA1B99 /* ASMainSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMainSerialQueue.h; sourceTree = "<group>"; };
@@ -902,6 +900,8 @@
 		E524616D1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "IGListAdapter+AsyncDisplayKit.h"; path = "Source/IGListAdapter+AsyncDisplayKit.h"; sourceTree = SOURCE_ROOT; };
 		E524616E1F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "IGListAdapter+AsyncDisplayKit.m"; path = "Source/IGListAdapter+AsyncDisplayKit.m"; sourceTree = SOURCE_ROOT; };
 		E52461731F1168800028CB9D /* ASSectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASSectionController.h; path = Source/ASSectionController.h; sourceTree = SOURCE_ROOT; };
+		E53EF3511F13A7ED00A5BEB6 /* ASWeakProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASWeakProxy.m; sourceTree = "<group>"; };
+		E53EF3521F13A7ED00A5BEB6 /* ASWeakProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASWeakProxy.h; sourceTree = "<group>"; };
 		E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPageTable.h; sourceTree = "<group>"; };
 		E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPageTable.m; sourceTree = "<group>"; };
 		E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutElement.mm; sourceTree = "<group>"; };
@@ -1257,6 +1257,8 @@
 				058D0A12195D050800B7D73C /* ASThread.h */,
 				9C70F2011CDA4EFA007D6C76 /* ASTraitCollection.h */,
 				9C70F2021CDA4EFA007D6C76 /* ASTraitCollection.m */,
+				E53EF3521F13A7ED00A5BEB6 /* ASWeakProxy.h */,
+				E53EF3511F13A7ED00A5BEB6 /* ASWeakProxy.m */,
 				CC3B20871C3F7A5400798563 /* ASWeakSet.h */,
 				CC3B20881C3F7A5400798563 /* ASWeakSet.m */,
 				205F0E1F1B376416007741D0 /* CoreGraphics+ASConvenience.h */,
@@ -1374,8 +1376,6 @@
 				0442850C1BAA64EC00D16268 /* ASTwoDimensionalArrayUtils.m */,
 				83A7D9581D44542100BF333E /* ASWeakMap.h */,
 				83A7D9591D44542100BF333E /* ASWeakMap.m */,
-				68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */,
-				68B8A4E01CBDB958007E4543 /* ASWeakProxy.m */,
 				058D0A03195D050800B7D73C /* _ASCoreAnimationExtras.h */,
 				058D0A04195D050800B7D73C /* _ASCoreAnimationExtras.mm */,
 				AC026B6D1BD57DBF00BBC17E /* _ASHierarchyChangeSet.h */,
@@ -1673,6 +1673,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E53EF3531F13A81200A5BEB6 /* ASWeakProxy.h in Headers */,
 				E52461711F11655C0028CB9D /* IGListAdapter+AsyncDisplayKit.h in Headers */,
 				E524616F1F11655C0028CB9D /* AsyncDisplayKit+IGListKitMethods.h in Headers */,
 				E524616A1F1165510028CB9D /* ASSupplementaryNodeSource.h in Headers */,
@@ -1802,7 +1803,6 @@
 				692BE8D71E36B65B00C86D87 /* ASLayoutSpecPrivate.h in Headers */,
 				34EFC75D1B701BE900AD841F /* ASInternalHelpers.h in Headers */,
 				E5B5B9D11E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h in Headers */,
-				68B8A4E21CBDB958007E4543 /* ASWeakProxy.h in Headers */,
 				9F98C0271DBE29FC00476D92 /* ASControlTargetAction.h in Headers */,
 				690ED5961E36D118000627C0 /* ASControlNode+tvOS.h in Headers */,
 				695943401D70815300B0EE1F /* ASDisplayNodeLayout.h in Headers */,
@@ -2145,6 +2145,7 @@
 			files = (
 				DEB8ED7C1DD003D300DBDE55 /* ASLayoutTransition.mm in Sources */,
 				CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */,
+				E53EF3541F13A82000A5BEB6 /* ASWeakProxy.m in Sources */,
 				9F98C0261DBE29E000476D92 /* ASControlTargetAction.m in Sources */,
 				9C70F2091CDABA36007D6C76 /* ASViewController.mm in Sources */,
 				3917EBD51E9C2FC400D04A01 /* _ASCollectionReusableView.m in Sources */,
@@ -2193,7 +2194,6 @@
 				E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */,
 				68FC85EC1CE29C7D00EDD713 /* ASVisibilityProtocols.m in Sources */,
 				CC55A7121E52A0F200594372 /* ASResponderChainEnumerator.m in Sources */,
-				68B8A4E41CBDB958007E4543 /* ASWeakProxy.m in Sources */,
 				9C70F20A1CDBE949007D6C76 /* ASTableNode.mm in Sources */,
 				69CB62AE1CB8165900024920 /* _ASDisplayViewAccessiblity.mm in Sources */,
 				B35061F61B010EFD0018CF92 /* ASCollectionView.mm in Sources */,
