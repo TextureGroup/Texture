@@ -108,6 +108,7 @@
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASVisibilityProtocols.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
+#import <AsyncDisplayKit/ASWeakProxy.h>
 #import <AsyncDisplayKit/ASEventLog.h>
 
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
