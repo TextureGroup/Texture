@@ -98,6 +98,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   return nil;
 }
 
+- (BOOL)implementsLayoutMethod
+{
+  return YES;
+}
+
 ASLayoutElementLayoutCalculationDefaults
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
