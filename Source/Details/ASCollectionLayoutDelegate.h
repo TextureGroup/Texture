@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion This method will be called on main thread and must block the thread until the layout attribues is ready.
  *
- * @param elementKind A string that identifies the type of supplementary element.
+ * @param kind A string that identifies the type of supplementary element.
  *
  * @param indexPath The index path of the element.
  *
