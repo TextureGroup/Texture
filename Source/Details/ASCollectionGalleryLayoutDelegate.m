@@ -12,18 +12,17 @@
 
 #import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
+#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState.h>
+#import <AsyncDisplayKit/ASCollectionLayoutState+Private.h>
 #import <AsyncDisplayKit/ASDispatch.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutElementPrivate.h>
-#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutRangeType.h>
 #import <AsyncDisplayKit/ASPageTable.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -36,197 +35,14 @@ static const ASRangeTuningParameters kASDefaultMeasureRangeTuningParameters = {
 
 static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRight | ASScrollDirectionDown);
 
-#pragma mark - _ASGalleryLayoutItem
-
-NS_ASSUME_NONNULL_BEGIN
-
-/**
- * A dummy item that represents a collection element to participate in the collection layout calculation process 
- * without triggering measurement on the actual node of the collection element.
- * 
- * This item always has a fixed size that is the item size passed to it.
- */
-AS_SUBCLASSING_RESTRICTED
-@interface _ASGalleryLayoutItem : NSObject <ASLayoutElement>
-
-@property (nonatomic, assign, readonly) CGSize itemSize;
-@property (nonatomic, weak, readonly) ASCollectionElement *collectionElement;
-
-- (instancetype)initWithItemSize:(CGSize)itemSize collectionElement:(ASCollectionElement *)collectionElement;
-- (instancetype)init __unavailable;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-@implementation _ASGalleryLayoutItem {
-  std::atomic<ASPrimitiveTraitCollection> _primitiveTraitCollection;
-}
-
-@synthesize style;
-
-- (instancetype)initWithItemSize:(CGSize)itemSize collectionElement:(ASCollectionElement *)collectionElement
-{
-  self = [super init];
-  if (self) {
-    ASDisplayNodeAssert(! CGSizeEqualToSize(CGSizeZero, itemSize), @"Item size should not be zero");
-    ASDisplayNodeAssertNotNil(collectionElement, @"Collection element should not be nil");
-    _itemSize = itemSize;
-    _collectionElement = collectionElement;
-  }
-  return self;
-}
-
-ASLayoutElementStyleExtensibilityForwarding
-ASPrimitiveTraitCollectionDefaults
-ASPrimitiveTraitCollectionDeprecatedImplementation
-
-- (ASTraitCollection *)asyncTraitCollection
-{
-  ASDisplayNodeAssertNotSupported();
-  return nil;
-}
-
-- (ASLayoutElementType)layoutElementType
-{
-  return ASLayoutElementTypeLayoutSpec;
-}
-
-- (NSArray<id<ASLayoutElement>> *)sublayoutElements
-{
-  ASDisplayNodeAssertNotSupported();
-  return nil;
-}
-
-- (BOOL)implementsLayoutMethod
-{
-  return YES;
-}
-
-ASLayoutElementLayoutCalculationDefaults
-
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
-{
-  ASDisplayNodeAssert(CGSizeEqualToSize(_itemSize, ASSizeRangeClamp(constrainedSize, _itemSize)),
-                      @"Item size %@ can't fit within the bounds of constrained size %@", NSStringFromCGSize(_itemSize), NSStringFromASSizeRange(constrainedSize));
-  return [ASLayout layoutWithLayoutElement:self size:_itemSize];
-}
-
-#pragma mark - ASLayoutElementAsciiArtProtocol
-
-- (NSString *)asciiArtString
-{
-  return [ASLayoutSpec asciiArtStringForChildren:@[] parentName:[self asciiArtName]];
-}
-
-- (NSString *)asciiArtName
-{
-  return [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
-}
-
-@end
-
-#pragma mark - _ASGalleryLayoutStateAdditionInfo
-
-NS_ASSUME_NONNULL_BEGIN
-
-/**
- * A thread-safe object that contains additional information of a collection layout.
- *
- * It keeps track of layout attributes of all unmeasured elements in a layout and facilitates highly-optimized lookups
- * for unmeasured elements within a given rect.
- */
-AS_SUBCLASSING_RESTRICTED
-@interface _ASGalleryLayoutStateAdditionInfo : NSObject
-
-/// Sets unmeasured layout attributes to this object.
-- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
-
-/// Removes and returns unmeasured layout attributes that intersect the specified rect
-- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-@implementation _ASGalleryLayoutStateAdditionInfo {
-  ASDN::Mutex __instanceLock__;
-  ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToUnmeasuredLayoutAttributesTable;
-}
-
-- (void)setUnmeasuredLayoutAttributes:(NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributes contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  _pageToUnmeasuredLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:layoutAttributes contentSize:contentSize pageSize:pageSize];
-}
-
-- (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesInRect:(CGRect)rect contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
-{
-  if (CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, pageSize) || CGSizeEqualToSize(CGSizeZero, contentSize)) {
-    return nil;
-  }
-
-  ASDN::MutexLocker l(__instanceLock__);
-  ASDisplayNodeAssertNotNil(_pageToUnmeasuredLayoutAttributesTable, @"Unmeasured page map hasn't been set");
-  if (_pageToUnmeasuredLayoutAttributesTable.count == 0) {
-    return nil;
-  }
-  
-  // Step 1: Determine all the pages that intersect the specified rect
-  NSPointerArray *pagesInRect = ASPageCoordinatesForPagesThatIntersectRect(rect, contentSize, pageSize);
-  if (pagesInRect.count == 0) {
-    return nil;
-  }
-  
-  // Step 2: Filter out attributes in these pages that intersect the specified rect. Remove them from the internal table as we go
-  ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
-  for (id pagePtr in pagesInRect) {
-    ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSMutableArray *attrsInPage = [_pageToUnmeasuredLayoutAttributesTable objectForPage:page];
-    
-    if (NSUInteger attrsCount = attrsInPage.count > 0) {
-      NSMutableArray *interesectingAttrsInPage = nil;
-      
-      CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
-      if (CGRectContainsRect(rect, pageRect)) {
-        // The page fits well within the specified rect. Simply return all attributes in this page.
-        // Don't need to make a copy of attrsInPage here because it will be removed from the page table soon anyway.
-        interesectingAttrsInPage = attrsInPage;
-      } else {
-        // The page intersects the specified rect. Some attributes in this page are to be returned, some are not.
-        for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
-          if (CGRectIntersectsRect(rect, attrs.frame)) {
-            if (interesectingAttrsInPage == nil) {
-              interesectingAttrsInPage = [NSMutableArray array];
-            }
-            [interesectingAttrsInPage addObject:attrs];
-          }
-        }
-      }
-      
-      if (NSUInteger interesectingAttrsCount = interesectingAttrsInPage.count > 0) {
-        [result setObject:interesectingAttrsInPage forPage:page];
-        if (attrsCount == interesectingAttrsCount) {
-          // All attributes in this page intersect the specified rect. Remove the whole page.
-          [_pageToUnmeasuredLayoutAttributesTable removeObjectForPage:page];
-        } else {
-          [attrsInPage removeObjectsInArray:interesectingAttrsInPage];
-        }
-      }
-    }
-  }
-  
-  return result;
-}
-
-@end
-
 #pragma mark - ASCollectionGalleryLayoutDelegate
 
 @implementation ASCollectionGalleryLayoutDelegate {
-  ASScrollDirection _scrollableDirections;
   CGSize _itemSize;
+  ASSizeRange _itemSizeRange;
 }
+
+@synthesize scrollableDirections = _scrollableDirections;
 
 - (instancetype)initWithScrollableDirections:(ASScrollDirection)scrollableDirections itemSize:(CGSize)itemSize
 {
@@ -235,6 +51,7 @@ NS_ASSUME_NONNULL_END
     ASDisplayNodeAssertFalse(CGSizeEqualToSize(CGSizeZero, itemSize));
     _scrollableDirections = scrollableDirections;
     _itemSize = itemSize;
+    _itemSizeRange = ASSizeRangeMake(_itemSize);
   }
   return self;
 }
@@ -263,7 +80,7 @@ NS_ASSUME_NONNULL_END
                                                                         flexWrap:ASStackLayoutFlexWrapWrap
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
-  // TODO Profile to see if a concurrent stack helps here?
+  stackSpec.concurrent = YES;
   ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, _scrollableDirections)];
   
   // Step 2: Create neccessary objects to hold information extracted from the layout
@@ -272,17 +89,14 @@ NS_ASSUME_NONNULL_END
   };
   ASCollectionLayoutState *collectionLayout =  [[ASCollectionLayoutState alloc] initWithContext:context
                                                                                          layout:layout
-                                                                                 additionalInfo:[[_ASGalleryLayoutStateAdditionInfo alloc] init]
+                                                                                 additionalInfo:nil
                                                                                 getElementBlock:getElementBlock];
   CGSize contentSize = collectionLayout.contentSize;
   if (CGSizeEqualToSize(contentSize, CGSizeZero)) {
     return collectionLayout;
   }
   
-  // Step 3: Since _ASGalleryLayoutItem is a dummy layout object, register all elements as unmeasured.
-  [collectionLayout.additionalInfo setUnmeasuredLayoutAttributes:[collectionLayout allLayoutAttributes] contentSize:contentSize pageSize:pageSize];
-  
-  // Step 4: Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
+  // Step 3: Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
   // TODO Consider content offset of the collection node
   CGRect initialRect = CGRectMake(0, 0, pageSize.width, pageSize.height);
   CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(initialRect, kASDefaultMeasureRangeTuningParameters, _scrollableDirections, kASStaticScrollDirection);
@@ -294,7 +108,7 @@ NS_ASSUME_NONNULL_END
 - (void)ensureLayoutAttributesForElementsInRect:(CGRect)rect withLayout:(ASCollectionLayoutState *)layout
 {
   ASDisplayNodeAssertMainThread();
-  if (CGRectIsEmpty(rect)) {
+  if (CGRectIsEmpty(rect) || layout == nil) {
     return;
   }
   
@@ -306,6 +120,10 @@ NS_ASSUME_NONNULL_END
 - (void)ensureLayoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath withLayout:(ASCollectionLayoutState *)layout
 {
   ASDisplayNodeAssertMainThread();
+  if (layout == nil) {
+    return;
+  }
+
   ASCollectionElement *element = [layout.context.elements elementForItemAtIndexPath:indexPath];
   ASCellNode *node = element.node;
   if (! CGSizeEqualToSize(_itemSize, node.calculatedSize)) {
@@ -318,11 +136,14 @@ NS_ASSUME_NONNULL_END
  */
 + (void)_measureElementsInRect:(CGRect)rect blockingRect:(CGRect)blockingRect layout:(ASCollectionLayoutState *)layout elementSize:(CGSize)elementSize
 {
-  if (CGRectIsEmpty(rect)) {
+  if (CGRectIsEmpty(rect) || layout == nil || CGSizeEqualToSize(CGSizeZero, elementSize)) {
     return;
   }
   BOOL hasBlockingRect = !CGRectIsEmpty(blockingRect);
-  ASDisplayNodeAssert(! hasBlockingRect || CGRectContainsRect(rect, blockingRect), @"Blocking rect, if specified, must be within the other (outer) rect");
+  if (hasBlockingRect && CGRectContainsRect(rect, blockingRect) == NO) {
+    ASDisplayNodeAssert(NO, @"Blocking rect, if specified, must be within the other (outer) rect");
+    return;
+  }
   
   // Step 1: Clamp the specified rects between the bounds of content rect
   CGSize contentSize = layout.contentSize;
@@ -336,12 +157,12 @@ NS_ASSUME_NONNULL_END
     hasBlockingRect = !CGRectIsNull(blockingRect);
   }
   
-  // Step 2: Get layout attributes of all unmeasured elements within the specified outer rect
+  // Step 2: Get layout attributes of all elements within the specified outer rect
   ASCollectionLayoutContext *context = layout.context;
   CGSize pageSize = context.viewportSize;
-  ASPageTable *unmeasuredAttrsTable = [layout.additionalInfo getAndRemoveUnmeasuredLayoutAttributesInRect:rect contentSize:contentSize pageSize:pageSize];
-  if (unmeasuredAttrsTable.count == 0) {
-    // No unmeasured elements in this rect! Bail early
+  ASPageTable *attrsTable = [layout pageToLayoutAttributesTableForElementsInRect:rect contentSize:contentSize pageSize:pageSize];
+  if (attrsTable.count == 0) {
+    // No elements in this rect! Bail early
     return;
   }
   
@@ -350,9 +171,9 @@ NS_ASSUME_NONNULL_END
   NSMutableOrderedSet<UICollectionViewLayoutAttributes *> *blockingAttrs = hasBlockingRect ? [NSMutableOrderedSet orderedSet] : nil;
   // Use a set here because some items may span multiple pages
   NSMutableSet<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableSet set];
-  for (id pagePtr in unmeasuredAttrsTable) {
+  for (id pagePtr in attrsTable) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [[unmeasuredAttrsTable objectForPage:page] allObjects];
+    NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [[attrsTable objectForPage:page] allObjects];
     // Calculate the page's rect but only if it's going to be used.
     CGRect pageRect = hasBlockingRect ? ASPageCoordinateGetPageRect(page, pageSize) : CGRectZero;
     
@@ -378,7 +199,8 @@ NS_ASSUME_NONNULL_END
   ASElementMap *elements = context.elements;
   ASSizeRange sizeRange = ASSizeRangeMake(elementSize);
   dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-  if (NSUInteger count = blockingAttrs.count > 0) {
+  NSUInteger count = blockingAttrs.count;
+  if (count > 0) {
     ASDispatchApply(count, queue, 0, ^(size_t i) {
       ASCollectionElement *element = [elements elementForItemAtIndexPath:blockingAttrs[i].indexPath];
       ASCellNode *node = element.node;
@@ -389,11 +211,12 @@ NS_ASSUME_NONNULL_END
   }
   
   // Step 5: Allocate and measure non-blocking ones
+  // TODO Limit the number of threads
   for (UICollectionViewLayoutAttributes *attrs in nonBlockingAttrs) {
     __weak ASCollectionElement *weakElement = [elements elementForItemAtIndexPath:attrs.indexPath];
     dispatch_async(queue, ^{
       __strong ASCollectionElement *strongElement = weakElement;
-      if (strongElement != nil) {
+      if (strongElement) {
         ASCellNode *node = strongElement.node;
         if (! CGSizeEqualToSize(elementSize, node.calculatedSize)) {
           [node layoutThatFits:sizeRange];

@@ -24,6 +24,8 @@
   UIEdgeInsets _interItemSpacing;
 }
 
+@synthesize scrollableDirections = _scrollableDirections;
+
 - (instancetype)initWithNumberOfColumns:(NSInteger)numberOfColumns headerHeight:(CGFloat)headerHeight
 {
   self = [super init];
@@ -33,6 +35,7 @@
     _columnSpacing = 10.0;
     _sectionInset = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
     _interItemSpacing = UIEdgeInsetsMake(10.0, 0, 10.0, 0);
+    _scrollableDirections = ASScrollDirectionVerticalDirections;
   }
   return self;
 }

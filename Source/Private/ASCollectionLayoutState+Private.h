@@ -1,5 +1,5 @@
 //
-//  ASCollectionLayoutContext.h
+//  ASCollectionLayoutState+Private.h
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -15,22 +15,17 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-
-@class ASElementMap;
+#import <AsyncDisplayKit/ASCollectionLayoutState.h>
+#import <AsyncDisplayKit/ASPageTable.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_SUBCLASSING_RESTRICTED
+@interface ASCollectionLayoutState (Private)
 
-@interface ASCollectionLayoutContext : NSObject
-
-@property (nonatomic, assign, readonly) CGSize viewportSize;
-@property (nonatomic, strong, readonly) ASElementMap *elements;
-@property (nonatomic, strong, readonly, nullable) id additionalInfo;
-
-- (instancetype)init __unavailable;
+/// Returns layout attributes for elements that intersect the specified rect
+- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
+                                                                                                              contentSize:(CGSize)contentSize
+                                                                                                                 pageSize:(CGSize)pageSize;
 
 @end
 

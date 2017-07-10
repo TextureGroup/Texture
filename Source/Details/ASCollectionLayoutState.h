@@ -55,7 +55,10 @@ AS_SUBCLASSING_RESTRICTED
  * @param table A map between elements to their layout attributes. It may contain all elements, or a subset of them that will be updated later. 
  * It should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
  */
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize additionalInfo:(nullable id)additionalInfo elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                    contentSize:(CGSize)contentSize
+                 additionalInfo:(nullable id)additionalInfo
+ elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
 
 /**
  * Convenience initializer.
@@ -68,7 +71,10 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param getElementBlock A block that can retrieve the collection element from a direct sublayout of the root layout.
  */
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout additionalInfo:(nullable id)additionalInfo getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                         layout:(ASLayout *)layout
+                 additionalInfo:(nullable id)additionalInfo
+                getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock;
 
 /**
  * Returns all layout attributes present in this object.
@@ -96,7 +102,8 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param indexPath The index path of the element.
  */
-- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)kind
+                                                                                 atIndexPath:(NSIndexPath *)indexPath;
 
 /**
  * Returns layout attributes of the specified element.

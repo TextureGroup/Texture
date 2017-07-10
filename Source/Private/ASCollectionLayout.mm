@@ -29,6 +29,13 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+struct ASCollectionLayoutDelegateFlags {
+  unsigned int implementsAdditionalInfoForLayoutWithElements:1;
+  unsigned int implementsEnsureLayoutAttributesForElementsInRect:1;
+  unsigned int implementsEnsureLayoutAttributesForItemAtIndexPath:1;
+  unsigned int implementsEnsureLayoutAttributesForSupplementaryElementOfKind:1;
+};
+
 @interface ASCollectionLayout () <ASDataControllerLayoutDelegate> {
   ASDN::Mutex __instanceLock__; // Non-recursive mutex, ftw!
   
@@ -38,12 +45,7 @@
   // The pending state calculated ahead of time, if any.
   ASCollectionLayoutState *_pendingLayout;
   
-  struct {
-    unsigned int additionalInfoForLayoutWithElements:1;
-    unsigned int ensureLayoutAttributesForElementsInRect:1;
-    unsigned int ensureLayoutAttributesForItemAtIndexPath:1;
-    unsigned int ensureLayoutAttributesForSupplementaryElementOfKind:1;
-  } _layoutDelegateFlags;
+  ASCollectionLayoutDelegateFlags _layoutDelegateFlags;
 }
 
 @end
@@ -56,10 +58,10 @@
   if (self) {
     ASDisplayNodeAssertNotNil(layoutDelegate, @"Collection layout delegate cannot be nil");
     _layoutDelegate = layoutDelegate;
-    _layoutDelegateFlags.additionalInfoForLayoutWithElements = [layoutDelegate respondsToSelector:@selector(additionalInfoForLayoutWithElements:)];
-    _layoutDelegateFlags.ensureLayoutAttributesForElementsInRect = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForElementsInRect:withLayout:)];
-    _layoutDelegateFlags.ensureLayoutAttributesForItemAtIndexPath = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForItemAtIndexPath:withLayout:)];
-    _layoutDelegateFlags.ensureLayoutAttributesForSupplementaryElementOfKind = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForSupplementaryElementOfKind:atIndexPath:withLayout:)];
+    _layoutDelegateFlags.implementsAdditionalInfoForLayoutWithElements = [layoutDelegate respondsToSelector:@selector(additionalInfoForLayoutWithElements:)];
+    _layoutDelegateFlags.implementsEnsureLayoutAttributesForElementsInRect = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForElementsInRect:withLayout:)];
+    _layoutDelegateFlags.implementsEnsureLayoutAttributesForItemAtIndexPath = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForItemAtIndexPath:withLayout:)];
+    _layoutDelegateFlags.implementsEnsureLayoutAttributesForSupplementaryElementOfKind = [layoutDelegate respondsToSelector:@selector(ensureLayoutAttributesForSupplementaryElementOfKind:atIndexPath:withLayout:)];
   }
   return self;
 }
@@ -71,7 +73,7 @@
   ASDisplayNodeAssertMainThread();
   CGSize viewportSize = [self viewportSize];
   id additionalInfo = nil;
-  if (_layoutDelegateFlags.additionalInfoForLayoutWithElements) {
+  if (_layoutDelegateFlags.implementsAdditionalInfoForLayoutWithElements) {
     additionalInfo = [_layoutDelegate additionalInfoForLayoutWithElements:elements];
   }
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize elements:elements additionalInfo:additionalInfo];
@@ -128,7 +130,7 @@
 {
   ASDisplayNodeAssertMainThread();
   
-  if (_layoutDelegate != nil && _layoutDelegateFlags.ensureLayoutAttributesForElementsInRect) {
+  if (_layoutDelegate != nil && _layoutDelegateFlags.implementsEnsureLayoutAttributesForElementsInRect) {
     [_layoutDelegate ensureLayoutAttributesForElementsInRect:rect withLayout:_layout];
   }
   
@@ -145,7 +147,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (_layoutDelegate != nil &&  _layoutDelegateFlags.ensureLayoutAttributesForItemAtIndexPath) {
+  if (_layoutDelegate != nil &&  _layoutDelegateFlags.implementsEnsureLayoutAttributesForItemAtIndexPath) {
     [_layoutDelegate ensureLayoutAttributesForItemAtIndexPath:indexPath withLayout:_layout];
   }
   
@@ -157,7 +159,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-  if (_layoutDelegate != nil && _layoutDelegateFlags.ensureLayoutAttributesForSupplementaryElementOfKind) {
+  if (_layoutDelegate != nil && _layoutDelegateFlags.implementsEnsureLayoutAttributesForSupplementaryElementOfKind) {
     [_layoutDelegate ensureLayoutAttributesForSupplementaryElementOfKind:elementKind atIndexPath:indexPath withLayout:_layout];
   }
   

@@ -26,9 +26,9 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 
-@implementation ASCollectionFlowLayoutDelegate {
-  ASScrollDirection _scrollableDirections;
-}
+@implementation ASCollectionFlowLayoutDelegate
+
+@synthesize scrollableDirections = _scrollableDirections;
 
 - (instancetype)init
 {

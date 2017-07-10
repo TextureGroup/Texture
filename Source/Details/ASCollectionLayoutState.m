@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
+#import <AsyncDisplayKit/ASCollectionLayoutState+Private.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
@@ -38,7 +39,10 @@
   ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
 }
 
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout additionalInfo:(nullable id)additionalInfo getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                         layout:(ASLayout *)layout
+                 additionalInfo:(nullable id)additionalInfo
+                getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
 {
   ASElementMap *elements = context.elements;
   NSMapTable *table = [NSMapTable elementToLayoutAttributesTable];
@@ -67,7 +71,10 @@
   return [self initWithContext:context contentSize:layout.size additionalInfo:additionalInfo elementToLayoutAttributesTable:table];
 }
 
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize additionalInfo:(id)additionalInfo elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                    contentSize:(CGSize)contentSize
+                 additionalInfo:(id)additionalInfo
+ elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
 {
   self = [super init];
   if (self) {
@@ -85,6 +92,24 @@
   return [_elementToLayoutAttributesTable.objectEnumerator allObjects];
 }
 
+- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASCollectionElement *element = [_context.elements elementForItemAtIndexPath:indexPath];
+  return [_elementToLayoutAttributesTable objectForKey:element];
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)elementKind
+                                                                        atIndexPath:(NSIndexPath *)indexPath
+{
+  ASCollectionElement *element = [_context.elements supplementaryElementOfKind:elementKind atIndexPath:indexPath];
+  return [_elementToLayoutAttributesTable objectForKey:element];
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForElement:(ASCollectionElement *)element
+{
+  return [_elementToLayoutAttributesTable objectForKey:element];
+}
+
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
   CGSize pageSize = _context.viewportSize;
@@ -92,7 +117,7 @@
   if (pages.count == 0) {
     return @[];
   }
-  
+
   // Use a set here because some items may span multiple pages
   NSMutableSet<UICollectionViewLayoutAttributes *> *result = [NSMutableSet set];
   for (id pagePtr in pages) {
@@ -100,7 +125,7 @@
     NSArray<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
     if (allAttrs.count > 0) {
       CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
-      
+
       if (CGRectContainsRect(rect, pageRect)) {
         [result addObjectsFromArray:allAttrs];
       } else {
@@ -115,21 +140,55 @@
   return [result allObjects];
 }
 
-- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+- (ASPageTable<id,NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
+                                                                                                    contentSize:(CGSize)contentSize
+                                                                                                       pageSize:(CGSize)pageSize
 {
-  ASCollectionElement *element = [_context.elements elementForItemAtIndexPath:indexPath];
-  return [_elementToLayoutAttributesTable objectForKey:element];
-}
+  if (_pageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
+    return nil;
+  }
 
-- (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
-{
-  ASCollectionElement *element = [_context.elements supplementaryElementOfKind:elementKind atIndexPath:indexPath];
-  return [_elementToLayoutAttributesTable objectForKey:element];
-}
+  // Step 1: Determine all the pages that intersect the specified rect
+  NSPointerArray *pagesInRect = ASPageCoordinatesForPagesThatIntersectRect(rect, contentSize, pageSize);
+  if (pagesInRect.count == 0) {
+    return nil;
+  }
 
-- (UICollectionViewLayoutAttributes *)layoutAttributesForElement:(ASCollectionElement *)element
-{
-  return [_elementToLayoutAttributesTable objectForKey:element];
+  // Step 2: Filter out attributes in these pages that intersect the specified rect.
+  ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
+  for (id pagePtr in pagesInRect) {
+    ASPageCoordinate page = (ASPageCoordinate)pagePtr;
+    NSMutableArray *attrsInPage = [_pageToLayoutAttributesTable objectForPage:page];
+
+    NSUInteger attrsCount = attrsInPage.count;
+    if (attrsCount > 0) {
+      NSMutableArray *interesectingAttrsInPage = nil;
+
+      CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
+      if (CGRectContainsRect(rect, pageRect)) {
+        // The page fits well within the specified rect. Simply return all attributes in this page.
+        // Don't need to make a copy of attrsInPage here because it will be removed from the page table soon anyway.
+        interesectingAttrsInPage = attrsInPage;
+      } else {
+        // The page intersects the specified rect. Some attributes in this page are to be returned, some are not.
+        for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
+          if (CGRectIntersectsRect(rect, attrs.frame)) {
+            if (interesectingAttrsInPage == nil) {
+              interesectingAttrsInPage = [NSMutableArray array];
+            }
+            [interesectingAttrsInPage addObject:attrs];
+          }
+        }
+      }
+
+      NSUInteger interesectingAttrsCount = interesectingAttrsInPage.count;
+      if (interesectingAttrsCount > 0) {
+        [result setObject:interesectingAttrsInPage forPage:page];
+      }
+    }
+  }
+  
+  return result;
 }
 
 @end

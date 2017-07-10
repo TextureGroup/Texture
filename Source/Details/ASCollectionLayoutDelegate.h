@@ -17,12 +17,15 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <AsyncDisplayKit/ASScrollDirection.h>
 
 @class ASElementMap, ASCollectionLayoutContext, ASCollectionLayoutState;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASCollectionLayoutDelegate <NSObject>
+
+@property (nonatomic, assign, readonly) ASScrollDirection scrollableDirections;
 
 // TODO Add delegate method to inform whether this delegate can allocate nodes itself
 
@@ -99,7 +102,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param layout The layout object previously returned by `-calculateLayoutWithContext:`.
  */
-- (void)ensureLayoutAttributesForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withLayout:(ASCollectionLayoutState *)layout;
+- (void)ensureLayoutAttributesForSupplementaryElementOfKind:(NSString *)kind
+                                                atIndexPath:(NSIndexPath *)indexPath
+                                                 withLayout:(ASCollectionLayoutState *)layout;
 
 @end
 
