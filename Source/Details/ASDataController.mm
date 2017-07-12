@@ -600,13 +600,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
                                                ASCollectionElement *element,
                                                (element.nodeIfAllocated.calculatedLayout == nil ? element : nil));
     }
-    
+
+    // TODO Don't even allocate nodes here
     [self batchAllocateNodesFromElements:elementsToProcess andLayout:(! canDelegateLayout) batchSize:elementsToProcess.count batchCompletion:^(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes) {
       ASSERT_ON_EDITING_QUEUE;
 
-      if (canDelegateLayout) {
-        [_layoutDelegate prepareLayoutWithContext:layoutContext];
-      }
+      ASCollectionLayoutState *layout = canDelegateLayout ? [_layoutDelegate calculateLayoutWithContext:layoutContext] : nil;
 
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
@@ -623,6 +622,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
           // Thus, we can't just swap the new map immediately before step 4, but until this update block is executed.
           // (https://github.com/TextureGroup/Texture/issues/378)
           self.visibleMap = newMap;
+          [_layoutDelegate applyLayout:layout];
         }];
       }];
     }];

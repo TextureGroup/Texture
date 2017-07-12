@@ -30,7 +30,6 @@
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASPageTable.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 static const ASRangeTuningParameters kASDefaultMeasureRangeTuningParameters = {
   .leadingBufferScreenfuls = 2.0,
@@ -40,13 +39,8 @@ static const ASRangeTuningParameters kASDefaultMeasureRangeTuningParameters = {
 static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRight | ASScrollDirectionDown);
 
 @interface ASCollectionLayout () <ASDataControllerLayoutDelegate> {
-  ASDN::Mutex __instanceLock__; // Non-recursive mutex, ftw!
-  
   // Main thread only.
   ASCollectionLayoutState *_layout;
-  
-  // The pending state calculated ahead of time, if any.
-  ASCollectionLayoutState *_pendingLayout;
   
   struct {
     unsigned int implementsAdditionalInfoForLayoutWithElements:1;
@@ -81,12 +75,27 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize elements:elements additionalInfo:additionalInfo];
 }
 
-- (void)prepareLayoutWithContext:(id)context
+- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
-  ASCollectionLayoutState *layout = ASCollectionLayoutStateWithContext(context, _layoutDelegate);
-  
-  ASDN::MutexLocker l(__instanceLock__);
-  _pendingLayout = layout;
+  ASCollectionLayoutState *layout = [_layoutDelegate calculateLayoutWithContext:context];
+
+  // Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
+  CGSize viewportSize = context.viewportSize;
+  // TODO Consider content offset of the collection node
+  CGRect initialRect = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
+  CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(initialRect,
+                                                                   kASDefaultMeasureRangeTuningParameters,
+                                                                   _layoutDelegate.scrollableDirections,
+                                                                   kASStaticScrollDirection);
+  ASCollectionLayoutMeasureElementsInRects(measureRect, initialRect, layout);
+
+  return layout;
+}
+
+- (void)applyLayout:(ASCollectionLayoutState *)layout
+{
+  ASDisplayNodeAssertMainThread();
+  _layout = layout;
 }
 
 #pragma mark - UICollectionViewLayout overrides
@@ -95,23 +104,13 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 {
   ASDisplayNodeAssertMainThread();
   [super prepareLayout];
+
   ASCollectionLayoutContext *context = [self layoutContextWithElements:_collectionNode.visibleElements];
-  
-  ASCollectionLayoutState *layout = nil;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    if (_pendingLayout != nil && ASObjectIsEqual(_pendingLayout.context, context)) {
-      // Looks like we can use the pending layout. Great!
-      layout = _pendingLayout;
-      _pendingLayout = nil;
-    }
+  if (_layout == nil || ASObjectIsEqual(_layout.context, context) == NO) {
+    // Looks like the existing layout is either unavailable or no longer valid.
+    // Calculate a new layout and apply it immediately
+    [self applyLayout:[self calculateLayoutWithContext:context]];
   }
-  
-  if (layout == nil) {
-    layout = ASCollectionLayoutStateWithContext(context, _layoutDelegate);
-  }
-  
-  _layout = layout;
 }
 
 - (void)invalidateLayout
@@ -202,20 +201,6 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 }
 
 # pragma mark - Convenient inline functions
-
-ASDISPLAYNODE_INLINE ASCollectionLayoutState *ASCollectionLayoutStateWithContext(ASCollectionLayoutContext *context, id<ASCollectionLayoutDelegate> delegate)
-{
-  ASCollectionLayoutState *layout = [delegate calculateLayoutWithContext:context];
-
-  // Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
-  CGSize viewportSize = context.viewportSize;
-  // TODO Consider content offset of the collection node
-  CGRect initialRect = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
-  CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(initialRect, kASDefaultMeasureRangeTuningParameters, delegate.scrollableDirections, kASStaticScrollDirection);
-  ASCollectionLayoutMeasureElementsInRects(measureRect, initialRect, layout);
-
-  return layout;
-}
 
 ASDISPLAYNODE_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
 {

@@ -33,9 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 #define ASDataControllerLogEvent(dataController, ...)
 #endif
 
-@class ASCollectionLayoutContext;
 @class ASCellNode;
 @class ASCollectionElement;
+@class ASCollectionLayoutContext;
+@class ASCollectionLayoutState;
 @class ASDataController;
 @class ASElementMap;
 @class ASLayout;
@@ -140,19 +141,28 @@ extern NSString * const ASCollectionInvalidUpdateException;
 - (ASCollectionLayoutContext *)layoutContextWithElements:(ASElementMap *)elements;
 
 /**
- * @abstract Prepares in advance a new layout with the given context.
+ * @abstract Prepares and returns a new layout for given context.
  *
  * @param context A context that was previously returned by `-layoutContextWithElements:`.
  *
+ * @return The new layout calculated for the given context.
+ *
  * @discussion This method is called ahead of time, i.e before the underlying collection/table view is aware of the provided elements.
- * As a result, this method should rely solely on the given context and should not reach out to its collection/table view for information regarding items.
+ * As a result, clients must solely rely on the given context and should not reach out to other objects for information not available in the context.
  *
- * @discussion This method will be called on background theads. It must be thread-safe and should not change any internal state of the conforming object.
- * It's recommended to put the resulting layouts of this method into a thread-safe cache that can be looked up later on.
- *
- * @discussion This method must block its calling thread. It can dispatch to other theads to reduce blocking time.
+ * This method will be called on background theads. It must be thread-safe and should not change any internal state of the conforming object.
+ * It must block the calling thread but can dispatch to other theads to reduce total blocking time.
  */
-- (void)prepareLayoutWithContext:(ASCollectionLayoutContext *)context;
+- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
+
+/**
+ * @abstract Applies the given layout.
+ *
+ * @param layout A layout that was previously returned by `-calculateLayoutWithContext:`.
+ *
+ * @discussion This method will be called on main thread.
+ */
+- (void)applyLayout:(ASCollectionLayoutState *)layout;
 
 @end
 
