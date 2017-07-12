@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 AS_SUBCLASSING_RESTRICTED
+
+/// An immutable state of the collection layout
 @interface ASCollectionLayoutState : NSObject
 
 /// The context used to calculate this object
@@ -52,7 +54,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param additionalInfo Any additional information to be stored in this object.
  *
- * @param table A map between elements to their layout attributes. It may contain all elements, or a subset of them that will be updated later. 
+ * @param table A map between elements to their layout attributes. It must contain all elements.
  * It should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
  */
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
@@ -65,7 +67,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param context The context used to calculate this object
  *
- * @param layout The layout describes size and position of all elements, or a subset of them and will be updated over time.
+ * @param layout The layout describes size and position of all elements.
  *
  * @param additionalInfo Any additional information to be stored in this object.
  *

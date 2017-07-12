@@ -41,7 +41,7 @@
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                          layout:(ASLayout *)layout
-                 additionalInfo:(nullable id)additionalInfo
+                 additionalInfo:(id)additionalInfo
                 getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
 {
   ASElementMap *elements = context.elements;
@@ -74,13 +74,13 @@
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                     contentSize:(CGSize)contentSize
                  additionalInfo:(id)additionalInfo
- elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *)table
+ elementToLayoutAttributesTable:(NSMapTable *)table
 {
   self = [super init];
   if (self) {
     _context = context;
     _contentSize = contentSize;
-    _elementToLayoutAttributesTable = table;
+    _elementToLayoutAttributesTable = [table copy]; // Copy the given table to make sure it won't be mutate by clients after this point.
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator contentSize:contentSize pageSize:context.viewportSize];
     _additionalInfo = additionalInfo;
   }
@@ -137,12 +137,13 @@
       }
     }
   }
+
   return [result allObjects];
 }
 
-- (ASPageTable<id,NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
-                                                                                                    contentSize:(CGSize)contentSize
-                                                                                                       pageSize:(CGSize)pageSize
+- (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
+                                                                                                     contentSize:(CGSize)contentSize
+                                                                                                        pageSize:(CGSize)pageSize
 {
   if (_pageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
     return nil;
@@ -158,7 +159,7 @@
   ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (id pagePtr in pagesInRect) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSMutableArray *attrsInPage = [_pageToLayoutAttributesTable objectForPage:page];
+    NSArray *attrsInPage = [_pageToLayoutAttributesTable objectForPage:page];
 
     NSUInteger attrsCount = attrsInPage.count;
     if (attrsCount > 0) {
@@ -168,7 +169,7 @@
       if (CGRectContainsRect(rect, pageRect)) {
         // The page fits well within the specified rect. Simply return all attributes in this page.
         // Don't need to make a copy of attrsInPage here because it will be removed from the page table soon anyway.
-        interesectingAttrsInPage = attrsInPage;
+        interesectingAttrsInPage = [NSMutableArray arrayWithArray:attrsInPage];
       } else {
         // The page intersects the specified rect. Some attributes in this page are to be returned, some are not.
         for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
@@ -181,8 +182,7 @@
         }
       }
 
-      NSUInteger interesectingAttrsCount = interesectingAttrsInPage.count;
-      if (interesectingAttrsCount > 0) {
+      if (interesectingAttrsInPage.count > 0) {
         [result setObject:interesectingAttrsInPage forPage:page];
       }
     }

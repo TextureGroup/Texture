@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define ASDataControllerLogEvent(dataController, ...)
 #endif
 
+@class ASCollectionLayoutContext;
 @class ASCellNode;
 @class ASCollectionElement;
 @class ASDataController;
@@ -136,7 +137,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * @discussion This method will be called on main thread.
  */
-- (id)layoutContextWithElements:(ASElementMap *)elements;
+- (ASCollectionLayoutContext *)layoutContextWithElements:(ASElementMap *)elements;
 
 /**
  * @abstract Prepares in advance a new layout with the given context.
@@ -151,7 +152,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * @discussion This method must block its calling thread. It can dispatch to other theads to reduce blocking time.
  */
-- (void)prepareLayoutWithContext:(id)context;
+- (void)prepareLayoutWithContext:(ASCollectionLayoutContext *)context;
 
 @end
 
