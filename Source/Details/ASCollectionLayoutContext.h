@@ -27,7 +27,7 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionLayoutContext : NSObject
 
 @property (nonatomic, assign, readonly) CGSize viewportSize;
-@property (nonatomic, strong, readonly) ASElementMap *elements;
+@property (nonatomic, weak, readonly) ASElementMap *elements;
 @property (nonatomic, strong, readonly, nullable) id additionalInfo;
 
 - (instancetype)init __unavailable;

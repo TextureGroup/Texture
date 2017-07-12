@@ -1,14 +1,9 @@
 //
-//  ASCollectionLayout.mm
+//  ASCollectionLayout.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
@@ -21,6 +16,7 @@
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollectionLayoutCache.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext+Private.h>
 #import <AsyncDisplayKit/ASCollectionLayoutDelegate.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState+Private.h>
@@ -39,11 +35,8 @@ static const ASRangeTuningParameters kASDefaultMeasureRangeTuningParameters = {
 static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRight | ASScrollDirectionDown);
 
 @interface ASCollectionLayout () <ASDataControllerLayoutDelegate> {
-  // Main thread only.
-  ASCollectionLayoutState *_layout;
-
-  // The pending state calculated ahead of time, if any. Main thread only.
-  ASCollectionLayoutState *_pendingLayout;
+  ASCollectionLayoutCache *_layoutCache;
+  ASCollectionLayoutState *_layout; // Main thread only.
 
   struct {
     unsigned int implementsAdditionalInfoForLayoutWithElements:1;
@@ -61,6 +54,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
     ASDisplayNodeAssertNotNil(layoutDelegate, @"Collection layout delegate cannot be nil");
     _layoutDelegate = layoutDelegate;
     _layoutDelegateFlags.implementsAdditionalInfoForLayoutWithElements = [layoutDelegate respondsToSelector:@selector(additionalInfoForLayoutWithElements:)];
+    _layoutCache = [[ASCollectionLayoutCache alloc] init];
   }
   return self;
 }
@@ -81,6 +75,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 - (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASCollectionLayoutState *layout = [_layoutDelegate calculateLayoutWithContext:context];
+  [_layoutCache setLayout:layout forContext:context];
 
   // Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
   CGSize viewportSize = context.viewportSize;
@@ -93,12 +88,6 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   ASCollectionLayoutMeasureElementsInRects(measureRect, initialRect, layout);
 
   return layout;
-}
-
-- (void)applyLayout:(ASCollectionLayoutState *)layout
-{
-  ASDisplayNodeAssertMainThread();
-  _pendingLayout = layout;
 }
 
 #pragma mark - UICollectionViewLayout overrides
@@ -114,22 +103,22 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
     return;
   }
 
-  if (_pendingLayout != nil && ASObjectIsEqual(_pendingLayout.context, context)) {
-    // The existing can be used. Great!
-    _layout = _pendingLayout;
-    _pendingLayout = nil;
-    return;
+  if (ASCollectionLayoutState *cachedLayout = [_layoutCache layoutForContext:context]) {
+    _layout = cachedLayout;
+  } else {
+    // A new layout is needed now. Calculate and apply it immediately
+    _layout = [self calculateLayoutWithContext:context];
   }
-
-  // A new layout is needed now. Calculate and apply it immediately
-  _layout = [self calculateLayoutWithContext:context];
 }
 
 - (void)invalidateLayout
 {
   ASDisplayNodeAssertMainThread();
   [super invalidateLayout];
-  _layout = nil;
+  if (_layout != nil) {
+    [_layoutCache removeLayoutForContext:_layout.context];
+    _layout = nil;
+  }
 }
 
 - (CGSize)collectionViewContentSize

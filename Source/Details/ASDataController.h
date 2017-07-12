@@ -155,15 +155,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 - (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
 
-/**
- * @abstract Applies the given layout.
- *
- * @param layout A layout that was previously returned by `-calculateLayoutWithContext:`.
- *
- * @discussion This method will be called on main thread.
- */
-- (void)applyLayout:(ASCollectionLayoutState *)layout;
-
 @end
 
 /**
