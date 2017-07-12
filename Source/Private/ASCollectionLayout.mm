@@ -264,7 +264,9 @@ ASDISPLAYNODE_INLINE void ASCollectionLayoutMeasureElementsInRects(CGRect rect, 
   // Step 2: Get layout attributes of all elements within the specified outer rect
   ASCollectionLayoutContext *context = layout.context;
   CGSize pageSize = context.viewportSize;
-  ASPageTable *attrsTable = [layout pageToLayoutAttributesTableForElementsInRect:rect contentSize:contentSize pageSize:pageSize];
+  ASPageTable *attrsTable = [layout getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:rect
+                                                                              contentSize:contentSize
+                                                                                 pageSize:pageSize];
   if (attrsTable.count == 0) {
     // No elements in this rect! Bail early
     return;
@@ -277,7 +279,7 @@ ASDISPLAYNODE_INLINE void ASCollectionLayoutMeasureElementsInRects(CGRect rect, 
   NSMutableSet<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableSet set];
   for (id pagePtr in attrsTable) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [[attrsTable objectForPage:page] allObjects];
+    NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [attrsTable objectForPage:page];
     // Calculate the page's rect but only if it's going to be used.
     CGRect pageRect = hasBlockingRect ? ASPageCoordinateGetPageRect(page, pageSize) : CGRectZero;
 

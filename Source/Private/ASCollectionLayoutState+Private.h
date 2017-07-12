@@ -17,10 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCollectionLayoutState (Private)
 
-/// Returns layout attributes for elements that intersect the specified rect
-- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
-                                                                                                              contentSize:(CGSize)contentSize
-                                                                                                                 pageSize:(CGSize)pageSize;
+/**
+ * Remove and returns layout attributes for unmeasured elements that intersect the specified rect
+ *
+ * @discussion This method is atomic and thread-safe
+ */
+- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:(CGRect)rect
+                                                                                                                       contentSize:(CGSize)contentSize
+                                                                                                                          pageSize:(CGSize)pageSize;
 
 @end
 

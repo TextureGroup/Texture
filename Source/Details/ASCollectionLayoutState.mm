@@ -24,6 +24,7 @@
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASPageTable.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 @implementation NSMapTable (ASCollectionLayoutConvenience)
 
@@ -35,8 +36,10 @@
 @end
 
 @implementation ASCollectionLayoutState {
+  ASDN::Mutex __instanceLock__;
   NSMapTable<ASCollectionElement *,UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
-  ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
+  ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *_pageToLayoutAttributesTable;
+  ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *_unmeasuredPageToLayoutAttributesTable;
 }
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
@@ -82,6 +85,8 @@
     _contentSize = contentSize;
     _elementToLayoutAttributesTable = [table copy]; // Copy the given table to make sure it won't be mutate by clients after this point.
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator contentSize:contentSize pageSize:context.viewportSize];
+    // Assume that all elements are unmeasured, deep copy the original table
+    _unmeasuredPageToLayoutAttributesTable = [_pageToLayoutAttributesTable deepCopy];
     _additionalInfo = additionalInfo;
   }
   return self;
@@ -141,11 +146,12 @@
   return [result allObjects];
 }
 
-- (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)pageToLayoutAttributesTableForElementsInRect:(CGRect)rect
-                                                                                                     contentSize:(CGSize)contentSize
-                                                                                                        pageSize:(CGSize)pageSize
+- (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:(CGRect)rect
+                                                                                                             contentSize:(CGSize)contentSize
+                                                                                                                pageSize:(CGSize)pageSize
 {
-  if (_pageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
+  ASDN::MutexLocker l(__instanceLock__);
+  if (_unmeasuredPageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
     return nil;
   }
 
@@ -159,35 +165,49 @@
   ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (id pagePtr in pagesInRect) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
-    NSArray *attrsInPage = [_pageToLayoutAttributesTable objectForPage:page];
+    NSArray *attrsInPage = [_unmeasuredPageToLayoutAttributesTable objectForPage:page];
 
-    NSUInteger attrsCount = attrsInPage.count;
-    if (attrsCount > 0) {
-      NSMutableArray *interesectingAttrsInPage = nil;
+    if (attrsInPage.count == 0) {
+      // Hm, this page should be removed before.
+      [_unmeasuredPageToLayoutAttributesTable removeObjectForPage:page];
+      continue;
+    }
 
-      CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
-      if (CGRectContainsRect(rect, pageRect)) {
-        // The page fits well within the specified rect. Simply return all attributes in this page.
-        // Don't need to make a copy of attrsInPage here because it will be removed from the page table soon anyway.
-        interesectingAttrsInPage = [NSMutableArray arrayWithArray:attrsInPage];
-      } else {
-        // The page intersects the specified rect. Some attributes in this page are to be returned, some are not.
-        for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
-          if (CGRectIntersectsRect(rect, attrs.frame)) {
-            if (interesectingAttrsInPage == nil) {
-              interesectingAttrsInPage = [NSMutableArray array];
-            }
-            [interesectingAttrsInPage addObject:attrs];
-          }
+    CGRect pageRect = ASPageCoordinateGetPageRect(page, pageSize);
+    if (CGRectContainsRect(rect, pageRect)) {
+      // This page fits well within the specified rect. Simply return all of its attributes.
+      [result setObject:attrsInPage forPage:page];
+      [_unmeasuredPageToLayoutAttributesTable removeObjectForPage:page];
+      continue;
+    }
+
+    // The page intersects the specified rect. Some attributes in this page are returned, some are not.
+    NSMutableArray *intersectingAttrsInPage = nil;
+    NSMutableArray *unmeasuredAttrsInPage = nil;
+    BOOL hasIntersectingAttrs = NO;
+
+    for (UICollectionViewLayoutAttributes *attrs in attrsInPage) {
+      if (CGRectIntersectsRect(rect, attrs.frame)) {
+        if (! hasIntersectingAttrs) {
+          intersectingAttrsInPage = [NSMutableArray array];
+          unmeasuredAttrsInPage = [attrsInPage mutableCopy];
+          hasIntersectingAttrs = YES;
         }
+        [intersectingAttrsInPage addObject:attrs];
+        [unmeasuredAttrsInPage removeObject:attrs];
       }
+    }
 
-      if (interesectingAttrsInPage.count > 0) {
-        [result setObject:interesectingAttrsInPage forPage:page];
+    if (hasIntersectingAttrs) {
+      [result setObject:intersectingAttrsInPage forPage:page];
+      if (unmeasuredAttrsInPage.count == 0) {
+        [_unmeasuredPageToLayoutAttributesTable removeObjectForPage:page];
+      } else {
+        [_unmeasuredPageToLayoutAttributesTable setObject:unmeasuredAttrsInPage forPage:page];
       }
     }
   }
-  
+
   return result;
 }
 

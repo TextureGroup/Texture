@@ -118,6 +118,11 @@ typedef NSMapTable ASPageTable;
  */
 - (void)removeObjectForPage:(ASPageCoordinate)page;
 
+/**
+ * Creates a new page table by deep copying a given page table
+ */
+- (NSMapTable *)deepCopy;
+
 @end
 
 NS_ASSUME_NONNULL_END
