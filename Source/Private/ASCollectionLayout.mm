@@ -41,7 +41,10 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 @interface ASCollectionLayout () <ASDataControllerLayoutDelegate> {
   // Main thread only.
   ASCollectionLayoutState *_layout;
-  
+
+  // The pending state calculated ahead of time, if any. Main thread only.
+  ASCollectionLayoutState *_pendingLayout;
+
   struct {
     unsigned int implementsAdditionalInfoForLayoutWithElements:1;
   } _layoutDelegateFlags;
@@ -95,7 +98,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 - (void)applyLayout:(ASCollectionLayoutState *)layout
 {
   ASDisplayNodeAssertMainThread();
-  _layout = layout;
+  _pendingLayout = layout;
 }
 
 #pragma mark - UICollectionViewLayout overrides
@@ -106,11 +109,20 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   [super prepareLayout];
 
   ASCollectionLayoutContext *context = [self layoutContextWithElements:_collectionNode.visibleElements];
-  if (_layout == nil || ASObjectIsEqual(_layout.context, context) == NO) {
-    // Looks like the existing layout is either unavailable or no longer valid.
-    // Calculate a new layout and apply it immediately
-    [self applyLayout:[self calculateLayoutWithContext:context]];
+  if (_layout != nil && ASObjectIsEqual(_layout.context, context)) {
+    // The existing layout is still valid. No-op
+    return;
   }
+
+  if (_pendingLayout != nil && ASObjectIsEqual(_pendingLayout.context, context)) {
+    // The existing can be used. Great!
+    _layout = _pendingLayout;
+    _pendingLayout = nil;
+    return;
+  }
+
+  // A new layout is needed now. Calculate and apply it immediately
+  _layout = [self calculateLayoutWithContext:context];
 }
 
 - (void)invalidateLayout
