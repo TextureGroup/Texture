@@ -64,7 +64,6 @@
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context
                                                 contentSize:CGSizeZero
-                                             additionalInfo:nil
                              elementToLayoutAttributesTable:[NSMapTable weakToStrongObjectsMapTable]];
   }
   
@@ -79,7 +78,7 @@
   stackSpec.concurrent = YES;
   ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections)];
   
-  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout additionalInfo:nil getElementBlock:^ASCollectionElement *(ASLayout *sublayout) {
+  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement *(ASLayout *sublayout) {
     return ((_ASGalleryLayoutItem *)sublayout.layoutElement).collectionElement;
   }];
 }

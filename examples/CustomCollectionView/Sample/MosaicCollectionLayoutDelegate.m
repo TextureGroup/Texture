@@ -112,7 +112,6 @@
   CGSize contentSize = CGSizeMake(layoutWidth, contentHeight);
   return [[ASCollectionLayoutState alloc] initWithContext:context
                                               contentSize:contentSize
-                                           additionalInfo:nil
                            elementToLayoutAttributesTable:attrsMap];
 }
 

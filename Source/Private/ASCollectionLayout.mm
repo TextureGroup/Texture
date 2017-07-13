@@ -87,7 +87,6 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   if (context.elements == nil) {
     return [[ASCollectionLayoutState alloc] initWithContext:context
                                                 contentSize:CGSizeZero
-                                             additionalInfo:nil
                              elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   }
 

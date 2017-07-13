@@ -40,9 +40,6 @@ AS_SUBCLASSING_RESTRICTED
 /// The final content size of the collection's layout
 @property (nonatomic, assign, readonly) CGSize contentSize;
 
-/// Any additional information can be stored here. Clients are responsible for the thread-safety of this object.
-@property (nonatomic, strong, readonly, nullable) id additionalInfo;
-
 - (instancetype)init __unavailable;
 
 /**
@@ -52,14 +49,11 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param contentSize The content size of the collection's layout
  *
- * @param additionalInfo Any additional information to be stored in this object.
- *
  * @param table A map between elements to their layout attributes. It must contain all elements.
  * It should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
  */
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                     contentSize:(CGSize)contentSize
-                 additionalInfo:(nullable id)additionalInfo
  elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
 
 /**
@@ -69,13 +63,10 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param layout The layout describes size and position of all elements.
  *
- * @param additionalInfo Any additional information to be stored in this object.
- *
  * @param getElementBlock A block that can retrieve the collection element from a direct sublayout of the root layout.
  */
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                          layout:(ASLayout *)layout
-                 additionalInfo:(nullable id)additionalInfo
                 getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock;
 
 /**

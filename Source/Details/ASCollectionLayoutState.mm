@@ -44,7 +44,6 @@
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                          layout:(ASLayout *)layout
-                 additionalInfo:(id)additionalInfo
                 getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
 {
   ASElementMap *elements = context.elements;
@@ -71,12 +70,11 @@
     [table setObject:attrs forKey:element];
   }
 
-  return [self initWithContext:context contentSize:layout.size additionalInfo:additionalInfo elementToLayoutAttributesTable:table];
+  return [self initWithContext:context contentSize:layout.size elementToLayoutAttributesTable:table];
 }
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                     contentSize:(CGSize)contentSize
-                 additionalInfo:(id)additionalInfo
  elementToLayoutAttributesTable:(NSMapTable *)table
 {
   self = [super init];
@@ -87,7 +85,6 @@
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:_elementToLayoutAttributesTable.objectEnumerator contentSize:contentSize pageSize:context.viewportSize];
     // Assume that all elements are unmeasured, deep copy the original table
     _unmeasuredPageToLayoutAttributesTable = [_pageToLayoutAttributesTable deepCopy];
-    _additionalInfo = additionalInfo;
   }
   return self;
 }
