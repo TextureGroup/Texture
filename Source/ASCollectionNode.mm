@@ -20,7 +20,7 @@
 
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASCollectionInternal.h>
+#import <AsyncDisplayKit/ASCollectionViewInternal.h>
 #import <AsyncDisplayKit/ASCollectionLayout.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
