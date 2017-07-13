@@ -21,6 +21,8 @@
 #import "SupplementaryNode.h"
 #import "ItemNode.h"
 
+#define ASYNC_COLLECTION_LAYOUT 0
+
 @interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout>
 
 @property (nonatomic, strong) ASCollectionNode *collectionNode;
@@ -43,11 +45,18 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  
-  id<ASCollectionLayoutDelegate> layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionVerticalDirections itemSize:CGSizeMake(180, 90)];
-//  id<ASCollectionLayoutDelegate> layoutDelegate = [[ASCollectionFlowLayoutDelegate alloc] init];
-  
+
+#if ASYNC_COLLECTION_LAYOUT
+  id<ASCollectionLayoutDelegate> layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionVerticalDirections
+                                                                                                                 itemSize:CGSizeMake(180, 90)];
   self.collectionNode = [[ASCollectionNode alloc] initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
+#else
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  layout.headerReferenceSize = CGSizeMake(50.0, 50.0);
+  layout.footerReferenceSize = CGSizeMake(50.0, 50.0);
+  self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
+#endif
+  
   self.collectionNode.dataSource = self;
   self.collectionNode.delegate = self;
   
