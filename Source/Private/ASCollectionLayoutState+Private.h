@@ -22,9 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion This method is atomic and thread-safe
  */
-- (nullable ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:(CGRect)rect
-                                                                                                                       contentSize:(CGSize)contentSize
-                                                                                                                          pageSize:(CGSize)pageSize;
+- (nullable ASPageToLayoutAttributesTable *)getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:(CGRect)rect
+                                                                                      contentSize:(CGSize)contentSize
+                                                                                         pageSize:(CGSize)pageSize;
 
 @end
 

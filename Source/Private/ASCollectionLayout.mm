@@ -153,7 +153,10 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   }
 
   // Measure elements in the measure range, block on the requested rect
-  CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(blockingRect, kASDefaultMeasureRangeTuningParameters, _layoutDelegate.scrollableDirections, kASStaticScrollDirection);
+  CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(blockingRect,
+                                                                   kASDefaultMeasureRangeTuningParameters,
+                                                                   _layout.context.scrollableDirections,
+                                                                   kASStaticScrollDirection);
   [ASCollectionLayout _measureElementsInRect:measureRect blockingRect:blockingRect layout:_layout];
   
   NSArray<UICollectionViewLayoutAttributes *> *result = [_layout layoutAttributesForElementsInRect:blockingRect];
@@ -247,9 +250,9 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   // Step 2: Get layout attributes of all elements within the specified outer rect
   ASCollectionLayoutContext *context = layout.context;
   CGSize pageSize = context.viewportSize;
-  ASPageTable *attrsTable = [layout getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:rect
-                                                                              contentSize:contentSize
-                                                                                 pageSize:pageSize];
+  ASPageToLayoutAttributesTable *attrsTable = [layout getAndRemoveUnmeasuredLayoutAttributesPageTableInRect:rect
+                                                                                                contentSize:contentSize
+                                                                                                   pageSize:pageSize];
   if (attrsTable.count == 0) {
     // No elements in this rect! Bail early
     return;

@@ -110,9 +110,9 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
   return [self pageTableWithValuePointerFunctions:weakObjectPointerFuncs];
 }
 
-+ (ASPageTable<id, NSArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
++ (ASPageToLayoutAttributesTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
 {
-  ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
+  ASPageToLayoutAttributesTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (UICollectionViewLayoutAttributes *attrs in layoutAttributesEnumerator) {
     // This attrs may span multiple pages. Make sure it's registered to all of them
     NSPointerArray *pages = ASPageCoordinatesForPagesThatIntersectRect(attrs.frame, contentSize, pageSize);
@@ -146,19 +146,6 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
 {
   __unsafe_unretained id key = (__bridge id)(void *)page;
   [self removeObjectForKey:key];
-}
-
-- (NSMapTable *)deepCopy
-{
-  NSMapTable *result = [[NSMapTable alloc] initWithKeyPointerFunctions:self.keyPointerFunctions
-                                                 valuePointerFunctions:self.valuePointerFunctions
-                                                              capacity:self.count];
-
-  for (id key in self) {
-    [result setObject:[[self objectForKey:key] copy] forKey:key];
-  }
-
-  return result;
 }
 
 @end
