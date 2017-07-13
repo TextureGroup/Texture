@@ -156,14 +156,11 @@
   }
 
   // Step 2: Filter out attributes in these pages that intersect the specified rect.
-  ASPageToLayoutAttributesTable *result = [ASPageTable pageTableForStrongObjectPointers];
+  ASPageToLayoutAttributesTable *result = nil;
   for (id pagePtr in pagesInRect) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSMutableArray *attrsInPage = [_unmeasuredPageToLayoutAttributesTable objectForPage:page];
-
     if (attrsInPage.count == 0) {
-      // Hm, this page should have been removed.
-      [_unmeasuredPageToLayoutAttributesTable removeObjectForPage:page];
       continue;
     }
 
@@ -189,6 +186,9 @@
         [_unmeasuredPageToLayoutAttributesTable removeObjectForPage:page];
       } else {
         [attrsInPage removeObjectsInArray:intersectingAttrsInPage];
+      }
+      if (result == nil) {
+        result = [ASPageTable pageTableForStrongObjectPointers];
       }
       [result setObject:intersectingAttrsInPage forPage:page];
     }

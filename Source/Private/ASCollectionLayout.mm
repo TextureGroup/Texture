@@ -259,10 +259,9 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   }
 
   // Step 3: Split all those attributes into blocking and non-blocking buckets
-  // Use an ordered set here because some items may span multiple pages and they will be accessed by indexes.
+  // Use ordered sets here because some items may span multiple pages, and the sets will be accessed by indexes later on.
   NSMutableOrderedSet<UICollectionViewLayoutAttributes *> *blockingAttrs = hasBlockingRect ? [NSMutableOrderedSet orderedSet] : nil;
-  // Use a set here because some items may span multiple pages
-  NSMutableSet<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableSet set];
+  NSMutableOrderedSet<UICollectionViewLayoutAttributes *> *nonBlockingAttrs = [NSMutableOrderedSet orderedSet];
   for (id pagePtr in attrsTable) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSArray<UICollectionViewLayoutAttributes *> *attrsInPage = [attrsTable objectForPage:page];
@@ -290,30 +289,28 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   // Step 4: Allocate and measure blocking elements' node
   ASElementMap *elements = context.elements;
   dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-  NSUInteger count = blockingAttrs.count;
-  if (count > 0) {
+  if (NSUInteger count = blockingAttrs.count) {
     ASDispatchApply(count, queue, 0, ^(size_t i) {
       UICollectionViewLayoutAttributes *attrs = blockingAttrs[i];
-      CGSize elementSize = attrs.frame.size;
-      ASCollectionElement *element = [elements elementForItemAtIndexPath:attrs.indexPath];
-      ASCellNode *node = element.node;
-      if (! CGSizeEqualToSize(elementSize, node.calculatedSize)) {
-        [node layoutThatFits:ASCollectionLayoutElementSizeRangeFromSize(elementSize)];
+      ASCellNode *node = [elements elementForItemAtIndexPath:attrs.indexPath].node;
+      CGSize expectedSize = attrs.frame.size;
+      if (! CGSizeEqualToSize(expectedSize, node.calculatedSize)) {
+        [node layoutThatFits:ASCollectionLayoutElementSizeRangeFromSize(expectedSize)];
       }
     });
   }
 
   // Step 5: Allocate and measure non-blocking ones
-  // TODO Limit the number of threads
-  for (UICollectionViewLayoutAttributes *attrs in nonBlockingAttrs) {
-    CGSize elementSize = attrs.frame.size;
-    __weak ASCollectionElement *weakElement = [elements elementForItemAtIndexPath:attrs.indexPath];
-    dispatch_async(queue, ^{
-      __strong ASCollectionElement *strongElement = weakElement;
-      if (strongElement) {
-        ASCellNode *node = strongElement.node;
-        if (! CGSizeEqualToSize(elementSize, node.calculatedSize)) {
-          [node layoutThatFits:ASCollectionLayoutElementSizeRangeFromSize(elementSize)];
+  if (NSUInteger count = nonBlockingAttrs.count) {
+    __weak ASElementMap *weakElements = elements;
+    ASDispatchAsync(count, queue, 0, ^(size_t i) {
+      __strong ASElementMap *strongElements = weakElements;
+      if (strongElements) {
+        UICollectionViewLayoutAttributes *attrs = nonBlockingAttrs[i];
+        ASCellNode *node = [elements elementForItemAtIndexPath:attrs.indexPath].node;
+        CGSize expectedSize = attrs.frame.size;
+        if (! CGSizeEqualToSize(expectedSize, node.calculatedSize)) {
+          [node layoutThatFits:ASCollectionLayoutElementSizeRangeFromSize(expectedSize)];
         }
       }
     });
