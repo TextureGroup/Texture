@@ -90,7 +90,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
                                                                    kASDefaultMeasureRangeTuningParameters,
                                                                    _layoutDelegate.scrollableDirections,
                                                                    kASStaticScrollDirection);
-  ASCollectionLayoutMeasureElementsInRects(measureRect, initialRect, layout);
+  [ASCollectionLayout _measureElementsInRect:measureRect blockingRect:initialRect layout:layout];
 
   return layout;
 }
@@ -142,7 +142,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 
   // Measure elements in the measure range, block on the requested rect
   CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(blockingRect, kASDefaultMeasureRangeTuningParameters, _layoutDelegate.scrollableDirections, kASStaticScrollDirection);
-  ASCollectionLayoutMeasureElementsInRects(measureRect, blockingRect, _layout);
+  [ASCollectionLayout _measureElementsInRect:measureRect blockingRect:blockingRect layout:_layout];
   
   NSArray<UICollectionViewLayoutAttributes *> *result = [_layout layoutAttributesForElementsInRect:blockingRect];
 
@@ -206,30 +206,10 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   }
 }
 
-# pragma mark - Convenient inline functions
-
-ASDISPLAYNODE_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
-{
-  // The layout delegate consulted us that this element must fit within this size,
-  // and the only way to achieve that without asking it again is to use an exact size range here.
-  return ASSizeRangeMake(size);
-}
-
-ASDISPLAYNODE_INLINE void ASCollectionLayoutSetSizeToElement(CGSize size, ASCollectionElement *element)
-{
-  if (ASCellNode *node = element.node) {
-    if (! CGSizeEqualToSize(size, node.frame.size)) {
-      CGRect frame = CGRectZero;
-      frame.size = size;
-      node.frame = frame;
-    }
-  }
-}
-
 /**
  * Measures all elements in the specified rect and blocks the calling thread while measuring those in the blocking rect.
  */
-ASDISPLAYNODE_INLINE void ASCollectionLayoutMeasureElementsInRects(CGRect rect, CGRect blockingRect, ASCollectionLayoutState *layout)
++ (void)_measureElementsInRect:(CGRect)rect blockingRect:(CGRect)blockingRect layout:(ASCollectionLayoutState *)layout
 {
   if (CGRectIsEmpty(rect) || layout == nil) {
     return;
@@ -322,6 +302,26 @@ ASDISPLAYNODE_INLINE void ASCollectionLayoutMeasureElementsInRects(CGRect rect, 
         }
       }
     });
+  }
+}
+
+# pragma mark - Convenient inline functions
+
+ASDISPLAYNODE_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
+{
+  // The layout delegate consulted us that this element must fit within this size,
+  // and the only way to achieve that without asking it again is to use an exact size range here.
+  return ASSizeRangeMake(size);
+}
+
+ASDISPLAYNODE_INLINE void ASCollectionLayoutSetSizeToElement(CGSize size, ASCollectionElement *element)
+{
+  if (ASCellNode *node = element.node) {
+    if (! CGSizeEqualToSize(size, node.frame.size)) {
+      CGRect frame = CGRectZero;
+      frame.size = size;
+      node.frame = frame;
+    }
   }
 }
 
