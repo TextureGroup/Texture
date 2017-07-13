@@ -153,7 +153,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * This method will be called on background theads. It must be thread-safe and should not change any internal state of the conforming object.
  * It must block the calling thread but can dispatch to other theads to reduce total blocking time.
  */
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
 
 @end
 

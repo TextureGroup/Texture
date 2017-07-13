@@ -26,9 +26,9 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 
-@implementation ASCollectionFlowLayoutDelegate
-
-@synthesize scrollableDirections = _scrollableDirections;
+@implementation ASCollectionFlowLayoutDelegate {
+  ASScrollDirection _scrollableDirections;
+}
 
 - (instancetype)init
 {
@@ -44,12 +44,17 @@
   return self;
 }
 
+- (ASScrollDirection)scrollableDirections
+{
+  return _scrollableDirections;
+}
+
 - (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
 {
   return nil;
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
   NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
@@ -68,7 +73,10 @@
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
   stackSpec.concurrent = YES;
-  ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, _scrollableDirections)];
+
+  ASSizeRange sizeRange = ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, context.scrollableDirections);
+  ASLayout *layout = [stackSpec layoutThatFits:sizeRange];
+
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout additionalInfo:nil getElementBlock:^ASCollectionElement * _Nonnull(ASLayout * _Nonnull sublayout) {
     return ((ASCellNode *)sublayout.layoutElement).collectionElement;
   }];

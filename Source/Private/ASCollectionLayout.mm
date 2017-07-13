@@ -74,13 +74,26 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   if (_layoutDelegateFlags.implementsAdditionalInfoForLayoutWithElements) {
     additionalInfo = [_layoutDelegate additionalInfoForLayoutWithElements:elements];
   }
-  return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize elements:elements additionalInfo:additionalInfo];
+  return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize
+                                            scrollableDirections:[_layoutDelegate scrollableDirections]
+                                                        elements:elements
+                                             layoutDelegateClass:[_layoutDelegate class]
+                                                     layoutCache:_layoutCache
+                                                  additionalInfo:additionalInfo];
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
-  ASCollectionLayoutState *layout = [_layoutDelegate calculateLayoutWithContext:context];
-  [_layoutCache setLayout:layout forContext:context];
+  if (context.elements == nil) {
+    return [[ASCollectionLayoutState alloc] initWithContext:context
+                                                contentSize:CGSizeZero
+                                             additionalInfo:nil
+                             elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
+  }
+
+  ASDisplayNodeAssertTrue([context.layoutDelegateClass conformsToProtocol:@protocol(ASCollectionLayoutDelegate)]);
+  ASCollectionLayoutState *layout = [context.layoutDelegateClass calculateLayoutWithContext:context];
+  [context.layoutCache setLayout:layout forContext:context];
 
   // Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
   CGSize viewportSize = context.viewportSize;
@@ -88,9 +101,9 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   CGRect initialRect = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
   CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(initialRect,
                                                                    kASDefaultMeasureRangeTuningParameters,
-                                                                   _layoutDelegate.scrollableDirections,
+                                                                   context.scrollableDirections,
                                                                    kASStaticScrollDirection);
-  [ASCollectionLayout _measureElementsInRect:measureRect blockingRect:initialRect layout:layout];
+  [self _measureElementsInRect:measureRect blockingRect:initialRect layout:layout];
 
   return layout;
 }
@@ -112,7 +125,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
     _layout = cachedLayout;
   } else {
     // A new layout is needed now. Calculate and apply it immediately
-    _layout = [self calculateLayoutWithContext:context];
+    _layout = [ASCollectionLayout calculateLayoutWithContext:context];
   }
 }
 
@@ -211,7 +224,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
  */
 + (void)_measureElementsInRect:(CGRect)rect blockingRect:(CGRect)blockingRect layout:(ASCollectionLayoutState *)layout
 {
-  if (CGRectIsEmpty(rect) || layout == nil) {
+  if (CGRectIsEmpty(rect) || layout.context.elements == nil) {
     return;
   }
   BOOL hasBlockingRect = !CGRectIsEmpty(blockingRect);

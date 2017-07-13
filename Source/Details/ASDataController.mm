@@ -54,7 +54,7 @@ const static char * kASDataControllerEditingQueueContext = "kASDataControllerEdi
 NSString * const ASDataControllerRowNodeKind = @"_ASDataControllerRowNodeKind";
 NSString * const ASCollectionInvalidUpdateException = @"ASCollectionInvalidUpdateException";
 
-typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes);
+typedef dispatch_block_t ASDataControllerCompletionBlock;
 
 @interface ASDataController () {
   id<ASDataControllerLayoutDelegate> _layoutDelegate;
@@ -151,12 +151,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
 #pragma mark - Cell Layout
 
-- (void)batchAllocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements andLayout:(BOOL)shouldLayout batchSize:(NSInteger)batchSize batchCompletion:(ASDataControllerCompletionBlock)batchCompletionHandler
+- (void)batchAllocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements batchSize:(NSInteger)batchSize batchCompletion:(ASDataControllerCompletionBlock)batchCompletionHandler
 {
   ASSERT_ON_EDITING_QUEUE;
 
   if (elements.count == 0 || _dataSource == nil) {
-    batchCompletionHandler(@[], @[]);
+    batchCompletionHandler();
     return;
   }
 
@@ -171,12 +171,11 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   for (NSUInteger i = 0; i < count; i += batchSize) {
     NSRange batchedRange = NSMakeRange(i, MIN(count - i, batchSize));
     NSArray<ASCollectionElement *> *batchedElements = [elements subarrayWithRange:batchedRange];
-    NSArray<ASCellNode *> *nodes;
     {
       as_activity_create_for_scope("Data controller  batch");
-      nodes = [self _allocateNodesFromElements:batchedElements andLayout:shouldLayout];
+      [self _allocateNodesFromElements:batchedElements];
     }
-    batchCompletionHandler(batchedElements, nodes);
+    batchCompletionHandler();
   }
 
   ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (_dataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
@@ -195,16 +194,14 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 }
 
 // TODO Is returned array still needed? Can it be removed?
-- (NSArray<ASCellNode *> *)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements andLayout:(BOOL)shouldLayout
+- (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements
 {
   ASSERT_ON_EDITING_QUEUE;
   
   NSUInteger nodeCount = elements.count;
   if (!nodeCount || _dataSource == nil) {
-    return @[];
+    return;
   }
-
-  __strong ASCellNode **allocatedNodeBuffer = (__strong ASCellNode **)calloc(nodeCount, sizeof(ASCellNode *));
 
   dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
   ASDispatchApply(nodeCount, queue, 0, ^(size_t i) {
@@ -218,29 +215,12 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       node = [[ASCellNode alloc] init]; // Fallback to avoid crash for production apps.
     }
     
-    if (shouldLayout) {
-      // Layout the node if the size range is valid.
-      ASSizeRange sizeRange = context.constrainedSize;
-      if (ASSizeRangeHasSignificantArea(sizeRange)) {
-        [self _layoutNode:node withConstrainedSize:sizeRange];
-      }
+    // Layout the node if the size range is valid.
+    ASSizeRange sizeRange = context.constrainedSize;
+    if (ASSizeRangeHasSignificantArea(sizeRange)) {
+      [self _layoutNode:node withConstrainedSize:sizeRange];
     }
-
-    allocatedNodeBuffer[i] = node;
   });
-
-  BOOL canceled = _dataSource == nil;
-
-  // Create nodes array
-  NSArray *nodes = canceled ? nil : [NSArray arrayWithObjects:allocatedNodeBuffer count:nodeCount];
-  
-  // Nil out buffer indexes to allow arc to free the stored cells.
-  for (int i = 0; i < nodeCount; i++) {
-    allocatedNodeBuffer[i] = nil;
-  }
-  free(allocatedNodeBuffer);
-
-  return nodes;
 }
 
 #pragma mark - Data Source Access (Calling _dataSource)
@@ -550,8 +530,8 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       @throw e;
     }
   }
-  
-  BOOL canDelegateLayout = (_layoutDelegate != nil);
+
+  BOOL canDelegate = (self.layoutDelegate != nil);
   ASElementMap *newMap;
   id layoutContext;
   {
@@ -569,7 +549,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       // Step 1.1: Update the mutable copies to match the data source's state
       [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
       ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
-      [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout) previousMap:previousMap];
+      [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegate) previousMap:previousMap];
 
       // Step 1.2: Clone the new data
       newMap = [mutableMap copy];
@@ -577,38 +557,19 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     self.pendingMap = newMap;
 
     // Step 2: Ask layout delegate for contexts
-    if (canDelegateLayout) {
-      layoutContext = [_layoutDelegate layoutContextWithElements:newMap];
+    if (canDelegate) {
+      layoutContext = [self.layoutDelegate layoutContextWithElements:newMap];
     }
   }
 
   as_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
-  
+
+  Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
   dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
-    // Step 3: Allocate and layout elements if can't delegate
-    NSArray<ASCollectionElement *> *elementsToProcess;
-    if (canDelegateLayout) {
-      // Allocate all nodes before handling them to the layout delegate.
-      // In the future, we may want to let the delegate drive allocation as well.
-      elementsToProcess = ASArrayByFlatMapping(newMap,
-                                               ASCollectionElement *element,
-                                               (element.nodeIfAllocated == nil ? element : nil));
-    } else {
-      elementsToProcess = ASArrayByFlatMapping(newMap,
-                                               ASCollectionElement *element,
-                                               (element.nodeIfAllocated.calculatedLayout == nil ? element : nil));
-    }
 
-    // TODO (ASCL) Don't even allocate nodes here
-    [self batchAllocateNodesFromElements:elementsToProcess andLayout:(! canDelegateLayout) batchSize:elementsToProcess.count batchCompletion:^(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes) {
-      ASSERT_ON_EDITING_QUEUE;
-
-      if (canDelegateLayout) {
-        [_layoutDelegate calculateLayoutWithContext:layoutContext];
-      }
-
+    dispatch_block_t completion = ^() {
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
         // TODO Merge the two delegate methods below
@@ -626,7 +587,18 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
           self.visibleMap = newMap;
         }];
       }];
-    }];
+    };
+
+    // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
+    if (canDelegate) {
+      [layoutDelegateClass calculateLayoutWithContext:layoutContext];
+      completion();
+    } else {
+      NSArray<ASCollectionElement *> *elementsToProcess = ASArrayByFlatMapping(newMap,
+                                                                               ASCollectionElement *element,
+                                                                               (element.nodeIfAllocated.calculatedLayout == nil ? element : nil));
+      [self batchAllocateNodesFromElements:elementsToProcess batchSize:elementsToProcess.count batchCompletion:completion];
+    }
   });
   
   if (_usesSynchronousDataLoading) {
@@ -838,7 +810,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
     // Can't update the trait collection right away because _visibleMap may not be up-to-date,
     // i.e there might be some elements that were allocated using the old trait collection but haven't been added to _visibleMap
-    
     [self _scheduleBlockOnMainSerialQueue:^{
       ASPrimitiveTraitCollection newTraitCollection = [self.node primitiveTraitCollection];
       for (ASCollectionElement *element in _visibleMap) {

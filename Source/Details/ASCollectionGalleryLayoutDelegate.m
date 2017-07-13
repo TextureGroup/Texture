@@ -27,11 +27,9 @@
 #pragma mark - ASCollectionGalleryLayoutDelegate
 
 @implementation ASCollectionGalleryLayoutDelegate {
+  ASScrollDirection _scrollableDirections;
   CGSize _itemSize;
-  ASSizeRange _itemSizeRange;
 }
-
-@synthesize scrollableDirections = _scrollableDirections;
 
 - (instancetype)initWithScrollableDirections:(ASScrollDirection)scrollableDirections itemSize:(CGSize)itemSize
 {
@@ -40,25 +38,34 @@
     ASDisplayNodeAssertFalse(CGSizeEqualToSize(CGSizeZero, itemSize));
     _scrollableDirections = scrollableDirections;
     _itemSize = itemSize;
-    _itemSizeRange = ASSizeRangeMake(_itemSize);
   }
   return self;
 }
 
-- (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
+- (ASScrollDirection)scrollableDirections
 {
-  return nil;
+  return _scrollableDirections;
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
+- (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
+{
+  return [NSValue valueWithCGSize:_itemSize];
+}
+
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
   CGSize pageSize = context.viewportSize;
+  CGSize itemSize = ((NSValue *)context.additionalInfo).CGSizeValue;
+  ASScrollDirection scrollableDirections = context.scrollableDirections;
   NSMutableArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
                                                                          ASCollectionElement *element,
-                                                                         [[_ASGalleryLayoutItem alloc] initWithItemSize:_itemSize collectionElement:element]);
+                                                                         [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
   if (children.count == 0) {
-    return [[ASCollectionLayoutState alloc] initWithContext:context contentSize:CGSizeZero additionalInfo:nil elementToLayoutAttributesTable:[NSMapTable weakToStrongObjectsMapTable]];
+    return [[ASCollectionLayoutState alloc] initWithContext:context
+                                                contentSize:CGSizeZero
+                                             additionalInfo:nil
+                             elementToLayoutAttributesTable:[NSMapTable weakToStrongObjectsMapTable]];
   }
   
   // Use a stack spec to calculate layout content size and frames of all elements without actually measuring each element
@@ -70,7 +77,7 @@
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
   stackSpec.concurrent = YES;
-  ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, _scrollableDirections)];
+  ASLayout *layout = [stackSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections)];
   
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout additionalInfo:nil getElementBlock:^ASCollectionElement *(ASLayout *sublayout) {
     return ((_ASGalleryLayoutItem *)sublayout.layoutElement).collectionElement;

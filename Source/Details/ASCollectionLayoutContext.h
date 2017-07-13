@@ -17,16 +17,17 @@
 
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASScrollDirection.h>
 
 @class ASElementMap;
 
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
-
 @interface ASCollectionLayoutContext : NSObject
 
 @property (nonatomic, assign, readonly) CGSize viewportSize;
+@property (nonatomic, assign, readonly) ASScrollDirection scrollableDirections;
 @property (nonatomic, weak, readonly) ASElementMap *elements;
 @property (nonatomic, strong, readonly, nullable) id additionalInfo;
 

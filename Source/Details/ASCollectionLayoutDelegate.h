@@ -25,7 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASCollectionLayoutDelegate <NSObject>
 
-@property (nonatomic, assign, readonly) ASScrollDirection scrollableDirections;
+/**
+ * @abstract Returns the scrollable directions of the coming layout (@see @c -calculateLayoutWithContext:).
+ * It will be available in the context parameter in +calculateLayoutWithContext:
+ *
+ * @return The scrollable directions.
+ */
+- (ASScrollDirection)scrollableDirections;
 
 /**
  * @abstract Returns any additional information needed for a coming layout pass (@see @c -calculateLayoutWithContext:) with the given elements.
@@ -33,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param elements The elements to be laid out later.
  *
  * @discussion The returned object must support equality and hashing (i.e `-isEqual:` and `-hash` must be properly implemented).
- * It should contain all the information needed for the layout pass to perform.
+ * It should contain all the information needed for the layout pass to perform. It will be available in the context parameter in +calculateLayoutWithContext:
  *
  * This method will be called on main thread.
  */
@@ -52,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This method can be called on background theads. It must be thread-safe and should not change any internal state of this delegate.
  * It must block the calling thread but can dispatch to other theads to reduce total blocking time.
  */
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
 
 @end
 
