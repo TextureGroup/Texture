@@ -453,21 +453,16 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   return @[];
 }
 
-- (ASSizeRange)constrainedSizeForElement:(ASCollectionElement *)element inElementMap:(ASElementMap *)map
-{
-  ASDisplayNodeAssertMainThread();
-  NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-  NSIndexPath *indexPath = [map indexPathForElement:element];
-  return [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
-}
-
-
+/**
+ * Returns constrained size for the node of the given kind and at the given index path.
+ * NOTE: index path must be in the data-source index space.
+ */
 - (ASSizeRange)constrainedSizeForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
   
   id<ASDataControllerSource> dataSource = _dataSource;
-  if (dataSource == nil) {
+  if (dataSource == nil || indexPath == nil) {
     return ASSizeRangeZero;
   }
   
@@ -777,15 +772,18 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   auto pendingMap = self.pendingMap;
   for (ASCellNode *node in nodes) {
     auto element = node.collectionElement;
+    NSIndexPath *indexPathInPendingMap = [pendingMap indexPathForElement:element];
     // Ensure the element is present in both maps or skip it. If it's not in the visible map,
     // then we can't check the presented size. If it's not in the pending map, we can't get the constrained size.
     // This will only happen if the element has been deleted, so the specifics of this behavior aren't important.
-    if ([visibleMap indexPathForElement:element] == nil || [pendingMap indexPathForElement:element] == nil) {
+    if (indexPathInPendingMap == nil || [visibleMap indexPathForElement:element] == nil) {
       continue;
     }
 
-    ASSizeRange constrainedSize = [self constrainedSizeForElement:element inElementMap:pendingMap];
+    NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
+    ASSizeRange constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
     [self _layoutNode:node withConstrainedSize:constrainedSize];
+
     BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:element matchesSize:node.frame.size];
     if (! matchesSize) {
       [nodesSizesChanged addObject:node];
@@ -812,15 +810,23 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 {
   ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in _visibleMap) {
-    ASSizeRange constrainedSize = [self constrainedSizeForElement:element inElementMap:_visibleMap];
-    if (ASSizeRangeHasSignificantArea(constrainedSize)) {
-      element.constrainedSize = constrainedSize;
+    // Ignore this element if it is no longer in the latest data. It is still recognized in the UIKit world but will be deleted soon.
+    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
+    if (indexPathInPendingMap == nil) {
+      continue;
+    }
+
+    NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
+    ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+
+    if (ASSizeRangeHasSignificantArea(newConstrainedSize)) {
+      element.constrainedSize = newConstrainedSize;
 
       // Node may not be allocated yet (e.g node virtualization or same size optimization)
       // Call context.nodeIfAllocated here to avoid immature node allocation and layout
       ASCellNode *node = element.nodeIfAllocated;
       if (node) {
-        [self _layoutNode:node withConstrainedSize:constrainedSize];
+        [self _layoutNode:node withConstrainedSize:newConstrainedSize];
       }
     }
   }
