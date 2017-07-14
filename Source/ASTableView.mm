@@ -1499,8 +1499,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return;
   }
 
-  // Note: Can't adjust content offset if this is a data reload
-  if (_automaticallyAdjustsContentOffset) {
+  BOOL shouldAdjustContentOffset = (_automaticallyAdjustsContentOffset && !changeSet.includesReloadData);
+  if (shouldAdjustContentOffset) {
     [self beginAdjustingContentOffset];
   }
   
@@ -1613,7 +1613,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [_rangeController updateIfNeeded];
     [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
   });
-  if (_automaticallyAdjustsContentOffset) {
+  if (shouldAdjustContentOffset) {
     [self endAdjustingContentOffsetAnimated:changeSet.animated];
   }
   [changeSet executeCompletionHandlerWithFinished:YES];
