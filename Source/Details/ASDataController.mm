@@ -121,18 +121,6 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   return self;
 }
 
-+ (NSUInteger)parallelProcessorCount
-{
-  static NSUInteger parallelProcessorCount;
-
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    parallelProcessorCount = [[NSProcessInfo processInfo] activeProcessorCount];
-  });
-
-  return parallelProcessorCount;
-}
-
 - (id<ASDataControllerLayoutDelegate>)layoutDelegate
 {
   ASDisplayNodeAssertMainThread();
@@ -164,8 +152,8 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 
   {
     as_activity_create_for_scope("Data controller batch");
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     ASDispatchApply(nodeCount, queue, 0, ^(size_t i) {
       __strong id<ASDataControllerSource> strongDataSource = weakDataSource;
       if (strongDataSource == nil) {
