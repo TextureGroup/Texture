@@ -78,7 +78,7 @@
   if (self) {
     _context = context;
     _contentSize = contentSize;
-    _elementToLayoutAttributesTable = [table copy]; // Copy the given table to make sure it won't be mutate by clients after this point.
+    _elementToLayoutAttributesTable = [table copy]; // Copy the given table to make sure clients can't mutate it after this point.
     CGSize pageSize = context.viewportSize;
     _pageToLayoutAttributesTable = [ASPageTable pageTableWithLayoutAttributes:table.objectEnumerator contentSize:contentSize pageSize:pageSize];
     _unmeasuredPageToLayoutAttributesTable = [ASCollectionLayoutState _unmeasuredLayoutAttributesTableFromTable:table contentSize:contentSize pageSize:pageSize];
