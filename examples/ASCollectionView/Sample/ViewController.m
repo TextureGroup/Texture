@@ -16,7 +16,7 @@
 //
 
 #import "ViewController.h"
-
+#import "AppDelegate.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import "SupplementaryNode.h"
 #import "ItemNode.h"
@@ -70,8 +70,8 @@
     {
       NSLog(@"ViewController is not nil");
       strongSelf->_data = [[NSArray alloc] init];
-      [strongSelf->_collectionView performBatchUpdates:^{
-        [strongSelf->_collectionView insertSections:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(0, 100)]];
+      [strongSelf->_collectionNode performBatchUpdates:^{
+        [strongSelf->_collectionNode insertSections:[[NSIndexSet alloc] initWithIndexesInRange:NSMakeRange(0, 100)]];
       } completion:nil];
       NSLog(@"ViewController finished updating collectionView");
     }
@@ -81,7 +81,7 @@
   };
   
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), mockWebService);
-  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     [self.navigationController popViewControllerAnimated:YES];
   });
 #endif
