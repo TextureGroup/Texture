@@ -622,21 +622,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return CGSizeZero;
   }
 
-  // Get the indexPath from the pendingMap, as we're about to query the delegate (and it will reference its current data source).
-  // Often this is a translation compared to the visibleMap where the element came from (UICollectionViewLayout requesting sizeForItem).
-  NSIndexPath *indexPath = [_dataController.pendingMap indexPathForElement:element];
-  NSString *supplementaryKind = element.supplementaryElementKind;
-  ASSizeRange sizeRange;
-  if (indexPath == nil) {
-    // In this case, the latest data no longer has the element, so we can't ask the delegate for its latest constrained size.
-    // The element is still visible, but will be deleted soon. We can reuse the last-known constrainedSize for the element.
-    sizeRange = element.constrainedSize;
-  } else if (supplementaryKind == nil) {
-    sizeRange = [self dataController:_dataController constrainedSizeForNodeAtIndexPath:indexPath];
+  ASCellNode *node = element.node;
+  BOOL useUIKitCell = node.shouldUseUIKitCell;
+  if (useUIKitCell) {
+    // In this case, we should use the exact value that was stashed earlier by calling sizeForItem:, referenceSizeFor*, etc.
+    // Although the node would use the preferredSize in layoutThatFits, we can skip this because there's no constrainedSize.
+    ASDisplayNodeAssert([node.superclass isSubclassOfClass:[ASCellNode class]] == NO,
+                        @"Placeholder cells for UIKit passthrough should be generic ASCellNodes: %@", node);
+    return node.style.preferredSize;
   } else {
-    sizeRange = [self dataController:_dataController constrainedSizeForSupplementaryNodeOfKind:supplementaryKind atIndexPath:indexPath];
+    return [node layoutThatFits:element.constrainedSize].size;
   }
-  return [element.node layoutThatFits:sizeRange].size;
 }
 
 - (CGSize)calculatedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
@@ -955,147 +951,92 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_dataController.visibleMap numberOfItemsInSection:section];
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView
-                  layout:(UICollectionViewLayout *)layout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+#define ASIndexPathForSection(section) [NSIndexPath indexPathForItem:0 inSection:section]
+#define ASFlowLayoutDefault(layout, property, default)                                        \
+({                                                                                            \
+  UICollectionViewFlowLayout *flowLayout = ASDynamicCast(layout, UICollectionViewFlowLayout); \
+  flowLayout ? flowLayout.property : default;                                                 \
+})
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
-  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
-  if (element == nil) {
-    ASDisplayNodeAssert(NO, @"Unexpected nil element for collectionView:layout:sizeForItemAtIndexPath: %@, %@, %@", self, collectionViewLayout, indexPath);
-    return CGSizeZero;
-  }
-
-  ASCellNode *cell = element.node;
-  if (cell.shouldUseUIKitCell) {
-    if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)]) {
-      CGSize size = [(id)_asyncDelegate collectionView:collectionView
-                                                layout:layout
-                                sizeForItemAtIndexPath:indexPath];
-      cell.style.preferredSize = size;
-      return size;
-    }
-  }
-
-  return [self sizeForElement:element];
+  ASCollectionElement *e = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  return e ? [self sizeForElement:e] : ASFlowLayoutDefault(layout, itemSize, CGSizeZero);
 }
 
-- (NSIndexPath *)pendingIndexPathForSection:(NSInteger)section
-{
-  // NOTE: For now, we don't translate length = 1 NSIndexPaths between spaces. Use the 0th item until then.
-  NSIndexPath *sectionIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:sectionIndexPath];
-  NSIndexPath *pendingIndexPath = element ? [_dataController.pendingMap indexPathForElement:element] : nil;
-  return pendingIndexPath;
-
-}
-
-#define ASFlowLayoutDefault(layout, property, default)                                          \
-  ({                                                                                            \
-    UICollectionViewFlowLayout *flowLayout = ASDynamicCast(layout, UICollectionViewFlowLayout); \
-    flowLayout ? flowLayout.property : default;                                                 \
-  })
-
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView
-                        layout:(UICollectionViewLayout *)layout insetForSectionAtIndex:(NSInteger)section
-{
-  if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:insetForSectionAtIndex:)]) {
-    NSIndexPath *appIndexPath = [self pendingIndexPathForSection:section];
-    // If the section no longer exists in the latest dataSource state, fall through to the defaults below.
-    if (appIndexPath) {
-      return [(id)_asyncDelegate collectionView:collectionView
-                                         layout:layout insetForSectionAtIndex:appIndexPath.section];
-    }
-  }
-  return ASFlowLayoutDefault(layout, sectionInset, UIEdgeInsetsZero);
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView
-                   layout:(UICollectionViewLayout *)layout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
-{
-  if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:minimumInteritemSpacingForSectionAtIndex:)]) {
-    NSIndexPath *appIndexPath = [self pendingIndexPathForSection:section];
-    // If the section no longer exists in the latest dataSource state, fall through to the defaults below.
-    if (appIndexPath) {
-      return [(id)_asyncDelegate collectionView:collectionView
-                                         layout:layout minimumInteritemSpacingForSectionAtIndex:appIndexPath.section];
-    }
-  }
-  return ASFlowLayoutDefault(layout, minimumInteritemSpacing, 10.0); // UIKit documents this default to be 10.0.
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView
-                   layout:(UICollectionViewLayout *)layout minimumLineSpacingForSectionAtIndex:(NSInteger)section
-{
-  if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:minimumLineSpacingForSectionAtIndex:)]) {
-    NSIndexPath *appIndexPath = [self pendingIndexPathForSection:section];
-    // If the section no longer exists in the latest dataSource state, fall through to the defaults below.
-    if (appIndexPath) {
-      return [(id)_asyncDelegate collectionView:collectionView
-                                         layout:layout minimumLineSpacingForSectionAtIndex:appIndexPath.section];
-    }
-  }
-  return ASFlowLayoutDefault(layout, minimumLineSpacing, 10.0); // UIKit documents this default to be 10.0.
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView
-                  layout:(UICollectionViewLayout *)layout referenceSizeForHeaderInSection:(NSInteger)section
+- (CGSize)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+referenceSizeForHeaderInSection:(NSInteger)section
 {
   ASDisplayNodeAssertMainThread();
-  NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionHeader
-                                                                            atIndexPath:indexPath];
-  if (element == nil) {
-    return ASFlowLayoutDefault(layout, headerReferenceSize, CGSizeZero); // UIKit documents this default to be CGSizeZero.
-  }
+  ASElementMap *map = _dataController.visibleMap;
+  ASCollectionElement *e = [map supplementaryElementOfKind:UICollectionElementKindSectionHeader
+                                               atIndexPath:ASIndexPathForSection(section)];
+  return e ? [self sizeForElement:e] : ASFlowLayoutDefault(l, headerReferenceSize, CGSizeZero);
+}
 
-  if (element.node.shouldUseUIKitCell && _asyncDelegateFlags.interop) {
-    if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:referenceSizeForHeaderInSection:)]) {
-      NSIndexPath *appIndexPath = [self pendingIndexPathForSection:section];
-      // If the section no longer exists in the latest dataSource state, fall through to the defaults below.
-      if (appIndexPath) {
-        return [(id)_asyncDelegate collectionView:collectionView layout:layout referenceSizeForHeaderInSection:appIndexPath.section];
-      }
-    }
-    return ASFlowLayoutDefault(layout, headerReferenceSize, CGSizeZero); // UIKit documents this default to be CGSizeZero.
+- (CGSize)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+referenceSizeForFooterInSection:(NSInteger)section
+{
+  ASDisplayNodeAssertMainThread();
+  ASElementMap *map = _dataController.visibleMap;
+  ASCollectionElement *e = [map supplementaryElementOfKind:UICollectionElementKindSectionFooter
+                                               atIndexPath:ASIndexPathForSection(section)];
+  return e ? [self sizeForElement:e] : ASFlowLayoutDefault(l, footerReferenceSize, CGSizeZero);
+}
+
+// For the methods that call delegateIndexPathForSection:withSelector:, translate the section from
+// visibleMap to pendingMap. If the section no longer exists, or the delegate doesn't implement
+// the selector, we will return a nil indexPath (and then use the ASFlowLayoutDefault).
+- (NSIndexPath *)delegateIndexPathForSection:(NSInteger)section withSelector:(SEL)selector
+{
+  if ([_asyncDelegate respondsToSelector:selector]) {
+    return [_dataController.pendingMap convertIndexPath:ASIndexPathForSection(section)
+                                                fromMap:_dataController.visibleMap];
   } else {
-    // In this case, we have an ASCellNode-based Supplementary Node as a header. Ask it what size it wants to be.
-    return [self sizeForElement:element];
+    return nil;
   }
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView
-                  layout:(UICollectionViewLayout *)layout referenceSizeForFooterInSection:(NSInteger)section
+- (UIEdgeInsets)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+        insetForSectionAtIndex:(NSInteger)section
 {
-  ASDisplayNodeAssertMainThread();
-  NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-  ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:UICollectionElementKindSectionFooter
-                                                                            atIndexPath:indexPath];
-  if (element == nil) {
-    return ASFlowLayoutDefault(layout, footerReferenceSize, CGSizeZero); // UIKit documents this default to be CGSizeZero.
+  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
+  if (indexPath) {
+    return [(id)_asyncDelegate collectionView:cv layout:l insetForSectionAtIndex:indexPath.section];
   }
-
-  if (element.node.shouldUseUIKitCell && _asyncDelegateFlags.interop) {
-    if ([_asyncDelegate respondsToSelector:@selector(collectionView:layout:referenceSizeForFooterInSection:)]) {
-      NSIndexPath *appIndexPath = [self pendingIndexPathForSection:section];
-      // If the section no longer exists in the latest dataSource state, fall through to the defaults below.
-      if (appIndexPath) {
-        return [(id)_asyncDelegate collectionView:collectionView layout:layout referenceSizeForFooterInSection:appIndexPath.section];
-      }
-    }
-    return ASFlowLayoutDefault(layout, footerReferenceSize, CGSizeZero); // UIKit documents this default to be CGSizeZero.
-  } else {
-    // In this case, we have an ASCellNode-based Supplementary Node as a footer. Ask it what size it wants to be.
-    return [self sizeForElement:element];
-  }
+  return ASFlowLayoutDefault(l, sectionInset, UIEdgeInsetsZero);
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
-           viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
+{
+  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
+  if (indexPath) {
+    return [(id)_asyncDelegate collectionView:cv layout:l
+     minimumInteritemSpacingForSectionAtIndex:indexPath.section];
+  }
+  return ASFlowLayoutDefault(l, minimumInteritemSpacing, 10.0); // Default is documented as 10.0
+}
+
+- (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+minimumLineSpacingForSectionAtIndex:(NSInteger)section
+{
+  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
+  if (indexPath) {
+    return [(id)_asyncDelegate collectionView:cv layout:l
+          minimumLineSpacingForSectionAtIndex:indexPath.section];
+  }
+  return ASFlowLayoutDefault(l, minimumLineSpacing, 10.0);      // Default is documented as 10.0
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   if ([_registeredSupplementaryKinds containsObject:kind] == NO) {
     [self registerSupplementaryNodeOfKind:kind];
   }
-  
+
   UICollectionReusableView *view = nil;
   ASCollectionElement *element = [_dataController.visibleMap supplementaryElementOfKind:kind atIndexPath:indexPath];
   ASCellNode *node = element.node;
@@ -1760,11 +1701,19 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   if (block == nil) {
     if (_asyncDataSourceFlags.interop) {
+      UICollectionViewLayout *layout = self.collectionViewLayout;
+      CGSize preferredSize = CGSizeZero;
+      SEL sizeForItem = @selector(collectionView:layout:sizeForItemAtIndexPath:);
+      if ([_asyncDelegate respondsToSelector:sizeForItem]) {
+        preferredSize = [(id)_asyncDelegate collectionView:self layout:layout sizeForItemAtIndexPath:indexPath];
+      } else {
+        preferredSize = ASFlowLayoutDefault(layout, itemSize, CGSizeZero);
+      }
       block = ^{
-        ASCellNode *cell = [[ASCellNode alloc] init];
-        cell.shouldUseUIKitCell = YES;
-        cell.style.preferredSize = CGSizeZero;
-        return cell;
+        ASCellNode *node = [[ASCellNode alloc] init];
+        node.shouldUseUIKitCell = YES;
+        node.style.preferredSize = preferredSize;
+        return node;
       };
     } else {
       ASDisplayNodeFailAssert(@"ASCollection could not get a node block for item at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
@@ -1855,9 +1804,31 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       nodeBlock = ^{ return node; };
     } else {
       BOOL useUIKitCell = _asyncDataSourceFlags.interop;
+      CGSize preferredSize = CGSizeZero;
+      if (useUIKitCell) {
+        UICollectionViewLayout *layout = self.collectionViewLayout;
+        if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
+          SEL sizeForHeader = @selector(collectionView:layout:referenceSizeForHeaderInSection:);
+          if ([_asyncDelegate respondsToSelector:sizeForHeader]) {
+            preferredSize = [(id)_asyncDelegate collectionView:self layout:layout
+                               referenceSizeForHeaderInSection:indexPath.section];
+          } else {
+            preferredSize = ASFlowLayoutDefault(layout, headerReferenceSize, CGSizeZero);
+          }
+        } else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+          SEL sizeForFooter = @selector(collectionView:layout:referenceSizeForFooterInSection:);
+          if ([_asyncDelegate respondsToSelector:sizeForFooter]) {
+            preferredSize = [(id)_asyncDelegate collectionView:self layout:layout
+                               referenceSizeForFooterInSection:indexPath.section];
+          } else {
+            preferredSize = ASFlowLayoutDefault(layout, footerReferenceSize, CGSizeZero);
+          }
+        }
+      }
       nodeBlock = ^{
         ASCellNode *node = [[ASCellNode alloc] init];
         node.shouldUseUIKitCell = useUIKitCell;
+        node.style.preferredSize = preferredSize;
         return node;
       };
     }

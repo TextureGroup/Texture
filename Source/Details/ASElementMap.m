@@ -113,7 +113,7 @@
 
 - (nullable NSIndexPath *)indexPathForElement:(ASCollectionElement *)element
 {
-  return [_elementToIndexPathMap objectForKey:element];
+  return element ? [_elementToIndexPathMap objectForKey:element] : nil;
 }
 
 - (nullable NSIndexPath *)indexPathForElementIfCell:(ASCollectionElement *)element
