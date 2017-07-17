@@ -17,10 +17,11 @@
 
 #import <AsyncDisplayKit/ASCollectionFlowLayoutDelegate.h>
 
-#import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
+#import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -43,18 +44,9 @@
   return self;
 }
 
-- (ASSizeRange)sizeRangeThatFits:(CGSize)viewportSize
+- (ASScrollDirection)scrollableDirections
 {
-  ASSizeRange sizeRange = ASSizeRangeUnconstrained;
-  if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.height = viewportSize.height;
-    sizeRange.max.height = viewportSize.height;
-  }
-  if (ASScrollDirectionContainsHorizontalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.width = viewportSize.width;
-    sizeRange.max.width = viewportSize.width;
-  }
-  return sizeRange;
+  return _scrollableDirections;
 }
 
 - (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
@@ -62,7 +54,7 @@
   return nil;
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
   NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
@@ -80,8 +72,13 @@
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
   stackSpec.concurrent = YES;
-  ASLayout *layout = [stackSpec layoutThatFits:[self sizeRangeThatFits:context.viewportSize]];
-  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout];
+
+  ASSizeRange sizeRange = ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, context.scrollableDirections);
+  ASLayout *layout = [stackSpec layoutThatFits:sizeRange];
+
+  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nonnull(ASLayout * _Nonnull sublayout) {
+    return ((ASCellNode *)sublayout.layoutElement).collectionElement;
+  }];
 }
 
 @end
