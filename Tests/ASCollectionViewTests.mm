@@ -1,5 +1,5 @@
 //
-//  ASCollectionViewTests.m
+//  ASCollectionViewTests.mm
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -259,7 +259,8 @@
   [window setRootViewController:testController];
   [window makeKeyAndVisible];
   
-  [testController.collectionView reloadDataImmediately];
+  [testController.collectionNode reloadData];
+  [testController.collectionNode waitUntilAllUpdatesAreCommitted];
   [testController.collectionView layoutIfNeeded];
   
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
@@ -390,12 +391,13 @@
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];\
   __unused ASCollectionViewTestDelegate *del = testController.asyncDelegate;\
   __unused ASCollectionView *cv = testController.collectionView;\
-  __unused ASCollectionNode *cn = testController.collectionNode;\
+  ASCollectionNode *cn = testController.collectionNode;\
   UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];\
   [window makeKeyAndVisible]; \
   window.rootViewController = testController;\
   \
-  [testController.collectionView reloadDataImmediately];\
+  [cn reloadData];\
+  [cn waitUntilAllUpdatesAreCommitted]; \
   [testController.collectionView layoutIfNeeded];
 
 - (void)testThatSubmittingAValidInsertDoesNotThrowAnException
@@ -620,7 +622,7 @@
   for (NSInteger i = 0; i < 2; i++) {
     // NOTE: waitUntilAllUpdatesAreCommitted or reloadDataImmediately is not sufficient here!!
     XCTestExpectation *done = [self expectationWithDescription:[NSString stringWithFormat:@"Reload #%td complete", i]];
-    [cv reloadDataWithCompletion:^{
+    [cn reloadDataWithCompletion:^{
       [done fulfill];
     }];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -752,7 +754,8 @@
   updateValidationTestPrologue
   
   del.sectionGeneration++;
-  [cv reloadDataImmediately];
+  [cn reloadData];
+  [cn waitUntilAllUpdatesAreCommitted];
   
   NSInteger sectionCount = del->_itemCounts.size();
   for (NSInteger section = 0; section < sectionCount; section++) {

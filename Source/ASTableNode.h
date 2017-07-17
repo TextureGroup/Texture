@@ -182,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)performBatchAnimated:(BOOL)animated updates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
- *  Perform a batch of updates asynchronously, optionally disabling all animations in the batch. This method must be called from the main thread.
+ *  Perform a batch of updates asynchronously with animations in the batch. This method must be called from the main thread.
  *  The data source must be updated to reflect the changes before the update block completes.
  *
  *  @param updates    The block that performs the relevant insert, delete, reload, or move operations.

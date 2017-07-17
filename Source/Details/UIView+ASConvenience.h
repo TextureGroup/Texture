@@ -29,9 +29,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGPoint position;
 @property (nonatomic, assign) CGFloat zPosition;
 @property (nonatomic, assign) CGPoint anchorPoint;
-@property (nullable, nonatomic, strong) id contents;
 @property (nonatomic, assign) CGFloat cornerRadius;
+@property (nullable, nonatomic, strong) id contents;
+@property (nonatomic, copy)   NSString *contentsGravity;
+@property (nonatomic, assign) CGRect contentsRect;
+@property (nonatomic, assign) CGRect contentsCenter;
 @property (nonatomic, assign) CGFloat contentsScale;
+@property (nonatomic, assign) CGFloat rasterizationScale;
 @property (nonatomic, assign) CATransform3D transform;
 @property (nonatomic, assign) CATransform3D sublayerTransform;
 @property (nonatomic, assign) BOOL needsDisplayOnBoundsChange;

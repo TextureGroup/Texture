@@ -316,7 +316,7 @@
   [_photoLocationLabel.style yogaNodeCreateIfNeeded];
   [_photoTimeIntervalSincePostLabel.style yogaNodeCreateIfNeeded];
 
-  ASDisplayNode *headerStack = [ASDisplayNode horizontalYogaStack];
+  ASDisplayNode *headerStack = [ASDisplayNode yogaHorizontalStack];
   headerStack.style.margin = ASEdgeInsetsMake(InsetForHeader);
   headerStack.style.alignItems = ASStackLayoutAlignItemsCenter;
   headerStack.style.flexGrow = 1.0;
@@ -327,7 +327,7 @@
   [headerStack addYogaChild:_userAvatarImageNode];
 
   // User Name and Photo Location stack is next
-  ASDisplayNode *userPhotoLocationStack = [ASDisplayNode verticalYogaStack];
+  ASDisplayNode *userPhotoLocationStack = [ASDisplayNode yogaVerticalStack];
   userPhotoLocationStack.style.flexShrink = 1.0;
   [headerStack addYogaChild:userPhotoLocationStack];
 
@@ -340,20 +340,15 @@
     [userPhotoLocationStack addYogaChild:_photoLocationLabel];
   }
 
-/* TODO: These parameters aren't working as expected. For now the timestamp is next to the username.
   // Add a spacer to allow a flexible space between the User Name / Location stack, and the Timestamp.
-  ASDisplayNode *spacer = [ASDisplayNode new];
-  spacer.style.flexShrink = 1.0;
-  spacer.style.width = ASDimensionMakeWithFraction(1.0);
-  [headerStack addYogaChild:spacer];
-*/
+  [headerStack addYogaChild:[ASDisplayNode yogaSpacerNode]];
 
   // Photo Timestamp Label.
   _photoTimeIntervalSincePostLabel.style.spacingBefore = HORIZONTAL_BUFFER;
   [headerStack addYogaChild:_photoTimeIntervalSincePostLabel];
 
   // Create the last stack before assembling everything: the Footer Stack contains the description and comments.
-  ASDisplayNode *footerStack = [ASDisplayNode verticalYogaStack];
+  ASDisplayNode *footerStack = [ASDisplayNode yogaVerticalStack];
   footerStack.style.margin = ASEdgeInsetsMake(InsetForFooter);
   footerStack.style.padding = ASEdgeInsetsMake(UIEdgeInsetsMake(0.0, 0.0, VERTICAL_BUFFER, 0.0));
   footerStack.yogaChildren = @[_photoLikesLabel, _photoDescriptionLabel, _photoCommentsNode];

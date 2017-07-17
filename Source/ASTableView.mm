@@ -1486,10 +1486,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
 }
 
-- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   if (!self.asyncDataSource || _updatingInResponseToInteractiveMove) {
+    updates();
     [changeSet executeCompletionHandlerWithFinished:NO];
     return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
   }
@@ -1500,6 +1501,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       if (self.test_enableSuperUpdateCallLogging) {
         NSLog(@"-[super reloadData]");
       }
+      updates();
       [super reloadData];
       // Flush any range changes that happened as part of submitting the reload.
       [_rangeController updateIfNeeded];
@@ -1513,6 +1515,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   LOG(@"--- UITableView beginUpdates");
   [super beginUpdates];
+
+  updates();
   
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
     NSArray<NSIndexPath *> *indexPaths = change.indexPaths;

@@ -20,8 +20,9 @@
 #import "ASListKitTestAdapterDataSource.h"
 #import "ASXCTExtensions.h"
 #import <JGMethodSwizzler/JGMethodSwizzler.h>
+#import "ASTestCase.h"
 
-@interface ASListKitTests : XCTestCase
+@interface ASListKitTests : ASTestCase
 
 @property (nonatomic, strong) ASCollectionNode *collectionNode;
 @property (nonatomic, strong) UICollectionView *collectionView;

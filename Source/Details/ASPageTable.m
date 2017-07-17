@@ -110,9 +110,9 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
   return [self pageTableWithValuePointerFunctions:weakObjectPointerFuncs];
 }
 
-+ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
++ (ASPageToLayoutAttributesTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize
 {
-  ASPageTable *result = [ASPageTable pageTableForStrongObjectPointers];
+  ASPageToLayoutAttributesTable *result = [ASPageTable pageTableForStrongObjectPointers];
   for (UICollectionViewLayoutAttributes *attrs in layoutAttributesEnumerator) {
     // This attrs may span multiple pages. Make sure it's registered to all of them
     NSPointerArray *pages = ASPageCoordinatesForPagesThatIntersectRect(attrs.frame, contentSize, pageSize);

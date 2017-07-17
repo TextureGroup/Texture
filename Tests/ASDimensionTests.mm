@@ -29,7 +29,7 @@
 {
   XCTAssertNoThrow(ASDimensionMake(ASDimensionUnitAuto, 0));
   XCTAssertThrows(ASDimensionMake(ASDimensionUnitAuto, 100));
-  XCTAssertThrows(ASDimensionMake(@""));
+  ASXCTAssertEqualDimensions(ASDimensionAuto, ASDimensionMake(@""));
   ASXCTAssertEqualDimensions(ASDimensionAuto, ASDimensionMake(@"auto"));
 }
 

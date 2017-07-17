@@ -12,6 +12,12 @@
 
 #import <XCTest/XCTest.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ASTestCase : XCTestCase
 
+@property (class, nonatomic, nullable, readonly) ASTestCase *currentTestCase;
+
 @end
+
+NS_ASSUME_NONNULL_END

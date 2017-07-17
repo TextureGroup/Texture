@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -273,6 +274,20 @@
     };
   }
 
+  /**
+   If we're profiling, wrap the display block with signpost start and end.
+   Color the interval red if cancelled, green otherwise.
+   */
+#if AS_KDEBUG_ENABLE
+  __unsafe_unretained id ptrSelf = self;
+  displayBlock = ^{
+    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
+    id result = displayBlock();
+    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    return result;
+  };
+#endif
+
   return displayBlock;
 }
 //
@@ -435,7 +450,7 @@
       UIImage *image = (UIImage *)value;
       BOOL stretchable = (NO == UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero));
       if (stretchable) {
-        ASDisplayNodeSetupLayerContentsWithResizableImage(layer, image);
+        ASDisplayNodeSetResizableContents(layer, image);
       } else {
         layer.contentsScale = self.contentsScale;
         layer.contents = (id)image.CGImage;

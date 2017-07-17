@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 AS_SUBCLASSING_RESTRICTED
+
+/// An immutable state of the collection layout
 @interface ASCollectionLayoutState : NSObject
 
 /// The context used to calculate this object
@@ -47,20 +49,25 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param contentSize The content size of the collection's layout
  *
- * @param table A map between elements to their layout attributes. It may contain all elements, or a subset of them that will be updated later.
- * It should be initialized using +[NSMapTable elementToLayoutAttributesTable] convenience initializer.
+ * @param table A map between elements to their layout attributes. It must contain all elements.
+ * It should have NSMapTableObjectPointerPersonality and NSMapTableWeakMemory as key options.
  */
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context contentSize:(CGSize)contentSize elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                    contentSize:(CGSize)contentSize
+ elementToLayoutAttributesTable:(NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)table NS_DESIGNATED_INITIALIZER;
 
 /**
  * Convenience initializer.
  *
  * @param context The context used to calculate this object
  *
- * @param layout The layout describes size and position of all elements, or a subset of them and will be updated over time.
+ * @param layout The layout describes size and position of all elements.
  *
+ * @param getElementBlock A block that can retrieve the collection element from a direct sublayout of the root layout.
  */
-- (instancetype)initWithContext:(ASCollectionLayoutContext *)context layout:(ASLayout *)layout;
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+                         layout:(ASLayout *)layout
+                getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock;
 
 /**
  * Returns all layout attributes present in this object.
@@ -88,7 +95,8 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param indexPath The index path of the element.
  */
-- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+- (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryElementOfKind:(NSString *)kind
+                                                                                 atIndexPath:(NSIndexPath *)indexPath;
 
 /**
  * Returns layout attributes of the specified element.

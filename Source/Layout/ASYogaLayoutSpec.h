@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 
 #if YOGA /* YOGA */
-#if !YOGA_TREE_CONTIGUOUS /* !YOGA_TREE_CONTIGUOUS */
 
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
@@ -22,5 +21,4 @@
 @property (nonatomic, strong, nonnull) ASDisplayNode *rootNode;
 @end
 
-#endif /* !YOGA_TREE_CONTIGUOUS */
 #endif /* YOGA */

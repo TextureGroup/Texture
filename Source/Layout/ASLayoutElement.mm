@@ -50,8 +50,6 @@ CGSize const ASLayoutElementParentSizeUndefined = {ASLayoutElementParentDimensio
 int32_t const ASLayoutElementContextInvalidTransitionID = 0;
 int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContextInvalidTransitionID + 1;
 
-pthread_key_t ASLayoutElementContextKey;
-
 static void ASLayoutElementDestructor(void *p) {
   if (p != NULL) {
     ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
@@ -59,36 +57,31 @@ static void ASLayoutElementDestructor(void *p) {
   }
 };
 
-// pthread_key_create must be called before the key can be used. This function does that.
-void ASLayoutElementContextEnsureKey()
+pthread_key_t ASLayoutElementContextKey()
 {
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pthread_key_create(&ASLayoutElementContextKey, ASLayoutElementDestructor);
-  });
+  return ASPthreadStaticKey(ASLayoutElementDestructor);
 }
 
 void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
-  ASLayoutElementContextEnsureKey();
   // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
   ASDisplayNodeCAssertNil(ASLayoutElementGetCurrentContext(), @"Nested ASLayoutElementContexts aren't supported.");
-  pthread_setspecific(ASLayoutElementContextKey, CFBridgingRetain(context));
+  pthread_setspecific(ASLayoutElementContextKey(), CFBridgingRetain(context));
 }
 
 ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 {
-  ASLayoutElementContextEnsureKey();
   // Don't retain here. Caller will retain if it wants to!
-  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey);
+  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey());
 }
 
 void ASLayoutElementPopContext()
 {
-  ASLayoutElementContextEnsureKey();
+  ASLayoutElementContextKey();
   ASDisplayNodeCAssertNotNil(ASLayoutElementGetCurrentContext(), @"Attempt to pop context when there wasn't a context!");
-  CFBridgingRelease(pthread_getspecific(ASLayoutElementContextKey));
-  pthread_setspecific(ASLayoutElementContextKey, NULL);
+  auto key = ASLayoutElementContextKey();
+  CFBridgingRelease(pthread_getspecific(key));
+  pthread_setspecific(key, NULL);
 }
 
 #pragma mark - ASLayoutElementStyle

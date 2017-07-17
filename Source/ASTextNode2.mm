@@ -11,6 +11,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextNode2.h>
+#import <AsyncDisplayKit/ASTextNode.h>  // Definition of ASTextNodeDelegate
 
 #import <tgmath.h>
 #import <deque>
@@ -488,7 +489,52 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
    inAdditionalTruncationMessage:(out BOOL *)inAdditionalTruncationMessageOut
                  forHighlighting:(BOOL)highlighting
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  ASDN::MutexLocker l(__instanceLock__);
+
+  // TODO: The copy and application of size shouldn't be required, but it is currently.
+  // See discussion in https://github.com/TextureGroup/Texture/pull/396
+  ASTextContainer *containerCopy = [_textContainer copy];
+  containerCopy.size = self.calculatedSize;
+  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
+  NSRange visibleRange = layout.visibleRange;
+  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
+
+  ASTextRange *range = [layout closestTextRangeAtPoint:point];
+
+  // For now, assume that a tap inside this text, but outside the text range is a tap on the
+  // truncation token.
+  if (![layout textRangeAtPoint:point]) {
+    *inAdditionalTruncationMessageOut = YES;
+    return nil;
+  }
+
+  NSRange effectiveRange = NSMakeRange(0, 0);
+  for (__strong NSString *attributeName in self.linkAttributeNames) {
+    id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
+    if (value == nil) {
+      // Didn't find any links specified with this attribute.
+      continue;
+    }
+
+    // If highlighting, check with delegate first. If not implemented, assume YES.
+    if (highlighting
+        && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName value:value atPoint:point]) {
+      value = nil;
+      attributeName = nil;
+    }
+
+    if (value != nil || attributeName != nil) {
+      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+
+      if (attributeNameOut != NULL) {
+        *attributeNameOut = attributeName;
+      }
+
+      return value;
+    }
+  }
+
   return nil;
 }
 
@@ -560,8 +606,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
+  // Set these so that link tapping works.
+  _highlightedLinkAttributeName = highlightedAttributeName;
+  _highlightedLinkAttributeValue = highlightedAttributeValue;
+
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
   // Much of the code from original ASTextNode is probably usable here.
+
   return;
 }
 
@@ -665,7 +716,39 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASDisplayNodeAssertMainThread();
 
   [super touchesBegan:touches withEvent:event];
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+
+  CGPoint point = [[touches anyObject] locationInView:self.view];
+
+  NSRange range = NSMakeRange(0, 0);
+  NSString *linkAttributeName = nil;
+  BOOL inAdditionalTruncationMessage = NO;
+
+  id linkAttributeValue = [self _linkAttributeValueAtPoint:point
+                                             attributeName:&linkAttributeName
+                                                     range:&range
+                             inAdditionalTruncationMessage:&inAdditionalTruncationMessage
+                                           forHighlighting:YES];
+
+  NSUInteger lastCharIndex = NSIntegerMax;
+  BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
+
+  if (inAdditionalTruncationMessage) {
+    NSRange visibleRange = NSMakeRange(0, 0);
+    {
+      ASDN::MutexLocker l(__instanceLock__);
+      // TODO: The copy and application of size shouldn't be required, but it is currently.
+      // See discussion in https://github.com/TextureGroup/Texture/pull/396
+      ASTextContainer *containerCopy = [_textContainer copy];
+      containerCopy.size = self.calculatedSize;
+      ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:containerCopy text:_attributedText];
+      visibleRange = layout.visibleRange;
+    }
+    NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
+    [self _setHighlightRange:truncationMessageRange forAttributeName:ASTextNodeTruncationTokenAttributeName value:nil animated:YES];
+  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+    [self _setHighlightRange:range forAttributeName:linkAttributeName value:linkAttributeValue animated:YES];
+  }
+
   return;
 }
 

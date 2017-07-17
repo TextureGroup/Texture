@@ -114,13 +114,6 @@
   _viewControllerNode.frame = self.bounds;
 }
 
-- (void)layoutDidFinish
-{
-  [super layoutDidFinish];
-
-  _viewControllerNode.frame = self.bounds;
-}
-
 - (void)_rootNodeDidInvalidateSize
 {
   if (_interactionDelegate != nil) {
@@ -322,13 +315,13 @@
     if (ip != nil) {
       [result addObject:@{ @"indexPath" : ip }];
     }
-    [result addObject:@{ @"collectionNode" : ASObjectDescriptionMakeTiny(owningNode) }];
+    [result addObject:@{ @"collectionNode" : owningNode }];
   } else if ([owningNode isKindOfClass:[ASTableNode class]]) {
     NSIndexPath *ip = [(ASTableNode *)owningNode indexPathForNode:self];
     if (ip != nil) {
       [result addObject:@{ @"indexPath" : ip }];
     }
-    [result addObject:@{ @"tableNode" : ASObjectDescriptionMakeTiny(owningNode) }];
+    [result addObject:@{ @"tableNode" : owningNode }];
   
   } else if ([scrollView isKindOfClass:[ASCollectionView class]]) {
     NSIndexPath *ip = [(ASCollectionView *)scrollView indexPathForNode:self];

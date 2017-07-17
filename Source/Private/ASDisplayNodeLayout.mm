@@ -17,23 +17,10 @@
 
 #import <AsyncDisplayKit/ASDisplayNodeLayout.h>
 
-BOOL ASDisplayNodeLayout::isDirty()
+BOOL ASDisplayNodeLayout::isValid(ASSizeRange theConstrainedSize, CGSize theParentSize, NSUInteger versionArg)
 {
-  return _dirty || layout == nil;
-}
-
-BOOL ASDisplayNodeLayout::isValidForConstrainedSizeParentSize(ASSizeRange theConstrainedSize, CGSize theParentSize)
-{
-  // Only generate a new layout if:
-  // - The current layout is dirty
-  // - The passed constrained size is different than the original layout's parent or constrained  size
-  return (layout != nil
-          && _dirty == NO
-          && CGSizeEqualToSize(parentSize, theParentSize)
-          && ASSizeRangeEqualToSizeRange(constrainedSize, theConstrainedSize));
-}
-
-void ASDisplayNodeLayout::invalidate()
-{
-  _dirty = YES;
+  return version >= versionArg
+      && layout != nil
+      && CGSizeEqualToSize(parentSize, theParentSize)
+      && ASSizeRangeEqualToSizeRange(constrainedSize, theConstrainedSize);
 }

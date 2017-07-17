@@ -1880,10 +1880,8 @@ static bool stringContainsPointer(NSString *description, id p) {
   node.debugName = @"big troll eater name";
 
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
   [node layer];
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
 }
 
 - (void)testNameInDescriptionLayer
@@ -2266,12 +2264,10 @@ static bool stringContainsPointer(NSString *description, id p) {
   UIViewController *vc = [[UIViewController alloc] init];
   [vc.view addSubnode:node];
   dispatch_group_t g = dispatch_group_create();
-  dispatch_group_enter(g);
   __block NSString *debugDescription;
-  [NSThread detachNewThreadWithBlock:^{
+  dispatch_group_async(g, dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
     debugDescription = [node debugDescription];
-    dispatch_group_leave(g);
-  }];
+  });
   dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
   // Ensure the debug description contains the VC string.
   // Have to split into two lines because XCTAssert macro can't handle the stringWithFormat:.

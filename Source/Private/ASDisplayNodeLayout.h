@@ -30,35 +30,26 @@ struct ASDisplayNodeLayout {
   ASSizeRange constrainedSize;
   CGSize parentSize;
   BOOL requestedLayoutFromAbove;
-  BOOL _dirty;
+  NSUInteger version;
   
   /*
    * Create a new display node layout with
    * @param layout The layout to associate, usually returned from a call to -layoutThatFits:parentSize:
    * @param constrainedSize Constrained size used to create the layout
    * @param parentSize Parent size used to create the layout
+   * @param version The version of the source layout data – see ASDisplayNode's _layoutVersion. 
    */
-  ASDisplayNodeLayout(ASLayout *layout, ASSizeRange constrainedSize, CGSize parentSize)
-  : layout(layout), constrainedSize(constrainedSize), parentSize(parentSize), requestedLayoutFromAbove(NO), _dirty(NO) {};
+  ASDisplayNodeLayout(ASLayout *layout, ASSizeRange constrainedSize, CGSize parentSize, NSUInteger version)
+  : layout(layout), constrainedSize(constrainedSize), parentSize(parentSize), requestedLayoutFromAbove(NO), version(version) {};
   
   /*
    * Creates a layout without any layout associated. By default this display node layout is dirty.
    */
   ASDisplayNodeLayout()
-  : layout(nil), constrainedSize({{0, 0}, {0, 0}}), parentSize({0, 0}), requestedLayoutFromAbove(NO), _dirty(YES) {};
+  : layout(nil), constrainedSize({{0, 0}, {0, 0}}), parentSize({0, 0}), requestedLayoutFromAbove(NO), version(0) {};
   
   /**
-   * Returns if the display node layout is dirty as it was invalidated or it was created without a layout.
+   * Returns whether this is valid for a given constrained size, parent size, and version
    */
-  BOOL isDirty();
-  
-  /**
-   * Returns if ASDisplayNode is still valid for a given constrained and parent size
-   */
-  BOOL isValidForConstrainedSizeParentSize(ASSizeRange constrainedSize, CGSize parentSize);
-  
-  /**
-   * Invalidate the display node layout
-   */
-  void invalidate();
+  BOOL isValid(ASSizeRange constrainedSize, CGSize parentSize, NSUInteger version);
 };

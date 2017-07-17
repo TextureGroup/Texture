@@ -24,18 +24,25 @@
   return node;
 }
 
-+ (ASDisplayNode *)verticalYogaStack
++ (ASDisplayNode *)yogaSpacerNode
 {
-  ASDisplayNode *stack = [self yogaNode];
-  stack.style.flexDirection = ASStackLayoutDirectionVertical;
-  return stack;
+  ASDisplayNode *node = [ASDisplayNode yogaNode];
+  node.style.flexGrow = 1.0f;
+  return node;
 }
 
-+ (ASDisplayNode *)horizontalYogaStack
++ (ASDisplayNode *)yogaVerticalStack
 {
-  ASDisplayNode *stack = [self yogaNode];
-  stack.style.flexDirection = ASStackLayoutDirectionHorizontal;
-  return stack;
+  ASDisplayNode *node = [self yogaNode];
+  node.style.flexDirection = ASStackLayoutDirectionVertical;
+  return node;
+}
+
++ (ASDisplayNode *)yogaHorizontalStack
+{
+  ASDisplayNode *node = [self yogaNode];
+  node.style.flexDirection = ASStackLayoutDirectionHorizontal;
+  return node;
 }
 
 @end
@@ -141,14 +148,18 @@ void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElemen
     return;
   }
   BOOL hasMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) != NULL);
-  if (layoutElement != nil && hasMeasureFunc == NO) {
-    // TODO(appleguy): Add override detection for calculateSizeThatFits: and calculateLayoutThatFits:,
-    // then we can set the MeasureFunc only for nodes that override one of the trio of measurement methods.
-    // if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0 && ...) {
-    // Retain the Context object. This must be explicitly released with a __bridge_transfer; YGNodeFree() is not sufficient.
-    YGNodeSetContext(yogaNode, (__bridge_retained void *)layoutElement);
-    YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
-  } else if (layoutElement == nil && hasMeasureFunc == YES){
+
+  if (layoutElement != nil && [layoutElement implementsLayoutMethod]) {
+    if (hasMeasureFunc == NO) {
+      // Retain the Context object. This must be explicitly released with a
+      // __bridge_transfer - YGNodeFree() is not sufficient.
+      YGNodeSetContext(yogaNode, (__bridge_retained void *)layoutElement);
+      YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
+    }
+    ASDisplayNodeCAssert(YGNodeGetContext(yogaNode) == (__bridge void *)layoutElement,
+                         @"Yoga node context should contain layoutElement: %@", layoutElement);
+  } else if (hasMeasureFunc == YES) {
+    // If we lack any of the conditions above, and currently have a measure func, get rid of it.
     // Release the __bridge_retained Context object.
     __unused id <ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
     YGNodeSetContext(yogaNode, NULL);

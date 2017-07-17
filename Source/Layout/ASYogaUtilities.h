@@ -22,8 +22,9 @@
 @interface ASDisplayNode (YogaHelpers)
 
 + (ASDisplayNode *)yogaNode;
-+ (ASDisplayNode *)verticalYogaStack;
-+ (ASDisplayNode *)horizontalYogaStack;
++ (ASDisplayNode *)yogaSpacerNode;
++ (ASDisplayNode *)yogaVerticalStack;
++ (ASDisplayNode *)yogaHorizontalStack;
 
 @end
 

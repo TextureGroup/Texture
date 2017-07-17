@@ -13,15 +13,9 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <Foundation/Foundation.h>
 
-// pthread_key_create must be called before the key can be used. This function does that.
 static pthread_key_t ASMainThreadAssertionsDisabledKey()
 {
-  static pthread_key_t ASMainThreadAssertionsDisabledKey;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pthread_key_create(&ASMainThreadAssertionsDisabledKey, NULL);
-  });
-  return ASMainThreadAssertionsDisabledKey;
+  return ASPthreadStaticKey(NULL);
 }
 
 BOOL ASMainThreadAssertionsAreDisabled() {

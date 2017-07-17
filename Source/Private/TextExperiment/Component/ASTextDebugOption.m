@@ -10,7 +10,6 @@
 //
 
 #import "ASTextDebugOption.h"
-#import <libkern/OSAtomic.h>
 #import <pthread.h>
 
 static pthread_mutex_t _sharedDebugLock;

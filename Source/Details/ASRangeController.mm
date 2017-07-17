@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 
@@ -203,6 +204,8 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)_updateVisibleNodeIndexPaths
 {
+  as_activity_scope_verbose(as_activity_create("Update range controller", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_verbose(ASCollectionLog(), "Updating ranges for %@", ASViewToDisplayNode(ASDynamicCast(self.delegate, UIView)));
   ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
   if (!_layoutController || !_dataSource) {
     return;
@@ -223,7 +226,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     [self _setVisibleNodes:newVisibleNodes];
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
-  ASProfilingSignpostStart(1, self);
+  ASSignpostStart(ASSignpostRangeControllerUpdate);
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];
@@ -412,7 +415,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   NSLog(@"Range update complete; modifiedIndexPaths: %@", [self descriptionWithIndexPaths:modifiedIndexPaths]);
 #endif
   
-  ASProfilingSignpostEnd(1, self);
+  ASSignpostEnd(ASSignpostRangeControllerUpdate);
 }
 
 #pragma mark - Notification observers
@@ -499,11 +502,11 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   [_delegate rangeController:self willUpdateWithChangeSet:changeSet];
 }
 
-- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   _rangeIsValid = NO;
-  [_delegate rangeController:self didUpdateWithChangeSet:changeSet];
+  [_delegate rangeController:self didUpdateWithChangeSet:changeSet updates:updates];
 }
 
 #pragma mark - Memory Management
