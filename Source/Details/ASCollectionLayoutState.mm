@@ -40,6 +40,13 @@
 }
 
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
+{
+  return [self initWithContext:context
+                   contentSize:CGSizeZero
+elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
+}
+
+- (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                          layout:(ASLayout *)layout
                 getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock
 {
