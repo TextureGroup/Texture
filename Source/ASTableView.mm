@@ -1474,19 +1474,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - ASRangeControllerDelegate
 
-- (void)rangeController:(ASRangeController *)rangeController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
-{
-  ASDisplayNodeAssertMainThread();
-  if (!self.asyncDataSource) {
-    return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
-  }
-  
-  if (_automaticallyAdjustsContentOffset && !changeSet.includesReloadData) {
-    [self beginAdjustingContentOffset];
-  }
-}
-
-- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
+- (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   if (!self.asyncDataSource || _updatingInResponseToInteractiveMove) {
@@ -1494,7 +1482,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [changeSet executeCompletionHandlerWithFinished:NO];
     return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
   }
-  
+
   if (changeSet.includesReloadData) {
     LOG(@"UITableView reloadData");
     ASPerformBlockWithoutAnimation(!changeSet.animated, ^{
@@ -1509,6 +1497,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       [changeSet executeCompletionHandlerWithFinished:YES];
     });
     return;
+  }
+
+  BOOL shouldAdjustContentOffset = (_automaticallyAdjustsContentOffset && !changeSet.includesReloadData);
+  if (shouldAdjustContentOffset) {
+    [self beginAdjustingContentOffset];
   }
   
   NSUInteger numberOfUpdates = 0;
@@ -1620,7 +1613,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [_rangeController updateIfNeeded];
     [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
   });
-  if (_automaticallyAdjustsContentOffset) {
+  if (shouldAdjustContentOffset) {
     [self endAdjustingContentOffsetAnimated:changeSet.animated];
   }
   [changeSet executeCompletionHandlerWithFinished:YES];
