@@ -12,6 +12,7 @@
 - Fix a crash where scrolling a table view after entering editing mode could lead to bad internal states in the table. [Huy Nguyen](https://github.com/nguyenhuy) [#416](https://github.com/TextureGroup/Texture/pull/416/)
 - Fix a crash in collection view that occurs if batch updates are performed while scrolling [Huy Nguyen](https://github.com/nguyenhuy) [#378](https://github.com/TextureGroup/Texture/issues/378)
 - Some improvements in ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#407](https://github.com/TextureGroup/Texture/pull/407)
+- Small refactors in ASDataController [Huy Nguyen](https://github.com/TextureGroup/Texture/pull/443) [#443](https://github.com/TextureGroup/Texture/pull/443)
 
 ##2.3.4
 - [Yoga] Rewrite YOGA_TREE_CONTIGUOUS mode with improved behavior and cleaner integration [Scott Goodson](https://github.com/appleguy)
