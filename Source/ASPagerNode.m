@@ -27,8 +27,6 @@
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor>
 {
-  ASPagerFlowLayout *_flowLayout;
-
   __weak id <ASPagerDataSource> _pagerDataSource;
   ASPagerNodeProxy *_proxyDataSource;
   struct {
@@ -65,9 +63,6 @@
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
   self = [super initWithCollectionViewLayout:flowLayout];
-  if (self != nil) {
-    _flowLayout = flowLayout;
-  }
   return self;
 }
 
