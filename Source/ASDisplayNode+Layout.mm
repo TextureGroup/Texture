@@ -302,10 +302,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
-  
+
   // Prefer _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
   // If there is no _pending, check if _calculated is valid to reuse (avoiding recalculation below).
-  if (_pendingDisplayNodeLayout == nullptr) {
+  if (_pendingDisplayNodeLayout == nullptr || _pendingDisplayNodeLayout->version < _layoutVersion) {
     if (_calculatedDisplayNodeLayout->version >= _layoutVersion
         && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
             || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
@@ -352,8 +352,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
-    
     nextLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, boundsSizeForLayout, version);
+    // Now that the constrained size of pending layout might have been reused, the layout is useless
+    // Release it and any orphaned subnodes it retains
+    _pendingDisplayNodeLayout = nullptr;
   }
   
   if (didCreateNewContext) {
@@ -373,6 +375,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     // particular ASLayout object, and shouldn't loop asking again unless we have a different ASLayout.
     nextLayout->requestedLayoutFromAbove = YES;
     [self _setNeedsLayoutFromAbove];
+    // Update the layout's version here because _setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
+    // Failing to do this will cause the layout to be invalid immediately 
+    nextLayout->version = _layoutVersion;
   }
 
   // Prepare to transition to nextLayout
@@ -956,7 +961,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     _unflattenedLayout = displayNodeLayout->layout;
     displayNodeLayout->layout = [_unflattenedLayout filteredNodeLayoutTree];
   }
-  
+
   _calculatedDisplayNodeLayout = displayNodeLayout;
 }
 
