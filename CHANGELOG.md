@@ -4,7 +4,8 @@
 - [ASCollectionView] Add delegate bridging and index space translation for missing UICollectionViewLayout properties. [Scott Goodson](https://github.com/appleguy)
 - [ASTextNode2] Add initial implementation for link handling. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/396)
 - [ASTextNode2] Provide compile flag to globally enable new implementation of ASTextNode: ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/410)
- - Add ASCollectionGalleryLayoutDelegate - an async collection layout that makes same-size collections (e.g photo galleries, pagers, etc) fast and lightweight! [Huy Nguyen](https://github.com/nguyenhuy/) [#76](https://github.com/TextureGroup/Texture/pull/76) [#451](https://github.com/TextureGroup/Texture/pull/451)
+- Add ASCollectionGalleryLayoutDelegate - an async collection layout that makes same-size collections (e.g photo galleries, pagers, etc) fast and lightweight! [Huy Nguyen](https://github.com/nguyenhuy/) [#76](https://github.com/TextureGroup/Texture/pull/76) [#451](https://github.com/TextureGroup/Texture/pull/451)
+- Fix an issue that causes infinite layout loop in ASDisplayNode after [#428](https://github.com/TextureGroup/Texture/pull/428) [Huy Nguyen](https://github.com/nguyenhuy) [#455](https://github.com/TextureGroup/Texture/pull/455) 
 
 ##2.3.5
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
