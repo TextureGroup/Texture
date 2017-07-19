@@ -76,7 +76,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
     additionalInfo = [_layoutDelegate additionalInfoForLayoutWithElements:elements];
   }
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize
-                                                   contentOffset:contentOffset
+                                            initialContentOffset:contentOffset
                                             scrollableDirections:[_layoutDelegate scrollableDirections]
                                                         elements:elements
                                              layoutDelegateClass:[_layoutDelegate class]
