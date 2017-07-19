@@ -70,11 +70,13 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 {
   ASDisplayNodeAssertMainThread();
   CGSize viewportSize = [self _viewportSize];
+  CGPoint contentOffset = _collectionNode.contentOffset;
   id additionalInfo = nil;
   if (_layoutDelegateFlags.implementsAdditionalInfoForLayoutWithElements) {
     additionalInfo = [_layoutDelegate additionalInfoForLayoutWithElements:elements];
   }
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize
+                                                   contentOffset:contentOffset
                                             scrollableDirections:[_layoutDelegate scrollableDirections]
                                                         elements:elements
                                              layoutDelegateClass:[_layoutDelegate class]
@@ -93,8 +95,8 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 
   // Measure elements in the measure range ahead of time, block on the initial rect as it'll be visible shortly
   CGSize viewportSize = context.viewportSize;
-  // TODO Consider content offset of the collection node
-  CGRect initialRect = CGRectMake(0, 0, viewportSize.width, viewportSize.height);
+  CGPoint contentOffset = context.initialContentOffset;
+  CGRect initialRect = CGRectMake(contentOffset.x, contentOffset.y, viewportSize.width, viewportSize.height);
   CGRect measureRect = CGRectExpandToRangeWithScrollableDirections(initialRect,
                                                                    kASDefaultMeasureRangeTuningParameters,
                                                                    context.scrollableDirections,
