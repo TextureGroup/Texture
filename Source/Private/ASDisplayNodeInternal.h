@@ -175,6 +175,10 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
   // keeps track of nodes/subnodes that have not finished display, used with placeholders
   ASWeakSet *_pendingDisplayNodes;
+  
+  CGFloat _cornerRadius;
+  ASCornerRoundingType _cornerRoundingType;
+  CALayer *_clipCornerLayers[4];
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;

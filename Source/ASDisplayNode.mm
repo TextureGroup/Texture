@@ -63,7 +63,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 // We have to forward declare the protocol as this place otherwise it will not compile compiling with an Base SDK < iOS 10
 @protocol CALayerDelegate;
 
-@interface ASDisplayNode () <UIGestureRecognizerDelegate, _ASDisplayLayerDelegate>
+@interface ASDisplayNode () <UIGestureRecognizerDelegate, CALayerDelegate, _ASDisplayLayerDelegate>
 
 /**
  * See ASDisplayNodeInternal.h for ivars
@@ -930,6 +930,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (loaded) {
     ASPerformBlockOnMainThread(^{
       [self layout];
+      [self _layoutClipCornersIfNeeded];
       [self layoutDidFinish];
     });
   }
@@ -1010,8 +1011,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
     return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
   }
-
-  [self _layoutClipCornersIfNeeded];
   
   // Size calcualtion with layout elements
   BOOL measureLayoutSpec = _measurementOptions & ASDisplayNodePerformanceMeasurementOptionLayoutSpec;
@@ -1512,7 +1511,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       if (isRight == YES) {
         CGContextTranslateCTM(ctx, -radius + 1, 0);
       }
-      if (isTop == NO) {
+      if (isTop == YES) {
         CGContextTranslateCTM(ctx, 0, -radius + 1);
       }
       UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];

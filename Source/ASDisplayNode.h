@@ -646,6 +646,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 @property (nonatomic, assign)           CGPoint anchorPoint;                   // default={0.5, 0.5}
 @property (nonatomic, assign)           CGFloat zPosition;                     // default=0.0
 @property (nonatomic, assign)           CGFloat cornerRadius;                  // default=0.0
+@property (nonatomic, assign)           CGFloat layerCornerRadius;             // default=0.0
 @property (nonatomic, assign)           CATransform3D transform;               // default=CATransform3DIdentity
 @property (nonatomic, assign)           CATransform3D subnodeTransform;        // default=CATransform3DIdentity
 
