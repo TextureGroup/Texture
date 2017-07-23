@@ -3167,6 +3167,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return measurements;
 }
 
+#pragma mark - Accessibility
+
+- (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _isAccessibilityContainer = isAccessibilityContainer;
+}
+
+- (BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _isAccessibilityContainer;
+}
 
 #pragma mark - Debugging (Private)
 
