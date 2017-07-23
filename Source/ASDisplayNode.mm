@@ -1559,7 +1559,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   __instanceLock__.lock();
     CGFloat oldCornerRadius = _cornerRadius;
     ASCornerRoundingType oldRoundingType = _cornerRoundingType;
-    
+
     _cornerRadius = newCornerRadius;
     _cornerRoundingType = newRoundingType;
   __instanceLock__.unlock();
@@ -1580,11 +1580,14 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
         else if (newRoundingType == ASCornerRoundingTypeClipping) {
           self.layerCornerRadius = 0.0;
           [self _setClipCornerLayersVisible:YES];
+        } else if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
         }
       }
       else if (oldRoundingType == ASCornerRoundingTypePrecomposited) {
         if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
           self.layerCornerRadius = newCornerRadius;
+          [self setNeedsDisplay];
         }
         else if (newRoundingType == ASCornerRoundingTypePrecomposited) {
           // Corners are already precomposited, but the radius has changed.
@@ -1593,6 +1596,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
         }
         else if (newRoundingType == ASCornerRoundingTypeClipping) {
           [self _setClipCornerLayersVisible:YES];
+          [self setNeedsDisplay];
         }
       }
       else if (oldRoundingType == ASCornerRoundingTypeClipping) {
@@ -1612,21 +1616,6 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       
     }
   });
-}
-
-- (CGFloat)cornerRadius
-{
-  return _cornerRadius;
-}
-
-- (void)setCornerRadius:(CGFloat)newCornerRadius
-{
-  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
-}
-
-- (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
-{
-  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRoundingType];
 }
 
 - (void)recursivelySetDisplaySuspended:(BOOL)flag

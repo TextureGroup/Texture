@@ -279,6 +279,9 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 /// Display the node's view/layer immediately on the current thread, bypassing the background thread rendering. Will be deprecated.
 - (void)displayImmediately;
 
+/// Refreshes any precomposited or drawn clip corners, setting up state as required to transition radius or rounding type.
+- (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType cornerRadius:(CGFloat)newCornerRadius;
+
 /// Alternative initialiser for backing with a custom view class.  Supports asynchronous display with _ASDisplayView subclasses.
 - (instancetype)initWithViewClass:(Class)viewClass;
 
@@ -320,6 +323,12 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
  * Called if a gesture recognizer was attached to an _ASDisplayView
  */
 - (void)nodeViewDidAddGestureRecognizer;
+
+@end
+
+@interface ASDisplayNode (InternalPropertyBridge)
+
+@property (nonatomic, assign) CGFloat layerCornerRadius;
 
 @end
 

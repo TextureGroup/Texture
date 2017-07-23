@@ -329,7 +329,9 @@
   if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0f) {
     CGRect bounds = CGRectZero;
     if (context == NULL) {
-      bounds = (CGRect){ CGPointZero, [*image size] };
+      bounds = self.threadSafeBounds;
+      bounds.size.width *= contentsScale;
+      bounds.size.height *= contentsScale;
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
       UIGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
