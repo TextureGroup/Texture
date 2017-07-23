@@ -740,6 +740,13 @@
   }
 }
 
+- (void)invalidateFlowLayoutDelegateMetrics {
+  ASDisplayNodeAssertMainThread();
+  if (self.nodeLoaded) {
+    [self.view invalidateFlowLayoutDelegateMetrics];
+  }
+}
+
 - (void)insertSections:(NSIndexSet *)sections
 {
   ASDisplayNodeAssertMainThread();
