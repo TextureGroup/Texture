@@ -985,23 +985,30 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
   // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
   // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
-  // If we're a leaf node, we are probably being called by a measure function and proceed as normal.
-  // If we're a yoga root or tree node, initiate a new Yoga calculation pass from root.
   YGNodeRef yogaNode = _style.yogaNode;
   BOOL hasYogaParent = (_yogaParent != nil);
   BOOL hasYogaChildren = (_yogaChildren.count > 0);
   BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
-  if (usesYoga && (_yogaParent == nil || _yogaChildren.count > 0)) {
+  if (usesYoga) {
     // This node has some connection to a Yoga tree.
-    ASDN::MutexUnlocker ul(__instanceLock__);
-
-    if (self.yogaLayoutInProgress == NO) {
-      [self calculateLayoutFromYogaRoot:constrainedSize];
+    if ([self shouldHaveYogaMeasureFunc] == NO) {
+      // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
+      // initiate a new Yoga calculation pass from root.
+      ASDN::MutexUnlocker ul(__instanceLock__);
+      as_activity_create_for_scope("Yoga layout calculation");
+      if (self.yogaLayoutInProgress == NO) {
+        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
+        [self calculateLayoutFromYogaRoot:constrainedSize];
+      } else {
+        ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
+      }
+      ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
+      return _yogaCalculatedLayout;
+    } else {
+      // If we're a yoga leaf node with custom measurement function, proceed with normal layout so layoutSpecs can run (e.g. ASButtonNode).
+      ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
     }
-    ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
-    return _yogaCalculatedLayout;
   }
-  ASYogaLog(@"PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
 #endif /* YOGA */
   
   // Manual size calculation via calculateSizeThatFits:

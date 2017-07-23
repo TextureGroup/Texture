@@ -175,12 +175,15 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;
+- (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index;
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
 @property (nonatomic, assign) BOOL yogaLayoutInProgress;
 @property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
-// These methods should not normally be called directly.
+
+// These methods are intended to be used internally to Texture, and should not be called directly.
+- (BOOL)shouldHaveYogaMeasureFunc;
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
 
