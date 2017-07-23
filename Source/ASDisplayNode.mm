@@ -1613,7 +1613,6 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
           [self _updateClipCornerLayerContentsWithRadius:newCornerRadius backgroundColor:self.backgroundColor];
         }
       }
-      
     }
   });
 }

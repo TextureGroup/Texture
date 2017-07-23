@@ -281,10 +281,6 @@
   return displayBlock;
 }
 
-- (void)drawRoundedCornerOverlayWithContext:(CGContextRef)context contentsScale:(CGFloat)contentsScale
-{
-}
-
 - (void)__willDisplayNodeContentWithRenderingContext:(CGContextRef)context drawParameters:(id _Nullable)drawParameters
 {
   if (context) {
