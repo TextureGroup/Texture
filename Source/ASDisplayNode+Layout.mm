@@ -185,6 +185,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (ASSizeRange)constrainedSizeForCalculatedLayout
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_constrainedSizeForCalculatedLayout];
+}
+
+- (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
+{
   if (_pendingDisplayNodeLayout != nullptr) {
     return _pendingDisplayNodeLayout->constrainedSize;
   }
@@ -478,6 +483,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_isLayoutTransitionValid];
+}
+
+- (BOOL)_locked_isLayoutTransitionValid
+{
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
     if (context == nil || _pendingTransitionID != context.transitionID) {
@@ -510,9 +520,6 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
                 measurementCompletion:(void(^)())completion
 {
   ASDisplayNodeAssertMainThread();
-
-  [self setNeedsLayout];
-  
   [self transitionLayoutWithSizeRange:[self _locked_constrainedSizeForLayoutPass]
                              animated:animated
                    shouldMeasureAsync:shouldMeasureAsync
@@ -536,17 +543,28 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     return;
   }
     
-  // Check if we are a subnode in a layout transition.
-  // In this case no measurement is needed as we're part of the layout transition.
-  if ([self _isLayoutTransitionInvalid]) {
-    return;
-  }
-  
+  BOOL shouldInvalidateLayout = NO;
   {
     ASDN::MutexLocker l(__instanceLock__);
-    ASDisplayNodeAssert(ASHierarchyStateIncludesLayoutPending(_hierarchyState) == NO, @"Can't start a transition when one of the supernodes is performing one.");
+
+    // Check if we are a subnode in a layout transition.
+    // In this case no measurement is needed as we're part of the layout transition.
+    if ([self _locked_isLayoutTransitionValid]) {
+      return;
+    }
+
+    if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
+      ASDisplayNodeAssert(NO, @"Can't start a transition when one of the supernodes is performing one.");
+      return;
+    }
+
+    shouldInvalidateLayout = ASSizeRangeEqualToSizeRange([self _locked_constrainedSizeForCalculatedLayout], constrainedSize);
   }
-  
+
+  if (shouldInvalidateLayout) {
+    [self setNeedsLayout];
+  }
+
   // Every new layout transition has a transition id associated to check in subsequent transitions for cancelling
   int32_t transitionID = [self _startNewTransition];
   as_log_verbose(ASLayoutLog(), "Transition ID is %d", transitionID);
