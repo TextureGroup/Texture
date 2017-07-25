@@ -17,9 +17,9 @@ By assigning an `imageModificationBlock` to your imageNode, you can define a set
 <pre lang="objc" class="objcCode">
 _backgroundImageNode.imageModificationBlock = ^(UIImage *image) {
 	UIImage *newImage = [image applyBlurWithRadius:30
-										 tintColor:[UIColor colorWithWhite:0.5 alpha:0.3]
-							 saturationDeltaFactor:1.8
-							 			 maskImage:nil];
+		tintColor:[UIColor colorWithWhite:0.5 alpha:0.3]
+		saturationDeltaFactor:1.8
+		maskImage:nil];
 	return newImage ? newImage : image;
 };
 
