@@ -113,9 +113,12 @@ static void dispatchApplyIfNeeded(size_t iterationCount, BOOL forced, void(^work
 
  @param lines unpositioned lines
  */
-static CGFloat computeLinesCrossDimensionSum(const std::vector<ASStackUnpositionedLine> &lines)
+static CGFloat computeLinesCrossDimensionSum(const std::vector<ASStackUnpositionedLine> &lines,
+                                             const ASStackLayoutSpecStyle &style)
 {
-  return std::accumulate(lines.begin(), lines.end(), 0.0,
+  return std::accumulate(lines.begin(), lines.end(),
+                         // Start from default spacing between each line:
+                         lines.empty() ? 0 : style.lineSpacing * (lines.size() - 1),
                          [&](CGFloat x, const ASStackUnpositionedLine &l) {
                            return x + l.crossSize;
                          });
@@ -236,7 +239,7 @@ static void stretchLinesAlongCrossDimension(std::vector<ASStackUnpositionedLine>
 {
   ASDisplayNodeCAssertFalse(lines.empty());
   const std::size_t numOfLines = lines.size();
-  const CGFloat violation = ASStackUnpositionedLayout::computeCrossViolation(computeLinesCrossDimensionSum(lines), style, sizeRange);
+  const CGFloat violation = ASStackUnpositionedLayout::computeCrossViolation(computeLinesCrossDimensionSum(lines, style), style, sizeRange);
   // Don't stretch if the stack is single line, because the line's cross size was clamped against the stack's constrained size.
   const BOOL shouldStretchLines = (numOfLines > 1
                                    && style.alignContent == ASStackLayoutAlignContentStretch
@@ -753,7 +756,7 @@ ASStackUnpositionedLayout ASStackUnpositionedLayout::compute(const std::vector<A
   }
   // Compute cross dimension sum of the stack.
   // This should be done before `lines` are moved to a new ASStackUnpositionedLayout struct (i.e `std::move(lines)`)
-  CGFloat layoutCrossDimensionSum = computeLinesCrossDimensionSum(lines);
+  CGFloat layoutCrossDimensionSum = computeLinesCrossDimensionSum(lines, style);
   
   return {.lines = std::move(lines), .stackDimensionSum = layoutStackDimensionSum, .crossDimensionSum = layoutCrossDimensionSum};
 }
