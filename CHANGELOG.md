@@ -1,6 +1,8 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASStackLayoutSpec] Add lineSpacing property working with flex wrap. [Flo Vouin](https://github.com/flovouin)
+- [ASStackLayoutSpec] Fix flex wrap overflow in some cases using item spacing. [Flo Vouin](https://github.com/flovouin)
 - [ASNodeController] Add -nodeDidLayout callback. Allow switching retain behavior at runtime. [Scott Goodson](https://github.com/appleguy)
 - [ASCollectionView] Add delegate bridging and index space translation for missing UICollectionViewLayout properties. [Scott Goodson](https://github.com/appleguy)
 - [ASTextNode2] Add initial implementation for link handling. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/396)
