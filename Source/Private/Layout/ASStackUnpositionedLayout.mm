@@ -648,7 +648,8 @@ static std::vector<ASStackUnpositionedLine> collectChildrenIntoLines(const std::
   for(auto it = items.begin(); it != items.end(); ++it) {
     const auto &item = *it;
     const CGFloat itemStackDimension = stackDimension(style.direction, item.layout.size);
-    const BOOL negativeViolationIfAddItem = (ASStackUnpositionedLayout::computeStackViolation(lineStackDimensionSum + itemStackDimension, style, sizeRange) < 0);
+    const CGFloat itemAndSpacingStackDimension = (lineItems.empty() ? 0.0 : style.spacing) + item.child.style.spacingBefore + itemStackDimension + item.child.style.spacingAfter;
+    const BOOL negativeViolationIfAddItem = (ASStackUnpositionedLayout::computeStackViolation(lineStackDimensionSum + itemAndSpacingStackDimension, style, sizeRange) < 0);
     const BOOL breakCurrentLine = negativeViolationIfAddItem && !lineItems.empty();
     
     if (breakCurrentLine) {
@@ -658,7 +659,7 @@ static std::vector<ASStackUnpositionedLine> collectChildrenIntoLines(const std::
     }
     
     lineItems.push_back(std::move(item));
-    lineStackDimensionSum += itemStackDimension;
+    lineStackDimensionSum += itemAndSpacingStackDimension;
   }
   
   // Handle last line
