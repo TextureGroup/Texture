@@ -20,7 +20,7 @@ _backgroundImageNode.imageModificationBlock = ^(UIImage *image) {
 										 tintColor:[UIColor colorWithWhite:0.5 alpha:0.3]
 							 saturationDeltaFactor:1.8
 							 			 maskImage:nil];
-	return newImage ? newImage : image;
+	return newImage ?: image;
 };
 
 //some time later...
