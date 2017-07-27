@@ -7,6 +7,7 @@
 - Add ASCollectionGalleryLayoutDelegate - an async collection layout that makes same-size collections (e.g photo galleries, pagers, etc) fast and lightweight! [Huy Nguyen](https://github.com/nguyenhuy/) [#76](https://github.com/TextureGroup/Texture/pull/76) [#451](https://github.com/TextureGroup/Texture/pull/451)
 - Fix an issue that causes infinite layout loop in ASDisplayNode after [#428](https://github.com/TextureGroup/Texture/pull/428) [Huy Nguyen](https://github.com/nguyenhuy) [#455](https://github.com/TextureGroup/Texture/pull/455) 
 - Fix an issue in layout transition that causes it to unexpectedly use the old layout [Huy Nguyen](https://github.com/nguyenhuy) [#464](https://github.com/TextureGroup/Texture/pull/464)
+- Add -[ASDisplayNode detailedLayoutDescription] property to aid debugging. [Adlai Holler](https://github.com/Adlai-Holler) [#476](https://github.com/TextureGroup/Texture/pull/476)
 
 ##2.3.5
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
