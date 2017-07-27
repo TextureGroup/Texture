@@ -3377,6 +3377,38 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return subtree;
 }
 
+- (NSString *)detailedLayoutDescription
+{
+  ASPushMainThreadAssertionsDisabled();
+  ASDN::MutexLocker l(__instanceLock__);
+  auto props = [NSMutableArray<NSDictionary *> array];
+
+  [props addObject:@{ @"layoutVersion": @(_layoutVersion.load()) }];
+  [props addObject:@{ @"bounds": [NSValue valueWithCGRect:self.bounds] }];
+
+  if (_calculatedDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
+    [props addObject:@{ @"calculatedLayout": c.layout }];
+    [props addObject:@{ @"calculatedVersion": @(c.version) }];
+    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(c.constrainedSize) }];
+    if (c.requestedLayoutFromAbove) {
+      [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
+    }
+  }
+  if (_pendingDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
+    [props addObject:@{ @"pendingLayout": p.layout }];
+    [props addObject:@{ @"pendingVersion": @(p.version) }];
+    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(p.constrainedSize) }];
+    if (p.requestedLayoutFromAbove) {
+      [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
+    }
+  }
+
+  ASPopMainThreadAssertionsDisabled();
+  return ASObjectDescriptionMake(self, props);
+}
+
 @end
 
 #pragma mark - ASDisplayNode UIKit / CA Categories

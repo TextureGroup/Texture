@@ -319,7 +319,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   as_activity_create_for_scope("Update node layout for current bounds");
-  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->isDirty());
+  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->version < _layoutVersion.load());
   // _calculatedDisplayNodeLayout is not reusable we need to transition to a new one
   [self cancelLayoutTransition];
   
@@ -543,7 +543,6 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     return;
   }
     
-  BOOL shouldInvalidateLayout = NO;
   {
     ASDN::MutexLocker l(__instanceLock__);
 
@@ -557,13 +556,14 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       ASDisplayNodeAssert(NO, @"Can't start a transition when one of the supernodes is performing one.");
       return;
     }
-
-    shouldInvalidateLayout = ASSizeRangeEqualToSizeRange([self _locked_constrainedSizeForCalculatedLayout], constrainedSize);
   }
 
-  if (shouldInvalidateLayout) {
-    [self setNeedsLayout];
-  }
+  // Invalidate calculated layout because this method acts as an animated "setNeedsLayout" for nodes.
+  // If the user has reconfigured the node and calls this, we should never return a stale layout
+  // for subsequent calls to layoutThatFits: regardless of size range. We choose this method rather than
+  // -setNeedsLayout because that method also triggers a CA layout invalidation, which isn't necessary at this time.
+  // See https://github.com/TextureGroup/Texture/issues/463
+  [self invalidateCalculatedLayout];
 
   // Every new layout transition has a transition id associated to check in subsequent transitions for cancelling
   int32_t transitionID = [self _startNewTransition];
