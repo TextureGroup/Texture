@@ -17,7 +17,7 @@ When it comes to corner rounding, many developers stick with CALayer's `.cornerR
 
 ## CALayer's .cornerRadius is Expensive
 
-Why is `.cornerRadius` so expensive?  Use of CALayer's `.cornerRadius` property triggers off-screen rendering to perform the clipping operation on every frame - 60 FPS during scrolling - even if the content in that area isn't changing!  This means that the GPU has to switch contexts on every frame, between compositing the overall frame + additional passes for each use of `.cornerRadius`.  
+Why is `.cornerRadius` so expensive?  Use of CALayer's `.cornerRadius` property triggers offscreen rendering to perform the clipping operation on every frame - 60 FPS during scrolling - even if the content in that area isn't changing!  This means that the GPU has to switch contexts on every frame, between compositing the overall frame + additional passes for each use of `.cornerRadius`.  
 
 Importantly, these costs don't show up in the Time Profiler, because they affect work done by the CoreAnimation Render Server on your app's behalf.  This intensive thrash annihilates performance for a lot of devices.  On the iPhone 4, 4S, and 5 / 5C (along with comparable iPads / iPods), expect to see notably degraded performance.  On the iPhone 5S and newer, even if you can't see the impact directly, it will reduce headroom so that it takes less to cause a frame drop. 
 
