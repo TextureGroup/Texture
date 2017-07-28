@@ -53,11 +53,11 @@ The final consideration is to determine if all four corners cover the same node 
 
 ### Precomposited Corners
 
-Precomposited corners refer to corners drawn using bezier paths to clip the content in a CGContext / UIGraphicsContext.  In this scenario, the corners become part of the image itself — and are "baked in" to the single CALayer.  There are two types of precomposited corners. 
+Precomposited corners refer to corners drawn using bezier paths (`[path clip]`) to clip the content in a CGContext / UIGraphicsContext.  In this scenario, the corners become part of the image itself — and are "baked in" to the single CALayer.  There are two types of precomposited corners. 
 
 The absolute best method is to use **precomposited opaque corners**.  This is the most efficient method available, resulting in zero alpha blending (although this is much less critical than avoiding offscreen rendering).  Unfortunately, this method is also the least flexible; the background behind the corners will need to be a solid color if the rounded image needs to move around on top of it.  It's possible, but tricky to make precomposited corners with a textured or photo background - usually it's best to use precomposited alpha corners instead'.'
 
-The second method involves using bezier paths with **precomposited alpha corners** (`[path clip]`).  This method is pretty flexible and should be one of the most frequently used.  It does incur the cost of alpha blending across the full size of the content, and including an alpha channel increases memory impact by 25% over opaque precompositing - but these costs are tiny on modern devices, and a different order of magnitude than `.cornerRadius` offscreen rendering.
+The second method involves using bezier paths with **precomposited alpha corners**.  This method is pretty flexible and should be one of the most frequently used.  It does incur the cost of alpha blending across the full size of the content, and including an alpha channel increases memory impact by 25% over opaque precompositing - but these costs are tiny on modern devices, and a different order of magnitude than `.cornerRadius` offscreen rendering.
 
 A key limitation of precomposited corners is that the corners must only touch one node and not intersect with any subnodes.  If either of these conditions exist, clip corners must be used.
 
