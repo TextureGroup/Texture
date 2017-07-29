@@ -77,5 +77,5 @@ scrollNode.layoutSpecBlock = { node, constrainedSize in
 </div>
 </div>
 
-As you can see, the `scrollNode`'s underlying view is a `ASScrollNode`.
+As you can see, the `scrollNode`'s underlying view is a `UIScrollView`.
 
