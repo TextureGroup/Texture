@@ -345,6 +345,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _retainedLayer = self.layer;
   }
   
+  if (AS_AT_LEAST_IOS11) {
+    super.estimatedRowHeight = 0.0;
+    super.estimatedSectionHeaderHeight = 0.0;
+    super.estimatedSectionFooterHeight = 0.0;
+  }
+  
   return self;
 }
 
