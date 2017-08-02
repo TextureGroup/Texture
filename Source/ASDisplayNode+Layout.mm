@@ -520,7 +520,14 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
                 measurementCompletion:(void(^)())completion
 {
   ASDisplayNodeAssertMainThread();
-  [self transitionLayoutWithSizeRange:[self _locked_constrainedSizeForLayoutPass]
+
+  ASSizeRange sizeRange;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    sizeRange = [self _locked_constrainedSizeForLayoutPass];
+  }
+
+  [self transitionLayoutWithSizeRange:sizeRange
                              animated:animated
                    shouldMeasureAsync:shouldMeasureAsync
                 measurementCompletion:completion];
