@@ -50,11 +50,9 @@ permalink: /showcase.html
 		</td>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/us/app/classdojo/id552602056"><img class="roundrect" src="http://is4.mzstatic.com/image/thumb/Purple122/v4/83/b1/ef/83b1efa6-bda8-3c80-fd66-4a461f638e07/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
-		<br />
-		<b>ClassDojo</b>
-		<br>
-		<a href="https://engineering.classdojo.com/blog/2017/07/12/asyncdisplaykit">Powering Class Story With Texture</a>
+		<a href="https://itunes.apple.com/us/app/nytimes-breaking-local-national/id284862083"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple71/v4/3b/be/3c/3bbe3c0b-98a9-3f18-db29-83c0b41e34b8/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>NYT</b>
 		</td>
 		
 		<td align="center" valign="top">
@@ -74,9 +72,9 @@ permalink: /showcase.html
 		</td>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/us/app/nytimes-breaking-local-national/id284862083"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple71/v4/3b/be/3c/3bbe3c0b-98a9-3f18-db29-83c0b41e34b8/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
-		<br />
-		<b>NYT</b>
+		<a href="https://itunes.apple.com/us/app/kwaver-app-create-original/id951431920?mt=8"><img class="roundrect" src="http://is4.mzstatic.com/image/thumb/Purple111/v4/22/b9/0b/22b90b90-c699-20c6-d9a4-735dd7d3921a/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Kwaver Music</b>
 		</td>
 		
 		<td align="center" valign="top">
@@ -124,9 +122,9 @@ permalink: /showcase.html
 		</td>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/us/app/kwaver-app-create-original/id951431920?mt=8"><img class="roundrect" src="http://is4.mzstatic.com/image/thumb/Purple111/v4/22/b9/0b/22b90b90-c699-20c6-d9a4-735dd7d3921a/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
-		<br />
-		<b>Kwaver Music</b>
+		<a href="https://itunes.apple.com/us/app/classdojo/id552602056"><img class="roundrect" src="http://is4.mzstatic.com/image/thumb/Purple122/v4/83/b1/ef/83b1efa6-bda8-3c80-fd66-4a461f638e07/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>ClassDojo</b>
 		</td>
     
 		</tr>
