@@ -1246,8 +1246,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[2].style.spacingAfter = 5;
 
   // 3 items, each item has a size of {50, 50}
-  // width is 160px. It's enough to fix all items without taking item spacings into account.
-  // But since item spacings exist, the last item should be pushsed into another line.
+  // width is 160px, enough to fit all items without taking interitem spacings into account
+  // But since spacings exist, the last item should be pushed to a second line.
   // See: https://github.com/TextureGroup/Texture/pull/472
   static ASSizeRange kSize = {{160, 300}, {160, 300}};
   [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
