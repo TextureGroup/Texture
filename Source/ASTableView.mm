@@ -345,6 +345,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _retainedLayer = self.layer;
   }
   
+  // iOS 11 automatically uses estimated heights, so disable those (see PR #485)
   if (AS_AT_LEAST_IOS11) {
     super.estimatedRowHeight = 0.0;
     super.estimatedSectionHeaderHeight = 0.0;
