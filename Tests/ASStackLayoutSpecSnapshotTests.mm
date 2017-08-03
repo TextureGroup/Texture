@@ -110,6 +110,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
    alignItems:style.alignItems
    flexWrap:style.flexWrap
    alignContent:style.alignContent
+   lineSpacing:style.lineSpacing
    children:children];
 
   [self testStackLayoutSpec:stackLayoutSpec sizeRange:sizeRange subnodes:subnodes identifier:identifier];
@@ -163,6 +164,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 }
 
 - (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
+                                lineSpacing:(CGFloat)lineSpacing
                                   sizeRange:(ASSizeRange)sizeRange
                                  identifier:(NSString *)identifier
 {
@@ -170,8 +172,9 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     .direction = ASStackLayoutDirectionHorizontal,
     .flexWrap = ASStackLayoutFlexWrapWrap,
     .alignContent = alignContent,
+    .lineSpacing = lineSpacing,
   };
-  
+
   CGSize subnodeSize = {50, 50};
   NSArray<ASDisplayNode *> *subnodes = @[
                                          ASDisplayNodeWithBackgroundColor([UIColor redColor], subnodeSize),
@@ -181,8 +184,15 @@ static NSArray<ASTextNode*> *defaultTextNodes()
                                          ASDisplayNodeWithBackgroundColor([UIColor greenColor], subnodeSize),
                                          ASDisplayNodeWithBackgroundColor([UIColor cyanColor], subnodeSize),
                                          ];
-  
+
   [self testStackLayoutSpecWithStyle:style sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+}
+
+- (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
+                                  sizeRange:(ASSizeRange)sizeRange
+                                 identifier:(NSString *)identifier
+{
+  [self testStackLayoutSpecWithAlignContent:alignContent lineSpacing:0.0 sizeRange:sizeRange identifier:identifier];
 }
 
 #pragma mark -
@@ -1209,6 +1219,40 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:children identifier:nil];
 }
 
+#pragma mark - Flex wrap and item spacings test
+
+- (void)testFlexWrapWithItemSpacings
+{
+  ASStackLayoutSpecStyle style = {
+    .spacing = 5,
+    .direction = ASStackLayoutDirectionHorizontal,
+    .flexWrap = ASStackLayoutFlexWrapWrap,
+    .alignContent = ASStackLayoutAlignContentStart,
+    .lineSpacing = 5,
+  };
+
+  CGSize subnodeSize = {50, 50};
+  NSArray<ASDisplayNode *> *subnodes = @[
+                                         ASDisplayNodeWithBackgroundColor([UIColor redColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor yellowColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor blueColor], subnodeSize),
+                                         ];
+
+  subnodes[0].style.spacingBefore = 5;
+  subnodes[0].style.spacingAfter = 5;
+  subnodes[1].style.spacingBefore = 5;
+  subnodes[1].style.spacingAfter = 5;
+  subnodes[2].style.spacingBefore = 5;
+  subnodes[2].style.spacingAfter = 5;
+
+  // 3 items, each item has a size of {50, 50}
+  // width is 160px. It's enough to fix all items without taking item spacings into account.
+  // But since item spacings exist, the last item should be pushsed into another line.
+  // See: https://github.com/TextureGroup/Texture/pull/472
+  static ASSizeRange kSize = {{160, 300}, {160, 300}};
+  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+}
+
 #pragma mark - Content alignment tests
 
 - (void)testAlignContentUnderflow
@@ -1280,6 +1324,35 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
   static ASSizeRange kSize = {{110, 300}, {110, 300}};
   [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+}
+
+#pragma mark - Line spacing tests
+
+- (void)testAlignContentAndLineSpacingUnderflow
+{
+  // 3 lines, each line has 2 items, each item has a size of {50, 50}
+  // 10px between lines
+  // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
+  static ASSizeRange kSize = {{110, 320}, {110, 320}};
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 sizeRange:kSize identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 sizeRange:kSize identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 sizeRange:kSize identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceAround"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch lineSpacing:10 sizeRange:kSize identifier:@"alignContentStretch"];
+}
+
+- (void)testAlignContentAndLineSpacingOverflow
+{
+  // 6 lines, each line has 1 item, each item has a size of {50, 50}
+  // 10px between lines
+  // width is 40px. It's 10px smaller than the width of each item (40px vs 50px) to test that items are still correctly collected into lines
+  static ASSizeRange kSize = {{40, 310}, {40, 310}};
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 sizeRange:kSize identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 sizeRange:kSize identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 sizeRange:kSize identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceAround"];
 }
 
 @end
