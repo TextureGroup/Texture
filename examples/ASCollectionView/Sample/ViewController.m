@@ -48,7 +48,7 @@
 
 #if ASYNC_COLLECTION_LAYOUT
   ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionVerticalDirections];
-  layoutDelegate.sizeProvider = self;
+  layoutDelegate.propertiesProvider = self;
   self.collectionNode = [[ASCollectionNode alloc] initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
 #else
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
