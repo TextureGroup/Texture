@@ -1,5 +1,5 @@
 //
-//  _ASCollectionGalleryLayoutInfo.h
+//  _ASCollectionGalleryLayoutInfo.m
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.

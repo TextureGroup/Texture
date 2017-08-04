@@ -23,7 +23,7 @@
 
 #define ASYNC_COLLECTION_LAYOUT 0
 
-@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout, ASCollectionGalleryLayoutSizeProviding>
+@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout, ASCollectionGalleryLayoutPropertiesProviding>
 
 @property (nonatomic, strong) ASCollectionNode *collectionNode;
 @property (nonatomic, strong) NSArray *data;
