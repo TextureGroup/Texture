@@ -850,8 +850,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   if (pendingLayoutTransition != nil) {
     [self _setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];
     [self _completeLayoutTransition:pendingLayoutTransition];
+    [self _pendingLayoutTransitionDidComplete];
   }
-  [self _pendingLayoutTransitionDidComplete];
 }
 
 /**
