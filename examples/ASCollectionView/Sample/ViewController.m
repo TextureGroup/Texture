@@ -108,7 +108,7 @@
   [self.collectionNode reloadData];
 }
 
-#pragma mark - ASCollectionGalleryLayoutSizeProviding
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
 - (CGSize)sizeForElements:(ASElementMap *)elements
 {
