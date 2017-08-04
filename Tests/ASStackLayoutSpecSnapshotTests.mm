@@ -1224,7 +1224,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testFlexWrapWithItemSpacings
 {
   ASStackLayoutSpecStyle style = {
-    .spacing = 5,
+    .spacing = 50,
     .direction = ASStackLayoutDirectionHorizontal,
     .flexWrap = ASStackLayoutFlexWrapWrap,
     .alignContent = ASStackLayoutAlignContentStart,
@@ -1238,18 +1238,55 @@ static NSArray<ASTextNode*> *defaultTextNodes()
                                          ASDisplayNodeWithBackgroundColor([UIColor blueColor], subnodeSize),
                                          ];
 
-  subnodes[0].style.spacingBefore = 5;
-  subnodes[0].style.spacingAfter = 5;
-  subnodes[1].style.spacingBefore = 5;
-  subnodes[1].style.spacingAfter = 5;
-  subnodes[2].style.spacingBefore = 5;
-  subnodes[2].style.spacingAfter = 5;
+  for (ASDisplayNode *subnode in subnodes) {
+    subnode.style.spacingBefore = 5;
+    subnode.style.spacingAfter = 5;
+  }
 
   // 3 items, each item has a size of {50, 50}
-  // width is 160px, enough to fit all items without taking interitem spacings into account
-  // But since spacings exist, the last item should be pushed to a second line.
+  // width is 230px, enough to fit all items without taking all spacings into account
+  // Test that all spacings are included and therefore the last item is pushed to a second line.
   // See: https://github.com/TextureGroup/Texture/pull/472
-  static ASSizeRange kSize = {{160, 300}, {160, 300}};
+  static ASSizeRange kSize = {{230, 300}, {230, 300}};
+  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+}
+
+- (void)testFlexWrapWithItemSpacingsBeingResetOnNewLines
+{
+  ASStackLayoutSpecStyle style = {
+    .spacing = 5,
+    .direction = ASStackLayoutDirectionHorizontal,
+    .flexWrap = ASStackLayoutFlexWrapWrap,
+    .alignContent = ASStackLayoutAlignContentStart,
+    .lineSpacing = 5,
+  };
+
+  CGSize subnodeSize = {50, 50};
+  NSArray<ASDisplayNode *> *subnodes = @[
+                                         // 1st line
+                                         ASDisplayNodeWithBackgroundColor([UIColor redColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor yellowColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor blueColor], subnodeSize),
+                                         // 2nd line
+                                         ASDisplayNodeWithBackgroundColor([UIColor magentaColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor greenColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor cyanColor], subnodeSize),
+                                         // 3rd line
+                                         ASDisplayNodeWithBackgroundColor([UIColor brownColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor orangeColor], subnodeSize),
+                                         ASDisplayNodeWithBackgroundColor([UIColor purpleColor], subnodeSize),
+                                         ];
+
+  for (ASDisplayNode *subnode in subnodes) {
+    subnode.style.spacingBefore = 5;
+    subnode.style.spacingAfter = 5;
+  }
+
+  // 3 lines, each line has 3 items, each item has a size of {50, 50}
+  // width is 190px, enough to fit 3 items into a line
+  // Test that interitem spacing is reset on new lines. Otherwise, lines after the 1st line would have only 2 items.
+  // See: https://github.com/TextureGroup/Texture/pull/472
+  static ASSizeRange kSize = {{190, 300}, {190, 300}};
   [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
 }
 
