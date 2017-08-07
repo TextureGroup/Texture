@@ -254,7 +254,7 @@
       id viewModel = viewModels[indexPath.item];
       XCTAssertEqualObjects(viewModel, [collectionNode viewModelForItemAtIndexPath:indexPath]);
       ASCellNode *node = [collectionNode nodeForItemAtIndexPath:indexPath];
-      XCTAssertEqualObjects(node.viewModel, viewModel);
+      XCTAssertEqualObjects(node.nodeViewModel, viewModel);
     }
   }
 }
