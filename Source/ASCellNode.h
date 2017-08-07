@@ -123,7 +123,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  *
  * This property may be set off the main thread, but this method will never be invoked concurrently on the 
  */
-@property (atomic, nullable) id viewModel;
+@property (atomic, nullable) id nodeViewModel;
 
 /**
  * Asks the node whether it can be updated to the given view model.

@@ -64,7 +64,7 @@
     node.owningNode = _owningNode;
     node.collectionElement = self;
     ASTraitCollectionPropagateDown(node, _traitCollection);
-    node.viewModel = _viewModel;
+    node.nodeViewModel = _viewModel;
     _node = node;
   }
   return _node;

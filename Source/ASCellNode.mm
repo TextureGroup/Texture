@@ -172,7 +172,7 @@
 
 - (BOOL)canUpdateToViewModel:(id)viewModel
 {
-  return [self.viewModel class] == [viewModel class];
+  return [self.nodeViewModel class] == [viewModel class];
 }
 
 - (NSIndexPath *)indexPath
