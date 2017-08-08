@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
 
-@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutSizeProviding>
+@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {
   __weak id <ASPagerDataSource> _pagerDataSource;
   ASPagerNodeProxy *_proxyDataSource;
@@ -75,7 +75,7 @@
   ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionHorizontalDirections];
   self = [super initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
   if (self) {
-    layoutDelegate.sizeProvider = self;
+    layoutDelegate.propertiesProvider = self;
   }
   return self;
 }
@@ -137,7 +137,7 @@
   return indexPath.row;
 }
 
-#pragma mark - ASCollectionGalleryLayoutSizeProviding
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
 - (CGSize)sizeForElements:(ASElementMap *)elements
 {
