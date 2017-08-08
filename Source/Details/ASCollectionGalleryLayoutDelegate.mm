@@ -42,7 +42,9 @@
 {
   self = [super init];
   if (self) {
-    // Scrollable directions must be either vertical or horizontal and can't be both
+    // Scrollable directions must be either vertical or horizontal, but not both
+    ASDisplayNodeAssertTrue(ASScrollDirectionContainsVerticalDirection(scrollableDirections)
+                            || ASScrollDirectionContainsHorizontalDirection(scrollableDirections));
     ASDisplayNodeAssertFalse(ASScrollDirectionContainsVerticalDirection(scrollableDirections)
                              && ASScrollDirectionContainsHorizontalDirection(scrollableDirections));
     _scrollableDirections = scrollableDirections;
