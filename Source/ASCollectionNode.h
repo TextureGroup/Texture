@@ -129,6 +129,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
 
 /**
+ * The offset of the content view's origin from the collection node's origin. Defaults to CGPointZero.
+ */
+@property (nonatomic, assign) CGPoint contentOffset;
+
+/**
+ * Sets the offset from the content node’s origin to the collection node’s origin.
+ *
+ * @param contentOffset The offset
+ *
+ * @param animated YES to animate to this new offset at a constant velocity, NO to not aniamte and immediately make the transition.
+ */
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
+
+/**
  * Tuning parameters for a range type in full mode.
  *
  * @param rangeType The range type to get the tuning parameters for.

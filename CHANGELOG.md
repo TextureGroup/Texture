@@ -7,13 +7,14 @@
 - [ASCollectionView] Add delegate bridging and index space translation for missing UICollectionViewLayout properties. [Scott Goodson](https://github.com/appleguy)
 - [ASTextNode2] Add initial implementation for link handling. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/396)
 - [ASTextNode2] Provide compile flag to globally enable new implementation of ASTextNode: ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE. [Scott Goodson](https://github.com/appleguy) [#396](https://github.com/TextureGroup/Texture/pull/410)
-- Add ASCollectionGalleryLayoutDelegate - an async collection layout that makes same-size collections (e.g photo galleries, pagers, etc) fast and lightweight! [Huy Nguyen](https://github.com/nguyenhuy/) [#76](https://github.com/TextureGroup/Texture/pull/76) [#451](https://github.com/TextureGroup/Texture/pull/451)
+- Add ASCollectionGalleryLayoutDelegate - an async collection layout that makes same-size collections (e.g photo galleries, pagers, etc) fast and lightweight! [Huy Nguyen](https://github.com/nguyenhuy/) [#76](https://github.com/TextureGroup/Texture/pull/76) [#451](https://github.com/TextureGroup/Texture/pull/451) [#496](https://github.com/TextureGroup/Texture/pull/496)
 - Fix an issue that causes infinite layout loop in ASDisplayNode after [#428](https://github.com/TextureGroup/Texture/pull/428) [Huy Nguyen](https://github.com/nguyenhuy) [#455](https://github.com/TextureGroup/Texture/pull/455) 
 - Fix an issue in layout transition that causes it to unexpectedly use the old layout [Huy Nguyen](https://github.com/nguyenhuy) [#464](https://github.com/TextureGroup/Texture/pull/464)
 - Add -[ASDisplayNode detailedLayoutDescription] property to aid debugging. [Adlai Holler](https://github.com/Adlai-Holler) [#476](https://github.com/TextureGroup/Texture/pull/476)
 - Fix an issue that causes calculatedLayoutDidChange being called needlessly. [Huy Nguyen](https://github.com/nguyenhuy) [#490](https://github.com/TextureGroup/Texture/pull/490)
 - Negate iOS 11 automatic estimated table row heights. [Christian Selig](https://github.com/christianselig) [#485](https://github.com/TextureGroup/Texture/pull/485)
 - Rename ASCellNode.viewModel to ASCellNode.nodeModel to reduce collisions with subclass properties implemented by clients. [Adlai Holler](https://github.com/Adlai-Holler) [#504](https://github.com/TextureGroup/Texture/pull/504)
+- [Breaking] Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
 
 ##2.3.5
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
