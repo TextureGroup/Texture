@@ -173,7 +173,7 @@
     // For each item:
     for (NSInteger i = 0; i < nodeModels.count; i++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:section];
-      [self expectnodeModelMethodForItemAtIndexPath:indexPath nodeModel:nodeModels[i]];
+      [self expectNodeModelMethodForItemAtIndexPath:indexPath nodeModel:nodeModels[i]];
       [self expectNodeBlockMethodForItemAtIndexPath:indexPath];
     }
   }
@@ -205,7 +205,7 @@
   }
 }
 
-- (void)expectnodeModelMethodForItemAtIndexPath:(NSIndexPath *)indexPath nodeModel:(id)nodeModel
+- (void)expectNodeModelMethodForItemAtIndexPath:(NSIndexPath *)indexPath nodeModel:(id)nodeModel
 {
   OCMExpect([mockDataSource collectionNode:collectionNode nodeModelForItemAtIndexPath:indexPath])
   .andReturn(nodeModel);
@@ -326,7 +326,7 @@
     }];
     
     for (NSIndexPath *indexPath in [insertsPlusReloads.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
-      [self expectnodeModelMethodForItemAtIndexPath:indexPath nodeModel:insertsPlusReloads[indexPath]];
+      [self expectNodeModelMethodForItemAtIndexPath:indexPath nodeModel:insertsPlusReloads[indexPath]];
       NSIndexPath *oldIndexPath = [reloadMappings allKeysForObject:indexPath].firstObject;
       BOOL isSkippedReload = oldIndexPath && [skippedReloadIndexPaths containsObject:oldIndexPath];
       if (!isSkippedReload) {
