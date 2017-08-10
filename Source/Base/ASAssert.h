@@ -19,6 +19,7 @@
 
 #import <Foundation/NSException.h>
 #import <pthread.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 
 #define ASDISPLAYNODE_ASSERTIONS_ENABLED (!defined(NS_BLOCK_ASSERTIONS))
 
@@ -42,8 +43,8 @@
 #define ASDisplayNodeAssertNotInstantiable() ASDisplayNodeAssert(NO, nil, @"This class is not instantiable.");
 #define ASDisplayNodeAssertNotSupported() ASDisplayNodeAssert(NO, nil, @"This method is not supported by class %@", [self class]);
 
-#define ASDisplayNodeAssertMainThread() ASDisplayNodeAssert(0 != pthread_main_np(), @"This method must be called on the main thread")
-#define ASDisplayNodeCAssertMainThread() ASDisplayNodeCAssert(0 != pthread_main_np(), @"This function must be called on the main thread")
+#define ASDisplayNodeAssertMainThread() ASDisplayNodeAssert(ASMainThreadAssertionsAreDisabled() || 0 != pthread_main_np(), @"This method must be called on the main thread")
+#define ASDisplayNodeCAssertMainThread() ASDisplayNodeCAssert(ASMainThreadAssertionsAreDisabled() || 0 != pthread_main_np(), @"This function must be called on the main thread")
 
 #define ASDisplayNodeAssertNotMainThread() ASDisplayNodeAssert(0 == pthread_main_np(), @"This method must be called off the main thread")
 #define ASDisplayNodeCAssertNotMainThread() ASDisplayNodeCAssert(0 == pthread_main_np(), @"This function must be called off the main thread")
@@ -69,9 +70,28 @@
 #define ASDisplayNodeErrorDomain @"ASDisplayNodeErrorDomain"
 #define ASDisplayNodeNonFatalErrorCode 1
 
-#define ASDisplayNodeAssertNonFatal(condition, desc, ...)                                                                         \
-  ASDisplayNodeAssert(condition, desc, ##__VA_ARGS__);                                                                            \
-  if (condition ==  NO) {                                                                                                         \
+/**
+ * In debug methods, it can be useful to disable main thread assertions to get valuable information,
+ * even if it means violating threading requirements. These functions are used in -debugDescription and let
+ * threads decide to suppress/re-enable main thread assertions.
+ */
+#pragma mark - Main Thread Assertions Disabling
+
+ASDISPLAYNODE_EXTERN_C_BEGIN
+BOOL ASMainThreadAssertionsAreDisabled();
+
+void ASPushMainThreadAssertionsDisabled();
+
+void ASPopMainThreadAssertionsDisabled();
+ASDISPLAYNODE_EXTERN_C_END
+
+#pragma mark - Non-Fatal Assertions
+
+/// Returns YES if assertion passed, NO otherwise.
+#define ASDisplayNodeAssertNonFatal(condition, desc, ...) ({                                                                      \
+  BOOL __evaluated = condition;                                                                                                   \
+  if (__evaluated == NO) {                                                                                                        \
+    ASDisplayNodeFailAssert(desc, ##__VA_ARGS__);                                                                                 \
     ASDisplayNodeNonFatalErrorBlock block = [ASDisplayNode nonFatalErrorBlock];                                                   \
     if (block != nil) {                                                                                                           \
       NSDictionary *userInfo = nil;                                                                                               \
@@ -81,4 +101,6 @@
       NSError *error = [NSError errorWithDomain:ASDisplayNodeErrorDomain code:ASDisplayNodeNonFatalErrorCode userInfo:userInfo];  \
       block(error);                                                                                                               \
     }                                                                                                                             \
-  }
+  }                                                                                                                               \
+  __evaluated;                                                                                                                    \
+})                                                                                                                                \

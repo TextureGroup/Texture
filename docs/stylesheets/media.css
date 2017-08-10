@@ -4,6 +4,10 @@
 		display: block;
 	}
 
+	header nav {
+	    line-height: 55px;
+	}
+
 	header ul {
 	}
 
@@ -43,12 +47,4 @@
 		width: 75%;
 		float: right;
 	}
-}
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  #logo {
-    content: url(/static/images/Texturelogo@2x.png);
-    width: 186px;
-    height: 40px;
-  }
 }

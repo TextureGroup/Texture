@@ -51,6 +51,8 @@ AS_SUBCLASSING_RESTRICTED
 
 + (instancetype)sharedDeallocationQueue;
 
+- (void)test_drain;
+
 - (void)releaseObjectInBackground:(id)object;
 
 @end

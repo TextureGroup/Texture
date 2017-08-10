@@ -53,6 +53,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     return;
   }
   
+  id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
   _animatedImage = animatedImage;
   
   if (animatedImage != nil) {
@@ -73,6 +74,13 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
       };
     }
   }
+  
+  [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
+}
+
+- (void)animatedImageSet:(id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(id <ASAnimatedImageProtocol>)previousAnimatedImage
+{
+  //Subclasses may override
 }
 
 - (id <ASAnimatedImageProtocol>)animatedImage
@@ -301,6 +309,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     self.lastDisplayLinkFire = 0;
   } else {
     self.contents = (__bridge id)frameImage;
+    [self displayDidFinish];
   }
 }
 

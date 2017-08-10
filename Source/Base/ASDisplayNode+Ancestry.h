@@ -22,7 +22,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASDisplayNode (Ancestry)
 
-- (NSEnumerator *)ancestorEnumeratorWithSelf:(BOOL)includeSelf;
+/**
+ * Returns an object to enumerate the supernode ancestry of this node, starting with its supernode.
+ *
+ * For instance, you could write:
+ *   for (ASDisplayNode *node in self.supernodes) {
+ *     if ([node.backgroundColor isEqual:[UIColor blueColor]]) {
+ *       node.hidden = YES;
+ *     }
+ *   }
+ *
+ * Note: If this property is read on the main thread, the enumeration will attempt to go up
+ *  the layer hierarchy if it finds a break in the display node hierarchy.
+ */
+@property (atomic, readonly) id<NSFastEnumeration> supernodes;
+
+/**
+ * Same as `supernodes` but begins the enumeration with self.
+ */
+@property (atomic, readonly) id<NSFastEnumeration> supernodesIncludingSelf;
+
+/**
+ * Searches the supernodes of this node for one matching the given class.
+ *
+ * @param supernodeClass The class of node you're looking for.
+ * @param includeSelf Whether to include self in the search.
+ * @return A node of the given class that is an ancestor of this node, or nil.
+ *
+ * @note See the documentation on `supernodes` for details about the upward traversal.
+ */
+- (nullable __kindof ASDisplayNode *)supernodeOfClass:(Class)supernodeClass includingSelf:(BOOL)includeSelf;
 
 /**
  * e.g. "(<MYTextNode: 0xFFFF>, <MYTextContainingNode: 0xFFFF>, <MYCellNode: 0xFFFF>)"

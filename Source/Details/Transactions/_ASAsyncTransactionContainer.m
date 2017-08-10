@@ -93,11 +93,11 @@ static const char *ASAsyncTransactionIsContainerKey = "ASTransactionIsContainer"
   if (transaction == nil) {
     NSHashTable *transactions = self.asyncdisplaykit_asyncLayerTransactions;
     if (transactions == nil) {
-      transactions = [NSHashTable hashTableWithOptions:NSPointerFunctionsObjectPointerPersonality];
+      transactions = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    transaction = [[_ASAsyncTransaction alloc] initWithCallbackQueue:dispatch_get_main_queue() completionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+    transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
       __strong CALayer *self = weakSelf;
       if (self == nil) {
         return;

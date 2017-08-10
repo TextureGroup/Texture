@@ -16,6 +16,8 @@
 //
 
 #import <AsyncDisplayKit/ASTableNode.h>
+#import <AsyncDisplayKit/ASTableNode+Beta.h>
+
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASTableViewInternal.h>
@@ -40,6 +42,8 @@
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 @property (nonatomic, assign) BOOL allowsMultipleSelectionDuringEditing;
 @property (nonatomic, assign) BOOL inverted;
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
 @end
 
 @implementation _ASTablePendingState
@@ -53,6 +57,8 @@
     _allowsMultipleSelection = NO;
     _allowsMultipleSelectionDuringEditing = NO;
     _inverted = NO;
+    _leadingScreensForBatching = 2;
+    _automaticallyAdjustsContentOffset = NO;
   }
   return self;
 }
@@ -64,6 +70,7 @@
 @interface ASTableNode ()
 {
   ASDN::RecursiveMutex _environmentStateLock;
+  id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 
 @property (nonatomic, strong) _ASTablePendingState *pendingState;
@@ -80,7 +87,7 @@
     [self setViewBlock:^{
       // Variable will be unused if event logging is off.
       __unused __typeof__(self) strongSelf = weakSelf;
-      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
     }];
   }
   return self;
@@ -135,10 +142,10 @@
 
 - (void)didEnterPreloadState
 {
-  // Intentionally allocate the view here so that super will trigger a layout pass on it which in turn will trigger the intial data load.
-  // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
-  [self view];
   [super didEnterPreloadState];
+  // Intentionally allocate the view here and trigger a layout pass on it, which in turn will trigger the intial data load.
+  // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
+  [[self view] layoutIfNeeded];
 }
 
 #if ASRangeControllerLoggingEnabled
@@ -201,6 +208,48 @@
     return _pendingState.inverted;
   } else {
     return self.view.inverted;
+  }
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.leadingScreensForBatching = leadingScreensForBatching;
+  } else {
+    ASDisplayNodeAssert(self.nodeLoaded, @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.leadingScreensForBatching = leadingScreensForBatching;
+  }
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.leadingScreensForBatching;
+  } else {
+    return self.view.leadingScreensForBatching;
+  }
+}
+
+- (void)setAutomaticallyAdjustsContentOffset:(BOOL)automaticallyAdjustsContentOffset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.automaticallyAdjustsContentOffset = automaticallyAdjustsContentOffset;
+  } else {
+    ASDisplayNodeAssert(self.nodeLoaded, @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.automaticallyAdjustsContentOffset = automaticallyAdjustsContentOffset;
+  }
+}
+
+- (BOOL)automaticallyAdjustsContentOffset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.automaticallyAdjustsContentOffset;
+  } else {
+    return self.view.automaticallyAdjustsContentOffset;
   }
 }
 
@@ -333,6 +382,16 @@
   } else {
     return self.view.allowsMultipleSelectionDuringEditing;
   }
+}
+
+- (void)setBatchFetchingDelegate:(id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  _batchFetchingDelegate = batchFetchingDelegate;
+}
+
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return _batchFetchingDelegate;
 }
 
 #pragma mark ASRangeControllerUpdateRangeProtocol

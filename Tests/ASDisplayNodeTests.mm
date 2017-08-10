@@ -1,5 +1,5 @@
 //
-//  ASDisplayNodeTests.m
+//  ASDisplayNodeTests.mm
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -1880,10 +1880,8 @@ static bool stringContainsPointer(NSString *description, id p) {
   node.debugName = @"big troll eater name";
 
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
   [node layer];
   XCTAssertTrue([node.description containsString:node.debugName], @"debugName didn't end up in description");
-  XCTAssertTrue([node.description containsString:@"debugName"], @"Node description should contain `debugName`.");
 }
 
 - (void)testNameInDescriptionLayer
@@ -1977,7 +1975,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  supernode.shouldRasterizeDescendants = YES;
+  [supernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -1995,7 +1993,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenAddedToContainerThatIsInHierarchy
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  supernode.shouldRasterizeDescendants = YES;
+  [supernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
 
@@ -2010,52 +2008,10 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertFalse(subnode.isVisible);
 }
 
-- (void)testThatLoadedNodeGetsUnloadedIfSubtreeBecomesRasterized
-{
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  [supernode view];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
-  ASSetDebugNames(supernode, subnode);
-  [supernode addSubnode:subnode];
-  XCTAssertTrue(subnode.nodeLoaded);
-  supernode.shouldRasterizeDescendants = YES;
-  XCTAssertFalse(subnode.nodeLoaded);
-}
-
-- (void)testThatLoadedNodeGetsUnloadedIfAddedToRasterizedSubtree
-{
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  supernode.shouldRasterizeDescendants = YES;
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
-  ASSetDebugNames(supernode, subnode);
-  [subnode view];
-  XCTAssertTrue(subnode.nodeLoaded);
-  [supernode addSubnode:subnode];
-  XCTAssertFalse(subnode.nodeLoaded);
-  XCTAssertTrue(ASHierarchyStateIncludesRasterized(subnode.hierarchyState));
-}
-
-- (void)testThatClearingRasterizationBitMidwayDownTheTreeWorksRight
-{
-  ASDisplayNode *topNode = [[ASDisplayNode alloc] init];
-  topNode.shouldRasterizeDescendants = YES;
-  ASDisplayNode *middleNode = [[ASDisplayNode alloc] init];
-  middleNode.shouldRasterizeDescendants = YES;
-  ASDisplayNode *bottomNode = [[ASDisplayNode alloc] init];
-  ASSetDebugNames(topNode, middleNode, bottomNode);
-  [middleNode addSubnode:bottomNode];
-  [topNode addSubnode:middleNode];
-  XCTAssertTrue(ASHierarchyStateIncludesRasterized(bottomNode.hierarchyState));
-  XCTAssertTrue(ASHierarchyStateIncludesRasterized(middleNode.hierarchyState));
-  middleNode.shouldRasterizeDescendants = NO;
-  XCTAssertTrue(ASHierarchyStateIncludesRasterized(bottomNode.hierarchyState));
-  XCTAssertTrue(ASHierarchyStateIncludesRasterized(middleNode.hierarchyState));
-}
-
 - (void)testThatRasterizingWrapperNodesIsNotAllowed
 {
   ASDisplayNode *rasterizedSupernode = [[ASDisplayNode alloc] init];
-  rasterizedSupernode.shouldRasterizeDescendants = YES;
+  [rasterizedSupernode enableSubtreeRasterization];
   ASDisplayNode *subnode = [[ASDisplayNode alloc] initWithViewBlock:^UIView * _Nonnull{
     return [[UIView alloc] init];
   }];
@@ -2110,7 +2066,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 {
   ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
   node.debugName = @"Node";
-  node.shouldRasterizeDescendants = YES;
+  [node enableSubtreeRasterization];
   
   ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   subnode.debugName = @"Subnode";
@@ -2300,6 +2256,23 @@ static bool stringContainsPointer(NSString *description, id p) {
   [window addSubnode:node];
   CGPoint expectedOrigin = CGPointMake(10, 10);
   ASXCTAssertEqualPoints([node convertPoint:node.bounds.origin toNode:nil], expectedOrigin);
+}
+
+- (void)testThatItIsAllowedToRetrieveDebugDescriptionIncludingVCOffMainThread
+{
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  UIViewController *vc = [[UIViewController alloc] init];
+  [vc.view addSubnode:node];
+  dispatch_group_t g = dispatch_group_create();
+  __block NSString *debugDescription;
+  dispatch_group_async(g, dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+    debugDescription = [node debugDescription];
+  });
+  dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+  // Ensure the debug description contains the VC string.
+  // Have to split into two lines because XCTAssert macro can't handle the stringWithFormat:.
+  BOOL hasVC = [debugDescription containsString:[NSString stringWithFormat:@"%p", vc]];
+  XCTAssert(hasVC);
 }
 
 @end

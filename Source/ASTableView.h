@@ -31,13 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asynchronous UITableView with Intelligent Preloading capabilities.
  *
- * @discussion ASTableView is a true subclass of UITableView, meaning it is pointer-compatible with code that
- * currently uses UITableView
- *
- * The main difference is that asyncDataSource expects -nodeForRowAtIndexPath, an ASCellNode, and
- * the heightForRowAtIndexPath: method is eliminated (as are the performance problems caused by it).
- * This is made possible because ASCellNodes can calculate their own size, and preload ahead of time.
- *
  * @note ASTableNode is strongly recommended over ASTableView.  This class is provided for adoption convenience.
  */
 @interface ASTableView : UITableView
@@ -49,29 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Retrieves the node for the row at the given index path.
  */
 - (nullable ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
-
-/**
- * YES to automatically adjust the contentOffset when cells are inserted or deleted above
- * visible cells, maintaining the users' visible scroll position. 
- *
- * @note This is only applied to non-animated updates. For animated updates, there is no way to
- * synchronize or "cancel out" the appearance of a scroll due to UITableView API limitations.
- *
- * default is NO.
- */
-@property (nonatomic) BOOL automaticallyAdjustsContentOffset;
-
-/**
- * The number of screens left to scroll before the delegate -tableView:beginBatchFetchingWithContext: is called.
- *
- * Defaults to two screenfuls.
- */
-@property (nonatomic, assign) CGFloat leadingScreensForBatching;
-
-/*
- * A Boolean value that determines whether the nodes that the data source renders will be flipped.
- */
-@property (nonatomic, assign) BOOL inverted;
 
 @end
 
@@ -89,6 +59,30 @@ NS_ASSUME_NONNULL_BEGIN
  * @param style A constant that specifies the style of the table view. See UITableViewStyle for descriptions of valid constants.
  */
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style ASDISPLAYNODE_DEPRECATED_MSG("Please use ASTableNode instead of ASTableView.");
+
+/**
+ * The number of screens left to scroll before the delegate -tableView:beginBatchFetchingWithContext: is called.
+ *
+ * Defaults to two screenfuls.
+ */
+@property (nonatomic, assign) CGFloat leadingScreensForBatching ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
+
+
+/**
+ * YES to automatically adjust the contentOffset when cells are inserted or deleted above
+ * visible cells, maintaining the users' visible scroll position.
+ *
+ * @note This is only applied to non-animated updates. For animated updates, there is no way to
+ * synchronize or "cancel out" the appearance of a scroll due to UITableView API limitations.
+ *
+ * default is NO.
+ */
+@property (nonatomic) BOOL automaticallyAdjustsContentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
+
+/*
+ * A Boolean value that determines whether the nodes that the data source renders will be flipped.
+ */
+@property (nonatomic, assign) BOOL inverted ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
 /**
  * Tuning parameters for a range type in full mode.

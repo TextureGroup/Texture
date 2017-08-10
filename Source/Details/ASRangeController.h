@@ -114,9 +114,9 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * @param rangeController Sender.
  *
- * @return an array of elements corresponding to the data currently visible onscreen (i.e., the visible range).
+ * @return an table of elements corresponding to the data currently visible onscreen (i.e., the visible range).
  */
-- (NSArray<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController;
+- (nullable NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController;
 
 /**
  * @param rangeController Sender.
@@ -146,18 +146,17 @@ AS_SUBCLASSING_RESTRICTED
 @protocol ASRangeControllerDelegate <NSObject>
 
 /**
- * Called before updating with given change set.
+ * Called to update with given change set.
  *
  * @param changeSet The change set that includes all updates
- */
-- (void)rangeController:(ASRangeController *)rangeController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;
-
-/**
- * Called after updating with given change set.
  *
- * @param changeSet The change set that includes all updates
+ * @param updates The block that performs relevant data updates.
+ *
+ * @discussion The updates block must always be executed or the data controller will get into a bad state.
+ * It should be called at the time the backing view is ready to process the updates,
+ * i.e inside the updates block of `-[UICollectionView performBatchUpdates:completion:] or after calling `-[UITableView beginUpdates]`.
  */
-- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;
+- (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates;
 
 @end
 

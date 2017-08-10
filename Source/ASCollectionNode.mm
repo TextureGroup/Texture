@@ -28,6 +28,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASSectionContext.h>
 #import <AsyncDisplayKit/ASDataController.h>
@@ -45,6 +46,9 @@
 @property (nonatomic, assign) BOOL allowsSelection; // default is YES
 @property (nonatomic, assign) BOOL allowsMultipleSelection; // default is NO
 @property (nonatomic, assign) BOOL inverted; //default is NO
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
 @end
 
 @implementation _ASCollectionPendingState
@@ -109,6 +113,7 @@
 {
   ASDN::RecursiveMutex _environmentStateLock;
   Class _collectionViewClass;
+  id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 @property (nonatomic) _ASCollectionPendingState *pendingState;
 @end
@@ -155,7 +160,7 @@
     __weak __typeof__(self) weakSelf = self;
     [self setViewBlock:^{
       __typeof__(self) strongSelf = weakSelf;
-      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
     }];
   }
   return self;
@@ -172,12 +177,14 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
-    self.pendingState            = nil;
-    view.asyncDelegate           = pendingState.delegate;
-    view.asyncDataSource         = pendingState.dataSource;
-    view.inverted                = pendingState.inverted;
-    view.allowsSelection         = pendingState.allowsSelection;
-    view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.asyncDelegate              = pendingState.delegate;
+    view.asyncDataSource            = pendingState.dataSource;
+    view.inverted                   = pendingState.inverted;
+    view.allowsSelection            = pendingState.allowsSelection;
+    view.allowsMultipleSelection    = pendingState.allowsMultipleSelection;
+    view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
+    view.layoutInspector            = pendingState.layoutInspector;
+    self.pendingState               = nil;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
@@ -206,10 +213,13 @@
 
 - (void)didEnterPreloadState
 {
-  // Intentionally allocate the view here so that super will trigger a layout pass on it which in turn will trigger the intial data load.
-  // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
-  [self view];
   [super didEnterPreloadState];
+  // Intentionally allocate the view here and trigger a layout pass on it, which in turn will trigger the intial data load.
+  // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
+  // TODO (ASCL) If this node supports async layout, kick off the initial data load without allocating the view
+  if (CGRectEqualToRect(self.bounds, CGRectZero) == NO) {
+    [[self view] layoutIfNeeded];
+  }
 }
 
 #if ASRangeControllerLoggingEnabled
@@ -272,6 +282,44 @@
     return _pendingState.inverted;
   } else {
     return self.view.inverted;
+  }
+}
+
+- (void)setLayoutInspector:(id<ASCollectionViewLayoutInspecting>)layoutInspector
+{
+  if ([self pendingState]) {
+    _pendingState.layoutInspector = layoutInspector;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.layoutInspector = layoutInspector;
+  }
+}
+
+- (id<ASCollectionViewLayoutInspecting>)layoutInspector
+{
+  if ([self pendingState]) {
+    return _pendingState.layoutInspector;
+  } else {
+    return self.view.layoutInspector;
+  }
+}
+
+- (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
+{
+  if ([self pendingState]) {
+    _pendingState.leadingScreensForBatching = leadingScreensForBatching;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.leadingScreensForBatching = leadingScreensForBatching;
+  }
+}
+
+- (CGFloat)leadingScreensForBatching
+{
+  if ([self pendingState]) {
+    return _pendingState.leadingScreensForBatching;
+  } else {
+    return self.view.leadingScreensForBatching;
   }
 }
 
@@ -386,6 +434,16 @@
   }
 }
 
+- (ASScrollDirection)scrollDirection
+{
+  return [self isNodeLoaded] ? self.view.scrollDirection : ASScrollDirectionNone;
+}
+
+- (ASScrollDirection)scrollableDirections
+{
+  return [self isNodeLoaded] ? self.view.scrollableDirections : ASScrollDirectionNone;
+}
+
 - (ASElementMap *)visibleElements
 {
   ASDisplayNodeAssertMainThread();
@@ -400,6 +458,34 @@
     return ((ASCollectionLayout *)layout).layoutDelegate;
   }
   return nil;
+}
+
+- (void)setBatchFetchingDelegate:(id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  _batchFetchingDelegate = batchFetchingDelegate;
+}
+
+- (id<ASBatchFetchingDelegate>)batchFetchingDelegate
+{
+  return _batchFetchingDelegate;
+}
+
+- (BOOL)usesSynchronousDataLoading
+{
+  if ([self pendingState]) {
+    return _pendingState.usesSynchronousDataLoading; 
+  } else {
+    return self.view.usesSynchronousDataLoading;
+  }
+}
+
+- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
+{
+  if ([self pendingState]) {
+    _pendingState.usesSynchronousDataLoading = usesSynchronousDataLoading; 
+  } else {
+    self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+  }
 }
 
 #pragma mark - Range Tuning
@@ -508,6 +594,12 @@
   return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].node;
 }
 
+- (id)viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self reloadDataInitiallyIfNeeded];
+  return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].viewModel;
+}
+
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
 {
   return [self.dataController.pendingMap indexPathForElement:cellNode.collectionElement];
@@ -594,9 +686,17 @@
 - (void)reloadDataWithCompletion:(void (^)())completion
 {
   ASDisplayNodeAssertMainThread();
-  if (self.nodeLoaded) {
-    [self.view reloadDataWithCompletion:completion];
+  if (!self.nodeLoaded) {
+    return;
   }
+  
+  [self performBatchUpdates:^{
+    [self.view.changeSet reloadData];
+  } completion:^(BOOL finished){
+    if (completion) {
+      completion();
+    }
+  }];
 }
 
 - (void)reloadData
@@ -604,14 +704,19 @@
   [self reloadDataWithCompletion:nil];
 }
 
-- (void)relayoutItems
-{
-  [self.view relayoutItems];
-}
-
 - (void)reloadDataImmediately
 {
-  [self.view reloadDataImmediately];
+  ASDisplayNodeAssertMainThread();
+  [self reloadData];
+  [self waitUntilAllUpdatesAreCommitted];
+}
+
+- (void)relayoutItems
+{
+  ASDisplayNodeAssertMainThread();
+  if (self.nodeLoaded) {
+  	[self.view relayoutItems];
+  }
 }
 
 - (void)beginUpdates

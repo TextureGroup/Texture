@@ -36,7 +36,7 @@ NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<N
   return newArray;
 }
 
-void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray *indexPaths)
+void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray<NSIndexPath *> *indexPaths)
 {
   if (indexPaths.count == 0) {
     return;
@@ -69,7 +69,7 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
   }
 }
 
-NSArray *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
+NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
   NSMutableArray *result = [NSMutableArray array];
   NSInteger section = 0;

@@ -18,14 +18,17 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-@class ASCellNode;
+@class ASCellNode, ASCollectionElement;
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_SUBCLASSING_RESTRICTED
+AS_SUBCLASSING_RESTRICTED // Note: ASDynamicCastStrict is used on instances of this class based on this restriction.
 @interface _ASCollectionReusableView : UICollectionReusableView
-@property (nonatomic, weak) ASCellNode *node;
+
+@property (nonatomic, strong, readonly, nullable) ASCellNode *node;
+@property (nonatomic, strong, nullable) ASCollectionElement *element;
 @property (nonatomic, strong, nullable) UICollectionViewLayoutAttributes *layoutAttributes;
+
 @end
 
 NS_ASSUME_NONNULL_END

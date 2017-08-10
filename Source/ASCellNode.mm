@@ -44,12 +44,6 @@
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
   BOOL _suspendInteractionDelegate;
-
-  struct {
-    unsigned int isTableNode:1;
-    unsigned int isCollectionNode:1;
-  } _owningNodeType;
-
 }
 
 @end
@@ -120,13 +114,6 @@
   _viewControllerNode.frame = self.bounds;
 }
 
-- (void)layoutDidFinish
-{
-  [super layoutDidFinish];
-
-  _viewControllerNode.frame = self.bounds;
-}
-
 - (void)_rootNodeDidInvalidateSize
 {
   if (_interactionDelegate != nil) {
@@ -165,19 +152,6 @@
   }
 }
 
-- (void)setOwningNode:(ASDisplayNode *)owningNode
-{
-  _owningNode = owningNode;
-
-  memset(&_owningNodeType, 0, sizeof(_owningNodeType));
-
-  if ([owningNode isKindOfClass:[ASTableNode class]]) {
-    _owningNodeType.isTableNode      = 1;
-  } else if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
-    _owningNodeType.isCollectionNode = 1;
-  }
-}
-
 - (void)__setSelectedFromUIKit:(BOOL)selected;
 {
   if (selected != _selected) {
@@ -196,17 +170,14 @@
   }
 }
 
+- (BOOL)canUpdateToViewModel:(id)viewModel
+{
+  return [self.nodeViewModel class] == [viewModel class];
+}
+
 - (NSIndexPath *)indexPath
 {
-  ASDisplayNodeAssertMainThread();
-
-  if (_owningNodeType.isTableNode) {
-    return [(ASTableNode *)self.owningNode indexPathForNode:self];
-  } else if (_owningNodeType.isCollectionNode) {
-    return [(ASCollectionNode *)self.owningNode indexPathForNode:self];
-  }
-
-  return nil;
+  return [self.owningNode indexPathForNode:self];
 }
 
 - (UIViewController *)viewController
@@ -344,13 +315,13 @@
     if (ip != nil) {
       [result addObject:@{ @"indexPath" : ip }];
     }
-    [result addObject:@{ @"collectionNode" : ASObjectDescriptionMakeTiny(owningNode) }];
+    [result addObject:@{ @"collectionNode" : owningNode }];
   } else if ([owningNode isKindOfClass:[ASTableNode class]]) {
     NSIndexPath *ip = [(ASTableNode *)owningNode indexPathForNode:self];
     if (ip != nil) {
       [result addObject:@{ @"indexPath" : ip }];
     }
-    [result addObject:@{ @"tableNode" : ASObjectDescriptionMakeTiny(owningNode) }];
+    [result addObject:@{ @"tableNode" : owningNode }];
   
   } else if ([scrollView isKindOfClass:[ASCollectionView class]]) {
     NSIndexPath *ip = [(ASCollectionView *)scrollView indexPathForNode:self];

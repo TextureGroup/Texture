@@ -16,46 +16,80 @@
 //
 
 #import "ASDisplayNode+Ancestry.h"
+#import <AsyncDisplayKit/ASThread.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASNodeAncestryEnumerator : NSEnumerator
 @end
 
 @implementation ASNodeAncestryEnumerator {
-  /// Would be nice to use __unsafe_unretained but nodes can be
-  /// deallocated on arbitrary threads so nope.
-  __weak ASDisplayNode * _nextNode;
+  ASDisplayNode *_lastNode; // This needs to be strong because enumeration will not retain the current batch of objects
+  BOOL _initialState;
 }
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
 {
   if (self = [super init]) {
-    _nextNode = node;
+    _initialState = YES;
+    _lastNode = node;
   }
   return self;
 }
 
 - (id)nextObject
 {
-  ASDisplayNode *node = _nextNode;
-  _nextNode = [node supernode];
-  return node;
+  if (_initialState) {
+    _initialState = NO;
+    return _lastNode;
+  }
+
+  ASDisplayNode *nextNode = _lastNode.supernode;
+  if (nextNode == nil && ASDisplayNodeThreadIsMain()) {
+    CALayer *layer = _lastNode.nodeLoaded ? _lastNode.layer.superlayer : nil;
+    while (layer != nil) {
+      nextNode = ASLayerToDisplayNode(layer);
+      if (nextNode != nil) {
+        break;
+      }
+      layer = layer.superlayer;
+    }
+  }
+  _lastNode = nextNode;
+  return nextNode;
 }
 
 @end
 
 @implementation ASDisplayNode (Ancestry)
 
-- (NSEnumerator *)ancestorEnumeratorWithSelf:(BOOL)includeSelf
+- (id<NSFastEnumeration>)supernodes
 {
-  ASDisplayNode *node = includeSelf ? self : self.supernode;
-  return [[ASNodeAncestryEnumerator alloc] initWithNode:node];
+  NSEnumerator *result = [[ASNodeAncestryEnumerator alloc] initWithNode:self];
+  [result nextObject]; // discard first object (self)
+  return result;
+}
+
+- (id<NSFastEnumeration>)supernodesIncludingSelf
+{
+  return [[ASNodeAncestryEnumerator alloc] initWithNode:self];
+}
+
+- (nullable __kindof ASDisplayNode *)supernodeOfClass:(Class)supernodeClass includingSelf:(BOOL)includeSelf
+{
+  id<NSFastEnumeration> chain = includeSelf ? self.supernodesIncludingSelf : self.supernodes;
+  for (ASDisplayNode *ancestor in chain) {
+    if ([ancestor isKindOfClass:supernodeClass]) {
+      return ancestor;
+    }
+  }
+  return nil;
 }
 
 - (NSString *)ancestryDescription
 {
   NSMutableArray *strings = [NSMutableArray array];
-  for (ASDisplayNode *node in [self ancestorEnumeratorWithSelf:YES]) {
+  for (ASDisplayNode *node in self.supernodes) {
     [strings addObject:ASObjectDescriptionMakeTiny(node)];
   }
   return strings.description;

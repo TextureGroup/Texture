@@ -65,6 +65,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout;
 
+@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+
+@property (nonatomic, assign) BOOL inverted;
+
+@property (nonatomic, readonly) ASScrollDirection scrollDirection;
+
+@property (nonatomic, readonly) ASScrollDirection scrollableDirections;
+
+@property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
+
 /**
  * Tuning parameters for a range type in full mode.
  *
@@ -152,30 +162,6 @@ NS_ASSUME_NONNULL_BEGIN
  *                    NO if they were interrupted. This parameter may be nil. If supplied, the block is run on the main thread.
  */
 - (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
-
-/**
- * Reload everything from scratch, destroying the working range and all cached nodes.
- *
- * @param completion block to run on completion of asynchronous loading or nil. If supplied, the block is run on
- * the main thread.
- * @warning This method is substantially more expensive than UICollectionView's version.
- */
-- (void)reloadDataWithCompletion:(nullable void (^)())completion;
-
-/**
- * Reload everything from scratch, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version.
- */
-- (void)reloadData;
-
-/**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version and will block the main thread
- * while all the cells load.
- */
-- (void)reloadDataImmediately;
 
 /**
  * Triggers a relayout of all nodes.

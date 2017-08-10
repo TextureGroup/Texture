@@ -17,8 +17,6 @@
 
 #import <AsyncDisplayKit/ASDimension.h>
 
-#import <UIKit/UIGeometry.h>
-
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
@@ -47,7 +45,6 @@ ASOVERLOADABLE ASDimension ASDimensionMake(NSString *dimension)
     }
   }
   
-  ASDisplayNodeCAssert(NO, @"Parsing dimension failed for: %@", dimension);
   return ASDimensionAuto;
 }
 
@@ -66,10 +63,6 @@ NSString *NSStringFromASDimension(ASDimension dimension)
 #pragma mark - ASLayoutSize
 
 ASLayoutSize const ASLayoutSizeAuto = {ASDimensionAuto, ASDimensionAuto};
-
-#pragma mark - ASEdgeInsets
-
-ASEdgeInsets const ASEdgeInsetsZero = {};
 
 #pragma mark - ASSizeRange
 
@@ -111,7 +104,30 @@ ASSizeRange ASSizeRangeIntersect(ASSizeRange sizeRange, ASSizeRange otherSizeRan
 
 NSString *NSStringFromASSizeRange(ASSizeRange sizeRange)
 {
-  return [NSString stringWithFormat:@"<ASSizeRange: min=%@, max=%@>",
-          NSStringFromCGSize(sizeRange.min),
-          NSStringFromCGSize(sizeRange.max)];
+  // 17 field length copied from iOS 10.3 impl of NSStringFromCGSize.
+  if (CGSizeEqualToSize(sizeRange.min, sizeRange.max)) {
+    return [NSString stringWithFormat:@"{{%.*g, %.*g}}",
+            17, sizeRange.min.width,
+            17, sizeRange.min.height];
+  }
+  return [NSString stringWithFormat:@"{{%.*g, %.*g}, {%.*g, %.*g}}",
+          17, sizeRange.min.width,
+          17, sizeRange.min.height,
+          17, sizeRange.max.width,
+          17, sizeRange.max.height];
 }
+
+#if YOGA
+#pragma mark - Yoga - ASEdgeInsets
+ASEdgeInsets const ASEdgeInsetsZero = {};
+
+extern ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets)
+{
+  ASEdgeInsets asEdgeInsets = ASEdgeInsetsZero;
+  asEdgeInsets.top = ASDimensionMake(edgeInsets.top);
+  asEdgeInsets.left = ASDimensionMake(edgeInsets.left);
+  asEdgeInsets.bottom = ASDimensionMake(edgeInsets.bottom);
+  asEdgeInsets.right = ASDimensionMake(edgeInsets.right);
+  return asEdgeInsets;
+}
+#endif

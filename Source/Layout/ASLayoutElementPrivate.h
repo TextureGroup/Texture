@@ -23,42 +23,42 @@
 
 #pragma mark - ASLayoutElementContext
 
-struct ASLayoutElementContext {
-  int32_t transitionID;
-};
+NS_ASSUME_NONNULL_BEGIN
+
+AS_SUBCLASSING_RESTRICTED
+@interface ASLayoutElementContext : NSObject
+@property (nonatomic) int32_t transitionID;
+@end
 
 extern int32_t const ASLayoutElementContextInvalidTransitionID;
 
 extern int32_t const ASLayoutElementContextDefaultTransitionID;
 
-extern struct ASLayoutElementContext const ASLayoutElementContextNull;
+// Does not currently support nesting – there must be no current context.
+extern void ASLayoutElementPushContext(ASLayoutElementContext * context);
 
-extern BOOL ASLayoutElementContextIsNull(struct ASLayoutElementContext context);
+extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext();
 
-extern struct ASLayoutElementContext ASLayoutElementContextMake(int32_t transitionID);
+extern void ASLayoutElementPopContext();
 
-extern void ASLayoutElementSetCurrentContext(struct ASLayoutElementContext context);
-
-extern struct ASLayoutElementContext ASLayoutElementGetCurrentContext();
-
-extern void ASLayoutElementClearCurrentContext();
-
+NS_ASSUME_NONNULL_END
 
 #pragma mark - ASLayoutElementLayoutDefaults
 
 #define ASLayoutElementLayoutCalculationDefaults \
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize\
 {\
-  _Pragma("clang diagnostic push")\
-  _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")\
-  /* For now we just call the deprecated measureWithSizeRange: method to not break old API */ \
-  return [self measureWithSizeRange:constrainedSize]; \
-  _Pragma("clang diagnostic pop")\
-} \
+  return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
+}\
 \
 - (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize\
 {\
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
+}\
+\
+- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize\
+{\
+  return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];\
 }\
 \
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize\
@@ -67,46 +67,6 @@ extern void ASLayoutElementClearCurrentContext();
 {\
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, ASLayoutElementSizeResolve(self.style.size, parentSize));\
   return [self calculateLayoutThatFits:resolvedRange];\
-}\
-
-
-#pragma mark - ASLayoutElementFinalLayoutElement
-/**
- *  The base protocol for ASLayoutElementFinalLayoutElement. Generally the methods/properties in this class do not need to be
- *  called by the end user and are only called internally. However, there may be a case where the methods are useful.
- */
-@protocol ASLayoutElementFinalLayoutElement <NSObject>
-
-/**
- *  @abstract This method can be used to give the user a chance to wrap an ASLayoutElement in an ASLayoutSpec 
- *  just before it is added to a parent ASLayoutSpec. For example, if you wanted an ASTextNode that was always 
- *  inside of an ASInsetLayoutSpec, you could subclass ASTextNode and implement finalLayoutElement so that it wraps
- *  itself in an inset spec.
- *
- *  Note that any ASLayoutElement other than self that is returned MUST set isFinalLayoutElement to YES. Make sure
- *  to do this BEFORE adding a child to the ASLayoutElement.
- *
- *  @return The layoutElement that will be added to the parent layout spec. Defaults to self.
- */
-- (id<ASLayoutElement>)finalLayoutElement;
-
-/**
- *  A flag to indicate that this ASLayoutElement was created in finalLayoutElement. This MUST be set to YES
- *  before adding a child to this layoutElement.
- */
-@property (nonatomic, assign) BOOL isFinalLayoutElement;
-
-@end
-
-// Default implementation for ASLayoutElementPrivate that can be used in classes that comply to ASLayoutElementPrivate
-
-#define ASLayoutElementFinalLayoutElementDefault \
-\
-@synthesize isFinalLayoutElement = _isFinalLayoutElement;\
-\
-- (id<ASLayoutElement>)finalLayoutElement\
-{\
-    return self;\
 }\
 
 

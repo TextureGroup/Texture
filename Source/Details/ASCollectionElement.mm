@@ -31,15 +31,17 @@
   ASCellNode *_node;
 }
 
-- (instancetype)initWithNodeBlock:(ASCellNodeBlock)nodeBlock
+- (instancetype)initWithViewModel:(id)viewModel
+                        nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize
-                       owningNode:(ASDisplayNode *)owningNode
+                       owningNode:(id<ASRangeManagingNode>)owningNode
                   traitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   NSAssert(nodeBlock != nil, @"Node block must not be nil");
   self = [super init];
   if (self) {
+    _viewModel = viewModel;
     _nodeBlock = nodeBlock;
     _supplementaryElementKind = [supplementaryElementKind copy];
     _constrainedSize = constrainedSize;
@@ -62,6 +64,7 @@
     node.owningNode = _owningNode;
     node.collectionElement = self;
     ASTraitCollectionPropagateDown(node, _traitCollection);
+    node.nodeViewModel = _viewModel;
     _node = node;
   }
   return _node;

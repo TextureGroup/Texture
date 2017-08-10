@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -77,7 +78,7 @@
   CGRect frame;
   
   // If this is the root container node, use a frame with a zero origin to draw into. If not, calculate the correct frame using the node's position, transform and anchorPoint.
-  if (self.shouldRasterizeDescendants) {
+  if (self.rasterizesSubtree) {
     frame = CGRectMake(0.0f, 0.0f, bounds.size.width, bounds.size.height);
   } else {
     CGPoint position = self.position;
@@ -168,11 +169,10 @@
   flags = _flags;
   
   // We always create a graphics context, unless a -display method is used, OR if we are a subnode drawing into a rasterized parent.
-  BOOL shouldCreateGraphicsContext = (flags.implementsInstanceImageDisplay == NO && flags.implementsImageDisplay == NO && rasterizing == NO);
-  BOOL shouldBeginRasterizing = (rasterizing == NO && flags.shouldRasterizeDescendants);
-  BOOL usesInstanceMethodDisplay = (flags.implementsInstanceDrawRect || flags.implementsInstanceImageDisplay);
-  BOOL usesImageDisplay = (flags.implementsImageDisplay || flags.implementsInstanceImageDisplay);
-  BOOL usesDrawRect = (flags.implementsDrawRect || flags.implementsInstanceDrawRect);
+  BOOL shouldCreateGraphicsContext = (flags.implementsImageDisplay == NO && rasterizing == NO);
+  BOOL shouldBeginRasterizing = (rasterizing == NO && flags.rasterizesSubtree);
+  BOOL usesImageDisplay = flags.implementsImageDisplay;
+  BOOL usesDrawRect = flags.implementsDrawRect;
   
   if (usesImageDisplay == NO && usesDrawRect == NO && shouldBeginRasterizing == NO) {
     // Early exit before requesting more expensive properties like bounds and opaque from the layer.
@@ -195,8 +195,6 @@
   }
   
   ASDisplayNodeAssert(contentsScaleForDisplay != 0.0, @"Invalid contents scale");
-  ASDisplayNodeAssert(usesInstanceMethodDisplay == NO || (flags.implementsDrawRect == NO && flags.implementsImageDisplay == NO),
-                      @"Node %@ should not implement both class and instance method display or draw", self);
   ASDisplayNodeAssert(rasterizing || !(_hierarchyState & ASHierarchyStateRasterized),
                       @"Rasterized descendants should never display unless being drawn into the rasterized container.");
 
@@ -251,22 +249,17 @@
       // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
       // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
       if (willDisplayNodeContentWithRenderingContext != nil) {
-        willDisplayNodeContentWithRenderingContext(currentContext);
+        willDisplayNodeContentWithRenderingContext(currentContext, drawParameters);
       }
       
-      // Decide if we use a class or instance method to draw or display.
-      id object = usesInstanceMethodDisplay ? self : [self class];
-      
       if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
-        image = [object displayWithParameters:drawParameters
-                                  isCancelled:isCancelledBlock];
+        image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
       } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
-        [object drawRect:bounds withParameters:drawParameters
-             isCancelled:isCancelledBlock isRasterizing:rasterizing];
+        [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
       }
       
       if (didDisplayNodeContentWithRenderingContext != nil) {
-        didDisplayNodeContentWithRenderingContext(currentContext);
+        didDisplayNodeContentWithRenderingContext(currentContext, drawParameters);
       }
       
       if (shouldCreateGraphicsContext) {
@@ -279,6 +272,20 @@
       return image;
     };
   }
+
+  /**
+   If we're profiling, wrap the display block with signpost start and end.
+   Color the interval red if cancelled, green otherwise.
+   */
+#if AS_KDEBUG_ENABLE
+  __unsafe_unretained id ptrSelf = self;
+  displayBlock = ^{
+    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
+    id result = displayBlock();
+    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    return result;
+  };
+#endif
 
   return displayBlock;
 }
@@ -334,7 +341,7 @@
       UIImage *image = (UIImage *)value;
       BOOL stretchable = (NO == UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero));
       if (stretchable) {
-        ASDisplayNodeSetupLayerContentsWithResizableImage(layer, image);
+        ASDisplayNodeSetResizableContents(layer, image);
       } else {
         layer.contentsScale = self.contentsScale;
         layer.contents = (id)image.CGImage;

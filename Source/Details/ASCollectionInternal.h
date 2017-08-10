@@ -25,11 +25,21 @@ NS_ASSUME_NONNULL_BEGIN
 @class ASRangeController;
 
 @interface ASCollectionView ()
-- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator eventLog:(nullable ASEventLog *)eventLog;
+- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(nullable ASCollectionNode *)owningNode eventLog:(nullable ASEventLog *)eventLog;
 
 @property (nonatomic, weak, readwrite) ASCollectionNode *collectionNode;
 @property (nonatomic, strong, readonly) ASDataController *dataController;
 @property (nonatomic, strong, readonly) ASRangeController *rangeController;
+
+/**
+ * The change set that we're currently building, if any.
+ */
+@property (nonatomic, strong, nullable, readonly) _ASHierarchyChangeSet *changeSet;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 
 /**
  * Attempt to get the view-layer index path for the item with the given index path.

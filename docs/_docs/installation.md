@@ -82,7 +82,7 @@ Or, to get the **master** branch:
 <div class = "highlight-group">
 <div class = "code">
 <pre lang="objc" class="objcCode">
-github "facetexturegroup/textureaster"
+github "texturegroup/texture" "master"
 </pre>
 </div>
 </div>

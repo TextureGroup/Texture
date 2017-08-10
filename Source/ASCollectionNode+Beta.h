@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASCollectionNode.h>
 
-@protocol ASCollectionViewLayoutFacilitatorProtocol, ASCollectionLayoutDelegate;
+@protocol ASCollectionViewLayoutFacilitatorProtocol, ASCollectionLayoutDelegate, ASBatchFetchingDelegate;
 @class ASElementMap;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -37,6 +37,25 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic, readonly) ASElementMap *visibleElements;
 
 @property (strong, readonly, nullable) id<ASCollectionLayoutDelegate> layoutDelegate;
+
+@property (nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
+
+/**
+ * When this mode is enabled, ASCollectionView matches the timing of UICollectionView as closely as possible, 
+ * ensuring that all reload and edit operations are performed on the main thread as blocking calls. 
+ *
+ * This mode is useful for applications that are debugging issues with their collection view implementation. 
+ * In particular, some applications do not properly conform to the API requirement of UICollectionView, and these 
+ * applications may experience difficulties with ASCollectionView. Providing this mode allows for developers to 
+ * work towards resolving technical debt in their collection view data source, while ramping up asynchronous 
+ * collection layout.
+ *
+ * NOTE: Because this mode results in expensive operations like cell layout being performed on the main thread, 
+ * it should be used as a tool to resolve data source conformance issues with Apple collection view API.
+ *
+ * @default defaults to NO.
+ */
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 

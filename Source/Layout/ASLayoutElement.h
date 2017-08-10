@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASStackLayoutElement.h>
 #import <AsyncDisplayKit/ASAbsoluteLayoutElement.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
+#import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 
 @class ASLayout;
 @class ASLayoutSpec;
@@ -42,16 +43,6 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
   ASLayoutElementTypeDisplayNode
 };
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-
-/**
- This function will walk the layout element hierarchy. It does run the block on the node provided
- directly to the function call.
- */
-extern void ASLayoutElementPerformBlockOnEveryElement(id<ASLayoutElement> root, void(^block)(id<ASLayoutElement> element));
-
-ASDISPLAYNODE_EXTERN_C_END
-
 #pragma mark - ASLayoutElement
 
 /**
@@ -70,7 +61,7 @@ ASDISPLAYNODE_EXTERN_C_END
  * access to the options via convenience properties. If you are creating custom layout spec, then you can
  * extend the backing layout options class to accommodate any new layout options.
  */
-@protocol ASLayoutElement <ASLayoutElementExtensibility, ASLayoutElementFinalLayoutElement, ASTraitEnvironment>
+@protocol ASLayoutElement <ASLayoutElementExtensibility, ASTraitEnvironment, ASLayoutElementAsciiArtProtocol>
 
 #pragma mark - Getter
 
@@ -82,7 +73,7 @@ ASDISPLAYNODE_EXTERN_C_END
 /**
  * @abstract A size constraint that should apply to this ASLayoutElement.
  */
-@property (nonatomic, assign, readonly) ASLayoutElementStyle *style;
+@property (nonatomic, strong, readonly) ASLayoutElementStyle *style;
 
 /**
  * @abstract Returns all children of an object which class conforms to the ASLayoutElement protocol
@@ -154,6 +145,7 @@ ASDISPLAYNODE_EXTERN_C_END
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 
+- (BOOL)implementsLayoutMethod;
 
 #pragma mark - Deprecated
 

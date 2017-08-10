@@ -35,10 +35,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASCellNode;
 @class ASCollectionElement;
+@class ASCollectionLayoutContext;
+@class ASCollectionLayoutState;
 @class ASDataController;
 @class ASElementMap;
 @class ASLayout;
 @class _ASHierarchyChangeSet;
+@protocol ASRangeManagingNode;
 @protocol ASTraitEnvironment;
 @protocol ASSectionContext;
 
@@ -70,9 +73,12 @@ extern NSString * const ASCollectionInvalidUpdateException;
 - (NSUInteger)numberOfSectionsInDataController:(ASDataController *)dataController;
 
 /**
- Returns if the collection element size matches a given size
+ Returns if the collection element size matches a given size.
+ @precondition The element is present in the data controller's visible map.
  */
 - (BOOL)dataController:(ASDataController *)dataController presentedSizeForElement:(ASCollectionElement *)element matchesSize:(CGSize)size;
+
+- (nullable id)dataController:(ASDataController *)dataController viewModelForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 @optional
 
@@ -96,12 +102,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
 
 @end
 
-@protocol ASDataControllerEnvironmentDelegate
-
-- (nullable id<ASTraitEnvironment>)dataControllerEnvironment;
-
-@end
-
 /**
  Delegate for notify the data updating of data controller.
  These methods will be invoked from main thread right now, but it may be moved to background thread in the future.
@@ -109,18 +109,17 @@ extern NSString * const ASCollectionInvalidUpdateException;
 @protocol ASDataControllerDelegate <NSObject>
 
 /**
- * Called before updating with given change set.
- *
- * @param changeSet The change set that includes all updates
- */
-- (void)dataController:(ASDataController *)dataController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;
-
-/**
  * Called for change set updates.
  *
  * @param changeSet The change set that includes all updates
+ *
+ * @param updates The block that performs relevant data updates.
+ *
+ * @discussion The updates block must always be executed or the data controller will get into a bad state.
+ * It should be called at the time the backing view is ready to process the updates,
+ * i.e inside the updates block of `-[UICollectionView performBatchUpdates:completion:] or after calling `-[UITableView beginUpdates]`.
  */
-- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet;
+- (void)dataController:(ASDataController *)dataController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates;
 
 @end
 
@@ -132,22 +131,22 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * @discussion This method will be called on main thread.
  */
-- (id)layoutContextWithElements:(ASElementMap *)elements;
+- (ASCollectionLayoutContext *)layoutContextWithElements:(ASElementMap *)elements;
 
 /**
- * @abstract Prepares in advance a new layout with the given context.
+ * @abstract Prepares and returns a new layout for given context.
  *
  * @param context A context that was previously returned by `-layoutContextWithElements:`.
  *
+ * @return The new layout calculated for the given context.
+ *
  * @discussion This method is called ahead of time, i.e before the underlying collection/table view is aware of the provided elements.
- * As a result, this method should rely solely on the given context and should not reach out to its collection/table view for information regarding items.
+ * As a result, clients must solely rely on the given context and should not reach out to other objects for information not available in the context.
  *
- * @discussion This method will be called on background theads. It must be thread-safe and should not change any internal state of the conforming object.
- * It's recommended to put the resulting layouts of this method into a thread-safe cache that can be looked up later on.
- *
- * @discussion This method must block its calling thread. It can dispatch to other theads to reduce blocking time.
+ * This method will be called on background theads. It must be thread-safe and should not change any internal state of the conforming object.
+ * It must block the calling thread but can dispatch to other theads to reduce total blocking time.
  */
-- (void)prepareLayoutWithContext:(id)context;
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context;
 
 @end
 
@@ -160,17 +159,30 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 @interface ASDataController : NSObject
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ * The node that owns this data controller, if any.
+ *
+ * NOTE: Soon we will drop support for using ASTableView/ASCollectionView without the node, so this will be non-null.
+ */
+@property (nonatomic, nullable, weak, readonly) id<ASRangeManagingNode> node;
 
 /**
  * The map that is currently displayed. The "UIKit index space."
+ *
+ * This property will only be changed on the main thread.
  */
-@property (nonatomic, strong, readonly) ASElementMap *visibleMap;
+@property (atomic, copy, readonly) ASElementMap *visibleMap;
 
 /**
  * The latest map fetched from the data source. May be more recent than @c visibleMap.
+ *
+ * This property will only be changed on the main thread.
  */
-@property (nonatomic, strong, readonly) ASElementMap *pendingMap;
+@property (atomic, copy, readonly) ASElementMap *pendingMap;
 
 /**
  Data source for fetching data info.
@@ -186,11 +198,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
  Delegate to notify when data is updated.
  */
 @property (nonatomic, weak) id<ASDataControllerDelegate> delegate;
-
-/**
- *
- */
-@property (nonatomic, weak) id<ASDataControllerEnvironmentDelegate> environmentDelegate;
 
 /**
  * Delegate for preparing layouts. Main thead only.
@@ -222,6 +229,11 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 @property (nonatomic, strong, readonly) ASEventLog *eventLog;
 #endif
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 
 /** @name Data Updating */
 
