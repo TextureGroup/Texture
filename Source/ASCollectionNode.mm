@@ -49,6 +49,8 @@
 @property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 @property (nonatomic, assign) CGFloat leadingScreensForBatching;
 @property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
+@property (nonatomic, assign) CGPoint contentOffset;
+@property (nonatomic, assign) BOOL animatesContentOffset;
 @end
 
 @implementation _ASCollectionPendingState
@@ -61,6 +63,8 @@
     _allowsSelection = YES;
     _allowsMultipleSelection = NO;
     _inverted = NO;
+    _contentOffset = CGPointZero;
+    _animatesContentOffset = NO;
   }
   return self;
 }
@@ -189,6 +193,8 @@
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
+
+    [view setContentOffset:pendingState.contentOffset animated:pendingState.animatesContentOffset];
     
     // Don't need to set collectionViewLayout to the view as the layout was already used to init the view in view block.
   }
@@ -431,6 +437,30 @@
     return _pendingState.collectionViewLayout;
   } else {
     return self.view.collectionViewLayout;
+  }
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+  [self setContentOffset:contentOffset animated:NO];
+}
+
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+{
+  if ([self pendingState]) {
+    _pendingState.contentOffset = contentOffset;
+    _pendingState.animatesContentOffset = animated;
+  } else {
+    [self.view setContentOffset:contentOffset animated:animated];
+  }
+}
+
+- (CGPoint)contentOffset
+{
+  if ([self pendingState]) {
+    return _pendingState.contentOffset;
+  } else {
+    return self.view.contentOffset;
   }
 }
 

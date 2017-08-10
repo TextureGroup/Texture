@@ -14,6 +14,7 @@
 - Fix an issue that causes calculatedLayoutDidChange being called needlessly. [Huy Nguyen](https://github.com/nguyenhuy) [#490](https://github.com/TextureGroup/Texture/pull/490)
 - Negate iOS 11 automatic estimated table row heights. [Christian Selig](https://github.com/christianselig) [#485](https://github.com/TextureGroup/Texture/pull/485)
 - Rename ASCellNode.viewModel to ASCellNode.nodeViewModel to reduce collisions with subclass properties implemented by clients. [Adlai Holler](https://github.com/Adlai-Holler) [#499](https://github.com/TextureGroup/Texture/pull/499)
+- [Breaking] Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
 
 ##2.3.5
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
