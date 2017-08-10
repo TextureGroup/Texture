@@ -419,15 +419,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable __kindof ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
 
 /**
- * Retrieves the view-model for the item at the given index path, if any.
+ * Retrieves the node-model for the item at the given index path, if any.
  *
  * @param indexPath The index path of the requested item.
  *
- * @return The view-model for the given item, or @c nil if no item exists at the specified path or no view-model was provided.
+ * @return The node-model for the given item, or @c nil if no item exists at the specified path or no node-model was provided.
  *
  * @warning This API is beta and subject to change. We'll try to provide an easy migration path.
  */
-- (nullable id)viewModelForItemAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
+- (nullable id)nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
 
 /**
  * Retrieve the index path for the item with the given node.
@@ -523,7 +523,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return An object that contains all the data for this item.
  */
-- (nullable id)collectionNode:(ASCollectionNode *)collectionNode viewModelForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (nullable id)collectionNode:(ASCollectionNode *)collectionNode nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  * Similar to -collectionNode:nodeForItemAtIndexPath:

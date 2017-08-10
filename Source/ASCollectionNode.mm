@@ -594,10 +594,10 @@
   return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].node;
 }
 
-- (id)viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+- (id)nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   [self reloadDataInitiallyIfNeeded];
-  return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].viewModel;
+  return [self.dataController.pendingMap elementForItemAtIndexPath:indexPath].nodeModel;
 }
 
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
