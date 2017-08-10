@@ -112,7 +112,7 @@
                skippedReloadIndexPaths:nil];
 }
 
-- (void)testReloadingAnItemWithACompatiblenodeModel
+- (void)testReloadingAnItemWithACompatibleNodeModel
 {
   [self loadInitialData];
 
@@ -335,7 +335,7 @@
     }
   } completion:nil];
 
-  // Assert that the counts and view models are all correct now.
+  // Assert that the counts and node models are all correct now.
   [self assertCollectionNodeContent];
 }
 

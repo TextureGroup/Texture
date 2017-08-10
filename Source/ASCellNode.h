@@ -126,7 +126,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 @property (atomic, nullable) id nodeModel;
 
 /**
- * Asks the node whether it can be updated to the given view model.
+ * Asks the node whether it can be updated to the given node model.
  *
  * The default implementation returns YES if the class matches that of the current view-model.
  */
