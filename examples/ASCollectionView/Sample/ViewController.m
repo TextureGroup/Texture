@@ -23,7 +23,7 @@
 
 #define ASYNC_COLLECTION_LAYOUT 0
 
-@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout, ASCollectionGalleryLayoutSizeProviding>
+@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout, ASCollectionGalleryLayoutPropertiesProviding>
 
 @property (nonatomic, strong) ASCollectionNode *collectionNode;
 @property (nonatomic, strong) NSArray *data;
@@ -48,7 +48,7 @@
 
 #if ASYNC_COLLECTION_LAYOUT
   ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionVerticalDirections];
-  layoutDelegate.sizeProvider = self;
+  layoutDelegate.propertiesProvider = self;
   self.collectionNode = [[ASCollectionNode alloc] initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
 #else
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
@@ -108,7 +108,7 @@
   [self.collectionNode reloadData];
 }
 
-#pragma mark - ASCollectionGalleryLayoutSizeProviding
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
 - (CGSize)sizeForElements:(ASElementMap *)elements
 {
