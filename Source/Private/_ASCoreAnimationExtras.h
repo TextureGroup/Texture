@@ -18,10 +18,33 @@
 #import <UIKit/UIKit.h>
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASDisplayNode.h>
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
 
-extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image);
+// This protocol defines the core properties that ASDisplayNode and CALayer share, for managing contents.
+@protocol ASResizableContents
+@required
+@property id contents;
+@property CGRect contentsRect;
+@property CGRect contentsCenter;
+@property CGFloat contentsScale;
+@property CGFloat rasterizationScale;
+@property NSString *contentsGravity;
+@end
+
+@interface CALayer (ASResizableContents) <ASResizableContents>
+@end
+@interface ASDisplayNode (ASResizableContents) <ASResizableContents>
+@end
+
+/**
+ This function can operate on either an ASDisplayNode (including un-loaded) or CALayer directly. More info about resizing mode: https://github.com/TextureGroup/Texture/issues/439
+
+ @param obj ASDisplayNode, CALayer or object that conforms to `ASResizableContents` protocol
+ @param image Image you would like to resize
+ */
+extern void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image);
 
 /**
  Turns a value of UIViewContentMode to a string for debugging or serialization
@@ -66,5 +89,8 @@ extern UIImage *ASDisplayNodeStretchableBoxContentsWithColor(UIColor *color, CGS
  @return YES if the layer has ongoing animations, otherwise NO
  */
 extern BOOL ASDisplayNodeLayerHasAnimations(CALayer *layer);
+
+// This function is a less generalized version of ASDisplayNodeSetResizableContents.
+extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image) ASDISPLAYNODE_DEPRECATED;
 
 ASDISPLAYNODE_EXTERN_C_END

@@ -96,6 +96,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)didExitPreloadState;
 
+/**
+ * @abstract Called when the node has completed applying the layout.
+ * @discussion Can be used for operations that are performed after layout has completed.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)nodeDidLayout;
+
 @end
 
 @interface ASDisplayNode (Subclassing) <ASInterfaceStateDelegate>
@@ -514,7 +521,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-#define ASDisplayNodeAssertThreadAffinity(viewNode)   ASDisplayNodeAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")
-#define ASDisplayNodeCAssertThreadAffinity(viewNode) ASDisplayNodeCAssert(!viewNode || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")
+#define ASDisplayNodeAssertThreadAffinity(viewNode)   ASDisplayNodeAssert(!viewNode || ASMainThreadAssertionsAreDisabled() || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")
+#define ASDisplayNodeCAssertThreadAffinity(viewNode) ASDisplayNodeCAssert(!viewNode || ASMainThreadAssertionsAreDisabled() || ASDisplayNodeThreadIsMain() || !(viewNode).nodeLoaded, @"Incorrect display node thread affinity - this method should not be called off the main thread after the ASDisplayNode's view or layer have been created")
 
 NS_ASSUME_NONNULL_END

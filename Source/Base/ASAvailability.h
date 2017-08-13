@@ -27,8 +27,13 @@
   #define kCFCoreFoundationVersionNumber_iOS_10_0 1348.00
 #endif
 
+#ifndef kCFCoreFoundationVersionNumber_iOS_11_0
+  #define kCFCoreFoundationVersionNumber_iOS_11_0 1438.10
+#endif
+
 #define AS_AT_LEAST_IOS9   (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_9_0)
 #define AS_AT_LEAST_IOS10  (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_10_0)
+#define AS_AT_LEAST_IOS11  (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_0)
 
 // If Yoga is available, make it available anywhere we use ASAvailability.
 // This reduces Yoga-specific code in other files.
@@ -39,6 +44,13 @@
 
 #ifndef YOGA
   #define YOGA __has_include(YOGA_HEADER_PATH)
+#endif
+
+// When enabled, use ASTextNode2 for ALL instances of ASTextNode.
+// This includes what ASButtonNode uses internally, as well as all app references to ASTextNode.
+// See ASTextNode+Beta.h declaration of ASTextNodeExperimentOptions for more details.
+#ifndef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+  #define ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE 0
 #endif
 
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)

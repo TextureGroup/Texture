@@ -16,9 +16,9 @@
 //
 
 #import "_ASCollectionViewCell.h"
-#import "ASCellNode+Internal.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation _ASCollectionViewCell
 
@@ -36,6 +36,20 @@
   
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
+}
+
+- (BOOL)consumesCellNodeVisibilityEvents
+{
+  ASCellNode *node = self.node;
+  if (node == nil) {
+    return NO;
+  }
+  return ASSubclassOverridesSelector([ASCellNode class], [node class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));
+}
+
+- (void)cellNodeVisibilityEvent:(ASCellNodeVisibilityEvent)event inScrollView:(UIScrollView *)scrollView
+{
+  [self.node cellNodeVisibilityEvent:event inScrollView:scrollView withCellFrame:self.frame];
 }
 
 - (void)setSelected:(BOOL)selected

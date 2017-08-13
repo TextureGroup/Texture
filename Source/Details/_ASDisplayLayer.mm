@@ -198,7 +198,7 @@
   NSMutableString *description = [[super description] mutableCopy];
   ASDisplayNode *node = self.asyncdisplaykit_node;
   if (node != nil) {
-    NSString *classString = [NSString stringWithFormat:@"%@-", [node class]];
+    NSString *classString = [NSString stringWithFormat:@"%s-", object_getClassName(node)];
     [description replaceOccurrencesOfString:@"_ASDisplay" withString:classString options:kNilOptions range:NSMakeRange(0, description.length)];
     NSUInteger insertionIndex = [description rangeOfString:@">"].location;
     if (insertionIndex != NSNotFound) {

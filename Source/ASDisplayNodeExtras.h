@@ -27,8 +27,10 @@
  * for the nodes will be set to `MYButtonNode.titleNode` and `MYButtonNode.countNode`.
  */
 #if DEBUG
+  #define ASSetDebugName(node, format, ...) node.debugName = [NSString stringWithFormat:format, __VA_ARGS__]
   #define ASSetDebugNames(...) _ASSetDebugNames(self.class, @"" # __VA_ARGS__, __VA_ARGS__, nil)
 #else
+  #define ASSetDebugName(node, name)
   #define ASSetDebugNames(...)
 #endif
 
@@ -77,6 +79,30 @@ __unused static NSString * _Nonnull NSStringFromASInterfaceState(ASInterfaceStat
   }
   return [NSString stringWithFormat:@"{ %@ }", [states componentsJoinedByString:@" | "]];
 }
+
+#define INTERFACE_STATE_DELTA(Name) ({ \
+  if ((oldState & ASInterfaceState##Name) != (newState & ASInterfaceState##Name)) { \
+    [changes appendFormat:@"%c%s ", (newState & ASInterfaceState##Name ? '+' : '-'), #Name]; \
+  } \
+})
+
+/// e.g. { +Visible, -Preload } (although that should never actually happen.)
+/// NOTE: Changes to MeasureLayout state don't really mean anything so we omit them for now.
+__unused static NSString * _Nonnull NSStringFromASInterfaceStateChange(ASInterfaceState oldState, ASInterfaceState newState)
+{
+  if (oldState == newState) {
+    return @"{ }";
+  }
+
+  NSMutableString *changes = [NSMutableString stringWithString:@"{ "];
+  INTERFACE_STATE_DELTA(Preload);
+  INTERFACE_STATE_DELTA(Display);
+  INTERFACE_STATE_DELTA(Visible);
+  [changes appendString:@"}"];
+  return changes;
+}
+
+#undef INTERFACE_STATE_DELTA
 
 NS_ASSUME_NONNULL_BEGIN
 

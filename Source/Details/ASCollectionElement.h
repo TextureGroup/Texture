@@ -26,14 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
 AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionElement : NSObject
 
-//TODO change this to be a generic "kind" or "elementKind" that exposes `nil` for row kind
 @property (nonatomic, readonly, copy, nullable) NSString *supplementaryElementKind;
 @property (nonatomic, assign) ASSizeRange constrainedSize;
 @property (nonatomic, readonly, weak) id<ASRangeManagingNode> owningNode;
 @property (nonatomic, assign) ASPrimitiveTraitCollection traitCollection;
-@property (nonatomic, readonly, nullable) id viewModel;
+@property (nonatomic, readonly, nullable) id nodeModel;
 
-- (instancetype)initWithViewModel:(nullable id)viewModel
+- (instancetype)initWithNodeModel:(nullable id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(nullable NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize

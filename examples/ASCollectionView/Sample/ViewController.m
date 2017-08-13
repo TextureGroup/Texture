@@ -1,6 +1,6 @@
 //
 //  ViewController.m
-//  Sample
+//  Texture
 //
 //  Copyright (c) 2017-present,
 //  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,12 +9,12 @@
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ViewController.h"
@@ -23,7 +23,9 @@
 #import "SupplementaryNode.h"
 #import "ItemNode.h"
 
-@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout>
+#define ASYNC_COLLECTION_LAYOUT 0
+
+@interface ViewController () <ASCollectionDataSource, ASCollectionDelegateFlowLayout, ASCollectionGalleryLayoutPropertiesProviding>
 
 @property (nonatomic, strong) ASCollectionNode *collectionNode;
 @property (nonatomic, strong) NSArray *data;
@@ -45,8 +47,18 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+
+#if ASYNC_COLLECTION_LAYOUT
+  ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionVerticalDirections];
+  layoutDelegate.propertiesProvider = self;
+  self.collectionNode = [[ASCollectionNode alloc] initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
+#else
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  layout.headerReferenceSize = CGSizeMake(50.0, 50.0);
+  layout.footerReferenceSize = CGSizeMake(50.0, 50.0);
+  self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
+#endif
   
-  self.collectionNode = [[ASCollectionNode alloc] initWithLayoutDelegate:[[ASCollectionFlowLayoutDelegate alloc] init] layoutFacilitator:nil];
   self.collectionNode.dataSource = self;
   self.collectionNode.delegate = self;
   
@@ -96,6 +108,14 @@
   // This method is deprecated because we reccommend using ASCollectionNode instead of ASCollectionView.
   // This functionality & example project remains for users who insist on using ASCollectionView.
   [self.collectionNode reloadData];
+}
+
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
+
+- (CGSize)sizeForElements:(ASElementMap *)elements
+{
+  ASDisplayNodeAssertMainThread();
+  return CGSizeMake(180, 90);
 }
 
 #pragma mark - ASCollectionView Data Source

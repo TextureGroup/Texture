@@ -87,7 +87,6 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  *
  * @return The supplementary element kind, or @c nil if this node does not represent a supplementary element.
  */
-//TODO change this to be a generic "kind" or "elementKind" that exposes `nil` for row kind
 @property (atomic, copy, readonly, nullable) NSString *supplementaryElementKind;
 
 /*
@@ -124,14 +123,14 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  *
  * This property may be set off the main thread, but this method will never be invoked concurrently on the 
  */
-@property (atomic, nullable) id viewModel;
+@property (atomic, nullable) id nodeModel;
 
 /**
- * Asks the node whether it can be updated to the given view model.
+ * Asks the node whether it can be updated to the given node model.
  *
  * The default implementation returns YES if the class matches that of the current view-model.
  */
-- (BOOL)canUpdateToViewModel:(id)viewModel;
+- (BOOL)canUpdateToNodeModel:(id)nodeModel;
 
 /**
  * The backing view controller, or @c nil if the node wasn't initialized with backing view controller

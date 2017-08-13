@@ -16,9 +16,8 @@
 //
 
 #import "_ASCollectionReusableView.h"
-#import "ASCellNode+Internal.h"
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @implementation _ASCollectionReusableView
 

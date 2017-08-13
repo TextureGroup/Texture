@@ -24,8 +24,11 @@
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASDispatch.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASMainSerialQueue.h>
 #import <AsyncDisplayKit/ASMutableElementMap.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
@@ -41,17 +44,15 @@
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
 
-#define RETURN_IF_NO_DATASOURCE(val) if (_dataSource == nil) { return val; }
 #define ASSERT_ON_EDITING_QUEUE ASDisplayNodeAssertNotNil(dispatch_get_specific(&kASDataControllerEditingQueueKey), @"%@ must be called on the editing transaction queue.", NSStringFromSelector(_cmd))
 
-const static NSUInteger kASDataControllerSizingCountPerProcessor = 5;
 const static char * kASDataControllerEditingQueueKey = "kASDataControllerEditingQueueKey";
 const static char * kASDataControllerEditingQueueContext = "kASDataControllerEditingQueueContext";
 
 NSString * const ASDataControllerRowNodeKind = @"_ASDataControllerRowNodeKind";
 NSString * const ASCollectionInvalidUpdateException = @"ASCollectionInvalidUpdateException";
 
-typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes);
+typedef dispatch_block_t ASDataControllerCompletionBlock;
 
 @interface ASDataController () {
   id<ASDataControllerLayoutDelegate> _layoutDelegate;
@@ -120,18 +121,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   return self;
 }
 
-+ (NSUInteger)parallelProcessorCount
-{
-  static NSUInteger parallelProcessorCount;
-
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    parallelProcessorCount = [[NSProcessInfo processInfo] activeProcessorCount];
-  });
-
-  return parallelProcessorCount;
-}
-
 - (id<ASDataControllerLayoutDelegate>)layoutDelegate
 {
   ASDisplayNodeAssertMainThread();
@@ -148,31 +137,47 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
 #pragma mark - Cell Layout
 
-- (void)batchAllocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements andLayout:(BOOL)shouldLayout batchSize:(NSInteger)batchSize batchCompletion:(ASDataControllerCompletionBlock)batchCompletionHandler
+- (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements completion:(ASDataControllerCompletionBlock)completionHandler
 {
   ASSERT_ON_EDITING_QUEUE;
-
-  if (elements.count == 0 || _dataSource == nil) {
-    batchCompletionHandler(@[], @[]);
+  
+  NSUInteger nodeCount = elements.count;
+  __weak id<ASDataControllerSource> weakDataSource = _dataSource;
+  if (nodeCount == 0 || weakDataSource == nil) {
+    completionHandler();
     return;
   }
 
   ASSignpostStart(ASSignpostDataControllerBatch);
 
-  if (batchSize == 0) {
-    batchSize = [[ASDataController class] parallelProcessorCount] * kASDataControllerSizingCountPerProcessor;
-  }
-  NSUInteger count = elements.count;
-  
-  // Processing in batches
-  for (NSUInteger i = 0; i < count; i += batchSize) {
-    NSRange batchedRange = NSMakeRange(i, MIN(count - i, batchSize));
-    NSArray<ASCollectionElement *> *batchedElements = [elements subarrayWithRange:batchedRange];
-    NSArray<ASCellNode *> *nodes = [self _allocateNodesFromElements:batchedElements andLayout:shouldLayout];
-    batchCompletionHandler(batchedElements, nodes);
+  {
+    as_activity_create_for_scope("Data controller batch");
+
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    ASDispatchApply(nodeCount, queue, 0, ^(size_t i) {
+      __strong id<ASDataControllerSource> strongDataSource = weakDataSource;
+      if (strongDataSource == nil) {
+        return;
+      }
+
+      // Allocate the node.
+      ASCollectionElement *context = elements[i];
+      ASCellNode *node = context.node;
+      if (node == nil) {
+        ASDisplayNodeAssertNotNil(node, @"Node block created nil node; %@, %@", self, strongDataSource);
+        node = [[ASCellNode alloc] init]; // Fallback to avoid crash for production apps.
+      }
+
+      // Layout the node if the size range is valid.
+      ASSizeRange sizeRange = context.constrainedSize;
+      if (ASSizeRangeHasSignificantArea(sizeRange)) {
+        [self _layoutNode:node withConstrainedSize:sizeRange];
+      }
+    });
   }
 
-  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (_dataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
+  completionHandler();
+  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (weakDataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
 }
 
 /**
@@ -185,55 +190,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   CGRect frame = CGRectZero;
   frame.size = [node layoutThatFits:constrainedSize].size;
   node.frame = frame;
-}
-
-// TODO Is returned array still needed? Can it be removed?
-- (NSArray<ASCellNode *> *)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements andLayout:(BOOL)shouldLayout
-{
-  ASSERT_ON_EDITING_QUEUE;
-  
-  NSUInteger nodeCount = elements.count;
-  if (!nodeCount || _dataSource == nil) {
-    return @[];
-  }
-
-  __strong ASCellNode **allocatedNodeBuffer = (__strong ASCellNode **)calloc(nodeCount, sizeof(ASCellNode *));
-
-  dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-  ASDispatchApply(nodeCount, queue, 0, ^(size_t i) {
-    RETURN_IF_NO_DATASOURCE();
-
-    // Allocate the node.
-    ASCollectionElement *context = elements[i];
-    ASCellNode *node = context.node;
-    if (node == nil) {
-      ASDisplayNodeAssertNotNil(node, @"Node block created nil node; %@, %@", self, self.dataSource);
-      node = [[ASCellNode alloc] init]; // Fallback to avoid crash for production apps.
-    }
-    
-    if (shouldLayout) {
-      // Layout the node if the size range is valid.
-      ASSizeRange sizeRange = context.constrainedSize;
-      if (ASSizeRangeHasSignificantArea(sizeRange)) {
-        [self _layoutNode:node withConstrainedSize:sizeRange];
-      }
-    }
-
-    allocatedNodeBuffer[i] = node;
-  });
-
-  BOOL canceled = _dataSource == nil;
-
-  // Create nodes array
-  NSArray *nodes = canceled ? nil : [NSArray arrayWithObjects:allocatedNodeBuffer count:nodeCount];
-  
-  // Nil out buffer indexes to allow arc to free the stored cells.
-  for (int i = 0; i < nodeCount; i++) {
-    allocatedNodeBuffer[i] = nil;
-  }
-  free(allocatedNodeBuffer);
-
-  return nodes;
 }
 
 #pragma mark - Data Source Access (Calling _dataSource)
@@ -298,7 +254,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
   // Remove all old supplementaries from these sections
   NSIndexSet *oldSections = [NSIndexSet as_sectionsFromIndexPaths:indexPaths];
-  [map removeSupplementaryElementsInSections:oldSections];
 
   // Add in new ones with the new kinds.
   NSIndexSet *newSections;
@@ -375,18 +330,18 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   id<ASRangeManagingNode> node = self.node;
   for (NSIndexPath *indexPath in indexPaths) {
     ASCellNodeBlock nodeBlock;
-    id viewModel;
+    id nodeModel;
     if (isRowKind) {
-      viewModel = [dataSource dataController:self viewModelForItemAtIndexPath:indexPath];
+      nodeModel = [dataSource dataController:self nodeModelForItemAtIndexPath:indexPath];
       
       // Get the prior element and attempt to update the existing cell node.
-      if (viewModel != nil && !changeSet.includesReloadData) {
+      if (nodeModel != nil && !changeSet.includesReloadData) {
         NSIndexPath *oldIndexPath = [changeSet oldIndexPathForNewIndexPath:indexPath];
         if (oldIndexPath != nil) {
           ASCollectionElement *oldElement = [previousMap elementForItemAtIndexPath:oldIndexPath];
           ASCellNode *oldNode = oldElement.node;
-          if ([oldNode canUpdateToViewModel:viewModel]) {
-            // Just wrap the node in a block. The collection element will -setViewModel:
+          if ([oldNode canUpdateToNodeModel:nodeModel]) {
+            // Just wrap the node in a block. The collection element will -setNodeModel:
             nodeBlock = ^{
               return oldNode;
             };
@@ -405,7 +360,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
     }
     
-    ASCollectionElement *element = [[ASCollectionElement alloc] initWithViewModel:viewModel
+    ASCollectionElement *element = [[ASCollectionElement alloc] initWithNodeModel:nodeModel
                                                                         nodeBlock:nodeBlock
                                                          supplementaryElementKind:isRowKind ? nil : kind
                                                                   constrainedSize:constrainedSize
@@ -447,21 +402,16 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   return @[];
 }
 
-- (ASSizeRange)constrainedSizeForElement:(ASCollectionElement *)element inElementMap:(ASElementMap *)map
-{
-  ASDisplayNodeAssertMainThread();
-  NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-  NSIndexPath *indexPath = [map indexPathForElement:element];
-  return [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
-}
-
-
+/**
+ * Returns constrained size for the node of the given kind and at the given index path.
+ * NOTE: index path must be in the data-source index space.
+ */
 - (ASSizeRange)constrainedSizeForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
   
   id<ASDataControllerSource> dataSource = _dataSource;
-  if (dataSource == nil) {
+  if (dataSource == nil || indexPath == nil) {
     return ASSizeRangeZero;
   }
   
@@ -492,7 +442,14 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   ASDisplayNodeAssertMainThread();
   
   if (changeSet.includesReloadData) {
-    _initialReloadDataHasBeenCalled = YES;
+    if (_initialReloadDataHasBeenCalled) {
+      as_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+    } else {
+      as_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      _initialReloadDataHasBeenCalled = YES;
+    }
+  } else {
+    as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
   
   NSTimeInterval transactionQueueFlushDuration = 0.0f;
@@ -505,6 +462,7 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.
   if (!_initialReloadDataHasBeenCalled) {
+    as_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
     [changeSet executeCompletionHandlerWithFinished:YES];
     return;
   }
@@ -536,69 +494,72 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
       @throw e;
     }
   }
-  
-  // Since we waited for _editingTransactionGroup at the beginning of this method, at this point we can guarantee that _pendingMap equals to _visibleMap.
-  // So if the change set is empty, we don't need to modify data and can safely schedule to notify the delegate.
-  if (changeSet.isEmpty) {
-    [_mainSerialQueue performBlockOnMainThread:^{
-      [_delegate dataController:self willUpdateWithChangeSet:changeSet];
-      [_delegate dataController:self didUpdateWithChangeSet:changeSet];
-    }];
-    return;
-  }
 
-  // Mutable copy of current data.
-  ASElementMap *previousMap = _pendingMap;
-  ASMutableElementMap *mutableMap = [previousMap mutableCopy];
-  
-  BOOL canDelegateLayout = (_layoutDelegate != nil);
+  BOOL canDelegate = (self.layoutDelegate != nil);
+  ASElementMap *newMap;
+  id layoutContext;
+  {
+    as_activity_scope(as_activity_create("Latch new data for collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
 
-  // Step 1: Update the mutable copies to match the data source's state
-  [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
-  ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
-  [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegateLayout) previousMap:previousMap];
-  
-  // Step 2: Clone the new data
-  ASElementMap *newMap = [mutableMap copy];
-  self.pendingMap = newMap;
-  
-  // Step 3: Ask layout delegate for contexts
-  id layoutContext = nil;
-  if (canDelegateLayout) {
-    layoutContext = [_layoutDelegate layoutContextWithElements:newMap];
-  }
-  
-  dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
-    // Step 4: Allocate and layout elements if can't delegate
-    NSArray<ASCollectionElement *> *elementsToProcess;
-    if (canDelegateLayout) {
-      // Allocate all nodes before handling them to the layout delegate.
-      // In the future, we may want to let the delegate drive allocation as well.
-      elementsToProcess = ASArrayByFlatMapping(newMap,
-                                               ASCollectionElement *element,
-                                               (element.nodeIfAllocated == nil ? element : nil));
+    // Step 1: Populate a new map that reflects the data source's state and use it as pendingMap
+    ASElementMap *previousMap = self.pendingMap;
+    if (changeSet.isEmpty) {
+      // If the change set is empty, nothing has changed so we can just reuse the previous map
+      newMap = previousMap;
     } else {
-      elementsToProcess = ASArrayByFlatMapping(newMap,
-                                               ASCollectionElement *element,
-                                               (element.nodeIfAllocated.calculatedLayout == nil ? element : nil));
+      // Mutable copy of current data.
+      ASMutableElementMap *mutableMap = [previousMap mutableCopy];
+
+      // Step 1.1: Update the mutable copies to match the data source's state
+      [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
+      ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
+      [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegate) previousMap:previousMap];
+
+      // Step 1.2: Clone the new data
+      newMap = [mutableMap copy];
     }
-    
-    [self batchAllocateNodesFromElements:elementsToProcess andLayout:(! canDelegateLayout) batchSize:elementsToProcess.count batchCompletion:^(NSArray<ASCollectionElement *> *elements, NSArray<ASCellNode *> *nodes) {
-      ASSERT_ON_EDITING_QUEUE;
+    self.pendingMap = newMap;
 
-      if (canDelegateLayout) {
-        [_layoutDelegate prepareLayoutWithContext:layoutContext];
-      }
-      
+    // Step 2: Ask layout delegate for contexts
+    if (canDelegate) {
+      layoutContext = [self.layoutDelegate layoutContextWithElements:newMap];
+    }
+  }
+
+  as_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
+
+  Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
+  dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
+    __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
+    as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
+
+    dispatch_block_t completion = ^() {
       [_mainSerialQueue performBlockOnMainThread:^{
-        [_delegate dataController:self willUpdateWithChangeSet:changeSet];
-
-        // Step 5: Deploy the new data as "completed" and inform delegate
-        self.visibleMap = newMap;
-        
-        [_delegate dataController:self didUpdateWithChangeSet:changeSet];
+        as_activity_scope_leave(&preparationScope);
+        // Step 4: Inform the delegate
+        [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
+          // Step 5: Deploy the new data as "completed"
+          //
+          // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
+          // it will not consume the batch update blocks immediately.
+          // As a result, in a short intermidate time, the view will still be relying on the old data source state.
+          // Thus, we can't just swap the new map immediately before step 4, but until this update block is executed.
+          // (https://github.com/TextureGroup/Texture/issues/378)
+          self.visibleMap = newMap;
+        }];
       }];
-    }];
+    };
+
+    // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
+    if (canDelegate) {
+      [layoutDelegateClass calculateLayoutWithContext:layoutContext];
+      completion();
+    } else {
+      NSArray<ASCollectionElement *> *elementsToProcess = ASArrayByFlatMapping(newMap,
+                                                                               ASCollectionElement *element,
+                                                                               (element.nodeIfAllocated.calculatedLayout == nil ? element : nil));
+      [self _allocateNodesFromElements:elementsToProcess completion:completion];
+    }
   });
   
   if (_usesSynchronousDataLoading) {
@@ -675,6 +636,9 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
     return;
   }
   
+  // Migrate old supplementary nodes to their new index paths.
+  [map migrateSupplementaryElementsWithSectionMapping:changeSet.sectionMapping];
+
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeDelete]) {
     [map removeItemsAtIndexPaths:change.indexPaths];
     // Aggressively repopulate supplementary nodes (#1773 & #1629)
@@ -688,7 +652,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeDelete]) {
     NSIndexSet *sectionIndexes = change.indexSet;
-    [map removeSupplementaryElementsInSections:sectionIndexes];
     [map removeSectionsOfItems:sectionIndexes];
   }
   
@@ -748,15 +711,18 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
   auto pendingMap = self.pendingMap;
   for (ASCellNode *node in nodes) {
     auto element = node.collectionElement;
+    NSIndexPath *indexPathInPendingMap = [pendingMap indexPathForElement:element];
     // Ensure the element is present in both maps or skip it. If it's not in the visible map,
     // then we can't check the presented size. If it's not in the pending map, we can't get the constrained size.
     // This will only happen if the element has been deleted, so the specifics of this behavior aren't important.
-    if ([visibleMap indexPathForElement:element] == nil || [pendingMap indexPathForElement:element] == nil) {
+    if (indexPathInPendingMap == nil || [visibleMap indexPathForElement:element] == nil) {
       continue;
     }
 
-    ASSizeRange constrainedSize = [self constrainedSizeForElement:element inElementMap:pendingMap];
+    NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
+    ASSizeRange constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
     [self _layoutNode:node withConstrainedSize:constrainedSize];
+
     BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:element matchesSize:node.frame.size];
     if (! matchesSize) {
       [nodesSizesChanged addObject:node];
@@ -783,15 +749,23 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 {
   ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in _visibleMap) {
-    ASSizeRange constrainedSize = [self constrainedSizeForElement:element inElementMap:_visibleMap];
-    if (ASSizeRangeHasSignificantArea(constrainedSize)) {
-      element.constrainedSize = constrainedSize;
+    // Ignore this element if it is no longer in the latest data. It is still recognized in the UIKit world but will be deleted soon.
+    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
+    if (indexPathInPendingMap == nil) {
+      continue;
+    }
+
+    NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
+    ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+
+    if (ASSizeRangeHasSignificantArea(newConstrainedSize)) {
+      element.constrainedSize = newConstrainedSize;
 
       // Node may not be allocated yet (e.g node virtualization or same size optimization)
       // Call context.nodeIfAllocated here to avoid immature node allocation and layout
       ASCellNode *node = element.nodeIfAllocated;
       if (node) {
-        [self _layoutNode:node withConstrainedSize:constrainedSize];
+        [self _layoutNode:node withConstrainedSize:newConstrainedSize];
       }
     }
   }
@@ -808,7 +782,6 @@ typedef void (^ASDataControllerCompletionBlock)(NSArray<ASCollectionElement *> *
 
     // Can't update the trait collection right away because _visibleMap may not be up-to-date,
     // i.e there might be some elements that were allocated using the old trait collection but haven't been added to _visibleMap
-    
     [self _scheduleBlockOnMainSerialQueue:^{
       ASPrimitiveTraitCollection newTraitCollection = [self.node primitiveTraitCollection];
       for (ASCollectionElement *element in _visibleMap) {

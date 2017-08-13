@@ -58,7 +58,7 @@
   ASDisplayNode *node = _asyncdisplaykit_node;
 
   if (node != nil) {
-    NSString *classString = [NSString stringWithFormat:@"%@-", [node class]];
+    NSString *classString = [NSString stringWithFormat:@"%s-", object_getClassName(node)];
     [description replaceOccurrencesOfString:@"_ASDisplay" withString:classString options:kNilOptions range:NSMakeRange(0, description.length)];
     NSUInteger semicolon = [description rangeOfString:@";"].location;
     if (semicolon != NSNotFound) {

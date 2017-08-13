@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 
@@ -203,6 +204,8 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)_updateVisibleNodeIndexPaths
 {
+  as_activity_scope_verbose(as_activity_create("Update range controller", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+  as_log_verbose(ASCollectionLog(), "Updating ranges for %@", ASViewToDisplayNode(ASDynamicCast(self.delegate, UIView)));
   ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
   if (!_layoutController || !_dataSource) {
     return;
@@ -490,20 +493,14 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 #pragma mark - ASDataControllerDelegete
 
-- (void)dataController:(ASDataController *)dataController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)dataController:(ASDataController *)dataController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   if (changeSet.includesReloadData) {
     [self _setVisibleNodes:nil];
   }
-  [_delegate rangeController:self willUpdateWithChangeSet:changeSet];
-}
-
-- (void)dataController:(ASDataController *)dataController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
-{
-  ASDisplayNodeAssertMainThread();
   _rangeIsValid = NO;
-  [_delegate rangeController:self didUpdateWithChangeSet:changeSet];
+  [_delegate rangeController:self updateWithChangeSet:changeSet updates:updates];
 }
 
 #pragma mark - Memory Management

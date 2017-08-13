@@ -66,9 +66,9 @@ ASDISPLAYNODE_EXTERN_C_END
 @property (nonatomic, assign, readonly) CGSize size;
 
 /**
- * Position in parent. Default to CGPointNull.
+ * Position in parent. Default to ASPointNull.
  * 
- * @discussion When being used as a sublayout, this property must not equal CGPointNull.
+ * @discussion When being used as a sublayout, this property must not equal ASPointNull.
  */
 @property (nonatomic, assign, readonly) CGPoint position;
 

@@ -21,20 +21,20 @@
 
 extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image)
 {
-  // FIXME: This method does not currently handle UIImageResizingModeTile, which is the default on iOS 6.
-  // I'm not sure of a way to use CALayer directly to perform such tiling on the GPU, though the stretch is handled by the GPU,
-  // and CALayer.h documents the fact that contentsCenter is used to stretch the pixels.
+  ASDisplayNodeSetResizableContents(layer, image);
+}
 
+extern void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
+{
   if (image) {
-
-    // Image may not actually be stretchable in one or both dimensions; this is handled
-    layer.contents = (id)[image CGImage];
-    layer.contentsScale = [image scale];
-    layer.rasterizationScale = [image scale];
-    CGSize imageSize = [image size];
-
     ASDisplayNodeCAssert(image.resizingMode == UIImageResizingModeStretch || UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero),
-             @"the resizing mode of image should be stretch; if not, then its insets must be all-zero");
+                         @"Image insets must be all-zero or resizingMode has to be UIImageResizingModeStretch. XCode assets default value is UIImageResizingModeTile which is not supported by Texture because of GPU-accelerated CALayer features.");
+    
+    // Image may not actually be stretchable in one or both dimensions; this is handled
+    obj.contents = (id)[image CGImage];
+    obj.contentsScale = [image scale];
+    obj.rasterizationScale = [image scale];
+    CGSize imageSize = [image size];
 
     UIEdgeInsets insets = [image capInsets];
 
@@ -51,11 +51,11 @@ extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UI
       contentsCenter.origin.y = ((insets.top + halfPixelFudge) / imageSize.height);
       contentsCenter.size.height = (imageSize.height - (insets.top + insets.bottom + 1.f) + otherPixelFudge) / imageSize.height;
     }
-    layer.contentsGravity = kCAGravityResize;
-    layer.contentsCenter = contentsCenter;
+    obj.contentsGravity = kCAGravityResize;
+    obj.contentsCenter = contentsCenter;
 
   } else {
-    layer.contents = nil;
+    obj.contents = nil;
   }
 }
 

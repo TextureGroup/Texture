@@ -16,7 +16,6 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionLayoutDelegate.h>
-#import <AsyncDisplayKit/ASScrollDirection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -113,7 +113,7 @@
 
 - (nullable NSIndexPath *)indexPathForElement:(ASCollectionElement *)element
 {
-  return [_elementToIndexPathMap objectForKey:element];
+  return element ? [_elementToIndexPathMap objectForKey:element] : nil;
 }
 
 - (nullable NSIndexPath *)indexPathForElementIfCell:(ASCollectionElement *)element
@@ -181,6 +181,18 @@
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
 {
   return [_elementToIndexPathMap countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+- (NSString *)smallDescription
+{
+  NSMutableArray *sectionDescriptions = [NSMutableArray array];
+
+  NSUInteger i = 0;
+  for (NSArray *section in _sectionsOfItems) {
+    [sectionDescriptions addObject:[NSString stringWithFormat:@"<S%tu: %tu>", i, section.count]];
+    i++;
+  }
+  return ASObjectDescriptionMakeWithoutObject(@[ @{ @"itemCounts": sectionDescriptions }]);
 }
 
 #pragma mark - ASDescriptionProvider

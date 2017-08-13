@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASTabBarController.h>
+#import <AsyncDisplayKit/ASLog.h>
 
 @implementation ASTabBarController
 {
@@ -72,12 +73,18 @@ ASVisibilityDepthImplementation;
 
 - (void)setSelectedIndex:(NSUInteger)selectedIndex
 {
+  as_activity_create_for_scope("Set selected index of ASTabBarController");
+  as_log_info(ASNodeLog(), "Selected tab %tu of %@", selectedIndex, self);
+
   [super setSelectedIndex:selectedIndex];
   [self visibilityDepthDidChange];
 }
 
 - (void)setSelectedViewController:(__kindof UIViewController *)selectedViewController
 {
+  as_activity_create_for_scope("Set selected view controller of ASTabBarController");
+  as_log_info(ASNodeLog(), "Selected view controller %@ of %@", selectedViewController, self);
+
   [super setSelectedViewController:selectedViewController];
   [self visibilityDepthDidChange];
 }
