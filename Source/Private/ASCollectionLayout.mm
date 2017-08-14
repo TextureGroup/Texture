@@ -140,8 +140,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 - (CGSize)collectionViewContentSize
 {
   ASDisplayNodeAssertMainThread();
-  ASDisplayNodeAssertNotNil(_layout, @"Collection layout state should not be nil at this point");
-  return _layout.contentSize;
+  return _layout ? _layout.contentSize : CGSizeZero;
 }
 
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)blockingRect
