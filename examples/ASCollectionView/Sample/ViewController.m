@@ -55,6 +55,8 @@
   layout.headerReferenceSize = CGSizeMake(50.0, 50.0);
   layout.footerReferenceSize = CGSizeMake(50.0, 50.0);
   self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
+  [self.collectionNode registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
+  [self.collectionNode registerSupplementaryNodeOfKind:UICollectionElementKindSectionFooter];
 #endif
   
   self.collectionNode.dataSource = self;
