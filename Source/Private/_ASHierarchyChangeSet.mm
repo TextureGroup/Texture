@@ -46,6 +46,7 @@ BOOL ASHierarchyChangeTypeIsFinal(_ASHierarchyChangeType changeType) {
     switch (changeType) {
         case _ASHierarchyChangeTypeInsert:
         case _ASHierarchyChangeTypeDelete:
+        case _ASHierarchyChangeTypeMove:
             return YES;
         default:
             return NO;
@@ -65,6 +66,8 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
       return @"OriginalDelete";
     case _ASHierarchyChangeTypeReload:
       return @"Reload";
+    case _ASHierarchyChangeTypeMove:
+      return @"Move";
     default:
       return @"(invalid)";
   }
@@ -99,6 +102,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 + (void)ensureItemChanges:(NSArray<_ASHierarchyItemChange *> *)changes ofSameType:(_ASHierarchyChangeType)changeType;
 @end
 
+@interface _ASHierarchyItemMoveChange ()
+- (instancetype)initWithSource:(NSIndexPath *)sourceIndexPath andDestination:(NSIndexPath*)destinationIndexPath animationOptions:(ASDataControllerAnimationOptions)animationOptions;
+@end
+
 @interface _ASHierarchyChangeSet ()
 
 // array index is old section index, map goes oldItem -> newItem
@@ -112,6 +119,8 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 @property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *deleteItemChanges;
 @property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalDeleteItemChanges;
+
+@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemMoveChange *> *moveItemChanges;
 
 @property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *reloadItemChanges;
 
@@ -152,6 +161,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     _originalDeleteItemChanges = [[NSMutableArray alloc] init];
     _deleteItemChanges = [[NSMutableArray alloc] init];
     _reloadItemChanges = [[NSMutableArray alloc] init];
+    _moveItemChanges = [[NSMutableArray alloc] init];
     
     _originalInsertSectionChanges = [[NSMutableArray alloc] init];
     _insertSectionChanges = [[NSMutableArray alloc] init];
@@ -236,6 +246,8 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
       return _originalInsertItemChanges;
     case _ASHierarchyChangeTypeOriginalDelete:
       return _originalDeleteItemChanges;
+    case _ASHierarchyChangeTypeMove:
+      return _moveItemChanges;
     default:
       NSAssert(NO, @"Request for item changes with invalid type: %lu", (long)changeType);
       return nil;
@@ -422,11 +434,9 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath animationOptions:(ASDataControllerAnimationOptions)options
 {
-  /**
-   * TODO: Proper move implementation.
-   */
-  [self deleteItems:@[ indexPath ] animationOptions:options];
-  [self insertItems:@[ newIndexPath ] animationOptions:options];
+    [self _ensureNotCompleted];
+    _ASHierarchyItemMoveChange *change = [[_ASHierarchyItemMoveChange alloc] initWithSource:indexPath andDestination:newIndexPath animationOptions:options];
+    [_moveItemChanges addObject:change];
 }
 
 - (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection animationOptions:(ASDataControllerAnimationOptions)options
@@ -578,6 +588,40 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     }
   }
   
+  // Validate that cell moves are all referencing valid source and destination index paths.
+  for (_ASHierarchyItemMoveChange *change in _moveItemChanges) {
+    NSInteger sourceSection = change.sourceIndexPath.section;
+    NSInteger sourceItem = change.sourceIndexPath.item;
+    
+    NSInteger destinationSection = change.destinationIndexPath.section;
+    NSInteger destinationItem = change.destinationIndexPath.item;
+    
+    // Assert that the move source is from a valid section
+    if (sourceSection >= oldSectionCount) {
+      ASFailUpdateValidation(@"Attempt to move item %zd from section %zd, which only contains %zd sections before the update.", sourceItem, sourceSection, oldSectionCount);
+      return;
+    }
+    
+    // Asset that the move source is from a valid item
+    NSInteger oldItemCount = _oldItemCounts[sourceSection];
+    if (sourceItem >= oldItemCount) {
+      ASFailUpdateValidation(@"Attempt to move item %zd from section %zd, which only contains %zd items before the update.", sourceItem, sourceSection, oldItemCount);
+      return;
+    }
+    
+    // Assert that the move destination is to a valid post-insert section
+    if (destinationSection >= newSectionCount) {
+      ASFailUpdateValidation(@"Attempt to move item %zd from section %zd into section %zd, but there are only %zd sections after the update.", sourceItem, sourceSection, destinationSection, newSectionCount);
+    }
+    
+    // Assert that the move destination is to a valid post-insert item
+    NSInteger newItemCount = _newItemCounts[destinationSection];
+    if (destinationItem >= newItemCount) {
+      ASFailUpdateValidation(@"Attempt to insert item %zd from section %zd into position %zd within section %zd, which only contains %zd items after the update.", sourceItem, sourceSection, destinationItem, destinationSection, newItemCount);
+      return;
+    }
+  }
+  
   for (_ASHierarchyItemChange *change in _insertItemChanges) {
     for (NSIndexPath *indexPath in change.indexPaths) {
       NSInteger section = indexPath.section;
@@ -686,6 +730,9 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   }
   if (_originalInsertItemChanges.count > 0) {
     [result addObject:@{ @"insertItems" : [_ASHierarchyItemChange smallDescriptionForItemChanges:_originalInsertItemChanges] }];
+  }
+  if (_moveItemChanges.count > 0) {
+    [result addObject:@{ @"moveItems" : [_ASHierarchyItemChange smallDescriptionForItemChanges:_moveItemChanges] }];
   }
   return result;
 }
@@ -1012,6 +1059,24 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   [result addObject:@{ @"type" : NSStringFromASHierarchyChangeType(_changeType) }];
   [result addObject:@{ @"indexPaths" : self.indexPaths }];
   return result;
+}
+
+@end
+
+@implementation _ASHierarchyItemMoveChange
+- (instancetype)initWithSource:(NSIndexPath *)sourceIndexPath andDestination:(NSIndexPath *)destinationIndexPath animationOptions:(ASDataControllerAnimationOptions)animationOptions
+{
+    /**
+     * Call super initialiser using source + destination as index paths,
+     * Obviously just push in Move change type.
+     */
+    self = [super initWithChangeType:_ASHierarchyChangeTypeMove indexPaths:@[sourceIndexPath,destinationIndexPath] animationOptions:animationOptions presorted:YES];
+    if (self) {
+        ASDisplayNodeAssert(sourceIndexPath != nil && destinationIndexPath != nil, @"Request to create _ASHierarchyItemMoveChange with nil index paths!");
+        _sourceIndexPath = sourceIndexPath;
+        _destinationIndexPath = destinationIndexPath;
+    }
+    return self;
 }
 
 @end

@@ -53,14 +53,19 @@ typedef NS_ENUM(NSInteger, _ASHierarchyChangeType) {
   /**
    * A change that was submitted by the user as an insert.
    */
-  _ASHierarchyChangeTypeOriginalInsert
+  _ASHierarchyChangeTypeOriginalInsert,
+    
+  /**
+   * A change that was submitted by the user as a move.
+   */
+  _ASHierarchyChangeTypeMove
 };
 
 /**
- * Returns YES if the given change type is either .Insert or .Delete, NO otherwise.
+ * Returns YES if the given change type is either .Insert, .Delete or .Move, NO otherwise.
  * Other change types – .Reload, .OriginalInsert, .OriginalDelete – are
- * intermediary types used while building the change set. All changes will
- * be reduced to either .Insert or .Delete when the change is marked completed.
+ * intermediary types used while building the change set. All other changes will
+ * be reduced to either .Insert, .Delete or .Move when the change is marked completed.
  */
 BOOL ASHierarchyChangeTypeIsFinal(_ASHierarchyChangeType changeType);
 
@@ -99,6 +104,19 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
  * with type .Insert or .Delete. Calling this on changes of other types is an error.
  */
 - (_ASHierarchyItemChange *)changeByFinalizingType;
+
+@end
+
+/**
+ * Subclass meant for moving an item.
+ * Considered simply using indexPaths and using index 0 as source and index 1 as
+ * destination, however simply seemed cleaner to make a lightweight subclass
+ * and be explicit.
+ */
+@interface _ASHierarchyItemMoveChange : _ASHierarchyItemChange
+
+@property (nonatomic, strong, readonly) NSIndexPath *sourceIndexPath;
+@property (nonatomic, strong, readonly) NSIndexPath *destinationIndexPath;
 
 @end
 
