@@ -140,6 +140,8 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 - (CGSize)collectionViewContentSize
 {
   ASDisplayNodeAssertMainThread();
+  // The content size can be queried right after a layout invalidation (https://github.com/TextureGroup/Texture/pull/509).
+  // In that case, return zero.
   return _layout ? _layout.contentSize : CGSizeZero;
 }
 
