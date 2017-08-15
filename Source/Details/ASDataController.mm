@@ -330,18 +330,18 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   id<ASRangeManagingNode> node = self.node;
   for (NSIndexPath *indexPath in indexPaths) {
     ASCellNodeBlock nodeBlock;
-    id viewModel;
+    id nodeModel;
     if (isRowKind) {
-      viewModel = [dataSource dataController:self viewModelForItemAtIndexPath:indexPath];
+      nodeModel = [dataSource dataController:self nodeModelForItemAtIndexPath:indexPath];
       
       // Get the prior element and attempt to update the existing cell node.
-      if (viewModel != nil && !changeSet.includesReloadData) {
+      if (nodeModel != nil && !changeSet.includesReloadData) {
         NSIndexPath *oldIndexPath = [changeSet oldIndexPathForNewIndexPath:indexPath];
         if (oldIndexPath != nil) {
           ASCollectionElement *oldElement = [previousMap elementForItemAtIndexPath:oldIndexPath];
           ASCellNode *oldNode = oldElement.node;
-          if ([oldNode canUpdateToViewModel:viewModel]) {
-            // Just wrap the node in a block. The collection element will -setViewModel:
+          if ([oldNode canUpdateToNodeModel:nodeModel]) {
+            // Just wrap the node in a block. The collection element will -setNodeModel:
             nodeBlock = ^{
               return oldNode;
             };
@@ -360,7 +360,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
     }
     
-    ASCollectionElement *element = [[ASCollectionElement alloc] initWithViewModel:viewModel
+    ASCollectionElement *element = [[ASCollectionElement alloc] initWithNodeModel:nodeModel
                                                                         nodeBlock:nodeBlock
                                                          supplementaryElementKind:isRowKind ? nil : kind
                                                                   constrainedSize:constrainedSize
