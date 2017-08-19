@@ -8,6 +8,7 @@
 - [Breaking] Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
 - Remove re-entrant access to self.view when applying initial pending state. [Adlai Holler](https://github.com/Adlai-Holler) [#510](https://github.com/TextureGroup/Texture/pull/510)
 - Small improvements in ASCollectionLayout [Huy Nguyen](https://github.com/nguyenhuy) [#509](https://github.com/TextureGroup/Texture/pull/509) [#513](https://github.com/TextureGroup/Texture/pull/513)
+- Fix retain cycle between ASImageNode and PINAnimatedImage [Phil Larson](https://github.com/plarson) [#520](https://github.com/TextureGroup/Texture/pull/520)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
