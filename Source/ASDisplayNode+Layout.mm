@@ -185,6 +185,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (ASSizeRange)constrainedSizeForCalculatedLayout
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_constrainedSizeForCalculatedLayout];
+}
+
+- (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
+{
   if (_pendingDisplayNodeLayout != nullptr) {
     return _pendingDisplayNodeLayout->constrainedSize;
   }
@@ -314,7 +319,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   as_activity_create_for_scope("Update node layout for current bounds");
-  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->isDirty());
+  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->version < _layoutVersion.load());
   // _calculatedDisplayNodeLayout is not reusable we need to transition to a new one
   [self cancelLayoutTransition];
   
@@ -478,6 +483,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_isLayoutTransitionValid];
+}
+
+- (BOOL)_locked_isLayoutTransitionValid
+{
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
     if (context == nil || _pendingTransitionID != context.transitionID) {
@@ -511,9 +521,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 {
   ASDisplayNodeAssertMainThread();
 
-  [self setNeedsLayout];
-  
-  [self transitionLayoutWithSizeRange:[self _locked_constrainedSizeForLayoutPass]
+  ASSizeRange sizeRange;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    sizeRange = [self _locked_constrainedSizeForLayoutPass];
+  }
+
+  [self transitionLayoutWithSizeRange:sizeRange
                              animated:animated
                    shouldMeasureAsync:shouldMeasureAsync
                 measurementCompletion:completion];
@@ -536,17 +550,28 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     return;
   }
     
-  // Check if we are a subnode in a layout transition.
-  // In this case no measurement is needed as we're part of the layout transition.
-  if ([self _isLayoutTransitionInvalid]) {
-    return;
-  }
-  
   {
     ASDN::MutexLocker l(__instanceLock__);
-    ASDisplayNodeAssert(ASHierarchyStateIncludesLayoutPending(_hierarchyState) == NO, @"Can't start a transition when one of the supernodes is performing one.");
+
+    // Check if we are a subnode in a layout transition.
+    // In this case no measurement is needed as we're part of the layout transition.
+    if ([self _locked_isLayoutTransitionValid]) {
+      return;
+    }
+
+    if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
+      ASDisplayNodeAssert(NO, @"Can't start a transition when one of the supernodes is performing one.");
+      return;
+    }
   }
-  
+
+  // Invalidate calculated layout because this method acts as an animated "setNeedsLayout" for nodes.
+  // If the user has reconfigured the node and calls this, we should never return a stale layout
+  // for subsequent calls to layoutThatFits: regardless of size range. We choose this method rather than
+  // -setNeedsLayout because that method also triggers a CA layout invalidation, which isn't necessary at this time.
+  // See https://github.com/TextureGroup/Texture/issues/463
+  [self invalidateCalculatedLayout];
+
   // Every new layout transition has a transition id associated to check in subsequent transitions for cancelling
   int32_t transitionID = [self _startNewTransition];
   as_log_verbose(ASLayoutLog(), "Transition ID is %d", transitionID);
@@ -832,8 +857,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   if (pendingLayoutTransition != nil) {
     [self _setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];
     [self _completeLayoutTransition:pendingLayoutTransition];
+    [self _pendingLayoutTransitionDidComplete];
   }
-  [self _pendingLayoutTransitionDidComplete];
 }
 
 /**
