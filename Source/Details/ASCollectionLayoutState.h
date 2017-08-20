@@ -23,6 +23,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef ASCollectionElement * _Nullable (^ASCollectionLayoutStateGetElementBlock)(ASLayout *);
+
 @interface NSMapTable (ASCollectionLayoutConvenience)
 
 + (NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *)elementToLayoutAttributesTable;
@@ -70,11 +72,11 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @param layout The layout describes size and position of all elements.
  *
- * @param getElementBlock A block that can retrieve the collection element from a direct sublayout of the root layout.
+ * @param getElementBlock A block that can retrieve the collection element from a sublayout of the root layout.
  */
 - (instancetype)initWithContext:(ASCollectionLayoutContext *)context
                          layout:(ASLayout *)layout
-                getElementBlock:(ASCollectionElement *(^)(ASLayout *))getElementBlock;
+                getElementBlock:(ASCollectionLayoutStateGetElementBlock)getElementBlock;
 
 /**
  * Returns all layout attributes present in this object.
