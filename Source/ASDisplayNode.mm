@@ -916,7 +916,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     if (_transitionID != ASLayoutElementContextInvalidTransitionID) {
       return;
     }
-    
+
+    as_activity_create_for_scope("-[ASDisplayNode __layout]");
+
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
     [self _locked_measureNodeWithBoundsIfNecessary:bounds];
@@ -1129,6 +1131,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
+  [_interfaceStateDelegate nodeDidLayout];
 }
 
 #pragma mark Layout Transition
@@ -3097,12 +3100,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_locked_applyPendingViewState
 {
   ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self _locked_isNodeLoaded], @"Expected node to be loaded before applying pending state.");
 
   if (_flags.layerBacked) {
-    [_pendingViewState applyToLayer:self.layer];
+    [_pendingViewState applyToLayer:_layer];
   } else {
     BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    [_pendingViewState applyToView:self.view withSpecialPropertiesHandling:specialPropertiesHandling];
+    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling];
   }
 
   // _ASPendingState objects can add up very quickly when adding
@@ -3174,6 +3178,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return measurements;
 }
 
+#pragma mark - Accessibility
+
+- (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _isAccessibilityContainer = isAccessibilityContainer;
+}
+
+- (BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _isAccessibilityContainer;
+}
 
 #pragma mark - Debugging (Private)
 
@@ -3382,6 +3399,38 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [subtree appendString:[n _recursiveDescriptionHelperWithIndent:[indent stringByAppendingString:@" | "]]];
   }
   return subtree;
+}
+
+- (NSString *)detailedLayoutDescription
+{
+  ASPushMainThreadAssertionsDisabled();
+  ASDN::MutexLocker l(__instanceLock__);
+  auto props = [NSMutableArray<NSDictionary *> array];
+
+  [props addObject:@{ @"layoutVersion": @(_layoutVersion.load()) }];
+  [props addObject:@{ @"bounds": [NSValue valueWithCGRect:self.bounds] }];
+
+  if (_calculatedDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
+    [props addObject:@{ @"calculatedLayout": c.layout }];
+    [props addObject:@{ @"calculatedVersion": @(c.version) }];
+    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(c.constrainedSize) }];
+    if (c.requestedLayoutFromAbove) {
+      [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
+    }
+  }
+  if (_pendingDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
+    [props addObject:@{ @"pendingLayout": p.layout }];
+    [props addObject:@{ @"pendingVersion": @(p.version) }];
+    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(p.constrainedSize) }];
+    if (p.requestedLayoutFromAbove) {
+      [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
+    }
+  }
+
+  ASPopMainThreadAssertionsDisabled();
+  return ASObjectDescriptionMake(self, props);
 }
 
 @end

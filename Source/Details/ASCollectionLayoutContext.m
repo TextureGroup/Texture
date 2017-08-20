@@ -22,13 +22,11 @@
 
 @implementation ASCollectionLayoutContext {
   Class<ASCollectionLayoutDelegate> _layoutDelegateClass;
-
-  // This ivar doesn't directly involve in the layout calculation process, i.e contexts can be equal regardless of the layout caches.
-  // As a result, this ivar is ignored in -isEqualToContext: and -hash.
   __weak ASCollectionLayoutCache *_layoutCache;
 }
 
 - (instancetype)initWithViewportSize:(CGSize)viewportSize
+                initialContentOffset:(CGPoint)initialContentOffset
                 scrollableDirections:(ASScrollDirection)scrollableDirections
                             elements:(ASElementMap *)elements
                  layoutDelegateClass:(Class<ASCollectionLayoutDelegate>)layoutDelegateClass
@@ -38,6 +36,7 @@
   self = [super init];
   if (self) {
     _viewportSize = viewportSize;
+    _initialContentOffset = initialContentOffset;
     _scrollableDirections = scrollableDirections;
     _elements = elements;
     _layoutDelegateClass = layoutDelegateClass;
@@ -57,6 +56,8 @@
   return _layoutCache;
 }
 
+// NOTE: Some properties, like initialContentOffset and layoutCache are ignored in -isEqualToContext: and -hash.
+// That is because contexts can be equal regardless of the content offsets or layout caches.
 - (BOOL)isEqualToContext:(ASCollectionLayoutContext *)context
 {
   if (context == nil) {

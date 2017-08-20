@@ -202,7 +202,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionViewNumberOfItemsInSection:1;
     unsigned int collectionNodeNodeForItem:1;
     unsigned int collectionNodeNodeBlockForItem:1;
-    unsigned int viewModelForItem:1;
+    unsigned int nodeModelForItem:1;
     unsigned int collectionNodeNodeForSupplementaryElement:1;
     unsigned int collectionNodeNodeBlockForSupplementaryElement:1;
     unsigned int collectionNodeSupplementaryElementKindsInSection:1;
@@ -431,7 +431,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDataSourceFlags.collectionNodeNodeForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeForSupplementaryElementOfKind:atIndexPath:)];
     _asyncDataSourceFlags.collectionNodeNodeBlockForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeBlockForSupplementaryElementOfKind:atIndexPath:)];
     _asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection = [_asyncDataSource respondsToSelector:@selector(collectionNode:supplementaryElementKindsInSection:)];
-    _asyncDataSourceFlags.viewModelForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:viewModelForItemAtIndexPath:)];
+    _asyncDataSourceFlags.nodeModelForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeModelForItemAtIndexPath:)];
 
     _asyncDataSourceFlags.interop = [_asyncDataSource conformsToProtocol:@protocol(ASCollectionDataSourceInterop)];
     if (_asyncDataSourceFlags.interop) {
@@ -1662,14 +1662,14 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
 
 #pragma mark - ASDataControllerSource
 
-- (id)dataController:(ASDataController *)dataController viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+- (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (!_asyncDataSourceFlags.viewModelForItem) {
+  if (!_asyncDataSourceFlags.nodeModelForItem) {
     return nil;
   }
 
   GET_COLLECTIONNODE_OR_RETURN(collectionNode, nil);
-  return [_asyncDataSource collectionNode:collectionNode viewModelForItemAtIndexPath:indexPath];
+  return [_asyncDataSource collectionNode:collectionNode nodeModelForItemAtIndexPath:indexPath];
 }
 
 - (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath
