@@ -437,6 +437,29 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   [self _scheduleBlockOnMainSerialQueue:^{ }];
 }
 
+- (BOOL)isProcessingUpdates
+{
+  ASDisplayNodeAssertMainThread();
+  long waitResult = dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_NOW);
+  return (waitResult == 0 ? NO : YES);
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  ASDisplayNodeAssertMainThread();
+  if ([self isProcessingUpdates] == NO) {
+    ASPerformBlockOnMainThread(completion);
+  } else {
+    dispatch_async(_editingTransactionQueue, ^{
+      // Retry the block. If we're done processing updates, it'll run immediately, otherwise
+      // wait again for updates to quiesce completely.
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self onDidFinishProcessingUpdates:completion];
+      });
+    });
+  }
+}
+
 - (void)updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
   ASDisplayNodeAssertMainThread();

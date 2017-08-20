@@ -254,7 +254,12 @@ extern NSString * const ASCollectionInvalidUpdateException;
  */
 - (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray * _Nonnull)nodesSizesChanged;
 
+/**
+ * See ASCollectionNode.h for full documentation of these methods.
+ */
 - (void)waitUntilAllUpdatesAreCommitted;
+- (BOOL)isProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
 
 /**
  * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information

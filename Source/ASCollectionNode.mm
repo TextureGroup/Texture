@@ -713,6 +713,25 @@
   }
 }
 
+- (void)waitUntilAllUpdatesAreProcessed
+{
+  [self waitUntilAllUpdatesAreCommitted];
+}
+
+- (BOOL)isProcessingUpdates
+{
+  return (self.nodeLoaded ? [self.view isProcessingUpdates] : NO);
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  if (!self.nodeLoaded) {
+    completion();
+  } else {
+    [self.view onDidFinishProcessingUpdates:completion];
+  }
+}
+
 - (void)reloadDataWithCompletion:(void (^)())completion
 {
   ASDisplayNodeAssertMainThread();

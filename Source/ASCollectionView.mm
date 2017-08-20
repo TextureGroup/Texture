@@ -371,6 +371,16 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [_dataController waitUntilAllUpdatesAreCommitted];
 }
 
+- (BOOL)isProcessingUpdates
+{
+  return [_dataController isProcessingUpdates];
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  [_dataController onDidFinishProcessingUpdates:completion];
+}
+
 - (void)setDataSource:(id<UICollectionViewDataSource>)dataSource
 {
   // UIKit can internally generate a call to this method upon changing the asyncDataSource; only assert for non-nil. We also allow this when we're doing interop.

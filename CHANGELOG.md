@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASCollectionNode] Add -isProcessingUpdates and -onDidFinishProcessingUpdates: APIs. [#522](https://github.com/TextureGroup/Texture/pull/522) [Scott Goodson](https://github.com/appleguy)
 - Fix an issue in layout transition that causes it to unexpectedly use the old layout [Huy Nguyen](https://github.com/nguyenhuy) [#464](https://github.com/TextureGroup/Texture/pull/464)
 - Add -[ASDisplayNode detailedLayoutDescription] property to aid debugging. [Adlai Holler](https://github.com/Adlai-Holler) [#476](https://github.com/TextureGroup/Texture/pull/476)
 - Fix an issue that causes calculatedLayoutDidChange being called needlessly. [Huy Nguyen](https://github.com/nguyenhuy) [#490](https://github.com/TextureGroup/Texture/pull/490)
