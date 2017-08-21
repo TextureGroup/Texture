@@ -67,8 +67,16 @@
     return proposedContentOffset;
   }
 
-  CGFloat xOffset = (CGRectGetWidth(self.collectionView.bounds) - CGRectGetWidth(attributes.frame)) / 2.0;
-  return CGPointMake(attributes.frame.origin.x - xOffset, proposedContentOffset.y);
+  switch (self.scrollDirection) {
+    case UICollectionViewScrollDirectionHorizontal: {
+      CGFloat xOffset = (CGRectGetWidth(self.collectionView.bounds) - CGRectGetWidth(attributes.frame)) / 2.0;
+      return CGPointMake(attributes.frame.origin.x - xOffset, proposedContentOffset.y);
+    }
+    case UICollectionViewScrollDirectionVertical: {
+      CGFloat yOffset = (CGRectGetHeight(self.collectionView.bounds) - CGRectGetHeight(attributes.frame)) / 2.0;
+      return CGPointMake(proposedContentOffset.x, attributes.frame.origin.y - yOffset);
+    }
+  }
 }
 
 - (BOOL)_dataSourceIsEmpty
