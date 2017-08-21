@@ -70,7 +70,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     } else {
       animatedImage.playbackReadyCallback = ^{
         // In this case the lock is already gone we have to call the unlocked version therefore
-        [self setShouldAnimate:YES];
+        [weakSelf setShouldAnimate:YES];
       };
     }
   }
