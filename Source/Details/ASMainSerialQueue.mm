@@ -40,6 +40,11 @@
   return self;
 }
 
+- (NSUInteger)numberOfScheduledBlocks
+{
+  return _blocks.count;
+}
+
 - (void)performBlockOnMainThread:(dispatch_block_t)block
 {
   ASDN::MutexLocker l(_serialQueueLock);

@@ -257,9 +257,9 @@ extern NSString * const ASCollectionInvalidUpdateException;
 /**
  * See ASCollectionNode.h for full documentation of these methods.
  */
-- (void)waitUntilAllUpdatesAreCommitted;
-- (BOOL)isProcessingUpdates;
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
 - (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
+- (void)waitUntilAllUpdatesAreCommitted;
 
 /**
  * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information

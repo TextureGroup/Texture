@@ -253,11 +253,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
- *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
- */
-- (void)waitUntilAllUpdatesAreProcessed;
-
-/**
  *  Returns YES if the ASCollectionNode is still processing changes from performBatchUpdates:.
  *  This is typically the concurrent allocation (calling nodeBlocks) and layout of newly inserted
  *  ASCellNodes. If YES is returned, then calling -waitUntilAllUpdatesAreProcessed may take tens of
@@ -269,7 +264,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  This method will always return NO if called immediately after -waitUntilAllUpdatesAreProcessed.
  */
-- (BOOL)isProcessingUpdates;
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
 
 /**
  *  Schedules a block to be performed (on the main thread) after processing of performBatchUpdates:
@@ -285,6 +280,11 @@ NS_ASSUME_NONNULL_BEGIN
  *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
  */
 - (void)onDidFinishProcessingUpdates:(nullable void (^)())didFinishProcessingUpdates;
+
+/**
+ *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
+ */
+- (void)waitUntilAllUpdatesAreProcessed;
 
 /**
  * Inserts one or more sections.

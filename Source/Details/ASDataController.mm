@@ -440,8 +440,14 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 - (BOOL)isProcessingUpdates
 {
   ASDisplayNodeAssertMainThread();
-  long waitResult = dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_NOW);
-  return (waitResult == 0 ? NO : YES);
+  if (_mainSerialQueue.numberOfScheduledBlocks > 0) {
+    return YES;
+  } else if (dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_NOW) != 0) {
+    // After waiting for zero duration, a nonzero value is returned if blocks are still running.
+    return YES;
+  }
+  // Both the _mainSerialQueue and _editingTransactionQueue are drained; we are fully quiesced.
+  return NO;
 }
 
 - (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
@@ -453,9 +459,9 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     dispatch_async(_editingTransactionQueue, ^{
       // Retry the block. If we're done processing updates, it'll run immediately, otherwise
       // wait again for updates to quiesce completely.
-      dispatch_async(dispatch_get_main_queue(), ^{
+      [_mainSerialQueue performBlockOnMainThread:^{
         [self onDidFinishProcessingUpdates:completion];
-      });
+      }];
     });
   }
 }
