@@ -113,7 +113,7 @@
 
 - (NSInteger)currentPageIndex
 {
-  return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+  return (self.view.contentOffset.x / [self pageSize].width);
 }
 
 - (CGSize)pageSize
