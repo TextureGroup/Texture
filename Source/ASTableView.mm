@@ -751,7 +751,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   // Remeasure all rows if our row width has changed.
   _remeasuringCellNodes = YES;
-  CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth];
+  UIEdgeInsets contentInset = self.contentInset;
+  CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth] - contentInset.left - contentInset.right;
   if (constrainedWidth > 0 && _nodesConstrainedWidth != constrainedWidth) {
     _nodesConstrainedWidth = constrainedWidth;
 

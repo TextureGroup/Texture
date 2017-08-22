@@ -66,6 +66,7 @@
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
+  ASDisplayNodeAssertTrue(flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal);
   self = [super initWithCollectionViewLayout:flowLayout];
   return self;
 }
@@ -112,7 +113,15 @@
 
 - (NSInteger)currentPageIndex
 {
-  return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+  return (self.view.contentOffset.x / [self pageSize].width);
+}
+
+- (CGSize)pageSize
+{
+  UIEdgeInsets contentInset = self.view.contentInset;
+  CGSize pageSize = self.bounds.size;
+  pageSize.height -= (contentInset.top + contentInset.bottom);
+  return pageSize;
 }
 
 #pragma mark - Helpers
@@ -142,7 +151,7 @@
 - (CGSize)sizeForElements:(ASElementMap *)elements
 {
   ASDisplayNodeAssertMainThread();
-  return self.bounds.size;
+  return [self pageSize];
 }
 
 #pragma mark - ASCollectionDataSource
@@ -179,7 +188,7 @@
   }
 #pragma clang diagnostic pop
 
-  return ASSizeRangeMake(self.bounds.size);
+  return ASSizeRangeMake([self pageSize]);
 }
 
 #pragma mark - Data Source Proxy
