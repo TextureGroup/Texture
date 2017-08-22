@@ -27,6 +27,11 @@
 // of the collection view
 ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionView) {
   CGSize maxSize = collectionView.bounds.size;
+  UIEdgeInsets contentInset = collectionView.contentInset;
+  if (! UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, contentInset)) {
+    maxSize.width -= (contentInset.left + contentInset.right);
+    maxSize.height -= (contentInset.top + contentInset.bottom);
+  }
   if (ASScrollDirectionContainsHorizontalDirection(collectionView.scrollableDirections)) {
     maxSize.width = CGFLOAT_MAX;
   } else {

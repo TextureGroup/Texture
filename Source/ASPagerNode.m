@@ -115,6 +115,17 @@
   return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
 }
 
+- (CGSize)pageSize
+{
+  CGSize pageSize = self.bounds.size;
+  UIEdgeInsets contentInset = self.view.contentInset;
+  if (! UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, contentInset)) {
+    pageSize.width -= (contentInset.left + contentInset.right);
+    pageSize.height -= (contentInset.top + contentInset.bottom);
+  }
+  return pageSize;
+}
+
 #pragma mark - Helpers
 
 - (void)scrollToPageAtIndex:(NSInteger)index animated:(BOOL)animated
@@ -142,7 +153,7 @@
 - (CGSize)sizeForElements:(ASElementMap *)elements
 {
   ASDisplayNodeAssertMainThread();
-  return self.bounds.size;
+  return [self pageSize];
 }
 
 #pragma mark - ASCollectionDataSource
@@ -179,7 +190,7 @@
   }
 #pragma clang diagnostic pop
 
-  return ASSizeRangeMake(self.bounds.size);
+  return ASSizeRangeMake([self pageSize]);
 }
 
 #pragma mark - Data Source Proxy
