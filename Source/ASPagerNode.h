@@ -88,7 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Initializer with custom-configured flow layout properties.
  *
- * NOTE: the flow layout must have a horizontal scroll direction.
+ * NOTE: The flow layout must have a horizontal scroll direction.
  */
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 
