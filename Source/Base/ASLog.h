@@ -22,7 +22,7 @@
 #import <os/activity.h>
 
 #ifndef ASEnableLogs
-  #define ASEnableLogs 1
+  #define ASEnableLogs 0
 #endif
 
 #ifndef ASEnableVerboseLogging
