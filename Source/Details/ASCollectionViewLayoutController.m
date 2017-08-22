@@ -120,7 +120,10 @@ typedef struct ASRangeGeometry ASRangeGeometry;
     if (CATransform3DIsIdentity(la.transform3D) && CGRectIntersectsRect(la.frame, rangeBounds) == NO) {
       continue;
     }
-    [elementSet addObject:[map elementForLayoutAttributes:la]];
+    ASCollectionElement *e = [map elementForLayoutAttributes:la];
+    if (e != nil) {
+      [elementSet addObject:e];
+    }
   }
 
   return elementSet;
