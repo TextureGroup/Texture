@@ -42,6 +42,7 @@
 
 - (NSUInteger)numberOfScheduledBlocks
 {
+  ASDN::MutexLocker l(_serialQueueLock);
   return _blocks.count;
 }
 
