@@ -1536,10 +1536,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
   return [self.layoutInspector scrollableDirections];
 }
 
-- (ASScrollDirection)flowLayoutScrollableDirections:(UICollectionViewFlowLayout *)flowLayout {
-  return (flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal) ? ASScrollDirectionHorizontalDirections : ASScrollDirectionVerticalDirections;
-}
-
 - (void)layoutSubviews
 {
   if (_cellsForLayoutUpdates.count > 0) {

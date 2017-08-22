@@ -12,6 +12,7 @@
 - Small improvements in ASCollectionLayout [Huy Nguyen](https://github.com/nguyenhuy) [#509](https://github.com/TextureGroup/Texture/pull/509) [#513](https://github.com/TextureGroup/Texture/pull/513)
 - Fix retain cycle between ASImageNode and PINAnimatedImage [Phil Larson](https://github.com/plarson) [#520](https://github.com/TextureGroup/Texture/pull/520)
 - Change the API for disabling logging from a compiler flag to a runtime C function ASDisableLogging().  [Adlai Holler](https://github.com/Adlai-Holler) [#528](https://github.com/TextureGroup/Texture/pull/528)
+- Table and collection views to consider content inset when calculating (default) element size range [Huy Nguyen](https://github.com/nguyenhuy) [#525](https://github.com/TextureGroup/Texture/pull/525)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
