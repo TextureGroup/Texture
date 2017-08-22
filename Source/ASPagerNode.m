@@ -66,6 +66,7 @@
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
+  ASDisplayNodeAssertTrue(flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal);
   self = [super initWithCollectionViewLayout:flowLayout];
   return self;
 }
@@ -117,12 +118,9 @@
 
 - (CGSize)pageSize
 {
-  CGSize pageSize = self.bounds.size;
   UIEdgeInsets contentInset = self.view.contentInset;
-  if (! UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, contentInset)) {
-    pageSize.width -= (contentInset.left + contentInset.right);
-    pageSize.height -= (contentInset.top + contentInset.bottom);
-  }
+  CGSize pageSize = self.bounds.size;
+  pageSize.height -= (contentInset.top + contentInset.bottom);
   return pageSize;
 }
 
