@@ -430,7 +430,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 
 #pragma mark - Batching (External API)
 
-- (void)waitUntilAllUpdatesAreCommitted
+- (void)waitUntilAllUpdatesAreProcessed
 {
   // Schedule block in main serial queue to wait until all operations are finished that are
   // where scheduled while waiting for the _editingTransactionQueue to finish
@@ -592,7 +592,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   });
   
   if (_usesSynchronousDataLoading) {
-    [self waitUntilAllUpdatesAreCommitted];
+    [self waitUntilAllUpdatesAreProcessed];
   }
 }
 

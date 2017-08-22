@@ -534,9 +534,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreProcessed instead.");
 
-// TODO: Rename framework uses of this method and add deprecation message.
-// ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
-- (void)waitUntilAllUpdatesAreCommitted;
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
 
 @end
 

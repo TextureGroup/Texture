@@ -300,7 +300,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
 - (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
-- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASCollectionNode waitUntilAllUpdatesAreProcessed] instead.");
 
 /**
  * Registers the given kind of supplementary node for use in creating node-backed supplementary views.

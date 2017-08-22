@@ -733,12 +733,31 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   }
 }
 
-- (void)waitUntilAllUpdatesAreCommitted
+- (BOOL)isProcessingUpdates
+{
+  return (self.nodeLoaded ? [self.view isProcessingUpdates] : NO);
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  if (!self.nodeLoaded) {
+    completion();
+  } else {
+    [self.view onDidFinishProcessingUpdates:completion];
+  }
+}
+
+- (void)waitUntilAllUpdatesAreProcessed
 {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
     [self.view waitUntilAllUpdatesAreCommitted];
   }
+}
+
+- (void)waitUntilAllUpdatesAreCommitted
+{
+  [self waitUntilAllUpdatesAreProcessed];
 }
 
 #pragma mark - Debugging (Private)

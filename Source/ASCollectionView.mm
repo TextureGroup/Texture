@@ -359,18 +359,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [_dataController relayoutAllNodes];
 }
 
-- (void)waitUntilAllUpdatesAreCommitted
-{
-  ASDisplayNodeAssertMainThread();
-  if (_batchUpdateCount > 0) {
-    // This assertion will be enabled soon.
-    //    ASDisplayNodeFailAssert(@"Should not call %@ during batch update", NSStringFromSelector(_cmd));
-    return;
-  }
-  
-  [_dataController waitUntilAllUpdatesAreCommitted];
-}
-
 - (BOOL)isProcessingUpdates
 {
   return [_dataController isProcessingUpdates];
@@ -379,6 +367,18 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
 {
   [_dataController onDidFinishProcessingUpdates:completion];
+}
+
+- (void)waitUntilAllUpdatesAreCommitted
+{
+  ASDisplayNodeAssertMainThread();
+  if (_batchUpdateCount > 0) {
+    // This assertion will be enabled soon.
+    //    ASDisplayNodeFailAssert(@"Should not call %@ during batch update", NSStringFromSelector(_cmd));
+    return;
+  }
+
+  [_dataController waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)setDataSource:(id<UICollectionViewDataSource>)dataSource
@@ -2207,7 +2207,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
 
   if (changedInNonScrollingDirection) {
     [_dataController relayoutAllNodes];
-    [_dataController waitUntilAllUpdatesAreCommitted];
+    [_dataController waitUntilAllUpdatesAreProcessed];
     // We need to ensure the size requery is done before we update our layout.
     [self.collectionViewLayout invalidateLayout];
   }
