@@ -22,7 +22,7 @@ void ASDisableLogging() {
   });
 }
 
-BOOL ASLoggingIsEnabled() {
+ASDISPLAYNODE_INLINE BOOL ASLoggingIsEnabled() {
   return atomic_load(&__ASLogEnabled);
 }
 
