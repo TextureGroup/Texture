@@ -3517,8 +3517,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
   self.automaticallyManagesSubnodes = enabled;
 }
 
-ASLayoutElementStyleForwarding
-
 - (void)visibilityDidChange:(BOOL)isVisible
 {
   if (isVisible) {

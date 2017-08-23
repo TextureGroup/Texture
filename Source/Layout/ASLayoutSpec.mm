@@ -342,11 +342,3 @@ ASLayoutElementStyleExtensibilityForwarding
 }
 
 @end
-
-#pragma mark - ASLayoutSpec (Deprecated)
-
-@implementation ASLayoutSpec (Deprecated)
-
-ASLayoutElementStyleForwarding
-
-@end

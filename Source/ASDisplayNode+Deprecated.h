@@ -21,8 +21,6 @@
 
 @interface ASDisplayNode (Deprecated)
 
-ASLayoutElementStyleForwardingDeclaration
-
 /**
  * @abstract Called whenever the visiblity of the node changed.
  *
