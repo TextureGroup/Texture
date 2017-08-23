@@ -24,7 +24,6 @@
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>

@@ -125,7 +125,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Tips.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 
 #import <AsyncDisplayKit/IGListAdapter+AsyncDisplayKit.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+IGListKitMethods.h>

@@ -20,7 +20,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
@@ -3480,11 +3479,5 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
     [self addSublayer:subnode.layer];
   }
 }
-
-@end
-
-#pragma mark - ASDisplayNode (Deprecated)
-
-@implementation ASDisplayNode (Deprecated)
 
 @end
