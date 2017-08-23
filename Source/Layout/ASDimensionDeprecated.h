@@ -53,7 +53,7 @@ extern AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMakeExactSize(CGSize size) A
 
 /**
  Expresses an inclusive range of relative sizes. Used to provide additional constraint to layout.
- Used by ASStaticLayoutSpec.
+ Used by ASAbsoluteLayoutSpec.
  */
 typedef struct {
   ASLayoutSize min;
