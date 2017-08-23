@@ -3519,20 +3519,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
   self.debugName = name;
 }
 
-- (void)setPreferredFrameSize:(CGSize)preferredFrameSize
-{
-  // Deprecated preferredFrameSize just calls through to set width and height
-  self.style.preferredSize = preferredFrameSize;
-  [self setNeedsLayout];
-}
-
-- (CGSize)preferredFrameSize
-{
-  ASLayoutSize size = self.style.preferredLayoutSize;
-  BOOL isPoints = (size.width.unit == ASDimensionUnitPoints && size.height.unit == ASDimensionUnitPoints);
-  return isPoints ? CGSizeMake(size.width.value, size.height.value) : CGSizeZero;
-}
-
 - (BOOL)usesImplicitHierarchyManagement
 {
   return self.automaticallyManagesSubnodes;
