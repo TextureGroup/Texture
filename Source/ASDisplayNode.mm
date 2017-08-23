@@ -3507,16 +3507,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @implementation ASDisplayNode (Deprecated)
 
-- (NSString *)name
-{
-  return self.debugName;
-}
-
-- (void)setName:(NSString *)name
-{
-  self.debugName = name;
-}
-
 - (BOOL)usesImplicitHierarchyManagement
 {
   return self.automaticallyManagesSubnodes;
