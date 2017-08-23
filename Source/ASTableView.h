@@ -185,14 +185,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 
 /**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UITableView's version and will block the main thread while
- * all the cells load.
- */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's reloadDataWithCompletion: followed by ASTableNode's -waitUntilAllUpdatesAreCommitted instead.");
-
-/**
  * Triggers a relayout of all nodes.
  *
  * @discussion This method invalidates and lays out every cell node in the table view.

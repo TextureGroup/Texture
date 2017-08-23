@@ -753,13 +753,6 @@
   [self reloadDataWithCompletion:nil];
 }
 
-- (void)reloadDataImmediately
-{
-  ASDisplayNodeAssertMainThread();
-  [self reloadData];
-  [self waitUntilAllUpdatesAreProcessed];
-}
-
 - (void)relayoutItems
 {
   ASDisplayNodeAssertMainThread();
