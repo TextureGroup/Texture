@@ -3487,9 +3487,4 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @implementation ASDisplayNode (Deprecated)
 
-- (void)cancelLayoutTransitionsInProgress
-{
-  [self cancelLayoutTransition];
-}
-
 @end

@@ -21,11 +21,4 @@
 
 @interface ASDisplayNode (Deprecated)
 
-/**
- * @abstract Cancels all performing layout transitions. Can be called on any thread.
- *
- * @deprecated Deprecated in version 2.0: Use cancelLayoutTransition
- */
-- (void)cancelLayoutTransitionsInProgress ASDISPLAYNODE_DEPRECATED_MSG("Use -cancelLayoutTransition instead.");
-
 @end
