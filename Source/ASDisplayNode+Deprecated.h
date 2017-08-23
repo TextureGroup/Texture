@@ -22,46 +22,6 @@
 @interface ASDisplayNode (Deprecated)
 
 /**
- * @abstract Called whenever the visiblity of the node changed.
- *
- * @discussion Subclasses may use this to monitor when they become visible.
- *
- * @deprecated @see didEnterVisibleState @see didExitVisibleState
- */
-- (void)visibilityDidChange:(BOOL)isVisible ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use -didEnterVisibleState / -didExitVisibleState instead.");
-
-/**
- * @abstract Called whenever the visiblity of the node changed.
- *
- * @discussion Subclasses may use this to monitor when they become visible.
- *
- * @deprecated @see didEnterVisibleState @see didExitVisibleState
- */
-- (void)visibleStateDidChange:(BOOL)isVisible ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use -didEnterVisibleState / -didExitVisibleState instead.");
-
-/**
- * @abstract Called whenever the the node has entered or exited the display state.
- *
- * @discussion Subclasses may use this to monitor when a node should be rendering its content.
- *
- * @note This method can be called from any thread and should therefore be thread safe.
- *
- * @deprecated @see didEnterDisplayState @see didExitDisplayState
- */
-- (void)displayStateDidChange:(BOOL)inDisplayState ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use -didEnterDisplayState / -didExitDisplayState instead.");
-
-/**
- * @abstract Called whenever the the node has entered or left the load state.
- *
- * @discussion Subclasses may use this to monitor data for a node should be loaded, either from a local or remote source.
- *
- * @note This method can be called from any thread and should therefore be thread safe.
- *
- * @deprecated @see didEnterPreloadState @see didExitPreloadState
- */
-- (void)loadStateDidChange:(BOOL)inLoadState ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use -didEnterPreloadState / -didExitPreloadState instead.");
-
-/**
  * @abstract Cancels all performing layout transitions. Can be called on any thread.
  *
  * @deprecated Deprecated in version 2.0: Use cancelLayoutTransition
