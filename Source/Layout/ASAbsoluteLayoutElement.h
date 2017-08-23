@@ -16,7 +16,6 @@
 //
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDimensionDeprecated.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

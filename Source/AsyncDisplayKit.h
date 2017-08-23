@@ -75,7 +75,6 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDimensionInternal.h>
-#import <AsyncDisplayKit/ASDimensionDeprecated.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
