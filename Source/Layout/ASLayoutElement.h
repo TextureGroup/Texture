@@ -147,10 +147,6 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 - (BOOL)implementsLayoutMethod;
 
-#pragma mark - Deprecated
-
-#define ASLayoutable ASLayoutElement
-
 @end
 
 #pragma mark - ASLayoutElementStyle
