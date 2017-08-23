@@ -705,12 +705,31 @@
   [self performBatchAnimated:UIView.areAnimationsEnabled updates:updates completion:completion];
 }
 
-- (void)waitUntilAllUpdatesAreCommitted
+- (BOOL)isProcessingUpdates
+{
+  return (self.nodeLoaded ? [self.view isProcessingUpdates] : NO);
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  if (!self.nodeLoaded) {
+    completion();
+  } else {
+    [self.view onDidFinishProcessingUpdates:completion];
+  }
+}
+
+- (void)waitUntilAllUpdatesAreProcessed
 {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
     [self.view waitUntilAllUpdatesAreCommitted];
   }
+}
+
+- (void)waitUntilAllUpdatesAreCommitted
+{
+  [self waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)reloadDataWithCompletion:(void (^)())completion
@@ -738,7 +757,7 @@
 {
   ASDisplayNodeAssertMainThread();
   [self reloadData];
-  [self waitUntilAllUpdatesAreCommitted];
+  [self waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)relayoutItems

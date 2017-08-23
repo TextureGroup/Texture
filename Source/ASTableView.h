@@ -219,9 +219,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)endUpdatesAnimated:(BOOL)animated completion:(void (^ _Nullable)(BOOL completed))completion ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's -performBatchUpdates:completion: instead.");
 
 /**
- *  Blocks execution of the main thread until all section and row updates are committed. This method must be called from the main thread.
+ * See ASTableNode.h for full documentation of these methods.
  */
-- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASTableNode waitUntilAllUpdatesAreProcessed] instead.");
 
 - (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 

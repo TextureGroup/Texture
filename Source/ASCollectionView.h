@@ -296,9 +296,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)relayoutItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
 
 /**
- *  Blocks execution of the main thread until all section and row updates are committed. This method must be called from the main thread.
+ * See ASCollectionNode.h for full documentation of these methods.
  */
-- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASCollectionNode waitUntilAllUpdatesAreProcessed] instead.");
 
 /**
  * Registers the given kind of supplementary node for use in creating node-backed supplementary views.

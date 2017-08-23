@@ -548,7 +548,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   ASDisplayNodeAssertMainThread();
   [self reloadData];
-  [_dataController waitUntilAllUpdatesAreCommitted];
+  [_dataController waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
@@ -735,6 +735,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } 
 }
 
+- (BOOL)isProcessingUpdates
+{
+  return [_dataController isProcessingUpdates];
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  [_dataController onDidFinishProcessingUpdates:completion];
+}
+
 - (void)waitUntilAllUpdatesAreCommitted
 {
   ASDisplayNodeAssertMainThread();
@@ -743,8 +753,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     //    ASDisplayNodeFailAssert(@"Should not call %@ during batch update", NSStringFromSelector(_cmd));
     return;
   }
-  
-  [_dataController waitUntilAllUpdatesAreCommitted];
+
+  [_dataController waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)layoutSubviews

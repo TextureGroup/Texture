@@ -253,9 +253,38 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
+ *  Returns YES if the ASCollectionNode is still processing changes from performBatchUpdates:.
+ *  This is typically the concurrent allocation (calling nodeBlocks) and layout of newly inserted
+ *  ASCellNodes. If YES is returned, then calling -waitUntilAllUpdatesAreProcessed may take tens of
+ *  milliseconds to return as it blocks on these concurrent operations.
+ *
+ *  Returns NO if ASCollectionNode is fully synchronized with the underlying UICollectionView. This
+ *  means that until the next performBatchUpdates: is called, it is safe to compare UIKit values
+ *  (such as from UICollectionViewLayout) with your app's data source.
+ *
+ *  This method will always return NO if called immediately after -waitUntilAllUpdatesAreProcessed.
+ */
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
+
+/**
+ *  Schedules a block to be performed (on the main thread) after processing of performBatchUpdates:
+ *  is finished (completely synchronized to UIKit). The blocks will be run at the moment that
+ *  -isProcessingUpdates changes from YES to NO;
+ *
+ *  When isProcessingUpdates == NO, the block is run block immediately (before the method returns).
+ *
+ *  Blocks scheduled by this mechanism are NOT guaranteed to run in the order they are scheduled.
+ *  They may also be delayed if performBatchUpdates continues to be called; the blocks will wait until
+ *  all running updates are finished.
+ *
+ *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
+ */
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())didFinishProcessingUpdates;
+
+/**
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
  */
-- (void)waitUntilAllUpdatesAreCommitted;
+- (void)waitUntilAllUpdatesAreProcessed;
 
 /**
  * Inserts one or more sections.
@@ -501,9 +530,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @warning This method is substantially more expensive than UICollectionView's version.
  *
  * @deprecated This method is deprecated in 2.0. Use @c reloadDataWithCompletion: and
- *   then @c waitUntilAllUpdatesAreCommitted instead.
+ *   then @c waitUntilAllUpdatesAreProcessed instead.
  */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreCommitted instead.");
+- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreProcessed instead.");
+
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
 
 @end
 
