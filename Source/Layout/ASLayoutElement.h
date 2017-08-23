@@ -151,18 +151,6 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 #define ASLayoutable ASLayoutElement
 
-/**
- * @abstract Calculate a layout based on given size range.
- *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
- *
- * @return An ASLayout instance defining the layout of the receiver and its children.
- *
- * @deprecated Deprecated in version 2.0: Use layoutThatFits: or layoutThatFits:parentSize: if used in
- * ASLayoutSpec subclasses
- */
-- (nonnull ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize ASDISPLAYNODE_DEPRECATED_MSG("Use layoutThatFits: instead.");
-
 @end
 
 #pragma mark - ASLayoutElementStyle

@@ -51,11 +51,6 @@ NS_ASSUME_NONNULL_END
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
 }\
 \
-- (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize\
-{\
-  return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
-}\
-\
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize\
 {\
   return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];\

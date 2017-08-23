@@ -35,17 +35,6 @@
 @dynamic layoutElementType;
 @synthesize debugName = _debugName;
 
-#pragma mark - Class
-
-+ (void)initialize
-{
-  [super initialize];
-  if (self != [ASLayoutSpec class]) {
-    ASDisplayNodeAssert(!ASSubclassOverridesSelector([ASLayoutSpec class], self, @selector(measureWithSizeRange:)), @"Subclass %@ must not override measureWithSizeRange: method. Instead override calculateLayoutThatFits:", NSStringFromClass(self));
-  }
-}
-
-
 #pragma mark - Lifecycle
 
 - (instancetype)init
