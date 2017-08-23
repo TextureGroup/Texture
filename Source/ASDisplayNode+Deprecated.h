@@ -69,17 +69,6 @@
 - (void)cancelLayoutTransitionsInProgress ASDISPLAYNODE_DEPRECATED_MSG("Use -cancelLayoutTransition instead.");
 
 /**
- * @abstract A boolean that shows whether the node automatically inserts and removes nodes based on the presence or
- * absence of the node and its subnodes is completely determined in its layoutSpecThatFits: method.
- *
- * @discussion If flag is YES the node no longer require addSubnode: or removeFromSupernode method calls. The presence
- * or absence of subnodes is completely determined in its layoutSpecThatFits: method.
- *
- * @deprecated Deprecated in version 2.0: Use automaticallyManagesSubnodes
- */
-@property (nonatomic, assign) BOOL usesImplicitHierarchyManagement ASDISPLAYNODE_DEPRECATED_MSG("Set .automaticallyManagesSubnodes instead.");
-
-/**
  * @abstract Indicates that the node should fetch any external data, such as images.
  *
  * @discussion Subclasses may override this method to be notified when they should begin to preload. Fetching

@@ -3507,16 +3507,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @implementation ASDisplayNode (Deprecated)
 
-- (BOOL)usesImplicitHierarchyManagement
-{
-  return self.automaticallyManagesSubnodes;
-}
-
-- (void)setUsesImplicitHierarchyManagement:(BOOL)enabled
-{
-  self.automaticallyManagesSubnodes = enabled;
-}
-
 - (void)visibilityDidChange:(BOOL)isVisible
 {
   if (isVisible) {
