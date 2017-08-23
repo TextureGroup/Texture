@@ -244,9 +244,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Deprecated in 2.0. You should not call this method.
 - (void)clearContents ASDISPLAYNODE_DEPRECATED_MSG("You should not call this method directly. Intead, rely on the Interstate State callback methods.");
 
-/// Deprecated in 2.0. You should not call this method.
-- (void)clearFetchedData ASDISPLAYNODE_DEPRECATED_MSG("You should not call this method directly. Intead, rely on the Interstate State callback methods.");
-
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 
 @end

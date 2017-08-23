@@ -182,12 +182,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
   }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(fetchData))) {
-    overrides |= ASDisplayNodeMethodOverrideFetchData;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(clearFetchedData))) {
-    overrides |= ASDisplayNodeMethodOverrideClearFetchedData;
-  }
 
   return overrides;
 }
@@ -2933,13 +2927,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   [_interfaceStateDelegate didEnterPreloadState];
-  
-  if (_methodOverrides & ASDisplayNodeMethodOverrideFetchData) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [self fetchData];
-#pragma clang diagnostic pop
-  }
 }
 
 - (void)didExitPreloadState
@@ -2947,13 +2934,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   [_interfaceStateDelegate didExitPreloadState];
-  
-  if (_methodOverrides & ASDisplayNodeMethodOverrideClearFetchedData) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [self clearFetchedData];
-#pragma clang diagnostic pop
-  }
 }
 
 - (void)clearContents
@@ -3506,16 +3486,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 #pragma mark - ASDisplayNode (Deprecated)
 
 @implementation ASDisplayNode (Deprecated)
-
-- (void)fetchData
-{
-  // subclass override
-}
-
-- (void)clearFetchedData
-{
-  // subclass override
-}
 
 - (void)cancelLayoutTransitionsInProgress
 {
