@@ -347,6 +347,12 @@
         layer.contents = (id)image.CGImage;
       }
       [self didDisplayAsyncLayer:self.asyncLayer];
+      
+      if (_flags.rasterizesSubtree) {
+        for (ASDisplayNode *subnode in self.subnodes) {
+          [subnode didDisplayAsyncLayer:subnode.asyncLayer];
+        }
+      }
     }
   };
 

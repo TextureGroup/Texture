@@ -111,6 +111,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL hasPreloaded;
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
+
+@property (nonatomic, assign) NSUInteger didDisplayCount;
+
 @end
 
 @interface ASTestResponderNode : ASTestDisplayNode
@@ -153,6 +156,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   if (_willDeallocBlock) {
     _willDeallocBlock(self);
   }
+}
+
+- (void)displayDidFinish
+{
+  [super displayDidFinish];
+  _didDisplayCount++;
 }
 
 @end
@@ -2017,6 +2026,25 @@ static bool stringContainsPointer(NSString *description, id p) {
   }];
   ASSetDebugNames(rasterizedSupernode, subnode);
   XCTAssertThrows([rasterizedSupernode addSubnode:subnode]);
+}
+
+- (void)testThatRasterizedSubnodesGetUpdatesWhenRenderPassCompletes
+{
+  ASTestDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
+  supernode.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
+  [supernode enableSubtreeRasterization];
+  
+  ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
+  
+  ASSetDebugNames(supernode, subnode);
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [supernode addSubnode:subnode];
+  [window addSubnode:supernode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.didDisplayCount == 1);
+  }));
 }
 
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2011
