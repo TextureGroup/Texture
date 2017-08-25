@@ -23,6 +23,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -349,9 +351,9 @@
       [self didDisplayAsyncLayer:self.asyncLayer];
       
       if (_flags.rasterizesSubtree) {
-        for (ASDisplayNode *subnode in self.subnodes) {
-          [subnode didDisplayAsyncLayer:subnode.asyncLayer];
-        }
+        ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+          [node didDisplayAsyncLayer:node.asyncLayer];
+        });
       }
     }
   };

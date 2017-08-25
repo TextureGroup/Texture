@@ -2035,15 +2035,21 @@ static bool stringContainsPointer(NSString *description, id p) {
   [supernode enableSubtreeRasterization];
   
   ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
+  ASTestDisplayNode *subSubnode = [[ASTestDisplayNode alloc] init];
   
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [subnode addSubnode:subSubnode];
   [supernode addSubnode:subnode];
   [window addSubnode:supernode];
   [window makeKeyAndVisible];
   
   XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
     return (subnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.didDisplayCount == 1);
   }));
 }
 
