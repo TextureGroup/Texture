@@ -118,8 +118,6 @@ ASLayoutElementStyleExtensibilityForwarding
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
-ASPrimitiveTraitCollectionDeprecatedImplementation
-
 #pragma mark - ASLayoutElementAsciiArtProtocol
 
 - (NSString *)asciiArtString

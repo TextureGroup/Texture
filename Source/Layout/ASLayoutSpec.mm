@@ -156,7 +156,6 @@ ASLayoutElementLayoutCalculationDefaults
 }
 
 ASPrimitiveTraitCollectionDefaults
-ASPrimitiveTraitCollectionDeprecatedImplementation
 
 #pragma mark - ASLayoutElementStyleExtensibility
 
