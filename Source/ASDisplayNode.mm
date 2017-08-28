@@ -1555,7 +1555,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
   // Subclass hook.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  [self displayWillStart]; // Subclass override
+  [self displayWillStart];
 #pragma clang diagnostic pop
 
   [self displayWillStartAsynchronously:asynchronously];
