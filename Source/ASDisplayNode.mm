@@ -1553,7 +1553,11 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 - (void)willDisplayAsyncLayer:(_ASDisplayLayer *)layer asynchronously:(BOOL)asynchronously
 {
   // Subclass hook.
-  [self displayWillStart];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  [self displayWillStart]; // Subclass override
+#pragma clang diagnostic pop
+
   [self displayWillStartAsynchronously:asynchronously];
 }
 
@@ -1566,7 +1570,6 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 - (void)displayWillStart {}
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
-  [self displayWillStart]; // Subclass override
   ASDisplayNodeAssertMainThread();
 
   ASDisplayNodeLogEvent(self, @"displayWillStart");

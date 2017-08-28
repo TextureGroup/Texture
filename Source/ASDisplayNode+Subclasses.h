@@ -318,12 +318,23 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract Indicates that the receiver is about to display.
  *
+ * @discussion Deprecated in 2.5.
+ *
  * @discussion Subclasses may override this method to be notified when display (asynchronous or synchronous) is
  * about to begin.
  *
  * @note Called on the main thread only
  */
-- (void)displayWillStart ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)displayWillStart ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use displayWillStartAsynchronously: instead.");
+
+/**
+ * @abstract Indicates that the receiver is about to display.
+ *
+ * @discussion Subclasses may override this method to be notified when display (asynchronous or synchronous) is
+ * about to begin.
+ *
+ * @note Called on the main thread only
+ */
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously ASDISPLAYNODE_REQUIRES_SUPER;
 
 /**

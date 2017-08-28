@@ -332,7 +332,7 @@
     return;
   }
   
-  ASDisplayNodeAssert(_layer, @"Expect _layer to be not nil");
+  ASDisplayNodeAssert(layer, @"Expect _layer to be not nil");
 
   // This block is called back on the main thread after rendering at the completion of the current async transaction, or immediately if !asynchronously
   asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
