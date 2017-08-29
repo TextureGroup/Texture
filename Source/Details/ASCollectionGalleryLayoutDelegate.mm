@@ -118,7 +118,8 @@
           ASCollectionElement *headerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
           if (headerElement) {
             NSInteger index = sectionIndex > 0 ? [context.elements numberOfItemsInSection:sectionIndex - 1] : 0;
-            index += numberOfSupplementaryelementsBefore++;
+            index += numberOfSupplementaryelementsBefore;
+            numberOfSupplementaryelementsBefore++;
             [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:headerElement] atIndex:index];
           }
         }
@@ -126,7 +127,8 @@
           ASCollectionElement *footerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
           if (footerElement) {
             NSInteger index = [context.elements numberOfItemsInSection:sectionIndex];
-            index += numberOfSupplementaryelementsBefore++;
+            index += numberOfSupplementaryelementsBefore;
+            numberOfSupplementaryelementsBefore++;
             [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:footerElement] atIndex:index];
           }
         }
