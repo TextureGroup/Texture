@@ -304,6 +304,7 @@
   }
   
   CALayer *layer = _layer;
+  BOOL rasterizesSubtree = _flags.rasterizesSubtree;
   
   __instanceLock__.unlock();
 
@@ -350,7 +351,7 @@
       }
       [self didDisplayAsyncLayer:self.asyncLayer];
       
-      if (_flags.rasterizesSubtree) {
+      if (rasterizesSubtree) {
         ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
           [node didDisplayAsyncLayer:node.asyncLayer];
         });
