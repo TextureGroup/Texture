@@ -361,6 +361,12 @@
 
   // Call willDisplay immediately in either case
   [self willDisplayAsyncLayer:self.asyncLayer asynchronously:asynchronously];
+  
+  if (rasterizesSubtree) {
+    ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+      [node willDisplayAsyncLayer:node.asyncLayer asynchronously:asynchronously];
+    });
+  }
 
   if (asynchronously) {
     // Async rendering operations are contained by a transaction, which allows them to proceed and concurrently

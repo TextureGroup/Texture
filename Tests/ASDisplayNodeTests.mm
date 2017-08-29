@@ -112,6 +112,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
 
+@property (nonatomic, assign) NSUInteger displayWillStartCount;
 @property (nonatomic, assign) NSUInteger didDisplayCount;
 
 @end
@@ -162,6 +163,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 {
   [super displayDidFinish];
   _didDisplayCount++;
+}
+
+- (void)displayWillStartAsynchronously:(BOOL)asynchronously
+{
+  [super displayWillStartAsynchronously:asynchronously];
+  _displayWillStartCount++;
 }
 
 @end
@@ -2028,7 +2035,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertThrows([rasterizedSupernode addSubnode:subnode]);
 }
 
-- (void)testThatRasterizedSubnodesGetUpdatesWhenRenderPassCompletes
+- (void)testThatSubnodesGetDisplayUpdatesIfRasterized
 {
   ASTestDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   supernode.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
@@ -2050,6 +2057,14 @@ static bool stringContainsPointer(NSString *description, id p) {
   
   XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
     return (subSubnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.displayWillStartCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.displayWillStartCount == 1);
   }));
 }
 
