@@ -105,6 +105,29 @@
   NSMutableArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
                                                                           ASCollectionElement *element,
                                                                           [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
+  NSInteger numberOfSupplementaryelementsBefore = 0;;
+  if ([context.elements.supplementaryElementKinds count]) {
+    for (int sectionIndex = 0; sectionIndex< context.elements.numberOfSections; ++sectionIndex) {
+      for (NSString *kind in context.elements.supplementaryElementKinds) {
+        if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
+          ASCollectionElement *headerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
+          if (headerElement) {
+            NSInteger index = sectionIndex > 0 ? [context.elements numberOfItemsInSection:sectionIndex - 1] : 0;
+            index += numberOfSupplementaryelementsBefore++;
+            [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:headerElement] atIndex:index];
+          }
+        }
+        if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+          ASCollectionElement *footerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
+          if (footerElement) {
+            NSInteger index = [context.elements numberOfItemsInSection:sectionIndex];
+            index += numberOfSupplementaryelementsBefore++;
+            [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:footerElement] atIndex:index];
+          }
+        }
+      }
+    }
+  }
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }
