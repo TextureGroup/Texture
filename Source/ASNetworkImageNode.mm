@@ -169,6 +169,15 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   }
 }
 
+- (void)setURL:(NSURL *)URL resetToDefault:(BOOL)reset
+{
+  if (URL) {
+    [self setURLs:@[URL] resetToDefault:reset];
+  } else {
+    [self setURLs:nil resetToDefault:reset];
+  }
+}
+
 - (NSURL *)URL
 {
   return [self.URLs lastObject];
