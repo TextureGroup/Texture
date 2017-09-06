@@ -17,10 +17,11 @@
 
 #import <AsyncDisplayKit/ASCollectionFlowLayoutDelegate.h>
 
-#import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
+#import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -43,33 +44,24 @@
   return self;
 }
 
-- (ASSizeRange)sizeRangeThatFits:(CGSize)viewportSize
+- (ASScrollDirection)scrollableDirections
 {
-  ASSizeRange sizeRange = ASSizeRangeUnconstrained;
-  if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.height = viewportSize.height;
-    sizeRange.max.height = viewportSize.height;
-  }
-  if (ASScrollDirectionContainsHorizontalDirection(_scrollableDirections) == NO) {
-    sizeRange.min.width = viewportSize.width;
-    sizeRange.max.width = viewportSize.width;
-  }
-  return sizeRange;
+  ASDisplayNodeAssertMainThread();
+  return _scrollableDirections;
 }
 
 - (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
 {
+  ASDisplayNodeAssertMainThread();
   return nil;
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
   NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
   if (children.count == 0) {
-    return [[ASCollectionLayoutState alloc] initWithContext:context
-                                                contentSize:CGSizeZero
-                             elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
+    return [[ASCollectionLayoutState alloc] initWithContext:context];
   }
   
   ASStackLayoutSpec *stackSpec = [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal
@@ -80,8 +72,14 @@
                                                                     alignContent:ASStackLayoutAlignContentStart
                                                                         children:children];
   stackSpec.concurrent = YES;
-  ASLayout *layout = [stackSpec layoutThatFits:[self sizeRangeThatFits:context.viewportSize]];
-  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout];
+
+  ASSizeRange sizeRange = ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, context.scrollableDirections);
+  ASLayout *layout = [stackSpec layoutThatFits:sizeRange];
+
+  return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {
+    ASCellNode *node = ASDynamicCast(sublayout.layoutElement, ASCellNode);
+    return node ? node.collectionElement : nil;
+  }];
 }
 
 @end

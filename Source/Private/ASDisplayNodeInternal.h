@@ -34,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol _ASDisplayLayerDelegate;
 @class _ASDisplayLayer;
 @class _ASPendingState;
-@class ASSentinel;
 struct ASDisplayNodeFlags;
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
@@ -160,6 +159,10 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   std::shared_ptr<ASDisplayNodeLayout> _calculatedDisplayNodeLayout;
   std::shared_ptr<ASDisplayNodeLayout> _pendingDisplayNodeLayout;
   
+  /// Sentinel for layout data. Incremented when we get -setNeedsLayout / -invalidateCalculatedLayout.
+  /// Starts at 1.
+  std::atomic<NSUInteger> _layoutVersion;
+  
   ASDisplayNodeViewBlock _viewBlock;
   ASDisplayNodeLayerBlock _layerBlock;
   NSMutableArray<ASDisplayNodeDidLoadBlock> *_onDidLoadBlocks;
@@ -192,6 +195,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSArray *_accessibilityHeaderElements;
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
+  BOOL _isAccessibilityContainer;
 
   // performance measurement
   ASDisplayNodePerformanceMeasurementOptions _measurementOptions;

@@ -17,6 +17,8 @@
 
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
+
+#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
 #include <mutex>
@@ -250,7 +252,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSMutableArray *result = [super propertiesForDescription];
   NSString *plainString = [self _plainStringForDescription];
   if (plainString.length > 0) {
-    [result insertObject:@{ @"text" : ASStringWithQuotesIfMultiword(plainString) } atIndex:0];
+    [result addObject:@{ (id)kCFNull : ASStringWithQuotesIfMultiword(plainString) }];
   }
   return result;
 }
@@ -1471,3 +1473,10 @@ static BOOL _hasAllocatedNode;
 }
 
 @end
+
+#else
+
+@implementation ASTextNode
+@end
+
+#endif

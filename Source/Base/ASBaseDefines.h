@@ -15,10 +15,6 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#pragma once
-
-#import <AsyncDisplayKit/ASLog.h>
-
 // The C++ compiler mangles C function names. extern "C" { /* your C functions */ } prevents this.
 // You should wrap all C function prototypes declared in headers with ASDISPLAYNODE_EXTERN_C_BEGIN/END, even if
 // they are included only from .m (Objective-C) files. It's common for .m files to start using C++
@@ -237,6 +233,12 @@
 #define ASDynamicCast(x, c) ({ \
   id __val = x;\
   ((c *) ([__val isKindOfClass:[c class]] ? __val : nil));\
+})
+
+/// Ensure that class is of certain kind, assuming it is subclass restricted
+#define ASDynamicCastStrict(x, c) ({ \
+  id __val = x;\
+  ((c *) ([__val class] == [c class] ? __val : nil));\
 })
 
 /**

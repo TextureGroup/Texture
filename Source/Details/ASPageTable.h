@@ -70,6 +70,11 @@ ASDISPLAYNODE_EXTERN_C_END
 typedef NSMapTable ASPageTable;
 
 /**
+ * A page to array of layout attributes table.
+ */
+typedef ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> ASPageToLayoutAttributesTable;
+
+/**
  * A category for creating & using map tables meant for storing objects using ASPage as keys.
  */
 @interface NSMapTable<id, ObjectType> (ASPageTableMethods)
@@ -93,7 +98,7 @@ typedef NSMapTable ASPageTable;
  *
  * @param pageSize The size of each page.
  */
-+ (ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
++ (ASPageToLayoutAttributesTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
 
 /**
  * Retrieves the object for a given page, or nil if the page is not found.

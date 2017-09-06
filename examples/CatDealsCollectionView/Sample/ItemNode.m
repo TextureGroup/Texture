@@ -18,6 +18,7 @@
 #import "ItemNode.h"
 #import "ItemStyles.h"
 #import "PlaceholderNetworkImageNode.h"
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
 const CGFloat kFixedLabelsAreaHeight = 96.0;
 const CGFloat kDesignWidth = 320.0;
@@ -45,6 +46,7 @@ const CGFloat kSoldOutGBHeight = 50.0;
 @end
 
 @implementation ItemNode
+@dynamic viewModel;
 
 - (instancetype)initWithViewModel:(ItemViewModel *)viewModel
 {
@@ -55,6 +57,8 @@ const CGFloat kSoldOutGBHeight = 50.0;
     [self updateLabels];
     [self updateBackgroundColor];
     
+    ASSetDebugName(self, @"Item #%zd", viewModel.identifier);
+    self.accessibilityIdentifier = viewModel.titleText;
   }
   return self;
 }

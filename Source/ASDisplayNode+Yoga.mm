@@ -19,6 +19,7 @@
 
 #if YOGA /* YOGA */
 
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
@@ -40,7 +41,7 @@
 
 - (void)setYogaChildren:(NSArray *)yogaChildren
 {
-  for (ASDisplayNode *child in _yogaChildren) {
+  for (ASDisplayNode *child in [_yogaChildren copy]) {
     // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
     // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
     [self removeYogaChild:child];
@@ -68,14 +69,8 @@
   // Clean up state in case this child had another parent.
   [self removeYogaChild:child];
 
-  BOOL hadZeroChildren = (_yogaChildren.count == 0);
-
   [_yogaChildren addObject:child];
 
-  // Ensure any measure function is removed before inserting the YGNodeRef child.
-  if (hadZeroChildren) {
-    [self updateYogaMeasureFuncIfNeeded];
-  }
   // YGNodeRef insertion is done in setParent:
   child.yogaParent = self;
 }
@@ -86,15 +81,10 @@
     return;
   }
   
-  BOOL hadChildren = (_yogaChildren.count > 0);
   [_yogaChildren removeObjectIdenticalTo:child];
 
   // YGNodeRef removal is done in setParent:
   child.yogaParent = nil;
-  // Ensure any measure function is re-added after removing the YGNodeRef child.
-  if (hadChildren && _yogaChildren.count == 0) {
-    [self updateYogaMeasureFuncIfNeeded];
-  }
 }
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
@@ -144,6 +134,7 @@
 - (void)setYogaLayoutInProgress:(BOOL)yogaLayoutInProgress
 {
   setFlag(YogaLayoutInProgress, yogaLayoutInProgress);
+  [self updateYogaMeasureFuncIfNeeded];
 }
 
 - (BOOL)yogaLayoutInProgress
@@ -184,8 +175,14 @@
 {
   // Size calculation via calculateSizeThatFits: or layoutSpecThatFits:
   // This will be used for ASTextNode, as well as any other node that has no Yoga children
-  id <ASLayoutElement> layoutElementToMeasure = (self.yogaChildren.count == 0 ? self : nil);
-  ASLayoutElementYogaUpdateMeasureFunc(self.style.yogaNode, layoutElementToMeasure);
+  BOOL isLeafNode = (self.yogaChildren.count == 0);
+  BOOL definesCustomLayout = [self implementsLayoutMethod];
+
+  // We set the measure func only during layout. Otherwise, a cycle is created:
+  // The YGNodeRef Context will retain the ASDisplayNode, which retains the style, which owns the YGNodeRef.
+  BOOL shouldHaveMeasureFunc = (isLeafNode && definesCustomLayout && checkFlag(YogaLayoutInProgress));
+
+  ASLayoutElementYogaUpdateMeasureFunc(self.style.yogaNode, shouldHaveMeasureFunc ? self : nil);
 }
 
 - (void)invalidateCalculatedYogaLayout
@@ -214,7 +211,6 @@
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
     node.yogaLayoutInProgress = YES;
-    [node updateYogaMeasureFuncIfNeeded];
   });
 
   if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
@@ -239,6 +235,11 @@
                         yogaFloatForCGFloat(rootConstrainedSize.max.width),
                         yogaFloatForCGFloat(rootConstrainedSize.max.height),
                         YGDirectionInherit);
+
+  // Reset accessible elements, since layout may have changed.
+  ASPerformBlockOnMainThread(^{
+    [(_ASDisplayView *)self.view setAccessibleElements:nil];
+  });
 
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
     [node setupYogaCalculatedLayout];

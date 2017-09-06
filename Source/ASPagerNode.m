@@ -16,6 +16,10 @@
 //
 
 #import <AsyncDisplayKit/ASPagerNode.h>
+#import <AsyncDisplayKit/ASPagerNode+Beta.h>
+
+#import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
+#import <AsyncDisplayKit/ASCollectionNode+Beta.h>
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -25,10 +29,8 @@
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
 
-@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor>
+@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {
-  ASPagerFlowLayout *_flowLayout;
-
   __weak id <ASPagerDataSource> _pagerDataSource;
   ASPagerNodeProxy *_proxyDataSource;
   struct {
@@ -64,9 +66,17 @@
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
+  ASDisplayNodeAssertTrue(flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal);
   self = [super initWithCollectionViewLayout:flowLayout];
-  if (self != nil) {
-    _flowLayout = flowLayout;
+  return self;
+}
+
+- (instancetype)initUsingAsyncCollectionLayout
+{
+  ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionHorizontalDirections];
+  self = [super initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
+  if (self) {
+    layoutDelegate.propertiesProvider = self;
   }
   return self;
 }
@@ -103,7 +113,15 @@
 
 - (NSInteger)currentPageIndex
 {
-  return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+  return (self.view.contentOffset.x / [self pageSize].width);
+}
+
+- (CGSize)pageSize
+{
+  UIEdgeInsets contentInset = self.view.contentInset;
+  CGSize pageSize = self.bounds.size;
+  pageSize.height -= (contentInset.top + contentInset.bottom);
+  return pageSize;
 }
 
 #pragma mark - Helpers
@@ -126,6 +144,14 @@
     return NSNotFound;
   }
   return indexPath.row;
+}
+
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
+
+- (CGSize)sizeForElements:(ASElementMap *)elements
+{
+  ASDisplayNodeAssertMainThread();
+  return [self pageSize];
 }
 
 #pragma mark - ASCollectionDataSource
@@ -162,7 +188,7 @@
   }
 #pragma clang diagnostic pop
 
-  return ASSizeRangeMake(self.bounds.size);
+  return ASSizeRangeMake([self pageSize]);
 }
 
 #pragma mark - Data Source Proxy

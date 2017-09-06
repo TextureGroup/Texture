@@ -79,13 +79,6 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   [_sectionsOfItems removeObjectsAtIndexes:itemSections];
 }
 
-- (void)removeSupplementaryElementsInSections:(NSIndexSet *)sections
-{
-  [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supplementariesForKind, BOOL * _Nonnull stop) {
-    [supplementariesForKind removeObjectsForKeys:[sections as_filterIndexPathsBySection:supplementariesForKind]];
-  }];
-}
-
 - (void)insertEmptySectionsOfItemsAtIndexes:(NSIndexSet *)sections
 {
   [sections enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
@@ -106,6 +99,38 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
     }
     supplementariesForKind[indexPath] = element;
   }
+}
+
+- (void)migrateSupplementaryElementsWithSectionMapping:(ASIntegerMap *)mapping
+{
+  // Fast-path, no section changes.
+  if (mapping == ASIntegerMap.identityMap) {
+    return;
+  }
+
+  // For each element kind,
+  [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supps, BOOL * _Nonnull stop) {
+    
+    // For each index path of that kind, move entries into a new dictionary.
+    // Note: it's tempting to update the dictionary in-place but because of the likely collision between old and new index paths,
+    // subtle bugs are possible. Note that this process is rare (only on section-level updates),
+    // that this work is done off-main, and that the typical supplementary element use case is just 1-per-section (header).
+    NSMutableDictionary *newSupps = [NSMutableDictionary dictionary];
+    [supps enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
+      NSInteger oldSection = oldIndexPath.section;
+      NSInteger newSection = [mapping integerForKey:oldSection];
+      
+      if (oldSection == newSection) {
+        // Index path stayed the same, just copy it over.
+        newSupps[oldIndexPath] = obj;
+      } else if (newSection != NSNotFound) {
+        // Section index changed, move it.
+        NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:oldIndexPath.item inSection:newSection];
+        newSupps[newIndexPath] = obj;
+      }
+    }];
+    [supps setDictionary:newSupps];
+  }];
 }
 
 #pragma mark - Helpers

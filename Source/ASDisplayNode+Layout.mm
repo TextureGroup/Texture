@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
+#import <AsyncDisplayKit/ASLog.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 
@@ -72,7 +73,7 @@
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
 {
   ASDN::MutexLocker l(__instanceLock__);
- 
+
   // If one or multiple layout transitions are in flight it still can happen that layout information is requested
   // on other threads. As the pending and calculated layout to be updated in the layout transition in here just a
   // layout calculation wil be performed without side effect
@@ -80,23 +81,24 @@
     return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];
   }
 
-  if (_calculatedDisplayNodeLayout->isValidForConstrainedSizeParentSize(constrainedSize, parentSize)) {
+  ASLayout *layout = nil;
+  NSUInteger version = _layoutVersion;
+  if (_calculatedDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
     ASDisplayNodeAssertNotNil(_calculatedDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _calculatedDisplayNodeLayout->layout should not be nil! %@", self);
-    // Our calculated layout is suitable for this constrainedSize, so keep using it and
-    // invalidate any pending layout that has been generated in the past.
-    _pendingDisplayNodeLayout = nullptr;
-    return _calculatedDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
+    layout = _calculatedDisplayNodeLayout->layout;
+  } else if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(constrainedSize, parentSize, version)) {
+    ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
+    layout = _pendingDisplayNodeLayout->layout;
+  } else {
+    // Create a pending display node layout for the layout pass
+    layout = [self calculateLayoutThatFits:constrainedSize
+                          restrictedToSize:self.style.size
+                      relativeToParentSize:parentSize];
+    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, parentSize, version);
+    ASDisplayNodeAssertNotNil(layout, @"-[ASDisplayNode layoutThatFits:parentSize:] newly calculated layout should not be nil! %@", self);
   }
   
-  // Create a pending display node layout for the layout pass
-  _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(
-    [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize],
-    constrainedSize,
-    parentSize
-  );
-  
-  ASDisplayNodeAssertNotNil(_pendingDisplayNodeLayout->layout, @"-[ASDisplayNode layoutThatFits:parentSize:] _pendingDisplayNodeLayout->layout should not be nil! %@", self);
-  return _pendingDisplayNodeLayout->layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
+  return layout ?: [ASLayout layoutWithLayoutElement:self size:{0, 0}];
 }
 
 #pragma mark ASLayoutElementStyleExtensibility
@@ -127,12 +129,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 ASPrimitiveTraitCollectionDeprecatedImplementation
 
-@end
-
-#pragma mark -
 #pragma mark - ASLayoutElementAsciiArtProtocol
-
-@implementation ASDisplayNode (ASLayoutElementAsciiArtProtocol)
 
 - (NSString *)asciiArtString
 {
@@ -141,11 +138,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 
 - (NSString *)asciiArtName
 {
-  NSString *string = NSStringFromClass([self class]);
+  NSMutableString *result = [NSMutableString stringWithCString:object_getClassName(self) encoding:NSASCIIStringEncoding];
   if (_debugName) {
-    string = [string stringByAppendingString:[NSString stringWithFormat:@"\"%@\"", _debugName]];
+    [result appendFormat:@" (%@)", _debugName];
   }
-  return string;
+  return result;
 }
 
 @end
@@ -188,6 +185,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (ASSizeRange)constrainedSizeForCalculatedLayout
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_constrainedSizeForCalculatedLayout];
+}
+
+- (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
+{
   if (_pendingDisplayNodeLayout != nullptr) {
     return _pendingDisplayNodeLayout->constrainedSize;
   }
@@ -222,6 +224,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
  */
 - (void)_setNeedsLayoutFromAbove
 {
+  as_activity_create_for_scope("Set needs layout from above");
   ASDisplayNodeAssertThreadAffinity(self);
 
   // Mark the node for layout in the next layout pass
@@ -304,17 +307,19 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   }
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
-  
+
   // Prefer _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
   // If there is no _pending, check if _calculated is valid to reuse (avoiding recalculation below).
-  if (_pendingDisplayNodeLayout == nullptr) {
-    if (_calculatedDisplayNodeLayout->isDirty() == NO
+  if (_pendingDisplayNodeLayout == nullptr || _pendingDisplayNodeLayout->version < _layoutVersion) {
+    if (_calculatedDisplayNodeLayout->version >= _layoutVersion
         && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
             || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
       return;
     }
   }
   
+  as_activity_create_for_scope("Update node layout for current bounds");
+  as_log_verbose(ASLayoutLog(), "Node %@, bounds size %@, calculatedSize %@, calculatedIsDirty %d", self, NSStringFromCGSize(boundsSizeForLayout), NSStringFromCGSize(_calculatedDisplayNodeLayout->layout.size), _calculatedDisplayNodeLayout->version < _layoutVersion.load());
   // _calculatedDisplayNodeLayout is not reusable we need to transition to a new one
   [self cancelLayoutTransition];
   
@@ -332,14 +337,30 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   
   // nextLayout was likely created by a call to layoutThatFits:, check if it is valid and can be applied.
   // If our bounds size is different than it, or invalid, recalculate.  Use #define to avoid nullptr->
-  if (nextLayout == nullptr || nextLayout->isDirty() == YES || layoutSizeDifferentFromBounds) {
+  BOOL pendingLayoutApplicable = NO;
+  if (nextLayout == nullptr) {
+    as_log_verbose(ASLayoutLog(), "No pending layout.");
+  } else if (nextLayout->version < _layoutVersion) {
+    as_log_verbose(ASLayoutLog(), "Pending layout is stale.");
+  } else if (layoutSizeDifferentFromBounds) {
+    as_log_verbose(ASLayoutLog(), "Pending layout size %@ doesn't match bounds size.", NSStringFromCGSize(nextLayout->layout.size));
+  } else {
+    as_log_verbose(ASLayoutLog(), "Using pending layout %@.", nextLayout->layout);
+    pendingLayoutApplicable = YES;
+  }
+
+  if (!pendingLayoutApplicable) {
+    as_log_verbose(ASLayoutLog(), "Measuring with previous constrained size.");
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
+    NSUInteger version = _layoutVersion;
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
-    
-    nextLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, boundsSizeForLayout);
+    nextLayout = std::make_shared<ASDisplayNodeLayout>(layout, constrainedSize, boundsSizeForLayout, version);
+    // Now that the constrained size of pending layout might have been reused, the layout is useless
+    // Release it and any orphaned subnodes it retains
+    _pendingDisplayNodeLayout = nullptr;
   }
   
   if (didCreateNewContext) {
@@ -350,6 +371,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   // This can occur for either pre-calculated or newly-calculated layouts.
   if (nextLayout->requestedLayoutFromAbove == NO
       && CGSizeEqualToSize(boundsSizeForLayout, nextLayout->layout.size) == NO) {
+    as_log_verbose(ASLayoutLog(), "Layout size doesn't match bounds size. Requesting layout from above.");
     // The layout that we have specifies that this node (self) would like to be a different size
     // than it currently is.  Because that size has been computed within the constrainedSize, we
     // expect that calling setNeedsLayoutFromAbove will result in our parent resizing us to this.
@@ -358,6 +380,9 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     // particular ASLayout object, and shouldn't loop asking again unless we have a different ASLayout.
     nextLayout->requestedLayoutFromAbove = YES;
     [self _setNeedsLayoutFromAbove];
+    // Update the layout's version here because _setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
+    // Failing to do this will cause the layout to be invalid immediately 
+    nextLayout->version = _layoutVersion;
   }
 
   // Prepare to transition to nextLayout
@@ -409,7 +434,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   ASLayout *layout;
   {
     ASDN::MutexLocker l(__instanceLock__);
-    if (_calculatedDisplayNodeLayout->isDirty()) {
+    if (_calculatedDisplayNodeLayout->version < _layoutVersion) {
       return;
     }
     layout = _calculatedDisplayNodeLayout->layout;
@@ -458,6 +483,11 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_isLayoutTransitionValid];
+}
+
+- (BOOL)_locked_isLayoutTransitionValid
+{
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
     if (context == nil || _pendingTransitionID != context.transitionID) {
@@ -491,9 +521,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
 {
   ASDisplayNodeAssertMainThread();
 
-  [self setNeedsLayout];
-  
-  [self transitionLayoutWithSizeRange:[self _locked_constrainedSizeForLayoutPass]
+  ASSizeRange sizeRange;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    sizeRange = [self _locked_constrainedSizeForLayoutPass];
+  }
+
+  [self transitionLayoutWithSizeRange:sizeRange
                              animated:animated
                    shouldMeasureAsync:shouldMeasureAsync
                 measurementCompletion:completion];
@@ -506,29 +540,48 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
                 measurementCompletion:(void(^)())completion
 {
   ASDisplayNodeAssertMainThread();
+  as_activity_create_for_scope("Transition node layout");
+  as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
   
   if (constrainedSize.max.width <= 0.0 || constrainedSize.max.height <= 0.0) {
     // Using CGSizeZero for the sizeRange can cause negative values in client layout code.
     // Most likely called transitionLayout: without providing a size, before first layout pass.
+    as_log_verbose(ASLayoutLog(), "Ignoring transition due to bad size range.");
     return;
   }
     
-  // Check if we are a subnode in a layout transition.
-  // In this case no measurement is needed as we're part of the layout transition.
-  if ([self _isLayoutTransitionInvalid]) {
-    return;
-  }
-  
   {
     ASDN::MutexLocker l(__instanceLock__);
-    ASDisplayNodeAssert(ASHierarchyStateIncludesLayoutPending(_hierarchyState) == NO, @"Can't start a transition when one of the supernodes is performing one.");
+
+    // Check if we are a subnode in a layout transition.
+    // In this case no measurement is needed as we're part of the layout transition.
+    if ([self _locked_isLayoutTransitionValid]) {
+      return;
+    }
+
+    if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
+      ASDisplayNodeAssert(NO, @"Can't start a transition when one of the supernodes is performing one.");
+      return;
+    }
   }
-  
+
+  // Invalidate calculated layout because this method acts as an animated "setNeedsLayout" for nodes.
+  // If the user has reconfigured the node and calls this, we should never return a stale layout
+  // for subsequent calls to layoutThatFits: regardless of size range. We choose this method rather than
+  // -setNeedsLayout because that method also triggers a CA layout invalidation, which isn't necessary at this time.
+  // See https://github.com/TextureGroup/Texture/issues/463
+  [self invalidateCalculatedLayout];
+
   // Every new layout transition has a transition id associated to check in subsequent transitions for cancelling
   int32_t transitionID = [self _startNewTransition];
+  as_log_verbose(ASLayoutLog(), "Transition ID is %d", transitionID);
   // NOTE: This block captures self. It's cheaper than hitting the weak table.
   asdisplaynode_iscancelled_block_t isCancelled = ^{
-    return (BOOL)(_transitionID != transitionID);
+    BOOL result = (_transitionID != transitionID);
+    if (result) {
+      as_log_verbose(ASLayoutLog(), "Transition %d canceled, superseded by %d", transitionID, _transitionID.load());
+    }
+    return result;
   };
 
   // Move all subnodes in layout pending state for this transition
@@ -545,6 +598,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     }
     
     // Perform a full layout creation pass with passed in constrained size to create the new layout for the transition
+    NSUInteger newLayoutVersion = _layoutVersion;
     ASLayout *newLayout;
     {
       ASDN::MutexLocker l(__instanceLock__);
@@ -573,6 +627,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       if (isCancelled()) {
         return;
       }
+      as_activity_create_for_scope("Commit layout transition");
       ASLayoutTransition *pendingLayoutTransition;
       _ASTransitionContext *pendingLayoutTransitionContext;
       {
@@ -584,7 +639,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
         auto previousLayout = _calculatedDisplayNodeLayout;
         auto pendingLayout = std::make_shared<ASDisplayNodeLayout>(newLayout,
                                                                    constrainedSize,
-                                                                   constrainedSize.max);
+                                                                   constrainedSize.max,
+                                                                   newLayoutVersion);
         [self _locked_setCalculatedDisplayNodeLayout:pendingLayout];
         
         // Setup pending layout transition for animation
@@ -598,10 +654,13 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       }
       
       // Apply complete layout transitions for all subnodes
-      ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
-        [node _completePendingLayoutTransition];
-        node.hierarchyState &= (~ASHierarchyStateLayoutPending);
-      });
+      {
+        as_activity_create_for_scope("Complete pending layout transitions for subtree");
+        ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+          [node _completePendingLayoutTransition];
+          node.hierarchyState &= (~ASHierarchyStateLayoutPending);
+        });
+      }
       
       // Measurement pass completion
       // Give the subclass a change to hook into before calling the completion block
@@ -614,7 +673,10 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
       [pendingLayoutTransition applySubnodeInsertions];
       
       // Kick off animating the layout transition
-      [self animateLayoutTransition:pendingLayoutTransitionContext];
+      {
+        as_activity_create_for_scope("Animate layout transition");
+        [self animateLayoutTransition:pendingLayoutTransitionContext];
+      }
       
       // Mark transaction as finished
       [self _finishOrCancelTransition];
@@ -795,8 +857,8 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   if (pendingLayoutTransition != nil) {
     [self _setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];
     [self _completeLayoutTransition:pendingLayoutTransition];
+    [self _pendingLayoutTransitionDidComplete];
   }
-  [self _pendingLayoutTransitionDidComplete];
 }
 
 /**
@@ -805,7 +867,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
  */
 - (void)_completeLayoutTransition:(ASLayoutTransition *)layoutTransition
 {
-  // Layout transition is not supported for nodes that are not have automatic subnode management enabled
+  // Layout transition is not supported for nodes that do not have automatic subnode management enabled
   if (layoutTransition == nil || self.automaticallyManagesSubnodes == NO) {
     return;
   }
@@ -924,7 +986,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
     _unflattenedLayout = displayNodeLayout->layout;
     displayNodeLayout->layout = [_unflattenedLayout filteredNodeLayoutTree];
   }
-  
+
   _calculatedDisplayNodeLayout = displayNodeLayout;
 }
 
