@@ -415,6 +415,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       if (!CGRectContainsRect(maxRect, containerBounds)) {
         continue;
       }
+      if (!CGSizeEqualToSize(container.size, constrainedSize)) {
+        continue;
+      }
       
       // Now check container params.
       ASTextContainer *otherContainer = layout.container;
