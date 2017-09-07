@@ -14,6 +14,8 @@
 - Fix retain cycle between ASImageNode and PINAnimatedImage [Phil Larson](https://github.com/plarson) [#520](https://github.com/TextureGroup/Texture/pull/520)
 - Change the API for disabling logging from a compiler flag to a runtime C function ASDisableLogging().  [Adlai Holler](https://github.com/Adlai-Holler) [#528](https://github.com/TextureGroup/Texture/pull/528)
 - Table and collection views to consider content inset when calculating (default) element size range [Huy Nguyen](https://github.com/nguyenhuy) [#525](https://github.com/TextureGroup/Texture/pull/525)
+- [ASEditableTextNode] added -editableTextNodeShouldBeginEditing to ASEditableTextNodeDelegate to mirror the corresponding method from UITextViewDelegate. [Yan S.](https://github.com/yans) [#535](https://github.com/TextureGroup/Texture/pull/535)
+- [Breaking] Remove APIs that have been deprecated since 2.0 and/or for at least 6 months [Huy Nguyen](https://github.com/nguyenhuy) [#529](https://github.com/TextureGroup/Texture/pull/529)
 - [ASDisplayNode] Ensure `-displayWillStartAsynchronously:` and `-displayDidFinish` are invoked on rasterized subnodes.  [Eric Scheers](https://github.com/smeis) [#532](https://github.com/TextureGroup/Texture/pull/532)
 
 ##2.4

@@ -52,8 +52,6 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
   ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
   ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
-  ASDisplayNodeMethodOverrideFetchData          = 1 << 7,
-  ASDisplayNodeMethodOverrideClearFetchedData   = 1 << 8
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)

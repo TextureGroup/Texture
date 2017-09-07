@@ -24,7 +24,6 @@
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
@@ -2175,27 +2174,6 @@ static bool stringContainsPointer(NSString *description, id p) {
   [node view];
   NSArray *expected = @[ @0, @1, @2 ];
   XCTAssertEqualObjects(calls, expected);
-}
-
-- (void)testPreferredFrameSizeDeprecated
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-
-  ASDisplayNode *node = [ASDisplayNode new];
-  
-  // Default auto preferred frame size will be CGSizeZero
-  XCTAssert(CGSizeEqualToSize(node.preferredFrameSize, CGSizeZero));
-  
-  // Set a specific preferredFrameSize
-  node.preferredFrameSize = CGSizeMake(100, 100);
-  ASXCTAssertEqualSizes(node.preferredFrameSize, CGSizeMake(100, 100));
-  
-  // CGSizeZero should be returned if width or height is not of unit type points
-  node.style.width = ASDimensionMakeWithFraction(0.5);
-  ASXCTAssertEqualSizes(node.preferredFrameSize, CGSizeZero);
-  
-#pragma clang diagnostic pop
 }
 
 - (void)testSettingPropertiesViaStyllableProtocol
