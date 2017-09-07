@@ -49,7 +49,7 @@ AS_SUBCLASSING_RESTRICTED
  * The underlying storage is a hash table and the Key type should implement `hash` and `isEqual:`.
  */
 AS_SUBCLASSING_RESTRICTED
-@interface ASWeakMap<__covariant Key : NSObject *, Value> : NSObject
+@interface ASWeakMap<__covariant Key, Value> : NSObject
 
 /**
  * Read from the cache.  The Value object is accessible from the returned ASWeakMapEntry.
