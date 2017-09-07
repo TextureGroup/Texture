@@ -281,14 +281,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData AS_UNAVAILABLE("Use ASCollectionNode method instead.");
 
 /**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version and will block the main thread
- * while all the cells load.
- */
-- (void)reloadDataImmediately AS_UNAVAILABLE("Use ASCollectionNode method instead.");
-
-/**
  * Triggers a relayout of all nodes.
  *
  * @discussion This method invalidates and lays out every cell node in the collection.

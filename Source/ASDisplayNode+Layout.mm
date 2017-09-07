@@ -58,15 +58,6 @@
 
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  // For now we just call the deprecated measureWithSizeRange: method to not break old API
-  return [self measureWithSizeRange:constrainedSize];
-#pragma clang diagnostic pop
-}
-
-- (ASLayout *)measureWithSizeRange:(ASSizeRange)constrainedSize
-{
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];
 }
 
@@ -126,8 +117,6 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
-
-ASPrimitiveTraitCollectionDeprecatedImplementation
 
 #pragma mark - ASLayoutElementAsciiArtProtocol
 
@@ -938,7 +927,7 @@ ASPrimitiveTraitCollectionDeprecatedImplementation
   // Grab lock after calling out to subclass
   ASDN::MutexLocker l(__instanceLock__);
 
-  // We generate placeholders at measureWithSizeRange: time so that a node is guaranteed to have a placeholder ready to go.
+  // We generate placeholders at -layoutThatFits: time so that a node is guaranteed to have a placeholder ready to go.
   // This is also because measurement is usually asynchronous, but placeholders need to be set up synchronously.
   // First measurement is guaranteed to be before the node is onscreen, so we can create the image async. but still have it appear sync.
   if (_placeholderEnabled && !_placeholderImage && [self _locked_displaysAsynchronously]) {

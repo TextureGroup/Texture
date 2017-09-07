@@ -524,16 +524,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCollectionNode (Deprecated)
 
-/**
- * Reload everything from scratch, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version.
- *
- * @deprecated This method is deprecated in 2.0. Use @c reloadDataWithCompletion: and
- *   then @c waitUntilAllUpdatesAreProcessed instead.
- */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreProcessed instead.");
-
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
 
 @end

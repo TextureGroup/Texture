@@ -23,6 +23,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -302,6 +304,7 @@
   }
   
   CALayer *layer = _layer;
+  BOOL rasterizesSubtree = _flags.rasterizesSubtree;
   
   __instanceLock__.unlock();
 
@@ -347,11 +350,23 @@
         layer.contents = (id)image.CGImage;
       }
       [self didDisplayAsyncLayer:self.asyncLayer];
+      
+      if (rasterizesSubtree) {
+        ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+          [node didDisplayAsyncLayer:node.asyncLayer];
+        });
+      }
     }
   };
 
   // Call willDisplay immediately in either case
   [self willDisplayAsyncLayer:self.asyncLayer asynchronously:asynchronously];
+  
+  if (rasterizesSubtree) {
+    ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+      [node willDisplayAsyncLayer:node.asyncLayer asynchronously:asynchronously];
+    });
+  }
 
   if (asynchronously) {
     // Async rendering operations are contained by a transaction, which allows them to proceed and concurrently

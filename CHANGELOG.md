@@ -8,12 +8,14 @@
 - Add -[ASDisplayNode detailedLayoutDescription] property to aid debugging. [Adlai Holler](https://github.com/Adlai-Holler) [#476](https://github.com/TextureGroup/Texture/pull/476)
 - Fix an issue that causes calculatedLayoutDidChange being called needlessly. [Huy Nguyen](https://github.com/nguyenhuy) [#490](https://github.com/TextureGroup/Texture/pull/490)
 - Negate iOS 11 automatic estimated table row heights. [Christian Selig](https://github.com/christianselig) [#485](https://github.com/TextureGroup/Texture/pull/485)
-- [Breaking] Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
+- Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
 - Remove re-entrant access to self.view when applying initial pending state. [Adlai Holler](https://github.com/Adlai-Holler) [#510](https://github.com/TextureGroup/Texture/pull/510)
 - Small improvements in ASCollectionLayout [Huy Nguyen](https://github.com/nguyenhuy) [#509](https://github.com/TextureGroup/Texture/pull/509) [#513](https://github.com/TextureGroup/Texture/pull/513)
 - Fix retain cycle between ASImageNode and PINAnimatedImage [Phil Larson](https://github.com/plarson) [#520](https://github.com/TextureGroup/Texture/pull/520)
 - Change the API for disabling logging from a compiler flag to a runtime C function ASDisableLogging().  [Adlai Holler](https://github.com/Adlai-Holler) [#528](https://github.com/TextureGroup/Texture/pull/528)
 - Table and collection views to consider content inset when calculating (default) element size range [Huy Nguyen](https://github.com/nguyenhuy) [#525](https://github.com/TextureGroup/Texture/pull/525)
+- [ASEditableTextNode] added -editableTextNodeShouldBeginEditing to ASEditableTextNodeDelegate to mirror the corresponding method from UITextViewDelegate. [Yan S.](https://github.com/yans) [#535](https://github.com/TextureGroup/Texture/pull/535)
+- [Breaking] Remove APIs that have been deprecated since 2.0 and/or for at least 6 months [Huy Nguyen](https://github.com/nguyenhuy) [#529](https://github.com/TextureGroup/Texture/pull/529)
 - Deprecate `-[ASDisplayNode displayWillStart]` in favor of `-displayWillStartAsynchronously:` [Huy Nguyen](https://github.com/nguyenhuy) [536](https://github.com/TextureGroup/Texture/pull/536)
 
 ##2.4

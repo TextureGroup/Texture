@@ -353,30 +353,6 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 @end
 
-@implementation ASLayout (Deprecation)
-
-- (id <ASLayoutElement>)layoutableObject
-{
-  return self.layoutElement;
-}
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size
-{
-  return [self layoutWithLayoutElement:layoutElement size:size];
-}
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size
-                                sublayouts:(nullable NSArray<ASLayout *> *)sublayouts
-{
-  return [self layoutWithLayoutElement:layoutElement size:size sublayouts:sublayouts];
-}
-
-@end
-
 ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, const ASSizeRange sizeRange, const CGSize parentSize)
 {
   ASDisplayNodeCAssertNotNil(layoutElement, @"Not valid layoutElement passed in.");
