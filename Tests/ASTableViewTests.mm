@@ -253,7 +253,8 @@
   tableView.asyncDelegate = delegate;
   tableView.asyncDataSource = dataSource;
   
-  [tableView reloadDataImmediately];
+  [tableView reloadData];
+  [tableView waitUntilAllUpdatesAreCommitted];
   [tableView setNeedsLayout];
   [tableView layoutIfNeeded];
   
