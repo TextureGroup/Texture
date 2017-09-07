@@ -620,7 +620,7 @@
   [window makeKeyAndVisible];
 
   for (NSInteger i = 0; i < 2; i++) {
-    // NOTE: waitUntilAllUpdatesAreProcessed or reloadDataImmediately is not sufficient here!!
+    // NOTE: reloadData and waitUntilAllUpdatesAreProcessed are not sufficient here!!
     XCTestExpectation *done = [self expectationWithDescription:[NSString stringWithFormat:@"Reload #%td complete", i]];
     [cn reloadDataWithCompletion:^{
       [done fulfill];

@@ -785,7 +785,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
- * calling -measure: on them in -calculateLayoutThatFits.
+ * calling -layoutThatFits: on them in -calculateLayoutThatFits.
  *
  * @return Size already calculated by -calculateLayoutThatFits:.
  *

@@ -185,14 +185,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 
 /**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UITableView's version and will block the main thread while
- * all the cells load.
- */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's reloadDataWithCompletion: followed by ASTableNode's -waitUntilAllUpdatesAreCommitted instead.");
-
-/**
  * Triggers a relayout of all nodes.
  *
  * @discussion This method invalidates and lays out every cell node in the table view.
@@ -240,12 +232,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 
 - (void)moveRowAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
-
-/// Deprecated in 2.0. You should not call this method.
-- (void)clearContents ASDISPLAYNODE_DEPRECATED_MSG("You should not call this method directly. Intead, rely on the Interstate State callback methods.");
-
-/// Deprecated in 2.0. You should not call this method.
-- (void)clearFetchedData ASDISPLAYNODE_DEPRECATED_MSG("You should not call this method directly. Intead, rely on the Interstate State callback methods.");
 
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");
 
