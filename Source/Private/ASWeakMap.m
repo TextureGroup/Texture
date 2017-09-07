@@ -19,6 +19,7 @@
 
 @interface ASWeakMapEntry ()
 @property (nonatomic, strong) NSObject *key;
+@property (atomic, strong) id value;
 @end
 
 @implementation ASWeakMapEntry
@@ -31,11 +32,6 @@
     _value = value;
   }
   return self;
-}
-
-- (void)setValue:(NSObject *)value
-{
-  _value = value;
 }
 
 @end
