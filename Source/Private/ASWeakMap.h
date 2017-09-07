@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 AS_SUBCLASSING_RESTRICTED
 @interface ASWeakMapEntry<Value> : NSObject
 
-@property (nonatomic, retain, readonly) Value value;
+@property (atomic, strong, readonly) Value value;
 
 @end
 

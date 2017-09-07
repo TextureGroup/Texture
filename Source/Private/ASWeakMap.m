@@ -17,8 +17,9 @@
 
 #import <AsyncDisplayKit/ASWeakMap.h>
 
-@interface ASWeakMapEntry ()
-@property (nonatomic, strong) NSObject *key;
+@interface ASWeakMapEntry<Value> ()
+@property (nonatomic, strong, readonly) NSObject *key;
+@property (atomic, strong) Value value;
 @end
 
 @implementation ASWeakMapEntry
@@ -31,11 +32,6 @@
     _value = value;
   }
   return self;
-}
-
-- (void)setValue:(NSObject *)value
-{
-  _value = value;
 }
 
 @end
