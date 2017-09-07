@@ -182,8 +182,11 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   // Accessibility support
   BOOL _isAccessibilityElement;
   NSString *_accessibilityLabel;
+  NSAttributedString *_accessibilityAttributedLabel;
   NSString *_accessibilityHint;
+  NSAttributedString *_accessibilityAttributedHint;
   NSString *_accessibilityValue;
+  NSAttributedString *_accessibilityAttributedValue;
   UIAccessibilityTraits _accessibilityTraits;
   CGRect _accessibilityFrame;
   NSString *_accessibilityLanguage;

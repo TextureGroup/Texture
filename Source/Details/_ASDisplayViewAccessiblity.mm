@@ -83,6 +83,11 @@ static void SortAccessibilityElements(NSMutableArray *elements)
   accessibilityElement.accessibilityHint = node.accessibilityHint;
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
+  if (@available(iOS 11.0, *)) {
+    accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
+    accessibilityElement.accessibilityAttributedHint = node.accessibilityAttributedHint;
+    accessibilityElement.accessibilityAttributedValue = node.accessibilityAttributedValue;
+  }
   return accessibilityElement;
 }
 
@@ -169,8 +174,20 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
   }
 
   SortAccessibilityElements(labeledNodes);
-  NSArray *labels = [labeledNodes valueForKey:@"accessibilityLabel"];
-  accessiblityElement.accessibilityLabel = [labels componentsJoinedByString:@", "];
+
+  if (@available(iOS 11.0, *)) {
+    NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
+    NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
+    [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+      if (idx != 0)
+        [attributedLabel appendAttributedString:[[NSAttributedString alloc] initWithString:@", "]];
+      [attributedLabel appendAttributedString:(NSAttributedString *)obj];
+    }];
+    accessiblityElement.accessibilityAttributedLabel = attributedLabel;
+  } else {
+    NSArray *labels = [labeledNodes valueForKey:@"accessibilityLabel"];
+    accessiblityElement.accessibilityLabel = [labels componentsJoinedByString:@", "];
+  }
 
   SortAccessibilityElements(actions);
   accessiblityElement.accessibilityCustomActions = actions;

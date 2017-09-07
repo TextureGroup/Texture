@@ -337,6 +337,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual((id)nil, node.accessibilityLabel, @"default accessibilityLabel is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityHint, @"default accessibilityHint is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityValue, @"default accessibilityValue is broken %@", hasLoadedView);
+  if (@available(iOS 11.0, *)) {
+    XCTAssertEqual((id)nil, node.accessibilityAttributedLabel, @"default accessibilityAttributedLabel is broken %@", hasLoadedView);
+    XCTAssertEqual((id)nil, node.accessibilityAttributedHint, @"default accessibilityAttributedHint is broken %@", hasLoadedView);
+    XCTAssertEqual((id)nil, node.accessibilityAttributedValue, @"default accessibilityAttributedValue is broken %@", hasLoadedView);
+  }
   XCTAssertEqual(UIAccessibilityTraitNone, node.accessibilityTraits, @"default accessibilityTraits is broken %@", hasLoadedView);
   XCTAssertTrue(CGRectEqualToRect(CGRectZero, node.accessibilityFrame), @"default accessibilityFrame is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityLanguage, @"default accessibilityLanguage is broken %@", hasLoadedView);
@@ -435,6 +440,13 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqualObjects(@"Ship love", node.accessibilityLabel, @"accessibilityLabel broken %@", hasLoadedView);
   XCTAssertEqualObjects(@"Awesome things will happen", node.accessibilityHint, @"accessibilityHint broken %@", hasLoadedView);
   XCTAssertEqualObjects(@"1 of 2", node.accessibilityValue, @"accessibilityValue broken %@", hasLoadedView);
+
+  // setting the accessibilityLabel, accessibilityHint and accessibilityValue is supposed to be bridged to the attributed versions
+  if (@available(iOS 11.0, *)) {
+    XCTAssertEqualObjects(@"Ship love", node.accessibilityAttributedLabel.string, @"accessibilityAttributedLabel is broken %@", hasLoadedView);
+    XCTAssertEqualObjects(@"Awesome things will happen", node.accessibilityAttributedHint.string, @"accessibilityAttributedHint is broken %@", hasLoadedView);
+    XCTAssertEqualObjects(@"1 of 2", node.accessibilityAttributedValue.string, @"accessibilityAttributedValue is broken %@", hasLoadedView);
+  }
   XCTAssertEqual(UIAccessibilityTraitSelected | UIAccessibilityTraitButton, node.accessibilityTraits, @"accessibilityTraits broken %@", hasLoadedView);
   XCTAssertTrue(CGRectEqualToRect(CGRectMake(1, 2, 3, 4), node.accessibilityFrame), @"accessibilityFrame broken %@", hasLoadedView);
   XCTAssertEqualObjects(@"mas", node.accessibilityLanguage, @"accessibilityLanguage broken %@", hasLoadedView);

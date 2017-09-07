@@ -716,8 +716,11 @@ extern NSInteger const ASDefaultDrawingPriority;
 // Accessibility support
 @property (nonatomic, assign)           BOOL isAccessibilityElement;
 @property (nonatomic, copy, nullable)   NSString *accessibilityLabel;
+@property (nullable, nonatomic, copy)   NSAttributedString *accessibilityAttributedLabel API_AVAILABLE(ios(11.0),tvos(11.0));
 @property (nonatomic, copy, nullable)   NSString *accessibilityHint;
+@property (nullable, nonatomic, copy)   NSAttributedString *accessibilityAttributedHint API_AVAILABLE(ios(11.0),tvos(11.0));
 @property (nonatomic, copy, nullable)   NSString *accessibilityValue;
+@property (nullable, nonatomic, copy)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
 @property (nonatomic, assign)           UIAccessibilityTraits accessibilityTraits;
 @property (nonatomic, assign)           CGRect accessibilityFrame;
 @property (nonatomic, copy, nullable)   UIBezierPath *accessibilityPath;

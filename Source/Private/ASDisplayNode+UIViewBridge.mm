@@ -901,6 +901,22 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
+  if (@available(iOS 11.0, *)) {
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, [[NSAttributedString alloc] initWithString:accessibilityLabel], accessibilityAttributedLabel, [[NSAttributedString alloc] initWithString:accessibilityLabel]);
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedLabel
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel);
+}
+
+- (void)setAccessibilityAttributedLabel:(NSAttributedString *)accessibilityAttributedLabel
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel); }
+  { _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityAttributedLabel.string, accessibilityLabel, accessibilityAttributedLabel.string); }
 }
 
 - (NSString *)accessibilityHint
@@ -913,6 +929,22 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
+  if (@available(iOS 11.0, *)) {
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, [[NSAttributedString alloc] initWithString:accessibilityHint], accessibilityAttributedHint, [[NSAttributedString alloc] initWithString:accessibilityHint]);
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedHint
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedHint, accessibilityAttributedHint);
+}
+
+- (void)setAccessibilityAttributedHint:(NSAttributedString *)accessibilityAttributedHint
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint); }
+  { _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityAttributedHint.string, accessibilityHint, accessibilityAttributedHint.string); }
 }
 
 - (NSString *)accessibilityValue
@@ -925,6 +957,22 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
+  if (@available(iOS 11.0, *)) {
+    _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, [[NSAttributedString alloc] initWithString:accessibilityValue], accessibilityAttributedValue, [[NSAttributedString alloc] initWithString:accessibilityValue]);
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedValue
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityAttributedValue, accessibilityAttributedValue);
+}
+
+- (void)setAccessibilityAttributedValue:(NSAttributedString *)accessibilityAttributedValue
+{
+  _bridge_prologue_write;
+  { _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue); }
+  { _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityAttributedValue.string, accessibilityValue, accessibilityAttributedValue.string); }
 }
 
 - (UIAccessibilityTraits)accessibilityTraits
