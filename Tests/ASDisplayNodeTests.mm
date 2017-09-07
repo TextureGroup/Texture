@@ -110,6 +110,10 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL hasPreloaded;
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
+
+@property (nonatomic, assign) NSUInteger displayWillStartCount;
+@property (nonatomic, assign) NSUInteger didDisplayCount;
+
 @end
 
 @interface ASTestResponderNode : ASTestDisplayNode
@@ -152,6 +156,18 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   if (_willDeallocBlock) {
     _willDeallocBlock(self);
   }
+}
+
+- (void)displayDidFinish
+{
+  [super displayDidFinish];
+  _didDisplayCount++;
+}
+
+- (void)displayWillStartAsynchronously:(BOOL)asynchronously
+{
+  [super displayWillStartAsynchronously:asynchronously];
+  _displayWillStartCount++;
 }
 
 @end
@@ -2016,6 +2032,39 @@ static bool stringContainsPointer(NSString *description, id p) {
   }];
   ASSetDebugNames(rasterizedSupernode, subnode);
   XCTAssertThrows([rasterizedSupernode addSubnode:subnode]);
+}
+
+- (void)testThatSubnodesGetDisplayUpdatesIfRasterized
+{
+  ASTestDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
+  supernode.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
+  [supernode enableSubtreeRasterization];
+  
+  ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
+  ASTestDisplayNode *subSubnode = [[ASTestDisplayNode alloc] init];
+  
+  ASSetDebugNames(supernode, subnode);
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [subnode addSubnode:subSubnode];
+  [supernode addSubnode:subnode];
+  [window addSubnode:supernode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.displayWillStartCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.displayWillStartCount == 1);
+  }));
 }
 
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2011
