@@ -16,7 +16,7 @@
 - Table and collection views to consider content inset when calculating (default) element size range [Huy Nguyen](https://github.com/nguyenhuy) [#525](https://github.com/TextureGroup/Texture/pull/525)
 - [ASEditableTextNode] added -editableTextNodeShouldBeginEditing to ASEditableTextNodeDelegate to mirror the corresponding method from UITextViewDelegate. [Yan S.](https://github.com/yans) [#535](https://github.com/TextureGroup/Texture/pull/535)
 - [Breaking] Remove APIs that have been deprecated since 2.0 and/or for at least 6 months [Huy Nguyen](https://github.com/nguyenhuy) [#529](https://github.com/TextureGroup/Texture/pull/529)
-- Fixed a memory corruption issue in the ASImageNode display system. [Adlai Holler](https://github.com/Adlai-Holler) [#55](https://github.com/TextureGroup/Texture/pull/555)
+- Fixed a memory corruption issue in the ASImageNode display system. [Adlai Holler](https://github.com/Adlai-Holler) [#555](https://github.com/TextureGroup/Texture/pull/555)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
