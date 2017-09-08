@@ -200,9 +200,6 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
               callbackQueue:(dispatch_queue_t)callbackQueue
                  completion:(ASImageCacherCompletion)completion
 {
-  NSEnumerator *enumerator = [URLs reverseObjectEnumerator];
-  NSURL *url = enumerator.nextObject;
-  
   [self cachedImageWithURL:[URLs lastObject]
              callbackQueue:callbackQueue
                 completion:^(id<ASImageContainerProtocol>  _Nullable imageFromCache) {
