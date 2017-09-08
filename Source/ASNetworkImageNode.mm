@@ -313,7 +313,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   return (self.image == nil && self.animatedImage == nil && _URL != nil);
 }
 
-/* displayWillStart in ASMultiplexImageNode has a very similar implementation. Changes here are likely necessary
+/* displayWillStartAsynchronously: in ASMultiplexImageNode has a very similar implementation. Changes here are likely necessary
  in ASMultiplexImageNode as well. */
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
