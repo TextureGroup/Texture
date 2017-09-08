@@ -145,7 +145,7 @@
 
 #pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
-- (CGSize)sizeForElements:(ASElementMap *)elements
+- (CGSize)galleryLayoutDelegate:(nonnull ASCollectionGalleryLayoutDelegate *)delegate sizeForElements:(nonnull ASElementMap *)elements
 {
   ASDisplayNodeAssertMainThread();
   return [self pageSize];
