@@ -20,6 +20,7 @@
 - Fixed a memory corruption issue in the ASImageNode display system. [Adlai Holler](https://github.com/Adlai-Holler) [#555](https://github.com/TextureGroup/Texture/pull/555)
 - [Breaking] Rename ASCollectionGalleryLayoutSizeProviding to ASCollectionGalleryLayoutPropertiesProviding. Besides a fixed item size, it now can provide interitem and line spacings, as well as section inset [Huy Nguyen](https://github.com/nguyenhuy) [#496](https://github.com/TextureGroup/Texture/pull/496) [#533](https://github.com/TextureGroup/Texture/pull/533)
 - Deprecate `-[ASDisplayNode displayWillStart]` in favor of `-displayWillStartAsynchronously:` [Huy Nguyen](https://github.com/nguyenhuy) [536](https://github.com/TextureGroup/Texture/pull/536)
+- Mark ASRunLoopQueue as drained if it contains only NULLs [Cesar Estebanez](https://github.com/cesteban)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)
