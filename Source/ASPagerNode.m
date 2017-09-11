@@ -115,7 +115,7 @@
 
 - (CGSize)pageSize
 {
-  UIEdgeInsets contentInset = self.view.contentInset;
+  UIEdgeInsets contentInset = self.contentInset;
   CGSize pageSize = self.bounds.size;
   pageSize.height -= (contentInset.top + contentInset.bottom);
   return pageSize;

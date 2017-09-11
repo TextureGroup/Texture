@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<ASTableDelegate>   asyncDelegate;
 @property (nonatomic, weak) id<ASTableDataSource> asyncDataSource;
+@property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) CGPoint contentOffset;
 @property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
 @property (nonatomic, assign) BOOL inverted;
