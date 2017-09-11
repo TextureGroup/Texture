@@ -32,8 +32,6 @@
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
 #endif
 
-static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
-
 @interface ASNetworkImageNode ()
 {
   // Only access any of these with __instanceLock__.
@@ -521,21 +519,9 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 {
   [self _locked_cancelImageDownloadWithResumePossibility:storeResume];
   
-  // Destruction of bigger images on the main thread can be expensive
-  // and can take some time, so we dispatch onto a bg queue to
-  // actually dealloc.
-  UIImage *image = [self _locked_Image];
-  UIImage *defaultImage = _defaultImage;
-  CGSize imageSize = image.size;
-  BOOL shouldReleaseImageOnBackgroundThread = imageSize.width > kMinReleaseImageOnBackgroundSize.width ||
-                                              imageSize.height > kMinReleaseImageOnBackgroundSize.height;
-  if (shouldReleaseImageOnBackgroundThread) {
-    ASPerformBackgroundDeallocation(image);
-  }
-
   [self _locked_setAnimatedImage:nil];
   [self _locked_setCurrentImageQuality:0.0];
-  [self _locked__setImage:defaultImage];
+  [self _locked__setImage:_defaultImage];
 
   _imageLoaded = NO;
 
