@@ -350,13 +350,14 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     ASDN::MutexLocker l(__instanceLock__);
 
     if (_imageLoaded == NO && _URLs.count > 0 && _downloadIdentifier == nil) {
-      for (NSURL *url in _URLs) {
+      for (NSURL *url in [_URLs reverseObjectEnumerator]) {
         UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:url] asdk_image];
         if (result) {
           [self _locked_setCurrentImageQuality:1.0];
           [self _locked__setImage:result];
           
           _imageLoaded = YES;
+          break;
         }
       }
     }
