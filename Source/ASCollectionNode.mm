@@ -49,6 +49,7 @@
 @property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 @property (nonatomic, assign) CGFloat leadingScreensForBatching;
 @property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
+@property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) CGPoint contentOffset;
 @property (nonatomic, assign) BOOL animatesContentOffset;
 @end
@@ -63,6 +64,7 @@
     _allowsSelection = YES;
     _allowsMultipleSelection = NO;
     _inverted = NO;
+    _contentInsets = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
   }
@@ -188,6 +190,7 @@
     view.allowsMultipleSelection    = pendingState.allowsMultipleSelection;
     view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
     view.layoutInspector            = pendingState.layoutInspector;
+    view.contentInset               = pendingState.contentInset;
     self.pendingState               = nil;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
@@ -440,6 +443,25 @@
   }
 }
 
+- (void)setContentInset:(UIEdgeInsets)contentInset
+{
+  if ([self pendingState]) {
+    _pendingState.contentInset = contentInset;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.contentInset = contentInset;
+  }
+}
+
+- (UIEdgeInsets)contentInset
+{
+  if ([self pendingState]) {
+    return _pendingState.contentInset;
+  } else {
+    return self.view.contentInset;
+  }
+}
+
 - (void)setContentOffset:(CGPoint)contentOffset
 {
   [self setContentOffset:contentOffset animated:NO];
@@ -451,6 +473,7 @@
     _pendingState.contentOffset = contentOffset;
     _pendingState.animatesContentOffset = animated;
   } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
     [self.view setContentOffset:contentOffset animated:animated];
   }
 }

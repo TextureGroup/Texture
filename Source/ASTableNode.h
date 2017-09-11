@@ -56,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL inverted;
 
 /**
+ * The distance that the content view is inset from the table node edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+/**
  * The offset of the content view's origin from the table node's origin. Defaults to CGPointZero.
  */
 @property (nonatomic, assign) CGPoint contentOffset;
