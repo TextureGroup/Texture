@@ -68,6 +68,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGFloat leadingScreensForBatching ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
 /**
+ * The distance that the content view is inset from the table view edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead");
+
+/**
  * The offset of the content view's origin from the table node's origin. Defaults to CGPointZero.
  */
 @property (nonatomic, assign) CGPoint contentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
