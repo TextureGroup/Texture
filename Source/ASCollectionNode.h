@@ -129,6 +129,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
 
 /**
+ * The distance that the content view is inset from the collection node edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+/**
  * The offset of the content view's origin from the collection node's origin. Defaults to CGPointZero.
  */
 @property (nonatomic, assign) CGPoint contentOffset;

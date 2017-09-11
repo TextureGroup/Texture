@@ -75,6 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
 
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
 @property (nonatomic, assign) CGPoint contentOffset;
 
 /**
