@@ -191,7 +191,6 @@ static void runLoopSourceCallback(void *info) {
   CFRunLoopSourceRef _runLoopSource;
   CFRunLoopObserverRef _runLoopObserver;
   NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
-  BOOL _isQueueDrained;
   ASDN::RecursiveMutex _internalQueueLock;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
@@ -278,7 +277,6 @@ typedef enum {
     _queueConsumer = handlerBlock;
     _batchSize = 1;
     _ensureExclusiveMembership = YES;
-    _isQueueDrained = YES;
 
     // We don't want to pollute the top-level app activities with run loop batches, so we create one top-level
     // activity per queue, and each batch activity joins that one instead.
@@ -346,18 +344,19 @@ typedef enum {
   // This is to avoid needlessly retaining/releasing the objects if we don't have a block.
   std::vector<id> itemsToProcess;
 
+  BOOL isQueueDrained = NO;
   {
     ASDN::MutexLocker l(_internalQueueLock);
 
+    NSInteger internalQueueCount = _internalQueue.count;
     // Early-exit if the queue is empty.
-    if (_isQueueDrained) {
+    if (internalQueueCount == 0) {
       return;
     }
 
     ASSignpostStart(ASSignpostRunLoopQueueBatch);
 
     // Snatch the next batch of items.
-    NSInteger internalQueueCount = _internalQueue.count;
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
 
     /**
@@ -383,9 +382,17 @@ typedef enum {
       }
     }
 
+    if (foundItemCount == 0) {
+      // If _internalQueue holds weak references, and all of them just become NULL, then the array
+      // is never marked as needsCompletion, and compact will return early, not removing the NULL's.
+      // Inserting a NULL here ensures the compaction will take place.
+      // See http://www.openradar.me/15396578 and https://stackoverflow.com/a/40274426/1136669
+      [_internalQueue addPointer:NULL];
+    }
+
     [_internalQueue compact];
-    if (_internalQueue.count == 0 || foundItemCount == 0) {
-      _isQueueDrained = YES;
+    if (_internalQueue.count == 0) {
+      isQueueDrained = YES;
     }
   }
 
@@ -396,7 +403,7 @@ typedef enum {
     auto itemsEnd = itemsToProcess.cend();
     for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
-      _queueConsumer(value, _isQueueDrained && iterator == itemsEnd - 1);
+      _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
     }
     if (count > 1) {
@@ -405,7 +412,7 @@ typedef enum {
   }
 
   // If the queue is not fully drained yet force another run loop to process next batch of items
-  if (!_isQueueDrained) {
+  if (!isQueueDrained) {
     CFRunLoopSourceSignal(_runLoopSource);
     CFRunLoopWakeUp(_runLoop);
   }
@@ -435,8 +442,7 @@ typedef enum {
 
   if (!foundObject) {
     [_internalQueue addPointer:(__bridge void *)object];
-    _isQueueDrained = NO;
-    
+
     CFRunLoopSourceSignal(_runLoopSource);
     CFRunLoopWakeUp(_runLoop);
   }
@@ -445,7 +451,7 @@ typedef enum {
 - (BOOL)isEmpty
 {
   ASDN::MutexLocker l(_internalQueueLock);
-  return _isQueueDrained;
+  return _internalQueue.count == 0;
 }
 
 @end
