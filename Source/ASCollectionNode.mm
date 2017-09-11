@@ -64,7 +64,7 @@
     _allowsSelection = YES;
     _allowsMultipleSelection = NO;
     _inverted = NO;
-    _contentInsets = UIEdgeInsetsZero;
+    _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
   }
