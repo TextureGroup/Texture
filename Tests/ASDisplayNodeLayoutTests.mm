@@ -179,4 +179,45 @@
   }];
 }
 
+- (void)testThatRemoveSubnodeOfASupernodeWithAutomaticallyManagesSubnodesEnabledCausesException
+{
+  const CGSize kSize = CGSizeMake(300, 300);
+  const NSUInteger kNumOfSubnodes = 5;
+  NSMutableArray *subnodes = [NSMutableArray arrayWithCapacity:kNumOfSubnodes];
+
+  ASDisplayNode *rootNode = [[ASDisplayNode alloc] init];
+  rootNode.automaticallyManagesSubnodes = YES;
+  rootNode.layoutSpecBlock = ^(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+    return [ASStackLayoutSpec
+            stackLayoutSpecWithDirection:ASStackLayoutDirectionVertical
+            spacing:0.0
+            justifyContent:ASStackLayoutJustifyContentStart
+            alignItems:ASStackLayoutAlignItemsStretch
+            children:subnodes];
+  };
+
+  // Trigger first measure and layout passes
+  rootNode.frame = CGRectMake(0, 0, kSize.width, kSize.height);
+  for (NSUInteger i = 0; i < kNumOfSubnodes; i++) {
+    ASTextNode *textNode = [ASTextNode new];
+    textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Test Test Test Test Test"];
+    [subnodes addObject:textNode];
+  }
+  [rootNode layoutIfNeeded];
+
+  // Calling removeFromSupernode on one of the subnodes should causes an assertion
+  XCTAssertNotNil(subnodes);
+  XCTAssertThrows([subnodes[0] removeFromSupernode]);
+
+  // Removing subnodes via layout specs is fine
+  [subnodes removeObjectAtIndex:1];
+  [rootNode setNeedsLayout];
+  [rootNode layoutIfNeeded];
+
+  XCTAssertEqual(rootNode.subnodes.count, subnodes.count);
+  for (NSUInteger i = 0; i < subnodes.count; i++) {
+    XCTAssertTrue(ASObjectIsEqual(rootNode.subnodes[i], subnodes[i]));
+  }
+}
+
 @end

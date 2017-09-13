@@ -2281,6 +2281,15 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeLogEvent(self, @"removeFromSupernode with automaticallyManagesSubnodes: %@",
                         self.automaticallyManagesSubnodes ? @"YES" : @"NO");
+
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+  __instanceLock__.lock();
+    __weak ASDisplayNode *supernode = _supernode;
+  __instanceLock__.unlock();
+
+  ASDisplayNodeAssert(! supernode.automaticallyManagesSubnodes, @"Should not manually remove node %@ from its supernode %@ which has automaticallyManagesSubnodes enabled. Please talk to Huy if you're hitting this in closeup!", self, supernode);
+#endif
+
   [self _removeFromSupernode];
 }
 
@@ -2304,7 +2313,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   
   __instanceLock__.lock();
-
     // Only remove if supernode is still the expected supernode
     if (!ASObjectIsEqual(_supernode, supernode)) {
       __instanceLock__.unlock();
