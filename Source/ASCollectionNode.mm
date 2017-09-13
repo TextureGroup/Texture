@@ -183,6 +183,7 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
+    self.pendingState               = nil;
     view.asyncDelegate              = pendingState.delegate;
     view.asyncDataSource            = pendingState.dataSource;
     view.inverted                   = pendingState.inverted;
@@ -191,7 +192,6 @@
     view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
     view.layoutInspector            = pendingState.layoutInspector;
     view.contentInset               = pendingState.contentInset;
-    self.pendingState               = nil;
     
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
