@@ -68,13 +68,22 @@
   } numResultsToReturn:4];
 }
 
+- (void)replaceRows:(NSArray *)newPhotos
+{
+  [self.tableView beginUpdates];
+  [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationNone];
+  [self insertNewRows:newPhotos];
+  [self.tableView endUpdates];
+}
+
 - (void)insertNewRows:(NSArray *)newPhotos
 {
   NSInteger section = 0;
   NSMutableArray *indexPaths = [NSMutableArray array];
   
   NSInteger newTotalNumberOfPhotos = [_photoFeed numberOfItemsInFeed];
-  for (NSInteger row = newTotalNumberOfPhotos - newPhotos.count; row < newTotalNumberOfPhotos; row++) {
+  NSInteger existingNumberOfPhotos = newTotalNumberOfPhotos - newPhotos.count;
+  for (NSInteger row = existingNumberOfPhotos; row < newTotalNumberOfPhotos; row++) {
     NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
     [indexPaths addObject:path];
   }
