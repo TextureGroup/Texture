@@ -16,9 +16,11 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <QuartzCore/QuartzCore.h>
 #import <cstdlib>
 #import <deque>
@@ -190,7 +192,10 @@ static void runLoopSourceCallback(void *info) {
   CFRunLoopObserverRef _runLoopObserver;
   NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
   ASDN::RecursiveMutex _internalQueueLock;
-  
+
+  // In order to not pollute the top-level activities, each queue has 1 root activity.
+  os_activity_t _rootActivity;
+
 #if ASRunLoopQueueLoggingEnabled
   NSTimer *_runloopQueueLoggingTimer;
 #endif
@@ -272,6 +277,15 @@ typedef enum {
     _queueConsumer = handlerBlock;
     _batchSize = 1;
     _ensureExclusiveMembership = YES;
+
+    // We don't want to pollute the top-level app activities with run loop batches, so we create one top-level
+    // activity per queue, and each batch activity joins that one instead.
+    _rootActivity = as_activity_create("Process run loop queue items", OS_ACTIVITY_NONE, OS_ACTIVITY_FLAG_DEFAULT);
+    {
+      // Log a message identifying this queue into the queue's root activity.
+      as_activity_scope_verbose(_rootActivity);
+      as_log_verbose(ASDisplayLog(), "Created run loop queue: %@", self);
+    }
     
     // Self is guaranteed to outlive the observer.  Without the high cost of a weak pointer,
     // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
@@ -334,12 +348,12 @@ typedef enum {
   {
     ASDN::MutexLocker l(_internalQueueLock);
 
-    // Early-exit if the queue is empty.
     NSInteger internalQueueCount = _internalQueue.count;
+    // Early-exit if the queue is empty.
     if (internalQueueCount == 0) {
       return;
     }
-    
+
     ASSignpostStart(ASSignpostRunLoopQueueBatch);
 
     // Snatch the next batch of items.
@@ -368,6 +382,14 @@ typedef enum {
       }
     }
 
+    if (foundItemCount == 0) {
+      // If _internalQueue holds weak references, and all of them just become NULL, then the array
+      // is never marked as needsCompletion, and compact will return early, not removing the NULL's.
+      // Inserting a NULL here ensures the compaction will take place.
+      // See http://www.openradar.me/15396578 and https://stackoverflow.com/a/40274426/1136669
+      [_internalQueue addPointer:NULL];
+    }
+
     [_internalQueue compact];
     if (_internalQueue.count == 0) {
       isQueueDrained = YES;
@@ -375,16 +397,17 @@ typedef enum {
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  if (itemsToProcess.empty() == false) {
-#if ASRunLoopQueueLoggingEnabled
-    NSLog(@"<%@> - Starting processing of: %ld", self, itemsToProcess.size());
-#endif
+  auto count = itemsToProcess.size();
+  if (count > 0) {
+    as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     auto itemsEnd = itemsToProcess.cend();
     for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
-      _queueConsumer(*iterator, isQueueDrained && iterator == itemsEnd - 1);
-#if ASRunLoopQueueLoggingEnabled
-      NSLog(@"<%@> - Finished processing 1 item", self);
-#endif
+      __unsafe_unretained id value = *iterator;
+      _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
+      as_log_verbose(ASDisplayLog(), "processed %@", value);
+    }
+    if (count > 1) {
+      as_log_verbose(ASDisplayLog(), "processed %lu items", (unsigned long)count);
     }
   }
 
@@ -419,10 +442,16 @@ typedef enum {
 
   if (!foundObject) {
     [_internalQueue addPointer:(__bridge void *)object];
-    
+
     CFRunLoopSourceSignal(_runLoopSource);
     CFRunLoopWakeUp(_runLoop);
   }
+}
+
+- (BOOL)isEmpty
+{
+  ASDN::MutexLocker l(_internalQueueLock);
+  return _internalQueue.count == 0;
 }
 
 @end

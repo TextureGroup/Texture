@@ -345,6 +345,13 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _retainedLayer = self.layer;
   }
   
+  // iOS 11 automatically uses estimated heights, so disable those (see PR #485)
+  if (AS_AT_LEAST_IOS11) {
+    super.estimatedRowHeight = 0.0;
+    super.estimatedSectionHeaderHeight = 0.0;
+    super.estimatedSectionFooterHeight = 0.0;
+  }
+  
   return self;
 }
 
@@ -537,13 +544,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [self reloadDataWithCompletion:nil];
 }
 
-- (void)reloadDataImmediately
-{
-  ASDisplayNodeAssertMainThread();
-  [self reloadData];
-  [_dataController waitUntilAllUpdatesAreCommitted];
-}
-
 - (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
 {
   if ([self validateIndexPath:indexPath]) {
@@ -728,6 +728,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } 
 }
 
+- (BOOL)isProcessingUpdates
+{
+  return [_dataController isProcessingUpdates];
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  [_dataController onDidFinishProcessingUpdates:completion];
+}
+
 - (void)waitUntilAllUpdatesAreCommitted
 {
   ASDisplayNodeAssertMainThread();
@@ -736,15 +746,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     //    ASDisplayNodeFailAssert(@"Should not call %@ during batch update", NSStringFromSelector(_cmd));
     return;
   }
-  
-  [_dataController waitUntilAllUpdatesAreCommitted];
+
+  [_dataController waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)layoutSubviews
 {
   // Remeasure all rows if our row width has changed.
   _remeasuringCellNodes = YES;
-  CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth];
+  UIEdgeInsets contentInset = self.contentInset;
+  CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth] - contentInset.left - contentInset.right;
   if (constrainedWidth > 0 && _nodesConstrainedWidth != constrainedWidth) {
     _nodesConstrainedWidth = constrainedWidth;
 
@@ -1474,32 +1485,22 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - ASRangeControllerDelegate
 
-- (void)rangeController:(ASRangeController *)rangeController willUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
-{
-  ASDisplayNodeAssertMainThread();
-  if (!self.asyncDataSource) {
-    return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
-  }
-  
-  if (_automaticallyAdjustsContentOffset && !changeSet.includesReloadData) {
-    [self beginAdjustingContentOffset];
-  }
-}
-
-- (void)rangeController:(ASRangeController *)rangeController didUpdateWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
   if (!self.asyncDataSource || _updatingInResponseToInteractiveMove) {
+    updates();
     [changeSet executeCompletionHandlerWithFinished:NO];
     return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
   }
-  
+
   if (changeSet.includesReloadData) {
     LOG(@"UITableView reloadData");
     ASPerformBlockWithoutAnimation(!changeSet.animated, ^{
       if (self.test_enableSuperUpdateCallLogging) {
         NSLog(@"-[super reloadData]");
       }
+      updates();
       [super reloadData];
       // Flush any range changes that happened as part of submitting the reload.
       [_rangeController updateIfNeeded];
@@ -1508,11 +1509,18 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     });
     return;
   }
+
+  BOOL shouldAdjustContentOffset = (_automaticallyAdjustsContentOffset && !changeSet.includesReloadData);
+  if (shouldAdjustContentOffset) {
+    [self beginAdjustingContentOffset];
+  }
   
   NSUInteger numberOfUpdates = 0;
   
   LOG(@"--- UITableView beginUpdates");
   [super beginUpdates];
+
+  updates();
   
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
     NSArray<NSIndexPath *> *indexPaths = change.indexPaths;
@@ -1616,7 +1624,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [_rangeController updateIfNeeded];
     [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
   });
-  if (_automaticallyAdjustsContentOffset) {
+  if (shouldAdjustContentOffset) {
     [self endAdjustingContentOffsetAnimated:changeSet.animated];
   }
   [changeSet executeCompletionHandlerWithFinished:YES];
@@ -1624,7 +1632,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - ASDataControllerSource
 
-- (id)dataController:(ASDataController *)dataController viewModelForItemAtIndexPath:(NSIndexPath *)indexPath
+- (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   // Not currently supported for tables. Will be added when the collection API stabilizes.
   return nil;

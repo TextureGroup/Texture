@@ -22,6 +22,9 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASSignpost.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -301,6 +304,7 @@
   }
   
   CALayer *layer = _layer;
+  BOOL rasterizesSubtree = _flags.rasterizesSubtree;
   
   __instanceLock__.unlock();
 
@@ -331,7 +335,7 @@
     return;
   }
   
-  ASDisplayNodeAssert(_layer, @"Expect _layer to be not nil");
+  ASDisplayNodeAssert(layer, @"Expect _layer to be not nil");
 
   // This block is called back on the main thread after rendering at the completion of the current async transaction, or immediately if !asynchronously
   asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
@@ -340,17 +344,29 @@
       UIImage *image = (UIImage *)value;
       BOOL stretchable = (NO == UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero));
       if (stretchable) {
-        ASDisplayNodeSetupLayerContentsWithResizableImage(layer, image);
+        ASDisplayNodeSetResizableContents(layer, image);
       } else {
         layer.contentsScale = self.contentsScale;
         layer.contents = (id)image.CGImage;
       }
       [self didDisplayAsyncLayer:self.asyncLayer];
+      
+      if (rasterizesSubtree) {
+        ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+          [node didDisplayAsyncLayer:node.asyncLayer];
+        });
+      }
     }
   };
 
   // Call willDisplay immediately in either case
   [self willDisplayAsyncLayer:self.asyncLayer asynchronously:asynchronously];
+  
+  if (rasterizesSubtree) {
+    ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode * _Nonnull node) {
+      [node willDisplayAsyncLayer:node.asyncLayer asynchronously:asynchronously];
+    });
+  }
 
   if (asynchronously) {
     // Async rendering operations are contained by a transaction, which allows them to proceed and concurrently

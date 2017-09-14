@@ -71,7 +71,7 @@ static ASLayout *crossChildLayout(const ASStackLayoutSpecChild &child,
                                  crossMax);
   const ASSizeRange childSizeRange = directionSizeRange(style.direction, stackMin, stackMax, childCrossMin, childCrossMax);
   ASLayout *layout = [child.element layoutThatFits:childSizeRange parentSize:parentSize];
-  ASDisplayNodeCAssertNotNil(layout, @"ASLayout returned from measureWithSizeRange: must not be nil: %@", child.element);
+  ASDisplayNodeCAssertNotNil(layout, @"ASLayout returned from -layoutThatFits:parentSize: must not be nil: %@", child.element);
   return layout ? : [ASLayout layoutWithLayoutElement:child.element size:{0, 0}];
 }
 
@@ -113,9 +113,12 @@ static void dispatchApplyIfNeeded(size_t iterationCount, BOOL forced, void(^work
 
  @param lines unpositioned lines
  */
-static CGFloat computeLinesCrossDimensionSum(const std::vector<ASStackUnpositionedLine> &lines)
+static CGFloat computeLinesCrossDimensionSum(const std::vector<ASStackUnpositionedLine> &lines,
+                                             const ASStackLayoutSpecStyle &style)
 {
-  return std::accumulate(lines.begin(), lines.end(), 0.0,
+  return std::accumulate(lines.begin(), lines.end(),
+                         // Start from default spacing between each line:
+                         lines.empty() ? 0 : style.lineSpacing * (lines.size() - 1),
                          [&](CGFloat x, const ASStackUnpositionedLine &l) {
                            return x + l.crossSize;
                          });
@@ -236,7 +239,7 @@ static void stretchLinesAlongCrossDimension(std::vector<ASStackUnpositionedLine>
 {
   ASDisplayNodeCAssertFalse(lines.empty());
   const std::size_t numOfLines = lines.size();
-  const CGFloat violation = ASStackUnpositionedLayout::computeCrossViolation(computeLinesCrossDimensionSum(lines), style, sizeRange);
+  const CGFloat violation = ASStackUnpositionedLayout::computeCrossViolation(computeLinesCrossDimensionSum(lines, style), style, sizeRange);
   // Don't stretch if the stack is single line, because the line's cross size was clamped against the stack's constrained size.
   const BOOL shouldStretchLines = (numOfLines > 1
                                    && style.alignContent == ASStackLayoutAlignContentStretch
@@ -482,7 +485,8 @@ static CGFloat computeItemsStackDimensionSum(const std::vector<ASStackLayoutSpec
                                                   });
 
   // Sum up the childrens' dimensions (including spacing) in the stack direction.
-  const CGFloat childStackDimensionSum = std::accumulate(items.begin(), items.end(), childSpacingSum,
+  const CGFloat childStackDimensionSum = std::accumulate(items.begin(), items.end(),
+                                                         childSpacingSum,
                                                          [&](CGFloat x, const ASStackLayoutSpecItem &l) {
                                                            return x + stackDimension(style.direction, l.layout.size);
                                                          });
@@ -644,21 +648,25 @@ static std::vector<ASStackUnpositionedLine> collectChildrenIntoLines(const std::
   std::vector<ASStackUnpositionedLine> lines;
   std::vector<ASStackLayoutSpecItem> lineItems;
   CGFloat lineStackDimensionSum = 0;
+  CGFloat interitemSpacing = 0;
 
   for(auto it = items.begin(); it != items.end(); ++it) {
     const auto &item = *it;
     const CGFloat itemStackDimension = stackDimension(style.direction, item.layout.size);
-    const BOOL negativeViolationIfAddItem = (ASStackUnpositionedLayout::computeStackViolation(lineStackDimensionSum + itemStackDimension, style, sizeRange) < 0);
+    const CGFloat itemAndSpacingStackDimension = item.child.style.spacingBefore + itemStackDimension + item.child.style.spacingAfter;
+    const BOOL negativeViolationIfAddItem = (ASStackUnpositionedLayout::computeStackViolation(lineStackDimensionSum + interitemSpacing + itemAndSpacingStackDimension, style, sizeRange) < 0);
     const BOOL breakCurrentLine = negativeViolationIfAddItem && !lineItems.empty();
     
     if (breakCurrentLine) {
       lines.push_back({.items = std::vector<ASStackLayoutSpecItem> (lineItems)});
       lineItems.clear();
       lineStackDimensionSum = 0;
+      interitemSpacing = 0;
     }
     
     lineItems.push_back(std::move(item));
-    lineStackDimensionSum += itemStackDimension;
+    lineStackDimensionSum += interitemSpacing + itemAndSpacingStackDimension;
+    interitemSpacing = style.spacing;
   }
   
   // Handle last line
@@ -752,7 +760,7 @@ ASStackUnpositionedLayout ASStackUnpositionedLayout::compute(const std::vector<A
   }
   // Compute cross dimension sum of the stack.
   // This should be done before `lines` are moved to a new ASStackUnpositionedLayout struct (i.e `std::move(lines)`)
-  CGFloat layoutCrossDimensionSum = computeLinesCrossDimensionSum(lines);
+  CGFloat layoutCrossDimensionSum = computeLinesCrossDimensionSum(lines, style);
   
   return {.lines = std::move(lines), .stackDimensionSum = layoutStackDimensionSum, .crossDimensionSum = layoutCrossDimensionSum};
 }

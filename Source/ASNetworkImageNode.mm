@@ -26,19 +26,18 @@
 #import <AsyncDisplayKit/ASImageNode+Private.h>
 #import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
+#import <AsyncDisplayKit/ASLog.h>
 
 #if AS_PIN_REMOTE_IMAGE
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
 #endif
-
-static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
 @interface ASNetworkImageNode ()
 {
   // Only access any of these with __instanceLock__.
   __weak id<ASNetworkImageNodeDelegate> _delegate;
 
-  NSURL *_URL;
+  NSArray *_URLs;
   UIImage *_defaultImage;
 
   NSUUID *_cacheUUID;
@@ -67,6 +66,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     unsigned int downloaderImplementsSetPriority:1;
     unsigned int downloaderImplementsAnimatedImage:1;
     unsigned int downloaderImplementsCancelWithResume:1;
+    unsigned int downloaderImplementsDownloadURLs:1;
   } _downloaderFlags;
 
   // Immutable and set on init only. We don't need to lock in this case.
@@ -74,6 +74,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   struct {
     unsigned int cacheSupportsClearing:1;
     unsigned int cacheSupportsSynchronousFetch:1;
+    unsigned int cacheSupportsCachedURLs:1;
   } _cacheFlags;
 }
 
@@ -95,9 +96,11 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   _downloaderFlags.downloaderImplementsSetPriority = [downloader respondsToSelector:@selector(setPriority:withDownloadIdentifier:)];
   _downloaderFlags.downloaderImplementsAnimatedImage = [downloader respondsToSelector:@selector(animatedImageWithData:)];
   _downloaderFlags.downloaderImplementsCancelWithResume = [downloader respondsToSelector:@selector(cancelImageDownloadWithResumePossibilityForIdentifier:)];
+  _downloaderFlags.downloaderImplementsDownloadURLs = [downloader respondsToSelector:@selector(downloadImageWithURLs:callbackQueue:downloadProgress:completion:)];
 
   _cacheFlags.cacheSupportsClearing = [cache respondsToSelector:@selector(clearFetchedImageFromCacheWithURL:)];
   _cacheFlags.cacheSupportsSynchronousFetch = [cache respondsToSelector:@selector(synchronouslyFetchedCachedImageWithURL:)];
+  _cacheFlags.cacheSupportsCachedURLs = [cache respondsToSelector:@selector(cachedImageWithURLs:callbackQueue:completion:)];
   
   _shouldCacheImage = YES;
   _shouldRenderProgressImages = YES;
@@ -135,8 +138,8 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   BOOL shouldCancelAndClear = imageWasSetExternally && (imageWasSetExternally != _imageWasSetExternally);
   _imageWasSetExternally = imageWasSetExternally;
   if (shouldCancelAndClear) {
-    ASDisplayNodeAssertNil(_URL, @"Directly setting an image on an ASNetworkImageNode causes it to behave like an ASImageNode instead of an ASNetworkImageNode. If this is what you want, set the URL to nil first.");
-    _URL = nil;
+    ASDisplayNodeAssert(_URLs == nil || _URLs.count == 0, @"Directly setting an image on an ASNetworkImageNode causes it to behave like an ASImageNode instead of an ASNetworkImageNode. If this is what you want, set the URL to nil first.");
+    _URLs = nil;
     [self _locked_cancelDownloadAndClearImageWithResumePossibility:NO];
   }
   
@@ -157,15 +160,38 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
 - (void)setURL:(NSURL *)URL
 {
-  [self setURL:URL resetToDefault:YES];
+  if (URL) {
+    [self setURLs:@[URL]];
+  } else {
+    [self setURLs:nil];
+  }
 }
 
 - (void)setURL:(NSURL *)URL resetToDefault:(BOOL)reset
 {
+  if (URL) {
+    [self setURLs:@[URL] resetToDefault:reset];
+  } else {
+    [self setURLs:nil resetToDefault:reset];
+  }
+}
+
+- (NSURL *)URL
+{
+  return [self.URLs lastObject];
+}
+
+- (void)setURLs:(NSArray <NSURL *> *)URLs
+{
+  [self setURLs:URLs resetToDefault:YES];
+}
+
+- (void)setURLs:(NSArray <NSURL *> *)URLs resetToDefault:(BOOL)reset
+{
   {
     ASDN::MutexLocker l(__instanceLock__);
     
-    if (ASObjectIsEqual(URL, _URL)) {
+    if (ASObjectIsEqual(URLs, _URLs)) {
       return;
     }
     
@@ -174,25 +200,25 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     _imageWasSetExternally = NO;
     
     [self _locked_cancelImageDownloadWithResumePossibility:NO];
-
+    
     _imageLoaded = NO;
     
-    _URL = URL;
+    _URLs = URLs;
     
-    BOOL hasURL = (_URL == nil);
+    BOOL hasURL = (_URLs.count == 0);
     if (reset || hasURL) {
       [self _locked_setCurrentImageQuality:(hasURL ? 0.0 : 1.0)];
       [self _locked__setImage:_defaultImage];
     }
   }
-
+  
   [self setNeedsPreload];
 }
 
-- (NSURL *)URL
+- (NSArray <NSURL *>*)URLs
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return _URL;
+  return _URLs;
 }
 
 - (void)setDefaultImage:(UIImage *)defaultImage
@@ -211,7 +237,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   _defaultImage = defaultImage;
 
   if (!_imageLoaded) {
-    [self _locked_setCurrentImageQuality:((_URL == nil) ? 0.0 : 1.0)];
+    [self _locked_setCurrentImageQuality:((_URLs.count == 0) ? 0.0 : 1.0)];
     [self _locked__setImage:defaultImage];
     
   }
@@ -309,10 +335,10 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 - (BOOL)placeholderShouldPersist
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return (self.image == nil && self.animatedImage == nil && _URL != nil);
+  return (self.image == nil && self.animatedImage == nil && _URLs.count != 0);
 }
 
-/* displayWillStart in ASMultiplexImageNode has a very similar implementation. Changes here are likely necessary
+/* displayWillStartAsynchronously: in ASMultiplexImageNode has a very similar implementation. Changes here are likely necessary
  in ASMultiplexImageNode as well. */
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
@@ -321,13 +347,16 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
   if (asynchronously == NO && _cacheFlags.cacheSupportsSynchronousFetch) {
     ASDN::MutexLocker l(__instanceLock__);
 
-    if (_imageLoaded == NO && _URL && _downloadIdentifier == nil) {
-      UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:_URL] asdk_image];
-      if (result) {
-        [self _locked_setCurrentImageQuality:1.0];
-        [self _locked__setImage:result];
-        
-        _imageLoaded = YES;
+    if (_imageLoaded == NO && _URLs.count > 0 && _downloadIdentifier == nil) {
+      for (NSURL *url in [_URLs reverseObjectEnumerator]) {
+        UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:url] asdk_image];
+        if (result) {
+          [self _locked_setCurrentImageQuality:1.0];
+          [self _locked__setImage:result];
+          
+          _imageLoaded = YES;
+          break;
+        }
       }
     }
   }
@@ -417,6 +446,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     return;
   }
   
+  as_log_verbose(ASImageLoadingLog(), "Received progress image for %@ q: %.2g id: %@", self, progress, progressImage);
   [self _locked_setCurrentImageQuality:progress];
   [self _locked__setImage:progressImage];
 }
@@ -443,12 +473,14 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
   // Unbind from the previous download.
   if (oldDownloadIDForProgressBlock != nil) {
+    as_log_verbose(ASImageLoadingLog(), "Disabled progress images for %@ id: %@", self, oldDownloadIDForProgressBlock);
     [_downloader setProgressImageBlock:nil callbackQueue:dispatch_get_main_queue() withDownloadIdentifier:oldDownloadIDForProgressBlock];
   }
 
   // Bind to the current download.
   if (newDownloadIDForProgressBlock != nil) {
     __weak __typeof(self) weakSelf = self;
+    as_log_verbose(ASImageLoadingLog(), "Enabled progress images for %@ id: %@", self, newDownloadIDForProgressBlock);
     [_downloader setProgressImageBlock:^(UIImage * _Nonnull progressImage, CGFloat progress, id  _Nullable downloadIdentifier) {
       [weakSelf handleProgressImage:progressImage progress:progress downloadIdentifier:downloadIdentifier];
     } callbackQueue:dispatch_get_main_queue() withDownloadIdentifier:newDownloadIDForProgressBlock];
@@ -487,27 +519,18 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 {
   [self _locked_cancelImageDownloadWithResumePossibility:storeResume];
   
-  // Destruction of bigger images on the main thread can be expensive
-  // and can take some time, so we dispatch onto a bg queue to
-  // actually dealloc.
-  UIImage *image = [self _locked_Image];
-  UIImage *defaultImage = _defaultImage;
-  CGSize imageSize = image.size;
-  BOOL shouldReleaseImageOnBackgroundThread = imageSize.width > kMinReleaseImageOnBackgroundSize.width ||
-                                              imageSize.height > kMinReleaseImageOnBackgroundSize.height;
-  if (shouldReleaseImageOnBackgroundThread) {
-    ASPerformBackgroundDeallocation(image);
-  }
-
   [self _locked_setAnimatedImage:nil];
   [self _locked_setCurrentImageQuality:0.0];
-  [self _locked__setImage:defaultImage];
+  [self _locked__setImage:_defaultImage];
 
   _imageLoaded = NO;
 
   if (_cacheFlags.cacheSupportsClearing) {
-    if (_URL != nil) {
-      [_cache clearFetchedImageFromCacheWithURL:_URL];
+    if (_URLs.count != 0) {
+      as_log_verbose(ASImageLoadingLog(), "Clearing cached image for %@ url: %@", self, _URLs);
+      for (NSURL *url in _URLs) {
+        [_cache clearFetchedImageFromCacheWithURL:url];
+      }
     }
   }
 }
@@ -526,8 +549,10 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
   if (_downloadIdentifier) {
     if (storeResume && _downloaderFlags.downloaderImplementsCancelWithResume) {
+      as_log_verbose(ASImageLoadingLog(), "Canceling image download w resume for %@ id: %@", self, _downloadIdentifier);
       [_downloader cancelImageDownloadWithResumePossibilityForIdentifier:_downloadIdentifier];
     } else {
+      as_log_verbose(ASImageLoadingLog(), "Canceling image download no resume for %@ id: %@", self, _downloadIdentifier);
       [_downloader cancelImageDownloadForIdentifier:_downloadIdentifier];
     }
   }
@@ -539,7 +564,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 - (void)_downloadImageWithCompletion:(void (^)(id <ASImageContainerProtocol> imageContainer, NSError*, id downloadIdentifier))finished
 {
   ASPerformBlockOnBackgroundThread(^{
-    NSURL *url;
+    NSArray <NSURL *> *urls;
     id downloadIdentifier;
     BOOL cancelAndReattempt = NO;
     
@@ -548,21 +573,34 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     // it and try again.
     {
       ASDN::MutexLocker l(__instanceLock__);
-      url = _URL;
+      urls = _URLs;
+    }
+
+    if (_downloaderFlags.downloaderImplementsDownloadURLs) {
+      downloadIdentifier = [_downloader downloadImageWithURLs:urls
+                                                callbackQueue:dispatch_get_main_queue()
+                                             downloadProgress:NULL
+                                                   completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier) {
+                                                     if (finished != NULL) {
+                                                       finished(imageContainer, error, downloadIdentifier);
+                                                     }
+                                                   }];
+    } else {
+      downloadIdentifier = [_downloader downloadImageWithURL:[urls lastObject]
+                                               callbackQueue:dispatch_get_main_queue()
+                                            downloadProgress:NULL
+                                                  completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier) {
+                                                    if (finished != NULL) {
+                                                      finished(imageContainer, error, downloadIdentifier);
+                                                    }
+                                                  }];
     }
     
-    downloadIdentifier = [_downloader downloadImageWithURL:url
-                                             callbackQueue:dispatch_get_main_queue()
-                                          downloadProgress:NULL
-                                                completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier) {
-                                                  if (finished != NULL) {
-                                                    finished(imageContainer, error, downloadIdentifier);
-                                                  }
-                                                }];
+    as_log_verbose(ASImageLoadingLog(), "Downloading image for %@ url: %@", self, url);
   
     {
       ASDN::MutexLocker l(__instanceLock__);
-      if (ASObjectIsEqual(_URL, url)) {
+      if (ASObjectIsEqual(_URLs, urls)) {
         // The download we kicked off is correct, no need to do any more work.
         _downloadIdentifier = downloadIdentifier;
       } else {
@@ -574,6 +612,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     
     if (cancelAndReattempt) {
       if (downloadIdentifier != nil) {
+        as_log_verbose(ASImageLoadingLog(), "Canceling image download no resume for %@ id: %@", self, downloadIdentifier);
         [_downloader cancelImageDownloadForIdentifier:downloadIdentifier];
       }
       [self _downloadImageWithCompletion:finished];
@@ -590,34 +629,36 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
     __weak id<ASNetworkImageNodeDelegate> delegate = _delegate;
     BOOL delegateDidStartFetchingData = _delegateFlags.delegateDidStartFetchingData;
     BOOL isImageLoaded = _imageLoaded;
-    NSURL *URL = _URL;
+    NSArray <NSURL *>*URLs = _URLs;
     id currentDownloadIdentifier = _downloadIdentifier;
   __instanceLock__.unlock();
   
-  if (!isImageLoaded && URL != nil && currentDownloadIdentifier == nil) {
+  if (!isImageLoaded && URLs.count > 0 && currentDownloadIdentifier == nil) {
     if (delegateDidStartFetchingData) {
       [delegate imageNodeDidStartFetchingData:self];
     }
     
-    if (URL.isFileURL) {
+    // We only support file URLs if there is one URL currently
+    if (URLs.count == 1 && [URLs lastObject].isFileURL) {
       dispatch_async(dispatch_get_main_queue(), ^{
         ASDN::MutexLocker l(__instanceLock__);
         
         // Bail out if not the same URL anymore
-        if (!ASObjectIsEqual(URL, _URL)) {
+        if (!ASObjectIsEqual(URLs, _URLs)) {
           return;
         }
         
+        NSURL *URL = [URLs lastObject];
         if (_shouldCacheImage) {
-          [self _locked__setImage:[UIImage imageNamed:_URL.path.lastPathComponent]];
+          [self _locked__setImage:[UIImage imageNamed:URL.path.lastPathComponent]];
         } else {
           // First try to load the path directly, for efficiency assuming a developer who
           // doesn't want caching is trying to be as minimal as possible.
-          UIImage *nonAnimatedImage = [UIImage imageWithContentsOfFile:_URL.path];
+          UIImage *nonAnimatedImage = [UIImage imageWithContentsOfFile:URL.path];
           if (nonAnimatedImage == nil) {
             // If we couldn't find it, execute an -imageNamed:-like search so we can find resources even if the
             // extension is not provided in the path.  This allows the same path to work regardless of shouldCacheImage.
-            NSString *filename = [[NSBundle mainBundle] pathForResource:_URL.path.lastPathComponent ofType:nil];
+            NSString *filename = [[NSBundle mainBundle] pathForResource:URL.path.lastPathComponent ofType:nil];
             if (filename != nil) {
               nonAnimatedImage = [UIImage imageWithContentsOfFile:filename];
             }
@@ -626,7 +667,7 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
           // If the file may be an animated gif and then created an animated image.
           id<ASAnimatedImageProtocol> animatedImage = nil;
           if (_downloaderFlags.downloaderImplementsAnimatedImage) {
-            NSData *data = [NSData dataWithContentsOfURL:_URL];
+            NSData *data = [NSData dataWithContentsOfURL:URL];
             if (data != nil) {
               animatedImage = [_downloader animatedImageWithData:data];
 
@@ -654,13 +695,15 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
       });
     } else {
       __weak __typeof__(self) weakSelf = self;
-      void (^finished)(id <ASImageContainerProtocol>, NSError *, id downloadIdentifier) = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier) {
+      auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier) {
        
         __typeof__(self) strongSelf = weakSelf;
         if (strongSelf == nil) {
           return;
         }
 
+        as_log_verbose(ASImageLoadingLog(), "Downloaded image for %@ img: %@ urls: %@", self, [imageContainer asdk_image], URLs);
+        
         // Grab the lock for the rest of the block
         ASDN::MutexLocker l(strongSelf->__instanceLock__);
         
@@ -702,24 +745,35 @@ static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
           _cacheUUID = cacheUUID;
         __instanceLock__.unlock();
 
-        [_cache cachedImageWithURL:URL
-                     callbackQueue:dispatch_get_main_queue()
-                        completion:^(id <ASImageContainerProtocol> imageContainer) {
-                          // If the cache UUID changed, that means this request was cancelled.
-                          __instanceLock__.lock();
-                            NSUUID *currentCacheUUID = _cacheUUID;
-                          __instanceLock__.unlock();
-                            
-                          if (!ASObjectIsEqual(currentCacheUUID, cacheUUID)) {
-                            return;
-                          }
-  
-                          if ([imageContainer asdk_image] == nil && _downloader != nil) {
-                            [self _downloadImageWithCompletion:finished];
-                          } else {
-                            finished(imageContainer, nil, nil);
-                          }
-                        }];
+        as_log_verbose(ASImageLoadingLog(), "Decaching image for %@ urls: %@", self, URLs);
+        
+        ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer) {
+          // If the cache UUID changed, that means this request was cancelled.
+          __instanceLock__.lock();
+          NSUUID *currentCacheUUID = _cacheUUID;
+          __instanceLock__.unlock();
+          
+          if (!ASObjectIsEqual(currentCacheUUID, cacheUUID)) {
+            return;
+          }
+          
+          if ([imageContainer asdk_image] == nil && _downloader != nil) {
+            [self _downloadImageWithCompletion:finished];
+          } else {
+            as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ urls: %@", self, [imageContainer asdk_image], URLs);
+            finished(imageContainer, nil, nil);
+          }
+        };
+        
+        if (_cacheFlags.cacheSupportsCachedURLs) {
+          [_cache cachedImageWithURLs:URLs
+                        callbackQueue:dispatch_get_main_queue()
+                           completion:completion];
+        } else {
+          [_cache cachedImageWithURL:[URLs lastObject]
+                       callbackQueue:dispatch_get_main_queue()
+                          completion:completion];
+        }
       } else {
         [self _downloadImageWithCompletion:finished];
       }

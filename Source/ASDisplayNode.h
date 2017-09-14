@@ -584,6 +584,11 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 - (NSString *)displayNodeRecursiveDescription AS_WARN_UNUSED_RESULT;
 
+/**
+ * A detailed description of this node's layout state. This is useful when debugging.
+ */
+@property (atomic, copy, readonly) NSString *detailedLayoutDescription;
+
 @end
 
 /**
@@ -621,28 +626,31 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 - (void)layoutIfNeeded;
 
-@property (nonatomic, strong, nullable) id contents;                           // default=nil
+@property (nonatomic, assign)           CGRect frame;                          // default=CGRectZero
+@property (nonatomic, assign)           CGRect bounds;                         // default=CGRectZero
+@property (nonatomic, assign)           CGPoint position;                      // default=CGPointZero
+@property (nonatomic, assign)           CGFloat alpha;                         // default=1.0f
+
 @property (nonatomic, assign)           BOOL clipsToBounds;                    // default==NO
+@property (nonatomic, getter=isHidden)  BOOL hidden;                           // default==NO
 @property (nonatomic, getter=isOpaque)  BOOL opaque;                           // default==YES
 
-@property (nonatomic, assign)           BOOL allowsGroupOpacity;
-@property (nonatomic, assign)           BOOL allowsEdgeAntialiasing;
-@property (nonatomic, assign)           unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
+@property (nonatomic, strong, nullable) id contents;                           // default=nil
+@property (nonatomic, assign)           CGRect contentsRect;                   // default={0,0,1,1}. @see CALayer.h for details.
+@property (nonatomic, assign)           CGRect contentsCenter;                 // default={0,0,1,1}. @see CALayer.h for details.
+@property (nonatomic, assign)           CGFloat contentsScale;                 // default=1.0f. See @contentsScaleForDisplay for details.
+@property (nonatomic, assign)           CGFloat rasterizationScale;            // default=1.0f.
 
-@property (nonatomic, getter=isHidden)  BOOL hidden;                           // default==NO
-@property (nonatomic, assign)           BOOL needsDisplayOnBoundsChange;       // default==NO
-@property (nonatomic, assign)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
-@property (nonatomic, assign)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone  (undefined for layer-backed nodes)
-@property (nonatomic, assign)           CGFloat alpha;                         // default=1.0f
-@property (nonatomic, assign)           CGRect bounds;                         // default=CGRectZero
-@property (nonatomic, assign)           CGRect frame;                          // default=CGRectZero
 @property (nonatomic, assign)           CGPoint anchorPoint;                   // default={0.5, 0.5}
 @property (nonatomic, assign)           CGFloat zPosition;                     // default=0.0
-@property (nonatomic, assign)           CGPoint position;                      // default=CGPointZero
 @property (nonatomic, assign)           CGFloat cornerRadius;                  // default=0.0
-@property (nonatomic, assign)           CGFloat contentsScale;                 // default=1.0f. See @contentsScaleForDisplay for more info
 @property (nonatomic, assign)           CATransform3D transform;               // default=CATransform3DIdentity
 @property (nonatomic, assign)           CATransform3D subnodeTransform;        // default=CATransform3DIdentity
+
+@property (nonatomic, assign, getter=isUserInteractionEnabled) BOOL userInteractionEnabled; // default=YES (NO for layer-backed nodes)
+#if TARGET_OS_IOS
+@property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
+#endif
 
 /**
  * @abstract The node view's background color.
@@ -652,8 +660,8 @@ extern NSInteger const ASDefaultDrawingPriority;
 */
 @property (nonatomic, strong, nullable) UIColor *backgroundColor;              // default=nil
 
-@property (nonatomic, strong, null_resettable)    UIColor *tintColor;          // default=Blue
-- (void)tintColorDidChange;     // Notifies the node when the tintColor has changed.
+@property (nonatomic, strong, null_resettable) UIColor *tintColor;             // default=Blue
+- (void)tintColorDidChange;                                                    // Notifies the node when the tintColor has changed.
 
 /**
  * @abstract A flag used to determine how a node lays out its content when its bounds change.
@@ -664,18 +672,23 @@ extern NSInteger const ASDefaultDrawingPriority;
  * contentMode for your content while it's being re-rendered.
  */
 @property (nonatomic, assign)           UIViewContentMode contentMode;         // default=UIViewContentModeScaleToFill
+@property (nonatomic, copy)             NSString *contentsGravity;             // Use .contentMode in preference when possible.
 @property (nonatomic, assign)           UISemanticContentAttribute semanticContentAttribute; // default=Unspecified
 
-@property (nonatomic, assign, getter=isUserInteractionEnabled) BOOL userInteractionEnabled; // default=YES (NO for layer-backed nodes)
-#if TARGET_OS_IOS
-@property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
-#endif
 @property (nonatomic, nullable)         CGColorRef shadowColor;                // default=opaque rgb black
 @property (nonatomic, assign)           CGFloat shadowOpacity;                 // default=0.0
 @property (nonatomic, assign)           CGSize shadowOffset;                   // default=(0, -3)
 @property (nonatomic, assign)           CGFloat shadowRadius;                  // default=3
 @property (nonatomic, assign)           CGFloat borderWidth;                   // default=0
 @property (nonatomic, nullable)         CGColorRef borderColor;                // default=opaque rgb black
+
+@property (nonatomic, assign)           BOOL allowsGroupOpacity;
+@property (nonatomic, assign)           BOOL allowsEdgeAntialiasing;
+@property (nonatomic, assign)           unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
+
+@property (nonatomic, assign)           BOOL needsDisplayOnBoundsChange;       // default==NO
+@property (nonatomic, assign)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
+@property (nonatomic, assign)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone (undefined for layer-backed nodes)
 
 // UIResponder methods
 // By default these fall through to the underlying view, but can be overridden.
@@ -748,9 +761,6 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-@interface ASDisplayNode (ASLayoutElementAsciiArtProtocol) <ASLayoutElementAsciiArtProtocol>
-@end
-
 @interface ASDisplayNode (ASLayout)
 
 /** @name Managing dimensions */
@@ -775,7 +785,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
- * calling -measure: on them in -calculateLayoutThatFits.
+ * calling -layoutThatFits: on them in -calculateLayoutThatFits.
  *
  * @return Size already calculated by -calculateLayoutThatFits:.
  *

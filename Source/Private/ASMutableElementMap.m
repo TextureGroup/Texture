@@ -1,5 +1,5 @@
 //
-//  ASMutableElementMap.mm
+//  ASMutableElementMap.m
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -22,7 +22,6 @@
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
-#import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 
 typedef NSMutableArray<NSMutableArray<ASCollectionElement *> *> ASMutableCollectionElementTwoDimensionalArray;
 
@@ -102,9 +101,10 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   }
 }
 
-- (void)migrateSupplementaryElementsWithChangeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)migrateSupplementaryElementsWithSectionMapping:(ASIntegerMap *)mapping
 {
-  if (changeSet.deletedSections.count == 0 && changeSet.insertedSections.count == 0) {
+  // Fast-path, no section changes.
+  if (mapping == ASIntegerMap.identityMap) {
     return;
   }
 
@@ -118,7 +118,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
     NSMutableDictionary *newSupps = [NSMutableDictionary dictionary];
     [supps enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
       NSInteger oldSection = oldIndexPath.section;
-      NSInteger newSection = [changeSet newSectionForOldSection:oldSection];
+      NSInteger newSection = [mapping integerForKey:oldSection];
       
       if (oldSection == newSection) {
         // Index path stayed the same, just copy it over.

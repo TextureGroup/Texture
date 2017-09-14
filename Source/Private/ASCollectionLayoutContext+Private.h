@@ -17,11 +17,23 @@
 
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 
+@class ASCollectionLayoutCache;
+@protocol ASCollectionLayoutDelegate;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCollectionLayoutContext (Private)
 
-- (instancetype)initWithViewportSize:(CGSize)viewportSize elements:(ASElementMap *)elements additionalInfo:(nullable id)additionalInfo;
+@property (nonatomic, strong, readonly) Class<ASCollectionLayoutDelegate> layoutDelegateClass;
+@property (nonatomic, weak, readonly) ASCollectionLayoutCache *layoutCache;
+
+- (instancetype)initWithViewportSize:(CGSize)viewportSize
+                initialContentOffset:(CGPoint)initialContentOffset
+                scrollableDirections:(ASScrollDirection)scrollableDirections
+                            elements:(ASElementMap *)elements
+                 layoutDelegateClass:(Class<ASCollectionLayoutDelegate>)layoutDelegateClass
+                         layoutCache:(ASCollectionLayoutCache *)layoutCache
+                      additionalInfo:(nullable id)additionalInfo;
 
 @end
 

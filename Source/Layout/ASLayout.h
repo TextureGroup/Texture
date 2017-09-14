@@ -66,9 +66,9 @@ ASDISPLAYNODE_EXTERN_C_END
 @property (nonatomic, assign, readonly) CGSize size;
 
 /**
- * Position in parent. Default to CGPointNull.
+ * Position in parent. Default to ASPointNull.
  * 
- * @discussion When being used as a sublayout, this property must not equal CGPointNull.
+ * @discussion When being used as a sublayout, this property must not equal ASPointNull.
  */
 @property (nonatomic, assign, readonly) CGPoint position;
 
@@ -144,23 +144,6 @@ ASDISPLAYNODE_EXTERN_C_END
 @interface ASLayout (Unavailable)
 
 - (instancetype)init __unavailable;
-
-@end
-
-#pragma mark - Deprecated
-
-@interface ASLayout (Deprecated)
-
-- (id <ASLayoutElement>)layoutableObject ASDISPLAYNODE_DEPRECATED;
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size ASDISPLAYNODE_DEPRECATED;
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size
-                                sublayouts:(nullable NSArray<ASLayout *> *)sublayouts AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED;
 
 @end
 
