@@ -59,21 +59,13 @@
     
     [_activityIndicatorView stopAnimating];
     
-    [self insertNewRows:newPhotos];
+    [self.tableView reloadData];
     [self requestCommentsForPhotos:newPhotos];
     
     // immediately start second larger fetch
     [self loadPage];
     
   } numResultsToReturn:4];
-}
-
-- (void)replaceRows:(NSArray *)newPhotos
-{
-  [self.tableView beginUpdates];
-  [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationNone];
-  [self insertNewRows:newPhotos];
-  [self.tableView endUpdates];
 }
 
 - (void)insertNewRows:(NSArray *)newPhotos
