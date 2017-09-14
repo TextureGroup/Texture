@@ -253,6 +253,10 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
     };
     
     PINRemoteImageManagerImageCompletion imageCompletion = ^(PINRemoteImageManagerResult * _Nonnull result) {
+        if (self.resultProvider) {
+            self.resultProvider(result);
+        }
+        
         /// If we're targeting the main queue and we're on the main thread, complete immediately.
         if (ASDisplayNodeThreadIsMain() && callbackQueue == dispatch_get_main_queue()) {
 #if PIN_ANIMATED_AVAILABLE
