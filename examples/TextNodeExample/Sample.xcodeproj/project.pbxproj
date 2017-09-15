@@ -10,7 +10,6 @@
 		97BD8C55FAB7A530B60C7A3B /* libPods-Sample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40812757320B48021FB91959 /* libPods-Sample.a */; };
 		C02F5A2E1F636F7B001AF17C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C02F5A2D1F636F7B001AF17C /* main.m */; };
 		C02F5A311F636F7B001AF17C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C02F5A301F636F7B001AF17C /* AppDelegate.m */; };
-		C02F5A341F636F7B001AF17C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C02F5A331F636F7B001AF17C /* ViewController.m */; };
 		C02F5A391F636F7B001AF17C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C02F5A381F636F7B001AF17C /* Assets.xcassets */; };
 		C02F5A3C1F636F7B001AF17C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C02F5A3A1F636F7B001AF17C /* LaunchScreen.storyboard */; };
 		C02F5A471F636F7B001AF17C /* SampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C02F5A461F636F7B001AF17C /* SampleTests.m */; };
@@ -43,8 +42,6 @@
 		C02F5A2D1F636F7B001AF17C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C02F5A2F1F636F7B001AF17C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C02F5A301F636F7B001AF17C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		C02F5A321F636F7B001AF17C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		C02F5A331F636F7B001AF17C /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		C02F5A381F636F7B001AF17C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C02F5A3B1F636F7B001AF17C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C02F5A3D1F636F7B001AF17C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -131,8 +128,6 @@
 			children = (
 				C02F5A2F1F636F7B001AF17C /* AppDelegate.h */,
 				C02F5A301F636F7B001AF17C /* AppDelegate.m */,
-				C02F5A321F636F7B001AF17C /* ViewController.h */,
-				C02F5A331F636F7B001AF17C /* ViewController.m */,
 				C02F5A381F636F7B001AF17C /* Assets.xcassets */,
 				C02F5A3A1F636F7B001AF17C /* LaunchScreen.storyboard */,
 				C02F5A3D1F636F7B001AF17C /* Info.plist */,
@@ -358,7 +353,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0851BAA1F672B45009724A3 /* TextCellNode.m in Sources */,
-				C02F5A341F636F7B001AF17C /* ViewController.m in Sources */,
 				C02F5A311F636F7B001AF17C /* AppDelegate.m in Sources */,
 				C0E1A3F71F68BE67008DE500 /* CollectionViewController.m in Sources */,
 				C02F5A2E1F636F7B001AF17C /* main.m in Sources */,

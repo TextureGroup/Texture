@@ -28,11 +28,12 @@
 
 @implementation TextCellNode
 
-- initWithText1:(NSString*)text1 text2:(NSString*)text2 {
+- (instancetype)initWithText1:(NSString*)text1 text2:(NSString*)text2 {
   self = [super init];
   if (self) {
     self.automaticallyManagesSubnodes = YES;
     self.clipsToBounds = YES;
+
     _label1 = [[ASTextNode2 alloc] init];
     _label1.attributedText = [[NSAttributedString alloc] initWithString:text1];
     _label2 = [[ASTextNode2 alloc] init];
@@ -48,17 +49,11 @@
   return self;
 }
 
--(void)didLoad {
-  [super didLoad];
-
-}
-
--(void)nodeDidLayout {
-  [super nodeDidLayout];
-
-}
-
--(void)simpleSetupYogaLayout {
+/** 
+  this is to text a row with two labels, the first should be truncated with "..."
+  Also to show a bug of ASTextNode2
+ */
+- (void)simpleSetupYogaLayout {
   [self.style yogaNodeCreateIfNeeded];
   [_label1.style yogaNodeCreateIfNeeded];
   [_label2.style yogaNodeCreateIfNeeded];
@@ -68,16 +63,20 @@
   _label1.backgroundColor = [UIColor lightGrayColor];
 
   _label2.style.flexGrow = 0;
-  _label2.style.flexShrink = 0; //!!!
+  _label2.style.flexShrink = 0;
 
-    ASDisplayNode* l1Container = [ASDisplayNode yogaVerticalStack];
-    l1Container.style.alignItems = ASStackLayoutAlignItemsCenter;
-    _label1.style.alignSelf = ASStackLayoutAlignSelfStart;
+  ASDisplayNode* l1Container = [ASDisplayNode yogaVerticalStack];
 
-    l1Container.style.flexShrink = 1;
-    l1Container.style.flexGrow = 0;
+  //TODO(fix ASTextNode2) uncomment next two line will show the bug of TextNode2
+  //which works for ASTextNode though
+  //see discussion here: https://github.com/TextureGroup/Texture/pull/553
+  //l1Container.style.alignItems = ASStackLayoutAlignItemsCenter;
+  //_label1.style.alignSelf = ASStackLayoutAlignSelfStart;
 
-    l1Container.yogaChildren = @[_label1];
+  l1Container.style.flexShrink = 1;
+  l1Container.style.flexGrow = 0;
+
+  l1Container.yogaChildren = @[_label1];
 
   self.style.justifyContent = ASStackLayoutJustifyContentSpaceBetween;
   self.style.alignItems = ASStackLayoutAlignItemsStart;

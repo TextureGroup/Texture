@@ -17,7 +17,6 @@
 
 #import "AppDelegate.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import "ViewController.h"
 #import "CollectionViewController.h"
 @interface AppDelegate ()
 
@@ -30,7 +29,6 @@
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASNavigationController* nav = [[ASNavigationController alloc] initWithRootViewController:[[CollectionViewController alloc] init]];
   self.window.rootViewController = nav;
-//  [ASTextNode setExperimentOptions:ASTextNodeExperimentAllInstances];
   [self.window makeKeyAndVisible];
   return YES;
 }

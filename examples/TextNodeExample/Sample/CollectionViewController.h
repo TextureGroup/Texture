@@ -19,5 +19,4 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @interface CollectionViewController : ASViewController
-
 @end
