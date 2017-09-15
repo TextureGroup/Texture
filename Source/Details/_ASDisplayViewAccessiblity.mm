@@ -179,8 +179,9 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
     NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
     NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
     [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-      if (idx != 0)
+      if (idx != 0) {
         [attributedLabel appendAttributedString:[[NSAttributedString alloc] initWithString:@", "]];
+      }
       [attributedLabel appendAttributedString:(NSAttributedString *)obj];
     }];
     accessiblityElement.accessibilityAttributedLabel = attributedLabel;
