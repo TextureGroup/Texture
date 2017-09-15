@@ -396,7 +396,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Add the constrained size back textContainerInset
   size.width += (_textContainerInset.left + _textContainerInset.right);
   size.height += (_textContainerInset.top + _textContainerInset.bottom);
-  
+
+  NSLog(@"%@", NSStringFromCGSize(constrainedSize));
+
+
   return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
                     std::fmin(size.height, originalConstrainedSize.height));
 }
