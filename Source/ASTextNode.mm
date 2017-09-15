@@ -397,9 +397,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   size.width += (_textContainerInset.left + _textContainerInset.right);
   size.height += (_textContainerInset.top + _textContainerInset.bottom);
 
-  NSLog(@"%@", NSStringFromCGSize(constrainedSize));
-
-
   return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
                     std::fmin(size.height, originalConstrainedSize.height));
 }

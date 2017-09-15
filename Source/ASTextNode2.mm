@@ -234,10 +234,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSMutableAttributedString *mutableText = [attributedText mutableCopy];
   [self prepareAttributedStringForDrawing:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
-  NSLog(@"%@, %@", NSStringFromCGSize(constrainedSize), mutableText);
-  [self setNeedsDisplay];
 
-  NSLog(@"self = %@, input = %@, out = %@", self, NSStringFromCGSize(constrainedSize), NSStringFromCGSize(layout.textBoundingSize));
+  [self setNeedsDisplay];
 
   return layout.textBoundingSize;
 }
@@ -409,20 +407,12 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       // 3. Thus, those two values (constrained width & returned width) form a range, where
       //    intermediate values in that range will be snapped. Thus, we can use a given layout as long as our
       //    width is in that range, between the min and max of those two values.
-
-      NSLog(@"%@, %@, %@", NSStringFromCGSize(container.size), NSStringFromCGSize(constrainedSize), NSStringFromCGSize(layoutSize));
-
       CGRect minRect = CGRectMake(0, 0, MIN(layoutSize.width, constrainedSize.width), MIN(layoutSize.height, constrainedSize.height));
       if (!CGRectContainsRect(containerBounds, minRect)) {
         continue;
       }
       CGRect maxRect = CGRectMake(0, 0, MAX(layoutSize.width, constrainedSize.width), MAX(layoutSize.height, constrainedSize.height));
       if (!CGRectContainsRect(maxRect, containerBounds)) {
-        continue;
-      }
-
-
-      if (!CGSizeEqualToSize(container.size, constrainedSize)) {
         continue;
       }
 
