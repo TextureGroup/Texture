@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASCollectionGalleryLayoutDelegate] Added supplementary node support:. [#538](https://github.com/TextureGroup/Texture/pull/538) [Nikolay Sahradyan](https://github.com/NikoSahradyan)
 - [ASCollectionNode] Add -isProcessingUpdates and -onDidFinishProcessingUpdates: APIs. [#522](https://github.com/TextureGroup/Texture/pull/522) [Scott Goodson](https://github.com/appleguy)
 - [Accessibility] Add .isAccessibilityContainer property, allowing automatic aggregation of children's a11y labels. [#468][Scott Goodson](https://github.com/appleguy)
 - [ASImageNode] Enabled .clipsToBounds by default, fixing the use of .cornerRadius and clipping of GIFs. [Scott Goodson](https://github.com/appleguy) [#466](https://github.com/TextureGroup/Texture/pull/466)

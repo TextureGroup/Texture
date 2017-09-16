@@ -2,8 +2,13 @@
 //  ASCollectionGalleryLayoutDelegate.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
+//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
+//  This source code is licensed under the BSD-style license found in the
+//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
+//  grant of patent rights can be found in the PATENTS file in the same directory.
+//
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
@@ -105,6 +110,31 @@
   NSMutableArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
                                                                           ASCollectionElement *element,
                                                                           [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
+  NSInteger numberOfSupplementaryelementsBefore = 0;;
+  if ([context.elements.supplementaryElementKinds count]) {
+    for (int sectionIndex = 0; sectionIndex< context.elements.numberOfSections; ++sectionIndex) {
+      for (NSString *kind in context.elements.supplementaryElementKinds) {
+        if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
+          ASCollectionElement *headerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
+          if (headerElement) {
+            NSInteger index = sectionIndex > 0 ? [context.elements numberOfItemsInSection:sectionIndex - 1] : 0;
+            index += numberOfSupplementaryelementsBefore;
+            numberOfSupplementaryelementsBefore++;
+            [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:headerElement] atIndex:index];
+          }
+        }
+        if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+          ASCollectionElement *footerElement = [context.elements supplementaryElementOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionIndex]];
+          if (footerElement) {
+            NSInteger index = [context.elements numberOfItemsInSection:sectionIndex];
+            index += numberOfSupplementaryelementsBefore;
+            numberOfSupplementaryelementsBefore++;
+            [children insertObject:[[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:footerElement] atIndex:index];
+          }
+        }
+      }
+    }
+  }
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }
