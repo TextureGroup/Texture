@@ -2,5 +2,8 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '8.0'
 target 'Sample' do
 	pod 'Texture', :path => '../..'
+	# DO NOT COMMIT!
+	pod 'PINRemoteImage', :path => '~/Development/PINRemoteImage'
+	pod 'PINRemoteImage/WebP', :path => '~/Development/PINRemoteImage'
 end
 

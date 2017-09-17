@@ -24,12 +24,18 @@
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
 
-#if __has_include (<PINRemoteImage/PINAnimatedImage.h>)
+#if __has_include (<PINRemoteImage/PINGIFAnimatedImage.h>)
 #define PIN_ANIMATED_AVAILABLE 1
-#import <PINRemoteImage/PINAnimatedImage.h>
+#import <PINRemoteImage/PINCachedAnimatedImage.h>
 #import <PINRemoteImage/PINAlternateRepresentationProvider.h>
 #else
 #define PIN_ANIMATED_AVAILABLE 0
+#endif
+
+#if __has_include(<webp/decode.h>)
+#define PIN_WEBP_AVAILABLE  1
+#else
+#define PIN_WEBP_AVAILABLE  0
 #endif
 
 #import <PINRemoteImage/PINRemoteImageManager.h>
@@ -42,35 +48,23 @@
 
 @end
 
-@interface PINAnimatedImage (ASPINRemoteImageDownloader) <ASAnimatedImageProtocol>
+@interface PINCachedAnimatedImage (ASPINRemoteImageDownloader) <ASAnimatedImageProtocol>
 
 @end
 
-@implementation PINAnimatedImage (ASPINRemoteImageDownloader)
-
-- (void)setCoverImageReadyCallback:(void (^)(UIImage * _Nonnull))coverImageReadyCallback
-{
-  self.infoCompletion = coverImageReadyCallback;
-}
-
-- (void (^)(UIImage * _Nonnull))coverImageReadyCallback
-{
-  return self.infoCompletion;
-}
-
-- (void)setPlaybackReadyCallback:(dispatch_block_t)playbackReadyCallback
-{
-  self.fileReady = playbackReadyCallback;
-}
-
-- (dispatch_block_t)playbackReadyCallback
-{
-  return self.fileReady;
-}
+@implementation PINCachedAnimatedImage (ASPINRemoteImageDownloader)
 
 - (BOOL)isDataSupported:(NSData *)data
 {
-  return [data pin_isGIF];
+    if ([data pin_isGIF]) {
+        return YES;
+    }
+#if PIN_WEBP_AVAILABLE
+    else if ([data pin_isAnimatedWebP]) {
+        return YES;
+    }
+#endif
+  return NO;
 }
 
 @end
@@ -164,7 +158,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 #if PIN_ANIMATED_AVAILABLE
 - (nullable id <ASAnimatedImageProtocol>)animatedImageWithData:(NSData *)animatedImageData
 {
-  return [[PINAnimatedImage alloc] initWithAnimatedImageData:animatedImageData];
+  return [[PINCachedAnimatedImage alloc] initWithAnimatedImageData:animatedImageData];
 }
 #endif
 
@@ -342,6 +336,12 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
   if ([data pin_isGIF]) {
     return data;
   }
+#if PIN_WEBP_AVAILABLE
+  else if ([data pin_isAnimatedWebP]) {
+      return data;
+  }
+#endif
+    
 #endif
   return nil;
 }

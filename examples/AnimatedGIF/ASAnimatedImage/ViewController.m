@@ -32,7 +32,9 @@
   // Do any additional setup after loading the view, typically from a nib.
   
   ASNetworkImageNode *imageNode = [[ASNetworkImageNode alloc] init];
-  imageNode.URL = [NSURL URLWithString:@"https://s-media-cache-ak0.pinimg.com/originals/07/44/38/074438e7c75034df2dcf37ba1057803e.gif"];
+//    imageNode.URL = [NSURL URLWithString:@"https://s-media-cache-ak0.pinimg.com/originals/07/44/38/074438e7c75034df2dcf37ba1057803e.gif"];
+  imageNode.URL = [NSURL URLWithString:@"https://storage.googleapis.com/downloads.webmproject.org/webp/images/dancing_banana2.lossless.webp"];
+//  imageNode.URL = [NSURL URLWithString:@"https://res.cloudinary.com/demo/image/upload/fl_awebp/bored_animation.webp"];
   imageNode.frame = self.view.bounds;
   imageNode.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   imageNode.contentMode = UIViewContentModeScaleAspectFit;
