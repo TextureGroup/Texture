@@ -1058,23 +1058,20 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setAccessibilityLabel)
     view.accessibilityLabel = accessibilityLabel;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedLabel)
-      view.accessibilityAttributedLabel = accessibilityAttributedLabel;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedLabel)
+    [view setValue:accessibilityAttributedLabel forKey:@"accessibilityAttributedLabel"];
 
   if (flags.setAccessibilityHint)
     view.accessibilityHint = accessibilityHint;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedHint)
-      view.accessibilityAttributedHint = accessibilityAttributedHint;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedHint)
+    [view setValue:accessibilityAttributedHint forKey:@"accessibilityAttributedHint"];
 
   if (flags.setAccessibilityValue)
     view.accessibilityValue = accessibilityValue;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedValue)
-      view.accessibilityAttributedValue = accessibilityAttributedValue;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedValue)
+    [view setValue:accessibilityAttributedValue forKey:@"accessibilityAttributedValue"];
 
   if (flags.setAccessibilityTraits)
     view.accessibilityTraits = accessibilityTraits;
@@ -1218,10 +1215,10 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
-  if (@available(iOS 11.0, *)) {
-    pendingState.accessibilityAttributedLabel = view.accessibilityAttributedLabel;
-    pendingState.accessibilityAttributedHint = view.accessibilityAttributedHint;
-    pendingState.accessibilityAttributedValue = view.accessibilityAttributedValue;
+  if (AS_AT_LEAST_IOS11) {
+    pendingState.accessibilityAttributedLabel = [view valueForKey: @"accessibilityAttributedLabel"];
+    pendingState.accessibilityAttributedHint = [view valueForKey: @"accessibilityAttributedHint"];
+    pendingState.accessibilityAttributedValue = [view valueForKey: @"accessibilityAttributedValue"];
   }
   pendingState.accessibilityTraits = view.accessibilityTraits;
   pendingState.accessibilityFrame = view.accessibilityFrame;
