@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Add attributed versions of a11y label, hint and value. [#554](https://github.com/TextureGroup/Texture/pull/554) [Alexander Hüllmandel](https://github.com/fruitcoder)
 - [ASCornerRounding] Introduce .cornerRoundingType: CALayer, Precomposited, or Clip Corners. [Scott Goodson](https://github.com/appleguy) [#465](https://github.com/TextureGroup/Texture/pull/465)
 - [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
 - [ASCollectionNode] Add -isProcessingUpdates and -onDidFinishProcessingUpdates: APIs. [#522](https://github.com/TextureGroup/Texture/pull/522) [Scott Goodson](https://github.com/appleguy)
