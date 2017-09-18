@@ -271,6 +271,27 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   return layout;
 }
 
+#pragma mark - Equality Checking
+
+- (BOOL)isEqual:(id)object
+{
+  ASLayout *layout = ASDynamicCast(object, ASLayout);
+  if (layout == nil) {
+    return NO;
+  }
+
+  if (!CGSizeEqualToSize(_size, layout.size)) return NO;
+  if (!CGPointEqualToPoint(_position, layout.position)) return NO;
+  if (_layoutElement != layout.layoutElement) return NO;
+
+  NSArray *sublayouts = layout.sublayouts;
+  if (sublayouts != _sublayouts && (sublayouts == nil || _sublayouts == nil || ![_sublayouts isEqual:sublayouts])) {
+    return NO;
+  }
+
+  return YES;
+}
+
 #pragma mark - Accessors
 
 - (ASLayoutElementType)type
