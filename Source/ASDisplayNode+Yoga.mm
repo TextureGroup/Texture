@@ -212,7 +212,7 @@
       parentSize.width = YGNodeLayoutGetWidth(parentNode);
       parentSize.height = YGNodeLayoutGetHeight(parentNode);
     }
-    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, ASSizeRangeUnconstrained, parentSize);
+    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, ASSizeRangeUnconstrained, parentSize, 0);
   }
 }
 
