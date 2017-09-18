@@ -138,7 +138,7 @@
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(cell.frame));
   XCTAssertEqual(pagerNode.contentOffset.y, 0);
-  XCTAssertEqual(pagerNode.view.contentInset.top, 0);
+  XCTAssertEqual(pagerNode.contentInset.top, 0);
   
   e = [self expectationWithDescription:@"Transition completed"];
   // Push another view controller
@@ -168,7 +168,7 @@
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(cell.frame));
   XCTAssertEqual(pagerNode.contentOffset.y, 0);
-  XCTAssertEqual(pagerNode.view.contentInset.top, 0);
+  XCTAssertEqual(pagerNode.contentInset.top, 0);
 }
 
 @end

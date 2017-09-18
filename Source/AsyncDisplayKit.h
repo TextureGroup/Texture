@@ -75,7 +75,6 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDimensionInternal.h>
-#import <AsyncDisplayKit/ASDimensionDeprecated.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
@@ -125,7 +124,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Tips.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 
 #import <AsyncDisplayKit/IGListAdapter+AsyncDisplayKit.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+IGListKitMethods.h>

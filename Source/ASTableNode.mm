@@ -43,6 +43,7 @@
 @property (nonatomic, assign) BOOL allowsMultipleSelectionDuringEditing;
 @property (nonatomic, assign) BOOL inverted;
 @property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (nonatomic, assign) UIEdgeInsets contentInset;
 @property (nonatomic, assign) CGPoint contentOffset;
 @property (nonatomic, assign) BOOL animatesContentOffset;
 @property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
@@ -60,6 +61,7 @@
     _allowsMultipleSelectionDuringEditing = NO;
     _inverted = NO;
     _leadingScreensForBatching = 2;
+    _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
     _automaticallyAdjustsContentOffset = NO;
@@ -113,17 +115,20 @@
 
   if (_pendingState) {
     _ASTablePendingState *pendingState = _pendingState;
-    self.pendingState    = nil;
-    view.asyncDelegate   = pendingState.delegate;
-    view.asyncDataSource = pendingState.dataSource;
-    view.inverted        = pendingState.inverted;
-    view.allowsSelection = pendingState.allowsSelection;
-    view.allowsSelectionDuringEditing = pendingState.allowsSelectionDuringEditing;
-    view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.asyncDelegate                        = pendingState.delegate;
+    view.asyncDataSource                      = pendingState.dataSource;
+    view.inverted                             = pendingState.inverted;
+    view.allowsSelection                      = pendingState.allowsSelection;
+    view.allowsSelectionDuringEditing         = pendingState.allowsSelectionDuringEditing;
+    view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
+    view.contentInset                         = pendingState.contentInset;
+    self.pendingState                         = nil;
+    
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
+
     [view setContentOffset:pendingState.contentOffset animated:pendingState.animatesContentOffset];
   }
 }
@@ -234,6 +239,27 @@
     return pendingState.leadingScreensForBatching;
   } else {
     return self.view.leadingScreensForBatching;
+  }
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.contentInset = contentInset;
+  } else {
+    ASDisplayNodeAssert(self.nodeLoaded, @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.contentInset = contentInset;
+  }
+}
+
+- (UIEdgeInsets)contentInset
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.contentInset;
+  } else {
+    return self.view.contentInset;
   }
 }
 
