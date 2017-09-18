@@ -218,8 +218,7 @@
 - (BOOL)sectionIndexIsValid:(NSInteger)section assert:(BOOL)assert
 {
   NSInteger sectionCount = _sectionsOfItems.count;
-  if (section >= sectionCount ||
-      section < 0) {
+  if (section >= sectionCount || section < 0) {
     if (assert) {
       ASDisplayNodeFailAssert(@"Invalid section index %zd when there are only %zd sections!", section, sectionCount);
     }
@@ -247,8 +246,7 @@
 
   NSInteger itemCount = _sectionsOfItems[section].count;
   NSInteger item = indexPath.item;
-  if (item >= itemCount ||
-      item < 0) {
+  if (item >= itemCount || item < 0) {
     if (assert) {
       ASDisplayNodeFailAssert(@"Invalid item index %zd in section %zd which only has %zd items!", item, section, itemCount);
     }
