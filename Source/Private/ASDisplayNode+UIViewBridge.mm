@@ -185,14 +185,30 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (CGFloat)cornerRadius
 {
-  _bridge_prologue_read;
-  return _getFromLayer(cornerRadius);
+  ASDN::MutexLocker l(__instanceLock__);
+  if (_cornerRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+    return self.layerCornerRadius;
+  } else {
+    return _cornerRadius;
+  }
 }
 
 - (void)setCornerRadius:(CGFloat)newCornerRadius
 {
-  _bridge_prologue_write;
-  _setToLayer(cornerRadius, newCornerRadius);
+  ASDN::MutexLocker l(__instanceLock__);
+  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
+}
+
+- (ASCornerRoundingType)cornerRoundingType
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _cornerRoundingType;
+}
+
+- (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRadius];
 }
 
 - (NSString *)contentsGravity
@@ -857,6 +873,21 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 @end
 
+@implementation ASDisplayNode (InternalPropertyBridge)
+
+- (CGFloat)layerCornerRadius
+{
+  _bridge_prologue_read;
+  return _getFromLayer(cornerRadius);
+}
+
+- (void)setLayerCornerRadius:(CGFloat)newLayerCornerRadius
+{
+  _bridge_prologue_write;
+  _setToLayer(cornerRadius, newLayerCornerRadius);
+}
+
+@end
 
 #pragma mark - UIViewBridgeAccessibility
 
