@@ -595,11 +595,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityLabel:(NSString *)newAccessibilityLabel
 {
-  if (accessibilityLabel != newAccessibilityLabel) {
+  if (![accessibilityLabel isEqualToString:newAccessibilityLabel]) {
     _flags.setAccessibilityLabel = YES;
     _flags.setAccessibilityAttributedLabel = YES;
     accessibilityLabel = [newAccessibilityLabel copy];
-    accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:[newAccessibilityLabel copy]];
+    accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:newAccessibilityLabel];
   }
 }
 
@@ -625,11 +625,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityHint:(NSString *)newAccessibilityHint
 {
-  if (accessibilityHint != newAccessibilityHint) {
+  if (![accessibilityHint isEqualToString:newAccessibilityHint]) {
     _flags.setAccessibilityHint = YES;
     _flags.setAccessibilityAttributedHint = YES;
     accessibilityHint = [newAccessibilityHint copy];
-    accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:[newAccessibilityHint copy]];
+    accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:newAccessibilityHint];
   }
 }
 
@@ -640,7 +640,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityAttributedHint:(NSAttributedString *)newAccessibilityAttributedHint
 {
-  if (accessibilityAttributedHint != newAccessibilityAttributedHint) {
+  if (![accessibilityAttributedHint isEqual:newAccessibilityAttributedHint]) {
     _flags.setAccessibilityAttributedHint = YES;
     _flags.setAccessibilityHint = YES;
     accessibilityAttributedHint = [newAccessibilityAttributedHint copy];
@@ -655,11 +655,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityValue:(NSString *)newAccessibilityValue
 {
-  if (accessibilityValue != newAccessibilityValue) {
+  if (![accessibilityValue isEqualToString:newAccessibilityValue]) {
     _flags.setAccessibilityValue = YES;
     _flags.setAccessibilityAttributedValue = YES;
     accessibilityValue = [newAccessibilityValue copy];
-    accessibilityAttributedValue = [[NSAttributedString alloc] initWithString: [newAccessibilityValue copy]];
+    accessibilityAttributedValue = [[NSAttributedString alloc] initWithString:newAccessibilityValue];
   }
 }
 
