@@ -912,13 +912,8 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
   if (AS_AT_LEAST_IOS11) {
-    _accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:accessibilityLabel];
-    BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-    if (shouldApply) {
-      [_view setValue: [[NSAttributedString alloc] initWithString:accessibilityLabel] forKey:@"accessibilityAttributedLabel"];
-    } else {
-      [ASDisplayNodeGetPendingState(self) setValue: [[NSAttributedString alloc] initWithString:accessibilityLabel] forKey:@"accessibilityAttributedLabel"];
-    }
+    NSAttributedString *accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:accessibilityLabel];
+    _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, @"accessibilityAttributedLabel", accessibilityAttributedLabel);
   }
 }
 
@@ -932,7 +927,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
 {
   _bridge_prologue_write;
   { _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, @"accessibilityAttributedLabel", accessibilityAttributedLabel); }
-  { _setAttributedAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityAttributedLabel.string, @"accessibilityLabel", accessibilityAttributedLabel.string); }
+  { _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityAttributedLabel.string, accessibilityLabel, accessibilityAttributedLabel.string); }
 }
 
 - (NSString *)accessibilityHint
@@ -946,7 +941,8 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
   if (AS_AT_LEAST_IOS11) {
-    _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedHint, [[NSAttributedString alloc] initWithString:accessibilityHint], @"accessibilityAttributedHint", [[NSAttributedString alloc] initWithString:accessibilityHint]);
+    NSAttributedString *accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:accessibilityHint];
+    _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, @"accessibilityAttributedHint", accessibilityAttributedHint);
   }
 }
 
@@ -960,7 +956,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
 {
   _bridge_prologue_write;
   { _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, @"accessibilityAttributedHint", accessibilityAttributedHint); }
-  { _setAttributedAccessibilityToViewAndProperty(_accessibilityHint, accessibilityAttributedHint.string, @"accessibilityHint", accessibilityAttributedHint.string); }
+  { _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityAttributedHint.string, accessibilityHint, accessibilityAttributedHint.string); }
 }
 
 - (NSString *)accessibilityValue
@@ -974,7 +970,8 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
   if (AS_AT_LEAST_IOS11) {
-    _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedValue, [[NSAttributedString alloc] initWithString:accessibilityValue], @"accessibilityAttributedValue", [[NSAttributedString alloc] initWithString:accessibilityValue]);
+    NSAttributedString *accessibilityAttributedValue = [[NSAttributedString alloc] initWithString:accessibilityValue];
+    _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, @"accessibilityAttributedValue", accessibilityAttributedValue);
   }
 }
 
@@ -988,7 +985,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
 {
   _bridge_prologue_write;
   { _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, @"accessibilityAttributedValue", accessibilityAttributedValue); }
-  { _setAttributedAccessibilityToViewAndProperty(_accessibilityValue, accessibilityAttributedValue.string, @"accessibilityValue", accessibilityAttributedValue.string); }
+  { _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityAttributedValue.string, accessibilityValue, accessibilityAttributedValue.string); }
 }
 
 - (UIAccessibilityTraits)accessibilityTraits
