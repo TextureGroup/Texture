@@ -2,13 +2,30 @@
 
 * Add your own contributions to the next release on the line below this with your name.
 - [ASCornerRounding] Introduce .cornerRoundingType: CALayer, Precomposited, or Clip Corners. [Scott Goodson](https://github.com/appleguy) [#465](https://github.com/TextureGroup/Texture/pull/465)
+- [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
+- [ASCollectionNode] Add -isProcessingUpdates and -onDidFinishProcessingUpdates: APIs. [#522](https://github.com/TextureGroup/Texture/pull/522) [Scott Goodson](https://github.com/appleguy)
+- [Accessibility] Add .isAccessibilityContainer property, allowing automatic aggregation of children's a11y labels. [#468][Scott Goodson](https://github.com/appleguy)
+- [ASImageNode] Enabled .clipsToBounds by default, fixing the use of .cornerRadius and clipping of GIFs. [Scott Goodson](https://github.com/appleguy) [#466](https://github.com/TextureGroup/Texture/pull/466)
 - Fix an issue in layout transition that causes it to unexpectedly use the old layout [Huy Nguyen](https://github.com/nguyenhuy) [#464](https://github.com/TextureGroup/Texture/pull/464)
 - Add -[ASDisplayNode detailedLayoutDescription] property to aid debugging. [Adlai Holler](https://github.com/Adlai-Holler) [#476](https://github.com/TextureGroup/Texture/pull/476)
 - Fix an issue that causes calculatedLayoutDidChange being called needlessly. [Huy Nguyen](https://github.com/nguyenhuy) [#490](https://github.com/TextureGroup/Texture/pull/490)
 - Negate iOS 11 automatic estimated table row heights. [Christian Selig](https://github.com/christianselig) [#485](https://github.com/TextureGroup/Texture/pull/485)
-- [Breaking] Add content offset bridging property to ASTableNode and ASCollectionNode. Deprecate related methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460)
+- Add content inset and offset bridging properties to ASTableNode and ASCollectionNode. Deprecate related properties and methods in ASTableView and ASCollectionView [Huy Nguyen](https://github.com/nguyenhuy) [#460](https://github.com/TextureGroup/Texture/pull/460) [#560](https://github.com/TextureGroup/Texture/pull/560)
 - Remove re-entrant access to self.view when applying initial pending state. [Adlai Holler](https://github.com/Adlai-Holler) [#510](https://github.com/TextureGroup/Texture/pull/510)
-- Small improvements in ASCollectionLayout [Huy Nguyen](https://github.com/nguyenhuy) [#509](https://github.com/TextureGroup/Texture/pull/509) [#513](https://github.com/TextureGroup/Texture/pull/513)
+- Small improvements in ASCollectionLayout [Huy Nguyen](https://github.com/nguyenhuy) [#509](https://github.com/TextureGroup/Texture/pull/509) [#513](https://github.com/TextureGroup/Texture/pull/513) [#562]((https://github.com/TextureGroup/Texture/pull/562)
+- Fix retain cycle between ASImageNode and PINAnimatedImage [Phil Larson](https://github.com/plarson) [#520](https://github.com/TextureGroup/Texture/pull/520)
+- Change the API for disabling logging from a compiler flag to a runtime C function ASDisableLogging().  [Adlai Holler](https://github.com/Adlai-Holler) [#528](https://github.com/TextureGroup/Texture/pull/528)
+- Table and collection views to consider content inset when calculating (default) element size range [Huy Nguyen](https://github.com/nguyenhuy) [#525](https://github.com/TextureGroup/Texture/pull/525)
+- [ASEditableTextNode] added -editableTextNodeShouldBeginEditing to ASEditableTextNodeDelegate to mirror the corresponding method from UITextViewDelegate. [Yan S.](https://github.com/yans) [#535](https://github.com/TextureGroup/Texture/pull/535)
+- [Breaking] Remove APIs that have been deprecated since 2.0 and/or for at least 6 months [Huy Nguyen](https://github.com/nguyenhuy) [#529](https://github.com/TextureGroup/Texture/pull/529)
+- [ASDisplayNode] Ensure `-displayWillStartAsynchronously:` and `-displayDidFinish` are invoked on rasterized subnodes.  [Eric Scheers](https://github.com/smeis) [#532](https://github.com/TextureGroup/Texture/pull/532)
+- Fixed a memory corruption issue in the ASImageNode display system. [Adlai Holler](https://github.com/Adlai-Holler) [#555](https://github.com/TextureGroup/Texture/pull/555)
+- [Breaking] Rename ASCollectionGalleryLayoutSizeProviding to ASCollectionGalleryLayoutPropertiesProviding. Besides a fixed item size, it now can provide interitem and line spacings, as well as section inset [Huy Nguyen](https://github.com/nguyenhuy) [#496](https://github.com/TextureGroup/Texture/pull/496) [#533](https://github.com/TextureGroup/Texture/pull/533)
+- Deprecate `-[ASDisplayNode displayWillStart]` in favor of `-displayWillStartAsynchronously:` [Huy Nguyen](https://github.com/nguyenhuy) [#536](https:/
+/github.com/TextureGroup/Texture/pull/536)
+- Add support for URLs on ASNetworkImageNode. [Garrett Moon](https://github.com/garrettmoon)
+- [ASImageNode] Always dealloc images in a background queue [Huy Nguyen](https://github.com/nguyenhuy) [#561](https://github.com/TextureGroup/Texture/pull/561)
+- Mark ASRunLoopQueue as drained if it contains only NULLs [Cesar Estebanez](https://github.com/cesteban) [#558](https://github.com/TextureGroup/Texture/pull/558)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)

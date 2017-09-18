@@ -45,7 +45,7 @@ Pod::Spec.new do |spec|
   end
   
   spec.subspec 'PINRemoteImage' do |pin|
-      pin.dependency 'PINRemoteImage/iOS', '= 3.0.0-beta.11'
+      pin.dependency 'PINRemoteImage/iOS', '= 3.0.0-beta.12'
       pin.dependency 'PINRemoteImage/PINCache'
       pin.dependency 'Texture/Core'
   end
@@ -57,7 +57,7 @@ Pod::Spec.new do |spec|
 
   spec.subspec 'Yoga' do |yoga|
       yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
-      yoga.dependency 'Yoga', '1.5.0'
+      yoga.dependency 'Yoga', '1.6.0'
       yoga.dependency 'Texture/Core'
   end
 

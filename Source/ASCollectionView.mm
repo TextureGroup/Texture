@@ -359,6 +359,16 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [_dataController relayoutAllNodes];
 }
 
+- (BOOL)isProcessingUpdates
+{
+  return [_dataController isProcessingUpdates];
+}
+
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+{
+  [_dataController onDidFinishProcessingUpdates:completion];
+}
+
 - (void)waitUntilAllUpdatesAreCommitted
 {
   ASDisplayNodeAssertMainThread();
@@ -367,8 +377,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     //    ASDisplayNodeFailAssert(@"Should not call %@ during batch update", NSStringFromSelector(_cmd));
     return;
   }
-  
-  [_dataController waitUntilAllUpdatesAreCommitted];
+
+  [_dataController waitUntilAllUpdatesAreProcessed];
 }
 
 - (void)setDataSource:(id<UICollectionViewDataSource>)dataSource
@@ -1536,10 +1546,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
   return [self.layoutInspector scrollableDirections];
 }
 
-- (ASScrollDirection)flowLayoutScrollableDirections:(UICollectionViewFlowLayout *)flowLayout {
-  return (flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal) ? ASScrollDirectionHorizontalDirections : ASScrollDirectionVerticalDirections;
-}
-
 - (void)layoutSubviews
 {
   if (_cellsForLayoutUpdates.count > 0) {
@@ -2197,7 +2203,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
 
   if (changedInNonScrollingDirection) {
     [_dataController relayoutAllNodes];
-    [_dataController waitUntilAllUpdatesAreCommitted];
+    [_dataController waitUntilAllUpdatesAreProcessed];
     // We need to ensure the size requery is done before we update our layout.
     [self.collectionViewLayout invalidateLayout];
   }
