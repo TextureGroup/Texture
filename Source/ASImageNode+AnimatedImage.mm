@@ -66,13 +66,12 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
       };
     }
     
+    animatedImage.playbackReadyCallback = ^{
+      // In this case the lock is already gone we have to call the unlocked version therefore
+      [weakSelf setShouldAnimate:YES];
+    };
     if (animatedImage.playbackReady) {
       [self _locked_setShouldAnimate:YES];
-    } else {
-      animatedImage.playbackReadyCallback = ^{
-        // In this case the lock is already gone we have to call the unlocked version therefore
-        [weakSelf setShouldAnimate:YES];
-      };
     }
   }
   
@@ -218,11 +217,13 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   NSLog(@"starting animation: %p", self);
 #endif
 
+  // Get frame interval before holding display link lock to avoid deadlock
+  NSUInteger frameInterval = self.animatedImage.frameInterval;
   ASDN::MutexLocker l(_displayLinkLock);
   if (_displayLink == nil) {
     _playHead = 0;
     _displayLink = [CADisplayLink displayLinkWithTarget:[ASWeakProxy weakProxyWithTarget:self] selector:@selector(displayLinkFired:)];
-    _displayLink.frameInterval = self.animatedImage.frameInterval;
+    _displayLink.frameInterval = frameInterval;
     
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
   } else {
@@ -263,7 +264,9 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   if (self.animatedImage.coverImageReady) {
     [self setCoverImage:self.animatedImage.coverImage];
   }
-  [self startAnimating];
+  if (self.animatedImage.playbackReady) {
+    [self startAnimating];
+  }
 }
 
 - (void)didExitVisibleState
