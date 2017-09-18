@@ -24,7 +24,6 @@
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
@@ -111,6 +110,10 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL hasPreloaded;
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
+
+@property (nonatomic, assign) NSUInteger displayWillStartCount;
+@property (nonatomic, assign) NSUInteger didDisplayCount;
+
 @end
 
 @interface ASTestResponderNode : ASTestDisplayNode
@@ -153,6 +156,18 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   if (_willDeallocBlock) {
     _willDeallocBlock(self);
   }
+}
+
+- (void)displayDidFinish
+{
+  [super displayDidFinish];
+  _didDisplayCount++;
+}
+
+- (void)displayWillStartAsynchronously:(BOOL)asynchronously
+{
+  [super displayWillStartAsynchronously:asynchronously];
+  _displayWillStartCount++;
 }
 
 @end
@@ -2019,6 +2034,39 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertThrows([rasterizedSupernode addSubnode:subnode]);
 }
 
+- (void)testThatSubnodesGetDisplayUpdatesIfRasterized
+{
+  ASTestDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
+  supernode.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
+  [supernode enableSubtreeRasterization];
+  
+  ASTestDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
+  ASTestDisplayNode *subSubnode = [[ASTestDisplayNode alloc] init];
+  
+  ASSetDebugNames(supernode, subnode);
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [subnode addSubnode:subSubnode];
+  [supernode addSubnode:subnode];
+  [window addSubnode:supernode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.didDisplayCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subnode.displayWillStartCount == 1);
+  }));
+  
+  XCTAssertTrue(ASDisplayNodeRunRunLoopUntilBlockIsTrue(^BOOL{
+    return (subSubnode.displayWillStartCount == 1);
+  }));
+}
+
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2011
 - (void)testThatLayerBackedSubnodesAreMarkedInvisibleBeforeDeallocWhenSupernodesViewIsRemovedFromHierarchyWhileBeingRetained
 {
@@ -2126,27 +2174,6 @@ static bool stringContainsPointer(NSString *description, id p) {
   [node view];
   NSArray *expected = @[ @0, @1, @2 ];
   XCTAssertEqualObjects(calls, expected);
-}
-
-- (void)testPreferredFrameSizeDeprecated
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-
-  ASDisplayNode *node = [ASDisplayNode new];
-  
-  // Default auto preferred frame size will be CGSizeZero
-  XCTAssert(CGSizeEqualToSize(node.preferredFrameSize, CGSizeZero));
-  
-  // Set a specific preferredFrameSize
-  node.preferredFrameSize = CGSizeMake(100, 100);
-  ASXCTAssertEqualSizes(node.preferredFrameSize, CGSizeMake(100, 100));
-  
-  // CGSizeZero should be returned if width or height is not of unit type points
-  node.style.width = ASDimensionMakeWithFraction(0.5);
-  ASXCTAssertEqualSizes(node.preferredFrameSize, CGSizeZero);
-  
-#pragma clang diagnostic pop
 }
 
 - (void)testSettingPropertiesViaStyllableProtocol

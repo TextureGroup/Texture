@@ -61,20 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @protocol ASPagerDelegate <ASCollectionDelegate>
-
-@optional
-
-/**
- * Provides the constrained size range for measuring the node at the index.
- *
- * @param pagerNode The sender.
- * @param index The index of the node.
- * @return A constrained size range for layout the node at this index.
- */
-- (ASSizeRange)pagerNode:(ASPagerNode *)pagerNode constrainedSizeForNodeAtIndex:(NSInteger)index ASDISPLAYNODE_DEPRECATED_MSG("Pages in a pager node should be the exact size of the collection node (default behavior).");
-
 @end
 
+/**
+ * A horizontal, paging collection node.
+ */
 @interface ASPagerNode : ASCollectionNode
 
 /**
@@ -84,6 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Initializer with custom-configured flow layout properties.
+ *
+ * NOTE: The flow layout must have a horizontal scroll direction.
  */
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 

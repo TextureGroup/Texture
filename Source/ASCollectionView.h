@@ -142,6 +142,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL zeroContentInsets ASDISPLAYNODE_DEPRECATED_MSG("Set automaticallyAdjustsScrollViewInsets=NO on your view controller instead.");
 
 /**
+ * The distance that the content view is inset from the collection view edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead");
+
+/**
  * The point at which the origin of the content view is offset from the origin of the collection view.
  */
 @property (nonatomic, assign) CGPoint contentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
@@ -281,14 +286,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData AS_UNAVAILABLE("Use ASCollectionNode method instead.");
 
 /**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version and will block the main thread
- * while all the cells load.
- */
-- (void)reloadDataImmediately AS_UNAVAILABLE("Use ASCollectionNode method instead.");
-
-/**
  * Triggers a relayout of all nodes.
  *
  * @discussion This method invalidates and lays out every cell node in the collection.
@@ -296,9 +293,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)relayoutItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
 
 /**
- *  Blocks execution of the main thread until all section and row updates are committed. This method must be called from the main thread.
+ * See ASCollectionNode.h for full documentation of these methods.
  */
-- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASCollectionNode waitUntilAllUpdatesAreProcessed] instead.");
 
 /**
  * Registers the given kind of supplementary node for use in creating node-backed supplementary views.

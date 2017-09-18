@@ -62,19 +62,6 @@ typedef struct {
 @interface ASDisplayNode (Beta)
 
 /**
- * ASTableView and ASCollectionView now throw exceptions on invalid updates
- * like their UIKit counterparts. If YES, these classes will log messages
- * on invalid updates rather than throwing exceptions.
- *
- * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
- * as it proceeds with an invalid update.
- *
- * This property defaults to NO. It will be removed in a future release.
- */
-+ (BOOL)suppressesInvalidCollectionUpdateExceptions AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
-+ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
-
-/**
  * @abstract Recursively ensures node and all subnodes are displayed.
  * @see Full documentation in ASDisplayNode+FrameworkPrivate.h
  */
