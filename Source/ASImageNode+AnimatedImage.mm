@@ -307,7 +307,6 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   CGImageRef frameImage = [self.animatedImage imageAtIndex:frameIndex];
   
   if (frameImage == nil) {
-    _playHead -= timeBetweenLastFire;
     //Pause the display link until we get a file ready notification
     displayLink.paused = YES;
     self.lastDisplayLinkFire = 0;
