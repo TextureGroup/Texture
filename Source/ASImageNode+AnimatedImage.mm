@@ -286,6 +286,8 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   CFTimeInterval timeBetweenLastFire;
   if (self.lastDisplayLinkFire == 0) {
     timeBetweenLastFire = 0;
+  } else if (AS_AT_LEAST_IOS10){
+    timeBetweenLastFire = displayLink.targetTimestamp - displayLink.timestamp;
   } else {
     timeBetweenLastFire = CACurrentMediaTime() - self.lastDisplayLinkFire;
   }
@@ -294,7 +296,8 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   _playHead += timeBetweenLastFire;
   
   while (_playHead > self.animatedImage.totalDuration) {
-    _playHead -= self.animatedImage.totalDuration;
+      // Set playhead to zero to keep from showing different frames on different playthroughs
+    _playHead = 0;
     _playedLoops++;
   }
   
