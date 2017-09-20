@@ -1384,7 +1384,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-static ASDN::Mutex _experimentLock;
+static ASDN::StaticMutex _experimentLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
 static ASTextNodeExperimentOptions _experimentOptions;
 static BOOL _hasAllocatedNode;
 
@@ -1392,34 +1392,34 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDN::MutexLocker lock(_experimentLock);
-    
-    // They must call this before allocating any text nodes.
-    ASDisplayNodeAssertFalse(_hasAllocatedNode);
-    
-    _experimentOptions = options;
-    
-    // Set superclass of all subclasses to ASTextNode2
-    if (options & ASTextNodeExperimentSubclasses) {
-      unsigned int classCount;
-      Class originalClass = [ASTextNode class];
-      Class newClass = [ASTextNode2 class];
-      Class *classes = objc_copyClassList(&classCount);
-      for (int i = 0; i < classCount; i++) {
-        Class c = classes[i];
-        if (class_getSuperclass(c) == originalClass) {
+    _experimentLock.lock();
+      // They must call this before allocating any text nodes.
+      ASDisplayNodeAssertFalse(_hasAllocatedNode);
+
+      _experimentOptions = options;
+
+      // Set superclass of all subclasses to ASTextNode2
+      if (options & ASTextNodeExperimentSubclasses) {
+        unsigned int classCount;
+        Class originalClass = [ASTextNode class];
+        Class newClass = [ASTextNode2 class];
+        Class *classes = objc_copyClassList(&classCount);
+        for (int i = 0; i < classCount; i++) {
+          Class c = classes[i];
+          if (class_getSuperclass(c) == originalClass) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-          class_setSuperclass(c, newClass);
+            class_setSuperclass(c, newClass);
 #pragma clang diagnostic pop
+          }
         }
+        free(classes);
       }
-      free(classes);
-    }
     
-    if (options & ASTextNodeExperimentDebugging) {
-      [ASTextNode2 enableDebugging];
-    }
+      if (options & ASTextNodeExperimentDebugging) {
+        [ASTextNode2 enableDebugging];
+      }
+    _experimentLock.unlock(); // Ignoring unlock failure
   });
 }
 
@@ -1427,8 +1427,9 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDN::MutexLocker lock(_experimentLock);
-    _hasAllocatedNode = YES;
+    _experimentLock.lock();
+      _hasAllocatedNode = YES;
+    _experimentLock.unlock(); // Ignoring unlock failure
   });
   
   // All instances || (random instances && rand() != 0)

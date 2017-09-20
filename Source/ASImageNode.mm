@@ -442,31 +442,48 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
-static ASDN::Mutex cacheLock;
+static ASDN::StaticMutex cacheLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
 
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  {
-    ASDN::MutexLocker l(cacheLock);
+  cacheLock.lock();
     if (!cache) {
       cache = [[ASWeakMap alloc] init];
     }
     ASWeakMapEntry *entry = [cache entryForKey:key];
-    if (entry != nil) {
-      return entry;
-    }
-  }
+  int unlockCode = cacheLock.unlock();
 
+  if (unlockCode != 0) {
+    // Failed to unlock cacheLock static mutex.
+    // Since the mutex was locked just a few lines above, this usually means there is a race condition going on.
+    // The race condition occurs when a static mutex is being destroyed as part of an app exit on main thread,
+    // and, at the same time, being used here on another thread.
+    // See https://github.com/TextureGroup/Texture/issues/136.
+    //
+    // Return nil here to signal that this operation should be cancelled.
+    return nil;
+  }
+  
+  if (entry != nil) {
+    return entry;
+  }
+  
   // cache miss
   UIImage *contents = [self createContentsForkey:key drawParameters:drawParameters isCancelled:isCancelled];
   if (contents == nil) { // If nil, we were cancelled
     return nil;
   }
 
-  {
-    ASDN::MutexLocker l(cacheLock);
-    return [cache setObject:contents forKey:key];
+  cacheLock.lock();
+    entry = [cache setObject:contents forKey:key];
+  unlockCode = cacheLock.unlock();
+
+  if (unlockCode != 0) {
+    // Same as above, return nil if fail to unlock.
+    return nil;
   }
+
+  return entry;
 }
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled

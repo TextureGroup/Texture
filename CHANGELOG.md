@@ -27,6 +27,7 @@
 - Add support for URLs on ASNetworkImageNode. [Garrett Moon](https://github.com/garrettmoon)
 - [ASImageNode] Always dealloc images in a background queue [Huy Nguyen](https://github.com/nguyenhuy) [#561](https://github.com/TextureGroup/Texture/pull/561)
 - Mark ASRunLoopQueue as drained if it contains only NULLs [Cesar Estebanez](https://github.com/cesteban) [#558](https://github.com/TextureGroup/Texture/pull/558)
+- Fix crashes caused by failing to unlock or destroy a static mutex while the app is being terminated [Huy Nguyen](https://github.com/nguyenhuy)
 
 ##2.4
 - Fix an issue where inserting/deleting sections could lead to inconsistent supplementary element behavior. [Adlai Holler](https://github.com/Adlai-Holler)

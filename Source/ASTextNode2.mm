@@ -376,7 +376,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
                                            text:(NSAttributedString *)text
 
 {
-  static ASDN::Mutex layoutCacheLock;
+  static ASDN::StaticMutex layoutCacheLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
   static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
@@ -384,12 +384,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   });
   
   ASTextCacheValue *cacheValue = ({
-    ASDN::MutexLocker lock(layoutCacheLock);
-    cacheValue = [textLayoutCache objectForKey:text];
-    if (cacheValue == nil) {
-      cacheValue = [[ASTextCacheValue alloc] init];
-      [textLayoutCache setObject:cacheValue forKey:text];
-    }
+    layoutCacheLock.lock();
+      cacheValue = [textLayoutCache objectForKey:text];
+      if (cacheValue == nil) {
+        cacheValue = [[ASTextCacheValue alloc] init];
+        [textLayoutCache setObject:cacheValue forKey:text];
+      }
+    layoutCacheLock.unlock(); // Ignoring unlock failure. Maybe bail early and return nil instead?
+
     cacheValue;
   });
   

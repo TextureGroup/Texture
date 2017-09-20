@@ -314,8 +314,19 @@ namespace ASDN {
       ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_lock (this->mutex()));
     }
 
-    void unlock () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_unlock (this->mutex()));
+    /**
+     Unlocks this mutex.
+
+     This method calls pthread_mutex_unlock() internally and returns its result.
+     Clients are expected to handle errors themselves.
+
+     Because of this behavior, StaticMutexLocker and StaticMutexUnlocker are not (and should not be) provided.
+
+     For more information, see https://github.com/TextureGroup/Texture/issues/136 and
+     https://www.ibm.com/support/knowledgecenter/en/ssw_i5_54/apis/users_65.htm
+     */
+    int unlock () {
+      return pthread_mutex_unlock (this->mutex());
     }
 
     pthread_mutex_t *mutex () { return &_m; }
@@ -323,9 +334,6 @@ namespace ASDN {
     StaticMutex(const StaticMutex&) = delete;
     StaticMutex &operator=(const StaticMutex&) = delete;
   };
-
-  typedef Locker<StaticMutex> StaticMutexLocker;
-  typedef Unlocker<StaticMutex> StaticMutexUnlocker;
 
   struct Condition
   {

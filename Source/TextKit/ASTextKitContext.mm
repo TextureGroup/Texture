@@ -40,8 +40,8 @@
 {
   if (self = [super init]) {
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    static ASDN::Mutex __staticMutex;
-    ASDN::MutexLocker l(__staticMutex);
+    static ASDN::StaticMutex __staticMutex = ASDISPLAYNODE_MUTEX_INITIALIZER;
+    __staticMutex.lock();
     
     __instanceLock__ = std::make_shared<ASDN::Mutex>();
     
@@ -65,6 +65,18 @@
     _textContainer.maximumNumberOfLines = maximumNumberOfLines;
     _textContainer.exclusionPaths = exclusionPaths;
     [_layoutManager addTextContainer:_textContainer];
+
+    if (__staticMutex.unlock() != 0) {
+      // Failed to unlock __staticMutex
+      // Since the mutex was locked at the beginninng of this method, the failure usually means there is a race condition going on.
+      // The race condition occurs when a static mutex is being destroyed as part of an app exit on main thread,
+      // and, at the same time, being used here on another thread.
+      // See https://github.com/TextureGroup/Texture/issues/136.
+      //
+      // Return nil here to signal that this initialization should not be done in the first place,
+      // and to ensure that `self` won't be used later.
+      return nil;
+    }
   }
   return self;
 }
