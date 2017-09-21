@@ -15,11 +15,9 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface ASBasicImageDownloaderContext : NSObject
 
-+ (nullable ASBasicImageDownloaderContext *)contextForURL:(NSURL *)URL;
++ (ASBasicImageDownloaderContext *)contextForURL:(NSURL *)URL;
 
 @property (nonatomic, strong, readonly) NSURL *URL;
 @property (nonatomic, weak) NSURLSessionTask *sessionTask;
@@ -28,5 +26,3 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cancel;
 
 @end
-
-NS_ASSUME_NONNULL_END

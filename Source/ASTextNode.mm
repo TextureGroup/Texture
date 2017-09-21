@@ -1384,7 +1384,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-static ASDN::StaticMutex _experimentLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
+// Allocate _experimentLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
+static ASDN::StaticMutex& _experimentLock = *new ASDN::StaticMutex;
 static ASTextNodeExperimentOptions _experimentOptions;
 static BOOL _hasAllocatedNode;
 
@@ -1392,34 +1393,34 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    _experimentLock.lock();
-      // They must call this before allocating any text nodes.
-      ASDisplayNodeAssertFalse(_hasAllocatedNode);
-
-      _experimentOptions = options;
-
-      // Set superclass of all subclasses to ASTextNode2
-      if (options & ASTextNodeExperimentSubclasses) {
-        unsigned int classCount;
-        Class originalClass = [ASTextNode class];
-        Class newClass = [ASTextNode2 class];
-        Class *classes = objc_copyClassList(&classCount);
-        for (int i = 0; i < classCount; i++) {
-          Class c = classes[i];
-          if (class_getSuperclass(c) == originalClass) {
+    ASDN::StaticMutexLocker lock(_experimentLock);
+    
+    // They must call this before allocating any text nodes.
+    ASDisplayNodeAssertFalse(_hasAllocatedNode);
+    
+    _experimentOptions = options;
+    
+    // Set superclass of all subclasses to ASTextNode2
+    if (options & ASTextNodeExperimentSubclasses) {
+      unsigned int classCount;
+      Class originalClass = [ASTextNode class];
+      Class newClass = [ASTextNode2 class];
+      Class *classes = objc_copyClassList(&classCount);
+      for (int i = 0; i < classCount; i++) {
+        Class c = classes[i];
+        if (class_getSuperclass(c) == originalClass) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            class_setSuperclass(c, newClass);
+          class_setSuperclass(c, newClass);
 #pragma clang diagnostic pop
-          }
         }
-        free(classes);
       }
+      free(classes);
+    }
     
-      if (options & ASTextNodeExperimentDebugging) {
-        [ASTextNode2 enableDebugging];
-      }
-    _experimentLock.unlock(); // Ignoring unlock failure
+    if (options & ASTextNodeExperimentDebugging) {
+      [ASTextNode2 enableDebugging];
+    }
   });
 }
 
@@ -1427,9 +1428,8 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    _experimentLock.lock();
-      _hasAllocatedNode = YES;
-    _experimentLock.unlock(); // Ignoring unlock failure
+    ASDN::StaticMutexLocker lock(_experimentLock);
+    _hasAllocatedNode = YES;
   });
   
   // All instances || (random instances && rand() != 0)

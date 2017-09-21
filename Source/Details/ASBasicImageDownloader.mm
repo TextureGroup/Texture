@@ -46,42 +46,29 @@ NSString * const kASBasicImageDownloaderContextCompletionBlock = @"kASBasicImage
 @implementation ASBasicImageDownloaderContext
 
 static NSMutableDictionary *currentRequests = nil;
-static ASDN::StaticMutex currentRequestsLock = ASDISPLAYNODE_MUTEX_INITIALIZER;
+// Allocate currentRequestsLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
+static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
 
 + (ASBasicImageDownloaderContext *)contextForURL:(NSURL *)URL
 {
-  currentRequestsLock.lock();
-    if (!currentRequests) {
-      currentRequests = [[NSMutableDictionary alloc] init];
-    }
-    ASBasicImageDownloaderContext *context = currentRequests[URL];
-    if (!context) {
-      context = [[ASBasicImageDownloaderContext alloc] initWithURL:URL];
-      currentRequests[URL] = context;
-    }
-  int unlockCode = currentRequestsLock.unlock();
-
-  if (unlockCode != 0) {
-    // Failed to unlock currentRequestsLock static mutex.
-    // Since the mutex was locked just a few lines above, this usually means there is a race condition going on.
-    // The race condition occurs when a static mutex is being destroyed as part of an app exit on main thread,
-    // and, at the same time, being used here on another thread.
-    // See https://github.com/TextureGroup/Texture/issues/136.
-    //
-    // Return nil here to signal that the image should not be loaded.
-    return nil;
+  ASDN::StaticMutexLocker l(currentRequestsLock);
+  if (!currentRequests) {
+    currentRequests = [[NSMutableDictionary alloc] init];
   }
-
+  ASBasicImageDownloaderContext *context = currentRequests[URL];
+  if (!context) {
+    context = [[ASBasicImageDownloaderContext alloc] initWithURL:URL];
+    currentRequests[URL] = context;
+  }
   return context;
 }
 
 + (void)cancelContextWithURL:(NSURL *)URL
 {
-  currentRequestsLock.lock();
-    if (currentRequests) {
-      [currentRequests removeObjectForKey:URL];
-    }
-  currentRequestsLock.unlock(); // Ignoring unlock failure
+  ASDN::StaticMutexLocker l(currentRequestsLock);
+  if (currentRequests) {
+    [currentRequests removeObjectForKey:URL];
+  }
 }
 
 - (instancetype)initWithURL:(NSURL *)URL
@@ -248,14 +235,11 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 #pragma mark ASImageDownloaderProtocol.
 
 - (id)downloadImageWithURL:(NSURL *)URL
-             callbackQueue:(dispatch_queue_t)callbackQueue
-          downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
-                completion:(ASImageDownloaderCompletion)completion
+                      callbackQueue:(dispatch_queue_t)callbackQueue
+                   downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
+                         completion:(ASImageDownloaderCompletion)completion
 {
   ASBasicImageDownloaderContext *context = [ASBasicImageDownloaderContext contextForURL:URL];
-  if (context == nil) {
-    return nil;
-  }
 
   // NSURLSessionDownloadTask will do file I/O to create a temp directory. If called on the main thread this will
   // cause significant performance issues.

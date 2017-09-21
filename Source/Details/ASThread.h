@@ -52,12 +52,6 @@ static inline BOOL ASDisplayNodeThreadIsMain()
 
 #include <memory>
 
-/**
- For use with ASDN::StaticMutex only.
- */
-#define ASDISPLAYNODE_MUTEX_INITIALIZER {PTHREAD_MUTEX_INITIALIZER}
-#define ASDISPLAYNODE_MUTEX_RECURSIVE_INITIALIZER {PTHREAD_RECURSIVE_MUTEX_INITIALIZER}
-
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
 // evaluation of x_ can be compiled out.)
@@ -297,43 +291,36 @@ namespace ASDN {
   typedef SharedUnlocker<Mutex> MutexSharedUnlocker;
 
   /**
-   If you are creating a static mutex, use StaticMutex and specify its default value as one of ASDISPLAYNODE_MUTEX_INITIALIZER
-   or ASDISPLAYNODE_MUTEX_RECURSIVE_INITIALIZER. This avoids expensive constructor overhead at startup (or worse, ordering
+   If you are creating a static mutex, use StaticMutex. This avoids expensive constructor overhead at startup (or worse, ordering
    issues between different static objects). It also avoids running a destructor on app exit time (needless expense).
 
    Note that you can, but should not, use StaticMutex for non-static objects. It will leak its mutex on destruction,
    so avoid that!
-
-   If you fail to specify a default value (like ASDISPLAYNODE_MUTEX_INITIALIZER) an assert will be thrown when you attempt to lock.
    */
   struct StaticMutex
   {
-    pthread_mutex_t _m; // public so it can be provided by ASDISPLAYNODE_MUTEX_INITIALIZER and friends
+    StaticMutex () : _m (PTHREAD_MUTEX_INITIALIZER) {}
+
+    // non-copyable.
+    StaticMutex(const StaticMutex&) = delete;
+    StaticMutex &operator=(const StaticMutex&) = delete;
 
     void lock () {
       ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_lock (this->mutex()));
     }
 
-    /**
-     Unlocks this mutex.
-
-     This method calls pthread_mutex_unlock() internally and returns its result.
-     Clients are expected to handle errors themselves.
-
-     Because of this behavior, StaticMutexLocker and StaticMutexUnlocker are not (and should not be) provided.
-
-     For more information, see https://github.com/TextureGroup/Texture/issues/136 and
-     https://www.ibm.com/support/knowledgecenter/en/ssw_i5_54/apis/users_65.htm
-     */
-    int unlock () {
-      return pthread_mutex_unlock (this->mutex());
+    void unlock () {
+      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_unlock (this->mutex()));
     }
 
     pthread_mutex_t *mutex () { return &_m; }
 
-    StaticMutex(const StaticMutex&) = delete;
-    StaticMutex &operator=(const StaticMutex&) = delete;
+  private:
+    pthread_mutex_t _m;
   };
+
+  typedef Locker<StaticMutex> StaticMutexLocker;
+  typedef Unlocker<StaticMutex> StaticMutexUnlocker;
 
   struct Condition
   {
