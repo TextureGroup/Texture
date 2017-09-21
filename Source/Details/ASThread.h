@@ -59,7 +59,7 @@ static inline BOOL ASDisplayNodeThreadIsMain()
   _Pragma("clang diagnostic push"); \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\""); \
   volatile int res = (x_); \
-  assert(res == 0); \
+  ASDisplayNodeCAssert(res == 0, @"Expected %@ to return 0, got %d instead", @#x_, res); \
   _Pragma("clang diagnostic pop"); \
 } while (0)
 
@@ -136,7 +136,7 @@ namespace ASDN {
 #if !TIME_LOCKER
     
     SharedLocker (std::shared_ptr<T> const& l) ASDISPLAYNODE_NOTHROW : _l (l) {
-      assert(_l != nullptr);
+      ASDisplayNodeCAssertTrue(_l != nullptr);
       _l->lock ();
     }
     
@@ -211,12 +211,12 @@ namespace ASDN {
       mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
       if (thread_id != _owner) {
         // New owner. Since this mutex can't be acquired by another thread if there is an existing owner, _owner and _count must be 0.
-        assert(0 == _owner);
-        assert(0 == _count);
+        ASDisplayNodeCAssertTrue(0 == _owner);
+        ASDisplayNodeCAssertTrue(0 == _count);
         _owner = thread_id;
       } else {
         // Existing owner tries to reacquire this (recursive) mutex. _count must already be positive.
-        assert(_count > 0);
+        ASDisplayNodeCAssertTrue(_count > 0);
       }
       ++_count;
 #endif
@@ -226,9 +226,9 @@ namespace ASDN {
 #if CHECK_LOCKING_SAFETY
       mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
       // Unlocking a mutex on an unowning thread causes undefined behaviour. Assert and fail early.
-      assert(thread_id == _owner);
+      ASDisplayNodeCAssertTrue(thread_id == _owner);
       // Current thread owns this mutex. _count must be positive.
-      assert(_count > 0);
+      ASDisplayNodeCAssertTrue(_count > 0);
       --_count;
       if (0 == _count) {
         // Current thread is no longer the owner.
