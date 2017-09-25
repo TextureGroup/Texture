@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASImageNode+Private.h>
@@ -43,7 +44,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)setAnimatedImage:(id <ASAnimatedImageProtocol>)animatedImage
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_setAnimatedImage:animatedImage];
 }
 
@@ -84,13 +85,13 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (id <ASAnimatedImageProtocol>)animatedImage
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   return _animatedImage;
 }
 
 - (void)setAnimatedImagePaused:(BOOL)animatedImagePaused
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
 
   _animatedImagePaused = animatedImagePaused;
 
@@ -99,13 +100,13 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (BOOL)animatedImagePaused
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   return _animatedImagePaused;
 }
 
 - (void)setCoverImageCompleted:(UIImage *)coverImage
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_setCoverImageCompleted:coverImage];
 }
 
@@ -122,7 +123,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)setCoverImage:(UIImage *)coverImage
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_setCoverImage:coverImage];
 }
 
@@ -160,7 +161,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)setShouldAnimate:(BOOL)shouldAnimate
 {
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_setShouldAnimate:shouldAnimate];
 }
 
@@ -193,7 +194,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 {
   ASDisplayNodeAssertMainThread();
 
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_startAnimating];
 }
 
@@ -234,7 +235,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 {
   ASDisplayNodeAssertMainThread();
   
-  ASDN::MutexLocker l(_animatedImageLock);
+  ASDN::MutexLocker l(__instanceLock__);
   [self _locked_stopAnimating];
 }
 
