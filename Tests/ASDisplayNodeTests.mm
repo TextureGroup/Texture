@@ -518,9 +518,19 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.debugName = @"quack like a duck";
     
     node.isAccessibilityElement = YES;
-    node.accessibilityLabel = @"Ship love";
-    node.accessibilityHint = @"Awesome things will happen";
-    node.accessibilityValue = @"1 of 2";
+
+    for (int i = 0; i < 4; i++) {
+      if (i % 2 == 0) {
+        XCTAssertNoThrow(node.accessibilityLabel = nil);
+        XCTAssertNoThrow(node.accessibilityHint = nil);
+        XCTAssertNoThrow(node.accessibilityValue = nil);
+      } else {
+        node.accessibilityLabel = @"Ship love";
+        node.accessibilityHint = @"Awesome things will happen";
+        node.accessibilityValue = @"1 of 2";
+      }
+    }
+
     node.accessibilityTraits = UIAccessibilityTraitSelected | UIAccessibilityTraitButton;
     node.accessibilityFrame = CGRectMake(1, 2, 3, 4);
     node.accessibilityLanguage = @"mas";
