@@ -963,7 +963,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
   if (flags.setContentsScale) {
     if (AS_AT_LEAST_IOS11 && layer.contentsScale != contentsScale) {
-      NSLog(@"Warning: Under iOS 11, this view automatically loaded an appropriate scale factor: %f. Are you sure you want to override it to (%f)?", layer.contentsScale, contentsScale);
+      NSLog(@"Warning: Under iOS 11, this view automatically loaded an appropriate scale factor: %f. Are you sure you want to change it to (%f)?", layer.contentsScale, contentsScale);
     }
     layer.contentsScale = contentsScale;
   }
