@@ -24,10 +24,13 @@
 NSOrderedSet *ASSnapshotTestCaseDefaultSuffixes(void)
 {
   NSMutableOrderedSet *suffixesSet = [[NSMutableOrderedSet alloc] init];
-  // In some rare cases, slightly different rendering may occur on iOS 10 (text rasterization).
+  // In some rare cases, slightly different rendering may occur on iOS 10 and 11 (text rasterization).
   // If the test folders find any image that exactly matches, they pass;
   // if an image is not present at all, or it fails, it moves on to check the others.
   // This means the order doesn't matter besides reducing logging / performance.
+  if (AS_AT_LEAST_IOS11) {
+    [suffixesSet addObject:@"_iOS_11"];
+  }
   if (AS_AT_LEAST_IOS10) {
     [suffixesSet addObject:@"_iOS_10"];
   }
