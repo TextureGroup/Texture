@@ -48,6 +48,7 @@
 {
   UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
   backgroundView.layer.as_allowsHighlightDrawing = YES;
+  backgroundView.backgroundColor = [UIColor whiteColor];
 
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"judar judar judar judar judar judar"
@@ -71,6 +72,7 @@
 {
   UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
   backgroundView.layer.as_allowsHighlightDrawing = YES;
+  backgroundView.backgroundColor = [UIColor whiteColor];
 
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"yolo"
