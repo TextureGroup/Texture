@@ -353,7 +353,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual((id)nil, node.accessibilityLabel, @"default accessibilityLabel is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityHint, @"default accessibilityHint is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityValue, @"default accessibilityValue is broken %@", hasLoadedView);
-  if (AS_AT_LEAST_IOS11) {
+  if (@available(11.0, *)) {
     XCTAssertEqual((id)nil, node.accessibilityAttributedLabel, @"default accessibilityAttributedLabel is broken %@", hasLoadedView);
     XCTAssertEqual((id)nil, node.accessibilityAttributedHint, @"default accessibilityAttributedHint is broken %@", hasLoadedView);
     XCTAssertEqual((id)nil, node.accessibilityAttributedValue, @"default accessibilityAttributedValue is broken %@", hasLoadedView);
@@ -458,7 +458,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqualObjects(@"1 of 2", node.accessibilityValue, @"accessibilityValue broken %@", hasLoadedView);
 
   // setting the accessibilityLabel, accessibilityHint and accessibilityValue is supposed to be bridged to the attributed versions
-  if (AS_AT_LEAST_IOS11) {
+  if (@available(11.0, *)) {
     XCTAssertEqualObjects(@"Ship love", node.accessibilityAttributedLabel.string, @"accessibilityAttributedLabel is broken %@", hasLoadedView);
     XCTAssertEqualObjects(@"Awesome things will happen", node.accessibilityAttributedHint.string, @"accessibilityAttributedHint is broken %@", hasLoadedView);
     XCTAssertEqualObjects(@"1 of 2", node.accessibilityAttributedValue.string, @"accessibilityAttributedValue is broken %@", hasLoadedView);
