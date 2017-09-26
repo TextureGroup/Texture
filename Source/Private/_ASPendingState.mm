@@ -961,8 +961,12 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setContentsCenter)
     layer.contentsCenter = contentsCenter;
 
-  if (flags.setContentsScale)
+  if (flags.setContentsScale) {
+    if (AS_AT_LEAST_IOS11 && layer.contentsScale != contentsScale) {
+      NSLog(@"Warning: Under iOS 11, this view automatically loaded an appropriate scale factor: %f. Are you sure you want to override it to (%f)?", layer.contentsScale, contentsScale);
+    }
     layer.contentsScale = contentsScale;
+  }
 
   if (flags.setRasterizationScale)
     layer.rasterizationScale = rasterizationScale;

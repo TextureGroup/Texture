@@ -668,7 +668,15 @@ extern NSInteger const ASDefaultDrawingPriority;
 @property (nonatomic, strong, nullable) id contents;                           // default=nil
 @property (nonatomic, assign)           CGRect contentsRect;                   // default={0,0,1,1}. @see CALayer.h for details.
 @property (nonatomic, assign)           CGRect contentsCenter;                 // default={0,0,1,1}. @see CALayer.h for details.
-@property (nonatomic, assign)           CGFloat contentsScale;                 // default=1.0f. See @contentsScaleForDisplay for details.
+/**
+ * The scale factor applied to the node backing view/layer. Defaults to 1.0f.
+ * See @contentsScaleForDisplay for details.
+ *
+ * Note: on iOS 11, if this node has a view (i.e not layer-backed), the view automatically changes this scale factor to a value
+ * appropriate to the screen. As a result, to avoid accidentally overriding the value that the view sets,
+ * you should only change it in `didLoad` and after taking the view's value into account.
+ */
+@property (nonatomic, assign)           CGFloat contentsScale;
 @property (nonatomic, assign)           CGFloat rasterizationScale;            // default=1.0f.
 
 @property (nonatomic, assign)           CGPoint anchorPoint;                   // default={0.5, 0.5}
