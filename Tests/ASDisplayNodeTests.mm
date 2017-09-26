@@ -2298,7 +2298,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   ASXCTAssertEqualPoints([node convertPoint:node.bounds.origin toNode:nil], expectedOrigin);
 }
 
-- (void)testThatItIsAllowedToRetrieveDebugDescriptionIncludingVCOffMainThread
+- (void)DISABLE_testThatItIsAllowedToRetrieveDebugDescriptionIncludingVCOffMainThread
 {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   UIViewController *vc = [[UIViewController alloc] init];
