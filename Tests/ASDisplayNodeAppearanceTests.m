@@ -141,6 +141,8 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   XCTAssertEqual([_didExitHierarchyCounts countForObject:n], 0u, @"didExitHierarchy erroneously called");
 
   [window addSubview:superview];
+  [window makeKeyAndVisible];
+  
   XCTAssertEqual([_willEnterHierarchyCounts countForObject:n], 1u, @"willEnterHierarchy not called when node's view added to hierarchy");
   XCTAssertEqual([_didExitHierarchyCounts countForObject:n], 0u, @"didExitHierarchy erroneously called");
 
@@ -188,6 +190,8 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   } else {
     [window addSubview:parent.view];
   }
+
+  [window makeKeyAndVisible];
 
   XCTAssertEqual([_willEnterHierarchyCounts countForObject:parent], 1u, @"Should have -willEnterHierarchy called once");
   XCTAssertEqual([_willEnterHierarchyCounts countForObject:a], 1u, @"Should have -willEnterHierarchy called once");
@@ -269,6 +273,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   XCTAssertFalse(viewBackedNode.inHierarchy, @"Should not yet be visible");
 
   [window addSubview:parentSynchronousNode.view];
+  [window makeKeyAndVisible];
 
   // This is a known case that isn't supported
   XCTAssertFalse(parentSynchronousNode.inHierarchy, @"Synchronous views are not currently marked visible");
@@ -328,6 +333,8 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
     [window addSubview:parentA.view];
     [window addSubview:parentB.view];
   }
+
+  [window makeKeyAndVisible];
 
   XCTAssertTrue(parentA.inHierarchy, @"Should be visible after added to window");
   XCTAssertTrue(parentB.inHierarchy, @"Should be visible after added to window");
