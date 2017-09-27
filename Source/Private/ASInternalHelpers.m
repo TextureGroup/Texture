@@ -72,6 +72,18 @@ void ASPerformBlockOnMainThread(void (^block)())
   }
 }
 
+void ASPerformSynchronousBlockOnMainThread(void (^block)())
+{
+  if (block == nil){
+    return;
+  }
+  if (ASDisplayNodeThreadIsMain()) {
+    block();
+  } else {
+    dispatch_sync(dispatch_get_main_queue(), block);
+  }
+}
+
 void ASPerformBlockOnBackgroundThread(void (^block)())
 {
   if (block == nil){

@@ -34,6 +34,9 @@ IMP ASReplaceMethodWithBlock(Class c, SEL origSEL, id block);
 /// Dispatches the given block to the main queue if not already running on the main thread
 void ASPerformBlockOnMainThread(void (^block)());
 
+/// Dispatches the given block to the main queue synchronously if not already running on the main thread
+void ASPerformSynchronousBlockOnMainThread(void (^block)());
+
 /// Dispatches the given block to a background queue with priority of DISPATCH_QUEUE_PRIORITY_DEFAULT if not already run on a background queue
 void ASPerformBlockOnBackgroundThread(void (^block)()); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 

@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASTextNodeWordKerner.h>
 #import <AsyncDisplayKit/ASThread.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 /**
  @abstract Object to hold UITextView's pending UITextInputTraits
@@ -179,7 +180,9 @@
 
 - (void)dealloc
 {
-  _textKitComponents.textView.delegate = nil;
+  ASPerformSynchronousBlockOnMainThread(^{
+    _textKitComponents.textView.delegate = nil;
+  });
   _textKitComponents.layoutManager.delegate = nil;
   _placeholderTextKitComponents.layoutManager.delegate = nil;
 }
