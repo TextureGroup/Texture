@@ -434,12 +434,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     
     if (ASClassRequiresMainThreadDeallocation(object_getClass(value))) {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Trampolining ivar '%s' value %@ for main deallocation.", self, ivar_getName(ivar), value);
-      ASPerformMainThreadDeallocation(value);
       
-      // After scheduling the ivar for main thread deallocation we have clear out the ivar, otherwise we can run
+      // Before scheduling the ivar for main thread deallocation we have clear out the ivar, otherwise we can run
       // into a race condition where the main queue is drained earlier than this node is deallocated and the ivar
       // is still deallocated on a background thread
       object_setIvar(self, ivar, nil);
+      
+      ASPerformMainThreadDeallocation(value);
     } else {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
     }
