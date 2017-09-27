@@ -1215,7 +1215,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
-  if (AS_AT_LEAST_IOS11) {
+  if (@available(iOS 11, *)) {
     pendingState.accessibilityAttributedLabel = [view valueForKey: @"accessibilityAttributedLabel"];
     pendingState.accessibilityAttributedHint = [view valueForKey: @"accessibilityAttributedHint"];
     pendingState.accessibilityAttributedValue = [view valueForKey: @"accessibilityAttributedValue"];
