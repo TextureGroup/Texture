@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASNetworkImageNode] Fix deadlock in GIF handling. [#582](https://github.com/TextureGroup/Texture/pull/582) [Garrett Moon](https://github.com/garrettmoon)
 - [ASDisplayNode] Add attributed versions of a11y label, hint and value. [#554](https://github.com/TextureGroup/Texture/pull/554) [Alexander Hüllmandel](https://github.com/fruitcoder)
 - [ASCornerRounding] Introduce .cornerRoundingType: CALayer, Precomposited, or Clip Corners. [Scott Goodson](https://github.com/appleguy) [#465](https://github.com/TextureGroup/Texture/pull/465)
 - [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
