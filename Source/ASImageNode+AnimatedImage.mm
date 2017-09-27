@@ -224,6 +224,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     _playHead = 0;
     _displayLink = [CADisplayLink displayLinkWithTarget:[ASWeakProxy weakProxyWithTarget:self] selector:@selector(displayLinkFired:)];
     _displayLink.frameInterval = frameInterval;
+    _lastSuccessfulFrameIndex = NSUIntegerMax;
     
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
   } else {
@@ -307,6 +308,9 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   }
   
   NSUInteger frameIndex = [self frameIndexAtPlayHeadPosition:_playHead];
+  if (frameIndex == _lastSuccessfulFrameIndex) {
+    return;
+  }
   CGImageRef frameImage = [self.animatedImage imageAtIndex:frameIndex];
   
   if (frameImage == nil) {
@@ -315,6 +319,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     self.lastDisplayLinkFire = 0;
   } else {
     self.contents = (__bridge id)frameImage;
+    _lastSuccessfulFrameIndex = frameIndex;
     [self displayDidFinish];
   }
 }
