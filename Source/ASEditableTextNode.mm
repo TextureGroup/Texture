@@ -177,13 +177,6 @@
   return self;
 }
 
-- (void)dealloc
-{
-  _textKitComponents.textView.delegate = nil;
-  _textKitComponents.layoutManager.delegate = nil;
-  _placeholderTextKitComponents.layoutManager.delegate = nil;
-}
-
 #pragma mark - ASDisplayNode Overrides
 - (void)didLoad
 {
