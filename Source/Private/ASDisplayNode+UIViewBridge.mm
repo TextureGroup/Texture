@@ -943,7 +943,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
   if (AS_AT_LEAST_IOS11) {
-    NSAttributedString *accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:accessibilityLabel];
+    NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
     _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, @"accessibilityAttributedLabel", accessibilityAttributedLabel);
   }
 }
@@ -972,7 +972,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
   if (AS_AT_LEAST_IOS11) {
-    NSAttributedString *accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:accessibilityHint];
+    NSAttributedString *accessibilityAttributedHint = accessibilityHint ? [[NSAttributedString alloc] initWithString:accessibilityHint] : nil;
     _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, @"accessibilityAttributedHint", accessibilityAttributedHint);
   }
 }
@@ -1001,7 +1001,7 @@ if (shouldApply) { [_view setValue:(viewAndPendingViewStateExpr) forKey: viewAnd
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
   if (AS_AT_LEAST_IOS11) {
-    NSAttributedString *accessibilityAttributedValue = [[NSAttributedString alloc] initWithString:accessibilityValue];
+    NSAttributedString *accessibilityAttributedValue = accessibilityValue ? [[NSAttributedString alloc] initWithString:accessibilityValue] : nil;
     _setAttributedAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, @"accessibilityAttributedValue", accessibilityAttributedValue);
   }
 }
