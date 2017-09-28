@@ -113,14 +113,14 @@ Class _Nullable ASGetClassFromType(const char  * _Nullable type)
 {
   // Class types all start with @"
   if (type == NULL || strncmp(type, "@\"", 2) != 0) {
-    return nil;
+    return Nil;
   }
 
   // Ensure length >= 3
   size_t typeLength = strlen(type);
   if (typeLength < 3) {
     ASDisplayNodeCFailAssert(@"Got invalid type-encoding: %s", type);
-    return nil;
+    return Nil;
   }
 
   // Copy type[2..(end-1)]. So @"UIImage" -> UIImage
