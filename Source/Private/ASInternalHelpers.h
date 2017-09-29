@@ -54,6 +54,10 @@ CGFloat ASCeilPixelValue(CGFloat f);
 
 CGFloat ASRoundPixelValue(CGFloat f);
 
+@protocol ASRequiringMainThreadDeallocating
++ (BOOL)requiresMainThreadDeallocation;
+@end
+
 BOOL ASClassRequiresMainThreadDeallocation(Class _Nullable c);
 
 Class _Nullable ASGetClassFromType(const char * _Nullable type);

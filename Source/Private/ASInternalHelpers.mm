@@ -22,8 +22,11 @@
 #import <objc/runtime.h>
 #import <tgmath.h>
 
+#import <AsyncDisplayKit/ASLRUCache.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
+
+using namespace ASDN;
 
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)
 {
@@ -91,21 +94,45 @@ void ASPerformBackgroundDeallocation(id object)
 
 BOOL ASClassRequiresMainThreadDeallocation(Class c)
 {
+  if (c == NULL) {
+    return NO;
+  }
+  
+  static dispatch_once_t onceToken;
+  static LRUCache<Class, BOOL> *cache = nullptr;
+  dispatch_once(&onceToken, ^{
+    cache = new LRUCache<Class, BOOL>();
+  });
+
+  if (cache->contains(c)) {
+    return cache->get(c);
+  }
+  
   if (c == [UIImage class] || c == [UIColor class]) {
+    cache->insert(c, NO);
     return NO;
   }
   
   if ([c isSubclassOfClass:[UIResponder class]]
       || [c isSubclassOfClass:[CALayer class]]
       || [c isSubclassOfClass:[UIGestureRecognizer class]]) {
+    cache->insert(c, YES);
     return YES;
   }
 
   const char *name = class_getName(c);
   if (strncmp(name, "UI", 2) == 0 || strncmp(name, "AV", 2) == 0 || strncmp(name, "CA", 2) == 0) {
+    cache->insert(c, YES);
     return YES;
   }
+  
+  if ([c conformsToProtocol:@protocol(ASRequiringMainThreadDeallocating)]) {
+    BOOL r = [c requiresMainThreadDeallocation];
+    cache->insert(c, r);
+    return r;
+  }
 
+  cache->insert(c, NO);
   return NO;
 }
 

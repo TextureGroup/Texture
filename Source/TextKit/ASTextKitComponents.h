@@ -17,11 +17,12 @@
 
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
-@interface ASTextKitComponents : NSObject
+@interface ASTextKitComponents : NSObject <ASRequiringMainThreadDeallocating>
 
 /**
  @abstract Creates the stack of TextKit components.

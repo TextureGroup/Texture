@@ -30,6 +30,11 @@
 
 @implementation ASTextKitComponents
 
++ (BOOL)requiresMainThreadDeallocation
+{
+  return YES;
+}
+
 + (instancetype)componentsWithAttributedSeedString:(NSAttributedString *)attributedSeedString
                                  textContainerSize:(CGSize)textContainerSize
 {
