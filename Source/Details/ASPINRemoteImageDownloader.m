@@ -84,7 +84,18 @@
 //Share image cache with sharedImageManager image cache.
 - (id <PINRemoteImageCaching>)defaultImageCache
 {
-  return [[PINRemoteImageManager sharedImageManager] cache];
+  static dispatch_once_t onceToken;
+  static id <PINRemoteImageCaching> cache = nil;
+  dispatch_once(&onceToken, ^{
+    cache = [[PINRemoteImageManager sharedImageManager] cache];
+
+    // Set a default byteLimit. PINCache recently implemented a 50MB default (PR #201).
+    // Ensure that older versions of PINCache also have a byteLimit applied.
+    PINDiskCache *diskCache = [ASDynamicCast(cache, PINCache) diskCache];
+    // NOTE: Using 20MB limit while large cache initialization is being optimized (Issue #144).
+    diskCache.byteLimit = 20 * 1024 * 1024;
+  });
+  return cache;
 }
 
 @end
