@@ -278,7 +278,8 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   [self stopAnimating];
   
   //Also clear out the contents we've set to be good citizens, we'll put it back in when we become visible.
-    self.contents = nil;
+  self.contents = nil;
+  [self setCoverImage:nil];
 }
 
 #pragma mark - Display Link Callbacks
