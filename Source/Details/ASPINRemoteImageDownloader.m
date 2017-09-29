@@ -76,6 +76,15 @@
 @end
 #endif
 
+// Declare two key methods on PINCache objects, avoiding a direct dependency on PINCache.h
+@protocol ASPINCache
+- (id)diskCache;
+@end
+
+@protocol ASPINDiskCache
+@property (assign) NSUInteger byteLimit;
+@end
+
 @interface ASPINRemoteImageManager : PINRemoteImageManager
 @end
 
@@ -88,12 +97,15 @@
   static id <PINRemoteImageCaching> cache = nil;
   dispatch_once(&onceToken, ^{
     cache = [[PINRemoteImageManager sharedImageManager] cache];
-
-    // Set a default byteLimit. PINCache recently implemented a 50MB default (PR #201).
-    // Ensure that older versions of PINCache also have a byteLimit applied.
-    PINDiskCache *diskCache = [ASDynamicCast(cache, PINCache) diskCache];
-    // NOTE: Using 20MB limit while large cache initialization is being optimized (Issue #144).
-    diskCache.byteLimit = 20 * 1024 * 1024;
+    if ([cache respondsToSelector:@selector(diskCache)]) {
+      id diskCache = [(id <ASPINCache>)cache diskCache];
+      if ([diskCache respondsToSelector:@selector(setByteLimit:)]) {
+        // Set a default byteLimit. PINCache recently implemented a 50MB default (PR #201).
+        // Ensure that older versions of PINCache also have a byteLimit applied.
+        // NOTE: Using 20MB limit while large cache initialization is being optimized (Issue #144).
+        ((id <ASPINDiskCache>)diskCache).byteLimit = 20 * 1024 * 1024;
+      }
+    }
   });
   return cache;
 }
