@@ -106,8 +106,10 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)setCoverImageCompleted:(UIImage *)coverImage
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  [self _locked_setCoverImageCompleted:coverImage];
+  if (ASInterfaceStateIncludesDisplay(self.interfaceState)) {
+    ASDN::MutexLocker l(__instanceLock__);
+    [self _locked_setCoverImageCompleted:coverImage];
+  }
 }
 
 - (void)_locked_setCoverImageCompleted:(UIImage *)coverImage
@@ -276,6 +278,12 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   [super didExitVisibleState];
   
   [self stopAnimating];
+}
+
+- (void)didExitDisplayState
+{
+  ASDisplayNodeAssertMainThread();
+  [super didExitDisplayState];
   
   //Also clear out the contents we've set to be good citizens, we'll put it back in when we become visible.
   self.contents = nil;
