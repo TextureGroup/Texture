@@ -23,6 +23,7 @@
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/ASLRUCache.h>
+#import <AsyncDisplayKit/ASRequiringMainThreadDeallocating.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 

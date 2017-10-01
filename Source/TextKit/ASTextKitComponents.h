@@ -17,7 +17,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASRequiringMainThreadDeallocating.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
