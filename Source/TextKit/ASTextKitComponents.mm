@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
+#import <AsyncDisplayKit/ASAssert.h>
 
 #import <tgmath.h>
 
@@ -64,6 +65,8 @@
 
 - (void)dealloc
 {
+  ASDisplayNodeAssertMainThread();
+
   // Nil out all delegate to prevent crash
   _textView.delegate = nil;
   _layoutManager.delegate = nil;
