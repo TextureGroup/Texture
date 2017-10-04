@@ -142,6 +142,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL zeroContentInsets ASDISPLAYNODE_DEPRECATED_MSG("Set automaticallyAdjustsScrollViewInsets=NO on your view controller instead.");
 
 /**
+ * The distance that the content view is inset from the collection view edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead");
+
+/**
  * The point at which the origin of the content view is offset from the origin of the collection view.
  */
 @property (nonatomic, assign) CGPoint contentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
@@ -279,14 +284,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @warning This method is substantially more expensive than UICollectionView's version.
  */
 - (void)reloadData AS_UNAVAILABLE("Use ASCollectionNode method instead.");
-
-/**
- * Reload everything from scratch entirely on the main thread, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version and will block the main thread
- * while all the cells load.
- */
-- (void)reloadDataImmediately AS_UNAVAILABLE("Use ASCollectionNode method instead.");
 
 /**
  * Triggers a relayout of all nodes.
