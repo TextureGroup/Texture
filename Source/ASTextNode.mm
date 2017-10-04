@@ -396,7 +396,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Add the constrained size back textContainerInset
   size.width += (_textContainerInset.left + _textContainerInset.right);
   size.height += (_textContainerInset.top + _textContainerInset.bottom);
-
+  
   return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
                     std::fmin(size.height, originalConstrainedSize.height));
 }
@@ -1384,7 +1384,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-static ASDN::Mutex _experimentLock;
+// Allocate _experimentLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
+static ASDN::StaticMutex& _experimentLock = *new ASDN::StaticMutex;
 static ASTextNodeExperimentOptions _experimentOptions;
 static BOOL _hasAllocatedNode;
 
@@ -1392,7 +1393,7 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDN::MutexLocker lock(_experimentLock);
+    ASDN::StaticMutexLocker lock(_experimentLock);
     
     // They must call this before allocating any text nodes.
     ASDisplayNodeAssertFalse(_hasAllocatedNode);
@@ -1427,7 +1428,7 @@ static BOOL _hasAllocatedNode;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDN::MutexLocker lock(_experimentLock);
+    ASDN::StaticMutexLocker lock(_experimentLock);
     _hasAllocatedNode = YES;
   });
   
