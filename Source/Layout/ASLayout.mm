@@ -271,6 +271,27 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   return layout;
 }
 
+#pragma mark - Equality Checking
+
+- (BOOL)isEqual:(id)object
+{
+  ASLayout *layout = ASDynamicCast(object, ASLayout);
+  if (layout == nil) {
+    return NO;
+  }
+
+  if (!CGSizeEqualToSize(_size, layout.size)) return NO;
+  if (!CGPointEqualToPoint(_position, layout.position)) return NO;
+  if (_layoutElement != layout.layoutElement) return NO;
+
+  NSArray *sublayouts = layout.sublayouts;
+  if (sublayouts != _sublayouts && (sublayouts == nil || _sublayouts == nil || ![_sublayouts isEqual:sublayouts])) {
+    return NO;
+  }
+
+  return YES;
+}
+
 #pragma mark - Accessors
 
 - (ASLayoutElementType)type
@@ -349,30 +370,6 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     [description appendString:[self _recursiveDescriptionForLayout:sublayout level:level + 1]];
   }
   return description;
-}
-
-@end
-
-@implementation ASLayout (Deprecation)
-
-- (id <ASLayoutElement>)layoutableObject
-{
-  return self.layoutElement;
-}
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size
-{
-  return [self layoutWithLayoutElement:layoutElement size:size];
-}
-
-+ (instancetype)layoutWithLayoutableObject:(id<ASLayoutElement>)layoutElement
-                      constrainedSizeRange:(ASSizeRange)constrainedSizeRange
-                                      size:(CGSize)size
-                                sublayouts:(nullable NSArray<ASLayout *> *)sublayouts
-{
-  return [self layoutWithLayoutElement:layoutElement size:size sublayouts:sublayouts];
 }
 
 @end

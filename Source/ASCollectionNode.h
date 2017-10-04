@@ -129,6 +129,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
 
 /**
+ * The distance that the content view is inset from the collection node edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+/**
  * The offset of the content view's origin from the collection node's origin. Defaults to CGPointZero.
  */
 @property (nonatomic, assign) CGPoint contentOffset;
@@ -523,16 +528,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface ASCollectionNode (Deprecated)
-
-/**
- * Reload everything from scratch, destroying the working range and all cached nodes.
- *
- * @warning This method is substantially more expensive than UICollectionView's version.
- *
- * @deprecated This method is deprecated in 2.0. Use @c reloadDataWithCompletion: and
- *   then @c waitUntilAllUpdatesAreProcessed instead.
- */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreProcessed instead.");
 
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
 

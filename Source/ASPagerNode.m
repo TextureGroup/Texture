@@ -39,9 +39,6 @@
   } _pagerDataSourceFlags;
 
   __weak id <ASPagerDelegate> _pagerDelegate;
-  struct {
-    unsigned constrainedSizeForNode:1;
-  } _pagerDelegateFlags;
   ASPagerNodeProxy *_proxyDelegate;
 }
 
@@ -118,7 +115,7 @@
 
 - (CGSize)pageSize
 {
-  UIEdgeInsets contentInset = self.view.contentInset;
+  UIEdgeInsets contentInset = self.contentInset;
   CGSize pageSize = self.bounds.size;
   pageSize.height -= (contentInset.top + contentInset.bottom);
   return pageSize;
@@ -148,7 +145,7 @@
 
 #pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
-- (CGSize)sizeForElements:(ASElementMap *)elements
+- (CGSize)galleryLayoutDelegate:(nonnull ASCollectionGalleryLayoutDelegate *)delegate sizeForElements:(nonnull ASElementMap *)elements
 {
   ASDisplayNodeAssertMainThread();
   return [self pageSize];
@@ -181,13 +178,6 @@
 
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  if (_pagerDelegateFlags.constrainedSizeForNode) {
-    return [_pagerDelegate pagerNode:self constrainedSizeForNodeAtIndex:indexPath.item];
-  }
-#pragma clang diagnostic pop
-
   return ASSizeRangeMake([self pageSize]);
 }
 
@@ -220,15 +210,7 @@
 {
   if (delegate != _pagerDelegate) {
     _pagerDelegate = delegate;
-    
-    if (delegate == nil) {
-      memset(&_pagerDelegateFlags, 0, sizeof(_pagerDelegateFlags));
-    } else {
-    	_pagerDelegateFlags.constrainedSizeForNode = [_pagerDelegate respondsToSelector:@selector(pagerNode:constrainedSizeForNodeAtIndex:)];
-    }
-    
     _proxyDelegate = delegate ? [[ASPagerNodeProxy alloc] initWithTarget:delegate interceptor:self] : nil;
-    
     super.delegate = (id <ASCollectionDelegate>)_proxyDelegate;
   }
 }
