@@ -234,9 +234,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSMutableAttributedString *mutableText = [attributedText mutableCopy];
   [self prepareAttributedStringForDrawing:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
-
+  
   [self setNeedsDisplay];
-
+  
   return layout.textBoundingSize;
 }
 
@@ -416,7 +416,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       if (!CGRectContainsRect(maxRect, containerBounds)) {
         continue;
       }
-
+      
       // Now check container params.
       ASTextContainer *otherContainer = layout.container;
       if (!UIEdgeInsetsEqualToEdgeInsets(container.insets, otherContainer.insets)) {
