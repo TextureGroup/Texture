@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASVideoNode] Fix unreleased time observer. [Flo Vouin](https://github.com/flovouin)
 - [PINCache] Set a default .byteLimit to reduce disk usage and startup time. [#595](https://github.com/TextureGroup/Texture/pull/595) [Scott Goodson](https://github.com/appleguy)
 - [ASNetworkImageNode] Fix deadlock in GIF handling. [#582](https://github.com/TextureGroup/Texture/pull/582) [Garrett Moon](https://github.com/garrettmoon)
 - [ASDisplayNode] Add attributed versions of a11y label, hint and value. [#554](https://github.com/TextureGroup/Texture/pull/554) [Alexander Hüllmandel](https://github.com/fruitcoder)
