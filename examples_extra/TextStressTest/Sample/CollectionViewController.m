@@ -25,6 +25,8 @@
 - (instancetype)init {
   UICollectionViewFlowLayout* flowLayout = [[UICollectionViewFlowLayout alloc] init];
   _collectionNode = [[ASCollectionNode alloc] initWithCollectionViewLayout:flowLayout];
+  CGRect rect = [[UIApplication sharedApplication] statusBarFrame];
+  _collectionNode.contentInset = UIEdgeInsetsMake(rect.size.height, 0, 0, 0);
   self = [super initWithNode:_collectionNode];
   if (self) {
     _collectionNode.delegate = self;

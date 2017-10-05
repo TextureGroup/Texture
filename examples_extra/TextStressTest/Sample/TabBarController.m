@@ -1,5 +1,5 @@
 //
-//  AppDelegate.h
+//  TabBarController.m
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -10,12 +10,10 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <UIKit/UIKit.h>
+#import "TabBarController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow *window;
-
-
+@interface TabBarController ()
 @end
 
+@implementation TabBarController
+@end

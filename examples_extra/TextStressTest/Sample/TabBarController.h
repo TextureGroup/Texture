@@ -1,5 +1,5 @@
 //
-//  TextCellNode.h
+//  TabBarController.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -12,7 +12,5 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-
-@interface TextCellNode : ASCellNode
-- (instancetype)initWithText1:(NSString*)text1 text2:(NSString*)text2;
+@interface TabBarController : ASTabBarController
 @end

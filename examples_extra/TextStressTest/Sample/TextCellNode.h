@@ -1,5 +1,5 @@
 //
-//  main.m
+//  TextCellNode.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -10,11 +10,8 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <UIKit/UIKit.h>
-#import "AppDelegate.h"
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-int main(int argc, char * argv[]) {
-  @autoreleasepool {
-      return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-  }
-}
+@interface TextCellNode : ASCellNode
+- (instancetype)initWithText1:(NSString*)text1 text2:(NSString*)text2;
+@end

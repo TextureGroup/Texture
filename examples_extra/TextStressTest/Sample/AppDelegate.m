@@ -11,7 +11,10 @@
 
 #import "AppDelegate.h"
 
+#import "TabBarController.h"
+#import "CollectionViewController.h"
 #import "ViewController.h"
+
 
 @implementation AppDelegate
 
@@ -19,9 +22,21 @@
 {
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   self.window.backgroundColor = [UIColor whiteColor];
-  self.window.rootViewController = [[ViewController alloc] init];
+
+  ViewController* viewController = [[ViewController alloc] init];
+  viewController.tabBarItem.title = @"TextStress";
+
+  CollectionViewController *cvc = [[CollectionViewController alloc] init];
+  cvc.tabBarItem.title = @"Flexbox";
+
+  TabBarController *tabBarController = [[TabBarController alloc] init];
+  tabBarController.viewControllers = @[cvc, viewController];
+
+  self.window.rootViewController = tabBarController;
   [self.window makeKeyAndVisible];
   return YES;
 }
+
+
 
 @end
