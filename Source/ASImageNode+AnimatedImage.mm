@@ -142,7 +142,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 #endif
   if ([self isKindOfClass:[ASNetworkImageNode class]]) {
     [(ASNetworkImageNode *)self _locked_setDefaultImage:coverImage];
-  } else if (_displayLink.paused == NO) {
+  } else if (_displayLink == nil || _displayLink.paused == YES) {
     [self _locked_setImage:coverImage];
   }
 }
