@@ -73,6 +73,10 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     if (animatedImage.playbackReady) {
       [self _locked_setShouldAnimate:YES];
     }
+  } else {
+      // Clean up after ourselves.
+      self.contents = nil;
+      [self setCoverImage:nil];
   }
   
   [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
@@ -133,9 +137,12 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 {
   //If we're a network image node, we want to set the default image so
   //that it will correctly be restored if it exits the range.
+#if ASAnimatedImageDebug
+    NSLog(@"setting cover image: %p", self);
+#endif
   if ([self isKindOfClass:[ASNetworkImageNode class]]) {
     [(ASNetworkImageNode *)self _locked_setDefaultImage:coverImage];
-  } else {
+  } else if (_displayLink.paused == NO) {
     [self _locked_setImage:coverImage];
   }
 }
@@ -283,11 +290,21 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 - (void)didExitDisplayState
 {
   ASDisplayNodeAssertMainThread();
+#if ASAnimatedImageDebug
+    NSLog(@"exiting display state: %p", self);
+#endif
+    
+  // Check to see if we're an animated image before calling super in case someone
+  // decides they want to clear out the animatedImage itself on exiting the display
+  // state
+  BOOL isAnimatedImage = self.animatedImage != nil;
   [super didExitDisplayState];
   
-  //Also clear out the contents we've set to be good citizens, we'll put it back in when we become visible.
-  self.contents = nil;
-  [self setCoverImage:nil];
+  // Also clear out the contents we've set to be good citizens, we'll put it back in when we become visible.
+  if (isAnimatedImage) {
+    self.contents = nil;
+    [self setCoverImage:nil];
+  }
 }
 
 #pragma mark - Display Link Callbacks
