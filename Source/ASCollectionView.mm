@@ -356,7 +356,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)relayoutItems
 {
-  [_dataController relayoutAllNodes];
+  [_dataController relayoutAllNodesWithInvalidationBlock:^{
+    [self.collectionViewLayout invalidateLayout];
+  }];
 }
 
 - (BOOL)isProcessingUpdates
@@ -2202,12 +2204,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section
   BOOL changedInNonScrollingDirection = (fixedHorizontally && newBounds.size.width != lastUsedSize.width) || (fixedVertically && newBounds.size.height != lastUsedSize.height);
 
   if (changedInNonScrollingDirection) {
-    // Because -invalidateLayout doesn't trigger any operations by itself, and we answer queries from UICollectionView using layoutThatFits:,
-    // we invalidate the layout before we have updated all of the cells. Any cells that the collection needs the size of immediately will get
-    // -layoutThatFits: with a new constraint, on the main thread, and synchronously calculate them. Meanwhile, relayoutAllNodes will update
-    // the layout of any remaining nodes on background threads (and fast-return for any nodes that the UICV got to first).
-    [self.collectionViewLayout invalidateLayout];
-    [_dataController relayoutAllNodes];
+    [_dataController relayoutAllNodesWithInvalidationBlock:^{
+      [self.collectionViewLayout invalidateLayout];
+    }];
   }
 }
 
