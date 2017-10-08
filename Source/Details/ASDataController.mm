@@ -791,7 +791,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       element.constrainedSize = newConstrainedSize;
 
       // Node may not be allocated yet (e.g node virtualization or same size optimization)
-      // Call context.nodeIfAllocated here to avoid immature node allocation and layout
+      // Call context.nodeIfAllocated here to avoid premature node allocation and layout
       ASCellNode *node = element.nodeIfAllocated;
       if (node) {
         [self _layoutNode:node withConstrainedSize:newConstrainedSize];
