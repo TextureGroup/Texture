@@ -348,12 +348,12 @@ typedef enum {
   {
     ASDN::MutexLocker l(_internalQueueLock);
 
-    // Early-exit if the queue is empty.
     NSInteger internalQueueCount = _internalQueue.count;
+    // Early-exit if the queue is empty.
     if (internalQueueCount == 0) {
       return;
     }
-    
+
     ASSignpostStart(ASSignpostRunLoopQueueBatch);
 
     // Snatch the next batch of items.
@@ -380,6 +380,14 @@ typedef enum {
         }
         [_internalQueue replacePointerAtIndex:i withPointer:NULL];
       }
+    }
+
+    if (foundItemCount == 0) {
+      // If _internalQueue holds weak references, and all of them just become NULL, then the array
+      // is never marked as needsCompletion, and compact will return early, not removing the NULL's.
+      // Inserting a NULL here ensures the compaction will take place.
+      // See http://www.openradar.me/15396578 and https://stackoverflow.com/a/40274426/1136669
+      [_internalQueue addPointer:NULL];
     }
 
     [_internalQueue compact];
@@ -434,10 +442,16 @@ typedef enum {
 
   if (!foundObject) {
     [_internalQueue addPointer:(__bridge void *)object];
-    
+
     CFRunLoopSourceSignal(_runLoopSource);
     CFRunLoopWakeUp(_runLoop);
   }
+}
+
+- (BOOL)isEmpty
+{
+  ASDN::MutexLocker l(_internalQueueLock);
+  return _internalQueue.count == 0;
 }
 
 @end

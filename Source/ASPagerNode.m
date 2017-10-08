@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
 
-@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutSizeProviding>
+@interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {
   __weak id <ASPagerDataSource> _pagerDataSource;
   ASPagerNodeProxy *_proxyDataSource;
@@ -39,9 +39,6 @@
   } _pagerDataSourceFlags;
 
   __weak id <ASPagerDelegate> _pagerDelegate;
-  struct {
-    unsigned constrainedSizeForNode:1;
-  } _pagerDelegateFlags;
   ASPagerNodeProxy *_proxyDelegate;
 }
 
@@ -66,6 +63,7 @@
 - (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
+  ASDisplayNodeAssertTrue(flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal);
   self = [super initWithCollectionViewLayout:flowLayout];
   return self;
 }
@@ -75,7 +73,7 @@
   ASCollectionGalleryLayoutDelegate *layoutDelegate = [[ASCollectionGalleryLayoutDelegate alloc] initWithScrollableDirections:ASScrollDirectionHorizontalDirections];
   self = [super initWithLayoutDelegate:layoutDelegate layoutFacilitator:nil];
   if (self) {
-    layoutDelegate.sizeProvider = self;
+    layoutDelegate.propertiesProvider = self;
   }
   return self;
 }
@@ -112,7 +110,15 @@
 
 - (NSInteger)currentPageIndex
 {
-  return (self.view.contentOffset.x / CGRectGetWidth(self.view.bounds));
+  return (self.view.contentOffset.x / [self pageSize].width);
+}
+
+- (CGSize)pageSize
+{
+  UIEdgeInsets contentInset = self.contentInset;
+  CGSize pageSize = self.bounds.size;
+  pageSize.height -= (contentInset.top + contentInset.bottom);
+  return pageSize;
 }
 
 #pragma mark - Helpers
@@ -137,12 +143,12 @@
   return indexPath.row;
 }
 
-#pragma mark - ASCollectionGalleryLayoutSizeProviding
+#pragma mark - ASCollectionGalleryLayoutPropertiesProviding
 
-- (CGSize)sizeForElements:(ASElementMap *)elements
+- (CGSize)galleryLayoutDelegate:(nonnull ASCollectionGalleryLayoutDelegate *)delegate sizeForElements:(nonnull ASElementMap *)elements
 {
   ASDisplayNodeAssertMainThread();
-  return self.bounds.size;
+  return [self pageSize];
 }
 
 #pragma mark - ASCollectionDataSource
@@ -172,14 +178,7 @@
 
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  if (_pagerDelegateFlags.constrainedSizeForNode) {
-    return [_pagerDelegate pagerNode:self constrainedSizeForNodeAtIndex:indexPath.item];
-  }
-#pragma clang diagnostic pop
-
-  return ASSizeRangeMake(self.bounds.size);
+  return ASSizeRangeMake([self pageSize]);
 }
 
 #pragma mark - Data Source Proxy
@@ -211,15 +210,7 @@
 {
   if (delegate != _pagerDelegate) {
     _pagerDelegate = delegate;
-    
-    if (delegate == nil) {
-      memset(&_pagerDelegateFlags, 0, sizeof(_pagerDelegateFlags));
-    } else {
-    	_pagerDelegateFlags.constrainedSizeForNode = [_pagerDelegate respondsToSelector:@selector(pagerNode:constrainedSizeForNodeAtIndex:)];
-    }
-    
     _proxyDelegate = delegate ? [[ASPagerNodeProxy alloc] initWithTarget:delegate interceptor:self] : nil;
-    
     super.delegate = (id <ASCollectionDelegate>)_proxyDelegate;
   }
 }

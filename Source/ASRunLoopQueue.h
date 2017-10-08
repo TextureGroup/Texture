@@ -41,6 +41,8 @@ AS_SUBCLASSING_RESTRICTED
 
 - (void)enqueue:(ObjectType)object;
 
+@property (nonatomic, readonly) BOOL isEmpty;
+
 @property (nonatomic, assign) NSUInteger batchSize;           // Default == 1.
 @property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
 

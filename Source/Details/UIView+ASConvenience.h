@@ -82,12 +82,15 @@ NS_ASSUME_NONNULL_BEGIN
  as they are already on NSObject
 
  @property (nonatomic, assign)           BOOL isAccessibilityElement;
- @property (nonatomic, copy)             NSString *accessibilityLabel;
- @property (nonatomic, copy)             NSString *accessibilityHint;
- @property (nonatomic, copy)             NSString *accessibilityValue;
+ @property (nonatomic, copy, nullable)   NSString *accessibilityLabel;
+ @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedLabel API_AVAILABLE(ios(11.0),tvos(11.0));
+ @property (nonatomic, copy, nullable)   NSString *accessibilityHint;
+ @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedHint API_AVAILABLE(ios(11.0),tvos(11.0));
+ @property (nonatomic, copy, nullable)   NSString *accessibilityValue;
+ @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
  @property (nonatomic, assign)           UIAccessibilityTraits accessibilityTraits;
  @property (nonatomic, assign)           CGRect accessibilityFrame;
- @property (nonatomic, strong)           NSString *accessibilityLanguage;
+ @property (nonatomic, strong, nullable) NSString *accessibilityLanguage;
  @property (nonatomic, assign)           BOOL accessibilityElementsHidden;
  @property (nonatomic, assign)           BOOL accessibilityViewIsModal;
  @property (nonatomic, assign)           BOOL shouldGroupAccessibilityChildren;

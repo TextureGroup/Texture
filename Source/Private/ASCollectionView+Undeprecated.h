@@ -75,6 +75,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) id<ASCollectionViewLayoutInspecting> layoutInspector;
 
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+@property (nonatomic, assign) CGPoint contentOffset;
+
 /**
  * Tuning parameters for a range type in full mode.
  *
@@ -296,6 +300,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  Invalidates and recalculates the cached sizes stored for pass-through cells used in interop mode.
  */
 - (void)invalidateFlowLayoutDelegateMetrics;
+
+- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 
 @end
 

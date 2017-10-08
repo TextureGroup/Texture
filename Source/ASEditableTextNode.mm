@@ -177,13 +177,6 @@
   return self;
 }
 
-- (void)dealloc
-{
-  _textKitComponents.textView.delegate = nil;
-  _textKitComponents.layoutManager.delegate = nil;
-  _placeholderTextKitComponents.layoutManager.delegate = nil;
-}
-
 #pragma mark - ASDisplayNode Overrides
 - (void)didLoad
 {
@@ -699,6 +692,12 @@
 }
 
 #pragma mark - UITextView Delegate
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView
+{
+  // Delegateify.
+  return [self _delegateShouldBeginEditing];
+}
+
 - (void)textViewDidBeginEditing:(UITextView *)textView
 {
   // Delegateify.
@@ -793,6 +792,14 @@
 }
 
 #pragma mark -
+- (BOOL)_delegateShouldBeginEditing
+{
+  if ([_delegate respondsToSelector:@selector(editableTextNodeShouldBeginEditing:)]) {
+    return [_delegate editableTextNodeShouldBeginEditing:self];
+  }
+  return YES;
+}
+
 - (void)_delegateDidBeginEditing
 {
   if ([_delegate respondsToSelector:@selector(editableTextNodeDidBeginEditing:)])
