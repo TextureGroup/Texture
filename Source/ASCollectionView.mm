@@ -793,7 +793,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       NSIndexPath *indexPath = [self indexPathForNode:node];
       NSString *kind = [element supplementaryElementKind];
       CGSize previousSize = node.style.preferredSize;
-      CGSize size = [self sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
+      CGSize size = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
 
       if (!CGSizeEqualToSize(previousSize, size)) {
         node.style.preferredSize = size;
@@ -811,6 +811,46 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (_hasDataControllerLayoutDelegate) {
     _dataController.layoutDelegate = (id<ASDataControllerLayoutDelegate>)layout;
   }
+}
+
+/**
+ This method is called only for UIKit Passthrough cells - either regular Items or Supplementary elements.
+ It checks if the delegate implements the UICollectionViewFlowLayout methods that provide sizes, and if not,
+ uses the default values set on the flow layout. If a flow layout is not in use, UICollectionView Passthrough
+ cells must be sized by logic in the Layout object, and Texture does not participate in these paths.
+*/
+- (CGSize)_sizeForUIKitCellWithKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+  CGSize size = CGSizeZero;
+  UICollectionViewLayout *l = self.collectionViewLayout;
+
+  if (kind == nil) {
+    ASDisplayNodeAssert(_asyncDataSourceFlags.interop, @"This code should not be called except for UIKit passthrough compatibility");
+    SEL sizeForItem = @selector(collectionView:layout:sizeForItemAtIndexPath:);
+    if ([_asyncDelegate respondsToSelector:sizeForItem]) {
+      size = [(id)_asyncDelegate collectionView:self layout:l sizeForItemAtIndexPath:indexPath];
+    } else {
+      size = ASFlowLayoutDefault(l, itemSize, CGSizeZero);
+    }
+  } else if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
+    ASDisplayNodeAssert(_asyncDataSourceFlags.interopViewForSupplementaryElement, @"This code should not be called except for UIKit passthrough compatibility");
+    SEL sizeForHeader = @selector(collectionView:layout:referenceSizeForHeaderInSection:);
+    if ([_asyncDelegate respondsToSelector:sizeForHeader]) {
+      size = [(id)_asyncDelegate collectionView:self layout:l referenceSizeForHeaderInSection:indexPath.section];
+    } else {
+      size = ASFlowLayoutDefault(l, headerReferenceSize, CGSizeZero);
+    }
+  } else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+    ASDisplayNodeAssert(_asyncDataSourceFlags.interopViewForSupplementaryElement, @"This code should not be called except for UIKit passthrough compatibility");
+    SEL sizeForFooter = @selector(collectionView:layout:referenceSizeForFooterInSection:);
+    if ([_asyncDelegate respondsToSelector:sizeForFooter]) {
+      size = [(id)_asyncDelegate collectionView:self layout:l referenceSizeForFooterInSection:indexPath.section];
+    } else {
+      size = ASFlowLayoutDefault(l, footerReferenceSize, CGSizeZero);
+    }
+  }
+
+  return size;
 }
 
 /**
@@ -1475,11 +1515,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [self _checkForBatchFetching];
   }
   
-  for (_ASCollectionViewCell *collectionCell in _cellsForVisibilityUpdates) {
-    // Only nodes that respond to the selector are added to _cellsForVisibilityUpdates
-    [[collectionCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
-                                      inScrollView:scrollView
-                                     withCellFrame:collectionCell.frame];
+  for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
+    // _cellsForVisibilityUpdates only includes cells for ASCellNode subclasses with overrides of the visibility method.
+    [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged inScrollView:scrollView];
   }
   if (_asyncDelegateFlags.scrollViewDidScroll) {
     [_asyncDelegate scrollViewDidScroll:scrollView];
@@ -1731,6 +1769,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath
 {
+  ASDisplayNodeAssertMainThread();
   ASCellNodeBlock block = nil;
   ASCellNode *cell = nil;
 
@@ -1758,12 +1797,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   if (block == nil) {
     if (_asyncDataSourceFlags.interop) {
-      CGSize preferredSize = [self sizeForUIKitCellWithKind:nil atIndexPath:indexPath];
+      CGSize preferredSize = [self _sizeForUIKitCellWithKind:nil atIndexPath:indexPath];
       block = ^{
-        ASCellNode *cell = [[ASCellNode alloc] init];
-        cell.shouldUseUIKitCell = YES;
-        cell.style.preferredSize = preferredSize;
-        return cell;
+        ASCellNode *node = [[ASCellNode alloc] init];
+        node.shouldUseUIKitCell = YES;
+        node.style.preferredSize = preferredSize;
+        return node;
       };
     } else {
       ASDisplayNodeFailAssert(@"ASCollection could not get a node block for item at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
@@ -1859,7 +1898,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       CGSize preferredSize = CGSizeZero;
       BOOL useUIKitCell = _asyncDataSourceFlags.interopViewForSupplementaryElement;
       if (useUIKitCell) {
-        preferredSize = [self sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
+        preferredSize = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
       }
       nodeBlock = ^{
         ASCellNode *node = [[ASCellNode alloc] init];
@@ -1871,40 +1910,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 
   return nodeBlock;
-}
-
-- (CGSize)sizeForUIKitCellWithKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
-{
-  CGSize size = CGSizeZero;
-  UICollectionViewLayout *l = self.collectionViewLayout;
-
-  if (kind == nil) {
-    ASDisplayNodeAssert(_asyncDataSourceFlags.interop, @"This code should not be called except for UIKit passthrough compatibility");
-    SEL sizeForItem = @selector(collectionView:layout:sizeForItemAtIndexPath:);
-    if ([_asyncDelegate respondsToSelector:sizeForItem]) {
-      size = [(id)_asyncDelegate collectionView:self layout:l sizeForItemAtIndexPath:indexPath];
-    } else {
-      size = ASFlowLayoutDefault(l, itemSize, CGSizeZero);
-    }
-  } else if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
-    ASDisplayNodeAssert(_asyncDataSourceFlags.interopViewForSupplementaryElement, @"This code should not be called except for UIKit passthrough compatibility");
-    SEL sizeForHeader = @selector(collectionView:layout:referenceSizeForHeaderInSection:);
-    if ([_asyncDelegate respondsToSelector:sizeForHeader]) {
-      size = [(id)_asyncDelegate collectionView:self layout:l referenceSizeForHeaderInSection:indexPath.section];
-    } else {
-      size = ASFlowLayoutDefault(l, headerReferenceSize, CGSizeZero);
-    }
-  } else if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
-    ASDisplayNodeAssert(_asyncDataSourceFlags.interopViewForSupplementaryElement, @"This code should not be called except for UIKit passthrough compatibility");
-    SEL sizeForFooter = @selector(collectionView:layout:referenceSizeForFooterInSection:);
-    if ([_asyncDelegate respondsToSelector:sizeForFooter]) {
-      size = [(id)_asyncDelegate collectionView:self layout:l referenceSizeForFooterInSection:indexPath.section];
-    } else {
-      size = ASFlowLayoutDefault(l, footerReferenceSize, CGSizeZero);
-    }
-  }
-
-  return size;
 }
 
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
