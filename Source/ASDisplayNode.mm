@@ -20,7 +20,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
@@ -63,7 +62,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 // We have to forward declare the protocol as this place otherwise it will not compile compiling with an Base SDK < iOS 10
 @protocol CALayerDelegate;
 
-@interface ASDisplayNode () <UIGestureRecognizerDelegate, _ASDisplayLayerDelegate>
+@interface ASDisplayNode () <UIGestureRecognizerDelegate, CALayerDelegate, _ASDisplayLayerDelegate>
 
 /**
  * See ASDisplayNodeInternal.h for ivars
@@ -77,18 +76,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 
 @synthesize threadSafeBounds = _threadSafeBounds;
 
-static BOOL suppressesInvalidCollectionUpdateExceptions = NO;
 static std::atomic_bool storesUnflattenedLayouts = ATOMIC_VAR_INIT(NO);
-
-+ (BOOL)suppressesInvalidCollectionUpdateExceptions
-{
-  return suppressesInvalidCollectionUpdateExceptions;
-}
-
-+ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses
-{
-  suppressesInvalidCollectionUpdateExceptions = suppresses;
-}
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector)
 {
@@ -182,12 +170,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
   }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(fetchData))) {
-    overrides |= ASDisplayNodeMethodOverrideFetchData;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(clearFetchedData))) {
-    overrides |= ASDisplayNodeMethodOverrideClearFetchedData;
-  }
 
   return overrides;
 }
@@ -202,8 +184,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(calculatedSize)), @"Subclass %@ must not override calculatedSize method.", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(calculatedLayout)), @"Subclass %@ must not override calculatedLayout method.", classString);
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(measure:)), @"Subclass %@ must not override measure: method", classString);
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(measureWithSizeRange:)), @"Subclass %@ must not override measureWithSizeRange: method. Instead override calculateLayoutThatFits:", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(layoutThatFits:)), @"Subclass %@ must not override layoutThatFits: method. Instead override calculateLayoutThatFits:.", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(layoutThatFits:parentSize:)), @"Subclass %@ must not override layoutThatFits:parentSize method. Instead override calculateLayoutThatFits:.", classString);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearContents)), @"Subclass %@ must not override recursivelyClearContents method.", classString);
@@ -285,6 +265,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _calculatedDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>();
   _pendingDisplayNodeLayout = nullptr;
+  _layoutVersion = 1;
   
   _defaultLayoutTransitionDuration = 0.2;
   _defaultLayoutTransitionDelay = 0.0;
@@ -447,8 +428,18 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
   for (Ivar ivar : ivars) {
     id value = object_getIvar(self, ivar);
+    if (value == nil) {
+      continue;
+    }
+    
     if (ASClassRequiresMainThreadDeallocation(object_getClass(value))) {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Trampolining ivar '%s' value %@ for main deallocation.", self, ivar_getName(ivar), value);
+      
+      // Before scheduling the ivar for main thread deallocation we have clear out the ivar, otherwise we can run
+      // into a race condition where the main queue is drained earlier than this node is deallocated and the ivar
+      // is still deallocated on a background thread
+      object_setIvar(self, ivar, nil);
+      
       ASPerformMainThreadDeallocation(value);
     } else {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
@@ -882,12 +873,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 {
   ASDN::MutexLocker l(__instanceLock__);
   
-  // This will cause the next layout pass to compute a new layout instead of returning
-  // the cached layout in case the constrained or parent size did not change
-  _calculatedDisplayNodeLayout->invalidate();
-  if (_pendingDisplayNodeLayout != nullptr) {
-    _pendingDisplayNodeLayout->invalidate();
-  }
+  _layoutVersion++;
   
   _unflattenedLayout = nil;
 
@@ -910,7 +896,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     if (CGRectEqualToRect(bounds, CGRectZero)) {
       // Performing layout on a zero-bounds view often results in frame calculations
       // with negative sizes after applying margins, which will cause
-      // measureWithSizeRange: on subnodes to assert.
+      // layoutThatFits: on subnodes to assert.
       as_log_debug(OS_LOG_DISABLED, "Warning: No size given for node before node was trying to layout itself: %@. Please provide a frame for the node.", self);
       return;
     }
@@ -920,12 +906,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     if (_transitionID != ASLayoutElementContextInvalidTransitionID) {
       return;
     }
-    
+
+    as_activity_create_for_scope("-[ASDisplayNode __layout]");
+
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
     [self _locked_measureNodeWithBoundsIfNecessary:bounds];
-    _pendingDisplayNodeLayout = nullptr;
-    
+
     [self _locked_layoutPlaceholderIfNecessary];
   }
   
@@ -935,6 +922,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (loaded) {
     ASPerformBlockOnMainThread(^{
       [self layout];
+      [self _layoutClipCornersIfNeeded];
       [self layoutDidFinish];
     });
   }
@@ -990,23 +978,30 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
   // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
   // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
-  // If we're a leaf node, we are probably being called by a measure function and proceed as normal.
-  // If we're a yoga root or tree node, initiate a new Yoga calculation pass from root.
   YGNodeRef yogaNode = _style.yogaNode;
   BOOL hasYogaParent = (_yogaParent != nil);
   BOOL hasYogaChildren = (_yogaChildren.count > 0);
   BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
-  if (usesYoga && (_yogaParent == nil || _yogaChildren.count > 0)) {
+  if (usesYoga) {
     // This node has some connection to a Yoga tree.
-    ASDN::MutexUnlocker ul(__instanceLock__);
-
-    if (self.yogaLayoutInProgress == NO) {
-      [self calculateLayoutFromYogaRoot:constrainedSize];
+    if ([self shouldHaveYogaMeasureFunc] == NO) {
+      // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
+      // initiate a new Yoga calculation pass from root.
+      ASDN::MutexUnlocker ul(__instanceLock__);
+      as_activity_create_for_scope("Yoga layout calculation");
+      if (self.yogaLayoutInProgress == NO) {
+        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
+        [self calculateLayoutFromYogaRoot:constrainedSize];
+      } else {
+        ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
+      }
+      ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
+      return _yogaCalculatedLayout;
+    } else {
+      // If we're a yoga leaf node with custom measurement function, proceed with normal layout so layoutSpecs can run (e.g. ASButtonNode).
+      ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
     }
-    ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
-    return _yogaCalculatedLayout;
   }
-  ASYogaLog(@"PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
 #endif /* YOGA */
   
   // Manual size calculation via calculateSizeThatFits:
@@ -1127,6 +1122,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
+  [_interfaceStateDelegate nodeDidLayout];
 }
 
 #pragma mark Layout Transition
@@ -1480,6 +1476,147 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   });
 }
 
+- (void)_layoutClipCornersIfNeeded
+{
+  ASDisplayNodeAssertMainThread();
+  if (_clipCornerLayers[0] == nil) {
+    return;
+  }
+  
+  CGSize boundsSize = self.bounds.size;
+  for (int idx = 0; idx < 4; idx++) {
+    BOOL isTop   = (idx == 0 || idx == 1);
+    BOOL isRight = (idx == 1 || idx == 2);
+    if (_clipCornerLayers[idx]) {
+      // Note the Core Animation coordinates are reversed for y; 0 is at the bottom.
+      _clipCornerLayers[idx].position = CGPointMake(isRight ? boundsSize.width : 0.0, isTop ? boundsSize.height : 0.0);
+      [_layer addSublayer:_clipCornerLayers[idx]];
+    }
+  }
+}
+
+- (void)_updateClipCornerLayerContentsWithRadius:(CGFloat)radius backgroundColor:(UIColor *)backgroundColor
+{
+  ASPerformBlockOnMainThread(^{
+    for (int idx = 0; idx < 4; idx++) {
+      // Layers are, in order: Top Left, Top Right, Bottom Right, Bottom Left.
+      // anchorPoint is Bottom Left at 0,0 and Top Right at 1,1.
+      BOOL isTop   = (idx == 0 || idx == 1);
+      BOOL isRight = (idx == 1 || idx == 2);
+      
+      CGSize size = CGSizeMake(radius + 1, radius + 1);
+      UIGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
+      
+      CGContextRef ctx = UIGraphicsGetCurrentContext();
+      if (isRight == YES) {
+        CGContextTranslateCTM(ctx, -radius + 1, 0);
+      }
+      if (isTop == YES) {
+        CGContextTranslateCTM(ctx, 0, -radius + 1);
+      }
+      UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
+      [roundedRect setUsesEvenOddFillRule:YES];
+      [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
+      [backgroundColor setFill];
+      [roundedRect fill];
+      
+      // No lock needed, as _clipCornerLayers is only modified on the main thread.
+      CALayer *clipCornerLayer = _clipCornerLayers[idx];
+      clipCornerLayer.contents = (id)(UIGraphicsGetImageFromCurrentImageContext().CGImage);
+      clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
+      clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 1.0 : 0.0);
+
+      UIGraphicsEndImageContext();
+    }
+    [self _layoutClipCornersIfNeeded];
+  });
+}
+
+- (void)_setClipCornerLayersVisible:(BOOL)visible
+{
+  ASPerformBlockOnMainThread(^{
+    ASDisplayNodeAssertMainThread();
+    if (visible) {
+      for (int idx = 0; idx < 4; idx++) {
+        if (_clipCornerLayers[idx] == nil) {
+          _clipCornerLayers[idx] = [[CALayer alloc] init];
+          _clipCornerLayers[idx].zPosition = 99999;
+          _clipCornerLayers[idx].delegate = self;
+        }
+      }
+      [self _updateClipCornerLayerContentsWithRadius:_cornerRadius backgroundColor:self.backgroundColor];
+    } else {
+      for (int idx = 0; idx < 4; idx++) {
+        [_clipCornerLayers[idx] removeFromSuperlayer];
+        _clipCornerLayers[idx] = nil;
+      }
+    }
+  });
+}
+
+- (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType cornerRadius:(CGFloat)newCornerRadius
+{
+  __instanceLock__.lock();
+    CGFloat oldCornerRadius = _cornerRadius;
+    ASCornerRoundingType oldRoundingType = _cornerRoundingType;
+
+    _cornerRadius = newCornerRadius;
+    _cornerRoundingType = newRoundingType;
+  __instanceLock__.unlock();
+ 
+  ASPerformBlockOnMainThread(^{
+    ASDisplayNodeAssertMainThread();
+    
+    if (oldRoundingType != newRoundingType || oldCornerRadius != newCornerRadius) {
+      if (oldRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+        if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          self.layerCornerRadius = 0.0;
+          if (oldCornerRadius > 0.0) {
+            [self displayImmediately];
+          } else {
+            [self setNeedsDisplay]; // Async display is OK if we aren't replacing an existing .cornerRadius.
+          }
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          self.layerCornerRadius = 0.0;
+          [self _setClipCornerLayersVisible:YES];
+        } else if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
+        }
+      }
+      else if (oldRoundingType == ASCornerRoundingTypePrecomposited) {
+        if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
+          [self setNeedsDisplay];
+        }
+        else if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          // Corners are already precomposited, but the radius has changed.
+          // Default to async re-display.  The user may force a synchronous display if desired.
+          [self setNeedsDisplay];
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          [self _setClipCornerLayersVisible:YES];
+          [self setNeedsDisplay];
+        }
+      }
+      else if (oldRoundingType == ASCornerRoundingTypeClipping) {
+        if (newRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
+          self.layerCornerRadius = newCornerRadius;
+          [self _setClipCornerLayersVisible:NO];
+        }
+        else if (newRoundingType == ASCornerRoundingTypePrecomposited) {
+          [self _setClipCornerLayersVisible:NO];
+          [self displayImmediately];
+        }
+        else if (newRoundingType == ASCornerRoundingTypeClipping) {
+          // Clip corners already exist, but the radius has changed.
+          [self _updateClipCornerLayerContentsWithRadius:newCornerRadius backgroundColor:self.backgroundColor];
+        }
+      }
+    }
+  });
+}
+
 - (void)recursivelySetDisplaySuspended:(BOOL)flag
 {
   _recursivelySetDisplaySuspended(self, nil, flag);
@@ -1555,7 +1692,11 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 - (void)willDisplayAsyncLayer:(_ASDisplayLayer *)layer asynchronously:(BOOL)asynchronously
 {
   // Subclass hook.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   [self displayWillStart];
+#pragma clang diagnostic pop
+
   [self displayWillStartAsynchronously:asynchronously];
 }
 
@@ -1568,7 +1709,6 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 - (void)displayWillStart {}
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
-  [self displayWillStart]; // Subclass override
   ASDisplayNodeAssertMainThread();
 
   ASDisplayNodeLogEvent(self, @"displayWillStart");
@@ -2937,13 +3077,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   [_interfaceStateDelegate didEnterPreloadState];
-  
-  if (_methodOverrides & ASDisplayNodeMethodOverrideFetchData) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [self fetchData];
-#pragma clang diagnostic pop
-  }
 }
 
 - (void)didExitPreloadState
@@ -2951,13 +3084,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   [_interfaceStateDelegate didExitPreloadState];
-  
-  if (_methodOverrides & ASDisplayNodeMethodOverrideClearFetchedData) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [self clearFetchedData];
-#pragma clang diagnostic pop
-  }
 }
 
 - (void)clearContents
@@ -3095,12 +3221,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_locked_applyPendingViewState
 {
   ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self _locked_isNodeLoaded], @"Expected node to be loaded before applying pending state.");
 
   if (_flags.layerBacked) {
-    [_pendingViewState applyToLayer:self.layer];
+    [_pendingViewState applyToLayer:_layer];
   } else {
     BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    [_pendingViewState applyToView:self.view withSpecialPropertiesHandling:specialPropertiesHandling];
+    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling];
   }
 
   // _ASPendingState objects can add up very quickly when adding
@@ -3172,6 +3299,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return measurements;
 }
 
+#pragma mark - Accessibility
+
+- (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _isAccessibilityContainer = isAccessibilityContainer;
+}
+
+- (BOOL)isAccessibilityContainer
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _isAccessibilityContainer;
+}
 
 #pragma mark - Debugging (Private)
 
@@ -3382,6 +3522,38 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return subtree;
 }
 
+- (NSString *)detailedLayoutDescription
+{
+  ASPushMainThreadAssertionsDisabled();
+  ASDN::MutexLocker l(__instanceLock__);
+  auto props = [NSMutableArray<NSDictionary *> array];
+
+  [props addObject:@{ @"layoutVersion": @(_layoutVersion.load()) }];
+  [props addObject:@{ @"bounds": [NSValue valueWithCGRect:self.bounds] }];
+
+  if (_calculatedDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
+    [props addObject:@{ @"calculatedLayout": c.layout }];
+    [props addObject:@{ @"calculatedVersion": @(c.version) }];
+    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(c.constrainedSize) }];
+    if (c.requestedLayoutFromAbove) {
+      [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
+    }
+  }
+  if (_pendingDisplayNodeLayout != nullptr) {
+    ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
+    [props addObject:@{ @"pendingLayout": p.layout }];
+    [props addObject:@{ @"pendingVersion": @(p.version) }];
+    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(p.constrainedSize) }];
+    if (p.requestedLayoutFromAbove) {
+      [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
+    }
+  }
+
+  ASPopMainThreadAssertionsDisabled();
+  return ASObjectDescriptionMake(self, props);
+}
+
 @end
 
 #pragma mark - ASDisplayNode UIKit / CA Categories
@@ -3457,104 +3629,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
     }
     [self addSublayer:subnode.layer];
   }
-}
-
-@end
-
-#pragma mark - ASDisplayNode (Deprecated)
-
-@implementation ASDisplayNode (Deprecated)
-
-- (NSString *)name
-{
-  return self.debugName;
-}
-
-- (void)setName:(NSString *)name
-{
-  self.debugName = name;
-}
-
-- (void)setPreferredFrameSize:(CGSize)preferredFrameSize
-{
-  // Deprecated preferredFrameSize just calls through to set width and height
-  self.style.preferredSize = preferredFrameSize;
-  [self setNeedsLayout];
-}
-
-- (CGSize)preferredFrameSize
-{
-  ASLayoutSize size = self.style.preferredLayoutSize;
-  BOOL isPoints = (size.width.unit == ASDimensionUnitPoints && size.height.unit == ASDimensionUnitPoints);
-  return isPoints ? CGSizeMake(size.width.value, size.height.value) : CGSizeZero;
-}
-
-- (BOOL)usesImplicitHierarchyManagement
-{
-  return self.automaticallyManagesSubnodes;
-}
-
-- (void)setUsesImplicitHierarchyManagement:(BOOL)enabled
-{
-  self.automaticallyManagesSubnodes = enabled;
-}
-
-- (CGSize)measure:(CGSize)constrainedSize
-{
-  return [self layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
-}
-
-ASLayoutElementStyleForwarding
-
-- (void)visibilityDidChange:(BOOL)isVisible
-{
-  if (isVisible) {
-    [self didEnterVisibleState];
-  } else {
-    [self didExitVisibleState];
-  }
-}
-
-- (void)visibleStateDidChange:(BOOL)isVisible
-{
-  if (isVisible) {
-    [self didEnterVisibleState];
-  } else {
-    [self didExitVisibleState];
-  }
-}
-
-- (void)displayStateDidChange:(BOOL)inDisplayState
-{
-  if (inDisplayState) {
-    [self didEnterVisibleState];
-  } else {
-    [self didExitVisibleState];
-  }
-}
-
-- (void)loadStateDidChange:(BOOL)inLoadState
-{
-  if (inLoadState) {
-    [self didEnterPreloadState];
-  } else {
-    [self didExitPreloadState];
-  }
-}
-
-- (void)fetchData
-{
-  // subclass override
-}
-
-- (void)clearFetchedData
-{
-  // subclass override
-}
-
-- (void)cancelLayoutTransitionsInProgress
-{
-  [self cancelLayoutTransition];
 }
 
 @end

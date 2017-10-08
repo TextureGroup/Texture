@@ -125,6 +125,8 @@ permalink: /showcase.html
 		<a href="https://itunes.apple.com/us/app/classdojo/id552602056"><img class="roundrect" src="http://is4.mzstatic.com/image/thumb/Purple122/v4/83/b1/ef/83b1efa6-bda8-3c80-fd66-4a461f638e07/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>ClassDojo</b>
+        <br>
+        <a href="https://engineering.classdojo.com/blog/2017/07/12/asyncdisplaykit">Powering Class Story With Texture</a>
 		</td>
     
 		</tr>
@@ -185,6 +187,28 @@ permalink: /showcase.html
 		<a href="https://itunes.apple.com/us/app/hakkerjobs-hackernews-client/id1028168255"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple49/v4/16/73/c8/1673c8ee-766b-e6ec-8889-27dcfd0b59f8/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>HakkerJobs</b>
+		</td>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/traceme-welcome-to-the-world-of-russell-wilson/id1253802880?mt=8"><img class="roundrect" src="http://is1.mzstatic.com/image/thumb/Purple128/v4/30/3c/72/303c72a0-bbc2-2f43-ecc1-5a1c06dc1f58/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>TraceMe</b>
+		</td>
+		
+		</tr>
+		
+		<tr>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/tw/app/pairs%E6%B4%BE%E6%84%9B%E6%97%8F-%E6%89%BE%E5%88%B0%E7%90%86%E6%83%B3%E5%B0%8D%E8%B1%A1%E7%9A%84%E4%BA%A4%E5%8F%8Bapp/id825433065?mt=8"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple118/v4/5b/a0/e3/5ba0e32f-5e6c-e0cb-fca9-ccb6b8bb02a4/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Pairs</b>
+		</td>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/app/apple-store/id1022256487?mt=8"><img class="roundrect" src="http://is2.mzstatic.com/image/thumb/Purple128/v4/07/d2/94/07d2947b-f074-1160-7eb7-f04acc9072c5/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Sorted: Master Your Day</b>
 		</td>
 		
 		</tr>

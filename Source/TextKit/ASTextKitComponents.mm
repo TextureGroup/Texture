@@ -1,5 +1,5 @@
 //
-//  ASTextKitComponents.m
+//  ASTextKitComponents.mm
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
+#import <AsyncDisplayKit/ASAssert.h>
 
 #import <tgmath.h>
 
@@ -29,6 +30,8 @@
 @end
 
 @implementation ASTextKitComponents
+
+#pragma mark - Class
 
 + (instancetype)componentsWithAttributedSeedString:(NSAttributedString *)attributedSeedString
                                  textContainerSize:(CGSize)textContainerSize
@@ -57,6 +60,19 @@
 
   return components;
 }
+
+#pragma mark - Lifecycle
+
+- (void)dealloc
+{
+  ASDisplayNodeAssertMainThread();
+
+  // Nil out all delegate to prevent crash
+  _textView.delegate = nil;
+  _layoutManager.delegate = nil;
+}
+
+#pragma mark - Sizing
 
 - (CGSize)sizeForConstrainedWidth:(CGFloat)constrainedWidth
 {

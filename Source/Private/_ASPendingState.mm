@@ -20,8 +20,9 @@
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
   || (flags.setOpaque && opaque != (layer).opaque)\
@@ -43,7 +44,6 @@ typedef struct {
   int setBounds:1;
   int setBackgroundColor:1;
   int setTintColor:1;
-  int setContents:1;
   int setHidden:1;
   int setAlpha:1;
   int setCornerRadius:1;
@@ -52,13 +52,14 @@ typedef struct {
   int setAnchorPoint:1;
   int setPosition:1;
   int setZPosition:1;
+  int setTransform:1;
+  int setSublayerTransform:1;
+  int setContents:1;
   int setContentsGravity:1;
   int setContentsRect:1;
   int setContentsCenter:1;
   int setContentsScale:1;
   int setRasterizationScale:1;
-  int setTransform:1;
-  int setSublayerTransform:1;
   int setUserInteractionEnabled:1;
   int setExclusiveTouch:1;
   int setShadowColor:1;
@@ -73,8 +74,11 @@ typedef struct {
   int setEdgeAntialiasingMask:1;
   int setIsAccessibilityElement:1;
   int setAccessibilityLabel:1;
+  int setAccessibilityAttributedLabel:1;
   int setAccessibilityHint:1;
+  int setAccessibilityAttributedHint:1;
   int setAccessibilityValue:1;
+  int setAccessibilityAttributedValue:1;
   int setAccessibilityTraits:1;
   int setAccessibilityFrame:1;
   int setAccessibilityLanguage:1;
@@ -98,20 +102,20 @@ typedef struct {
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
   CGRect bounds;
   CGColorRef backgroundColor;
-  id contents;
   CGFloat alpha;
   CGFloat cornerRadius;
   UIViewContentMode contentMode;
   CGPoint anchorPoint;
   CGPoint position;
   CGFloat zPosition;
+  CATransform3D transform;
+  CATransform3D sublayerTransform;
+  id contents;
   NSString *contentsGravity;
   CGRect contentsRect;
   CGRect contentsCenter;
   CGFloat contentsScale;
   CGFloat rasterizationScale;
-  CATransform3D transform;
-  CATransform3D sublayerTransform;
   CGColorRef shadowColor;
   CGFloat shadowOpacity;
   CGSize shadowOffset;
@@ -121,8 +125,11 @@ typedef struct {
   BOOL asyncTransactionContainer;
   BOOL isAccessibilityElement;
   NSString *accessibilityLabel;
+  NSAttributedString *accessibilityAttributedLabel;
   NSString *accessibilityHint;
+  NSAttributedString *accessibilityAttributedHint;
   NSString *accessibilityValue;
+  NSAttributedString *accessibilityAttributedValue;
   UIAccessibilityTraits accessibilityTraits;
   CGRect accessibilityFrame;
   NSString *accessibilityLanguage;
@@ -169,7 +176,6 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize frame=frame;
 @synthesize bounds=bounds;
 @synthesize backgroundColor=backgroundColor;
-@synthesize contents=contents;
 @synthesize hidden=isHidden;
 @synthesize needsDisplayOnBoundsChange=needsDisplayOnBoundsChange;
 @synthesize allowsGroupOpacity=allowsGroupOpacity;
@@ -184,13 +190,14 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize anchorPoint=anchorPoint;
 @synthesize position=position;
 @synthesize zPosition=zPosition;
+@synthesize transform=transform;
+@synthesize sublayerTransform=sublayerTransform;
+@synthesize contents=contents;
 @synthesize contentsGravity=contentsGravity;
 @synthesize contentsRect=contentsRect;
 @synthesize contentsCenter=contentsCenter;
 @synthesize contentsScale=contentsScale;
 @synthesize rasterizationScale=rasterizationScale;
-@synthesize transform=transform;
-@synthesize sublayerTransform=sublayerTransform;
 @synthesize userInteractionEnabled=userInteractionEnabled;
 @synthesize exclusiveTouch=exclusiveTouch;
 @synthesize shadowColor=shadowColor;
@@ -242,7 +249,6 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   bounds = CGRectZero;
   backgroundColor = nil;
   tintColor = defaultTintColor;
-  contents = nil;
   isHidden = NO;
   needsDisplayOnBoundsChange = NO;
   allowsGroupOpacity = defaultAllowsGroupOpacity;
@@ -255,9 +261,14 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   anchorPoint = CGPointMake(0.5, 0.5);
   position = CGPointZero;
   zPosition = 0.0;
-  contentsScale = 1.0f;
   transform = CATransform3DIdentity;
   sublayerTransform = CATransform3DIdentity;
+  contents = nil;
+  contentsGravity = kCAGravityResize;
+  contentsRect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+  contentsCenter = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+  contentsScale = 1.0f;
+  rasterizationScale = 1.0f;
   userInteractionEnabled = YES;
   shadowColor = blackColorRef;
   shadowOpacity = 0.0;
@@ -267,8 +278,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   borderColor = blackColorRef;
   isAccessibilityElement = NO;
   accessibilityLabel = nil;
+  accessibilityAttributedLabel = nil;
   accessibilityHint = nil;
+  accessibilityAttributedHint = nil;
   accessibilityValue = nil;
+  accessibilityAttributedValue = nil;
   accessibilityTraits = UIAccessibilityTraitNone;
   accessibilityFrame = CGRectZero;
   accessibilityLanguage = nil;
@@ -388,16 +402,6 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   _flags.setTintColor = YES;
 }
 
-- (void)setContents:(id)newContents
-{
-  if (contents == newContents) {
-    return;
-  }
-
-  contents = newContents;
-  _flags.setContents = YES;
-}
-
 - (void)setHidden:(BOOL)flag
 {
   isHidden = flag;
@@ -445,12 +449,6 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   _flags.setZPosition = YES;
 }
 
-- (void)setContentsScale:(CGFloat)newContentsScale
-{
-  contentsScale = newContentsScale;
-  _flags.setContentsScale = YES;
-}
-
 - (void)setTransform:(CATransform3D)newTransform
 {
   transform = newTransform;
@@ -461,6 +459,46 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 {
   sublayerTransform = newSublayerTransform;
   _flags.setSublayerTransform = YES;
+}
+
+- (void)setContents:(id)newContents
+{
+  if (contents == newContents) {
+    return;
+  }
+
+  contents = newContents;
+  _flags.setContents = YES;
+}
+
+- (void)setContentsGravity:(NSString *)newContentsGravity
+{
+  contentsGravity = newContentsGravity;
+  _flags.setContentsGravity = YES;
+}
+
+- (void)setContentsRect:(CGRect)newContentsRect
+{
+  contentsRect = newContentsRect;
+  _flags.setContentsRect = YES;
+}
+
+- (void)setContentsCenter:(CGRect)newContentsCenter
+{
+  contentsCenter = newContentsCenter;
+  _flags.setContentsCenter = YES;
+}
+
+- (void)setContentsScale:(CGFloat)newContentsScale
+{
+  contentsScale = newContentsScale;
+  _flags.setContentsScale = YES;
+}
+
+- (void)setRasterizationScale:(CGFloat)newRasterizationScale
+{
+  rasterizationScale = newRasterizationScale;
+  _flags.setRasterizationScale = YES;
 }
 
 - (void)setUserInteractionEnabled:(BOOL)flag
@@ -558,9 +596,26 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityLabel:(NSString *)newAccessibilityLabel
 {
-  _flags.setAccessibilityLabel = YES;
-  if (accessibilityLabel != newAccessibilityLabel) {
-    accessibilityLabel = [newAccessibilityLabel copy];
+  if (! ASObjectIsEqual(accessibilityLabel, newAccessibilityLabel)) {
+    _flags.setAccessibilityLabel = YES;
+    _flags.setAccessibilityAttributedLabel = YES;
+    accessibilityLabel = newAccessibilityLabel ? [newAccessibilityLabel copy] : nil;
+    accessibilityAttributedLabel = newAccessibilityLabel ? [[NSAttributedString alloc] initWithString:newAccessibilityLabel] : nil;
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedLabel
+{
+  return accessibilityAttributedLabel;
+}
+
+- (void)setAccessibilityAttributedLabel:(NSAttributedString *)newAccessibilityAttributedLabel
+{
+  if (! ASObjectIsEqual(accessibilityAttributedLabel, newAccessibilityAttributedLabel)) {
+    _flags.setAccessibilityAttributedLabel = YES;
+    _flags.setAccessibilityLabel = YES;
+    accessibilityAttributedLabel = newAccessibilityAttributedLabel ? [newAccessibilityAttributedLabel copy] : nil;
+    accessibilityLabel = newAccessibilityAttributedLabel ? [newAccessibilityAttributedLabel.string copy] : nil;
   }
 }
 
@@ -571,8 +626,27 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityHint:(NSString *)newAccessibilityHint
 {
-  _flags.setAccessibilityHint = YES;
-  accessibilityHint = [newAccessibilityHint copy];
+  if (! ASObjectIsEqual(accessibilityHint, newAccessibilityHint)) {
+    _flags.setAccessibilityHint = YES;
+    _flags.setAccessibilityAttributedHint = YES;
+    accessibilityHint = newAccessibilityHint ? [newAccessibilityHint copy] : nil;
+    accessibilityAttributedHint = newAccessibilityHint ? [[NSAttributedString alloc] initWithString:newAccessibilityHint] : nil;
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedHint
+{
+  return accessibilityAttributedHint;
+}
+
+- (void)setAccessibilityAttributedHint:(NSAttributedString *)newAccessibilityAttributedHint
+{
+  if (! ASObjectIsEqual(accessibilityAttributedHint, newAccessibilityAttributedHint)) {
+    _flags.setAccessibilityAttributedHint = YES;
+    _flags.setAccessibilityHint = YES;
+    accessibilityAttributedHint = newAccessibilityAttributedHint ? [newAccessibilityAttributedHint copy] : nil;
+    accessibilityHint = newAccessibilityAttributedHint ? [newAccessibilityAttributedHint.string copy] : nil;
+  }
 }
 
 - (NSString *)accessibilityValue
@@ -582,8 +656,27 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 - (void)setAccessibilityValue:(NSString *)newAccessibilityValue
 {
-  _flags.setAccessibilityValue = YES;
-  accessibilityValue = [newAccessibilityValue copy];
+  if (! ASObjectIsEqual(accessibilityValue, newAccessibilityValue)) {
+    _flags.setAccessibilityValue = YES;
+    _flags.setAccessibilityAttributedValue = YES;
+    accessibilityValue = newAccessibilityValue ? [newAccessibilityValue copy] : nil;
+    accessibilityAttributedValue = newAccessibilityValue ? [[NSAttributedString alloc] initWithString:newAccessibilityValue] : nil;
+  }
+}
+
+- (NSAttributedString *)accessibilityAttributedValue
+{
+  return accessibilityAttributedValue;
+}
+
+- (void)setAccessibilityAttributedValue:(NSAttributedString *)newAccessibilityAttributedValue
+{
+  if (! ASObjectIsEqual(accessibilityAttributedValue, newAccessibilityAttributedValue)) {
+    _flags.setAccessibilityAttributedValue = YES;
+    _flags.setAccessibilityValue = YES;
+    accessibilityAttributedValue = newAccessibilityAttributedValue?  [newAccessibilityAttributedValue copy] : nil;
+    accessibilityValue = newAccessibilityAttributedValue ? [newAccessibilityAttributedValue.string copy] : nil;
+  }
 }
 
 - (UIAccessibilityTraits)accessibilityTraits
@@ -732,9 +825,6 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setZPosition)
     layer.zPosition = zPosition;
 
-  if (flags.setContentsScale)
-    layer.contentsScale = contentsScale;
-
   if (flags.setTransform)
     layer.transform = transform;
 
@@ -743,6 +833,21 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
   if (flags.setContents)
     layer.contents = contents;
+
+  if (flags.setContentsGravity)
+    layer.contentsGravity = contentsGravity;
+
+  if (flags.setContentsRect)
+    layer.contentsRect = contentsRect;
+
+  if (flags.setContentsCenter)
+    layer.contentsCenter = contentsCenter;
+
+  if (flags.setContentsScale)
+    layer.contentsScale = contentsScale;
+
+  if (flags.setRasterizationScale)
+    layer.rasterizationScale = rasterizationScale;
 
   if (flags.setClipsToBounds)
     layer.masksToBounds = clipsToBounds;
@@ -880,7 +985,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
     view.tintColor = self.tintColor;
 
   if (flags.setOpaque)
-    view.layer.opaque = opaque;
+    layer.opaque = opaque;
 
   if (flags.setHidden)
     view.hidden = isHidden;
@@ -942,7 +1047,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
     view.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
 
   if (flags.setOpaque)
-    ASDisplayNodeAssert(view.layer.opaque == opaque, @"Didn't set opaque as desired");
+    ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
 
   if (flags.setSemanticContentAttribute) {
     view.semanticContentAttribute = semanticContentAttribute;
@@ -954,11 +1059,20 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setAccessibilityLabel)
     view.accessibilityLabel = accessibilityLabel;
 
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedLabel)
+    [view setValue:accessibilityAttributedLabel forKey:@"accessibilityAttributedLabel"];
+
   if (flags.setAccessibilityHint)
     view.accessibilityHint = accessibilityHint;
 
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedHint)
+    [view setValue:accessibilityAttributedHint forKey:@"accessibilityAttributedHint"];
+
   if (flags.setAccessibilityValue)
     view.accessibilityValue = accessibilityValue;
+
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedValue)
+    [view setValue:accessibilityAttributedValue forKey:@"accessibilityAttributedValue"];
 
   if (flags.setAccessibilityTraits)
     view.accessibilityTraits = accessibilityTraits;
@@ -1024,10 +1138,14 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.position = layer.position;
   pendingState.zPosition = layer.zPosition;
   pendingState.bounds = layer.bounds;
-  pendingState.contentsScale = layer.contentsScale;
   pendingState.transform = layer.transform;
   pendingState.sublayerTransform = layer.sublayerTransform;
   pendingState.contents = layer.contents;
+  pendingState.contentsGravity = layer.contentsGravity;
+  pendingState.contentsRect = layer.contentsRect;
+  pendingState.contentsCenter = layer.contentsCenter;
+  pendingState.contentsScale = layer.contentsScale;
+  pendingState.rasterizationScale = layer.rasterizationScale;
   pendingState.clipsToBounds = layer.masksToBounds;
   pendingState.backgroundColor = layer.backgroundColor;
   pendingState.opaque = layer.opaque;
@@ -1098,6 +1216,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
+  if (@available(iOS 11, *)) {
+    pendingState.accessibilityAttributedLabel = [view valueForKey: @"accessibilityAttributedLabel"];
+    pendingState.accessibilityAttributedHint = [view valueForKey: @"accessibilityAttributedHint"];
+    pendingState.accessibilityAttributedValue = [view valueForKey: @"accessibilityAttributedValue"];
+  }
   pendingState.accessibilityTraits = view.accessibilityTraits;
   pendingState.accessibilityFrame = view.accessibilityFrame;
   pendingState.accessibilityLanguage = view.accessibilityLanguage;
@@ -1139,10 +1262,14 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   || flags.setFrame
   || flags.setBounds
   || flags.setPosition
-  || flags.setContentsScale
   || flags.setTransform
   || flags.setSublayerTransform
   || flags.setContents
+  || flags.setContentsGravity
+  || flags.setContentsRect
+  || flags.setContentsCenter
+  || flags.setContentsScale
+  || flags.setRasterizationScale
   || flags.setClipsToBounds
   || flags.setBackgroundColor
   || flags.setTintColor
@@ -1171,8 +1298,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   || flags.setSemanticContentAttribute
   || flags.setIsAccessibilityElement
   || flags.setAccessibilityLabel
+  || flags.setAccessibilityAttributedLabel
   || flags.setAccessibilityHint
+  || flags.setAccessibilityAttributedHint
   || flags.setAccessibilityValue
+  || flags.setAccessibilityAttributedValue
   || flags.setAccessibilityTraits
   || flags.setAccessibilityFrame
   || flags.setAccessibilityLanguage

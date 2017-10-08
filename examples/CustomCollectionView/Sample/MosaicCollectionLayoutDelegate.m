@@ -11,63 +11,67 @@
 //
 
 #import "MosaicCollectionLayoutDelegate.h"
+#import "MosaicCollectionLayoutInfo.h"
 #import "ImageCellNode.h"
 
 #import <AsyncDisplayKit/ASCollectionElement.h>
 
 @implementation MosaicCollectionLayoutDelegate {
   // Read-only properties
-  NSInteger _numberOfColumns;
-  CGFloat _headerHeight;
-  CGFloat _columnSpacing;
-  UIEdgeInsets _sectionInset;
-  UIEdgeInsets _interItemSpacing;
+  MosaicCollectionLayoutInfo *_info;
 }
 
 - (instancetype)initWithNumberOfColumns:(NSInteger)numberOfColumns headerHeight:(CGFloat)headerHeight
 {
   self = [super init];
   if (self != nil) {
-    _numberOfColumns = numberOfColumns;
-    _headerHeight = headerHeight;
-    _columnSpacing = 10.0;
-    _sectionInset = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
-    _interItemSpacing = UIEdgeInsetsMake(10.0, 0, 10.0, 0);
+    _info = [[MosaicCollectionLayoutInfo alloc] initWithNumberOfColumns:numberOfColumns
+                                                           headerHeight:headerHeight
+                                                          columnSpacing:10.0
+                                                          sectionInsets:UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0)
+                                                       interItemSpacing:UIEdgeInsetsMake(10.0, 0, 10.0, 0)];
   }
   return self;
 }
 
-- (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
+- (ASScrollDirection)scrollableDirections
 {
-  return nil;
+  ASDisplayNodeAssertMainThread();
+  return ASScrollDirectionVerticalDirections;
 }
 
-- (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
+- (id)additionalInfoForLayoutWithElements:(ASElementMap *)elements
+{
+  ASDisplayNodeAssertMainThread();
+  return _info;
+}
+
++ (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   CGFloat layoutWidth = context.viewportSize.width;
   ASElementMap *elements = context.elements;
   CGFloat top = 0;
+  MosaicCollectionLayoutInfo *info = (MosaicCollectionLayoutInfo *)context.additionalInfo;
   
-  // TODO use +[NSMapTable elementToLayoutAttributesTable]
-  NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *attrsMap = [NSMapTable mapTableWithKeyOptions:(NSMapTableObjectPointerPersonality | NSMapTableWeakMemory) valueOptions:NSMapTableStrongMemory];
+  NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *attrsMap = [NSMapTable elementToLayoutAttributesTable];
   NSMutableArray *columnHeights = [NSMutableArray array];
   
   NSInteger numberOfSections = [elements numberOfSections];
   for (NSUInteger section = 0; section < numberOfSections; section++) {
     NSInteger numberOfItems = [elements numberOfItemsInSection:section];
     
-    top += _sectionInset.top;
+    top += info.sectionInsets.top;
     
-    if (_headerHeight > 0) {
+    if (info.headerHeight > 0) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:section];
       ASCollectionElement *element = [elements supplementaryElementOfKind:UICollectionElementKindSectionHeader
                                                               atIndexPath:indexPath];
       UICollectionViewLayoutAttributes *attrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                                                                                                     withIndexPath:indexPath];
+                                                                                                               withIndexPath:indexPath];
       
-      ASSizeRange sizeRange = [self sizeRangeForHeaderOfSection:section withLayoutWidth:layoutWidth];
+      ASSizeRange sizeRange = [self _sizeRangeForHeaderOfSection:section withLayoutWidth:layoutWidth info:info];
       CGSize size = [element.node layoutThatFits:sizeRange].size;
-      CGRect frame = CGRectMake(_sectionInset.left, top, size.width, size.height);
+      CGRect frame = CGRectMake(info.sectionInsets.left, top, size.width, size.height);
       
       attrs.frame = frame;
       [attrsMap setObject:attrs forKey:element];
@@ -75,31 +79,31 @@
     }
     
     [columnHeights addObject:[NSMutableArray array]];
-    for (NSUInteger idx = 0; idx < _numberOfColumns; idx++) {
+    for (NSUInteger idx = 0; idx < info.numberOfColumns; idx++) {
       [columnHeights[section] addObject:@(top)];
     }
     
-    CGFloat columnWidth = [self _columnWidthForSection:section withLayoutWidth:layoutWidth];
+    CGFloat columnWidth = [self _columnWidthForSection:section withLayoutWidth:layoutWidth info:info];
     for (NSUInteger idx = 0; idx < numberOfItems; idx++) {
       NSUInteger columnIndex = [self _shortestColumnIndexInSection:section withColumnHeights:columnHeights];
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:section];
       ASCollectionElement *element = [elements elementForItemAtIndexPath:indexPath];
       UICollectionViewLayoutAttributes *attrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
       
-      ASSizeRange sizeRange = [self sizeRangeForItem:element.node atIndexPath:indexPath withLayoutWidth:layoutWidth];
+      ASSizeRange sizeRange = [self _sizeRangeForItem:element.node atIndexPath:indexPath withLayoutWidth:layoutWidth info:info];
       CGSize size = [element.node layoutThatFits:sizeRange].size;
-      CGPoint position = CGPointMake(_sectionInset.left + (columnWidth + _columnSpacing) * columnIndex,
-                                         [columnHeights[section][columnIndex] floatValue]);
+      CGPoint position = CGPointMake(info.sectionInsets.left + (columnWidth + info.columnSpacing) * columnIndex,
+                                     [columnHeights[section][columnIndex] floatValue]);
       CGRect frame = CGRectMake(position.x, position.y, size.width, size.height);
       
       attrs.frame = frame;
       [attrsMap setObject:attrs forKey:element];
       // TODO Profile and avoid boxing if there are significant retain/release overheads
-      columnHeights[section][columnIndex] = @(CGRectGetMaxY(frame) + _interItemSpacing.bottom);
+      columnHeights[section][columnIndex] = @(CGRectGetMaxY(frame) + info.interItemSpacing.bottom);
     }
     
     NSUInteger columnIndex = [self _tallestColumnIndexInSection:section withColumnHeights:columnHeights];
-    top = [columnHeights[section][columnIndex] floatValue] - _interItemSpacing.bottom + _sectionInset.bottom;
+    top = [columnHeights[section][columnIndex] floatValue] - info.interItemSpacing.bottom + info.sectionInsets.bottom;
     
     for (NSUInteger idx = 0; idx < [columnHeights[section] count]; idx++) {
       columnHeights[section][idx] = @(top);
@@ -108,22 +112,24 @@
   
   CGFloat contentHeight = [[[columnHeights lastObject] firstObject] floatValue];
   CGSize contentSize = CGSizeMake(layoutWidth, contentHeight);
-  return [[ASCollectionLayoutState alloc] initWithContext:context contentSize:contentSize elementToLayoutAttributesTable:attrsMap];
+  return [[ASCollectionLayoutState alloc] initWithContext:context
+                                              contentSize:contentSize
+                           elementToLayoutAttributesTable:attrsMap];
 }
 
-- (CGFloat)_widthForSection:(NSUInteger)section withLayoutWidth:(CGFloat)layoutWidth
++ (CGFloat)_columnWidthForSection:(NSUInteger)section withLayoutWidth:(CGFloat)layoutWidth info:(MosaicCollectionLayoutInfo *)info
 {
-  return layoutWidth - _sectionInset.left - _sectionInset.right;
+  return ([self _widthForSection:section withLayoutWidth:layoutWidth info:info] - ((info.numberOfColumns - 1) * info.columnSpacing)) / info.numberOfColumns;
 }
 
-- (CGFloat)_columnWidthForSection:(NSUInteger)section withLayoutWidth:(CGFloat)layoutWidth
++ (CGFloat)_widthForSection:(NSUInteger)section withLayoutWidth:(CGFloat)layoutWidth info:(MosaicCollectionLayoutInfo *)info
 {
-  return ([self _widthForSection:section withLayoutWidth:layoutWidth] - ((_numberOfColumns - 1) * _columnSpacing)) / _numberOfColumns;
+  return layoutWidth - info.sectionInsets.left - info.sectionInsets.right;
 }
 
-- (ASSizeRange)sizeRangeForItem:(ASCellNode *)item atIndexPath:(NSIndexPath *)indexPath withLayoutWidth:(CGFloat)layoutWidth;
++ (ASSizeRange)_sizeRangeForItem:(ASCellNode *)item atIndexPath:(NSIndexPath *)indexPath withLayoutWidth:(CGFloat)layoutWidth info:(MosaicCollectionLayoutInfo *)info
 {
-  CGFloat itemWidth = [self _columnWidthForSection:indexPath.section withLayoutWidth:layoutWidth];
+  CGFloat itemWidth = [self _columnWidthForSection:indexPath.section withLayoutWidth:layoutWidth info:info];
   if ([item isKindOfClass:[ImageCellNode class]]) {
     return ASSizeRangeMake(CGSizeMake(itemWidth, 0), CGSizeMake(itemWidth, CGFLOAT_MAX));
   } else {
@@ -131,12 +137,12 @@
   }
 }
 
-- (ASSizeRange)sizeRangeForHeaderOfSection:(NSInteger)section withLayoutWidth:(CGFloat)layoutWidth
++ (ASSizeRange)_sizeRangeForHeaderOfSection:(NSInteger)section withLayoutWidth:(CGFloat)layoutWidth info:(MosaicCollectionLayoutInfo *)info
 {
-  return ASSizeRangeMake(CGSizeMake(0, _headerHeight), CGSizeMake([self _widthForSection:section withLayoutWidth:layoutWidth], _headerHeight));
+  return ASSizeRangeMake(CGSizeMake(0, info.headerHeight), CGSizeMake([self _widthForSection:section withLayoutWidth:layoutWidth info:info], info.headerHeight));
 }
 
-- (NSUInteger)_tallestColumnIndexInSection:(NSUInteger)section withColumnHeights:(NSArray *)columnHeights
++ (NSUInteger)_tallestColumnIndexInSection:(NSUInteger)section withColumnHeights:(NSArray *)columnHeights
 {
   __block NSUInteger index = 0;
   __block CGFloat tallestHeight = 0;
@@ -149,7 +155,7 @@
   return index;
 }
 
-- (NSUInteger)_shortestColumnIndexInSection:(NSUInteger)section withColumnHeights:(NSArray *)columnHeights
++ (NSUInteger)_shortestColumnIndexInSection:(NSUInteger)section withColumnHeights:(NSArray *)columnHeights
 {
   __block NSUInteger index = 0;
   __block CGFloat shortestHeight = CGFLOAT_MAX;
