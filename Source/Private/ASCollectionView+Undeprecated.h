@@ -296,6 +296,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode AS_WARN_UNUSED_RESULT;
 
+/**
+ *  Invalidates and recalculates the cached sizes stored for pass-through cells used in interop mode.
+ */
+- (void)invalidateFlowLayoutDelegateMetrics;
+
 - (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
 
 @end
