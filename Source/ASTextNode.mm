@@ -428,7 +428,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   
   if (attributedText == nil) {
-    attributedText = [[NSAttributedString alloc] initWithString:@"" attributes:nil];
+    return;
   }
   
   // Don't hold textLock for too long.
