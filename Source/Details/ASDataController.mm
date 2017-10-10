@@ -759,7 +759,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
 }
 
-- (void)relayoutAllNodesWithInvalidationBlock:(void (^)())invalidationBlock
+- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)())invalidationBlock
 {
   ASDisplayNodeAssertMainThread();
   if (!_initialReloadDataHasBeenCalled) {
