@@ -709,7 +709,12 @@
         
         //Getting a result back for a different download identifier, download must not have been successfully canceled
         if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
-            return;
+          return;
+        }
+          
+        //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
+        if (ASInterfaceStateIncludesPreload(self->_interfaceState) == NO) {
+          return;
         }
 
         if (imageContainer != nil) {

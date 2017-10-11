@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
+#import <AsyncDisplayKit/ASAssert.h>
 
 #import <tgmath.h>
 
@@ -25,6 +26,9 @@
 @property (nonatomic, strong, readwrite) NSTextStorage *textStorage;
 @property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
 @property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
+
+// Indicates whether or not this object must be deallocated on main thread. Defaults to YES.
+@property (nonatomic, assign) BOOL requiresMainThreadDeallocation;
 
 @end
 
@@ -57,6 +61,8 @@
   components.textContainer.lineFragmentPadding = 0.0; // We want the text laid out up to the very edges of the text-view.
   [components.layoutManager addTextContainer:components.textContainer];
 
+  components.requiresMainThreadDeallocation = YES;
+
   return components;
 }
 
@@ -64,8 +70,13 @@
 
 - (void)dealloc
 {
-  // Nil out all delegate to prevent crash
-  _textView.delegate = nil;
+  if (_requiresMainThreadDeallocation) {
+    ASDisplayNodeAssertMainThread();
+  }
+  // Nil out all delegates to prevent crash
+  if (_textView) {
+    _textView.delegate = nil;
+  }
   _layoutManager.delegate = nil;
 }
 
@@ -79,6 +90,8 @@
   // Otherwise, we create a temporary stack to size for `constrainedWidth`.
   if (CGRectGetWidth(components.textView.bounds) != constrainedWidth) {
     components = [ASTextKitComponents componentsWithAttributedSeedString:components.textStorage textContainerSize:CGSizeMake(constrainedWidth, CGFLOAT_MAX)];
+    // The temporary stack can be deallocated off main
+    components.requiresMainThreadDeallocation = NO;
   }
 
   // Force glyph generation and layout, which may not have happened yet (and isn't triggered by -usedRectForTextContainer:).
@@ -99,6 +112,8 @@
   
   // Always use temporary stack in case of threading issues
   components = [ASTextKitComponents componentsWithAttributedSeedString:components.textStorage textContainerSize:CGSizeMake(constrainedWidth, CGFLOAT_MAX)];
+  // The temporary stack can be deallocated off main
+  components.requiresMainThreadDeallocation = NO;
   
   // Force glyph generation and layout, which may not have happened yet (and isn't triggered by - usedRectForTextContainer:).
   [components.layoutManager ensureLayoutForTextContainer:components.textContainer];
