@@ -41,15 +41,6 @@
   return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-  self = [super initWithCoder:aDecoder];
-  if (self) {
-    _threadSafeBounds = self.bounds;
-  }
-  return self;
-}
-
 - (void)setFrame:(CGRect)frame
 {
   ASDisplayNodeAssertMainThread();
