@@ -59,12 +59,6 @@ AS_SUBCLASSING_RESTRICTED
 - (CGSize)sizeForConstrainedWidth:(CGFloat)constrainedWidth
               forMaxNumberOfLines:(NSInteger)numberOfLines;
 
-/**
- * Set a new frame to the backing text view. Users should use this method instead of setting the frame directly on the view.
- * This method must be called on the main thread.
- */
-- (void)setTextViewFrame:(CGRect)frame;
-
 @property (nonatomic, strong, readonly) NSTextStorage *textStorage;
 @property (nonatomic, strong, readonly) NSTextContainer *textContainer;
 @property (nonatomic, strong, readonly) NSLayoutManager *layoutManager;
