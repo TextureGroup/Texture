@@ -75,7 +75,7 @@
 
  See issue: https://github.com/facebook/AsyncDisplayKit/issues/1063
  */
-@interface ASPanningOverriddenUITextView : UITextView
+@interface ASPanningOverriddenUITextView : ASTextKitComponentsTextView
 {
   BOOL _shouldBlockPanGesture;
 }
@@ -221,7 +221,7 @@
   configureTextView(_placeholderTextKitComponents.textView);
 
   // Create and configure our text view.
-  _textKitComponents.textView = [[ASTextKitComponentsTextView alloc] initWithFrame:CGRectZero textContainer:_textKitComponents.textContainer];
+  _textKitComponents.textView = [[ASPanningOverriddenUITextView alloc] initWithFrame:CGRectZero textContainer:_textKitComponents.textContainer];
   _textKitComponents.textView.scrollEnabled = _scrollEnabled;
   _textKitComponents.textView.delegate = self;
   #if TARGET_OS_IOS
