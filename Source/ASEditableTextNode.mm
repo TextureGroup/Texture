@@ -474,8 +474,8 @@
   ASDN::MutexLocker l(_textKitLock);
 
   // Layout filling our bounds.
-  _textKitComponents.textView.frame = self.bounds;
-  _placeholderTextKitComponents.textView.frame = self.bounds;
+  [_textKitComponents setTextViewFrame:self.bounds];
+  [_placeholderTextKitComponents setTextViewFrame:self.bounds];
 
   // Note that both of these won't be necessary once we can disable scrolling, pending rdar://14729288
   // When we resize to fit (above) the prior layout becomes invalid. For whatever reason, UITextView doesn't invalidate its layout when its frame changes on its own, so we have to do so ourselves.

@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 #import <tgmath.h>
 
@@ -27,12 +28,16 @@
 @property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
 @property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
 
-// Indicates whether or not this object must be deallocated on main thread. Defaults to YES.
-@property (nonatomic, assign) BOOL requiresMainThreadDeallocation;
+@property (nonatomic, assign, readwrite) CGRect textViewThreadSafeBounds;
 
 @end
 
 @implementation ASTextKitComponents
+{
+  ASDN::Mutex __instanceLock__;
+}
+
+@synthesize textViewThreadSafeBounds = _textViewThreadSafeBounds;
 
 #pragma mark - Class
 
@@ -61,7 +66,7 @@
   components.textContainer.lineFragmentPadding = 0.0; // We want the text laid out up to the very edges of the text-view.
   [components.layoutManager addTextContainer:components.textContainer];
 
-  components.requiresMainThreadDeallocation = YES;
+  components.textViewThreadSafeBounds = CGRectZero;
 
   return components;
 }
@@ -70,14 +75,40 @@
 
 - (void)dealloc
 {
-  if (_requiresMainThreadDeallocation) {
-    ASDisplayNodeAssertMainThread();
-  }
   // Nil out all delegates to prevent crash
   if (_textView) {
+    ASDisplayNodeAssertMainThread();
     _textView.delegate = nil;
   }
   _layoutManager.delegate = nil;
+}
+
+#pragma mark - Getters and
+
+- (void)setTextView:(UITextView *)textView
+{
+  ASDisplayNodeAssertMainThread();
+  _textView = textView;
+  self.textViewThreadSafeBounds = _textView.bounds;
+}
+
+- (void)setTextViewFrame:(CGRect)frame
+{
+  ASDisplayNodeAssertMainThread();
+  _textView.frame = frame;
+  self.textViewThreadSafeBounds = _textView.bounds;
+}
+
+- (void)setTextViewThreadSafeBounds:(CGRect)bounds
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _textViewThreadSafeBounds = bounds;
+}
+
+- (CGRect)textViewThreadSafeBounds
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _textViewThreadSafeBounds;
 }
 
 #pragma mark - Sizing
@@ -88,10 +119,8 @@
 
   // If our text-view's width is already the constrained width, we can use our existing TextKit stack for this sizing calculation.
   // Otherwise, we create a temporary stack to size for `constrainedWidth`.
-  if (CGRectGetWidth(components.textView.bounds) != constrainedWidth) {
+  if (CGRectGetWidth(self.textViewThreadSafeBounds) != constrainedWidth) {
     components = [ASTextKitComponents componentsWithAttributedSeedString:components.textStorage textContainerSize:CGSizeMake(constrainedWidth, CGFLOAT_MAX)];
-    // The temporary stack can be deallocated off main
-    components.requiresMainThreadDeallocation = NO;
   }
 
   // Force glyph generation and layout, which may not have happened yet (and isn't triggered by -usedRectForTextContainer:).
@@ -112,9 +141,7 @@
   
   // Always use temporary stack in case of threading issues
   components = [ASTextKitComponents componentsWithAttributedSeedString:components.textStorage textContainerSize:CGSizeMake(constrainedWidth, CGFLOAT_MAX)];
-  // The temporary stack can be deallocated off main
-  components.requiresMainThreadDeallocation = NO;
-  
+
   // Force glyph generation and layout, which may not have happened yet (and isn't triggered by - usedRectForTextContainer:).
   [components.layoutManager ensureLayoutForTextContainer:components.textContainer];
   
