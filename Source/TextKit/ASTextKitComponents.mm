@@ -52,7 +52,7 @@
 {
   ASDisplayNodeAssertMainThread();
   [super setBounds:bounds];
-  self.threadSafeBounds = self.bounds;
+  self.threadSafeBounds = bounds;
 }
 
 - (void)setThreadSafeBounds:(CGRect)bounds
