@@ -210,7 +210,8 @@ static BOOL checkAttributes(const ASTextKitAttributes &attributes, const CGSize 
   [[NSAttributedString alloc]
    initWithString:@"90's cray photo booth tote bag bespoke Carles. Plaid wayfarers Odd Future master cleanse tattooed four dollar toast small batch kale chips leggings meh photo booth occupy irony.  " attributes:@{ASTextKitEntityAttributeName : [[ASTextKitEntityAttribute alloc] initWithEntity:@"entity"]}];
   ASTextKitComponents *components = [ASTextKitComponents componentsWithAttributedSeedString:attributedString textContainerSize:CGSizeZero];
-  components.textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, 20, 100) textContainer:components.textContainer];
+  components.textView = [[ASTextKitComponentsTextView alloc] initWithFrame:CGRectZero textContainer:components.textContainer];
+  components.textView.frame = CGRectMake(0, 0, 20, 1000);
 
   XCTestExpectation *expectation = [self expectationWithDescription:@"Components deallocated in background"];
   

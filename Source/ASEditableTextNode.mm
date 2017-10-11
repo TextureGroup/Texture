@@ -215,13 +215,13 @@
   ASDN::MutexLocker l(_textKitLock);
 
   // Create and configure the placeholder text view.
-  _placeholderTextKitComponents.textView = [[UITextView alloc] initWithFrame:CGRectZero textContainer:_placeholderTextKitComponents.textContainer];
+  _placeholderTextKitComponents.textView = [[ASTextKitComponentsTextView alloc] initWithFrame:CGRectZero textContainer:_placeholderTextKitComponents.textContainer];
   _placeholderTextKitComponents.textView.userInteractionEnabled = NO;
   _placeholderTextKitComponents.textView.accessibilityElementsHidden = YES;
   configureTextView(_placeholderTextKitComponents.textView);
 
   // Create and configure our text view.
-  _textKitComponents.textView = [[ASPanningOverriddenUITextView alloc] initWithFrame:CGRectZero textContainer:_textKitComponents.textContainer];
+  _textKitComponents.textView = [[ASTextKitComponentsTextView alloc] initWithFrame:CGRectZero textContainer:_textKitComponents.textContainer];
   _textKitComponents.textView.scrollEnabled = _scrollEnabled;
   _textKitComponents.textView.delegate = self;
   #if TARGET_OS_IOS
@@ -474,8 +474,8 @@
   ASDN::MutexLocker l(_textKitLock);
 
   // Layout filling our bounds.
-  [_textKitComponents setTextViewFrame:self.bounds];
-  [_placeholderTextKitComponents setTextViewFrame:self.bounds];
+  _textKitComponents.textView.frame = self.bounds;
+  _placeholderTextKitComponents.textView.frame = self.bounds;
 
   // Note that both of these won't be necessary once we can disable scrolling, pending rdar://14729288
   // When we resize to fit (above) the prior layout becomes invalid. For whatever reason, UITextView doesn't invalidate its layout when its frame changes on its own, so we have to do so ourselves.

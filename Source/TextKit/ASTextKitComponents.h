@@ -21,6 +21,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
+@interface ASTextKitComponentsTextView : UITextView
+@end
+
+AS_SUBCLASSING_RESTRICTED
 @interface ASTextKitComponents : NSObject
 
 /**
@@ -64,7 +68,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, strong, readonly) NSTextStorage *textStorage;
 @property (nonatomic, strong, readonly) NSTextContainer *textContainer;
 @property (nonatomic, strong, readonly) NSLayoutManager *layoutManager;
-@property (nonatomic, strong, nullable) UITextView *textView;
+@property (nonatomic, strong, nullable) ASTextKitComponentsTextView *textView;
 
 @end
 
