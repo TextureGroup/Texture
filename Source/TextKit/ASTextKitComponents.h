@@ -59,7 +59,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, strong, readonly) NSTextStorage *textStorage;
 @property (nonatomic, strong, readonly) NSTextContainer *textContainer;
 @property (nonatomic, strong, readonly) NSLayoutManager *layoutManager;
-@property (nullable, nonatomic, strong) UITextView *textView;
+@property (nonatomic, strong, nullable) UITextView *textView;
 
 @end
 
