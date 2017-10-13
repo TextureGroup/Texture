@@ -26,8 +26,6 @@
 
 @implementation ASTextKitComponentsTextView
 
-@synthesize threadSafeBounds = _threadSafeBounds;
-
 - (instancetype)initWithFrame:(CGRect)frame textContainer:(NSTextContainer *)textContainer
 {
   self = [super initWithFrame:frame textContainer:textContainer];
