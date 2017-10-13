@@ -17,18 +17,14 @@
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 #import <tgmath.h>
 
 @interface ASTextKitComponentsTextView ()
-@property (nonatomic, assign) CGRect threadSafeBounds;
+@property (atomic, assign) CGRect threadSafeBounds;
 @end
 
 @implementation ASTextKitComponentsTextView
-{
-  ASDN::Mutex __instanceLock__;
-}
 
 @synthesize threadSafeBounds = _threadSafeBounds;
 
@@ -53,18 +49,6 @@
   ASDisplayNodeAssertMainThread();
   [super setBounds:bounds];
   self.threadSafeBounds = bounds;
-}
-
-- (void)setThreadSafeBounds:(CGRect)bounds
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  _threadSafeBounds = bounds;
-}
-
-- (CGRect)threadSafeBounds
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  return _threadSafeBounds;
 }
 
 @end
