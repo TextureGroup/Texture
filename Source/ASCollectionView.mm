@@ -367,6 +367,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)relayoutItems
 {
+  [self invalidateFlowLayoutDelegateMetrics];
   [_dataController relayoutAllNodes];
 }
 
@@ -2246,18 +2247,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
  */
 - (void)layer:(CALayer *)layer didChangeBoundsWithOldValue:(CGRect)oldBounds newValue:(CGRect)newBounds
 {
-  if (_hasDataControllerLayoutDelegate) {
-    // Let the layout delegate handle bounds changes if it's available.
-    return;
-  }
-  if (self.collectionViewLayout == nil) {
-    return;
-  }
+  CGSize newSize = newBounds.size;
   CGSize lastUsedSize = _lastBoundsSizeUsedForMeasuringNodes;
-  if (CGSizeEqualToSize(lastUsedSize, newBounds.size)) {
+  if (CGSizeEqualToSize(lastUsedSize, newSize)) {
     return;
   }
-  _lastBoundsSizeUsedForMeasuringNodes = newBounds.size;
+  if (_hasDataControllerLayoutDelegate || self.collectionViewLayout == nil) {
+    // Let the layout delegate handle bounds changes if it's available. If no layout, it will init in the new state.
+    return;
+  }
+
+  _lastBoundsSizeUsedForMeasuringNodes = newSize;
 
   // Laying out all nodes is expensive.
   // We only need to do this if the bounds changed in the non-scrollable direction.
@@ -2265,13 +2265,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // appearance update, we do not need to relayout all nodes.
   // For a more permanent fix to the unsafety mentioned above, see https://github.com/facebook/AsyncDisplayKit/pull/2182
   ASScrollDirection scrollDirection = self.scrollableDirections;
-  BOOL fixedVertically = (ASScrollDirectionContainsVerticalDirection(scrollDirection) == NO);
+  BOOL fixedVertically   = (ASScrollDirectionContainsVerticalDirection  (scrollDirection) == NO);
   BOOL fixedHorizontally = (ASScrollDirectionContainsHorizontalDirection(scrollDirection) == NO);
 
-  BOOL changedInNonScrollingDirection = (fixedHorizontally && newBounds.size.width != lastUsedSize.width) || (fixedVertically && newBounds.size.height != lastUsedSize.height);
+  BOOL changedInNonScrollingDirection = (fixedHorizontally && newSize.width  != lastUsedSize.width) ||
+                                        (fixedVertically   && newSize.height != lastUsedSize.height);
 
   if (changedInNonScrollingDirection) {
-    [_dataController relayoutAllNodes];
+    [self relayoutItems];
     [_dataController waitUntilAllUpdatesAreProcessed];
     // We need to ensure the size requery is done before we update our layout.
     [self.collectionViewLayout invalidateLayout];
