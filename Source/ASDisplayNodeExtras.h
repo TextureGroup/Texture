@@ -208,8 +208,8 @@ extern __kindof ASDisplayNode * _Nullable ASDisplayNodeFindFirstSubnode(ASDispla
  */
 extern __kindof ASDisplayNode * _Nullable ASDisplayNodeFindFirstSubnodeOfClass(ASDisplayNode *start, Class c) AS_WARN_UNUSED_RESULT;
 
-extern UIColor *ASDisplayNodeDefaultPlaceholderColor() AS_WARN_UNUSED_RESULT;
-extern UIColor *ASDisplayNodeDefaultTintColor() AS_WARN_UNUSED_RESULT;
+extern UIColor *ASDisplayNodeDefaultPlaceholderColor(void) AS_WARN_UNUSED_RESULT;
+extern UIColor *ASDisplayNodeDefaultTintColor(void) AS_WARN_UNUSED_RESULT;
 
 /**
  Disable willAppear / didAppear / didDisappear notifications for a sub-hierarchy, then re-enable when done. Nested calls are supported.
