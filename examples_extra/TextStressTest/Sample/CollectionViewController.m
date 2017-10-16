@@ -15,7 +15,7 @@
 
 @interface CollectionViewController() <ASCollectionDataSource, ASCollectionDelegate> {
   ASCollectionNode *_collectionNode;
-  NSArray<NSString*> *_labels;
+  NSArray<NSString *> *_labels;
   TextCellNode *_cellNode;
 }
 
