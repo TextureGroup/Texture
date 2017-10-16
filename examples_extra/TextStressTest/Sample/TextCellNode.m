@@ -31,7 +31,8 @@
 
 @implementation TextCellNode
 
-- (instancetype)initWithText1:(NSString*)text1 text2:(NSString*)text2 {
+- (instancetype)initWithText1:(NSString *)text1 text2:(NSString *)text2
+{
   self = [super init];
   if (self) {
     self.automaticallyManagesSubnodes = YES;
@@ -62,7 +63,8 @@
   Layout is like: [l1Container[_label1], label2].
   This shows a bug of ASTextNode2.
  */
-- (void)simpleSetupYogaLayout {
+- (void)simpleSetupYogaLayout
+{
   [self.style yogaNodeCreateIfNeeded];
   [_label1.style yogaNodeCreateIfNeeded];
   [_label2.style yogaNodeCreateIfNeeded];
@@ -75,7 +77,7 @@
   _label2.style.flexShrink = 0;
   _label2.backgroundColor = [UIColor greenColor];
 
-  ASDisplayNode* l1Container = [ASDisplayNode yogaVerticalStack];
+  ASDisplayNode *l1Container = [ASDisplayNode yogaVerticalStack];
 
   // TODO(fix ASTextNode2): next two line will show the bug of TextNode2
   // which works for ASTextNode though

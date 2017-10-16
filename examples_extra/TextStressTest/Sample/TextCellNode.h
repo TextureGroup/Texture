@@ -13,5 +13,5 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 @interface TextCellNode : ASCellNode
-- (instancetype)initWithText1:(NSString*)text1 text2:(NSString*)text2;
+- (instancetype)initWithText1:(NSString *)text1 text2:(NSString *)text2;
 @end
