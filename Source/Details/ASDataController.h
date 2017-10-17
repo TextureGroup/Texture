@@ -258,7 +258,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * See ASCollectionNode.h for full documentation of these methods.
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreProcessed;
 
 /**
