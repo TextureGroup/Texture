@@ -18,7 +18,8 @@
 #define USE_ASTEXTNODE_2 1
 #endif
 
-@interface TextCellNode() {
+@interface TextCellNode()
+{
 #if USE_ASTEXTNODE_2
   ASTextNode2 *_label1;
   ASTextNode2 *_label2;
