@@ -13,7 +13,8 @@
 #import "CollectionViewController.h"
 #import "TextCellNode.h"
 
-@interface CollectionViewController() <ASCollectionDataSource, ASCollectionDelegate> {
+@interface CollectionViewController() <ASCollectionDataSource, ASCollectionDelegate>
+{
   ASCollectionNode *_collectionNode;
   NSArray<NSString *> *_labels;
   TextCellNode *_cellNode;
@@ -22,6 +23,7 @@
 @end
 
 @implementation CollectionViewController
+
 - (instancetype)init
 {
   UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
@@ -36,7 +38,8 @@
   return self;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
   [super viewDidLoad];
   _collectionNode.backgroundColor = [UIColor whiteColor];
   _labels = @[@"Fight of the Living Dead: Experiment Fight of the Living Dead: Experiment", @"S1 • E1"];
