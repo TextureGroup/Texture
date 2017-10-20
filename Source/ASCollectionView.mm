@@ -1587,7 +1587,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_leadingScreensForBatching != leadingScreensForBatching) {
     _leadingScreensForBatching = leadingScreensForBatching;
-    [self _checkForBatchFetching];
+    ASPerformBlockOnMainThread(^{
+      [self _checkForBatchFetching];
+    });
   }
 }
 
