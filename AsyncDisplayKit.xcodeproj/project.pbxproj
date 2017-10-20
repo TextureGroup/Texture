@@ -96,6 +96,8 @@
 		3917EBD41E9C2FC400D04A01 /* _ASCollectionReusableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3917EBD21E9C2FC400D04A01 /* _ASCollectionReusableView.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3917EBD51E9C2FC400D04A01 /* _ASCollectionReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3917EBD31E9C2FC400D04A01 /* _ASCollectionReusableView.m */; };
 		3C9C128519E616EF00E942A0 /* ASTableViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */; };
+		44A442581F9A1FEC007B9B1A /* ASContentSizeCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A442571F9A1FEC007B9B1A /* ASContentSizeCategory.m */; };
+		44A442591F9A2080007B9B1A /* ASContentSizeCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = 44A442561F9A1D93007B9B1A /* ASContentSizeCategory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4E9127691F64157600499623 /* ASRunLoopQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9127681F64157600499623 /* ASRunLoopQueueTests.m */; };
 		509E68601B3AED8E009B9150 /* ASScrollDirection.m in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E111B371BD7007741D0 /* ASScrollDirection.m */; };
 		509E68611B3AEDA0009B9150 /* ASAbstractLayoutController.h in Headers */ = {isa = PBXBuildFile; fileRef = 205F0E171B37339C007741D0 /* ASAbstractLayoutController.h */; };
@@ -620,6 +622,8 @@
 		3917EBD21E9C2FC400D04A01 /* _ASCollectionReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASCollectionReusableView.h; sourceTree = "<group>"; };
 		3917EBD31E9C2FC400D04A01 /* _ASCollectionReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _ASCollectionReusableView.m; sourceTree = "<group>"; };
 		3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASTableViewTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		44A442561F9A1D93007B9B1A /* ASContentSizeCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASContentSizeCategory.h; sourceTree = "<group>"; };
+		44A442571F9A1FEC007B9B1A /* ASContentSizeCategory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASContentSizeCategory.m; sourceTree = "<group>"; };
 		464052191A3F83C40061C0BA /* ASDataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ASDataController.h; sourceTree = "<group>"; };
 		4640521A1A3F83C40061C0BA /* ASDataController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASDataController.mm; sourceTree = "<group>"; };
 		4640521B1A3F83C40061C0BA /* ASTableLayoutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTableLayoutController.h; sourceTree = "<group>"; };
@@ -1263,6 +1267,8 @@
 				68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.m */,
 				205F0E1B1B373A2C007741D0 /* ASCollectionViewLayoutController.h */,
 				205F0E1C1B373A2C007741D0 /* ASCollectionViewLayoutController.m */,
+				44A442561F9A1D93007B9B1A /* ASContentSizeCategory.h */,
+				44A442571F9A1FEC007B9B1A /* ASContentSizeCategory.m */,
 				696F01EA1DD2AF450049FBD5 /* ASEventLog.h */,
 				696F01EB1DD2AF450049FBD5 /* ASEventLog.mm */,
 				E5B225271F1790B5001E1431 /* ASHashing.h */,
@@ -1823,6 +1829,7 @@
 				E5775B021F16759300CAC9BC /* ASCollectionLayoutCache.h in Headers */,
 				E5775B001F13D25400CAC9BC /* ASCollectionLayoutState+Private.h in Headers */,
 				E5667E8C1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h in Headers */,
+				44A442591F9A2080007B9B1A /* ASContentSizeCategory.h in Headers */,
 				E5775AFC1F13CE9F00CAC9BC /* _ASCollectionGalleryLayoutItem.h in Headers */,
 				E5855DF01EBB4D83003639AE /* ASCollectionLayoutDefines.h in Headers */,
 				E5B5B9D11E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h in Headers */,
@@ -2197,6 +2204,7 @@
 				CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */,
 				8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.m in Sources */,
 				B30BF6541C59D889004FCD53 /* ASLayoutManager.m in Sources */,
+				44A442581F9A1FEC007B9B1A /* ASContentSizeCategory.m in Sources */,
 				92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */,
 				CCA282B91E9EA8E40037E8B7 /* AsyncDisplayKit+Tips.m in Sources */,
 				636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */,

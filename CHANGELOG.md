@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
 - [ASCollectionView] Improve index space translation of Flow Layout Delegate methods. [Scott Goodson](https://github.com/appleguy)
 - [ASVideoNode] Fix unreleased time observer. [Flo Vouin](https://github.com/flovouin)
 - [PINCache] Set a default .byteLimit to reduce disk usage and startup time. [#595](https://github.com/TextureGroup/Texture/pull/595) [Scott Goodson](https://github.com/appleguy)

@@ -32,36 +32,54 @@ extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimit
   }
 }
 
-ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault()
-{
+ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   return (ASPrimitiveTraitCollection) {
     // Default values can be defined in here
+    .displayGamut = UIDisplayGamutUnspecified,
     .userInterfaceIdiom = UIUserInterfaceIdiomUnspecified,
+    .layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified,
+    .preferredContentSizeCategory = ASContentSizeCategoryUnspecified,
     .containerSize = CGSizeZero,
   };
 }
 
-ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection)
-{
+ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection) {
   ASPrimitiveTraitCollection environmentTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  environmentTraitCollection.displayScale = traitCollection.displayScale;
   environmentTraitCollection.horizontalSizeClass = traitCollection.horizontalSizeClass;
   environmentTraitCollection.verticalSizeClass = traitCollection.verticalSizeClass;
+  environmentTraitCollection.displayScale = traitCollection.displayScale;
   environmentTraitCollection.userInterfaceIdiom = traitCollection.userInterfaceIdiom;
   if (AS_AT_LEAST_IOS9) {
     environmentTraitCollection.forceTouchCapability = traitCollection.forceTouchCapability;
   }
+  if (AS_AT_LEAST_IOS10) {
+    environmentTraitCollection.displayGamut = traitCollection.displayGamut;
+    environmentTraitCollection.layoutDirection = traitCollection.layoutDirection;
+
+    // `preferredContentSizeCategory` is also available on older iOS versions, but only via `UIApplication` class.
+    // It should be noted that `[UIApplication sharedApplication]` is unavailable because Texture is built with only extension-safe API.
+    environmentTraitCollection.preferredContentSizeCategory = ASContentSizeCategoryFromUIContentSizeCategory(traitCollection.preferredContentSizeCategory);
+
+    #if TARGET_OS_TV
+      environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
+    #endif
+  }
   return environmentTraitCollection;
 }
 
-BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs)
-{
+BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs) {
   return
     lhs.verticalSizeClass == rhs.verticalSizeClass &&
     lhs.horizontalSizeClass == rhs.horizontalSizeClass &&
     lhs.displayScale == rhs.displayScale &&
+    lhs.displayGamut == rhs.displayGamut &&
     lhs.userInterfaceIdiom == rhs.userInterfaceIdiom &&
     lhs.forceTouchCapability == rhs.forceTouchCapability &&
+    lhs.layoutDirection == rhs.layoutDirection &&
+    #if TARGET_OS_TV
+      lhs.userInterfaceStyle == rhs.userInterfaceStyle &&
+    #endif
+    lhs.preferredContentSizeCategory == rhs.preferredContentSizeCategory &&
     CGSizeEqualToSize(lhs.containerSize, rhs.containerSize);
 }
 
@@ -105,14 +123,58 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceSizeClass(UIUserInt
   }
 }
 
-NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits)
-{
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIDisplayGamut(UIDisplayGamut displayGamut) {
+  switch (displayGamut) {
+    case UIDisplayGamutSRGB:
+      return @"sRGB";
+    case UIDisplayGamutP3:
+      return @"P3";
+    default:
+      return @"Unspecified";
+  }
+}
+
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentLayoutDirection(UITraitEnvironmentLayoutDirection layoutDirection) {
+  switch (layoutDirection) {
+    case UITraitEnvironmentLayoutDirectionLeftToRight:
+      return @"LeftToRight";
+    case UITraitEnvironmentLayoutDirectionRightToLeft:
+      return @"RightToLeft";
+    default:
+      return @"Unspecified";
+  }
+}
+
+#if TARGET_OS_TV
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfaceStyle userInterfaceStyle) {
+  switch (userInterfaceStyle) {
+    case UIUserInterfaceStyleLight:
+      return @"Light";
+    case UIUserInterfaceStyleDark:
+      return @"Dark";
+    default:
+      return @"Unspecified";
+  }
+}
+#endif
+
+NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits) {
   NSMutableArray<NSDictionary *> *props = [NSMutableArray array];
-  [props addObject:@{ @"userInterfaceIdiom": AS_NSStringFromUIUserInterfaceIdiom(traits.userInterfaceIdiom) }];
-  [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
-  [props addObject:@{ @"horizontalSizeClass": AS_NSStringFromUIUserInterfaceSizeClass(traits.horizontalSizeClass) }];
   [props addObject:@{ @"verticalSizeClass": AS_NSStringFromUIUserInterfaceSizeClass(traits.verticalSizeClass) }];
+  [props addObject:@{ @"horizontalSizeClass": AS_NSStringFromUIUserInterfaceSizeClass(traits.horizontalSizeClass) }];
+  [props addObject:@{ @"displayScale": [NSString stringWithFormat: @"%.0lf", (double)traits.displayScale] }];
+  [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
+  [props addObject:@{ @"userInterfaceIdiom": AS_NSStringFromUIUserInterfaceIdiom(traits.userInterfaceIdiom) }];
   [props addObject:@{ @"forceTouchCapability": AS_NSStringFromUIForceTouchCapability(traits.forceTouchCapability) }];
+  [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
+  #if TARGET_OS_TV
+    [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
+  #endif
+  [props addObject:@{ @"preferredContentSizeCategory": UIContentSizeCategoryFromASContentSizeCategory(traits.preferredContentSizeCategory) }];
+  [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
   return ASObjectDescriptionMakeWithoutObject(props);
 }
 
@@ -120,70 +182,144 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 @implementation ASTraitCollection
 
-- (instancetype)initWithDisplayScale:(CGFloat)displayScale
-                  userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
-                 horizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
-                   verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
-                forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
-                       containerSize:(CGSize)windowSize
+- (instancetype)initWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
+                          verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
+                               displayScale:(CGFloat)displayScale
+                               displayGamut:(UIDisplayGamut)displayGamut
+                         userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
+                       forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
+                            layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
+#if TARGET_OS_TV
+                         userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
+#endif
+               preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                              containerSize:(CGSize)windowSize
 {
     self = [super init];
     if (self) {
-      _displayScale = displayScale;
-      _userInterfaceIdiom = userInterfaceIdiom;
       _horizontalSizeClass = horizontalSizeClass;
       _verticalSizeClass = verticalSizeClass;
+      _displayScale = displayScale;
+      _displayGamut = displayGamut;
+      _userInterfaceIdiom = userInterfaceIdiom;
       _forceTouchCapability = forceTouchCapability;
+      _layoutDirection = layoutDirection;
+      #if TARGET_OS_TV
+        _userInterfaceStyle = userInterfaceStyle;
+      #endif
+      _preferredContentSizeCategory = preferredContentSizeCategory;
       _containerSize = windowSize;
     }
     return self;
 }
 
-+ (instancetype)traitCollectionWithDisplayScale:(CGFloat)displayScale
-                             userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
-                            horizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
-                              verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
-                           forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
-                                  containerSize:(CGSize)windowSize
++ (instancetype)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
+                                     verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
+                                          displayScale:(CGFloat)displayScale
+                                          displayGamut:(UIDisplayGamut)displayGamut
+                                    userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
+                                  forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
+                                       layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
+#if TARGET_OS_TV
+                                    userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
+#endif
+                          preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                                         containerSize:(CGSize)windowSize
 {
-  return [[self alloc] initWithDisplayScale:displayScale
-                         userInterfaceIdiom:userInterfaceIdiom
-                        horizontalSizeClass:horizontalSizeClass
-                          verticalSizeClass:verticalSizeClass
-                       forceTouchCapability:forceTouchCapability
-                              containerSize:windowSize];
+  return [[self alloc] initWithHorizontalSizeClass:horizontalSizeClass
+                                 verticalSizeClass:verticalSizeClass
+                                      displayScale:displayScale
+                                      displayGamut:displayGamut
+                                userInterfaceIdiom:userInterfaceIdiom
+                              forceTouchCapability:forceTouchCapability
+                                   layoutDirection:layoutDirection
+#if TARGET_OS_TV
+                                userInterfaceStyle:userIntefaceStyle
+#endif
+                      preferredContentSizeCategory:preferredContentSizeCategory
+                                     containerSize:windowSize];
 }
 
 + (instancetype)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits
 {
-  return [self traitCollectionWithDisplayScale:traits.displayScale
-                            userInterfaceIdiom:traits.userInterfaceIdiom
-                           horizontalSizeClass:traits.horizontalSizeClass
-                             verticalSizeClass:traits.verticalSizeClass
-                          forceTouchCapability:traits.forceTouchCapability
-                                 containerSize:traits.containerSize];
+  return [self traitCollectionWithHorizontalSizeClass:traits.horizontalSizeClass
+                                    verticalSizeClass:traits.verticalSizeClass
+                                         displayScale:traits.displayScale
+                                         displayGamut:traits.displayGamut
+                                   userInterfaceIdiom:traits.userInterfaceIdiom
+                                 forceTouchCapability:traits.forceTouchCapability
+                                      layoutDirection:traits.layoutDirection
+#if TARGET_OS_TV
+                                   userInterfaceStyle:traits.userInterfaceStyle
+#endif
+                         preferredContentSizeCategory:UIContentSizeCategoryFromASContentSizeCategory(traits.preferredContentSizeCategory)
+                                        containerSize:traits.containerSize];
 }
 
 + (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
-                                        containerSize:(CGSize)windowSize
+                                       containerSize:(CGSize)windowSize
+{
+  return [self traitCollectionWithUITraitCollection:traitCollection
+                                      containerSize:windowSize
+                        fallbackContentSizeCategory:UIContentSizeCategoryFromASContentSizeCategory(ASContentSizeCategoryUnspecified)];
+}
+
+
++ (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
+                                       containerSize:(CGSize)windowSize
+                         fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory
 {
   UIForceTouchCapability forceTouch = AS_AT_LEAST_IOS9 ? traitCollection.forceTouchCapability : UIForceTouchCapabilityUnknown;
-  return [self traitCollectionWithDisplayScale:traitCollection.displayScale
-                            userInterfaceIdiom:traitCollection.userInterfaceIdiom
-                           horizontalSizeClass:traitCollection.horizontalSizeClass
-                             verticalSizeClass:traitCollection.verticalSizeClass
-                          forceTouchCapability:forceTouch
-                                 containerSize:windowSize];
+  UIDisplayGamut displayGamut;
+  UITraitEnvironmentLayoutDirection layoutDirection;
+  UIContentSizeCategory sizeCategory;
+  #if TARGET_OS_TV
+    UIUserInterfaceStyle userInterfaceStyle;
+  #endif
+  if (AS_AT_LEAST_IOS10) {
+    displayGamut = traitCollection.displayGamut;
+    layoutDirection = traitCollection.layoutDirection;
+    sizeCategory = traitCollection.preferredContentSizeCategory;
+    #if TARGET_OS_TV
+      userInterfaceStyle = traitCollection.userInterfaceStyle;
+    #endif
+  } else {
+    displayGamut = UIDisplayGamutUnspecified;
+    layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified;
+    sizeCategory = fallbackContentSizeCategory;
+    #if TARGET_OS_TV
+      userInterfaceStyle = UIUserInterfaceStyleUnspecified;
+    #endif
+  }
+
+  return [self traitCollectionWithHorizontalSizeClass:traitCollection.horizontalSizeClass
+                                    verticalSizeClass:traitCollection.verticalSizeClass
+                                         displayScale:traitCollection.displayScale
+                                         displayGamut:displayGamut
+                                   userInterfaceIdiom:traitCollection.userInterfaceIdiom
+                                 forceTouchCapability:forceTouch
+                                      layoutDirection:layoutDirection
+#if TARGET_OS_TV
+                                   userInterfaceStyle:userInterfaceStyle
+#endif
+                         preferredContentSizeCategory:sizeCategory
+                                        containerSize:windowSize];
 }
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
   return (ASPrimitiveTraitCollection) {
-    .displayScale = self.displayScale,
     .horizontalSizeClass = self.horizontalSizeClass,
-    .userInterfaceIdiom = self.userInterfaceIdiom,
     .verticalSizeClass = self.verticalSizeClass,
+    .displayScale = self.displayScale,
+    .displayGamut = self.displayGamut,
+    .userInterfaceIdiom = self.userInterfaceIdiom,
     .forceTouchCapability = self.forceTouchCapability,
+    .layoutDirection = self.layoutDirection,
+    #if TARGET_OS_TV
+      .userInterfaceStyle = self.userInterfaceStyle,
+    #endif
+    .preferredContentSizeCategory = ASContentSizeCategoryFromUIContentSizeCategory(self.preferredContentSizeCategory),
     .containerSize = self.containerSize,
   };
 }
@@ -194,12 +330,19 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
     return YES;
   }
 
-  return self.displayScale == traitCollection.displayScale &&
-  self.horizontalSizeClass == traitCollection.horizontalSizeClass &&
-  self.verticalSizeClass == traitCollection.verticalSizeClass &&
-  self.userInterfaceIdiom == traitCollection.userInterfaceIdiom &&
-  CGSizeEqualToSize(self.containerSize, traitCollection.containerSize) &&
-  self.forceTouchCapability == traitCollection.forceTouchCapability;
+  return
+    self.horizontalSizeClass == traitCollection.horizontalSizeClass &&
+    self.verticalSizeClass == traitCollection.verticalSizeClass &&
+    self.displayScale == traitCollection.displayScale &&
+    self.displayGamut == traitCollection.displayGamut &&
+    self.userInterfaceIdiom == traitCollection.userInterfaceIdiom &&
+    self.forceTouchCapability == traitCollection.forceTouchCapability &&
+    self.layoutDirection == traitCollection.layoutDirection &&
+    #if TARGET_OS_TV
+      self.userInterfaceStyle == traitCollection.userInterfaceStyle &&
+    #endif
+    [self.preferredContentSizeCategory isEqualToString:traitCollection.preferredContentSizeCategory] &&
+    CGSizeEqualToSize(self.containerSize, traitCollection.containerSize);
 }
 
 @end

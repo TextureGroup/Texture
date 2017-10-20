@@ -17,6 +17,8 @@
 
 
 #import <UIKit/UIKit.h>
+
+#import <AsyncDisplayKit/ASContentSizeCategory.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 @class ASTraitCollection;
@@ -30,11 +32,20 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
 #pragma mark - ASPrimitiveTraitCollection
 
 typedef struct ASPrimitiveTraitCollection {
-  CGFloat displayScale;
   UIUserInterfaceSizeClass horizontalSizeClass;
-  UIUserInterfaceIdiom userInterfaceIdiom;
   UIUserInterfaceSizeClass verticalSizeClass;
+
+  CGFloat displayScale;
+  UIDisplayGamut displayGamut;
+
+  UIUserInterfaceIdiom userInterfaceIdiom;
   UIForceTouchCapability forceTouchCapability;
+  UITraitEnvironmentLayoutDirection layoutDirection;
+#if TARGET_OS_TV
+  UIUserInterfaceStyle userInterfaceStyle;
+#endif
+
+  ASContentSizeCategory preferredContentSizeCategory;
 
   CGSize containerSize;
 } ASPrimitiveTraitCollection;
@@ -124,11 +135,21 @@ ASDISPLAYNODE_EXTERN_C_END
 AS_SUBCLASSING_RESTRICTED
 @interface ASTraitCollection : NSObject
 
-@property (nonatomic, assign, readonly) CGFloat displayScale;
 @property (nonatomic, assign, readonly) UIUserInterfaceSizeClass horizontalSizeClass;
-@property (nonatomic, assign, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (nonatomic, assign, readonly) UIUserInterfaceSizeClass verticalSizeClass;
+
+@property (nonatomic, assign, readonly) CGFloat displayScale;
+@property (nonatomic, assign, readonly) UIDisplayGamut displayGamut;
+
+@property (nonatomic, assign, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (nonatomic, assign, readonly) UIForceTouchCapability forceTouchCapability;
+@property (nonatomic, assign, readonly) UITraitEnvironmentLayoutDirection layoutDirection;
+#if TARGET_OS_TV
+@property (nonatomic, assign, readonly) UIUserInterfaceStyle userInterfaceStyle;
+#endif
+
+@property (nonatomic, assign, readonly) UIContentSizeCategory preferredContentSizeCategory;
+
 @property (nonatomic, assign, readonly) CGSize containerSize;
 
 + (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits;
@@ -136,13 +157,23 @@ AS_SUBCLASSING_RESTRICTED
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                               containerSize:(CGSize)windowSize;
 
++ (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
+                                              containerSize:(CGSize)windowSize
+                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory;
 
-+ (ASTraitCollection *)traitCollectionWithDisplayScale:(CGFloat)displayScale
-                                    userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
-                                   horizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
-                                     verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
-                                  forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
-                                         containerSize:(CGSize)windowSize;
+
++ (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
+                                            verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
+                                                 displayScale:(CGFloat)displayScale
+                                                 displayGamut:(UIDisplayGamut)displayGamut
+                                           userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
+                                         forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
+                                              layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
+#if TARGET_OS_TV
+                                           userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
+#endif
+                                 preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                                                containerSize:(CGSize)windowSize;
 
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
