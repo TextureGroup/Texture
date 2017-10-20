@@ -9,6 +9,7 @@
 - [ASCornerRounding] Introduce .cornerRoundingType: CALayer, Precomposited, or Clip Corners. [Scott Goodson](https://github.com/appleguy) [#465](https://github.com/TextureGroup/Texture/pull/465)
 - [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
 - [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
+- [ASCollectionView] Check if batch fetching is needed if batch fetching parameter has been changed. [#624](https://github.com/TextureGroup/Texture/pull/624) [Garrett Moon](https://github.com/garrettmoon)
 
 ## 2.5
 
