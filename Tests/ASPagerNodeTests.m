@@ -90,6 +90,14 @@
   XCTAssertEqual([testController.pagerNode indexOfPageWithNode:badNode], NSNotFound);
 }
 
+- (void)testScrollPageToIndex {
+  ASPagerNodeTestController *testController = [self testController];
+  testController.pagerNode.frame = CGRectMake(0, 0, 500, 500);
+  [testController.pagerNode scrollToPageAtIndex:1 animated:false];
+
+  XCTAssertEqual(testController.pagerNode.currentPageIndex, 1);
+}
+
 - (ASPagerNodeTestController *)testController {
   ASPagerNodeTestController *testController = [[ASPagerNodeTestController alloc] initWithNibName:nil bundle:nil];
   UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
