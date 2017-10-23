@@ -64,6 +64,21 @@
   return roundedImage;
 }
 
++ (UIImage *)imageWithSize:(CGSize)size fillColor:(UIColor *)fillColor shapeBlock:(UIBezierPath *(^)(void))shapeBlock
+{
+    UIGraphicsBeginImageContext(size);
+    [fillColor setFill];
+    
+    UIBezierPath *path = shapeBlock();
+    [path addClip];
+    [path fill];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
 @end
 
 @implementation NSAttributedString (Additions)

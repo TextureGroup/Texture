@@ -18,6 +18,7 @@
 
 @interface UIImage (Additions)
 - (UIImage *)makeCircularImageWithSize:(CGSize)size withBorderWidth:(CGFloat)width;
++ (UIImage *)imageWithSize:(CGSize)size fillColor:(UIColor *)fillColor shapeBlock:(UIBezierPath *(^)(void))shapeBlock;
 @end
 
 @interface NSAttributedString (Additions)
