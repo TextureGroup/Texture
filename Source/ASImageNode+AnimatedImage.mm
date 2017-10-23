@@ -53,6 +53,14 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   if (ASObjectIsEqual(_animatedImage, animatedImage)) {
     return;
   }
+    
+  if (animatedImage == nil) {
+    // Animated image can take while to dealloc, do it off the main queue
+    __block id <ASAnimatedImageProtocol>deallocImage = _animatedImage;
+    ASPerformBlockOnBackgroundThread(^{
+      deallocImage = nil;
+    });
+  }
   
   id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
   _animatedImage = animatedImage;
