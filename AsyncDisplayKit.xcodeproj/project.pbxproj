@@ -33,6 +33,8 @@
 		05EA6FE71AC0966E00E35788 /* ASSnapshotTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 05EA6FE61AC0966E00E35788 /* ASSnapshotTestCase.m */; };
 		18C2ED7F1B9B7DE800F627B3 /* ASCollectionNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 18C2ED7C1B9B7DE800F627B3 /* ASCollectionNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		18C2ED831B9B7DE800F627B3 /* ASCollectionNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C2ED7D1B9B7DE800F627B3 /* ASCollectionNode.mm */; };
+		1A00A3B61F9E0B5000D72431 /* ASCornerLayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A00A3B41F9E0B5000D72431 /* ASCornerLayoutSpec.h */; };
+		1A00A3B71F9E0B5000D72431 /* ASCornerLayoutSpec.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A00A3B51F9E0B5000D72431 /* ASCornerLayoutSpec.mm */; };
 		242995D31B29743C00090100 /* ASBasicImageDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 242995D21B29743C00090100 /* ASBasicImageDownloaderTests.m */; };
 		2538B6F31BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m */; };
 		254C6B521BF8FE6D003EC431 /* ASTextKitTruncationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 254C6B511BF8FE6D003EC431 /* ASTextKitTruncationTests.mm */; };
@@ -570,6 +572,8 @@
 		18C2ED7C1B9B7DE800F627B3 /* ASCollectionNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionNode.h; sourceTree = "<group>"; };
 		18C2ED7D1B9B7DE800F627B3 /* ASCollectionNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionNode.mm; sourceTree = "<group>"; };
 		1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASEqualityHelpers.h; sourceTree = "<group>"; };
+		1A00A3B41F9E0B5000D72431 /* ASCornerLayoutSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCornerLayoutSpec.h; sourceTree = "<group>"; };
+		1A00A3B51F9E0B5000D72431 /* ASCornerLayoutSpec.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCornerLayoutSpec.mm; sourceTree = "<group>"; };
 		205F0E0D1B371875007741D0 /* UICollectionViewLayout+ASConvenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionViewLayout+ASConvenience.h"; sourceTree = "<group>"; };
 		205F0E0E1B371875007741D0 /* UICollectionViewLayout+ASConvenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionViewLayout+ASConvenience.m"; sourceTree = "<group>"; };
 		205F0E111B371BD7007741D0 /* ASScrollDirection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASScrollDirection.m; sourceTree = "<group>"; };
@@ -1518,6 +1522,8 @@
 				ACF6ED021B17843500DA7C62 /* ASBackgroundLayoutSpec.mm */,
 				ACF6ED031B17843500DA7C62 /* ASCenterLayoutSpec.h */,
 				ACF6ED041B17843500DA7C62 /* ASCenterLayoutSpec.mm */,
+				1A00A3B41F9E0B5000D72431 /* ASCornerLayoutSpec.h */,
+				1A00A3B51F9E0B5000D72431 /* ASCornerLayoutSpec.mm */,
 				ACF6ED071B17843500DA7C62 /* ASDimension.h */,
 				ACF6ED081B17843500DA7C62 /* ASDimension.mm */,
 				690C35631E055C7B00069B91 /* ASDimensionInternal.h */,
@@ -1861,6 +1867,7 @@
 				CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */,
 				83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */,
 				E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */,
+				1A00A3B61F9E0B5000D72431 /* ASCornerLayoutSpec.h in Headers */,
 				9019FBBD1ED8061D00C45F72 /* ASYogaLayoutSpec.h in Headers */,
 				6947B0BE1E36B4E30007C478 /* ASStackUnpositionedLayout.h in Headers */,
 				CC4C2A771D88E3BF0039ACAB /* ASTraceEvent.h in Headers */,
@@ -2326,6 +2333,7 @@
 				68FC85E51CE29B7E00EDD713 /* ASTabBarController.m in Sources */,
 				CCCCCCDC1EC3EF060087FE10 /* ASTextLine.m in Sources */,
 				34EFC7741B701D0A00AD841F /* ASAbsoluteLayoutSpec.mm in Sources */,
+				1A00A3B71F9E0B5000D72431 /* ASCornerLayoutSpec.mm in Sources */,
 				CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.m in Sources */,
 				690C35621E055C5D00069B91 /* ASDimensionInternal.mm in Sources */,
 				909C4C761F09C98B00D6B76F /* ASTextNode2.mm in Sources */,

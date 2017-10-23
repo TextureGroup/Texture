@@ -37,7 +37,10 @@
     _layoutExamples = @[[HeaderWithRightAndLeftItems class],
                         [PhotoWithInsetTextOverlay class],
                         [PhotoWithOutsetIconOverlay class],
-                        [FlexibleSeparatorSurroundingContent class]];
+                        [FlexibleSeparatorSurroundingContent class],
+                        [CornerLayoutExample class],
+                        [UserProfileSample class]
+                        ];
   }
   
   return self;
