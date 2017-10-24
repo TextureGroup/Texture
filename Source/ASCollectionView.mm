@@ -367,7 +367,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)relayoutItems
 {
-  [_dataController relayoutAllNodes];
+  [_dataController relayoutAllNodesWithInvalidationBlock:^{
+    [self.collectionViewLayout invalidateLayout];
+  }];
 }
 
 - (BOOL)isProcessingUpdates
@@ -2276,10 +2278,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   BOOL changedInNonScrollingDirection = (fixedHorizontally && newBounds.size.width != lastUsedSize.width) || (fixedVertically && newBounds.size.height != lastUsedSize.height);
 
   if (changedInNonScrollingDirection) {
-    [_dataController relayoutAllNodes];
-    [_dataController waitUntilAllUpdatesAreProcessed];
-    // We need to ensure the size requery is done before we update our layout.
-    [self.collectionViewLayout invalidateLayout];
+    [_dataController relayoutAllNodesWithInvalidationBlock:^{
+      [self.collectionViewLayout invalidateLayout];
+    }];
   }
 }
 
