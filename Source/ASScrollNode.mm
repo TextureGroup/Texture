@@ -102,7 +102,7 @@
     // We can achieve this behavior by: 1. Always set contentSize to layout.size.  2. Set bounds to parentSize,
     // unless one dimension is not defined, in which case adopt the contentSize for that dimension.
     _contentCalculatedSizeFromLayout = layout.size;
-    CGSize selfSize = parentSize;
+    CGSize selfSize = ASSizeRangeClamp(constrainedSize, parentSize);
     if (ASPointsValidForLayout(selfSize.width) == NO) {
       selfSize.width = _contentCalculatedSizeFromLayout.width;
     }
