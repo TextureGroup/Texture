@@ -84,7 +84,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
   accessibilityElement.accessibilityHint = node.accessibilityHint;
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
-  if (@available(iOS 11, *)) {
+  if (AS_AT_LEAST_IOS11) {
     [accessibilityElement setValue:node.accessibilityAttributedLabel forKey:@"accessibilityAttributedLabel"];
     [accessibilityElement setValue:node.accessibilityAttributedHint forKey:@"accessibilityAttributedHint"];
     [accessibilityElement setValue:node.accessibilityAttributedValue forKey:@"accessibilityAttributedValue"];

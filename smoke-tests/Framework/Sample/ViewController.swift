@@ -25,7 +25,7 @@ class ViewController: UIViewController, ASTableDataSource, ASTableDelegate {
 
   // MARK: UIViewController.
 
-  override required init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+  override required init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
     self.tableNode = ASTableNode()
 
     super.init(nibName: nil, bundle: nil)
@@ -50,7 +50,7 @@ class ViewController: UIViewController, ASTableDataSource, ASTableDelegate {
 
   // MARK: ASTableView data source and delegate.
 
-  func tableNode(_ tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath) -> ASCellNode {
+  func tableNode(tableNode: ASTableNode, nodeForRowAtIndexPath indexPath: NSIndexPath) -> ASCellNode {
     let patter = NSString(format: "[%ld.%ld] says hello!", indexPath.section, indexPath.row)
     let node = ASTextCellNode()
     node.text = patter as String
@@ -58,11 +58,11 @@ class ViewController: UIViewController, ASTableDataSource, ASTableDelegate {
     return node
   }
 
-  func numberOfSections(in tableNode: ASTableNode) -> Int {
+  func numberOfSectionsInTableNode(tableNode: ASTableNode) -> Int {
     return 1
   }
 
-  func tableNode(_ tableNode: ASTableNode, numberOfRowsInSection section: Int) -> Int {
+  func tableNode(tableNode: ASTableNode, numberOfRowsInSection section: Int) -> Int {
     return 20
   }
 
