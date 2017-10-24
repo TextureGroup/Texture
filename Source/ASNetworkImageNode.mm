@@ -703,6 +703,7 @@
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASDN::MutexUnlocker u(__instanceLock__);
           ASNetworkImageNodeDidLoadInfo info = {};
+          info.imageSource = ASNetworkImageSourceFileURL;
           [delegate imageNode:self didLoadImage:self.image info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASDN::MutexUnlocker u(__instanceLock__);

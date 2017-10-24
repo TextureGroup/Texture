@@ -135,7 +135,8 @@ typedef NS_ENUM(NSInteger, ASNetworkImageSource) {
   ASNetworkImageSourceUnspecified = 0,
   ASNetworkImageSourceSynchronousCache,
   ASNetworkImageSourceAsynchronousCache,
-  ASNetworkImageSourceDownload
+  ASNetworkImageSourceFileURL,
+  ASNetworkImageSourceDownload,
 };
 
 /// A struct that carries details about ASNetworkImageNode's image loads.
