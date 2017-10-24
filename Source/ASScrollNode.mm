@@ -161,7 +161,10 @@
 - (void)setScrollableDirections:(ASScrollDirection)scrollableDirections
 {
   ASDN::MutexLocker l(__instanceLock__);
-  _scrollableDirections = scrollableDirections;
+  if (_scrollableDirections != scrollableDirections) {
+    _scrollableDirections = scrollableDirections;
+    [self setNeedsLayout];
+  }
 }
 
 @end
