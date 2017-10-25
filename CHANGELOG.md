@@ -10,6 +10,7 @@
 - [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
 - [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
 - [ASCollectionView] Check if batch fetching is needed if batch fetching parameter has been changed. [#624](https://github.com/TextureGroup/Texture/pull/624) [Garrett Moon](https://github.com/garrettmoon)
+- [ASCornerLayoutSpec] Add new layout spec class for corner element layout with simple declairative way. [#632](https://github.com/TextureGroup/Texture/pull/632#issuecomment-338708228) [huangkun](https://github.com/huang-kun)
 
 ## 2.5
 
@@ -93,3 +94,5 @@
 - [IGListKit] Add IGListKit headers to public section of Xcode project [Michael Schneider](https://github.com/maicki)[#286](https://github.com/TextureGroup/Texture/pull/286)
 - [Layout] Ensure -layout and -layoutDidFinish are called only if a node is loaded. [Huy Nguyen](https://github.com/nguyenhuy) [#285](https://github.com/TextureGroup/Texture/pull/285)
 - [Layout Debugger] Small changes needed for the coming layout debugger [Huy Nguyen](https://github.com/nguyenhuy) [#337](https://github.com/TextureGroup/Texture/pull/337)
+
+
