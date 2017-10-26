@@ -213,6 +213,7 @@ ASLayoutElementStyleExtensibilityForwarding
  */
 - (void)_u_setNeedsLayoutFromAbove
 {
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock);
   as_activity_create_for_scope("Set needs layout from above");
   ASDisplayNodeAssertThreadAffinity(self);
 
@@ -289,6 +290,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock);
   ASDN::MutexLocker l(__instanceLock__);
   // Check if we are a subnode in a layout transition.
   // In this case no measurement is needed as it's part of the layout transition
