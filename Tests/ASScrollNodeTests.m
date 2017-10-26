@@ -16,26 +16,27 @@
 #import "ASXCTExtensions.h"
 
 @interface ASScrollNodeTests : XCTestCase
+
+@property (nonatomic) ASScrollNode *scrollNode;
+@property (nonatomic) ASDisplayNode *subnode;
+
 @end
 
-@implementation ASScrollNodeTests {
-  ASScrollNode *scrollNode;
-  ASDisplayNode *subnode;
-}
+@implementation ASScrollNodeTests
 
 - (void)setUp
 {
-  subnode = [[ASDisplayNode alloc] init];;
+  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  self.subnode = subnode;
 
-  scrollNode = [[ASScrollNode alloc] init];
-  scrollNode.scrollableDirections = ASScrollDirectionVerticalDirections;
-  scrollNode.automaticallyManagesContentSize = YES;
-  scrollNode.automaticallyManagesSubnodes = YES;
-  __weak __typeof(self) weakSelf = self;
-  scrollNode.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    __strong __typeof(weakSelf) strongSelf = weakSelf;
-    return [[ASWrapperLayoutSpec alloc] initWithLayoutElement:strongSelf.subnode];
+  self.scrollNode = [[ASScrollNode alloc] init];
+  self.scrollNode.scrollableDirections = ASScrollDirectionVerticalDirections;
+  self.scrollNode.automaticallyManagesContentSize = YES;
+  self.scrollNode.automaticallyManagesSubnodes = YES;
+  self.scrollNode.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+    return [[ASWrapperLayoutSpec alloc] initWithLayoutElement:subnode];
   };
+  [self.scrollNode view];
 }
 
 - (void)testSubnodeLayoutCalculatedWithUnconstrainedMaxSizeInScrollableDirection
@@ -43,21 +44,21 @@
   CGSize parentSize = CGSizeMake(100, 100);
   ASSizeRange sizeRange = ASSizeRangeMake(parentSize);
 
-  [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
 
   ASSizeRange subnodeSizeRange = sizeRange;
   subnodeSizeRange.max.height = CGFLOAT_MAX;
-  XCTAssertEqual(scrollNode.scrollableDirections, ASScrollDirectionVerticalDirections);
-  ASXCTAssertEqualSizeRanges(subnode.constrainedSizeForCalculatedLayout, subnodeSizeRange);
+  XCTAssertEqual(self.scrollNode.scrollableDirections, ASScrollDirectionVerticalDirections);
+  ASXCTAssertEqualSizeRanges(self.subnode.constrainedSizeForCalculatedLayout, subnodeSizeRange);
 
   // Same test for horizontal scrollable directions
-  scrollNode.scrollableDirections = ASScrollDirectionHorizontalDirections;
-  [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  self.scrollNode.scrollableDirections = ASScrollDirectionHorizontalDirections;
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
 
   subnodeSizeRange = sizeRange;
   subnodeSizeRange.max.width = CGFLOAT_MAX;
 
-  ASXCTAssertEqualSizeRanges(subnode.constrainedSizeForCalculatedLayout, subnodeSizeRange);
+  ASXCTAssertEqualSizeRanges(self.subnode.constrainedSizeForCalculatedLayout, subnodeSizeRange);
 }
 
 - (void)testAutomaticallyManagesContentSizeUnderflow
@@ -66,13 +67,13 @@
   CGSize parentSize = CGSizeMake(100, 200);
   ASSizeRange sizeRange = ASSizeRangeUnconstrained;
 
-  subnode.style.preferredSize = subnodeSize;
+  self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
-  [scrollNode layout];
+  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
 
   ASXCTAssertEqualSizes(layout.size, parentSize);
-  ASXCTAssertEqualSizes(scrollNode.view.contentSize, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
 - (void)testAutomaticallyManagesContentSizeOverflow
@@ -81,13 +82,13 @@
   CGSize parentSize = CGSizeMake(100, 200);
   ASSizeRange sizeRange = ASSizeRangeUnconstrained;
 
-  subnode.style.preferredSize = subnodeSize;
+  self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
-  [scrollNode layout];
+  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
 
   ASXCTAssertEqualSizes(layout.size, parentSize);
-  ASXCTAssertEqualSizes(scrollNode.view.contentSize, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
 - (void)testAutomaticallyManagesContentSizeWithSizeRangeSmallerThanParentSize
@@ -96,13 +97,13 @@
   CGSize parentSize = CGSizeMake(100, 500);
   ASSizeRange sizeRange = ASSizeRangeMake(CGSizeMake(100, 100), CGSizeMake(100, 200));
 
-  subnode.style.preferredSize = subnodeSize;
+  self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
-  [scrollNode layout];
+  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
 
   ASXCTAssertEqualSizes(layout.size, sizeRange.max);
-  ASXCTAssertEqualSizes(scrollNode.view.contentSize, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
 - (void)testAutomaticallyManagesContentSizeWithSizeRangeBiggerThanParentSize
@@ -111,13 +112,13 @@
   CGSize parentSize = CGSizeMake(100, 100);
   ASSizeRange sizeRange = ASSizeRangeMake(CGSizeMake(100, 150));
 
-  subnode.style.preferredSize = subnodeSize;
+  self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
-  [scrollNode layout];
+  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
 
   ASXCTAssertEqualSizes(layout.size, sizeRange.min);
-  ASXCTAssertEqualSizes(scrollNode.view.contentSize, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
 - (void)testAutomaticallyManagesContentSizeWithInvalidCalculatedSizeForLayout
@@ -126,13 +127,13 @@
   CGSize parentSize = CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX);
   ASSizeRange sizeRange = ASSizeRangeUnconstrained;
 
-  subnode.style.preferredSize = subnodeSize;
+  self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [scrollNode layoutThatFits:sizeRange parentSize:parentSize];
-  [scrollNode layout];
+  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
 
   ASXCTAssertEqualSizes(layout.size, subnodeSize);
-  ASXCTAssertEqualSizes(scrollNode.view.contentSize, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
 @end
