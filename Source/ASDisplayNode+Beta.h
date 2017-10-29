@@ -28,8 +28,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
-void ASPerformBlockOnMainThread(void (^block)());
-void ASPerformBlockOnBackgroundThread(void (^block)()); // DISPATCH_QUEUE_PRIORITY_DEFAULT
+void ASPerformBlockOnMainThread(void (^block)(void));
+void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 ASDISPLAYNODE_EXTERN_C_END
 
 #if ASEVENTLOG_ENABLE

@@ -367,8 +367,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)relayoutItems
 {
-  [self invalidateFlowLayoutDelegateMetrics];
-  [_dataController relayoutAllNodes];
+  [_dataController relayoutAllNodesWithInvalidationBlock:^{
+    [self.collectionViewLayout invalidateLayout];
+    [self invalidateFlowLayoutDelegateMetrics];
+  }];
 }
 
 - (BOOL)isProcessingUpdates
@@ -1586,7 +1588,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
 {
-  _leadingScreensForBatching = leadingScreensForBatching;
+  if (_leadingScreensForBatching != leadingScreensForBatching) {
+    _leadingScreensForBatching = leadingScreensForBatching;
+    ASPerformBlockOnMainThread(^{
+      [self _checkForBatchFetching];
+    });
+  }
 }
 
 - (CGFloat)leadingScreensForBatching
@@ -2273,9 +2280,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   if (changedInNonScrollingDirection) {
     [self relayoutItems];
-    [_dataController waitUntilAllUpdatesAreProcessed];
-    // We need to ensure the size requery is done before we update our layout.
-    [self.collectionViewLayout invalidateLayout];
   }
 }
 

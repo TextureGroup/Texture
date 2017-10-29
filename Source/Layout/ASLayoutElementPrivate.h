@@ -37,9 +37,9 @@ extern int32_t const ASLayoutElementContextDefaultTransitionID;
 // Does not currently support nesting – there must be no current context.
 extern void ASLayoutElementPushContext(ASLayoutElementContext * context);
 
-extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext();
+extern ASLayoutElementContext * _Nullable ASLayoutElementGetCurrentContext(void);
 
-extern void ASLayoutElementPopContext();
+extern void ASLayoutElementPopContext(void);
 
 NS_ASSUME_NONNULL_END
 
