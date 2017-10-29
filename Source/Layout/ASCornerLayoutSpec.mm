@@ -101,30 +101,49 @@ static NSUInteger const kCornerChildIndex = 1;
   // Layout child
   ASLayout *childLayout = [child layoutThatFits:constrainedSize parentSize:constrainedSize.max];
   if (ASPointIsNull(childLayout.position)) {
-    childLayout.position = child.style.layoutPosition;
+    childLayout.position = CGPointZero;
   }
   
   // Layout corner
   ASLayout *cornerLayout = [corner layoutThatFits:constrainedSize parentSize:constrainedSize.max];
   if (ASPointIsNull(cornerLayout.position)) {
-    cornerLayout.position = corner.style.layoutPosition;
+    cornerLayout.position = CGPointZero;
   }
   
   // Calculate corner's position
-  CGPoint cornerOrigin = as_calculatedCornerOriginIn(childLayout.frame, cornerLayout.frame.size, _cornerLocation, _offset);
+  CGPoint relativePosition = as_calculatedCornerOriginIn(childLayout.frame, cornerLayout.frame.size, _cornerLocation, _offset);
   
   // Update corner's position
-  cornerLayout.position = cornerOrigin;
-  corner.style.layoutPosition = cornerOrigin;
+  cornerLayout.position = relativePosition;
+  corner.style.layoutPosition = relativePosition;
   
   // Calculate size
-  CGSize size = childLayout.size;
+  CGRect frame = childLayout.frame;
   if (_includeCornerForSizeCalculation) {
-    CGRect unionRect = CGRectUnion(childLayout.frame, cornerLayout.frame);
-    size = ASSizeRangeClamp(constrainedSize, unionRect.size);
+    frame = CGRectUnion(childLayout.frame, cornerLayout.frame);
+    frame.size = ASSizeRangeClamp(constrainedSize, frame.size);
   }
   
-  return [ASLayout layoutWithLayoutElement:self size:size sublayouts:@[childLayout, cornerLayout]];
+  // Shift sublayouts' positions if they are off the bounds.
+  CGPoint childPosition = childLayout.position;
+  CGPoint cornerPosition = cornerLayout.position;
+  
+  if (frame.origin.x != 0) {
+    CGFloat deltaX = frame.origin.x;
+    childPosition.x = childPosition.x - deltaX;
+    cornerPosition.x = cornerPosition.x - deltaX;
+  }
+  
+  if (frame.origin.y != 0) {
+    CGFloat deltaY = frame.origin.y;
+    childPosition.y = childPosition.y - deltaY;
+    cornerPosition.y = cornerPosition.y - deltaY;
+  }
+  
+  childLayout.position = childPosition;
+  cornerLayout.position = cornerPosition;
+  
+  return [ASLayout layoutWithLayoutElement:self size:frame.size sublayouts:@[childLayout, cornerLayout]];
 }
 
 - (void)validateElement:(id <ASLayoutElement>)element {

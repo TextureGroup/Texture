@@ -35,6 +35,7 @@
 		18C2ED831B9B7DE800F627B3 /* ASCollectionNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C2ED7D1B9B7DE800F627B3 /* ASCollectionNode.mm */; };
 		1A00A3B61F9E0B5000D72431 /* ASCornerLayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A00A3B41F9E0B5000D72431 /* ASCornerLayoutSpec.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A00A3B71F9E0B5000D72431 /* ASCornerLayoutSpec.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A00A3B51F9E0B5000D72431 /* ASCornerLayoutSpec.mm */; };
+		1A819F731FA5B0A3007A564F /* ASCornerLayoutSpecSnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A819F721FA5B0A3007A564F /* ASCornerLayoutSpecSnapshotTests.m */; };
 		242995D31B29743C00090100 /* ASBasicImageDownloaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 242995D21B29743C00090100 /* ASBasicImageDownloaderTests.m */; };
 		2538B6F31BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m */; };
 		254C6B521BF8FE6D003EC431 /* ASTextKitTruncationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 254C6B511BF8FE6D003EC431 /* ASTextKitTruncationTests.mm */; };
@@ -574,6 +575,7 @@
 		1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASEqualityHelpers.h; sourceTree = "<group>"; };
 		1A00A3B41F9E0B5000D72431 /* ASCornerLayoutSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCornerLayoutSpec.h; sourceTree = "<group>"; };
 		1A00A3B51F9E0B5000D72431 /* ASCornerLayoutSpec.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCornerLayoutSpec.mm; sourceTree = "<group>"; };
+		1A819F721FA5B0A3007A564F /* ASCornerLayoutSpecSnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASCornerLayoutSpecSnapshotTests.m; sourceTree = "<group>"; };
 		205F0E0D1B371875007741D0 /* UICollectionViewLayout+ASConvenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionViewLayout+ASConvenience.h"; sourceTree = "<group>"; };
 		205F0E0E1B371875007741D0 /* UICollectionViewLayout+ASConvenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionViewLayout+ASConvenience.m"; sourceTree = "<group>"; };
 		205F0E111B371BD7007741D0 /* ASScrollDirection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASScrollDirection.m; sourceTree = "<group>"; };
@@ -1159,6 +1161,7 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				1A819F721FA5B0A3007A564F /* ASCornerLayoutSpecSnapshotTests.m */,
 				CC583ABF1EF9BAB400134156 /* Common */,
 				CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */,
 				CC034A0F1E60C9BF00626263 /* ASRectTableTests.m */,
@@ -2181,6 +2184,7 @@
 				AEEC47E41C21D3D200EC1693 /* ASVideoNodeTests.m in Sources */,
 				254C6B521BF8FE6D003EC431 /* ASTextKitTruncationTests.mm in Sources */,
 				058D0A3D195D057000B7D73C /* ASTextKitCoreTextAdditionsTests.m in Sources */,
+				1A819F731FA5B0A3007A564F /* ASCornerLayoutSpecSnapshotTests.m in Sources */,
 				CC3B20901C3F892D00798563 /* ASBridgedPropertiesTests.mm in Sources */,
 				058D0A40195D057000B7D73C /* ASTextNodeTests.m in Sources */,
 				DBC453221C5FD97200B16017 /* ASDisplayNodeImplicitHierarchyTests.m in Sources */,
