@@ -1166,9 +1166,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_asyncDelegateFlags.interopWillDisplayCell) {
     ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:modelIndexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:indexPath];
     }
   }
 
@@ -1227,9 +1226,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_asyncDelegateFlags.interopDidEndDisplayingCell) {
     ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:modelIndexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:indexPath];
     }
   }
 
@@ -1272,10 +1270,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)rawView forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopWillDisplaySupplementaryView) {
-    ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplaySupplementaryView:rawView forElementKind:elementKind atIndexPath:modelIndexPath];
+    ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplaySupplementaryView:rawView forElementKind:elementKind atIndexPath:indexPath];
     }
   }
 
@@ -1313,10 +1310,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)rawView forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopdidEndDisplayingSupplementaryView) {
-    ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingSupplementaryView:rawView forElementOfKind:elementKind atIndexPath:modelIndexPath];
+    ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingSupplementaryView:rawView forElementOfKind:elementKind atIndexPath:indexPath];
     }
   }
 
