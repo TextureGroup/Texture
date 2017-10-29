@@ -12,7 +12,6 @@
 
 #import "ASLayoutSpecSnapshotTestsHelper.h"
 #import <AsyncDisplayKit/ASCornerLayoutSpec.h>
-#import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 
 typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
