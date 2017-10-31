@@ -63,10 +63,9 @@ static void runLoopSourceCallback(void *info) {
   }
 
   if (objectPtr != NULL && *objectPtr != nil) {
-    _queueLock.lock();
+    ASDN::MutexLocker l(_queueLock);
     _queue.push_back(*objectPtr);
     *objectPtr = nil;
-    _queueLock.unlock();
   }
 }
 
