@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutLocation) {
  
  @param child A child that is laid out to determine the size of this spec.
  @param corner A layoutElement object that is laid out to a corner on the child.
- @param position The corner position option.
+ @param location The corner position option.
  @return An ASCornerLayoutSpec object with a given child and an layoutElement that act as corner.
  */
 - (instancetype)initWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location AS_WARN_UNUSED_RESULT;
@@ -43,7 +43,7 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutLocation) {
  
  @param child A child that is laid out to determine the size of this spec.
  @param corner A layoutElement object that is laid out to a corner on the child.
- @param position The corner position option.
+ @param location The corner position option.
  @return An ASCornerLayoutSpec object with a given child and an layoutElement that act as corner.
  */
 + (instancetype)cornerLayoutSpecWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location AS_WARN_UNUSED_RESULT NS_SWIFT_UNAVAILABLE("Use -initWithChild:corner:location: instead.");
