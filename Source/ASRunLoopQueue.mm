@@ -45,7 +45,7 @@ static void runLoopSourceCallback(void *info) {
   ASDN::RecursiveMutex _queueLock;
 }
 
-+ (instancetype)sharedDeallocationQueue
++ (ASDeallocQueue *)sharedDeallocationQueue
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
