@@ -51,7 +51,7 @@ AS_SUBCLASSING_RESTRICTED
 AS_SUBCLASSING_RESTRICTED
 @interface ASDeallocQueue : NSObject
 
-+ (ASDeallocQueue *)sharedDeallocationQueue;
+@property (class, atomic, readonly) ASDeallocQueue *sharedDeallocationQueue;
 
 - (void)test_drain;
 
