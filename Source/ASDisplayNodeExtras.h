@@ -35,7 +35,7 @@
 #endif
 
 /// For deallocation of objects on the main thread across multiple run loops.
-extern void ASPerformMainThreadDeallocation(_Nullable id object);
+extern void ASPerformMainThreadDeallocation(id _Nullable __strong * _Nonnull objectPtr);
 
 // Because inline methods can't be extern'd and need to be part of the translation unit of code
 // that compiles with them to actually inline, we both declare and define these in the header.

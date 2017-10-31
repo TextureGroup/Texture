@@ -372,8 +372,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [self setAsyncDataSource:nil];
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
-  ASPerformBackgroundDeallocation(_dataController);
-  ASPerformBackgroundDeallocation(_rangeController);
+  ASPerformBackgroundDeallocation(&_dataController);
+  ASPerformBackgroundDeallocation(&_rangeController);
 }
 
 #pragma mark -
