@@ -6,6 +6,7 @@
 - [ASCollectionView] Check if batch fetching is needed if batch fetching parameter has been changed. [#624](https://github.com/TextureGroup/Texture/pull/624) [Garrett Moon](https://github.com/garrettmoon)
 - [ASNetworkImageNode] New delegate callback to tell the consumer whether the image was loaded from cache or download. [Adlai Holler](https://github.com/Adlai-Holler)
 - [Layout] Fixes a deadlock in layout. [#638](https://github.com/TextureGroup/Texture/pull/638) [Garrett Moon](https://github.com/garrettmoon)
+- Updated to be backwards compatible with Xcode 8. [Adlai Holler](https://github.com/Adlai-Holler)
 - Fixed cases where main-thread-deallocation doesn't work as expected [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
