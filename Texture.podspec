@@ -16,8 +16,7 @@ Pod::Spec.new do |spec|
 
   spec.ios.deployment_target = '8.0'
 
-  # Uncomment when fixed: issues with tvOS build for release 2.0
-  # spec.tvos.deployment_target = '9.0'
+  #spec.tvos.deployment_target = '9.0'
 
   # Subspecs
   spec.subspec 'Core' do |core|
