@@ -367,7 +367,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)relayoutItems
 {
-  [_dataController relayoutAllNodes];
+  [_dataController relayoutAllNodesWithInvalidationBlock:^{
+    [self.collectionViewLayout invalidateLayout];
+    [self invalidateFlowLayoutDelegateMetrics];
+  }];
 }
 
 - (BOOL)isProcessingUpdates
@@ -1163,9 +1166,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_asyncDelegateFlags.interopWillDisplayCell) {
     ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:modelIndexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplayCell:rawCell forItemAtIndexPath:indexPath];
     }
   }
 
@@ -1224,9 +1226,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_asyncDelegateFlags.interopDidEndDisplayingCell) {
     ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:modelIndexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingCell:rawCell forItemAtIndexPath:indexPath];
     }
   }
 
@@ -1269,10 +1270,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)collectionView:(UICollectionView *)collectionView willDisplaySupplementaryView:(UICollectionReusableView *)rawView forElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopWillDisplaySupplementaryView) {
-    ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplaySupplementaryView:rawView forElementKind:elementKind atIndexPath:modelIndexPath];
+    ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView willDisplaySupplementaryView:rawView forElementKind:elementKind atIndexPath:indexPath];
     }
   }
 
@@ -1310,10 +1310,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)collectionView:(UICollectionView *)collectionView didEndDisplayingSupplementaryView:(UICollectionReusableView *)rawView forElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.interopdidEndDisplayingSupplementaryView) {
-    ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    NSIndexPath *modelIndexPath = [self indexPathForNode:node];
-    if (modelIndexPath && node.shouldUseUIKitCell) {
-      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingSupplementaryView:rawView forElementOfKind:elementKind atIndexPath:modelIndexPath];
+    ASCellNode *node = [self supplementaryNodeForElementKind:elementKind atIndexPath:indexPath];
+    if (node.shouldUseUIKitCell) {
+      [(id <ASCollectionDelegateInterop>)_asyncDelegate collectionView:collectionView didEndDisplayingSupplementaryView:rawView forElementOfKind:elementKind atIndexPath:indexPath];
     }
   }
 
@@ -1585,7 +1584,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)setLeadingScreensForBatching:(CGFloat)leadingScreensForBatching
 {
-  _leadingScreensForBatching = leadingScreensForBatching;
+  if (_leadingScreensForBatching != leadingScreensForBatching) {
+    _leadingScreensForBatching = leadingScreensForBatching;
+    ASPerformBlockOnMainThread(^{
+      [self _checkForBatchFetching];
+    });
+  }
 }
 
 - (CGFloat)leadingScreensForBatching
@@ -2246,18 +2250,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
  */
 - (void)layer:(CALayer *)layer didChangeBoundsWithOldValue:(CGRect)oldBounds newValue:(CGRect)newBounds
 {
-  if (_hasDataControllerLayoutDelegate) {
-    // Let the layout delegate handle bounds changes if it's available.
-    return;
-  }
-  if (self.collectionViewLayout == nil) {
-    return;
-  }
+  CGSize newSize = newBounds.size;
   CGSize lastUsedSize = _lastBoundsSizeUsedForMeasuringNodes;
-  if (CGSizeEqualToSize(lastUsedSize, newBounds.size)) {
+  if (CGSizeEqualToSize(lastUsedSize, newSize)) {
     return;
   }
-  _lastBoundsSizeUsedForMeasuringNodes = newBounds.size;
+  if (_hasDataControllerLayoutDelegate || self.collectionViewLayout == nil) {
+    // Let the layout delegate handle bounds changes if it's available. If no layout, it will init in the new state.
+    return;
+  }
+
+  _lastBoundsSizeUsedForMeasuringNodes = newSize;
 
   // Laying out all nodes is expensive.
   // We only need to do this if the bounds changed in the non-scrollable direction.
@@ -2265,16 +2268,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // appearance update, we do not need to relayout all nodes.
   // For a more permanent fix to the unsafety mentioned above, see https://github.com/facebook/AsyncDisplayKit/pull/2182
   ASScrollDirection scrollDirection = self.scrollableDirections;
-  BOOL fixedVertically = (ASScrollDirectionContainsVerticalDirection(scrollDirection) == NO);
+  BOOL fixedVertically   = (ASScrollDirectionContainsVerticalDirection  (scrollDirection) == NO);
   BOOL fixedHorizontally = (ASScrollDirectionContainsHorizontalDirection(scrollDirection) == NO);
 
-  BOOL changedInNonScrollingDirection = (fixedHorizontally && newBounds.size.width != lastUsedSize.width) || (fixedVertically && newBounds.size.height != lastUsedSize.height);
+  BOOL changedInNonScrollingDirection = (fixedHorizontally && newSize.width  != lastUsedSize.width) ||
+                                        (fixedVertically   && newSize.height != lastUsedSize.height);
 
   if (changedInNonScrollingDirection) {
-    [_dataController relayoutAllNodes];
-    [_dataController waitUntilAllUpdatesAreProcessed];
-    // We need to ensure the size requery is done before we update our layout.
-    [self.collectionViewLayout invalidateLayout];
+    [self relayoutItems];
   }
 }
 
