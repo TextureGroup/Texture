@@ -6,6 +6,8 @@
 - [ASCollectionView] Check if batch fetching is needed if batch fetching parameter has been changed. [#624](https://github.com/TextureGroup/Texture/pull/624) [Garrett Moon](https://github.com/garrettmoon)
 - [ASNetworkImageNode] New delegate callback to tell the consumer whether the image was loaded from cache or download. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASCornerLayoutSpec] Add new layout spec class for corner element layout with simple declairative way. [#632](https://github.com/TextureGroup/Texture/pull/632) [huangkun](https://github.com/huang-kun)
+- [Layout] Fixes a deadlock in layout. [#638](https://github.com/TextureGroup/Texture/pull/638) [Garrett Moon](https://github.com/garrettmoon)
+- Updated to be backwards compatible with Xcode 8. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
