@@ -18,7 +18,6 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASContentSizeCategory.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 @class ASTraitCollection;
@@ -28,6 +27,34 @@
 NS_ASSUME_NONNULL_BEGIN
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
+
+#pragma mark - ASPrimitiveContentSizeCategory
+
+/**
+ * ASPrimitiveContentSizeCategory is a UIContentSizeCategory that can be used inside a struct.
+ *
+ * We need an unretained pointer because ARC can't manage struct memory.
+ *
+ * WARNING: DO NOT cast UIContentSizeCategory values to ASPrimitiveContentSizeCategory directly.
+ *   Use ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory) instead.
+ *   This is because we make some assumptions about the lifetime of the object it points to.
+ *   Also note that cast from ASPrimitiveContentSizeCategory to UIContentSizeCategory is always safe.
+ */
+typedef __unsafe_unretained UIContentSizeCategory ASPrimitiveContentSizeCategory;
+
+/**
+ * Safely casts from UIContentSizeCategory to ASPrimitiveContentSizeCategory.
+ *
+ * The UIKit documentation doesn't specify if we can receive a copy of the UIContentSizeCategory constant. While getting
+ * copies is fine with ARC, usage of unretained pointers requires us to ensure the lifetime of the object it points to.
+ * Manual retain&release of the UIContentSizeCategory object is not an option because it would require us to do that
+ * everywhere ASPrimitiveTraitCollection is used. This is error-prone and can lead to crashes and memory leaks. So, we
+ * explicitly limit possible values of ASPrimitiveContentSizeCategory to the predetermined set of global constants with
+ * known lifetime.
+ *
+ * @return a pointer to one of the UIContentSizeCategory constants.
+ */
+extern ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory sizeCategory);
 
 #pragma mark - ASPrimitiveTraitCollection
 
@@ -45,7 +72,7 @@ typedef struct ASPrimitiveTraitCollection {
   UIUserInterfaceStyle userInterfaceStyle;
 #endif
 
-  ASContentSizeCategory preferredContentSizeCategory;
+  ASPrimitiveContentSizeCategory preferredContentSizeCategory;
 
   CGSize containerSize;
 } ASPrimitiveTraitCollection;

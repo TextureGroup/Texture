@@ -20,6 +20,59 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 
+#pragma mark - ASPrimitiveContentSizeCategory
+
+// UIContentSizeCategoryUnspecified is available only in iOS 10.0 and later.
+// This constant is used as a fallback for older iOS versions.
+static UIContentSizeCategory const AS_UIContentSizeCategoryUnspecified = @"_UICTContentSizeCategoryUnspecified";
+
+ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory sizeCategory) {
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryExtraSmall]) {
+    return UIContentSizeCategoryExtraSmall;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategorySmall]) {
+    return UIContentSizeCategorySmall;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryMedium]) {
+    return UIContentSizeCategoryMedium;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryLarge]) {
+    return UIContentSizeCategoryLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryExtraLarge]) {
+    return UIContentSizeCategoryExtraLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
+    return UIContentSizeCategoryExtraExtraLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
+    return UIContentSizeCategoryExtraExtraExtraLarge;
+  }
+
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
+    return UIContentSizeCategoryAccessibilityMedium;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
+    return UIContentSizeCategoryAccessibilityLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
+    return UIContentSizeCategoryAccessibilityExtraLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
+    return UIContentSizeCategoryAccessibilityExtraExtraLarge;
+  }
+  if ([sizeCategory isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
+    return UIContentSizeCategoryAccessibilityExtraExtraExtraLarge;
+  }
+
+  if (AS_AT_LEAST_IOS10) {
+    return UIContentSizeCategoryUnspecified;
+  }
+  else {
+    return AS_UIContentSizeCategoryUnspecified;
+  }
+}
+
 #pragma mark - ASPrimitiveTraitCollection
 
 extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
@@ -38,7 +91,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
     .displayGamut = UIDisplayGamutUnspecified,
     .userInterfaceIdiom = UIUserInterfaceIdiomUnspecified,
     .layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified,
-    .preferredContentSizeCategory = ASContentSizeCategoryUnspecified,
+    .preferredContentSizeCategory = ASPrimitiveContentSizeCategoryMake(AS_AT_LEAST_IOS10 ? UIContentSizeCategoryUnspecified : AS_UIContentSizeCategoryUnspecified),
     .containerSize = CGSizeZero,
   };
 }
@@ -56,9 +109,9 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
     environmentTraitCollection.displayGamut = traitCollection.displayGamut;
     environmentTraitCollection.layoutDirection = traitCollection.layoutDirection;
 
-    // `preferredContentSizeCategory` is also available on older iOS versions, but only via `UIApplication` class.
-    // It should be noted that `[UIApplication sharedApplication]` is unavailable because Texture is built with only extension-safe API.
-    environmentTraitCollection.preferredContentSizeCategory = ASContentSizeCategoryFromUIContentSizeCategory(traitCollection.preferredContentSizeCategory);
+    // preferredContentSizeCategory is also available on older iOS versions, but only via UIApplication class.
+    // It should be noted that [UIApplication sharedApplication] is unavailable because Texture is built with only extension-safe API.
+    environmentTraitCollection.preferredContentSizeCategory = ASPrimitiveContentSizeCategoryMake(traitCollection.preferredContentSizeCategory);
 
     #if TARGET_OS_TV
       environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
@@ -79,7 +132,11 @@ BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTr
     #if TARGET_OS_TV
       lhs.userInterfaceStyle == rhs.userInterfaceStyle &&
     #endif
+
+    // preferredContentSizeCategory always points to one of UIContentSizeCategory constants.
+    // Assuming their values do not duplicate, we can simply compare pointers, avoiding string comparison.
     lhs.preferredContentSizeCategory == rhs.preferredContentSizeCategory &&
+
     CGSizeEqualToSize(lhs.containerSize, rhs.containerSize);
 }
 
@@ -173,7 +230,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   #if TARGET_OS_TV
     [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
   #endif
-  [props addObject:@{ @"preferredContentSizeCategory": UIContentSizeCategoryFromASContentSizeCategory(traits.preferredContentSizeCategory) }];
+  [props addObject:@{ @"preferredContentSizeCategory": (UIContentSizeCategory)traits.preferredContentSizeCategory }];
   [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
   return ASObjectDescriptionMakeWithoutObject(props);
 }
@@ -252,7 +309,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 #if TARGET_OS_TV
                                    userInterfaceStyle:traits.userInterfaceStyle
 #endif
-                         preferredContentSizeCategory:UIContentSizeCategoryFromASContentSizeCategory(traits.preferredContentSizeCategory)
+                         preferredContentSizeCategory:(UIContentSizeCategory)traits.preferredContentSizeCategory
                                         containerSize:traits.containerSize];
 }
 
@@ -261,7 +318,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 {
   return [self traitCollectionWithUITraitCollection:traitCollection
                                       containerSize:windowSize
-                        fallbackContentSizeCategory:UIContentSizeCategoryFromASContentSizeCategory(ASContentSizeCategoryUnspecified)];
+                        fallbackContentSizeCategory:AS_AT_LEAST_IOS10 ? UIContentSizeCategoryUnspecified : AS_UIContentSizeCategoryUnspecified];
 }
 
 
@@ -319,7 +376,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
     #if TARGET_OS_TV
       .userInterfaceStyle = self.userInterfaceStyle,
     #endif
-    .preferredContentSizeCategory = ASContentSizeCategoryFromUIContentSizeCategory(self.preferredContentSizeCategory),
+    .preferredContentSizeCategory = ASPrimitiveContentSizeCategoryMake(self.preferredContentSizeCategory),
     .containerSize = self.containerSize,
   };
 }
