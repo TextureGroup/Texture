@@ -260,6 +260,169 @@
 
 @end
 
+@interface CornerLayoutExample ()
+@property (nonatomic, strong) ASImageNode *dotNode;
+@property (nonatomic, strong) ASImageNode *photoNode1;
+@property (nonatomic, strong) ASTextNode *badgeNode;
+@property (nonatomic, strong) ASImageNode *photoNode2;
+@end
+
+@implementation CornerLayoutExample
+
+static CGFloat const kSampleAvatarSize = 100;
+static CGFloat const kSampleIconSize = 26;
+
++ (NSString *)title {
+    return @"Declarative way for Corner image Layout";
+}
+
++ (NSString *)descriptionTitle {
+    return nil;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        UIImage *avatarImage = [self avatarImageWithSize:CGSizeMake(kSampleAvatarSize, kSampleAvatarSize)];
+        UIImage *cornerImage = [self cornerImageWithSize:CGSizeMake(kSampleIconSize, kSampleIconSize)];
+        
+        NSAttributedString *numberText = [NSAttributedString attributedStringWithString:@" 999+ " fontSize:20 color:UIColor.whiteColor];
+        
+        _dotNode = [ASImageNode new];
+        _dotNode.image = cornerImage;
+        
+        _photoNode1 = [ASImageNode new];
+        _photoNode1.image = avatarImage;
+        
+        _badgeNode = [ASTextNode new];
+        _badgeNode.attributedText = numberText;
+        _badgeNode.backgroundColor = UIColor.redColor;
+        _badgeNode.cornerRadius = 12;
+        _badgeNode.clipsToBounds = YES;
+        
+        _photoNode2 = [ASImageNode new];
+        _photoNode2.image = avatarImage;
+    }
+    return self;
+}
+
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+    
+    ASCornerLayoutSpec *cornerSpec1 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode1 corner:_dotNode location:ASCornerLayoutLocationTopRight];
+    cornerSpec1.offset = CGPointMake(-3, 3);
+    
+    ASCornerLayoutSpec *cornerSpec2 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode2 corner:_badgeNode location:ASCornerLayoutLocationTopRight];
+    
+    self.photoNode.style.preferredSize = CGSizeMake(kSampleAvatarSize, kSampleAvatarSize);
+    self.iconNode.style.preferredSize = CGSizeMake(kSampleIconSize, kSampleIconSize);
+    
+    ASCornerLayoutSpec *cornerSpec3 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:self.photoNode corner:self.iconNode location:ASCornerLayoutLocationTopRight];
+    
+    ASStackLayoutSpec *stackSpec = [ASStackLayoutSpec verticalStackLayoutSpec];
+    stackSpec.spacing = 40;
+    stackSpec.children = @[cornerSpec1, cornerSpec2, cornerSpec3];
+    
+    return stackSpec;
+}
+
+- (UIImage *)avatarImageWithSize:(CGSize)size {
+    return [UIImage imageWithSize:size fillColor:UIColor.lightGrayColor shapeBlock:^UIBezierPath *{
+        CGRect rect = (CGRect){ CGPointZero, size };
+        return [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:MIN(size.width, size.height) / 20];
+    }];
+}
+
+- (UIImage *)cornerImageWithSize:(CGSize)size {
+    return [UIImage imageWithSize:size fillColor:UIColor.redColor shapeBlock:^UIBezierPath *{
+        return [UIBezierPath bezierPathWithOvalInRect:(CGRect){ CGPointZero, size }];
+    }];
+}
+
+@end
+
+
+@interface UserProfileSample ()
+@property (nonatomic, strong) ASImageNode *badgeNode;
+@property (nonatomic, strong) ASImageNode *avatarNode;
+@property (nonatomic, strong) ASTextNode *usernameNode;
+@property (nonatomic, strong) ASTextNode *subtitleNode;
+@property (nonatomic, assign) CGFloat photoSizeValue;
+@property (nonatomic, assign) CGFloat iconSizeValue;
+@end
+
+@implementation UserProfileSample
+
++ (NSString *)title {
+    return @"Common user profile layout.";
+}
+
++ (NSString *)descriptionTitle {
+    return @"For corner image layout and text truncation.";
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _photoSizeValue = 44;
+        _iconSizeValue = 15;
+        
+        _badgeNode = [ASImageNode new];
+        _badgeNode.backgroundColor = [UIColor redColor];
+        _badgeNode.style.preferredSize = CGSizeMake(_iconSizeValue, _iconSizeValue);
+        _badgeNode.cornerRadius = _iconSizeValue / 2;
+        _badgeNode.clipsToBounds = YES;
+        
+        _avatarNode = [ASImageNode new];
+        _avatarNode.backgroundColor = [UIColor lightGrayColor];
+        _avatarNode.style.preferredSize = CGSizeMake(_photoSizeValue, _photoSizeValue);
+        _avatarNode.cornerRadius = _photoSizeValue / 2;
+        _avatarNode.clipsToBounds = YES;
+        
+        _usernameNode = [ASTextNode new];
+        _usernameNode.attributedText = [NSAttributedString attributedStringWithString:@"Hello World" fontSize:17 color:UIColor.blackColor];
+        _usernameNode.maximumNumberOfLines = 1;
+        
+        _subtitleNode = [ASTextNode new];
+        _subtitleNode.attributedText = [NSAttributedString attributedStringWithString:@"This is a long long subtitle, with a long long appended string." fontSize:14 color:UIColor.lightGrayColor];
+        _subtitleNode.maximumNumberOfLines = 1;
+    }
+    return self;
+}
+
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+    
+    // Apply avatar with badge
+    // Normally, avatar's box size is the only photo size and it will not include the badge size.
+    // Otherwise, use includeCornerForSizeCalculation property to increase the box's size if needed.
+    ASCornerLayoutSpec *avatarBox = [ASCornerLayoutSpec new];
+    avatarBox.child = _avatarNode;
+    avatarBox.corner = _badgeNode;
+    avatarBox.cornerLocation = ASCornerLayoutLocationBottomRight;
+    avatarBox.offset = CGPointMake(-6, -6);
+    
+    ASStackLayoutSpec *textBox = [ASStackLayoutSpec verticalStackLayoutSpec];
+    textBox.justifyContent = ASStackLayoutJustifyContentSpaceAround;
+    textBox.children = @[_usernameNode, _subtitleNode];
+    
+    ASStackLayoutSpec *profileBox = [ASStackLayoutSpec horizontalStackLayoutSpec];
+    profileBox.spacing = 10;
+    profileBox.children = @[avatarBox, textBox];
+    
+    // Apply text truncation.
+    NSArray *elems = @[_usernameNode, _subtitleNode, textBox, profileBox];
+    for (id <ASLayoutElement> elem in elems) {
+        elem.style.flexShrink = 1;
+    }
+    
+    ASInsetLayoutSpec *profileInsetBox = [ASInsetLayoutSpec new];
+    profileInsetBox.insets = UIEdgeInsetsMake(120, 20, INFINITY, 20);
+    profileInsetBox.child = profileBox;
+    
+    return profileInsetBox;
+}
+
+@end
+
 @implementation LayoutExampleNode
 
 + (NSString *)title
