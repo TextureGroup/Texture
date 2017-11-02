@@ -759,7 +759,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
 }
 
-- (void)relayoutAllNodes
+- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)())invalidationBlock
 {
   ASDisplayNodeAssertMainThread();
   if (!_initialReloadDataHasBeenCalled) {
@@ -770,6 +770,13 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   // i.e there might be some nodes that were measured using the old constrained size but haven't been added to _visibleMap
   LOG(@"Edit Command - relayoutRows");
   [self _scheduleBlockOnMainSerialQueue:^{
+    // Because -invalidateLayout doesn't trigger any operations by itself, and we answer queries from UICollectionView using layoutThatFits:,
+    // we invalidate the layout before we have updated all of the cells. Any cells that the collection needs the size of immediately will get
+    // -layoutThatFits: with a new constraint, on the main thread, and synchronously calculate them. Meanwhile, relayoutAllNodes will update
+    // the layout of any remaining nodes on background threads (and fast-return for any nodes that the UICV got to first).
+    if (invalidationBlock) {
+      invalidationBlock();
+    }
     [self _relayoutAllNodes];
   }];
 }
