@@ -45,7 +45,7 @@ static void runLoopSourceCallback(void *info) {
   ASDN::RecursiveMutex _queueLock;
 }
 
-+ (instancetype)sharedDeallocationQueue
++ (ASDeallocQueue *)sharedDeallocationQueue
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
@@ -55,16 +55,18 @@ static void runLoopSourceCallback(void *info) {
   return deallocQueue;
 }
 
-- (void)releaseObjectInBackground:(id)object
+- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
 {
   // Disable background deallocation on iOS 8 and below to avoid crashes related to UIAXDelegateClearer (#2767).
   if (!AS_AT_LEAST_IOS9) {
     return;
   }
 
-  _queueLock.lock();
-  _queue.push_back(object);
-  _queueLock.unlock();
+  if (objectPtr != NULL && *objectPtr != nil) {
+    ASDN::MutexLocker l(_queueLock);
+    _queue.push_back(*objectPtr);
+    *objectPtr = nil;
+  }
 }
 
 - (void)threadMain
@@ -452,6 +454,18 @@ typedef enum {
 {
   ASDN::MutexLocker l(_internalQueueLock);
   return _internalQueue.count == 0;
+}
+
+#pragma mark - NSLocking
+
+- (void)lock
+{
+  _internalQueueLock.lock();
+}
+
+- (void)unlock
+{
+  _internalQueueLock.unlock();
 }
 
 @end
