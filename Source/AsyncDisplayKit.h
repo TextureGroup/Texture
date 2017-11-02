@@ -79,6 +79,7 @@
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
+#import <AsyncDisplayKit/ASCornerLayoutSpec.h>
 #import <AsyncDisplayKit/ASRelativeLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
