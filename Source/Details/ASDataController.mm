@@ -540,7 +540,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       ASMutableElementMap *mutableMap = [previousMap mutableCopy];
 
       // Step 1.1: Update the mutable copies to match the data source's state
-      [self _updateSectionContextsInMap:mutableMap changeSet:changeSet];
+      [self _updateSectionsInMap:mutableMap changeSet:changeSet];
       ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
       [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegate) previousMap:previousMap];
 
@@ -599,43 +599,38 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 /**
  * Update sections based on the given change set.
  */
-- (void)_updateSectionContextsInMap:(ASMutableElementMap *)map changeSet:(_ASHierarchyChangeSet *)changeSet
+- (void)_updateSectionsInMap:(ASMutableElementMap *)map changeSet:(_ASHierarchyChangeSet *)changeSet
 {
   ASDisplayNodeAssertMainThread();
   
-  if (!_dataSourceFlags.contextForSection) {
-    return;
-  }
-  
   if (changeSet.includesReloadData) {
-    [map removeAllSectionContexts];
+    [map removeAllSections];
     
     NSUInteger sectionCount = [self itemCountsFromDataSource].size();
     NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
-    [self _insertSectionContextsIntoMap:map indexes:sectionIndexes];
+    [self _insertSectionsIntoMap:map indexes:sectionIndexes];
     // Return immediately because reloadData can't be used in conjuntion with other updates.
     return;
   }
   
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeDelete]) {
-    [map removeSectionContextsAtIndexes:change.indexSet];
+    [map removeSectionsAtIndexes:change.indexSet];
   }
   
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeInsert]) {
-    [self _insertSectionContextsIntoMap:map indexes:change.indexSet];
+    [self _insertSectionsIntoMap:map indexes:change.indexSet];
   }
 }
 
-- (void)_insertSectionContextsIntoMap:(ASMutableElementMap *)map indexes:(NSIndexSet *)sectionIndexes
+- (void)_insertSectionsIntoMap:(ASMutableElementMap *)map indexes:(NSIndexSet *)sectionIndexes
 {
   ASDisplayNodeAssertMainThread();
-  
-  if (!_dataSourceFlags.contextForSection) {
-    return;
-  }
-  
+
   [sectionIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-    id<ASSectionContext> context = [_dataSource dataController:self contextForSection:idx];
+    id<ASSectionContext> context;
+    if (_dataSourceFlags.contextForSection) {
+      context = [_dataSource dataController:self contextForSection:idx];
+    }
     ASSection *section = [[ASSection alloc] initWithSectionID:_nextSectionID context:context];
     [map insertSection:section atIndex:idx];
     _nextSectionID++;

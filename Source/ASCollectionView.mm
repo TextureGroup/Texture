@@ -64,8 +64,6 @@
     return __val; \
   }
 
-#define ASIndexPathForSection(section) [NSIndexPath indexPathForItem:0 inSection:section]
-
 #define ASFlowLayoutDefault(layout, property, default)                                        \
 ({                                                                                            \
   UICollectionViewFlowLayout *flowLayout = ASDynamicCast(layout, UICollectionViewFlowLayout); \
@@ -679,19 +677,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (indexPath == nil) {
     return nil;
   }
-  
-  // If this is a section index path, we don't currently have a method
-  // to do a mapping.
-  if (indexPath.item == NSNotFound) {
-    return indexPath;
-  } else {
-    NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
-    if (viewIndexPath == nil && wait) {
-      [self waitUntilAllUpdatesAreCommitted];
-      return [self convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:NO];
-    }
-    return viewIndexPath;
+
+  NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
+  if (viewIndexPath == nil && wait) {
+    [self waitUntilAllUpdatesAreCommitted];
+    return [self convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:NO];
   }
+  return viewIndexPath;
 }
 
 /**
@@ -725,13 +717,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return nil;
   }
 
-  // If this is a section index path, we don't currently have a method
-  // to do a mapping.
-  if (indexPath.item == NSNotFound) {
-    return indexPath;
-  } else {
-    return [_dataController.pendingMap convertIndexPath:indexPath fromMap:_dataController.visibleMap];
-  }
+  return [_dataController.pendingMap convertIndexPath:indexPath fromMap:_dataController.visibleMap];
 }
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToCollectionNode:(NSArray<NSIndexPath *> *)indexPaths
@@ -1050,7 +1036,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASDisplayNodeAssertMainThread();
   ASElementMap *map = _dataController.visibleMap;
   ASCollectionElement *e = [map supplementaryElementOfKind:UICollectionElementKindSectionHeader
-                                               atIndexPath:ASIndexPathForSection(section)];
+                                               atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
   return e ? [self sizeForElement:e] : ASFlowLayoutDefault(l, headerReferenceSize, CGSizeZero);
 }
 
@@ -1060,29 +1046,28 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASDisplayNodeAssertMainThread();
   ASElementMap *map = _dataController.visibleMap;
   ASCollectionElement *e = [map supplementaryElementOfKind:UICollectionElementKindSectionFooter
-                                               atIndexPath:ASIndexPathForSection(section)];
+                                               atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
   return e ? [self sizeForElement:e] : ASFlowLayoutDefault(l, footerReferenceSize, CGSizeZero);
 }
 
 // For the methods that call delegateIndexPathForSection:withSelector:, translate the section from
 // visibleMap to pendingMap. If the section no longer exists, or the delegate doesn't implement
-// the selector, we will return a nil indexPath (and then use the ASFlowLayoutDefault).
-- (NSIndexPath *)delegateIndexPathForSection:(NSInteger)section withSelector:(SEL)selector
+// the selector, we will return NSNotFound (and then use the ASFlowLayoutDefault).
+- (NSInteger)delegateIndexForSection:(NSInteger)section withSelector:(SEL)selector
 {
   if ([_asyncDelegate respondsToSelector:selector]) {
-    return [_dataController.pendingMap convertIndexPath:ASIndexPathForSection(section)
-                                                fromMap:_dataController.visibleMap];
+    return [_dataController.pendingMap convertSection:section fromMap:_dataController.visibleMap];
   } else {
-    return nil;
+    return NSNotFound;
   }
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
                                       insetForSectionAtIndex:(NSInteger)section
 {
-  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
-  if (indexPath) {
-    return [(id)_asyncDelegate collectionView:cv layout:l insetForSectionAtIndex:indexPath.section];
+  section = [self delegateIndexForSection:section withSelector:_cmd];
+  if (section != NSNotFound) {
+    return [(id)_asyncDelegate collectionView:cv layout:l insetForSectionAtIndex:section];
   }
   return ASFlowLayoutDefault(l, sectionInset, UIEdgeInsetsZero);
 }
@@ -1090,10 +1075,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
                minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
-  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
-  if (indexPath) {
+  section = [self delegateIndexForSection:section withSelector:_cmd];
+  if (section != NSNotFound) {
     return [(id)_asyncDelegate collectionView:cv layout:l
-               minimumInteritemSpacingForSectionAtIndex:indexPath.section];
+               minimumInteritemSpacingForSectionAtIndex:section];
   }
   return ASFlowLayoutDefault(l, minimumInteritemSpacing, 10.0); // Default is documented as 10.0
 }
@@ -1101,10 +1086,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
                     minimumLineSpacingForSectionAtIndex:(NSInteger)section
 {
-  NSIndexPath *indexPath = [self delegateIndexPathForSection:section withSelector:_cmd];
-  if (indexPath) {
+  section = [self delegateIndexForSection:section withSelector:_cmd];
+  if (section != NSNotFound) {
     return [(id)_asyncDelegate collectionView:cv layout:l
-                    minimumLineSpacingForSectionAtIndex:indexPath.section];
+                    minimumLineSpacingForSectionAtIndex:section];
   }
   return ASFlowLayoutDefault(l, minimumLineSpacing, 10.0);      // Default is documented as 10.0
 }
