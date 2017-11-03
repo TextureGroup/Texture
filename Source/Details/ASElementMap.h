@@ -65,8 +65,17 @@ AS_SUBCLASSING_RESTRICTED
 
 /**
  * Returns the index path that corresponds to the same element in @c map at the given @c indexPath. O(1)
+ *
+ * Note you can pass "section index paths" of length 1 and get a corresponding section index path.
  */
 - (nullable NSIndexPath *)convertIndexPath:(NSIndexPath *)indexPath fromMap:(ASElementMap *)map;
+
+/**
+ * Returns the section index into the receiver that corresponds to the same element in @c map at @c sectionIndex. Fast O(N).
+ *
+ * Returns @c NSNotFound if the section does not exist in the receiver.
+ */
+- (NSInteger)convertSection:(NSInteger)sectionIndex fromMap:(ASElementMap *)map;
 
 /**
  * Returns the index path for the given element. O(1)
