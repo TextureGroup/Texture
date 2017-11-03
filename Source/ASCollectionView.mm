@@ -677,19 +677,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (indexPath == nil) {
     return nil;
   }
-  
-  // If this is a section index path, we don't currently have a method
-  // to do a mapping.
-  if (indexPath.item == NSNotFound) {
-    return indexPath;
-  } else {
-    NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
-    if (viewIndexPath == nil && wait) {
-      [self waitUntilAllUpdatesAreCommitted];
-      return [self convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:NO];
-    }
-    return viewIndexPath;
+
+  NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
+  if (viewIndexPath == nil && wait) {
+    [self waitUntilAllUpdatesAreCommitted];
+    return [self convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:NO];
   }
+  return viewIndexPath;
 }
 
 /**
