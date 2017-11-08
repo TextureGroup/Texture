@@ -40,31 +40,31 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  * are at the `debug` log level, which the system
  * disables in production.
  */
-void ASDisableLogging();
+void ASDisableLogging(void);
 
 /// Log for general node events e.g. interfaceState, didLoad.
 #define ASNodeLogEnabled 1
-os_log_t ASNodeLog();
+os_log_t ASNodeLog(void);
 
 /// Log for layout-specific events e.g. calculateLayout.
 #define ASLayoutLogEnabled 1
-os_log_t ASLayoutLog();
+os_log_t ASLayoutLog(void);
 
 /// Log for display-specific events e.g. display queue batches.
 #define ASDisplayLogEnabled 1
-os_log_t ASDisplayLog();
+os_log_t ASDisplayLog(void);
 
 /// Log for collection events e.g. reloadData, performBatchUpdates.
 #define ASCollectionLogEnabled 1
-os_log_t ASCollectionLog();
+os_log_t ASCollectionLog(void);
 
 /// Log for ASNetworkImageNode and ASMultiplexImageNode events.
 #define ASImageLoadingLogEnabled 1
-os_log_t ASImageLoadingLog();
+os_log_t ASImageLoadingLog(void);
 
 /// Specialized log for our main thread deallocation trampoline.
 #define ASMainThreadDeallocationLogEnabled 0
-os_log_t ASMainThreadDeallocationLog();
+os_log_t ASMainThreadDeallocationLog(void);
 
 ASDISPLAYNODE_EXTERN_C_END
 

@@ -96,7 +96,7 @@
 
 - (void)dealloc
 {
-  ASPerformBackgroundDeallocation(_node);
+  ASPerformBackgroundDeallocation(&_node);
 }
 
 - (void)loadView

@@ -1216,11 +1216,13 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
-  if (@available(iOS 11, *)) {
-    pendingState.accessibilityAttributedLabel = [view valueForKey: @"accessibilityAttributedLabel"];
-    pendingState.accessibilityAttributedHint = [view valueForKey: @"accessibilityAttributedHint"];
-    pendingState.accessibilityAttributedValue = [view valueForKey: @"accessibilityAttributedValue"];
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
+  if (AS_AVAILABLE_IOS(11)) {
+    pendingState.accessibilityAttributedLabel = view.accessibilityAttributedLabel;
+    pendingState.accessibilityAttributedHint = view.accessibilityAttributedHint;
+    pendingState.accessibilityAttributedValue = view.accessibilityAttributedValue;
   }
+#endif
   pendingState.accessibilityTraits = view.accessibilityTraits;
   pendingState.accessibilityFrame = view.accessibilityFrame;
   pendingState.accessibilityLanguage = view.accessibilityLanguage;
