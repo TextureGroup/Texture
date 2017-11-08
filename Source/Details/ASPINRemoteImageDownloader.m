@@ -359,7 +359,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
  * If queue is nil, assert and perform now.
  * Otherwise, dispatch async to queue.
  */
-+ (void)_performWithCallbackQueue:(dispatch_queue_t)queue work:(void (^)())work
++ (void)_performWithCallbackQueue:(dispatch_queue_t)queue work:(void (^)(void))work
 {
   if (work == nil) {
     // No need to assert here, really. We aren't expecting any feedback from this method.

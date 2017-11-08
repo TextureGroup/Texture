@@ -273,7 +273,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // Experiments done by Instagram show that this option being YES (default)
   // when unused causes a significant hit to scroll performance.
   // https://github.com/Instagram/IGListKit/issues/318
-  if (AS_AT_LEAST_IOS10) {
+  if (AS_AVAILABLE_IOS(10)) {
     super.prefetchingEnabled = NO;
   }
 
@@ -1972,7 +1972,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 /// The UIKit version of this method is only available on iOS >= 9
 - (NSArray<NSIndexPath *> *)asdk_indexPathsForVisibleSupplementaryElementsOfKind:(NSString *)kind
 {
-  if (NSFoundationVersionNumber >= NSFoundationVersionNumber_iOS_9_0) {
+  if (AS_AVAILABLE_IOS(9)) {
     return [self indexPathsForVisibleSupplementaryElementsOfKind:kind];
   }
 
