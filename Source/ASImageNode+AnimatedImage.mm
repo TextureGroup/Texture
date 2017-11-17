@@ -53,16 +53,9 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   if (ASObjectIsEqual(_animatedImage, animatedImage)) {
     return;
   }
-    
-  if (animatedImage == nil) {
-    // Animated image can take while to dealloc, do it off the main queue
-    __block id <ASAnimatedImageProtocol>deallocImage = _animatedImage;
-    ASPerformBlockOnBackgroundThread(^{
-      deallocImage = nil;
-    });
-  }
   
-  id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
+  const id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
+  
   _animatedImage = animatedImage;
   
   if (animatedImage != nil) {
@@ -85,6 +78,11 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
       // Clean up after ourselves.
       self.contents = nil;
       [self setCoverImage:nil];
+  }
+  
+  // Animated image can take while to dealloc, do it off the main queue
+  if (previousAnimatedImage != nil) {
+    ASPerformBackgroundDeallocation(previousAnimatedImage);
   }
   
   [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
