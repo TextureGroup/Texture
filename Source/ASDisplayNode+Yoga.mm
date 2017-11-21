@@ -307,7 +307,7 @@
       NSLog(@"node = %@", node);
       NSLog(@"style = %@", node.style);
       NSLog(@"layout = %@", node.yogaCalculatedLayout);
-      YGNodePrint(node.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
+      YGNodePrint(node.style.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
     });
   }
 #endif /* YOGA_LAYOUT_LOGGING */
