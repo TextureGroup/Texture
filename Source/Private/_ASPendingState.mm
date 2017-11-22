@@ -91,6 +91,9 @@ typedef struct {
   int setAccessibilityActivationPoint:1;
   int setAccessibilityPath:1;
   int setSemanticContentAttribute:1;
+  int setLayoutMargins:1;
+  int setPreservesSuperviewLayoutMargins:1;
+  int setInsetsLayoutMarginsFromSafeArea:1;
 } ASPendingStateFlags;
 
 @implementation _ASPendingState
@@ -123,6 +126,9 @@ typedef struct {
   CGFloat borderWidth;
   CGColorRef borderColor;
   BOOL asyncTransactionContainer;
+  UIEdgeInsets layoutMargins;
+  BOOL preservesSuperviewLayoutMargins;
+  BOOL insetsLayoutMarginsFromSafeArea;
   BOOL isAccessibilityElement;
   NSString *accessibilityLabel;
   NSAttributedString *accessibilityAttributedLabel;
@@ -208,7 +214,9 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize borderColor=borderColor;
 @synthesize asyncdisplaykit_asyncTransactionContainer=asyncTransactionContainer;
 @synthesize semanticContentAttribute=semanticContentAttribute;
-
+@synthesize layoutMargins=layoutMargins;
+@synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
+@synthesize insetsLayoutMarginsFromSafeArea=insetsLayoutMarginsFromSafeArea;
 
 static CGColorRef blackColorRef = NULL;
 static UIColor *defaultTintColor = nil;
@@ -276,6 +284,9 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   shadowRadius = 3;
   borderWidth = 0;
   borderColor = blackColorRef;
+  layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8);
+  preservesSuperviewLayoutMargins = NO;
+  insetsLayoutMarginsFromSafeArea = YES;
   isAccessibilityElement = NO;
   accessibilityLabel = nil;
   accessibilityAttributedLabel = nil;
@@ -571,6 +582,24 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 {
   asyncTransactionContainer = flag;
   _flags.setAsyncTransactionContainer = YES;
+}
+
+- (void)setLayoutMargins:(UIEdgeInsets)margins
+{
+  layoutMargins = margins;
+  _flags.setLayoutMargins = YES;
+}
+
+- (void)setPreservesSuperviewLayoutMargins:(BOOL)flag
+{
+  preservesSuperviewLayoutMargins = flag;
+  _flags.setPreservesSuperviewLayoutMargins = YES;
+}
+
+- (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)flag
+{
+  insetsLayoutMarginsFromSafeArea = flag;
+  _flags.setInsetsLayoutMarginsFromSafeArea = YES;
 }
 
 - (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute {
@@ -1049,6 +1078,18 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setOpaque)
     ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
 
+  if (flags.setLayoutMargins)
+    view.layoutMargins = layoutMargins;
+
+  if (flags.setPreservesSuperviewLayoutMargins)
+    view.preservesSuperviewLayoutMargins = preservesSuperviewLayoutMargins;
+
+  if (AS_AVAILABLE_IOS(11.0)) {
+    if (flags.setInsetsLayoutMarginsFromSafeArea) {
+      view.insetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+    }
+  }
+
   if (flags.setSemanticContentAttribute) {
     view.semanticContentAttribute = semanticContentAttribute;
   }
@@ -1212,6 +1253,11 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.allowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
   pendingState.edgeAntialiasingMask = layer.edgeAntialiasingMask;
   pendingState.semanticContentAttribute = view.semanticContentAttribute;
+  pendingState.layoutMargins = view.layoutMargins;
+  pendingState.preservesSuperviewLayoutMargins = view.preservesSuperviewLayoutMargins;
+  if (AS_AVAILABLE_IOS(11)) {
+    pendingState.insetsLayoutMarginsFromSafeArea = view.insetsLayoutMarginsFromSafeArea;
+  }
   pendingState.isAccessibilityElement = view.isAccessibilityElement;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
@@ -1298,6 +1344,9 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   || flags.setAsyncTransactionContainer
   || flags.setOpaque
   || flags.setSemanticContentAttribute
+  || flags.setLayoutMargins
+  || flags.setPreservesSuperviewLayoutMargins
+  || flags.setInsetsLayoutMarginsFromSafeArea
   || flags.setIsAccessibilityElement
   || flags.setAccessibilityLabel
   || flags.setAccessibilityAttributedLabel

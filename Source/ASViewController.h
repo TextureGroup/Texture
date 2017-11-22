@@ -78,6 +78,11 @@ NS_ASSUME_NONNULL_BEGIN
 // Refer to examples/SynchronousConcurrency, AsyncViewController.m
 @property (nonatomic, assign) BOOL neverShowPlaceholders;
 
+/* Custom container UIViewController subclasses can use this property to add to the overlay
+ that UIViewController calculates for the safeAreaInsets for contained view controllers.
+ */
+@property(nonatomic) UIEdgeInsets additionalSafeAreaInsets;
+
 @end
 
 @interface ASViewController (ASRangeControllerUpdateRangeProtocol)

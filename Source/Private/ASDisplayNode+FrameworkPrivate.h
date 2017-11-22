@@ -214,6 +214,25 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  */
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState;
 
+/**
+ * @abstract safeAreaInsets will fallback to this value if the corresponding UIKit property is not available
+ * (due to an old iOS version).
+ *
+ * @discussion This should be set by the owning view controller based on it's layout guides.
+ * If this is not a view controllet's node the value will be calculated automatically by the parent node.
+ */
+@property (nonatomic, assign) UIEdgeInsets fallbackSafeAreaInsets;
+
+/**
+ * @abstract Indicates if this node is a view controller's root node. Defaults to NO.
+ *
+ * @discussion Set to YES in -[ASViewController initWithNode:].
+ *
+ * YES here only means that this node is used as an ASViewController node. It doesn't mean that this node is a root of
+ * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASViewController.
+ */
+@property (nonatomic, assign, getter=isViewControllerRoot) BOOL viewControllerRoot;
+
 @end
 
 

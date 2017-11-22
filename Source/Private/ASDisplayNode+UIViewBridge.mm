@@ -871,6 +871,111 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   }
 }
 
+- (UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  UIEdgeInsets margins = _getFromViewOnly(layoutMargins);
+
+  if (!AS_AT_LEAST_IOS11 && self.insetsLayoutMarginsFromSafeArea) {
+    UIEdgeInsets safeArea = self.safeAreaInsets;
+    margins = ASConcatInsets(margins, safeArea);
+  }
+
+  return margins;
+}
+
+- (void)setLayoutMargins:(UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(layoutMargins, layoutMargins);
+}
+
+- (BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  return _getFromViewOnly(preservesSuperviewLayoutMargins);
+}
+
+- (void)setPreservesSuperviewLayoutMargins:(BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(preservesSuperviewLayoutMargins, preservesSuperviewLayoutMargins);
+}
+
+- (void)layoutMarginsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+  BOOL automaticallyRelayout;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    automaticallyRelayout = _automaticallyRelayoutOnLayoutMarginsChanges;
+  }
+
+  if (automaticallyRelayout) {
+    [self setNeedsLayout];
+  }
+}
+
+- (UIEdgeInsets)safeAreaInsets
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+
+  if (AS_AVAILABLE_IOS(11.0)) {
+    if (__loaded(self)) {
+      return self.view.safeAreaInsets;
+    }
+  }
+  return _fallbackSafeAreaInsets;
+}
+
+- (BOOL)insetsLayoutMarginsFromSafeArea
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+
+  if (AS_AVAILABLE_IOS(11.0)) {
+    return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+  }
+  return _fallbackInsetsLayoutMarginsFromSafeArea;
+}
+
+- (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)insetsLayoutMarginsFromSafeArea
+{
+  {
+    _bridge_prologue_write;
+    ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+
+    _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+
+    if (AS_AVAILABLE_IOS(11.0)) {
+      _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
+    }
+  }
+
+  if (!AS_AT_LEAST_IOS11) {
+    [self layoutMarginsDidChange];
+  }
+}
+
+- (void)safeAreaInsetsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+  BOOL automaticallyRelayout;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    automaticallyRelayout = _automaticallyRelayoutOnSafeAreaChanges;
+  }
+
+  if (automaticallyRelayout) {
+    [self setNeedsLayout];
+  }
+}
+
 @end
 
 @implementation ASDisplayNode (InternalPropertyBridge)

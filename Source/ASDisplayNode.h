@@ -551,6 +551,20 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 @property (nonatomic, readonly) BOOL supportsLayerBacking;
 
+/**
+ * Whether or not the node layout should be automatically updated when it receives safeAreaInsetsDidChange.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL automaticallyRelayoutOnSafeAreaChanges;
+
+/**
+ * Whether or not the node layout should be automatically updated when it receives layoutMarginsDidChange.
+ *
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL automaticallyRelayoutOnLayoutMarginsChanges;
+
 @end
 
 /**
@@ -718,6 +732,17 @@ extern NSInteger const ASDefaultDrawingPriority;
 @property (nonatomic, assign)           BOOL needsDisplayOnBoundsChange;       // default==NO
 @property (nonatomic, assign)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
 @property (nonatomic, assign)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone (undefined for layer-backed nodes)
+
+// Content margins
+@property (nonatomic, assign)           UIEdgeInsets layoutMargins;
+@property (nonatomic, assign)           BOOL preservesSuperviewLayoutMargins;  // default is NO - set to enable pass-through or cascading behavior of margins from this view’s parent to its children
+- (void)layoutMarginsDidChange;
+
+// Safe area
+@property (nonatomic, readonly)         UIEdgeInsets safeAreaInsets;
+@property (nonatomic, assign)           BOOL insetsLayoutMarginsFromSafeArea;  // Default: YES
+- (void)safeAreaInsetsDidChange;
+
 
 // UIResponder methods
 // By default these fall through to the underlying view, but can be overridden.
