@@ -263,7 +263,8 @@
 @interface CornerLayoutExample ()
 @property (nonatomic, strong) ASImageNode *dotNode;
 @property (nonatomic, strong) ASImageNode *photoNode1;
-@property (nonatomic, strong) ASTextNode *badgeNode;
+@property (nonatomic, strong) ASTextNode *badgeTextNode;
+@property (nonatomic, strong) ASImageNode *badgeImageNode;
 @property (nonatomic, strong) ASImageNode *photoNode2;
 @end
 
@@ -271,16 +272,20 @@
 
 static CGFloat const kSampleAvatarSize = 100;
 static CGFloat const kSampleIconSize = 26;
+static CGFloat const kSampleBadgeCornerRadius = 12;
 
-+ (NSString *)title {
++ (NSString *)title
+{
     return @"Declarative way for Corner image Layout";
 }
 
-+ (NSString *)descriptionTitle {
++ (NSString *)descriptionTitle
+{
     return nil;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     self = [super init];
     if (self) {
         UIImage *avatarImage = [self avatarImageWithSize:CGSizeMake(kSampleAvatarSize, kSampleAvatarSize)];
@@ -294,11 +299,13 @@ static CGFloat const kSampleIconSize = 26;
         _photoNode1 = [ASImageNode new];
         _photoNode1.image = avatarImage;
         
-        _badgeNode = [ASTextNode new];
-        _badgeNode.attributedText = numberText;
-        _badgeNode.backgroundColor = UIColor.redColor;
-        _badgeNode.cornerRadius = 12;
-        _badgeNode.clipsToBounds = YES;
+        _badgeTextNode = [ASTextNode new];
+        _badgeTextNode.attributedText = numberText;
+        
+        _badgeImageNode = [ASImageNode new];
+        _badgeImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:kSampleBadgeCornerRadius
+                                                                      cornerColor:UIColor.clearColor
+                                                                        fillColor:UIColor.redColor];
         
         _photoNode2 = [ASImageNode new];
         _photoNode2.image = avatarImage;
@@ -306,12 +313,16 @@ static CGFloat const kSampleIconSize = 26;
     return self;
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+{
+    
+    ASBackgroundLayoutSpec *badgeSpec = [ASBackgroundLayoutSpec backgroundLayoutSpecWithChild:_badgeTextNode
+                                                                                   background:_badgeImageNode];
     
     ASCornerLayoutSpec *cornerSpec1 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode1 corner:_dotNode location:ASCornerLayoutLocationTopRight];
     cornerSpec1.offset = CGPointMake(-3, 3);
     
-    ASCornerLayoutSpec *cornerSpec2 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode2 corner:_badgeNode location:ASCornerLayoutLocationTopRight];
+    ASCornerLayoutSpec *cornerSpec2 = [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode2 corner:badgeSpec location:ASCornerLayoutLocationTopRight];
     
     self.photoNode.style.preferredSize = CGSizeMake(kSampleAvatarSize, kSampleAvatarSize);
     self.iconNode.style.preferredSize = CGSizeMake(kSampleIconSize, kSampleIconSize);
@@ -325,14 +336,16 @@ static CGFloat const kSampleIconSize = 26;
     return stackSpec;
 }
 
-- (UIImage *)avatarImageWithSize:(CGSize)size {
+- (UIImage *)avatarImageWithSize:(CGSize)size
+{
     return [UIImage imageWithSize:size fillColor:UIColor.lightGrayColor shapeBlock:^UIBezierPath *{
         CGRect rect = (CGRect){ CGPointZero, size };
         return [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:MIN(size.width, size.height) / 20];
     }];
 }
 
-- (UIImage *)cornerImageWithSize:(CGSize)size {
+- (UIImage *)cornerImageWithSize:(CGSize)size
+{
     return [UIImage imageWithSize:size fillColor:UIColor.redColor shapeBlock:^UIBezierPath *{
         return [UIBezierPath bezierPathWithOvalInRect:(CGRect){ CGPointZero, size }];
     }];
@@ -352,31 +365,37 @@ static CGFloat const kSampleIconSize = 26;
 
 @implementation UserProfileSample
 
-+ (NSString *)title {
++ (NSString *)title
+{
     return @"Common user profile layout.";
 }
 
-+ (NSString *)descriptionTitle {
++ (NSString *)descriptionTitle
+{
     return @"For corner image layout and text truncation.";
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     self = [super init];
     if (self) {
         _photoSizeValue = 44;
         _iconSizeValue = 15;
         
+        CGSize iconSize = CGSizeMake(_iconSizeValue, _iconSizeValue);
+        CGSize photoSize = CGSizeMake(_photoSizeValue, _photoSizeValue);
+        
         _badgeNode = [ASImageNode new];
-        _badgeNode.backgroundColor = [UIColor redColor];
-        _badgeNode.style.preferredSize = CGSizeMake(_iconSizeValue, _iconSizeValue);
-        _badgeNode.cornerRadius = _iconSizeValue / 2;
-        _badgeNode.clipsToBounds = YES;
+        _badgeNode.style.preferredSize = iconSize;
+        _badgeNode.image = [UIImage imageWithSize:iconSize fillColor:UIColor.redColor shapeBlock:^UIBezierPath *{
+            return [UIBezierPath bezierPathWithOvalInRect:(CGRect){ CGPointZero, iconSize }];
+        }];
         
         _avatarNode = [ASImageNode new];
-        _avatarNode.backgroundColor = [UIColor lightGrayColor];
-        _avatarNode.style.preferredSize = CGSizeMake(_photoSizeValue, _photoSizeValue);
-        _avatarNode.cornerRadius = _photoSizeValue / 2;
-        _avatarNode.clipsToBounds = YES;
+        _avatarNode.style.preferredSize = photoSize;
+        _avatarNode.image = [UIImage imageWithSize:photoSize fillColor:UIColor.lightGrayColor shapeBlock:^UIBezierPath *{
+            return [UIBezierPath bezierPathWithOvalInRect:(CGRect){ CGPointZero, photoSize }];
+        }];
         
         _usernameNode = [ASTextNode new];
         _usernameNode.attributedText = [NSAttributedString attributedStringWithString:@"Hello World" fontSize:17 color:UIColor.blackColor];
@@ -389,8 +408,8 @@ static CGFloat const kSampleIconSize = 26;
     return self;
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize {
-    
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+{
     // Apply avatar with badge
     // Normally, avatar's box size is the only photo size and it will not include the badge size.
     // Otherwise, use includeCornerForSizeCalculation property to increase the box's size if needed.

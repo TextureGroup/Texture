@@ -59,54 +59,54 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 - (void)testCornerSpecForAllLocations {
   ASCornerLayoutSpecSnapshotTestsOffsetOption center = ASCornerLayoutSpecSnapshotTestsOffsetOptionCenter;
   
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:center childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:center childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:center wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:center wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:center childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:center childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:center wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:center wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:center childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:center childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:center wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:center wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:center childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:center childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:center wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:center wrapsCorner:YES];
 }
 
 - (void)testCornerSpecForAllLocationsWithInnerOffset {
   ASCornerLayoutSpecSnapshotTestsOffsetOption inner = ASCornerLayoutSpecSnapshotTestsOffsetOptionInner;
   
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:inner childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:inner childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:inner wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:inner wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:inner childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:inner childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:inner wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:inner wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:inner childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:inner childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:inner wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:inner wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:inner childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:inner childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:inner wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:inner wrapsCorner:YES];
 }
 
 - (void)testCornerSpecForAllLocationsWithOuterOffset {
   ASCornerLayoutSpecSnapshotTestsOffsetOption outer = ASCornerLayoutSpecSnapshotTestsOffsetOptionOuter;
   
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:outer childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:outer childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:outer wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:outer wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:outer childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:outer childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:outer wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationTopRight offsetOption:outer wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:outer childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:outer childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:outer wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomLeft offsetOption:outer wrapsCorner:YES];
 
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:outer childSizeOnly:NO];
-  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:outer childSizeOnly:YES];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:outer wrapsCorner:NO];
+  [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:outer wrapsCorner:YES];
 }
 
 - (void)testCornerSpecWithLocation:(ASCornerLayoutLocation)location
                       offsetOption:(ASCornerLayoutSpecSnapshotTestsOffsetOption)offsetOption
-                     childSizeOnly:(BOOL)childSizeOnly {
+                       wrapsCorner:(BOOL)wrapsCorner {
   
   ASDisplayNode *baseNode = ASDisplayNodeWithBackgroundColor(_baseColor, _baseSize);
   ASDisplayNode *cornerNode = ASDisplayNodeWithBackgroundColor(_cornerColor, _cornerSize);
@@ -121,7 +121,7 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   
   CGPoint delta = (CGPoint){ _cornerSize.width / 2, _cornerSize.height / 2 };
   cornerSpec.offset = [self offsetForOption:offsetOption location:location delta:delta];
-  cornerSpec.includeCornerForSizeCalculation = !childSizeOnly;
+  cornerSpec.wrapsCorner = wrapsCorner;
   
   ASBackgroundLayoutSpec *backgroundSpec = [ASBackgroundLayoutSpec backgroundLayoutSpecWithChild:cornerSpec
                                                                                       background:debugBoxNode];
@@ -129,7 +129,7 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   [self testLayoutSpec:backgroundSpec
              sizeRange:_contextSizeRange
               subnodes:@[debugBoxNode, baseNode, cornerNode]
-            identifier:[self suffixWithLocation:location option:offsetOption childSizeOnly:childSizeOnly]];
+            identifier:[self suffixWithLocation:location option:offsetOption wrapsCorner:wrapsCorner]];
 }
 
 - (CGPoint)offsetForOption:(ASCornerLayoutSpecSnapshotTestsOffsetOption)option
@@ -168,7 +168,7 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 - (NSString *)suffixWithLocation:(ASCornerLayoutLocation)location
                           option:(ASCornerLayoutSpecSnapshotTestsOffsetOption)option
-                   childSizeOnly:(BOOL)childSizeOnly {
+                     wrapsCorner:(BOOL)wrapsCorner {
   
   NSMutableString *desc = [NSMutableString string];
   
@@ -203,10 +203,10 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   
   [desc appendString:@"_"];
   
-  if (childSizeOnly) {
-    [desc appendString:@"childSize"];
-  } else {
+  if (wrapsCorner) {
     [desc appendString:@"fullSize"];
+  } else {
+    [desc appendString:@"childSize"];
   }
   
   return desc.copy;

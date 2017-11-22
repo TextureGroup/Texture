@@ -148,7 +148,8 @@ class CornerLayoutSample : PhotoWithOutsetIconOverlay {
   let photoNode1 = ASImageNode()
   let photoNode2 = ASImageNode()
   let dotNode = ASImageNode()
-  let badgeNode = ASTextNode()
+  let badgeTextNode = ASTextNode()
+  let badgeImageNode = ASImageNode()
   
   struct ImageSize {
     static let avatar = CGSize(width: 100, height: 100)
@@ -175,18 +176,18 @@ class CornerLayoutSample : PhotoWithOutsetIconOverlay {
     photoNode2.image = avatarImage
     dotNode.image = iconImage
     
-    badgeNode.attributedText = NSAttributedString.attributedString(string: " 999+ ", fontSize: 20, color: .white)
-    badgeNode.backgroundColor = .red
-    badgeNode.cornerRadius = 12
-    badgeNode.clipsToBounds = true
+    badgeTextNode.attributedText = NSAttributedString.attributedString(string: " 999+ ", fontSize: 20, color: .white)
+    
+    badgeImageNode.image = UIImage.as_resizableRoundedImage(withCornerRadius: 12, cornerColor: .clear, fill: .red)
   }
   
   override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
     photoNode.style.preferredSize = ImageSize.avatar
     iconNode.style.preferredSize = ImageSize.icon
     
+    let badgeSpec = ASBackgroundLayoutSpec(child: badgeTextNode, background: badgeImageNode)
     let cornerSpec1 = ASCornerLayoutSpec(child: photoNode1, corner: dotNode, location: .topRight)
-    let cornerSpec2 = ASCornerLayoutSpec(child: photoNode2, corner: badgeNode, location: .topRight)
+    let cornerSpec2 = ASCornerLayoutSpec(child: photoNode2, corner: badgeSpec, location: .topRight)
     let cornerSpec3 = ASCornerLayoutSpec(child: photoNode, corner: iconNode, location: .topRight)
     
     cornerSpec1.offset = CGPoint(x: -3, y: 3)
@@ -227,21 +228,16 @@ class UserProfileSample : LayoutExampleNode {
   required init() {
     super.init()
     
-    avatarNode.backgroundColor = ImageColor.avatar
-    circularize(avatarNode, in: ImageSize.avatar)
+    avatarNode.image = UIImage.draw(size: ImageSize.avatar, fillColor: ImageColor.avatar) { () -> UIBezierPath in
+      return UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: ImageSize.avatar))
+    }
     
-    badgeNode.backgroundColor = ImageColor.badge
-    circularize(badgeNode, in: ImageSize.badge)
+    badgeNode.image = UIImage.draw(size: ImageSize.badge, fillColor: ImageColor.badge) { () -> UIBezierPath in
+      return UIBezierPath(ovalIn: CGRect(origin: CGPoint.zero, size: ImageSize.badge))
+    }
     
     makeSingleLine(for: usernameNode, with: "Hello world", fontSize: 17, textColor: .black)
     makeSingleLine(for: subtitleNode, with: "This is a long long subtitle, with a long long appended string.", fontSize: 14, textColor: .lightGray)
-  }
-  
-  private func circularize(_ node: ASDisplayNode, in size: CGSize) {
-    assert(size.width == size.height)
-    node.style.preferredSize = size
-    node.cornerRadius = size.width / 2
-    node.clipsToBounds = true
   }
   
   private func makeSingleLine(for node: ASTextNode, with text: String, fontSize: CGFloat, textColor: UIColor) {
