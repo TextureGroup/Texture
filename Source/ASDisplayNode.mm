@@ -440,7 +440,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
       // is still deallocated on a background thread
       object_setIvar(self, ivar, nil);
       
-      ASPerformMainThreadDeallocation(value);
+      ASPerformMainThreadDeallocation(&value);
     } else {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
     }

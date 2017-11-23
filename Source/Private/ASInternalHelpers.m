@@ -84,7 +84,7 @@ void ASPerformBlockOnBackgroundThread(void (^block)(void))
   }
 }
 
-void ASPerformBackgroundDeallocation(id object)
+void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object)
 {
   [[ASDeallocQueue sharedDeallocationQueue] releaseObjectInBackground:object];
 }
