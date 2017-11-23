@@ -15,8 +15,8 @@
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
-CGPoint as_calculatedCornerOriginIn(CGRect baseFrame, CGSize cornerSize, ASCornerLayoutLocation cornerLocation, CGPoint offset) {
-  
+CGPoint as_calculatedCornerOriginIn(CGRect baseFrame, CGSize cornerSize, ASCornerLayoutLocation cornerLocation, CGPoint offset)
+{
   CGPoint cornerOrigin = CGPointZero;
   CGPoint baseOrigin = baseFrame.origin;
   CGSize baseSize = baseFrame.size;

@@ -39,7 +39,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 @implementation ASCornerLayoutSpecSnapshotTests
 
-- (void)setUp {
+- (void)setUp
+{
   [super setUp];
   
   self.recordMode = NO;
@@ -56,7 +57,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   _contextSizeRange = ASSizeRangeMake(CGSizeZero, _contextSize);
 }
 
-- (void)testCornerSpecForAllLocations {
+- (void)testCornerSpecForAllLocations
+{
   ASCornerLayoutSpecSnapshotTestsOffsetOption center = ASCornerLayoutSpecSnapshotTestsOffsetOptionCenter;
   
   [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:center wrapsCorner:NO];
@@ -72,7 +74,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:center wrapsCorner:YES];
 }
 
-- (void)testCornerSpecForAllLocationsWithInnerOffset {
+- (void)testCornerSpecForAllLocationsWithInnerOffset
+{
   ASCornerLayoutSpecSnapshotTestsOffsetOption inner = ASCornerLayoutSpecSnapshotTestsOffsetOptionInner;
   
   [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:inner wrapsCorner:NO];
@@ -88,7 +91,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
   [self testCornerSpecWithLocation:ASCornerLayoutLocationBottomRight offsetOption:inner wrapsCorner:YES];
 }
 
-- (void)testCornerSpecForAllLocationsWithOuterOffset {
+- (void)testCornerSpecForAllLocationsWithOuterOffset
+{
   ASCornerLayoutSpecSnapshotTestsOffsetOption outer = ASCornerLayoutSpecSnapshotTestsOffsetOptionOuter;
   
   [self testCornerSpecWithLocation:ASCornerLayoutLocationTopLeft offsetOption:outer wrapsCorner:NO];
@@ -106,8 +110,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 - (void)testCornerSpecWithLocation:(ASCornerLayoutLocation)location
                       offsetOption:(ASCornerLayoutSpecSnapshotTestsOffsetOption)offsetOption
-                       wrapsCorner:(BOOL)wrapsCorner {
-  
+                       wrapsCorner:(BOOL)wrapsCorner
+{
   ASDisplayNode *baseNode = ASDisplayNodeWithBackgroundColor(_baseColor, _baseSize);
   ASDisplayNode *cornerNode = ASDisplayNodeWithBackgroundColor(_cornerColor, _cornerSize);
   ASDisplayNode *debugBoxNode = ASDisplayNodeWithBackgroundColor(_boxColor);
@@ -134,8 +138,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 - (CGPoint)offsetForOption:(ASCornerLayoutSpecSnapshotTestsOffsetOption)option
                   location:(ASCornerLayoutLocation)location
-                     delta:(CGPoint)delta {
-  
+                     delta:(CGPoint)delta
+{
   CGFloat x = delta.x;
   CGFloat y = delta.y;
   
@@ -168,8 +172,8 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 - (NSString *)suffixWithLocation:(ASCornerLayoutLocation)location
                           option:(ASCornerLayoutSpecSnapshotTestsOffsetOption)option
-                     wrapsCorner:(BOOL)wrapsCorner {
-  
+                     wrapsCorner:(BOOL)wrapsCorner
+{  
   NSMutableString *desc = [NSMutableString string];
   
   switch (location) {
