@@ -204,7 +204,7 @@ override func viewDidLoad() {
 
 An important thing to notice is that `ASTableNode` does not provide an equivalent to `UITableView`'s `-tableView:heightForRowAtIndexPath:`.
 
-This is because nodes are responsible for determining their own height based on the provided constraints.  This means you no longer have to write code to determine this detail at the view controller level. 
+This is because nodes are responsible for determining their own height based on the provided layout spec. This means you no longer have to write code to determine this detail at the view controller level.
 
 A node defines its height by way of the layoutSpec returned in the `-layoutSpecThatFits:` method. All nodes given a constrained size are able to calculate their desired size.
 
