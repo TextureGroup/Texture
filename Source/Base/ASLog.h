@@ -138,11 +138,11 @@ if (AS_AVAILABLE_IOS(9)) {                        \
 }                                                 \
 
 #define as_log_info(log, format, ...)             \
-if (AS_AVAILABLE_IOS(9)) { \
+if (AS_AVAILABLE_IOS(9)) {                        \
   os_log_info(log, format, ##__VA_ARGS__);        \
 } else {                                          \
   (void)0;                                        \
-}\
+}                                                 \
 
 #define as_log_error(log, format, ...)            \
 if (AS_AVAILABLE_IOS(9)) {                        \
