@@ -282,11 +282,12 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   }
 
   if (!CGSizeEqualToSize(_size, layout.size)) return NO;
-  if (!CGPointEqualToPoint(_position, layout.position)) return NO;
+
+  if (!((ASPointIsNull(self.position) && ASPointIsNull(layout.position))
+        || CGPointEqualToPoint(self.position, layout.position))) return NO;
   if (_layoutElement != layout.layoutElement) return NO;
 
-  NSArray *sublayouts = layout.sublayouts;
-  if (sublayouts != _sublayouts && (sublayouts == nil || _sublayouts == nil || ![_sublayouts isEqual:sublayouts])) {
+  if (!ASObjectIsEqual(_sublayouts, layout.sublayouts)) {
     return NO;
   }
 
@@ -371,22 +372,6 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     [description appendString:[self _recursiveDescriptionForLayout:sublayout level:level + 1]];
   }
   return description;
-}
-
-- (BOOL)isEqual:(id)object
-{
-  if (self == object) {
-    return YES;
-  }
-
-  if (ASLayout *layout = ASDynamicCast(object, ASLayout)) {
-    return CGSizeEqualToSize(self.size, layout.size)
-    && ((ASPointIsNull(self.position) && ASPointIsNull(layout.position))
-      || CGPointEqualToPoint(self.position, layout.position))
-    && self.layoutElement == layout.layoutElement
-    && ASObjectIsEqual(self.sublayouts, layout.sublayouts);
-  }
-  return NO;
 }
 
 @end
