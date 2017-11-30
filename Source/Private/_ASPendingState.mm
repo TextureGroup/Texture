@@ -147,7 +147,7 @@ typedef struct {
   NSArray *accessibilityHeaderElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
-  UISemanticContentAttribute semanticContentAttribute;
+  UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
 
   ASPendingStateFlags _flags;
 }
@@ -306,7 +306,9 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   accessibilityActivationPoint = CGPointZero;
   accessibilityPath = nil;
   edgeAntialiasingMask = (kCALayerLeftEdge | kCALayerRightEdge | kCALayerTopEdge | kCALayerBottomEdge);
-  semanticContentAttribute = UISemanticContentAttributeUnspecified;
+  if (AS_AVAILABLE_IOS(9)) {
+    semanticContentAttribute = UISemanticContentAttributeUnspecified;
+  }
 
   return self;
 }
@@ -602,7 +604,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   _flags.setInsetsLayoutMarginsFromSafeArea = YES;
 }
 
-- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute {
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute API_AVAILABLE(ios(9.0), tvos(9.0)) {
   semanticContentAttribute = attribute;
   _flags.setSemanticContentAttribute = YES;
 }
@@ -1090,8 +1092,10 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
     }
   }
 
-  if (flags.setSemanticContentAttribute) {
-    view.semanticContentAttribute = semanticContentAttribute;
+  if (AS_AVAILABLE_IOS(9)) {
+    if (flags.setSemanticContentAttribute) {
+      view.semanticContentAttribute = semanticContentAttribute;
+    }
   }
 
   if (flags.setIsAccessibilityElement)
@@ -1252,7 +1256,9 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.allowsGroupOpacity = layer.allowsGroupOpacity;
   pendingState.allowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
   pendingState.edgeAntialiasingMask = layer.edgeAntialiasingMask;
-  pendingState.semanticContentAttribute = view.semanticContentAttribute;
+  if (AS_AVAILABLE_IOS(9)) {
+    pendingState.semanticContentAttribute = view.semanticContentAttribute;
+  }
   pendingState.layoutMargins = view.layoutMargins;
   pendingState.preservesSuperviewLayoutMargins = view.preservesSuperviewLayoutMargins;
   if (AS_AVAILABLE_IOS(11)) {

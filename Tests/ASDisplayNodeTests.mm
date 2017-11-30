@@ -734,46 +734,54 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(105, 105), correctPoint = CGPointMake(95, 95);
+  originalPoint = CGPointMake(105, 105);
+  correctPoint = CGPointMake(95, 95);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(15, 15);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(15, 15);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(95, 95), correctPoint = CGPointMake(105, 105);
+  originalPoint = CGPointMake(95, 95);
+  correctPoint = CGPointMake(105, 105);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
   node.frame = CGRectMake(0, 0, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(-5, -5);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(-5, -5);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }
@@ -787,7 +795,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
@@ -796,12 +805,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(20, 20, 100, 100);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(42, 42), correctPoint = CGPointMake(36, 36);
+  originalPoint = CGPointMake(42, 42);
+  correctPoint = CGPointMake(36, 36);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
@@ -810,12 +821,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(-1000, -1000, 1337, 1337);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(11, 11);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(11, 11);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
@@ -824,12 +837,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(20, 20, 100, 100);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(36, 36), correctPoint = CGPointMake(42, 42);
+  originalPoint = CGPointMake(36, 36);
+  correctPoint = CGPointMake(42, 42);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
@@ -838,7 +853,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(-1000, -1000, 1337, 1337);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(11, 11), correctPoint = CGPointMake(5, 5);
+  originalPoint = CGPointMake(11, 11);
+  correctPoint = CGPointMake(5, 5);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }
@@ -851,7 +867,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
@@ -859,12 +876,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.75, 1);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(42, 42), correctPoint = CGPointMake(51, 56);
+  originalPoint = CGPointMake(42, 42);
+  correctPoint = CGPointMake(51, 56);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
@@ -872,12 +891,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.3, 0.3);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(55, 55), correctPoint = CGPointMake(1, 1);
+  originalPoint = CGPointMake(55, 55);
+  correctPoint = CGPointMake(1, 1);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
@@ -885,12 +906,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.75, 1);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(51, 56), correctPoint = CGPointMake(42, 42);
+  originalPoint = CGPointMake(51, 56);
+  correctPoint = CGPointMake(42, 42);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
@@ -898,7 +921,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.3, 0.3);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(1, 1), correctPoint = CGPointMake(55, 55);
+  originalPoint = CGPointMake(1, 1);
+  correctPoint = CGPointMake(55, 55);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }

@@ -1,6 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASDisplayNode] Add safeAreaInsets, layoutMargins and related properties to ASDisplayNode [Yevgen Pogribnyi](https://github.com/ypogribnyi)
+- [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
 - [ASCollectionView] Improve performance and behavior of rotation / bounds changes. [Scott Goodson](https://github.com/appleguy) [#431](https://github.com/TextureGroup/Texture/pull/431)
 - [ASCollectionView] Improve index space translation of Flow Layout Delegate methods. [Scott Goodson](https://github.com/appleguy)
 - [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
@@ -10,6 +11,7 @@
 - Updated to be backwards compatible with Xcode 8. [Adlai Holler](https://github.com/Adlai-Holler)
 - [API CHANGES] `ASPerformMainThreadDeallocation` and `ASPerformBackgroundDeallocation` functions take `id *` instead of `id` and they're now more reliable. Also, in Swift, `ASDeallocQueue.sharedDeallocationQueue() -> ASDeallocQueue.sharedDeallocationQueue`. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/651)
 - [Collection/Table] Added direct support for mapping section indexes between data spaces. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/660)
+- [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
