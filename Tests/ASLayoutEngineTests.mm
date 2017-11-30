@@ -191,7 +191,7 @@
  * Note: incorrect behavior likely introduced by the early check in __layout added in
  * https://github.com/facebookarchive/AsyncDisplayKit/pull/2657
  */
-- (void)testASetNeedsLayoutInterferingWithTheCurrentTransition
+- (void)DISABLE_testASetNeedsLayoutInterferingWithTheCurrentTransition
 {
   static BOOL enforceCorrectBehavior = NO;
 
