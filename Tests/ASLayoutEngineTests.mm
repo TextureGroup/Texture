@@ -124,9 +124,6 @@
  */
 - (void)testLayoutTransitionWithAsyncMeasurement
 {
-  // BUG: There is an extra main-thread layout pass run on nodeC, and its result is discarded.
-  static BOOL enforceCorrectBehavior = NO;
-
   [self stubCalculatedLayoutDidChange];
   [self runFirstLayoutPassWithFixture:fixture1];
 
@@ -166,15 +163,6 @@
   __block BOOL injectedMainThreadWorkDone = NO;
   injectedMainThreadWork = ^{
     injectedMainThreadWorkDone = YES;
-
-    // BUG: nodeC survives but gets a layout update during transition.
-    // When this layout pass comes down, its parent will set its new frame which will
-    // trigger the layout pass to go down into it and we will measure against that new bounds.
-    // The new bounds will be the post-transition size.
-    if (!enforceCorrectBehavior) {
-      auto postTransitionSize = [fixture2 layoutForNode:nodeC].size;
-      OCMExpect([nodeC.mock calculateLayoutThatFits:ASSizeRangeMake(postTransitionSize)]).onMainThread();
-    }
 
     [window layoutIfNeeded];
 
