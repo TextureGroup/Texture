@@ -316,7 +316,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   CFTimeInterval timeBetweenLastFire;
   if (self.lastDisplayLinkFire == 0) {
     timeBetweenLastFire = 0;
-  } else if (AS_AT_LEAST_IOS10){
+  } else if (AS_AVAILABLE_IOS(10)){
     timeBetweenLastFire = displayLink.targetTimestamp - displayLink.timestamp;
   } else {
     timeBetweenLastFire = CACurrentMediaTime() - self.lastDisplayLinkFire;

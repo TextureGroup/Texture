@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
 - [ASCollectionView] Improve performance and behavior of rotation / bounds changes. [Scott Goodson](https://github.com/appleguy) [#431](https://github.com/TextureGroup/Texture/pull/431)
 - [ASCollectionView] Improve index space translation of Flow Layout Delegate methods. [Scott Goodson](https://github.com/appleguy)
 - [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)

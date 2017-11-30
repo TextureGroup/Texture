@@ -539,7 +539,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 }
 
 - (id)_linkAttributeValueAtPoint:(CGPoint)point
-                   attributeName:(out NSString **)attributeNameOut
+                   attributeName:(out NSString * __autoreleasing *)attributeNameOut
                            range:(out NSRange *)rangeOut
    inAdditionalTruncationMessage:(out BOOL *)inAdditionalTruncationMessageOut
                  forHighlighting:(BOOL)highlighting

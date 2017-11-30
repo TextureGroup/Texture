@@ -248,7 +248,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * The invalidationBlock is called after flushing the ASMainSerialQueue, which ensures that any in-progress
  * layout calculations have been applied. The block will not be called if data hasn't been loaded.
  */
-- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)())invalidationBlock;
+- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)(void))invalidationBlock;
 
 /**
  * Re-measures given nodes in the backing store.
