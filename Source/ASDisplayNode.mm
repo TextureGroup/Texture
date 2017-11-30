@@ -855,11 +855,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     _fallbackSafeAreaInsets = insets;
   }
 
-  BOOL needsManualUpdate = !AS_AT_LEAST_IOS11;
+  BOOL needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
   BOOL updatesLayoutMargins = needsManualUpdate && self.insetsLayoutMarginsFromSafeArea;
 
   if (needsManualUpdate) {
-    [self _fallbackUpdateSafeAreaOnChildren];
     [self safeAreaInsetsDidChange];
   }
 

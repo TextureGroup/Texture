@@ -923,10 +923,9 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIEdgeInsets)safeAreaInsets
 {
   _bridge_prologue_read;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
 
   if (AS_AVAILABLE_IOS(11.0)) {
-    if (__loaded(self)) {
+    if (!_flags.layerBacked && __loaded(self)) {
       return self.view.safeAreaInsets;
     }
   }
@@ -936,10 +935,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (BOOL)insetsLayoutMarginsFromSafeArea
 {
   _bridge_prologue_read;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
 
   if (AS_AVAILABLE_IOS(11.0)) {
-    return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+    if (!_flags.layerBacked) {
+      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+    }
   }
   return _fallbackInsetsLayoutMarginsFromSafeArea;
 }
@@ -948,16 +948,17 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   {
     _bridge_prologue_write;
-    ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
 
     _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
     if (AS_AVAILABLE_IOS(11.0)) {
-      _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
+      if (!_flags.layerBacked) {
+        _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
+      }
     }
   }
 
-  if (!AS_AT_LEAST_IOS11) {
+  if (!AS_AT_LEAST_IOS11 || _flags.layerBacked) {
     [self layoutMarginsDidChange];
   }
 }
@@ -974,6 +975,8 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   if (automaticallyRelayout) {
     [self setNeedsLayout];
   }
+
+  [self _fallbackUpdateSafeAreaOnChildren];
 }
 
 @end
