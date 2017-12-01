@@ -56,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL inverted;
 
 /**
+ * The distance that the content view is inset from the table node edges. Defaults to UIEdgeInsetsZero.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+/**
  * The offset of the content view's origin from the table node's origin. Defaults to CGPointZero.
  */
 @property (nonatomic, assign) CGPoint contentOffset;
@@ -167,7 +172,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the main thread.
  * @warning This method is substantially more expensive than UITableView's version.
  */
-- (void)reloadDataWithCompletion:(nullable void (^)())completion;
+- (void)reloadDataWithCompletion:(nullable void (^)(void))completion;
 
 /**
  * Reload everything from scratch, destroying the working range and all cached nodes.
@@ -193,7 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
  *                    Boolean parameter that contains the value YES if all of the related animations completed successfully or
  *                    NO if they were interrupted. This parameter may be nil. If supplied, the block is run on the main thread.
  */
-- (void)performBatchAnimated:(BOOL)animated updates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
+- (void)performBatchAnimated:(BOOL)animated updates:(nullable AS_NOESCAPE void (^)(void))updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
  *  Perform a batch of updates asynchronously with animations in the batch. This method must be called from the main thread.
@@ -204,12 +209,41 @@ NS_ASSUME_NONNULL_BEGIN
  *                    Boolean parameter that contains the value YES if all of the related animations completed successfully or
  *                    NO if they were interrupted. This parameter may be nil. If supplied, the block is run on the main thread.
  */
-- (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
+- (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)(void))updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
- *  Blocks execution of the main thread until all section and row updates are committed. This method must be called from the main thread.
+ *  Returns YES if the ASCollectionNode is still processing changes from performBatchUpdates:.
+ *  This is typically the concurrent allocation (calling nodeBlocks) and layout of newly inserted
+ *  ASCellNodes. If YES is returned, then calling -waitUntilAllUpdatesAreProcessed may take tens of
+ *  milliseconds to return as it blocks on these concurrent operations.
+ *
+ *  Returns NO if ASCollectionNode is fully synchronized with the underlying UICollectionView. This
+ *  means that until the next performBatchUpdates: is called, it is safe to compare UIKit values
+ *  (such as from UICollectionViewLayout) with your app's data source.
+ *
+ *  This method will always return NO if called immediately after -waitUntilAllUpdatesAreProcessed.
  */
-- (void)waitUntilAllUpdatesAreCommitted;
+@property (nonatomic, readonly) BOOL isProcessingUpdates;
+
+/**
+ *  Schedules a block to be performed (on the main thread) after processing of performBatchUpdates:
+ *  is finished (completely synchronized to UIKit). The blocks will be run at the moment that
+ *  -isProcessingUpdates changes from YES to NO;
+ *
+ *  When isProcessingUpdates == NO, the block is run block immediately (before the method returns).
+ *
+ *  Blocks scheduled by this mechanism are NOT guaranteed to run in the order they are scheduled.
+ *  They may also be delayed if performBatchUpdates continues to be called; the blocks will wait until
+ *  all running updates are finished.
+ *
+ *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
+ */
+- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))didFinishProcessingUpdates;
+
+/**
+ *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
+ */
+- (void)waitUntilAllUpdatesAreProcessed;
 
 /**
  * Inserts one or more sections, with an option to animate the insertion.
@@ -696,6 +730,12 @@ NS_ASSUME_NONNULL_BEGIN
  * This method is deprecated. Use @c tableView:willDisplayNode:forRowAtIndexPath: instead.
  */
 - (void)tableView:(ASTableView *)tableView willDisplayNodeForRowAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
+
+@end
+
+@interface ASTableNode (Deprecated)
+
+- (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
 
 @end
 
