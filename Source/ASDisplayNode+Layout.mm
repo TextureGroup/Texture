@@ -306,7 +306,7 @@ ASLayoutElementStyleExtensibilityForwarding
                                    && _pendingDisplayNodeLayout->version >= _layoutVersion
                                    && _pendingDisplayNodeLayout->version > _calculatedDisplayNodeLayout->version); // _pending is not yet applied
   BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->version >= _layoutVersion
-                                     && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
+                                     && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
                                          || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout)));
   if (!pendingLayoutIsPreferred && calculatedLayoutIsReusable) {
     return;
