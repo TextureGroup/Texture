@@ -300,14 +300,16 @@ ASLayoutElementStyleExtensibilityForwarding
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
 
-  // Prefer _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout (if exists, it's the newest)
-  // If there is no _pending, check if _calculated is valid to reuse (avoiding recalculation below).
-  if (_pendingDisplayNodeLayout == nullptr || _pendingDisplayNodeLayout->version < _layoutVersion) {
-    if (_calculatedDisplayNodeLayout->version >= _layoutVersion
-        && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove == YES
-            || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
-      return;
-    }
+  // Prefer a newer and not yet applied _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout
+  // If there is no such _pending, check if _calculated is valid to reuse (avoiding recalculation below).
+  BOOL pendingLayoutIsPreferred = (_pendingDisplayNodeLayout != nullptr
+                                   && _pendingDisplayNodeLayout->version >= _layoutVersion
+                                   && _pendingDisplayNodeLayout->version > _calculatedDisplayNodeLayout->version); // _pending is not yet applied
+  BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->version >= _layoutVersion
+                                     && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
+                                         || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout)));
+  if (!pendingLayoutIsPreferred && calculatedLayoutIsReusable) {
+    return;
   }
   
   as_activity_create_for_scope("Update node layout for current bounds");

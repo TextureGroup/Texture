@@ -702,7 +702,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 @property (nonatomic, assign)           UIViewContentMode contentMode;         // default=UIViewContentModeScaleToFill
 @property (nonatomic, copy)             NSString *contentsGravity;             // Use .contentMode in preference when possible.
-@property (nonatomic, assign)           UISemanticContentAttribute semanticContentAttribute; // default=Unspecified
+@property (nonatomic, assign)           UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0)); // default=Unspecified
 
 @property (nonatomic, nullable)         CGColorRef shadowColor;                // default=opaque rgb black
 @property (nonatomic, assign)           CGFloat shadowOpacity;                 // default=0.0
