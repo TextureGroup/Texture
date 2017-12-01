@@ -69,10 +69,10 @@
 
   self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];
 
-  ASXCTAssertEqualSizes(layout.size, parentSize);
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, parentSize);
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
@@ -84,10 +84,10 @@
 
   self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];
 
-  ASXCTAssertEqualSizes(layout.size, parentSize);
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, parentSize);
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
@@ -99,10 +99,10 @@
 
   self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];
 
-  ASXCTAssertEqualSizes(layout.size, sizeRange.max);
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, sizeRange.max);
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
@@ -114,10 +114,10 @@
 
   self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];
 
-  ASXCTAssertEqualSizes(layout.size, sizeRange.min);
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, sizeRange.min);
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
@@ -129,10 +129,10 @@
 
   self.subnode.style.preferredSize = subnodeSize;
 
-  ASLayout *layout = [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];
 
-  ASXCTAssertEqualSizes(layout.size, subnodeSize);
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, subnodeSize);
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
