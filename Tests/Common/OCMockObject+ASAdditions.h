@@ -46,15 +46,15 @@
  * You will usually need to jump to frame 12 "fr s 12"
  */
 #define andDebugBreak() _andDebugBreak()
-@property (nonatomic, readonly) OCMStubRecorder *(^ _andDebugBreak)();
+@property (nonatomic, readonly) OCMStubRecorder *(^ _andDebugBreak)(void);
 
 #define ignoringNonObjectArgs() _ignoringNonObjectArgs()
-@property (nonatomic, readonly) OCMStubRecorder *(^ _ignoringNonObjectArgs)();
+@property (nonatomic, readonly) OCMStubRecorder *(^ _ignoringNonObjectArgs)(void);
 
 #define onMainThread() _onMainThread()
-@property (nonatomic, readonly) OCMStubRecorder *(^ _onMainThread)();
+@property (nonatomic, readonly) OCMStubRecorder *(^ _onMainThread)(void);
 
 #define offMainThread() _offMainThread()
-@property (nonatomic, readonly) OCMStubRecorder *(^ _offMainThread)();
+@property (nonatomic, readonly) OCMStubRecorder *(^ _offMainThread)(void);
 
 @end

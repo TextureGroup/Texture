@@ -191,9 +191,9 @@
 
 @dynamic _ignoringNonObjectArgs;
 
-- (OCMStubRecorder *(^)())_ignoringNonObjectArgs
+- (OCMStubRecorder *(^)(void))_ignoringNonObjectArgs
 {
-  id (^theBlock)() = ^ ()
+  id (^theBlock)(void) = ^ ()
   {
     return [self ignoringNonObjectArgs];
   };
@@ -202,9 +202,9 @@
 
 @dynamic _onMainThread;
 
-- (OCMStubRecorder *(^)())_onMainThread
+- (OCMStubRecorder *(^)(void))_onMainThread
 {
-  id (^theBlock)() = ^ ()
+  id (^theBlock)(void) = ^ ()
   {
     return [self andDo:^(NSInvocation *invocation) {
       ASDisplayNodeAssertMainThread();
@@ -215,9 +215,9 @@
 
 @dynamic _offMainThread;
 
-- (OCMStubRecorder *(^)())_offMainThread
+- (OCMStubRecorder *(^)(void))_offMainThread
 {
-  id (^theBlock)() = ^ ()
+  id (^theBlock)(void) = ^ ()
   {
     return [self andDo:^(NSInvocation *invocation) {
       ASDisplayNodeAssertNotMainThread();
@@ -228,9 +228,9 @@
 
 @dynamic _andDebugBreak;
 
-- (OCMStubRecorder *(^)())_andDebugBreak
+- (OCMStubRecorder *(^)(void))_andDebugBreak
 {
-  id (^theBlock)() = ^ ()
+  id (^theBlock)(void) = ^ ()
   {
     return [self andDo:^(NSInvocation *invocation) {
       debug_break();
