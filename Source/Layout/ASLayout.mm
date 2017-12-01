@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRectTable.h>
@@ -281,11 +282,12 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   }
 
   if (!CGSizeEqualToSize(_size, layout.size)) return NO;
-  if (!CGPointEqualToPoint(_position, layout.position)) return NO;
+
+  if (!((ASPointIsNull(self.position) && ASPointIsNull(layout.position))
+        || CGPointEqualToPoint(self.position, layout.position))) return NO;
   if (_layoutElement != layout.layoutElement) return NO;
 
-  NSArray *sublayouts = layout.sublayouts;
-  if (sublayouts != _sublayouts && (sublayouts == nil || _sublayouts == nil || ![_sublayouts isEqual:sublayouts])) {
+  if (!ASObjectIsEqual(_sublayouts, layout.sublayouts)) {
     return NO;
   }
 

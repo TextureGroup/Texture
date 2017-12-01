@@ -99,6 +99,29 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
 	return [NSString stringWithFormat:@"{ %@ }", [states componentsJoinedByString:@" | "]];
 }
 
+#define HIERARCHY_STATE_DELTA(Name) ({ \
+  if ((oldState & ASHierarchyState##Name) != (newState & ASHierarchyState##Name)) { \
+    [changes appendFormat:@"%c%s ", (newState & ASHierarchyState##Name ? '+' : '-'), #Name]; \
+  } \
+})
+
+__unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarchyState oldState, ASHierarchyState newState)
+{
+  if (oldState == newState) {
+    return @"{ }";
+  }
+
+  NSMutableString *changes = [NSMutableString stringWithString:@"{ "];
+  HIERARCHY_STATE_DELTA(Rasterized);
+  HIERARCHY_STATE_DELTA(RangeManaged);
+  HIERARCHY_STATE_DELTA(TransitioningSupernodes);
+  HIERARCHY_STATE_DELTA(LayoutPending);
+  [changes appendString:@"}"];
+  return changes;
+}
+
+#undef HIERARCHY_STATE_DELTA
+
 @interface ASDisplayNode () <ASDescriptionProvider, ASDebugDescriptionProvider>
 {
 @protected
