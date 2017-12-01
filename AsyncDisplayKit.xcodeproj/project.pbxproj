@@ -443,6 +443,7 @@
 		E5775B041F16759F00CAC9BC /* ASCollectionLayoutCache.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5775B031F16759F00CAC9BC /* ASCollectionLayoutCache.mm */; };
 		E5855DEF1EBB4D83003639AE /* ASCollectionLayoutDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = E5855DED1EBB4D83003639AE /* ASCollectionLayoutDefines.m */; };
 		E5855DF01EBB4D83003639AE /* ASCollectionLayoutDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = E5855DEE1EBB4D83003639AE /* ASCollectionLayoutDefines.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E586F96C1F9F9E2900ECE00E /* ASScrollNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E586F96B1F9F9E2900ECE00E /* ASScrollNodeTests.m */; };
 		E58E9E421E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = E58E9E3D1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E58E9E431E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E58E9E3E1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m */; };
 		E58E9E441E941D74004CFC59 /* ASCollectionLayoutContext.h in Headers */ = {isa = PBXBuildFile; fileRef = E58E9E3F1E941D74004CFC59 /* ASCollectionLayoutContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -936,6 +937,7 @@
 		E5775B031F16759F00CAC9BC /* ASCollectionLayoutCache.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionLayoutCache.mm; sourceTree = "<group>"; };
 		E5855DED1EBB4D83003639AE /* ASCollectionLayoutDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionLayoutDefines.m; sourceTree = "<group>"; };
 		E5855DEE1EBB4D83003639AE /* ASCollectionLayoutDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutDefines.h; sourceTree = "<group>"; };
+		E586F96B1F9F9E2900ECE00E /* ASScrollNodeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASScrollNodeTests.m; sourceTree = "<group>"; };
 		E58E9E3D1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionFlowLayoutDelegate.h; sourceTree = "<group>"; };
 		E58E9E3E1E941D74004CFC59 /* ASCollectionFlowLayoutDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionFlowLayoutDelegate.m; sourceTree = "<group>"; };
 		E58E9E3F1E941D74004CFC59 /* ASCollectionLayoutContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutContext.h; sourceTree = "<group>"; };
@@ -1219,6 +1221,7 @@
 				E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */,
 				052EE0651A159FEF002C6279 /* ASMultiplexImageNodeTests.m */,
 				058D0A32195D057000B7D73C /* ASMutableAttributedStringBuilderTests.m */,
+				E586F96B1F9F9E2900ECE00E /* ASScrollNodeTests.m */,
 				3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */,
 				CC4981B21D1A02BE004E13CC /* ASTableViewThrashTests.m */,
 				058D0A33195D057000B7D73C /* ASTextKitCoreTextAdditionsTests.m */,
@@ -2177,6 +2180,7 @@
 				CC7FD9E11BB5F750005CCB2B /* ASPhotosFrameworkImageRequestTests.m in Sources */,
 				052EE0661A159FEF002C6279 /* ASMultiplexImageNodeTests.m in Sources */,
 				058D0A3C195D057000B7D73C /* ASMutableAttributedStringBuilderTests.m in Sources */,
+				E586F96C1F9F9E2900ECE00E /* ASScrollNodeTests.m in Sources */,
 				CC8B05D81D73979700F54286 /* ASTextNodePerformanceTests.m in Sources */,
 				CC583AD91EF9BDC600134156 /* ASDisplayNode+OCMock.m in Sources */,
 				697B315A1CFE4B410049936F /* ASEditableTextNodeTests.m in Sources */,

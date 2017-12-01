@@ -12,6 +12,8 @@
 - [Collection/Table] Added direct support for mapping section indexes between data spaces. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/660)
 - [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
 - [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
+- [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
