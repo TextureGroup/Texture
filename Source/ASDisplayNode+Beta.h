@@ -28,8 +28,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
-void ASPerformBlockOnMainThread(void (^block)());
-void ASPerformBlockOnBackgroundThread(void (^block)()); // DISPATCH_QUEUE_PRIORITY_DEFAULT
+void ASPerformBlockOnMainThread(void (^block)(void));
+void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 ASDISPLAYNODE_EXTERN_C_END
 
 #if ASEVENTLOG_ENABLE
@@ -60,19 +60,6 @@ typedef struct {
 } ASDisplayNodePerformanceMeasurements;
 
 @interface ASDisplayNode (Beta)
-
-/**
- * ASTableView and ASCollectionView now throw exceptions on invalid updates
- * like their UIKit counterparts. If YES, these classes will log messages
- * on invalid updates rather than throwing exceptions.
- *
- * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
- * as it proceeds with an invalid update.
- *
- * This property defaults to NO. It will be removed in a future release.
- */
-+ (BOOL)suppressesInvalidCollectionUpdateExceptions AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
-+ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
 
 /**
  * @abstract Recursively ensures node and all subnodes are displayed.
@@ -111,6 +98,19 @@ typedef struct {
  */
 @property (nonatomic, strong, readonly) ASEventLog *eventLog;
 #endif
+
+/**
+ * @abstract Whether this node acts as an accessibility container. If set to YES, then this node's accessibility label will represent
+ * an aggregation of all child nodes' accessibility labels. Nodes in this node's subtree that are also accessibility containers will
+ * not be included in this aggregation, and will be exposed as separate accessibility elements to UIKit.
+ */
+@property (nonatomic, assign) BOOL isAccessibilityContainer;
+
+/**
+ * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
+ * an accessibity label and have an interactive UIAccessibilityTrait will automatically receive custom-action handling.
+ */
+- (void)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
 
 /**
  * @abstract Currently used by ASNetworkImageNode and ASMultiplexImageNode to allow their placeholders to stay if they are loading an image from the network.
@@ -175,12 +175,15 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;
+- (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index;
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
 @property (nonatomic, assign) BOOL yogaLayoutInProgress;
 @property (nonatomic, strong, nullable) ASLayout *yogaCalculatedLayout;
-// These methods should not normally be called directly.
+
+// These methods are intended to be used internally to Texture, and should not be called directly.
+- (BOOL)shouldHaveYogaMeasureFunc;
 - (void)invalidateCalculatedYogaLayout;
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
 
