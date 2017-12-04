@@ -54,7 +54,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     return;
   }
   
-  const id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
+  id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
   
   _animatedImage = animatedImage;
   
@@ -82,7 +82,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   
   // Animated image can take while to dealloc, do it off the main queue
   if (previousAnimatedImage != nil) {
-    ASPerformBackgroundDeallocation(previousAnimatedImage);
+    ASPerformBackgroundDeallocation(&previousAnimatedImage);
   }
   
   [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
