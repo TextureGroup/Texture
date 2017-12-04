@@ -736,8 +736,9 @@
           
           if (imageContainer != nil) {
             [strongSelf _locked_setCurrentImageQuality:1.0];
-            if ([imageContainer asdk_animatedImageData] && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
-              id animatedImage = [strongSelf->_downloader animatedImageWithData:[imageContainer asdk_animatedImageData]];
+            NSData *animatedImageData = [imageContainer asdk_animatedImageData];
+            if (animatedImageData && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
+              id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];
               [strongSelf _locked_setAnimatedImage:animatedImage];
             } else {
               [strongSelf _locked__setImage:[imageContainer asdk_image]];
