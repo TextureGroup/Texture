@@ -713,55 +713,67 @@
     } else {
       __weak __typeof__(self) weakSelf = self;
       auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSource imageSource) {
-       
-        __typeof__(self) strongSelf = weakSelf;
-        if (strongSelf == nil) {
-          return;
-        }
-
-        as_log_verbose(ASImageLoadingLog(), "Downloaded image for %@ img: %@ urls: %@", self, [imageContainer asdk_image], URLs);
-        
-        // Grab the lock for the rest of the block
-        ASDN::MutexLocker l(strongSelf->__instanceLock__);
-        
-        //Getting a result back for a different download identifier, download must not have been successfully canceled
-        if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
-          return;
-        }
+        ASPerformBlockOnBackgroundThread(^{
+          __typeof__(self) strongSelf = weakSelf;
+          if (strongSelf == nil) {
+            return;
+          }
           
-        //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
-        if (ASInterfaceStateIncludesPreload(self->_interfaceState) == NO) {
-          return;
-        }
-
-        if (imageContainer != nil) {
-          [strongSelf _locked_setCurrentImageQuality:1.0];
-          if ([imageContainer asdk_animatedImageData] && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
-            id animatedImage = [strongSelf->_downloader animatedImageWithData:[imageContainer asdk_animatedImageData]];
-            [strongSelf _locked_setAnimatedImage:animatedImage];
-          } else {
-            [strongSelf _locked__setImage:[imageContainer asdk_image]];
+          as_log_verbose(ASImageLoadingLog(), "Downloaded image for %@ img: %@ urls: %@", self, [imageContainer asdk_image], URLs);
+          
+          // Grab the lock for the rest of the block
+          ASDN::MutexLocker l(strongSelf->__instanceLock__);
+          
+          //Getting a result back for a different download identifier, download must not have been successfully canceled
+          if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
+            return;
           }
-          strongSelf->_imageLoaded = YES;
-        }
-
-        strongSelf->_downloadIdentifier = nil;
-        strongSelf->_cacheUUID = nil;
-
-        if (imageContainer != nil) {
-          if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
-            ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-            ASNetworkImageNodeDidLoadInfo info = {};
-            info.imageSource = imageSource;
-            [delegate imageNode:strongSelf didLoadImage:strongSelf.image info:info];
-          } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {
-            ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-            [delegate imageNode:strongSelf didLoadImage:strongSelf.image];
+          
+          //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
+          if (ASInterfaceStateIncludesPreload(self->_interfaceState) == NO) {
+            return;
           }
-        } else if (error && strongSelf->_delegateFlags.delegateDidFailWithError) {
-          ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-          [delegate imageNode:strongSelf didFailWithError:error];
-        }
+          
+          if (imageContainer != nil) {
+            [strongSelf _locked_setCurrentImageQuality:1.0];
+            NSData *animatedImageData = [imageContainer asdk_animatedImageData];
+            if (animatedImageData && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
+              id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];
+              [strongSelf _locked_setAnimatedImage:animatedImage];
+            } else {
+              [strongSelf _locked__setImage:[imageContainer asdk_image]];
+            }
+            strongSelf->_imageLoaded = YES;
+          }
+          
+          strongSelf->_downloadIdentifier = nil;
+          strongSelf->_cacheUUID = nil;
+          
+          ASPerformBlockOnMainThread(^{
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+              return;
+            }
+            
+            // Grab the lock for the rest of the block
+            ASDN::MutexLocker l(strongSelf->__instanceLock__);
+            
+            if (imageContainer != nil) {
+              if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
+                ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
+                ASNetworkImageNodeDidLoadInfo info = {};
+                info.imageSource = imageSource;
+                [delegate imageNode:strongSelf didLoadImage:strongSelf.image info:info];
+              } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {
+                ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
+                [delegate imageNode:strongSelf didLoadImage:strongSelf.image];
+              }
+            } else if (error && strongSelf->_delegateFlags.delegateDidFailWithError) {
+              ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
+              [delegate imageNode:strongSelf didFailWithError:error];
+            }
+          });
+        });
       };
 
       // As the _cache and _downloader is only set once in the intializer we don't have to use a
