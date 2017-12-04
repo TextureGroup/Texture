@@ -80,12 +80,12 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
       [self setCoverImage:nil];
   }
   
+  [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
+    
   // Animated image can take while to dealloc, do it off the main queue
   if (previousAnimatedImage != nil) {
     ASPerformBackgroundDeallocation(&previousAnimatedImage);
   }
-  
-  [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
 }
 
 - (void)animatedImageSet:(id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(id <ASAnimatedImageProtocol>)previousAnimatedImage
