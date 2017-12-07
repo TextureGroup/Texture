@@ -499,7 +499,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     [_delegate videoPlayerNode:self willChangeVideoNodeState:state toVideoNodeState:toState];
   }
 
-  if (toState == ASVideoNodePlayerStateReadyToPlay) {
+  if (toState == ASVideoNodePlayerStateReadyToPlay || toState == ASVideoNodePlayerStatePlaying) {
     _duration = _videoNode.currentItem.duration;
     [self updateDurationTimeLabel];
   }
