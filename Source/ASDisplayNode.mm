@@ -3087,8 +3087,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     // If this node has an up-to-date layout (and subnodes), calling layoutIfNeeded will be fast.
     //
     // If this node doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
-    // (see __layout and _u_measureNodeWithBoundsIfNecessary:). This scenario should be uncommon, and forcing is necessary
-    // to kick off preloading on subnodes since it's already a bit late.
+    // (see __layout and _u_measureNodeWithBoundsIfNecessary:).
+    // This scenario should be uncommon, and running a measurement pass here is a fine trade-off because preloading
+    // any time after this point would be late.
     [self layoutIfNeeded];
   }
 
