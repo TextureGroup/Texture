@@ -3079,6 +3079,16 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
+
+  if (self.automaticallyManagesSubnodes) {
+    // Tell the node to apply its (applicable) pending layout, if any, so that its subnodes are inserted/deleted and enter preload state as well.
+    // If this node has an up-to-date layout (and subnodes), calling layoutIfNeeded will be fast.
+    // If this node doesn't have a calculated or pending layout that fits its current bounds,
+    // a measurement pass will be forced to occur (see __layout and _u_measureNodeWithBoundsIfNecessary:).
+    // The situation should be uncommon, and forcing is necessary to kick off preloading on subnodes.
+    [self layoutIfNeeded];
+  }
+
   [_interfaceStateDelegate didEnterPreloadState];
 }
 
