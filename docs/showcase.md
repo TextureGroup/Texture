@@ -210,7 +210,13 @@ permalink: /showcase.html
 		<br /> 
 		<b>Sorted: Master Your Day</b>
 		</td>
-		
+
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/vingle-very-community/id637534820?mt=8"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple128/v4/09/21/52/09215288-4bab-6f97-240c-6e3a26218af2/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Vingle</b>
+		</td>
+
 		</tr>
 		
 		</table>
