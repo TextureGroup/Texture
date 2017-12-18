@@ -698,6 +698,7 @@
           
           //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
           if (ASInterfaceStateIncludesPreload(self->_interfaceState) == NO) {
+            self->_downloadIdentifier = nil;
             return;
           }
           
