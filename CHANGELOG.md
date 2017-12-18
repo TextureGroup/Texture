@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
 - [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
 - [ASCollectionView] Improve performance and behavior of rotation / bounds changes. [Scott Goodson](https://github.com/appleguy) [#431](https://github.com/TextureGroup/Texture/pull/431)

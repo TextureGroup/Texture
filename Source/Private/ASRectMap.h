@@ -1,5 +1,5 @@
 //
-//  ASRectTable.h
+//  ASRectMap.h
 //  Texture
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -17,56 +17,40 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CGGeometry.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * An alias for an NSMapTable created to store rects.
- *
- * You should not call -objectForKey:, -setObject:forKey:, or -allObjects
- * on these objects.
+ * A category for indexing weak pointers to CGRects. Similar to ASIntegerMap.
  */
-typedef NSMapTable ASRectTable;
+@interface ASRectMap : NSObject
 
 /**
- * A category for creating & using map tables meant for storing CGRects.
- *
- * This category is private, so name collisions are not worth worrying about.
+ * Creates a new rect map. The keys are never retained.
  */
-@interface NSMapTable<KeyType, id> (ASRectTableMethods)
-
-/**
- * Creates a new rect table with (NSMapTableStrongMemory | NSMapTableObjectPointerPersonality) for keys.
- */
-+ (ASRectTable *)rectTableForStrongObjectPointers;
-
-/**
- * Creates a new rect table with (NSMapTableWeakMemory | NSMapTableObjectPointerPersonality) for keys.
- */
-+ (ASRectTable *)rectTableForWeakObjectPointers;
++ (ASRectMap *)rectMapForWeakObjectPointers;
 
 /**
  * Retrieves the rect for a given key, or CGRectNull if the key is not found.
  *
  * @param key An object to lookup the rect for.
  */
-- (CGRect)rectForKey:(KeyType)key;
+- (CGRect)rectForKey:(id)key;
 
 /**
- * Sets the given rect for the associated key.
+ * Sets the given rect for the associated key. Key *will not be retained!*
  *
  * @param rect The rect to store as value.
  * @param key The key to use for the rect.
  */
-- (void)setRect:(CGRect)rect forKey:(KeyType)key;
+- (void)setRect:(CGRect)rect forKey:(id)key;
 
 /**
  * Removes the rect for the given key, if one exists.
  *
  * @param key The key to remove.
  */
-- (void)removeRectForKey:(KeyType)key;
+- (void)removeRectForKey:(id)key;
 
 @end
 
