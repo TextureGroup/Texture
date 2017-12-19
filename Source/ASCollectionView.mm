@@ -539,6 +539,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionNodeShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldShowMenuForItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeCanPerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:canPerformAction:forItemAtIndexPath:sender:)];
     _asyncDelegateFlags.collectionNodePerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:performAction:forItemAtIndexPath:sender:)];
+    _asyncDelegateFlags.collectionNodeWillDisplaySupplementaryElement = [_asyncDelegate respondsToSelector:@selector(collectionNode:willDisplaySupplementaryElementWithNode:)];
+    _asyncDelegateFlags.collectionNodeDidEndDisplayingSupplementaryElement = [_asyncDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingSupplementaryElementWithNode:)];
     _asyncDelegateFlags.interop = [_asyncDelegate conformsToProtocol:@protocol(ASCollectionDelegateInterop)];
     if (_asyncDelegateFlags.interop) {
       id<ASCollectionDelegateInterop> interopDelegate = (id<ASCollectionDelegateInterop>)_asyncDelegate;
@@ -1174,7 +1176,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCellNode *cellNode = element.node;
   cellNode.scrollView = collectionView;
 
-  // Update the selected background view in collectionView:willDisplayCell:forItemAtIndexPath: otherwise it could be to
+  // Update the selected background view in collectionView:willDisplayCell:forItemAtIndexPath: otherwise it could be too
   // early e.g. if the selectedBackgroundView was set in didLoad()
   cell.selectedBackgroundView = cellNode.selectedBackgroundView;
   
