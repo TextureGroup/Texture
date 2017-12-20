@@ -34,7 +34,6 @@
   struct {
     unsigned int implementsSizeRangeForHeader:1;
     unsigned int implementsSizeRangeForFooter:1;
-    unsigned int implementsReferenceSizeForFooter:1;
     unsigned int implementsConstrainedSizeForItemAtIndexPath:1;
   } _delegateFlags;
 }
@@ -61,7 +60,6 @@
   } else {
     _delegateFlags.implementsSizeRangeForHeader = [delegate respondsToSelector:@selector(collectionNode:sizeRangeForHeaderInSection:)];
     _delegateFlags.implementsSizeRangeForFooter = [delegate respondsToSelector:@selector(collectionNode:sizeRangeForFooterInSection:)];
-    _delegateFlags.implementsReferenceSizeForFooter = [delegate respondsToSelector:@selector(collectionView:layout:referenceSizeForFooterInSection:)];
     _delegateFlags.implementsConstrainedSizeForItemAtIndexPath = [delegate respondsToSelector:@selector(collectionNode:constrainedSizeForItemAtIndexPath:)];
   }
 }
@@ -100,12 +98,6 @@
   } else if (ASObjectIsEqual(kind, UICollectionElementKindSectionFooter)) {
     if (_delegateFlags.implementsSizeRangeForFooter) {
       result = [[self delegateForCollectionView:collectionView] collectionNode:collectionView.collectionNode sizeRangeForFooterInSection:indexPath.section];
-    } else if (_delegateFlags.implementsReferenceSizeForFooter) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      CGSize exactSize = [[self delegateForCollectionView:collectionView] collectionView:collectionView layout:_layout referenceSizeForFooterInSection:indexPath.section];
-#pragma clang diagnostic pop
-      result = ASSizeRangeMake(exactSize);
     } else {
       result = ASSizeRangeMake(_layout.footerReferenceSize);
     }

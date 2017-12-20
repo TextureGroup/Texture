@@ -474,11 +474,6 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
  */
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode sizeRangeForFooterInSection:(NSInteger)section;
 
-/**
- * Asks the delegate for the size of the footer in the specified section.
- */
-- (CGSize)collectionView:(ASCollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section ASDISPLAYNODE_DEPRECATED_MSG("Implement collectionNode:sizeRangeForFooterInSection: instead.");
-
 @end
 
 ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegateFlowLayout.")
