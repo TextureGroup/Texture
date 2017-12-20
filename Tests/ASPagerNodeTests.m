@@ -17,7 +17,6 @@
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 @interface ASPagerNodeTestDataSource : NSObject <ASPagerDataSource>
 @end
@@ -145,7 +144,7 @@
   [self waitForExpectationsWithTimeout:2 handler:nil];
   
   // Test initial values
-  cell = [pagerNode.view cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  cell = [pagerNode cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(cell.frame));
   XCTAssertEqual(pagerNode.contentOffset.y, 0);
@@ -172,7 +171,7 @@
   [self waitForExpectationsWithTimeout:2 handler:nil];
   
   // Test values again after popping the view controller
-  cell = [pagerNode.view cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  cell = [pagerNode cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(cell.frame));
   XCTAssertEqual(pagerNode.contentOffset.y, 0);
