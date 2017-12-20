@@ -651,6 +651,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @param indexPath The index path of the item.
  *
  * @return A constrained size range for layout for the item at this index path.
+ *
+ * @discussion If you do not implement this method, a constrained size will be calculated based on the collection layout.
  */
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 
@@ -700,17 +702,6 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
-
-/**
- * Provides the constrained size range for measuring the node at the index path.
- *
- * @param collectionView The sender.
- *
- * @param indexPath The index path of the node.
- *
- * @return A constrained size range for layout the node at this index path.
- */
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's constrainedSizeForItemAtIndexPath: instead. PLEASE NOTE the very subtle method name change.");
 
 /**
  * Informs the delegate that the collection view will add the given node
