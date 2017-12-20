@@ -550,7 +550,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asks the data source for the number of sections in the collection node.
  *
- * @see @c numberOfSectionsInCollectionView:
+ * @param collectionNode The collection node requesting this information
+ *
+ * @return The number of sections in the collection node.
+ *
+ * @discussion If this method is not implemented, the collection node uses a default value of 1.
  */
 - (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode;
 
