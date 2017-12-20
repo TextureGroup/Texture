@@ -204,7 +204,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } _asyncDelegateFlags;
   
   struct {
-    unsigned int collectionViewNodeForItem:1;
     unsigned int collectionViewNodeBlockForItem:1;
     unsigned int collectionViewNodeForSupplementaryElement:1;
     unsigned int collectionNodeNodeForItem:1;
@@ -436,7 +435,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDataSource = asyncDataSource;
     _proxyDataSource = [[ASCollectionViewProxy alloc] initWithTarget:_asyncDataSource interceptor:self];
     
-    _asyncDataSourceFlags.collectionViewNodeForItem = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeForItemAtIndexPath:)];
     _asyncDataSourceFlags.collectionViewNodeBlockForItem = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeBlockForItemAtIndexPath:)];
     _asyncDataSourceFlags.collectionViewNodeForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeForSupplementaryElementOfKind:atIndexPath:)];
 
@@ -458,8 +456,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
     ASDisplayNodeAssert(_asyncDataSourceFlags.collectionNodeNodeBlockForItem
                         || _asyncDataSourceFlags.collectionNodeNodeForItem
-                        || _asyncDataSourceFlags.collectionViewNodeBlockForItem
-                        || _asyncDataSourceFlags.collectionViewNodeForItem, @"Data source must implement collectionNode:nodeBlockForItemAtIndexPath: or collectionNode:nodeForItemAtIndexPath:");
+                        || _asyncDataSourceFlags.collectionViewNodeBlockForItem,
+                        @"Data source must implement collectionNode:nodeBlockForItemAtIndexPath: or collectionNode:nodeForItemAtIndexPath:");
   }
   
   _dataController.validationErrorSource = asyncDataSource;
@@ -1767,8 +1765,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   } else if (_asyncDataSourceFlags.collectionViewNodeBlockForItem) {
     block = [_asyncDataSource collectionView:self nodeBlockForItemAtIndexPath:indexPath];
-  } else if (_asyncDataSourceFlags.collectionViewNodeForItem) {
-    cell = [_asyncDataSource collectionView:self nodeForItemAtIndexPath:indexPath];
   }
 #pragma clang diagnostic pop
 
