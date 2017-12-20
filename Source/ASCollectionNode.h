@@ -635,15 +635,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSString *> *)collectionNode:(ASCollectionNode *)collectionNode supplementaryElementKindsInSection:(NSInteger)section;
 
 /**
- * Asks the collection view to provide a supplementary node to display in the collection view.
- *
- * @param collectionView An object representing the collection view requesting this information.
- * @param kind           The kind of supplementary node to provide.
- * @param indexPath      The index path that specifies the location of the new supplementary node.
- */
-- (ASCellNode *)collectionView:(ASCollectionView *)collectionView nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
-
-/**
  * Indicator to lock the data source for data fetching in async mode.
  * We should not update the data source until the data source has been unlocked. Otherwise, it will incur data inconsistency or exception
  * due to the data access in async mode.

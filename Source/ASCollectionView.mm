@@ -204,7 +204,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } _asyncDelegateFlags;
   
   struct {
-    unsigned int collectionViewNodeForSupplementaryElement:1;
     unsigned int collectionNodeNodeForItem:1;
     unsigned int collectionNodeNodeBlockForItem:1;
     unsigned int nodeModelForItem:1;
@@ -434,8 +433,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDataSource = asyncDataSource;
     _proxyDataSource = [[ASCollectionViewProxy alloc] initWithTarget:_asyncDataSource interceptor:self];
     
-    _asyncDataSourceFlags.collectionViewNodeForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeForSupplementaryElementOfKind:atIndexPath:)];
-
     _asyncDataSourceFlags.collectionNodeNodeForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeForItemAtIndexPath:)];
     _asyncDataSourceFlags.collectionNodeNodeBlockForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeBlockForItemAtIndexPath:)];
     _asyncDataSourceFlags.numberOfSectionsInCollectionNode = [_asyncDataSource respondsToSelector:@selector(numberOfSectionsInCollectionNode:)];
@@ -1840,11 +1837,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } else if (_asyncDataSourceFlags.collectionNodeNodeForSupplementaryElement) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, ^{ return [[ASCellNode alloc] init]; });
     node = [_asyncDataSource collectionNode:collectionNode nodeForSupplementaryElementOfKind:kind atIndexPath:indexPath];
-  } else if (_asyncDataSourceFlags.collectionViewNodeForSupplementaryElement) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    node = [_asyncDataSource collectionView:self nodeForSupplementaryElementOfKind:kind atIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 
   if (nodeBlock == nil) {
