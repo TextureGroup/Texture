@@ -635,20 +635,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSString *> *)collectionNode:(ASCollectionNode *)collectionNode supplementaryElementKindsInSection:(NSInteger)section;
 
 /**
- * Similar to -collectionView:nodeForItemAtIndexPath:
- * This method takes precedence over collectionView:nodeForItemAtIndexPath: if implemented.
- *
- * @param collectionView The sender.
- *
- * @param indexPath The index path of the requested node.
- *
- * @return a block that creates the node for display at this indexpath.
- *   Must be thread-safe (can be called on the main thread or a background
- *   queue) and should not implement reuse (it will be called once per row).
- */
-- (ASCellNodeBlock)collectionView:(ASCollectionView *)collectionView nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
-
-/**
  * Asks the collection view to provide a supplementary node to display in the collection view.
  *
  * @param collectionView An object representing the collection view requesting this information.

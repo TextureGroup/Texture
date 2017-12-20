@@ -204,7 +204,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } _asyncDelegateFlags;
   
   struct {
-    unsigned int collectionViewNodeBlockForItem:1;
     unsigned int collectionViewNodeForSupplementaryElement:1;
     unsigned int collectionNodeNodeForItem:1;
     unsigned int collectionNodeNodeBlockForItem:1;
@@ -435,7 +434,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDataSource = asyncDataSource;
     _proxyDataSource = [[ASCollectionViewProxy alloc] initWithTarget:_asyncDataSource interceptor:self];
     
-    _asyncDataSourceFlags.collectionViewNodeBlockForItem = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeBlockForItemAtIndexPath:)];
     _asyncDataSourceFlags.collectionViewNodeForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionView:nodeForSupplementaryElementOfKind:atIndexPath:)];
 
     _asyncDataSourceFlags.collectionNodeNodeForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeForItemAtIndexPath:)];
@@ -455,8 +453,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
 
     ASDisplayNodeAssert(_asyncDataSourceFlags.collectionNodeNodeBlockForItem
-                        || _asyncDataSourceFlags.collectionNodeNodeForItem
-                        || _asyncDataSourceFlags.collectionViewNodeBlockForItem,
+                        || _asyncDataSourceFlags.collectionNodeNodeForItem,
                         @"Data source must implement collectionNode:nodeBlockForItemAtIndexPath: or collectionNode:nodeForItemAtIndexPath:");
   }
   
@@ -1761,12 +1758,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } else if (_asyncDataSourceFlags.collectionNodeNodeForItem) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, ^{ return [[ASCellNode alloc] init]; });
     cell = [_asyncDataSource collectionNode:collectionNode nodeForItemAtIndexPath:indexPath];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  } else if (_asyncDataSourceFlags.collectionViewNodeBlockForItem) {
-    block = [_asyncDataSource collectionView:self nodeBlockForItemAtIndexPath:indexPath];
   }
-#pragma clang diagnostic pop
 
   // Handle nil node block or cell
   if (cell && [cell isKindOfClass:[ASCellNode class]]) {
