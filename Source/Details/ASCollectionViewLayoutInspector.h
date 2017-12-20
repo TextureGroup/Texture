@@ -65,16 +65,6 @@ extern ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *colle
  */
 - (void)didChangeCollectionViewDataSource:(nullable id<ASCollectionDataSource>)dataSource;
 
-#pragma mark Deprecated Methods
-
-/**
- * Asks the inspector for the number of supplementary sections in the collection view for the given kind.
- *
- * @deprecated This method will not be called, and it is only deprecated as a reminder to remove it.
- * Supplementary elements must exist in the same sections as regular collection view items i.e. -numberOfSectionsInCollectionView:
- */
-- (NSUInteger)collectionView:(ASCollectionView *)collectionView numberOfSectionsForSupplementaryNodeOfKind:(NSString *)kind ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
-
 @end
 
 /**
