@@ -167,7 +167,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionViewDidSelectItem:1;
     unsigned int collectionViewShouldDeselectItem:1;
     unsigned int collectionViewDidDeselectItem:1;
-    unsigned int collectionViewDidHighlightItem:1;
     unsigned int collectionViewDidUnhighlightItem:1;
     unsigned int collectionViewShouldShowMenuForItem:1;
     unsigned int collectionViewCanPerformActionForItem:1;
@@ -491,7 +490,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionViewDidSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldDeselectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didDeselectItemAtIndexPath:)];
-    _asyncDelegateFlags.collectionViewDidHighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didHighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidUnhighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didUnhighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldShowMenuForItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewCanPerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:canPerformAction:forItemAtIndexPath:withSender:)];
@@ -1372,11 +1370,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (indexPath != nil) {
       [_asyncDelegate collectionNode:collectionNode didHighlightItemAtIndexPath:indexPath];
     }
-  } else if (_asyncDelegateFlags.collectionViewDidHighlightItem) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate collectionView:self didHighlightItemAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 }
 
