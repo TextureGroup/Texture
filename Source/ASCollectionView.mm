@@ -167,7 +167,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionViewDidSelectItem:1;
     unsigned int collectionViewShouldDeselectItem:1;
     unsigned int collectionViewDidDeselectItem:1;
-    unsigned int collectionViewShouldHighlightItem:1;
     unsigned int collectionViewDidHighlightItem:1;
     unsigned int collectionViewDidUnhighlightItem:1;
     unsigned int collectionViewShouldShowMenuForItem:1;
@@ -492,7 +491,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionViewDidSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldDeselectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didDeselectItemAtIndexPath:)];
-    _asyncDelegateFlags.collectionViewShouldHighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldHighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidHighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didHighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidUnhighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didUnhighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldShowMenuForItemAtIndexPath:)];
@@ -1362,11 +1360,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     } else {
       return YES;
     }
-  } else if (_asyncDelegateFlags.collectionViewShouldHighlightItem) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate collectionView:self shouldHighlightItemAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
   return YES;
 }
