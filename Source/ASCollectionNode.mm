@@ -784,27 +784,6 @@
   }
 }
 
-- (void)beginUpdates
-{
-  ASDisplayNodeAssertMainThread();
-  if (self.nodeLoaded) {
-    [self.view beginUpdates];
-  }
-}
-
-- (void)endUpdatesAnimated:(BOOL)animated
-{
-  [self endUpdatesAnimated:animated completion:nil];
-}
-
-- (void)endUpdatesAnimated:(BOOL)animated completion:(void (^)(BOOL))completion
-{
-  ASDisplayNodeAssertMainThread();
-  if (self.nodeLoaded) {
-    [self.view endUpdatesAnimated:animated completion:completion];
-  }
-}
-
 - (void)invalidateFlowLayoutDelegateMetrics {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
