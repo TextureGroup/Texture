@@ -21,20 +21,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * This is a subset of UICollectionViewDataSource.
- *
- * @see ASCollectionDataSource
- */
-@protocol ASCommonCollectionDataSource <NSObject>
-
-@optional
-
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Implement - collectionNode:nodeForSupplementaryElementOfKind:atIndexPath: instead.");
-
-@end
-
-
-/**
  * This is a subset of UICollectionViewDelegate.
  *
  * @see ASCollectionDelegate

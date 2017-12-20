@@ -536,7 +536,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This is a node-based UICollectionViewDataSource.
  */
-@protocol ASCollectionDataSource <ASCommonCollectionDataSource>
+@protocol ASCollectionDataSource <NSObject>
 
 /**
  * Asks the data source for the number of items in the given section of the collection node.
