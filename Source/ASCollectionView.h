@@ -476,8 +476,4 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
 
 @end
 
-ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegateFlowLayout.")
-@protocol ASCollectionViewDelegateFlowLayout <ASCollectionDelegateFlowLayout>
-@end
-
 NS_ASSUME_NONNULL_END
