@@ -538,14 +538,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol ASCollectionDataSource <ASCommonCollectionDataSource>
 
-@optional
-
 /**
  * Asks the data source for the number of items in the given section of the collection node.
  *
  * @see @c collectionView:numberOfItemsInSection:
  */
 - (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section;
+
+@optional
 
 /**
  * Asks the data source for the number of sections in the collection node.
