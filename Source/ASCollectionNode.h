@@ -703,21 +703,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
 
-/**
- * Informs the delegate that the collection view did remove the provided node from the view hierarchy.
- * This may be caused by the node scrolling out of view, or by deleting the item
- * or its containing section with @c deleteItemsAtIndexPaths: or @c deleteSections: .
- *
- * @param collectionView The sender.
- * @param node The node which was removed from the view hierarchy.
- * @param indexPath The index path at which the node was located before it was removed.
- *
- * @warning AsyncDisplayKit processes collection view edits asynchronously. The index path
- *   passed into this method may not correspond to the same item in your data source
- *   if your data source has been updated since the last edit was processed.
- */
-- (void)collectionView:(ASCollectionView *)collectionView didEndDisplayingNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
-
 - (void)collectionView:(ASCollectionView *)collectionView willBeginBatchFetchWithContext:(ASBatchContext *)context ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
 
 /**
