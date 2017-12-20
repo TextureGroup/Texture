@@ -17,7 +17,6 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASCollectionViewProtocols.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASBatchContext.h>
 #import <AsyncDisplayKit/ASDimension.h>

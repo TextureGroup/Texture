@@ -16,6 +16,7 @@
 //
 
 #import <UIKit/UICollectionView.h>
+#import <UIKit/UIScrollView.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASCollectionView.h>
@@ -639,7 +640,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This is a node-based UICollectionViewDelegate.
  */
-@protocol ASCollectionDelegate <ASCommonCollectionDelegate, NSObject>
+@protocol ASCollectionDelegate <UIScrollViewDelegate, NSObject>
 
 @optional
 
@@ -674,6 +675,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;
 - (void)collectionNode:(ASCollectionNode *)collectionNode performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;
+
+- (UICollectionViewTransitionLayout *)collectionView:(UICollectionView *)collectionView transitionLayoutForOldLayout:(UICollectionViewLayout *)fromLayout newLayout:(UICollectionViewLayout *)toLayout;
 
 /**
  * Receive a message that the collection node is near the end of its data set and more data should be fetched if

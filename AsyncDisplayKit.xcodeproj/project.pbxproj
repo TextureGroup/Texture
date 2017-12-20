@@ -234,7 +234,6 @@
 		B35061F31B010EFD0018CF92 /* ASCellNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 055F1A3A19ABD43F004DAFF1 /* ASCellNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B35061F51B010EFD0018CF92 /* ASCollectionView.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3C4A4F1A1139C100143C57 /* ASCollectionView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B35061F61B010EFD0018CF92 /* ASCollectionView.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3C4A501A1139C100143C57 /* ASCollectionView.mm */; };
-		B35061F71B010EFD0018CF92 /* ASCollectionViewProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3C4A531A113EEC00143C57 /* ASCollectionViewProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B35061F81B010EFD0018CF92 /* ASControlNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 058D09D5195D050800B7D73C /* ASControlNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B35061F91B010EFD0018CF92 /* ASControlNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 058D09D6195D050800B7D73C /* ASControlNode.mm */; };
 		B35061FA1B010EFD0018CF92 /* ASControlNode+Subclasses.h in Headers */ = {isa = PBXBuildFile; fileRef = 058D09D7195D050800B7D73C /* ASControlNode+Subclasses.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -745,7 +744,6 @@
 		AC21EC0F1B3D0BF600C8B19A /* ASStackLayoutDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASStackLayoutDefines.h; sourceTree = "<group>"; };
 		AC3C4A4F1A1139C100143C57 /* ASCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ASCollectionView.h; sourceTree = "<group>"; };
 		AC3C4A501A1139C100143C57 /* ASCollectionView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASCollectionView.mm; sourceTree = "<group>"; };
-		AC3C4A531A113EEC00143C57 /* ASCollectionViewProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewProtocols.h; sourceTree = "<group>"; };
 		AC6145401D8AFAE8003D62A2 /* ASSection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASSection.h; path = ../Private/ASSection.h; sourceTree = "<group>"; };
 		AC6145421D8AFD4F003D62A2 /* ASSection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASSection.m; path = ../Private/ASSection.m; sourceTree = "<group>"; };
 		AC6456071B0A335000CF11B8 /* ASCellNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCellNode.mm; sourceTree = "<group>"; };
@@ -1085,7 +1083,6 @@
 				B13CA0FF1C52004900E031AB /* ASCollectionNode+Beta.h */,
 				AC3C4A4F1A1139C100143C57 /* ASCollectionView.h */,
 				AC3C4A501A1139C100143C57 /* ASCollectionView.mm */,
-				AC3C4A531A113EEC00143C57 /* ASCollectionViewProtocols.h */,
 				B13CA0F61C519E9400E031AB /* ASCollectionViewLayoutFacilitatorProtocol.h */,
 				DEC146B41C37A16A004A0EE7 /* ASCollectionInternal.h */,
 				DEC146B51C37A16A004A0EE7 /* ASCollectionInternal.m */,
@@ -1796,7 +1793,6 @@
 				B35061F51B010EFD0018CF92 /* ASCollectionView.h in Headers */,
 				ACE87A2C1D73696800D7FF06 /* ASSectionContext.h in Headers */,
 				509E68631B3AEDB4009B9150 /* ASCollectionViewLayoutController.h in Headers */,
-				B35061F71B010EFD0018CF92 /* ASCollectionViewProtocols.h in Headers */,
 				68FC85E31CE29B7E00EDD713 /* ASTabBarController.h in Headers */,
 				CC56013B1F06E9A700DC4FBE /* ASIntegerMap.h in Headers */,
 				B35061FA1B010EFD0018CF92 /* ASControlNode+Subclasses.h in Headers */,
