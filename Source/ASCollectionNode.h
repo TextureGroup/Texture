@@ -634,26 +634,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSArray<NSString *> *)collectionNode:(ASCollectionNode *)collectionNode supplementaryElementKindsInSection:(NSInteger)section;
 
-/**
- * Indicator to lock the data source for data fetching in async mode.
- * We should not update the data source until the data source has been unlocked. Otherwise, it will incur data inconsistency or exception
- * due to the data access in async mode.
- *
- * @param collectionView The sender.
- * @deprecated The data source is always accessed on the main thread, and this method will not be called.
- */
-- (void)collectionViewLockDataSource:(ASCollectionView *)collectionView ASDISPLAYNODE_DEPRECATED_MSG("Data source accesses are on the main thread. Method will not be called.");
-
-/**
- * Indicator to unlock the data source for data fetching in async mode.
- * We should not update the data source until the data source has been unlocked. Otherwise, it will incur data inconsistency or exception
- * due to the data access in async mode.
- *
- * @param collectionView The sender.
- * @deprecated The data source is always accessed on the main thread, and this method will not be called.
- */
-- (void)collectionViewUnlockDataSource:(ASCollectionView *)collectionView ASDISPLAYNODE_DEPRECATED_MSG("Data source accesses are on the main thread. Method will not be called.");
-
 @end
 
 /**
