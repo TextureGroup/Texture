@@ -163,8 +163,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int scrollViewDidEndDragging:1;
     unsigned int scrollViewWillEndDragging:1;
     unsigned int scrollViewDidEndDecelerating:1;
-    unsigned int collectionViewShouldSelectItem:1;
-    unsigned int collectionViewDidSelectItem:1;
     unsigned int collectionViewShouldDeselectItem:1;
     unsigned int collectionViewDidDeselectItem:1;
     unsigned int collectionViewShouldShowMenuForItem:1;
@@ -485,8 +483,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
-    _asyncDelegateFlags.collectionViewShouldSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)];
-    _asyncDelegateFlags.collectionViewDidSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldDeselectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didDeselectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldShowMenuForItemAtIndexPath:)];
@@ -1288,11 +1284,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (indexPath != nil) {
       return [_asyncDelegate collectionNode:collectionNode shouldSelectItemAtIndexPath:indexPath];
     }
-  } else if (_asyncDelegateFlags.collectionViewShouldSelectItem) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate collectionView:self shouldSelectItemAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
   return YES;
 }
@@ -1305,11 +1296,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (indexPath != nil) {
       [_asyncDelegate collectionNode:collectionNode didSelectItemAtIndexPath:indexPath];
     }
-  } else if (_asyncDelegateFlags.collectionViewDidSelectItem) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate collectionView:self didSelectItemAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 }
 
