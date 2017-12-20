@@ -173,7 +173,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionViewShouldShowMenuForItem:1;
     unsigned int collectionViewCanPerformActionForItem:1;
     unsigned int collectionViewPerformActionForItem:1;
-    unsigned int shouldBatchFetchForCollectionView:1;
     unsigned int collectionNodeWillDisplayItem:1;
     unsigned int collectionNodeDidEndDisplayingItem:1;
     unsigned int collectionNodeShouldSelectItem:1;
@@ -489,7 +488,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
-    _asyncDelegateFlags.shouldBatchFetchForCollectionView = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForCollectionView:)];
     _asyncDelegateFlags.collectionViewShouldSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewShouldDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldDeselectItemAtIndexPath:)];
@@ -1644,11 +1642,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (canFetch && _asyncDelegateFlags.shouldBatchFetchForCollectionNode) {
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
     return [_asyncDelegate shouldBatchFetchForCollectionNode:collectionNode];
-  } else if (canFetch && _asyncDelegateFlags.shouldBatchFetchForCollectionView) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate shouldBatchFetchForCollectionView:self];
-#pragma clang diagnostic pop
   } else {
     return canFetch;
   }

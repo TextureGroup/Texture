@@ -571,7 +571,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Similar to -collectionNode:nodeForItemAtIndexPath:
- * This method takes precedence over collectionNode:nodeForItemAtIndexPath: if implemented.
+ * This method takes precedence over -collectionNode:nodeForItemAtIndexPath: if implemented.
  *
  * @param collectionNode The sender.
  * @param indexPath The index path of the item.
@@ -702,19 +702,6 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
-
-/**
- * Tell the collectionView if batch fetching should begin.
- *
- * @param collectionView The sender.
- *
- * @discussion Use this method to conditionally fetch batches. Example use cases are: limiting the total number of
- * objects that can be fetched or no network connection.
- *
- * If not implemented, the collectionView assumes that it should notify its asyncDelegate when batch fetching
- * should occur.
- */
-- (BOOL)shouldBatchFetchForCollectionView:(ASCollectionView *)collectionView ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
 
 @end
 
