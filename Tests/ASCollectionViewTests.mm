@@ -22,7 +22,6 @@
 #import <AsyncDisplayKit/ASSectionContext.h>
 #import <vector>
 #import <OCMock/OCMock.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode
 
@@ -59,7 +58,7 @@
 
 @end
 
-@interface ASCollectionViewTestDelegate : NSObject <ASCollectionDataSource, ASCollectionDelegate, UICollectionViewDelegateFlowLayout>
+@interface ASCollectionViewTestDelegate : NSObject <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout>
 
 @property (nonatomic, assign) NSInteger sectionGeneration;
 @property (nonatomic, copy) void(^willBeginBatchFetch)(ASBatchContext *);
@@ -82,7 +81,8 @@
   return self;
 }
 
-- (ASCellNode *)collectionView:(ASCollectionView *)collectionView nodeForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
   ASTextCellNodeWithSetSelectedCounter *textCellNode = [ASTextCellNodeWithSetSelectedCounter new];
   textCellNode.text = indexPath.description;
 
@@ -90,7 +90,8 @@
 }
 
 
-- (ASCellNodeBlock)collectionView:(ASCollectionView *)collectionView nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
+{
   return ^{
     ASTextCellNodeWithSetSelectedCounter *textCellNode = [ASTextCellNodeWithSetSelectedCounter new];
     textCellNode.text = indexPath.description;
@@ -98,11 +99,13 @@
   };
 }
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+- (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode
+{
   return _itemCounts.size();
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section
+{
   return _itemCounts[section];
 }
 
@@ -114,12 +117,12 @@
   return context;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+- (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode sizeRangeForHeaderInSection:(NSInteger)section
 {
-  return CGSizeMake(100, 100);
+  return ASSizeRangeMake(CGSizeMake(100, 100));
 }
 
-- (ASCellNode *)collectionView:(ASCollectionView *)collectionView nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   return [[ASTextCellNodeWithSetSelectedCounter alloc] init];
 }
@@ -193,37 +196,45 @@
 - (void)testDataSourceImplementsNecessaryMethods
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  // Force view allocation here to avoid setting data source to pending state
+  __unused ASCollectionView *collectionView = collectionNode.view;
   
   id dataSource = [NSObject new];
-  XCTAssertThrows((collectionView.asyncDataSource = dataSource));
+  XCTAssertThrows((collectionNode.dataSource = dataSource));
   
   dataSource = [OCMockObject niceMockForProtocol:@protocol(ASCollectionDataSource)];
-  XCTAssertNoThrow((collectionView.asyncDataSource = dataSource));
+  XCTAssertNoThrow((collectionNode.dataSource = dataSource));
 }
 
 - (void)testThatItSetsALayoutInspectorForFlowLayouts
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-  XCTAssert(collectionView.layoutInspector != nil, @"should automatically set a layout delegate for flow layouts");
-  XCTAssert([collectionView.layoutInspector isKindOfClass:[ASCollectionViewFlowLayoutInspector class]], @"should have a flow layout inspector by default");
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  // Force view allocation here to avoid getting layout inspector from pending state
+  __unused ASCollectionView *collectionView = collectionNode.view;
+
+  XCTAssert(collectionNode.layoutInspector != nil, @"should automatically set a layout delegate for flow layouts");
+  XCTAssert([collectionNode.layoutInspector isKindOfClass:[ASCollectionViewFlowLayoutInspector class]], @"should have a flow layout inspector by default");
 }
 
 - (void)testThatADefaultLayoutInspectorIsProvidedForCustomLayouts
 {
   UICollectionViewLayout *layout = [[UICollectionViewLayout alloc] init];
-  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-  XCTAssert(collectionView.layoutInspector != nil, @"should automatically set a layout delegate for flow layouts");
-  XCTAssert([collectionView.layoutInspector isKindOfClass:[ASCollectionViewLayoutInspector class]], @"should have a default layout inspector by default");
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  // Force view allocation here to avoid getting layout inspector from pending state
+  __unused ASCollectionView *collectionView = collectionNode.view;
+
+  XCTAssert(collectionNode.layoutInspector != nil, @"should automatically set a layout delegate for flow layouts");
+  XCTAssert([collectionNode.layoutInspector isKindOfClass:[ASCollectionViewLayoutInspector class]], @"should have a default layout inspector by default");
 }
 
 - (void)testThatRegisteringASupplementaryNodeStoresItForIntrospection
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-  [collectionView registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
-  XCTAssertEqualObjects([collectionView dataController:nil supplementaryNodeKindsInSections:[NSIndexSet indexSetWithIndex:0]], @[UICollectionElementKindSectionHeader]);
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  [collectionNode registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
+  XCTAssertEqualObjects([collectionNode.view dataController:nil supplementaryNodeKindsInSections:[NSIndexSet indexSetWithIndex:0]], @[UICollectionElementKindSectionHeader]);
 }
 
 - (void)testReloadIfNeeded
@@ -270,12 +281,12 @@
   // selecting node should select cell
   node.selected = YES;
   ++setSelectedCount;
-  XCTAssertTrue([[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath], @"Selecting node should update cell selection.");
+  XCTAssertTrue([[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath], @"Selecting node should update cell selection.");
   
   // deselecting node should deselect cell
   node.selected = NO;
   ++setSelectedCount;
-  XCTAssertTrue([[testController.collectionView indexPathsForSelectedItems] isEqualToArray:@[]], @"Deselecting node should update cell selection.");
+  XCTAssertTrue([[testController.collectionNode indexPathsForSelectedItems] isEqualToArray:@[]], @"Deselecting node should update cell selection.");
 
   // selecting cell via collectionNode should select node
   ++setSelectedCount;
@@ -301,33 +312,33 @@
   [testController.collectionNode selectItemAtIndexPath:indexPath2 animated:NO scrollPosition:UICollectionViewScrollPositionNone];
   XCTAssertTrue(node2.isSelected == YES, @"Selecting cell should update node selection.");
 
-  XCTAssertTrue([[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath] &&
-                [[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath2],
+  XCTAssertTrue([[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath] &&
+                [[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath2],
                 @"Selecting multiple cells should result in those cells being in the array of selectedItems.");
 
   // deselecting node should deselect cell
   node.selected = NO;
   ++setSelectedCount;
-  XCTAssertTrue(![[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath] &&
-                [[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath2], @"Deselecting node should update array of selectedItems.");
+  XCTAssertTrue(![[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath] &&
+                [[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath2], @"Deselecting node should update array of selectedItems.");
 
   node.selected = YES;
   ++setSelectedCount;
-  XCTAssertTrue([[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath], @"Selecting node should update cell selection.");
+  XCTAssertTrue([[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath], @"Selecting node should update cell selection.");
 
   node2.selected = NO;
-  XCTAssertTrue([[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath] &&
-                ![[testController.collectionView indexPathsForSelectedItems] containsObject:indexPath2], @"Deselecting node should update array of selectedItems.");
+  XCTAssertTrue([[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath] &&
+                ![[testController.collectionNode indexPathsForSelectedItems] containsObject:indexPath2], @"Deselecting node should update array of selectedItems.");
 
   // reload cell (-prepareForReuse is called) & check that selected state is preserved
-  [testController.collectionView setContentOffset:CGPointMake(0,testController.collectionView.bounds.size.height)];
-  [testController.collectionView layoutIfNeeded];
-  [testController.collectionView setContentOffset:CGPointMake(0,0)];
-  [testController.collectionView layoutIfNeeded];
+  [testController.collectionNode setContentOffset:CGPointMake(0, testController.collectionNode.bounds.size.height)];
+  [testController.collectionNode layoutIfNeeded];
+  [testController.collectionNode setContentOffset:CGPointMake(0,0)];
+  [testController.collectionNode layoutIfNeeded];
   XCTAssertTrue(node.isSelected == YES, @"Reloaded cell should preserve state.");
   
   // deselecting cell should deselect node
-  UICollectionViewCell *cell = [testController.collectionView cellForItemAtIndexPath:indexPath];
+  UICollectionViewCell *cell = [testController.collectionNode cellForItemAtIndexPath:indexPath];
   cell.selected = NO;
   XCTAssertTrue(node.isSelected == NO, @"Deselecting cell should update node selection.");
   
@@ -363,16 +374,16 @@
 - (void)testTuningParameters
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
   
   ASRangeTuningParameters renderParams = { .leadingBufferScreenfuls = 1.2, .trailingBufferScreenfuls = 3.2 };
   ASRangeTuningParameters preloadParams = { .leadingBufferScreenfuls = 4.3, .trailingBufferScreenfuls = 2.3 };
   
-  [collectionView setTuningParameters:renderParams forRangeType:ASLayoutRangeTypeDisplay];
-  [collectionView setTuningParameters:preloadParams forRangeType:ASLayoutRangeTypePreload];
+  [collectionNode setTuningParameters:renderParams forRangeType:ASLayoutRangeTypeDisplay];
+  [collectionNode setTuningParameters:preloadParams forRangeType:ASLayoutRangeTypePreload];
   
-  XCTAssertTrue(ASRangeTuningParametersEqualToRangeTuningParameters(renderParams, [collectionView tuningParametersForRangeType:ASLayoutRangeTypeDisplay]));
-  XCTAssertTrue(ASRangeTuningParametersEqualToRangeTuningParameters(preloadParams, [collectionView tuningParametersForRangeType:ASLayoutRangeTypePreload]));
+  XCTAssertTrue(ASRangeTuningParametersEqualToRangeTuningParameters(renderParams, [collectionNode tuningParametersForRangeType:ASLayoutRangeTypeDisplay]));
+  XCTAssertTrue(ASRangeTuningParametersEqualToRangeTuningParameters(preloadParams, [collectionNode tuningParametersForRangeType:ASLayoutRangeTypePreload]));
 }
 
 /**
@@ -390,7 +401,6 @@
 #define updateValidationTestPrologue \
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];\
   __unused ASCollectionViewTestDelegate *del = testController.asyncDelegate;\
-  __unused ASCollectionView *cv = testController.collectionView;\
   ASCollectionNode *cn = testController.collectionNode;\
   UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];\
   [window makeKeyAndVisible]; \
@@ -406,7 +416,7 @@
   NSInteger sectionCount = del->_itemCounts.size();
   
   del->_itemCounts[sectionCount - 1]++;
-  XCTAssertNoThrow([cv insertItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1] ]]);
+  XCTAssertNoThrow([cn insertItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1] ]]);
 }
 
 - (void)testThatSubmittingAValidReloadDoesNotThrowAnException
@@ -414,7 +424,7 @@
   updateValidationTestPrologue
   NSInteger sectionCount = del->_itemCounts.size();
   
-  XCTAssertNoThrow([cv reloadItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1] ]]);
+  XCTAssertNoThrow([cn reloadItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount - 1] ]]);
 }
 
 - (void)testThatSubmittingAnInvalidInsertThrowsAnException
@@ -422,7 +432,7 @@
   updateValidationTestPrologue
   NSInteger sectionCount = del->_itemCounts.size();
   
-  XCTAssertThrows([cv insertItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount + 1] ]]);
+  XCTAssertThrows([cn insertItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount + 1] ]]);
 }
 
 - (void)testThatSubmittingAnInvalidDeleteThrowsAnException
@@ -430,17 +440,17 @@
   updateValidationTestPrologue
   NSInteger sectionCount = del->_itemCounts.size();
   
-  XCTAssertThrows([cv deleteItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount + 1] ]]);
+  XCTAssertThrows([cn deleteItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:sectionCount + 1] ]]);
 }
 
 - (void)testThatDeletingAndReloadingTheSameItemThrowsAnException
 {
   updateValidationTestPrologue
   
-  XCTAssertThrows([cv performBatchUpdates:^{
+  XCTAssertThrows([cn performBatchUpdates:^{
     NSArray *indexPaths = @[ [NSIndexPath indexPathForItem:0 inSection:0] ];
-    [cv deleteItemsAtIndexPaths:indexPaths];
-    [cv reloadItemsAtIndexPaths:indexPaths];
+    [cn deleteItemsAtIndexPaths:indexPaths];
+    [cn reloadItemsAtIndexPaths:indexPaths];
   } completion:nil]);
 }
 
@@ -448,21 +458,21 @@
 {
   updateValidationTestPrologue
   
-  XCTAssertThrows([cv deleteSections:[NSIndexSet indexSetWithIndex:0]]);
+  XCTAssertThrows([cn deleteSections:[NSIndexSet indexSetWithIndex:0]]);
 }
 
 - (void)testThatHavingAnIncorrectItemCountThrowsAnException
 {
   updateValidationTestPrologue
   
-  XCTAssertThrows([cv deleteItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:0] ]]);
+  XCTAssertThrows([cn deleteItemsAtIndexPaths:@[ [NSIndexPath indexPathForItem:0 inSection:0] ]]);
 }
 
 - (void)testThatHavingAnIncorrectItemCountWithNoUpdatesThrowsAnException
 {
   updateValidationTestPrologue
   
-  XCTAssertThrows([cv performBatchUpdates:^{
+  XCTAssertThrows([cn performBatchUpdates:^{
     del->_itemCounts[0]++;
   } completion:nil]);
 }
@@ -473,8 +483,8 @@
   NSInteger sectionCount = del->_itemCounts.size();
   
   del->_itemCounts.push_back(10);
-  XCTAssertThrows([cv performBatchUpdates:^{
-    [cv insertSections:[NSIndexSet indexSetWithIndex:sectionCount + 1]];
+  XCTAssertThrows([cn performBatchUpdates:^{
+    [cn insertSections:[NSIndexSet indexSetWithIndex:sectionCount + 1]];
   } completion:nil]);
 }
 
@@ -484,10 +494,10 @@
   NSInteger sectionCount = del->_itemCounts.size();
   
   del->_itemCounts.pop_back();
-  XCTAssertThrows([cv performBatchUpdates:^{
+  XCTAssertThrows([cn performBatchUpdates:^{
     NSIndexSet *sections = [NSIndexSet indexSetWithIndex:sectionCount - 1];
-    [cv reloadSections:sections];
-    [cv deleteSections:sections];
+    [cn reloadSections:sections];
+    [cn deleteSections:sections];
   } completion:nil]);
 }
 
@@ -497,7 +507,7 @@
   NSSet *nodeBatch1 = [NSSet setWithArray:[cn visibleNodes]];
   XCTAssertGreaterThan(nodeBatch1.count, 0);
   
-  NSArray<UICollectionViewLayoutAttributes *> *visibleLayoutAttributesBatch1 = [cv.collectionViewLayout layoutAttributesForElementsInRect:cv.bounds];
+  NSArray<UICollectionViewLayoutAttributes *> *visibleLayoutAttributesBatch1 = [cn.collectionViewLayout layoutAttributesForElementsInRect:cn.bounds];
   XCTAssertGreaterThan(visibleLayoutAttributesBatch1.count, 0);
 
   // Expect all visible nodes get 1 applyLayoutAttributes and have a non-nil value.
@@ -510,15 +520,15 @@
     if (layoutAttributes.representedElementCategory != UICollectionElementCategorySupplementaryView) {
       continue;
     }
-    ASTextCellNodeWithSetSelectedCounter *node = (ASTextCellNodeWithSetSelectedCounter *)[cv supplementaryNodeForElementKind:layoutAttributes.representedElementKind atIndexPath:layoutAttributes.indexPath];
+    ASTextCellNodeWithSetSelectedCounter *node = (ASTextCellNodeWithSetSelectedCounter *)[cn.view supplementaryNodeForElementKind:layoutAttributes.representedElementKind atIndexPath:layoutAttributes.indexPath];
     XCTAssertEqual(node.applyLayoutAttributesCount, 1, @"Expected applyLayoutAttributes to be called exactly once for visible supplementary nodes.");
     XCTAssertNotNil(node.layoutAttributes, @"Expected layoutAttributes to be non-nil for visible supplementary node.");
   }
 
   // Scroll to next batch of items.
   NSIndexPath *nextIP = [NSIndexPath indexPathForItem:nodeBatch1.count inSection:0];
-  [cv scrollToItemAtIndexPath:nextIP atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
-  [cv layoutIfNeeded];
+  [cn scrollToItemAtIndexPath:nextIP atScrollPosition:UICollectionViewScrollPositionTop animated:NO];
+  [cn layoutIfNeeded];
 
   // Ensure we scrolled far enough that all the old ones are offscreen.
   NSSet *nodeBatch2 = [NSSet setWithArray:[cn visibleNodes]];
@@ -534,7 +544,7 @@
     if (layoutAttributes.representedElementCategory != UICollectionElementCategorySupplementaryView) {
       continue;
     }
-    ASTextCellNodeWithSetSelectedCounter *node = (ASTextCellNodeWithSetSelectedCounter *)[cv supplementaryNodeForElementKind:layoutAttributes.representedElementKind atIndexPath:layoutAttributes.indexPath];
+    ASTextCellNodeWithSetSelectedCounter *node = (ASTextCellNodeWithSetSelectedCounter *)[cn.view supplementaryNodeForElementKind:layoutAttributes.representedElementKind atIndexPath:layoutAttributes.indexPath];
     XCTAssertEqual(node.applyLayoutAttributesCount, 1, @"Expected applyLayoutAttributes to be called exactly once for visible supplementary nodes, even after node is removed.");
     XCTAssertNil(node.layoutAttributes, @"Expected layoutAttributes to be nil for removed supplementary node.");
   }
@@ -589,8 +599,6 @@
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UICollectionViewLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   ASCollectionNode *cn = [[ASCollectionNode alloc] initWithFrame:window.bounds collectionViewLayout:layout];
-  ASCollectionView *cv = cn.view;
-
 
   __unused NSMutableSet *keepaliveNodes = [NSMutableSet set];
   id dataSource = [OCMockObject niceMockForProtocol:@protocol(ASCollectionDataSource)];
@@ -607,15 +615,15 @@
     [suppNode addSubnode:layerBacked];
     [invocation setReturnValue:&suppNode];
   }] collectionNode:cn nodeForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:OCMOCK_ANY];
-  [[[dataSource stub] andReturnValue:[NSNumber numberWithInteger:1]] numberOfSectionsInCollectionView:cv];
-  cv.asyncDataSource = dataSource;
+  [[[dataSource stub] andReturnValue:[NSNumber numberWithInteger:1]] numberOfSectionsInCollectionNode:cn];
+  cn.dataSource = dataSource;
 
   id delegate = [OCMockObject niceMockForProtocol:@protocol(UICollectionViewDelegateFlowLayout)];
-  [[[delegate stub] andReturnValue:[NSValue valueWithCGSize:CGSizeMake(100, 100)]] collectionView:cv layout:OCMOCK_ANY referenceSizeForHeaderInSection:0];
-  cv.asyncDelegate = delegate;
+  [[[delegate stub] andReturnValue:[NSValue valueWithCGSize:CGSizeMake(100, 100)]] collectionView:cn.view layout:OCMOCK_ANY referenceSizeForHeaderInSection:0];
+  cn.delegate = delegate;
 
-  [cv registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
-  [window addSubview:cv];
+  [cn registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
+  [window addSubnode:cn];
 
   [window makeKeyAndVisible];
 
@@ -633,24 +641,24 @@
 - (void)testThatNodeCalculatedSizesAreUpdatedBeforeFirstPrepareLayoutAfterRotation
 {
   updateValidationTestPrologue
-  id layout = cv.collectionViewLayout;
-  CGSize initialItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
-  CGSize initialCVSize = cv.bounds.size;
+  id layout = cn.collectionViewLayout;
+  CGSize initialItemSize = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
+  CGSize initialCVSize = cn.bounds.size;
 
   // Capture the node size before first call to prepareLayout after frame change.
   __block CGSize itemSizeAtFirstLayout = CGSizeZero;
   __block CGSize boundsSizeAtFirstLayout = CGSizeZero;
   [[[[layout expect] andDo:^(NSInvocation *) {
-    itemSizeAtFirstLayout = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
-    boundsSizeAtFirstLayout = [cv bounds].size;
+    itemSizeAtFirstLayout = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
+    boundsSizeAtFirstLayout = cn.bounds.size;
   }] andForwardToRealObject] prepareLayout];
 
   // Rotate the device
   UIDeviceOrientation oldDeviceOrientation = [[UIDevice currentDevice] orientation];
   [[UIDevice currentDevice] setValue:@(UIDeviceOrientationLandscapeLeft) forKey:@"orientation"];
 
-  CGSize finalItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
-  CGSize finalCVSize = cv.bounds.size;
+  CGSize finalItemSize = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
+  CGSize finalCVSize = cn.bounds.size;
   XCTAssertNotEqualObjects(NSStringFromCGSize(initialItemSize),  NSStringFromCGSize(itemSizeAtFirstLayout));
   XCTAssertNotEqualObjects(NSStringFromCGSize(initialCVSize),  NSStringFromCGSize(boundsSizeAtFirstLayout));
   XCTAssertEqualObjects(NSStringFromCGSize(itemSizeAtFirstLayout), NSStringFromCGSize(finalItemSize));
@@ -676,7 +684,7 @@
 {
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];
 
-  ASCollectionView *cv = testController.collectionView;
+  ASCollectionNode *cn = testController.collectionNode;
 
   XCTestExpectation *inner0 = [self expectationWithDescription:@"Inner completion 0 is called"];
   XCTestExpectation *inner1 = [self expectationWithDescription:@"Inner completion 1 is called"];
@@ -684,14 +692,14 @@
 
   NSMutableArray<XCTestExpectation *> *completions = [NSMutableArray array];
 
-  [cv performBatchUpdates:^{
-    [cv performBatchUpdates:^{
+  [cn performBatchUpdates:^{
+    [cn performBatchUpdates:^{
 
     } completion:^(BOOL finished) {
       [completions addObject:inner0];
       [inner0 fulfill];
     }];
-    [cv performBatchUpdates:^{
+    [cn performBatchUpdates:^{
 
     } completion:^(BOOL finished) {
       [completions addObject:inner1];
@@ -728,8 +736,8 @@
   NSInteger toSection = 0;
 
   del.sectionGeneration++;
-  [cv moveSection:originalSection toSection:toSection];
-  [cv waitUntilAllUpdatesAreCommitted];
+  [cn moveSection:originalSection toSection:toSection];
+  [cn waitUntilAllUpdatesAreProcessed];
   
   // Only test left moving
   XCTAssertTrue(toSection < originalSection);
@@ -772,8 +780,8 @@
   NSInteger sectionToReload = 0;
   
   del.sectionGeneration++;
-  [cv reloadSections:[NSIndexSet indexSetWithIndex:sectionToReload]];
-  [cv waitUntilAllUpdatesAreCommitted];
+  [cn reloadSections:[NSIndexSet indexSetWithIndex:sectionToReload]];
+  [cn waitUntilAllUpdatesAreProcessed];
   
   NSInteger sectionCount = del->_itemCounts.size();
   for (NSInteger section = 0; section < sectionCount; section++) {
@@ -788,16 +796,16 @@
 - (void)testThatIssuingAnUpdateBeforeInitialReloadIsAcceptable
 {
   ASCollectionViewTestDelegate *del = [[ASCollectionViewTestDelegate alloc] initWithNumberOfSections:0 numberOfItemsInSection:0];
-  ASCollectionView *cv = [[ASCollectionView alloc] initWithCollectionViewLayout:[UICollectionViewFlowLayout new]];
-  cv.asyncDataSource = del;
-  cv.asyncDelegate = del;
+  ASCollectionNode *cn = [[ASCollectionNode alloc] initWithCollectionViewLayout:[UICollectionViewFlowLayout new]];
+  cn.dataSource = del;
+  cn.delegate = del;
 
   // Add a section to the data source
   del->_itemCounts.push_back(0);
   // Attempt to insert section into collection view. We ignore it to workaround
   // the bug demonstrated by
   // ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
-  XCTAssertNoThrow([cv insertSections:[NSIndexSet indexSetWithIndex:0]]);
+  XCTAssertNoThrow([cn insertSections:[NSIndexSet indexSetWithIndex:0]]);
 }
 
 - (void)testThatNodeAtIndexPathIsCorrectImmediatelyAfterSubmittingUpdate
@@ -809,7 +817,7 @@
   ASCellNode *oldNode = [cn nodeForItemAtIndexPath:indexPath];
   XCTAssertNotNil(oldNode);
   del->_itemCounts[0] += 1;
-  [cv insertItemsAtIndexPaths:@[ indexPath ]];
+  [cn insertItemsAtIndexPaths:@[ indexPath ]];
   ASCellNode *newNode = [cn nodeForItemAtIndexPath:indexPath];
   XCTAssertNotNil(newNode);
   XCTAssertNotEqualObjects(oldNode, newNode);
@@ -817,7 +825,7 @@
   // Delete all sections and assert nodeForItemAtIndexPath: immediately returns nil
   NSIndexSet *sections = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, del->_itemCounts.size())];
   del->_itemCounts.clear();
-  [cv deleteSections:sections];
+  [cn deleteSections:sections];
   XCTAssertNil([cn nodeForItemAtIndexPath:indexPath]);
 }
 
@@ -825,12 +833,12 @@
 {
   updateValidationTestPrologue
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-  ASCellNode *oldHeader = [cv supplementaryNodeForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
+  ASCellNode *oldHeader = [cn.view supplementaryNodeForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
   XCTAssertNotNil(oldHeader);
 
   // Reload the section and ensure that the new header is loaded
-  [cv reloadSections:[NSIndexSet indexSetWithIndex:0]];
-  ASCellNode *newHeader = [cv supplementaryNodeForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
+  [cn reloadSections:[NSIndexSet indexSetWithIndex:0]];
+  ASCellNode *newHeader = [cn.view supplementaryNodeForElementKind:UICollectionElementKindSectionHeader atIndexPath:indexPath];
   XCTAssertNotNil(newHeader);
   XCTAssertNotEqualObjects(oldHeader, newHeader);
 }
@@ -1029,7 +1037,7 @@
   CGFloat requiredContentHeight;
   CGFloat itemHeight = [cn.view layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].size.height;
   if (visible) {
-    requiredContentHeight = CGRectGetMaxY(cn.bounds) + CGRectGetHeight(cn.bounds) * cn.view.leadingScreensForBatching;
+    requiredContentHeight = CGRectGetMaxY(cn.bounds) + CGRectGetHeight(cn.bounds) * cn.leadingScreensForBatching;
   } else {
     requiredContentHeight = CGRectGetMaxY(cn.bounds);
   }
