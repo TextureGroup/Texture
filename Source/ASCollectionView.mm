@@ -163,7 +163,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int scrollViewDidEndDragging:1;
     unsigned int scrollViewWillEndDragging:1;
     unsigned int scrollViewDidEndDecelerating:1;
-    unsigned int collectionViewWillDisplayNodeForItemDeprecated:1;
     unsigned int collectionViewDidEndDisplayingNodeForItem:1;
     unsigned int collectionViewShouldSelectItem:1;
     unsigned int collectionViewDidSelectItem:1;
@@ -492,7 +491,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
-    _asyncDelegateFlags.collectionViewWillDisplayNodeForItemDeprecated = [_asyncDelegate respondsToSelector:@selector(collectionView:willDisplayNodeForItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewDidEndDisplayingNodeForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:didEndDisplayingNode:forItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(collectionView:willBeginBatchFetchWithContext:)];
     _asyncDelegateFlags.shouldBatchFetchForCollectionView = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForCollectionView:)];
@@ -1174,13 +1172,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   if (_asyncDelegateFlags.collectionNodeWillDisplayItem && self.collectionNode != nil) {
     [_asyncDelegate collectionNode:self.collectionNode willDisplayItemWithNode:cellNode];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  } else if (_asyncDelegateFlags.collectionViewWillDisplayNodeForItemDeprecated) {
-    [_asyncDelegate collectionView:self willDisplayNodeForItemAtIndexPath:indexPath];
   }
-#pragma clang diagnostic pop
-  
+
   [_rangeController setNeedsUpdate];
   
   if ([cell consumesCellNodeVisibilityEvents]) {
