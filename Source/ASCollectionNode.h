@@ -703,8 +703,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
 
-- (void)collectionView:(ASCollectionView *)collectionView willBeginBatchFetchWithContext:(ASBatchContext *)context ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
-
 /**
  * Tell the collectionView if batch fetching should begin.
  *
