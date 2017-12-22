@@ -866,7 +866,7 @@
 
   ASCollectionNode *cn = testController.collectionNode;
   [cn waitUntilAllUpdatesAreProcessed];
-  [cn.view layoutIfNeeded];
+  [cn layoutIfNeeded];
   ASCellNode *node = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   XCTAssertTrue(node.visible);
   testController.asyncDelegate->_itemCounts = {0};
@@ -1030,7 +1030,7 @@
   // Wait for ASDK reload to finish
   [cn waitUntilAllUpdatesAreProcessed];
   // Force UIKit to read updated data & range controller to update and account for it
-  [cn.view layoutIfNeeded];
+  [cn layoutIfNeeded];
   [self waitForExpectationsWithTimeout:60 handler:nil];
   
   CGFloat contentHeight = cn.view.contentSize.height;
@@ -1070,7 +1070,7 @@
   XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates after -wait call");
 
   // Force UIKit to read updated data & range controller to update and account for it
-  [cn.view layoutIfNeeded];
+  [cn layoutIfNeeded];
 
   CGRect preloadBounds = ({
     CGRect r = CGRectNull;
@@ -1111,7 +1111,7 @@
   cn.primitiveTraitCollection = traitCollection;
   
   [cn waitUntilAllUpdatesAreProcessed];
-  [cn.view layoutIfNeeded];
+  [cn layoutIfNeeded];
   
   // Assert that the new trait collection is picked up by all cell nodes, including ones that were not allocated but are forced to allocate now
   for (NSInteger s = 0; s < cn.numberOfSections; s++) {
