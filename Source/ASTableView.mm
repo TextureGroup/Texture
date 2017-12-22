@@ -246,7 +246,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeDidDeselectRow:1;
     unsigned int tableNodeShouldHighlightRow:1;
     unsigned int tableNodeDidHighlightRow:1;
-    unsigned int tableViewDidUnhighlightRow:1;
     unsigned int tableNodeDidUnhighlightRow:1;
     unsigned int tableViewShouldShowMenuForRow:1;
     unsigned int tableNodeShouldShowMenuForRow:1;
@@ -474,7 +473,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableNodeDidDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeShouldHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldHighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didHighlightRowAtIndexPath:)];
-    _asyncDelegateFlags.tableViewDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableView:didUnhighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didUnhighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewShouldShowMenuForRow = [_asyncDelegate respondsToSelector:@selector(tableView:shouldShowMenuForRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeShouldShowMenuForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldShowMenuForRowAtIndexPath:)];
@@ -1109,11 +1107,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     if (indexPath != nil) {
       return [_asyncDelegate tableNode:tableNode didUnhighlightRowAtIndexPath:indexPath];
     }
-  } else if (_asyncDelegateFlags.tableViewDidUnhighlightRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate tableView:self didUnhighlightRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 }
 
