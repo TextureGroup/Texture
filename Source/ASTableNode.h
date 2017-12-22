@@ -604,20 +604,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode;
 
 /**
- * Informs the delegate that the table view will add the given node
- * at the given index path to the view hierarchy.
- *
- * @param tableView The sender.
- * @param node The node that will be displayed.
- * @param indexPath The index path of the row that will be displayed.
- *
- * @warning AsyncDisplayKit processes table view edits asynchronously. The index path
- *   passed into this method may not correspond to the same item in your data source
- *   if your data source has been updated since the last edit was processed.
- */
-- (void)tableView:(ASTableView *)tableView willDisplayNode:(ASCellNode *)node forRowAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
-
-/**
  * Informs the delegate that the table view did remove the provided node from the view hierarchy.
  * This may be caused by the node scrolling out of view, or by deleting the row
  * or its containing section with @c deleteRowsAtIndexPaths:withRowAnimation: or @c deleteSections:withRowAnimation: .

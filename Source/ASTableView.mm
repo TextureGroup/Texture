@@ -232,7 +232,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int scrollViewWillEndDragging:1;
     unsigned int scrollViewDidEndDecelerating:1;
     unsigned int tableNodeWillDisplayNodeForRow:1;
-    unsigned int tableViewWillDisplayNodeForRow:1;
     unsigned int tableViewWillDisplayNodeForRowDeprecated:1;
     unsigned int tableNodeDidEndDisplayingNodeForRow:1;
     unsigned int tableViewDidEndDisplayingNodeForRow:1;
@@ -470,11 +469,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     
     _asyncDelegateFlags.scrollViewDidScroll = [_asyncDelegate respondsToSelector:@selector(scrollViewDidScroll:)];
 
-    _asyncDelegateFlags.tableViewWillDisplayNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:willDisplayNode:forRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeWillDisplayNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willDisplayRowWithNode:)];
-    if (_asyncDelegateFlags.tableViewWillDisplayNodeForRow == NO) {
-      _asyncDelegateFlags.tableViewWillDisplayNodeForRowDeprecated = [_asyncDelegate respondsToSelector:@selector(tableView:willDisplayNodeForRowAtIndexPath:)];
-    }
+    _asyncDelegateFlags.tableViewWillDisplayNodeForRowDeprecated = [_asyncDelegate respondsToSelector:@selector(tableView:willDisplayNodeForRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidEndDisplayingNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:didEndDisplayingNode:forRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidEndDisplayingNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didEndDisplayingRowWithNode:)];
     _asyncDelegateFlags.scrollViewWillEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillEndDragging:withVelocity:targetContentOffset:)];
@@ -991,10 +987,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (_asyncDelegateFlags.tableNodeWillDisplayNodeForRow) {
     GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     [_asyncDelegate tableNode:tableNode willDisplayRowWithNode:cellNode];
-  } else if (_asyncDelegateFlags.tableViewWillDisplayNodeForRow) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate tableView:self willDisplayNode:cellNode forRowAtIndexPath:indexPath];
   } else if (_asyncDelegateFlags.tableViewWillDisplayNodeForRowDeprecated) {
     [_asyncDelegate tableView:self willDisplayNodeForRowAtIndexPath:indexPath];
   }
