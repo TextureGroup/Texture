@@ -236,7 +236,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeDidEndDisplayingNodeForRow:1;
     unsigned int tableNodeWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForTableNode:1;
-    unsigned int tableViewConstrainedSizeForRow:1;
     unsigned int tableNodeConstrainedSizeForRow:1;
     unsigned int tableViewWillSelectRow:1;
     unsigned int tableNodeWillSelectRow:1;
@@ -475,9 +474,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.shouldBatchFetchForTableNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableNode:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
-    _asyncDelegateFlags.tableViewConstrainedSizeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:constrainedSizeForRowAtIndexPath:)];
-    _asyncDelegateFlags.tableNodeConstrainedSizeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:constrainedSizeForRowAtIndexPath:)];
-
+    
     _asyncDelegateFlags.tableViewWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)];
@@ -1672,14 +1669,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (_asyncDelegateFlags.tableNodeConstrainedSizeForRow) {
     GET_TABLENODE_OR_RETURN(tableNode, constrainedSize);
     ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:tableNode constrainedSizeForRowAtIndexPath:indexPath];
-    // ignore widths in the returned size range (for TableView)
-    constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
-                                      CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height));
-  } else if (_asyncDelegateFlags.tableViewConstrainedSizeForRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableView:self constrainedSizeForRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
     // ignore widths in the returned size range (for TableView)
     constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
                                       CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height));
