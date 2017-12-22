@@ -532,16 +532,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath;
 
-/**
- * Indicator to unlock the data source for data fetching in asyn mode.
- * We should not update the data source until the data source has been unlocked. Otherwise, it will incur data inconsistency or exception
- * due to the data access in async mode.
- *
- * @param tableView The sender.
- * @deprecated The data source is always accessed on the main thread, and this method will not be called.
- */
-- (void)tableViewUnlockDataSource:(ASTableView *)tableView ASDISPLAYNODE_DEPRECATED_MSG("Data source accesses are on the main thread. Method will not be called.");
-
 @end
 
 /**
