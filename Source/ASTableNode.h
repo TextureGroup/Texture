@@ -604,33 +604,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode;
 
 /**
- * Receive a message that the tableView is near the end of its data set and more data should be fetched if necessary.
- *
- * @param tableView The sender.
- * @param context A context object that must be notified when the batch fetch is completed.
- *
- * @discussion You must eventually call -completeBatchFetching: with an argument of YES in order to receive future
- * notifications to do batch fetches. This method is called on a background queue.
- *
- * ASTableView currently only supports batch events for tail loads. If you require a head load, consider implementing a
- * UIRefreshControl.
- */
-- (void)tableView:(ASTableView *)tableView willBeginBatchFetchWithContext:(ASBatchContext *)context ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
-
-/**
- * Tell the tableView if batch fetching should begin.
- *
- * @param tableView The sender.
- *
- * @discussion Use this method to conditionally fetch batches. Example use cases are: limiting the total number of
- * objects that can be fetched or no network connection.
- *
- * If not implemented, the tableView assumes that it should notify its asyncDelegate when batch fetching
- * should occur.
- */
-- (BOOL)shouldBatchFetchForTableView:(ASTableView *)tableView AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
-
-/**
  * Provides the constrained size range for measuring the row at the index path.
  * Note: the widths in the returned size range are ignored!
  *

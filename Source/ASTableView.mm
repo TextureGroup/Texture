@@ -235,8 +235,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableViewWillDisplayNodeForRowDeprecated:1;
     unsigned int tableNodeDidEndDisplayingNodeForRow:1;
     unsigned int tableNodeWillBeginBatchFetch:1;
-    unsigned int tableViewWillBeginBatchFetch:1;
-    unsigned int shouldBatchFetchForTableView:1;
     unsigned int shouldBatchFetchForTableNode:1;
     unsigned int tableViewConstrainedSizeForRow:1;
     unsigned int tableNodeConstrainedSizeForRow:1;
@@ -473,9 +471,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableNodeDidEndDisplayingNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didEndDisplayingRowWithNode:)];
     _asyncDelegateFlags.scrollViewWillEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillEndDragging:withVelocity:targetContentOffset:)];
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
-    _asyncDelegateFlags.tableViewWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(tableView:willBeginBatchFetchWithContext:)];
     _asyncDelegateFlags.tableNodeWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(tableNode:willBeginBatchFetchWithContext:)];
-    _asyncDelegateFlags.shouldBatchFetchForTableView = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableView:)];
     _asyncDelegateFlags.shouldBatchFetchForTableNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableNode:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
@@ -1386,15 +1382,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)canBatchFetch
 {
   // if the delegate does not respond to this method, there is no point in starting to fetch
-  BOOL canFetch = _asyncDelegateFlags.tableNodeWillBeginBatchFetch || _asyncDelegateFlags.tableViewWillBeginBatchFetch;
+  BOOL canFetch = _asyncDelegateFlags.tableNodeWillBeginBatchFetch;
   if (canFetch && _asyncDelegateFlags.shouldBatchFetchForTableNode) {
     GET_TABLENODE_OR_RETURN(tableNode, NO);
     return [_asyncDelegate shouldBatchFetchForTableNode:tableNode];
-  } else if (canFetch && _asyncDelegateFlags.shouldBatchFetchForTableView) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate shouldBatchFetchForTableView:self];
-#pragma clang diagnostic pop
   } else {
     return canFetch;
   }
@@ -1443,13 +1434,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       GET_TABLENODE_OR_RETURN(tableNode, (void)0);
       [_asyncDelegate tableNode:tableNode willBeginBatchFetchWithContext:_batchContext];
-    });
-  } else if (_asyncDelegateFlags.tableViewWillBeginBatchFetch) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      [_asyncDelegate tableView:self willBeginBatchFetchWithContext:_batchContext];
-#pragma clang diagnostic pop
     });
   }
 }
