@@ -269,7 +269,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int numberOfSectionsInTableNode:1;
     unsigned int tableNodeNumberOfRowsInSection:1;
     unsigned int tableViewNumberOfRowsInSection:1;
-    unsigned int tableViewNodeBlockForRow:1;
     unsigned int tableNodeNodeBlockForRow:1;
     unsigned int tableNodeNodeForRow:1;
     unsigned int tableViewCanMoveRow:1;
@@ -429,15 +428,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDataSourceFlags.tableViewNumberOfRowsInSection = [_asyncDataSource respondsToSelector:@selector(tableView:numberOfRowsInSection:)];
     _asyncDataSourceFlags.tableNodeNumberOfRowsInSection = [_asyncDataSource respondsToSelector:@selector(tableNode:numberOfRowsInSection:)];
     _asyncDataSourceFlags.tableNodeNodeForRow = [_asyncDataSource respondsToSelector:@selector(tableNode:nodeForRowAtIndexPath:)];
-    _asyncDataSourceFlags.tableViewNodeBlockForRow = [_asyncDataSource respondsToSelector:@selector(tableView:nodeBlockForRowAtIndexPath:)];
     _asyncDataSourceFlags.tableNodeNodeBlockForRow = [_asyncDataSource respondsToSelector:@selector(tableNode:nodeBlockForRowAtIndexPath:)];
     _asyncDataSourceFlags.tableViewCanMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:canMoveRowAtIndexPath:)];
     _asyncDataSourceFlags.tableViewMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)];
     _asyncDataSourceFlags.sectionIndexMethods = [_asyncDataSource respondsToSelector:@selector(sectionIndexTitlesForTableView:)] && [_asyncDataSource respondsToSelector:@selector(tableView:sectionForSectionIndexTitle:atIndex:)];
     
-    ASDisplayNodeAssert(_asyncDataSourceFlags.tableViewNodeBlockForRow
-                        || _asyncDataSourceFlags.tableNodeNodeBlockForRow
-                        || _asyncDataSourceFlags.tableNodeNodeForRow, @"Data source must implement tableNode:nodeBlockForRowAtIndexPath: or tableNode:nodeForRowAtIndexPath:");
+    ASDisplayNodeAssert(_asyncDataSourceFlags.tableNodeNodeBlockForRow
+                        || _asyncDataSourceFlags.tableNodeNodeForRow,
+                        @"Data source must implement tableNode:nodeBlockForRowAtIndexPath: or tableNode:nodeForRowAtIndexPath:");
     ASDisplayNodeAssert(_asyncDataSourceFlags.tableNodeNumberOfRowsInSection || _asyncDataSourceFlags.tableViewNumberOfRowsInSection, @"Data source must implement tableNode:numberOfRowsInSection:");
   }
   
@@ -1670,10 +1668,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     } else {
       ASDisplayNodeFailAssert(@"Data source returned invalid node from tableNode:nodeForRowAtIndexPath:. Node: %@", node);
     }
-  } else if (_asyncDataSourceFlags.tableViewNodeBlockForRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    block = [_asyncDataSource tableView:self nodeBlockForRowAtIndexPath:indexPath];
   }
 
   // Handle nil node block
