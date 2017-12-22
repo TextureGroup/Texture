@@ -244,7 +244,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeDidHighlightRow:1;
     unsigned int tableNodeDidUnhighlightRow:1;
     unsigned int tableNodeShouldShowMenuForRow:1;
-    unsigned int tableViewCanPerformActionForRow:1;
     unsigned int tableNodeCanPerformActionForRow:1;
     unsigned int tableViewPerformActionForRow:1;
     unsigned int tableNodePerformActionForRow:1;
@@ -466,7 +465,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableNodeDidHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didHighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didUnhighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeShouldShowMenuForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldShowMenuForRowAtIndexPath:)];
-    _asyncDelegateFlags.tableViewCanPerformActionForRow = [_asyncDelegate respondsToSelector:@selector(tableView:canPerformAction:forRowAtIndexPath:withSender:)];
     _asyncDelegateFlags.tableNodeCanPerformActionForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:canPerformAction:forRowAtIndexPath:withSender:)];
     _asyncDelegateFlags.tableViewPerformActionForRow = [_asyncDelegate respondsToSelector:@selector(tableView:performAction:forRowAtIndexPath:withSender:)];
     _asyncDelegateFlags.tableNodePerformActionForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:performAction:forRowAtIndexPath:withSender:)];
@@ -1100,11 +1098,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     if (indexPath != nil) {
       return [_asyncDelegate tableNode:tableNode canPerformAction:action forRowAtIndexPath:indexPath withSender:sender];
     }
-  } else if (_asyncDelegateFlags.tableViewCanPerformActionForRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate tableView:self canPerformAction:action forRowAtIndexPath:indexPath withSender:sender];
-#pragma clang diagnostic pop
   }
   return NO;
 }
