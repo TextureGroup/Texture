@@ -234,7 +234,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeWillDisplayNodeForRow:1;
     unsigned int tableViewWillDisplayNodeForRowDeprecated:1;
     unsigned int tableNodeDidEndDisplayingNodeForRow:1;
-    unsigned int tableViewDidEndDisplayingNodeForRow:1;
     unsigned int tableNodeWillBeginBatchFetch:1;
     unsigned int tableViewWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForTableView:1;
@@ -471,7 +470,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
     _asyncDelegateFlags.tableNodeWillDisplayNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willDisplayRowWithNode:)];
     _asyncDelegateFlags.tableViewWillDisplayNodeForRowDeprecated = [_asyncDelegate respondsToSelector:@selector(tableView:willDisplayNodeForRowAtIndexPath:)];
-    _asyncDelegateFlags.tableViewDidEndDisplayingNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:didEndDisplayingNode:forRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidEndDisplayingNodeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didEndDisplayingRowWithNode:)];
     _asyncDelegateFlags.scrollViewWillEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillEndDragging:withVelocity:targetContentOffset:)];
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
@@ -1021,11 +1019,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     if (ASTableNode *tableNode = self.tableNode) {
     	[_asyncDelegate tableNode:tableNode didEndDisplayingRowWithNode:cellNode];
     }
-  } else if (_asyncDelegateFlags.tableViewDidEndDisplayingNodeForRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate tableView:self didEndDisplayingNode:cellNode forRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 
   [_cellsForVisibilityUpdates removeObject:cell];
