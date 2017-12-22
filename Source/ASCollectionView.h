@@ -414,14 +414,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDataSource.")
-@protocol ASCollectionViewDataSource <ASCollectionDataSource>
-@end
-
-ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
-@protocol ASCollectionViewDelegate <ASCollectionDelegate>
-@end
-
 /**
  * Defines methods that let you coordinate a `UICollectionViewFlowLayout` in combination with an `ASCollectionNode`.
  */
