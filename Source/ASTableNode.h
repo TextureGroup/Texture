@@ -489,6 +489,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol ASTableDataSource <ASCommonTableDataSource, NSObject>
 
+/**
+ * Asks the data source for the number of rows in the given section of the table node.
+ *
+ * @see @c numberOfSectionsInTableView:
+ */
+- (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section;
+
 @optional
 
 /**
@@ -497,13 +504,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @see @c numberOfSectionsInTableView:
  */
 - (NSInteger)numberOfSectionsInTableNode:(ASTableNode *)tableNode;
-
-/**
- * Asks the data source for the number of rows in the given section of the table node.
- *
- * @see @c numberOfSectionsInTableView:
- */
-- (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section;
 
 /**
  * Asks the data source for a block to create a node to represent the row at the given index path.

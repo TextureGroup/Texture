@@ -28,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section ASDISPLAYNODE_DEPRECATED_MSG("Implement -tableNode:numberOfRowsInSection: instead.");
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView ASDISPLAYNODE_DEPRECATED_MSG("Implement numberOfSectionsInTableNode: instead.");
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section;
