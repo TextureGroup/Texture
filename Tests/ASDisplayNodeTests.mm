@@ -2283,7 +2283,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   };
   
   ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
-  [node.view layoutIfNeeded];
+  [node layoutIfNeeded];
   
   NSInteger underlayIndex = [node.subnodes indexOfObjectIdenticalTo:underlay];
   NSInteger overlayIndex = [node.subnodes indexOfObjectIdenticalTo:overlay];
@@ -2304,7 +2304,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   };
   
   ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
-  [node.view layoutIfNeeded];
+  [node layoutIfNeeded];
   
   NSInteger underlayIndex = [node.subnodes indexOfObjectIdenticalTo:underlay];
   NSInteger overlayIndex = [node.subnodes indexOfObjectIdenticalTo:overlay];

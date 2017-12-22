@@ -23,7 +23,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <JGMethodSwizzler/JGMethodSwizzler.h>
 #import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -86,17 +85,17 @@
 
 @implementation ASTableViewTestDelegate
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section
 {
   return 0;
 }
 
-- (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   return nil;
 }
 
-- (ASCellNodeBlock)tableView:(ASTableView *)tableView nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   return nil;
 }
@@ -163,25 +162,24 @@
   }
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSInteger)numberOfSectionsInTableNode:(ASTableNode *)tableNode
 {
   return NumberOfSections;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section
 {
   return _rowsPerSection;
 }
 
-- (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   ASTestTextCellNode *textCellNode = [ASTestTextCellNode new];
   textCellNode.text = indexPath.description;
-  
   return textCellNode;
 }
 
-- (ASCellNodeBlock)tableView:(ASTableView *)tableView nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   if (_nodeBlockForItem) {
     return _nodeBlockForItem(indexPath);
@@ -212,7 +210,7 @@
 
 @implementation ASTableViewFilledDelegate
 
-- (ASSizeRange)tableView:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASSizeRange)tableNode:(ASTableNode *)tableNode constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   return ASSizeRangeMake(CGSizeMake(10, 42));
 }
@@ -220,43 +218,43 @@
 @end
 
 @interface ASTableViewTests : XCTestCase
-@property (nonatomic, retain) ASTableView *testTableView;
 @end
 
 @implementation ASTableViewTests
 
 - (void)testDataSourceImplementsNecessaryMethods
 {
-  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, 100, 400)
-                                                                  style:UITableViewStylePlain];
-  
-  
-  
+  ASTableNode *tableNode = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+  // Force view allocation here to avoid setting data source to pending state
+  __unused ASTableView *tableView = tableNode.view;
+
   ASTableViewFilledDataSource *dataSource = (ASTableViewFilledDataSource *)[NSObject new];
-  XCTAssertThrows((tableView.asyncDataSource = dataSource));
+  XCTAssertThrows((tableNode.dataSource = dataSource));
   
   dataSource = [ASTableViewFilledDataSource new];
-  XCTAssertNoThrow((tableView.asyncDataSource = dataSource));
+  XCTAssertNoThrow((tableNode.dataSource = dataSource));
 }
 
 - (void)testConstrainedSizeForRowAtIndexPath
 {
-  // Initial width of the table view is non-zero and all nodes are measured with this size.
+  ASTableNode *tableNode = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+  // Force view allocation here to avoid fast path in the coming reload data pass
+  __unused ASTableView *tableView = tableNode.view;
+  // Initial width of the table node is non-zero and all nodes are measured with this size.
   // Any subsequent size change must trigger a relayout.
   // Width and height are swapped so that a later size change will simulate a rotation
-  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, 100, 400)
-                                                                  style:UITableViewStylePlain];
-  
+  tableNode.frame = CGRectMake(0, 0, 100, 400);
+
   ASTableViewFilledDelegate *delegate = [ASTableViewFilledDelegate new];
   ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
 
-  tableView.asyncDelegate = delegate;
-  tableView.asyncDataSource = dataSource;
+  tableNode.delegate = delegate;
+  tableNode.dataSource = dataSource;
   
-  [tableView reloadData];
-  [tableView waitUntilAllUpdatesAreCommitted];
-  [tableView setNeedsLayout];
-  [tableView layoutIfNeeded];
+  [tableNode reloadData];
+  [tableNode waitUntilAllUpdatesAreProcessed];
+  [tableNode setNeedsLayout];
+  [tableNode layoutIfNeeded];
   
   CGFloat separatorHeight = 1.0 / ASScreenScale();
   for (int section = 0; section < NumberOfSections; section++) {
@@ -270,31 +268,31 @@
 }
 
 // TODO: Convert this to ARC.
-- (void)DISABLED_testTableViewDoesNotRetainItselfAndDelegate
-{
-  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectZero style:UITableViewStylePlain];
-  
-  __block BOOL tableViewDidDealloc = NO;
-  tableView.willDeallocBlock = ^(ASTableView *v){
-    tableViewDidDealloc = YES;
-  };
-  
-  ASTableViewTestDelegate *delegate = [[ASTableViewTestDelegate alloc] init];
-  
-  __block BOOL delegateDidDealloc = NO;
-  delegate.willDeallocBlock = ^(ASTableViewTestDelegate *d){
-    delegateDidDealloc = YES;
-  };
-  
-  tableView.asyncDataSource = delegate;
-  tableView.asyncDelegate = delegate;
-
-//  [delegate release];
-  XCTAssertTrue(delegateDidDealloc, @"unexpected delegate lifetime:%@", delegate);
-  
-//  XCTAssertNoThrow([tableView release], @"unexpected exception when deallocating table view:%@", tableView);
-  XCTAssertTrue(tableViewDidDealloc, @"unexpected table view lifetime:%@", tableView);
-}
+//- (void)DISABLED_testTableViewDoesNotRetainItselfAndDelegate
+//{
+//  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectZero style:UITableViewStylePlain];
+//
+//  __block BOOL tableViewDidDealloc = NO;
+//  tableView.willDeallocBlock = ^(ASTableView *v){
+//    tableViewDidDealloc = YES;
+//  };
+//
+//  ASTableViewTestDelegate *delegate = [[ASTableViewTestDelegate alloc] init];
+//
+//  __block BOOL delegateDidDealloc = NO;
+//  delegate.willDeallocBlock = ^(ASTableViewTestDelegate *d){
+//    delegateDidDealloc = YES;
+//  };
+//
+//  tableView.asyncDataSource = delegate;
+//  tableView.asyncDelegate = delegate;
+//
+////  [delegate release];
+//  XCTAssertTrue(delegateDidDealloc, @"unexpected delegate lifetime:%@", delegate);
+//
+////  XCTAssertNoThrow([tableView release], @"unexpected exception when deallocating table view:%@", tableView);
+//  XCTAssertTrue(tableViewDidDealloc, @"unexpected table view lifetime:%@", tableView);
+//}
 
 - (NSIndexSet *)randomIndexSet
 {
@@ -322,66 +320,66 @@
   return indexPaths;
 }
 
-- (void)DISABLED_testReloadData
-{
-  // Keep the viewport moderately sized so that new cells are loaded on scrolling
-  ASTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, 100, 500)
-                                                              style:UITableViewStylePlain];
-  
-  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
-  
-  tableView.asyncDelegate = dataSource;
-  tableView.asyncDataSource = dataSource;
-
-  XCTestExpectation *reloadDataExpectation = [self expectationWithDescription:@"reloadData"];
-  
-  [tableView reloadDataWithCompletion:^{
-    NSLog(@"*** Reload Complete ***");
-    [reloadDataExpectation fulfill];
-  }];
-
-  [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
-    if (error) {
-      XCTFail(@"Expectation failed: %@", error);
-    }
-  }];
-  
-  for (int i = 0; i < NumberOfReloadIterations; ++i) {
-    UITableViewRowAnimation rowAnimation = (arc4random_uniform(2) == 0 ? UITableViewRowAnimationMiddle : UITableViewRowAnimationNone);
-    BOOL animatedScroll               = (arc4random_uniform(2) == 0 ? YES : NO);
-    BOOL reloadRowsInsteadOfSections  = (arc4random_uniform(2) == 0 ? YES : NO);
-    NSTimeInterval runLoopDelay       = ((arc4random_uniform(2) == 0) ? (1.0 / (1 + arc4random_uniform(500))) : 0);
-    BOOL useBeginEndUpdates           = (arc4random_uniform(3) == 0 ? YES : NO);
-
-    // instrument our instrumentation ;)
-    //NSLog(@"Iteration %03d: %@|%@|%@|%@|%g", i, (rowAnimation == UITableViewRowAnimationNone) ? @"NONE  " : @"MIDDLE", animatedScroll ? @"ASCR" : @"    ", reloadRowsInsteadOfSections ? @"ROWS" : @"SECS", useBeginEndUpdates ? @"BEGEND" : @"      ", runLoopDelay);
-
-    if (useBeginEndUpdates) {
-      [tableView beginUpdates];
-    }
-    
-    if (reloadRowsInsteadOfSections) {
-      NSArray *indexPaths = [self randomIndexPathsExisting:YES rowCount:dataSource.rowsPerSection];
-      //NSLog(@"reloading rows: %@", indexPaths);
-      [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:rowAnimation];
-    } else {
-      NSIndexSet *sections = [self randomIndexSet];
-      //NSLog(@"reloading sections: %@", sections);
-      [tableView reloadSections:sections withRowAnimation:rowAnimation];
-    }
-    
-    [tableView setContentOffset:CGPointMake(0, arc4random_uniform(tableView.contentSize.height - tableView.bounds.size.height)) animated:animatedScroll];
-    
-    if (runLoopDelay > 0) {
-      // Run other stuff on the main queue for between 2ms and 1000ms.
-      [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:runLoopDelay]];
-    }
-    
-    if (useBeginEndUpdates) {
-      [tableView endUpdates];
-    }
-  }
-}
+//- (void)DISABLED_testReloadData
+//{
+//  // Keep the viewport moderately sized so that new cells are loaded on scrolling
+//  ASTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, 100, 500)
+//                                                              style:UITableViewStylePlain];
+//
+//  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+//
+//  tableView.asyncDelegate = dataSource;
+//  tableView.asyncDataSource = dataSource;
+//
+//  XCTestExpectation *reloadDataExpectation = [self expectationWithDescription:@"reloadData"];
+//
+//  [tableView reloadDataWithCompletion:^{
+//    NSLog(@"*** Reload Complete ***");
+//    [reloadDataExpectation fulfill];
+//  }];
+//
+//  [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
+//    if (error) {
+//      XCTFail(@"Expectation failed: %@", error);
+//    }
+//  }];
+//
+//  for (int i = 0; i < NumberOfReloadIterations; ++i) {
+//    UITableViewRowAnimation rowAnimation = (arc4random_uniform(2) == 0 ? UITableViewRowAnimationMiddle : UITableViewRowAnimationNone);
+//    BOOL animatedScroll               = (arc4random_uniform(2) == 0 ? YES : NO);
+//    BOOL reloadRowsInsteadOfSections  = (arc4random_uniform(2) == 0 ? YES : NO);
+//    NSTimeInterval runLoopDelay       = ((arc4random_uniform(2) == 0) ? (1.0 / (1 + arc4random_uniform(500))) : 0);
+//    BOOL useBeginEndUpdates           = (arc4random_uniform(3) == 0 ? YES : NO);
+//
+//    // instrument our instrumentation ;)
+//    //NSLog(@"Iteration %03d: %@|%@|%@|%@|%g", i, (rowAnimation == UITableViewRowAnimationNone) ? @"NONE  " : @"MIDDLE", animatedScroll ? @"ASCR" : @"    ", reloadRowsInsteadOfSections ? @"ROWS" : @"SECS", useBeginEndUpdates ? @"BEGEND" : @"      ", runLoopDelay);
+//
+//    if (useBeginEndUpdates) {
+//      [tableView beginUpdates];
+//    }
+//
+//    if (reloadRowsInsteadOfSections) {
+//      NSArray *indexPaths = [self randomIndexPathsExisting:YES rowCount:dataSource.rowsPerSection];
+//      //NSLog(@"reloading rows: %@", indexPaths);
+//      [tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:rowAnimation];
+//    } else {
+//      NSIndexSet *sections = [self randomIndexSet];
+//      //NSLog(@"reloading sections: %@", sections);
+//      [tableView reloadSections:sections withRowAnimation:rowAnimation];
+//    }
+//
+//    [tableView setContentOffset:CGPointMake(0, arc4random_uniform(tableView.contentSize.height - tableView.bounds.size.height)) animated:animatedScroll];
+//
+//    if (runLoopDelay > 0) {
+//      // Run other stuff on the main queue for between 2ms and 1000ms.
+//      [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:runLoopDelay]];
+//    }
+//
+//    if (useBeginEndUpdates) {
+//      [tableView endUpdates];
+//    }
+//  }
+//}
 
 - (void)testRelayoutAllNodesWithNonZeroSizeInitially
 {
@@ -394,10 +392,13 @@
   
   ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   tableView.asyncDelegate = dataSource;
   tableView.asyncDataSource = dataSource;
 
   [tableView layoutIfNeeded];
+#pragma clang diagnostic pop
   
   XCTAssertEqual(tableView.testDataController.numberOfAllNodesRelayouts, 0);
   [self triggerSizeChangeAndAssertRelayoutAllNodesForTableView:tableView newSize:tableViewFinalSize];
@@ -405,6 +406,8 @@
 
 - (void)testRelayoutVisibleRowsWhenEditingModeIsChanged
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   CGSize tableViewSize = CGSizeMake(100, 500);
   ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, tableViewSize.width, tableViewSize.height)
                                                                 style:UITableViewStylePlain];
@@ -418,6 +421,7 @@
       return textCellNode;
     };
   };
+
   tableView.asyncDelegate = dataSource;
   tableView.asyncDataSource = dataSource;
 
@@ -477,64 +481,71 @@
       XCTFail(@"Expectation failed: %@", error);
     }
   }];
+#pragma clang diagnostic pop
 }
 
-- (void)DISABLED_testRelayoutRowsAfterEditingModeIsChangedAndTheyBecomeVisible
-{
-  CGSize tableViewSize = CGSizeMake(100, 500);
-  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, tableViewSize.width, tableViewSize.height)
-                                                                  style:UITableViewStylePlain];
-  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
-  
-  tableView.asyncDelegate = dataSource;
-  tableView.asyncDataSource = dataSource;
-  
-  [self triggerFirstLayoutMeasurementForTableView:tableView];
-  
-  // Cause table view to enter editing mode and then scroll to the bottom.
-  // The last node should be re-measured on main thread with the new (smaller) content view width.
-  NSIndexPath *lastRowIndexPath = [NSIndexPath indexPathForRow:(dataSource.rowsPerSection - 1) inSection:(NumberOfSections - 1)];
-  XCTestExpectation *relayoutExpectation = [self expectationWithDescription:@"relayout"];
-  [tableView beginUpdates];
-  [tableView setEditing:YES];
-  [tableView setContentOffset:CGPointMake(0, CGFLOAT_MAX) animated:YES];
-  [tableView endUpdatesAnimated:YES completion:^(BOOL completed) {
-    ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:lastRowIndexPath];
-    XCTAssertEqual(node.numberOfLayoutsOnMainThread, 1);
-    XCTAssertLessThan(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
-    [relayoutExpectation fulfill];
-  }];
-  [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
-    if (error) {
-      XCTFail(@"Expectation failed: %@", error);
-    }
-  }];
-}
+//- (void)DISABLED_testRelayoutRowsAfterEditingModeIsChangedAndTheyBecomeVisible
+//{
+//  CGSize tableViewSize = CGSizeMake(100, 500);
+//  ASTestTableView *tableView = [[ASTestTableView alloc] __initWithFrame:CGRectMake(0, 0, tableViewSize.width, tableViewSize.height)
+//                                                                  style:UITableViewStylePlain];
+//  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+//
+//  tableView.asyncDelegate = dataSource;
+//  tableView.asyncDataSource = dataSource;
+//
+//  [self triggerFirstLayoutMeasurementForTableView:tableView];
+//
+//  // Cause table view to enter editing mode and then scroll to the bottom.
+//  // The last node should be re-measured on main thread with the new (smaller) content view width.
+//  NSIndexPath *lastRowIndexPath = [NSIndexPath indexPathForRow:(dataSource.rowsPerSection - 1) inSection:(NumberOfSections - 1)];
+//  XCTestExpectation *relayoutExpectation = [self expectationWithDescription:@"relayout"];
+//  [tableView beginUpdates];
+//  [tableView setEditing:YES];
+//  [tableView setContentOffset:CGPointMake(0, CGFLOAT_MAX) animated:YES];
+//  [tableView endUpdatesAnimated:YES completion:^(BOOL completed) {
+//    ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:lastRowIndexPath];
+//    XCTAssertEqual(node.numberOfLayoutsOnMainThread, 1);
+//    XCTAssertLessThan(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
+//    [relayoutExpectation fulfill];
+//  }];
+//  [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
+//    if (error) {
+//      XCTFail(@"Expectation failed: %@", error);
+//    }
+//  }];
+//}
 
 - (void)testIndexPathForNode
 {
-  CGSize tableViewSize = CGSizeMake(100, 500);
-  ASTestTableView *tableView = [[ASTestTableView alloc] initWithFrame:CGRectMake(0, 0, tableViewSize.width, tableViewSize.height)
-                                                                style:UITableViewStylePlain];
+  ASTableNode *tableNode = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+  // Force view allocation here to avoid fast path in the coming reloadData call
+  __unused ASTableView *tableView = tableNode.view;
+
+  CGSize tableNodeSize = CGSizeMake(100, 500);
+  tableNode.frame = CGRectMake(0, 0, tableNodeSize.width, tableNodeSize.height);
+
   ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
 
-  tableView.asyncDelegate = dataSource;
-  tableView.asyncDataSource = dataSource;
-  
-  [tableView reloadDataWithCompletion:^{
+  tableNode.delegate = dataSource;
+  tableNode.dataSource = dataSource;
+
+  [tableNode reloadDataWithCompletion:^{
     for (NSUInteger i = 0; i < NumberOfSections; i++) {
       for (NSUInteger j = 0; j < dataSource.rowsPerSection; j++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:j inSection:i];
         ASCellNode *cellNode = [tableView nodeForRowAtIndexPath:indexPath];
-        NSIndexPath *reportedIndexPath = [tableView indexPathForNode:cellNode];
+        NSIndexPath *reportedIndexPath = [tableNode indexPathForNode:cellNode];
         XCTAssertEqual(indexPath.row, reportedIndexPath.row);
       }
     }
-    self.testTableView = nil;
   }];
 }
 
-- (void)triggerFirstLayoutMeasurementForTableView:(ASTableView *)tableView{
+- (void)triggerFirstLayoutMeasurementForTableView:(ASTableView *)tableView
+{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   XCTestExpectation *reloadDataExpectation = [self expectationWithDescription:@"reloadData"];
   [tableView reloadDataWithCompletion:^{
     for (int section = 0; section < NumberOfSections; section++) {
@@ -555,10 +566,13 @@
   [tableView setNeedsLayout];
   [tableView layoutIfNeeded];
   [tableView waitUntilAllUpdatesAreCommitted];
+#pragma clang diagnostic pop
 }
 
 - (void)triggerSizeChangeAndAssertRelayoutAllNodesForTableView:(ASTestTableView *)tableView newSize:(CGSize)newSize
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   XCTestExpectation *nodesMeasuredUsingNewConstrainedSizeExpectation = [self expectationWithDescription:@"nodesMeasuredUsingNewConstrainedSize"];
   
   [tableView beginUpdates];
@@ -586,6 +600,7 @@
       XCTFail(@"Expectation failed: %@", error);
     }
   }];
+#pragma clang diagnostic pop
 }
 
 /**
@@ -703,10 +718,10 @@
   // All nodes loaded and measured during the initial reloadData used an outdated constrained width (i.e full width: 320).
   // So we need to force a new layout pass so that the table will pick up a new constrained size and apply to its node.
   [node setNeedsLayout];
-  [node.view layoutIfNeeded];
+  [node layoutIfNeeded];
   [node waitUntilAllUpdatesAreProcessed];
 
-  UITableViewCell *cell = [node.view cellForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  UITableViewCell *cell = [node cellForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   XCTAssertNotNil(cell);
 
   CGFloat cellWidth = cell.contentView.frame.size.width;
@@ -792,7 +807,7 @@
   node.dataSource = ds;
 
   // Force node to load initial data.
-  [node.view layoutIfNeeded];
+  [node layoutIfNeeded];
 
   // Submit an invalid update, ensure exception name matches and that data source is included in the reason.
   @try {
@@ -807,12 +822,12 @@
 - (void)testAutomaticallyAdjustingContentOffset
 {
   ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
-  node.view.automaticallyAdjustsContentOffset = YES;
+  node.automaticallyAdjustsContentOffset = YES;
   node.bounds = CGRectMake(0, 0, 100, 100);
   ASTableViewFilledDataSource *ds = [[ASTableViewFilledDataSource alloc] init];
   node.dataSource = ds;
   
-  [node.view layoutIfNeeded];
+  [node layoutIfNeeded];
   [node waitUntilAllUpdatesAreProcessed];
   CGFloat rowHeight = [node.view rectForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]].size.height;
   // Scroll to row (0,1) + 10pt

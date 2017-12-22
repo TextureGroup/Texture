@@ -103,7 +103,7 @@
   displayNode.frame = {.size = nodeSize};
   
   // Trigger initial layout pass without a measurement pass before
-  [displayNode.view layoutIfNeeded];
+  [displayNode layoutIfNeeded];
   XCTAssertEqual(numberOfLayoutSpecThatFitsCalls, 1, @"Should measure during layout if not measured");
   
   [displayNode layoutThatFits:ASSizeRangeMake(nodeSize, nodeSize)];
@@ -167,7 +167,7 @@
     [rootNode layoutThatFits:ASSizeRangeMake(kSize)];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-      XCTAssertNoThrow([rootNode.view layoutIfNeeded]);
+      XCTAssertNoThrow([rootNode layoutIfNeeded]);
       [expectation fulfill];
     });
   });
