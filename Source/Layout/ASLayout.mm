@@ -26,7 +26,7 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASRectTable.h>
+#import <AsyncDisplayKit/ASRectMap.h>
 
 CGPoint const ASPointNull = {NAN, NAN};
 
@@ -86,7 +86,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsFlattened(ASLayout *la
  */
 @property (nonatomic, strong) NSMutableArray<id<ASLayoutElement>> *sublayoutLayoutElements;
 
-@property (nonatomic, strong, readonly) ASRectTable<id<ASLayoutElement>, id> *elementToRectTable;
+@property (nonatomic, strong, readonly) ASRectMap *elementToRectMap;
 
 @end
 
@@ -143,9 +143,9 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     _sublayouts = sublayouts != nil ? [sublayouts copy] : @[];
 
     if (_sublayouts.count > 0) {
-      _elementToRectTable = [ASRectTable rectTableForWeakObjectPointers];
+      _elementToRectMap = [ASRectMap rectMapForWeakObjectPointers];
       for (ASLayout *layout in sublayouts) {
-        [_elementToRectTable setRect:layout.frame forKey:layout.layoutElement];
+        [_elementToRectMap setRect:layout.frame forKey:layout.layoutElement];
       }
     }
     
@@ -303,7 +303,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 - (CGRect)frameForElement:(id<ASLayoutElement>)layoutElement
 {
-  return _elementToRectTable ? [_elementToRectTable rectForKey:layoutElement] : CGRectNull;
+  return _elementToRectMap ? [_elementToRectMap rectForKey:layoutElement] : CGRectNull;
 }
 
 - (CGRect)frame
