@@ -236,7 +236,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForTableNode:1;
     unsigned int tableNodeConstrainedSizeForRow:1;
-    unsigned int tableViewWillSelectRow:1;
     unsigned int tableNodeWillSelectRow:1;
     unsigned int tableViewDidSelectRow:1;
     unsigned int tableNodeDidSelectRow:1;
@@ -463,7 +462,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
 
-    _asyncDelegateFlags.tableViewWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didSelectRowAtIndexPath:)];
@@ -1012,11 +1010,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       result = [self convertIndexPathFromTableNode:result waitingIfNeeded:YES];
       return result;
     }
-  } else if (_asyncDelegateFlags.tableViewWillSelectRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate tableView:self willSelectRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   } else {
     return indexPath;
   }
