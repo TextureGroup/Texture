@@ -245,7 +245,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableViewDidDeselectRow:1;
     unsigned int tableNodeDidDeselectRow:1;
     unsigned int tableNodeShouldHighlightRow:1;
-    unsigned int tableViewDidHighlightRow:1;
     unsigned int tableNodeDidHighlightRow:1;
     unsigned int tableViewDidUnhighlightRow:1;
     unsigned int tableNodeDidUnhighlightRow:1;
@@ -474,7 +473,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableViewDidDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableView:didDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeShouldHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldHighlightRowAtIndexPath:)];
-    _asyncDelegateFlags.tableViewDidHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableView:didHighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didHighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableView:didUnhighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didUnhighlightRowAtIndexPath:)];
@@ -1100,11 +1098,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     if (indexPath != nil) {
       return [_asyncDelegate tableNode:tableNode didHighlightRowAtIndexPath:indexPath];
     }
-  } else if (_asyncDelegateFlags.tableViewDidHighlightRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    [_asyncDelegate tableView:self didHighlightRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
 }
 
