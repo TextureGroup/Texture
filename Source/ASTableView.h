@@ -242,12 +242,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASTableDataSource.")
-@protocol ASTableViewDataSource <ASTableDataSource>
-@end
-
-ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASTableDelegate.")
-@protocol ASTableViewDelegate <ASTableDelegate>
-@end
-
 NS_ASSUME_NONNULL_END
