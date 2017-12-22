@@ -603,21 +603,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode;
 
-/**
- * Informs the delegate that the table view will add the node
- * at the given index path to the view hierarchy.
- *
- * @param tableView The sender.
- * @param indexPath The index path of the row that will be displayed.
- *
- * @warning AsyncDisplayKit processes table view edits asynchronously. The index path
- *   passed into this method may not correspond to the same item in your data source
- *   if your data source has been updated since the last edit was processed.
- *
- * This method is deprecated. Use @c tableView:willDisplayNode:forRowAtIndexPath: instead.
- */
-- (void)tableView:(ASTableView *)tableView willDisplayNodeForRowAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
-
 @end
 
 @interface ASTableNode (Deprecated)
