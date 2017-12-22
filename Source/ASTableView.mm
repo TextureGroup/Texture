@@ -239,7 +239,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeWillSelectRow:1;
     unsigned int tableViewDidSelectRow:1;
     unsigned int tableNodeDidSelectRow:1;
-    unsigned int tableViewWillDeselectRow:1;
     unsigned int tableNodeWillDeselectRow:1;
     unsigned int tableViewDidDeselectRow:1;
     unsigned int tableNodeDidDeselectRow:1;
@@ -465,7 +464,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableNodeWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didSelectRowAtIndexPath:)];
-    _asyncDelegateFlags.tableViewWillDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableView:willDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeWillDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableView:didDeselectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidDeselectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didDeselectRowAtIndexPath:)];
@@ -1044,11 +1042,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       result = [self convertIndexPathFromTableNode:result waitingIfNeeded:YES];
       return result;
     }
-  } else if (_asyncDelegateFlags.tableViewWillDeselectRow) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDelegate tableView:self willDeselectRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
   }
   return indexPath;
 }
