@@ -81,8 +81,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSInteger)tableView:(UITableView *)tableView indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath;
 
-- (void)tableView:(UITableView *)tableView performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender ASDISPLAYNODE_DEPRECATED_MSG("Implement -tableNode:performAction:forRowAtIndexPath:withSender: instead.");
-
 @end
 
 NS_ASSUME_NONNULL_END
