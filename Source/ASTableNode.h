@@ -533,18 +533,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
- * Similar to -tableView:cellForRowAtIndexPath:.
- *
- * @param tableView The sender.
- *
- * @param indexPath The index path of the requested node.
- *
- * @return a node for display at this indexpath. This will be called on the main thread and should not implement reuse (it will be called once per row). Unlike UITableView's version, this method
- * is not called when the row is about to display.
- */
-- (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
-
-/**
  * Similar to -tableView:nodeForRowAtIndexPath:
  * This method takes precedence over tableView:nodeForRowAtIndexPath: if implemented.
  * @param tableView The sender.
