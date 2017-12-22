@@ -18,7 +18,7 @@
 - [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 - Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
 - [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
-- [API CHANGES] Remove deprecated APIs in collection-related classes/protocols [Huy Nguyen](https://github.com/nguyenhuy) [#722](https://github.com/TextureGroup/Texture/pull/722)
+- [API CHANGES] Remove deprecated APIs in collection protocols [Huy Nguyen](https://github.com/nguyenhuy) [#722](https://github.com/TextureGroup/Texture/pull/722)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
