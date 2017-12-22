@@ -259,7 +259,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } _asyncDelegateFlags;
   
   struct {
-    unsigned int numberOfSectionsInTableView:1;
     unsigned int numberOfSectionsInTableNode:1;
     unsigned int tableNodeNodeBlockForRow:1;
     unsigned int tableNodeNodeForRow:1;
@@ -415,7 +414,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDataSource = asyncDataSource;
     _proxyDataSource = [[ASTableViewProxy alloc] initWithTarget:_asyncDataSource interceptor:self];
     
-    _asyncDataSourceFlags.numberOfSectionsInTableView = [_asyncDataSource respondsToSelector:@selector(numberOfSectionsInTableView:)];
     _asyncDataSourceFlags.numberOfSectionsInTableNode = [_asyncDataSource respondsToSelector:@selector(numberOfSectionsInTableNode:)];
     _asyncDataSourceFlags.tableNodeNodeForRow = [_asyncDataSource respondsToSelector:@selector(tableNode:nodeForRowAtIndexPath:)];
     _asyncDataSourceFlags.tableNodeNodeBlockForRow = [_asyncDataSource respondsToSelector:@selector(tableNode:nodeBlockForRowAtIndexPath:)];
@@ -1678,11 +1676,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (_asyncDataSourceFlags.numberOfSectionsInTableNode) {
     GET_TABLENODE_OR_RETURN(tableNode, 0);
     return [_asyncDataSource numberOfSectionsInTableNode:tableNode];
-  } else if (_asyncDataSourceFlags.numberOfSectionsInTableView) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [_asyncDataSource numberOfSectionsInTableView:self];
-#pragma clang diagnostic pop
   } else {
     return 1; // default section number
   }

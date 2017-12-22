@@ -501,7 +501,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Asks the data source for the number of sections in the table node.
  *
- * @see @c numberOfSectionsInTableView:
+ * @param tableNode The table node requesting this information
+ *
+ * @return the number of sections in the table node.
+ *
+ * @discussion If this method is not implemented, the table node uses a default value of 1.
  */
 - (NSInteger)numberOfSectionsInTableNode:(ASTableNode *)tableNode;
 
