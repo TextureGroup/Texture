@@ -42,6 +42,16 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  */
 void ASDisableLogging(void);
 
+/**
+ * Restore logging that has been runtime-disabled via ASDisableLogging().
+ *
+ * Logging can be disabled at runtime using the ASDisableLogging() function.
+ * This command restores logging to the level provided in the build
+ * configuration. This can be used in conjunction with ASDisableLogging()
+ * to allow logging to be toggled off and back on at runtime.
+ */
+void ASEnableLogging(void);
+
 /// Log for general node events e.g. interfaceState, didLoad.
 #define ASNodeLogEnabled 1
 os_log_t ASNodeLog(void);

@@ -25,12 +25,13 @@ final class WebService {
 		URLSession.shared.dataTask(with: resource.url) { data, response, error in
 			// Check for errors in responses.
 			let result = self.checkForNetworkErrors(data, response, error)
-			
-			switch result {
-			case .success(let data):
-				completion(resource.parse(data))
-			case .failure(let error):
-				completion(.failure(error))
+			DispatchQueue.main.async {
+				switch result {
+				case .success(let data):
+					completion(resource.parse(data))
+				case .failure(let error):
+					completion(.failure(error))
+				}
 			}
 		}.resume()
 	}
@@ -49,7 +50,7 @@ extension WebService {
 			}
 		}
 		
-		if let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode <= 299 {
+		if let response = response as? HTTPURLResponse, response.statusCode <= 200 && response.statusCode >= 299 {
 			return .failure((.invalidStatusCode("Request returned status code other than 2xx \(response)")))
 		}
 		
