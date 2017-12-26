@@ -1,6 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
-- [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc)
+- [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)
 - [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
