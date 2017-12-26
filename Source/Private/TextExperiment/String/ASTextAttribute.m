@@ -63,7 +63,9 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
     dic[(id)kCTSuperscriptAttributeName] = UIKit; //it's a CoreText attrubite, but only supported by UIKit...
     dic[NSVerticalGlyphFormAttributeName] = All;
     dic[(id)kCTGlyphInfoAttributeName] = CoreText_ASText;
+#if TARGET_OS_IOS
     dic[(id)kCTCharacterShapeAttributeName] = CoreText_ASText;
+#endif
     dic[(id)kCTRunDelegateAttributeName] = CoreText_ASText;
     dic[(id)kCTBaselineClassAttributeName] = CoreText_ASText;
     dic[(id)kCTBaselineInfoAttributeName] = CoreText_ASText;

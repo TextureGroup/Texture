@@ -228,6 +228,7 @@ NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedSt
   if (CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(minimumLineHeight), &minimumLineHeight))
     newParagraphStyle.minimumLineHeight = minimumLineHeight;
 
+#if TARGET_OS_IOS
   // kCTParagraphStyleSpecifierLineSpacing -> lineSpacing
   // Note that kCTParagraphStyleSpecifierLineSpacing is deprecated and will die soon. We should not be using it.
 #pragma clang diagnostic push
@@ -236,6 +237,7 @@ NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedSt
     if (CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierLineSpacing, sizeof(lineSpacing), &lineSpacing))
         newParagraphStyle.lineSpacing = lineSpacing;
 #pragma clang diagnostic pop
+#endif
 
   // kCTParagraphStyleSpecifierParagraphSpacing -> paragraphSpacing
   CGFloat paragraphSpacing;

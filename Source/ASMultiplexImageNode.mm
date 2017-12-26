@@ -16,7 +16,10 @@
 //
 
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
+
+#if TARGET_OS_TVOS
 #import <AssetsLibrary/AssetsLibrary.h>
+#endif
 
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>

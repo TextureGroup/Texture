@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #if TARGET_OS_TV
 #import <AsyncDisplayKit/ASImageNode+tvOS.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 
 #import <GLKit/GLKit.h>
 #import <tgmath.h>

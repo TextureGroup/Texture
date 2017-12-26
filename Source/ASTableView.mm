@@ -116,8 +116,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     self.backgroundColor = node.backgroundColor;
     self.selectionStyle = node.selectionStyle;
     self.selectedBackgroundView = node.selectedBackgroundView;
+#if TARGET_OS_IOS
     self.separatorInset = node.separatorInset;
-    self.selectionStyle = node.selectionStyle;
+#endif
     self.accessoryType = node.accessoryType;
     
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
@@ -918,6 +919,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASCellNode *node = [_dataController.visibleMap elementForItemAtIndexPath:indexPath].node;
   CGFloat height = node.calculatedSize.height;
   
+#if TARGET_OS_IOS
   /**
    * Weirdly enough, Apple expects the return value here to _include_ the height
    * of the separator, if there is one! So if our node wants to be 43.5, we need
@@ -927,6 +929,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (tableView.separatorStyle != UITableViewCellSeparatorStyleNone) {
     height += 1.0 / ASScreenScale();
   }
+#endif
+  
   return height;
 }
 
@@ -1754,6 +1758,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
   CGRect rect = [self rectForRowAtIndexPath:indexPath];
   
+#if TARGET_OS_IOS
   /**
    * Weirdly enough, Apple expects the return value in tableView:heightForRowAtIndexPath: to _include_ the height
    * of the separator, if there is one! So if rectForRow would return 44.0 we need to use 43.5.
@@ -1761,6 +1766,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (self.separatorStyle != UITableViewCellSeparatorStyleNone) {
     rect.size.height -= 1.0 / ASScreenScale();
   }
+#endif
 
   return (fabs(rect.size.height - size.height) < FLT_EPSILON);
 }

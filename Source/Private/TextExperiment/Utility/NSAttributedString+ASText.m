@@ -600,7 +600,9 @@ return style. _attr_;
   dispatch_once(&onceToken, ^{
     failSet = [NSMutableSet new];
     [failSet addObject:(id)kCTGlyphInfoAttributeName];
+#if TARGET_OS_IOS
     [failSet addObject:(id)kCTCharacterShapeAttributeName];
+#endif
     [failSet addObject:(id)kCTLanguageAttributeName];
     [failSet addObject:(id)kCTRunDelegateAttributeName];
     [failSet addObject:(id)kCTBaselineClassAttributeName];
