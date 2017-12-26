@@ -114,10 +114,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   if (node) {
     self.backgroundColor = node.backgroundColor;
-    self.selectionStyle = node.selectionStyle;
     self.selectedBackgroundView = node.selectedBackgroundView;
     self.separatorInset = node.separatorInset;
-    self.selectionStyle = node.selectionStyle;
+    self.selectionStyle = node.selectionStyle; 
+    self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
     
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)

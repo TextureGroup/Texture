@@ -58,6 +58,7 @@
 
   // Use UITableViewCell defaults
   _selectionStyle = UITableViewCellSelectionStyleDefault;
+  _focusStyle = UITableViewCellFocusStyleDefault;
   self.clipsToBounds = YES;
 
   return self;
