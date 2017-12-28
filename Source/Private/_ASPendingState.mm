@@ -1223,7 +1223,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
-  if (AS_AVAILABLE_IOS(11)) {
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     pendingState.accessibilityAttributedLabel = view.accessibilityAttributedLabel;
     pendingState.accessibilityAttributedHint = view.accessibilityAttributedHint;
     pendingState.accessibilityAttributedValue = view.accessibilityAttributedValue;
