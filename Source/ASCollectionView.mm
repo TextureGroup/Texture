@@ -1974,7 +1974,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 /// The UIKit version of this method is only available on iOS >= 9
 - (NSArray<NSIndexPath *> *)asdk_indexPathsForVisibleSupplementaryElementsOfKind:(NSString *)kind
 {
-  if (AS_AVAILABLE_IOS(9)) {
+  if (AS_AVAILABLE_IOS_TVOS(9, 9)) {
     return [self indexPathsForVisibleSupplementaryElementsOfKind:kind];
   }
 

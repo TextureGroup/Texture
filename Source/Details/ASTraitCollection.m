@@ -67,7 +67,7 @@ BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTr
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
 ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceIdiom(UIUserInterfaceIdiom idiom) {
-  if (AS_AVAILABLE_IOS(9)) {
+  if (AS_AVAILABLE_IOS_TVOS(9, 9)) {
     switch (idiom) {
       case UIUserInterfaceIdiomTV:
         return @"TV";
