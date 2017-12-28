@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
 
-#if TARGET_OS_TVOS
+#if TARGET_OS_IOS
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
 
