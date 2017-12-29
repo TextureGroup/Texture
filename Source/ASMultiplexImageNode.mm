@@ -147,7 +147,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   @param request The photos image request to load. May not be nil.
   @param completionBlock The block to be performed when the image has been loaded, if possible. May not be nil.
  */
-- (void)_loadPHAssetWithRequest:(ASPhotosFrameworkImageRequest *)request identifier:(id)imageIdentifier completion:(void (^)(UIImage *image, NSError *error))completionBlock API_AVAILABLE(ios(9.0), tvos(10.0));
+- (void)_loadPHAssetWithRequest:(ASPhotosFrameworkImageRequest *)request identifier:(id)imageIdentifier completion:(void (^)(UIImage *image, NSError *error))completionBlock API_AVAILABLE(ios(8.0), tvos(10.0));
 
 /**
  @abstract Downloads the image corresponding to the given imageIdentifier from the given URL.

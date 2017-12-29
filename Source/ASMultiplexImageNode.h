@@ -136,7 +136,7 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
  
  * @see `+[NSURL URLWithAssetLocalIdentifier:targetSize:contentMode:options:]` below.
  */
-@property (nullable, nonatomic, strong) PHImageManager *imageManager API_AVAILABLE(ios(9.0), tvos(10.0));
+@property (nullable, nonatomic, strong) PHImageManager *imageManager API_AVAILABLE(ios(8.0), tvos(10.0));
 @end
 
 
@@ -253,7 +253,7 @@ didFinishDownloadingImageWithIdentifier:(ASImageIdentifier)imageIdentifier
  * @note This method may be called from any thread.
  * @return A PHAsset corresponding to `assetLocalIdentifier`, or nil if none is available.
  */
-- (nullable PHAsset *)multiplexImageNode:(ASMultiplexImageNode *)imageNode assetForLocalIdentifier:(NSString *)assetLocalIdentifier API_AVAILABLE(ios(9.0), tvos(10.0));
+- (nullable PHAsset *)multiplexImageNode:(ASMultiplexImageNode *)imageNode assetForLocalIdentifier:(NSString *)assetLocalIdentifier API_AVAILABLE(ios(8.0), tvos(10.0));
 @end
 
 #pragma mark -
@@ -270,7 +270,7 @@ didFinishDownloadingImageWithIdentifier:(ASImageIdentifier)imageIdentifier
 + (NSURL *)URLWithAssetLocalIdentifier:(NSString *)assetLocalIdentifier
                             targetSize:(CGSize)targetSize
                            contentMode:(PHImageContentMode)contentMode
-                               options:(PHImageRequestOptions *)options AS_WARN_UNUSED_RESULT API_AVAILABLE(ios(9.0), tvos(10.0));
+                               options:(PHImageRequestOptions *)options AS_WARN_UNUSED_RESULT API_AVAILABLE(ios(8.0), tvos(10.0));
 
 @end
 
