@@ -147,7 +147,7 @@ static UIControlState const ASControlStateSelected ASDISPLAYNODE_DEPRECATED_MSG(
 @interface ASControlNode (tvOS)
 
 /**
- @abstract How the node looks when it isn't focused.
+ @abstract How the node looks when it isn't focused. Exposed here so that subclasses can override.
  */
 - (void)setDefaultFocusAppearance;
 
