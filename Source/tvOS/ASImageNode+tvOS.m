@@ -15,9 +15,8 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
 #if TARGET_OS_TV
-#import <AsyncDisplayKit/ASImageNode+tvOS.h>
+#import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 
 #import <GLKit/GLKit.h>
