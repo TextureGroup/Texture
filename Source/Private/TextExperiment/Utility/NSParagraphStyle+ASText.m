@@ -116,16 +116,16 @@
   CTParagraphStyleSetting set[kCTParagraphStyleSpecifierCount] = { };
   int count = 0;
   
+#if TARGET_OS_IOS
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   CGFloat lineSpacing = self.lineSpacing;
-#if TARGET_OS_IOS
-  set[count].spec = kCTParagraphStyleSpecifierMaximumLineSpacing;
-#endif
+  set[count].spec = kCTParagraphStyleSpecifierLineSpacing;
   set[count].valueSize = sizeof(CGFloat);
   set[count].value = &lineSpacing;
   count++;
 #pragma clang diagnostic pop
+#endif
   
   CGFloat paragraphSpacing = self.paragraphSpacing;
   set[count].spec = kCTParagraphStyleSpecifierParagraphSpacing;
