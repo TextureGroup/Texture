@@ -1502,6 +1502,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  // Mimic UIKit's gating logic.
+  // If the data source doesn't support moving, then all bets are off.
+  if (!_asyncDataSourceFlags.collectionNodeMoveItem) {
+    return NO;
+  }
+  
   // Currently we do not support interactive moves when using async layout. The reason is, we do not have a mechanism
   // to propagate the "presentation data" element map (containing the speculative in-progress moves) to the layout delegate,
   // and this can cause exceptions to be thrown from UICV. For example, if you drag an item out of a section,
@@ -1513,16 +1519,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if ([self.collectionViewLayout isKindOfClass:[ASCollectionLayout class]]) {
     return NO;
   }
-  
-  // Only allow the move if the data source responds to both methods.
-  // Otherwise it's too dangerous – this mimics UIKit's behavior.
-  if (_asyncDataSourceFlags.collectionNodeCanMoveItem && _asyncDataSourceFlags.collectionNodeMoveItem) {
+
+  // If the data source implements canMoveItem, let them decide.
+  if (_asyncDataSourceFlags.collectionNodeCanMoveItem) {
     if (auto cellNode = [self nodeForItemAtIndexPath:indexPath]) {
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
       return [_asyncDataSource collectionNode:collectionNode canMoveItemWithNode:cellNode];
     }
   }
-  return NO;
+  
+  // Otherwise allow the move for all items.
+  return YES;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
@@ -1531,10 +1538,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   // Inform the data source first, in case they call nodeForItemAtIndexPath:.
   // We want to make sure we return them the node for the item they have in mind.
-  if (_asyncDataSourceFlags.collectionNodeMoveItem) {
-    if (auto collectionNode = self.collectionNode) {
-      [_asyncDataSource collectionNode:collectionNode moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
-    }
+  if (auto collectionNode = self.collectionNode) {
+    [_asyncDataSource collectionNode:collectionNode moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
   }
   
   // Now we update our data controller's store.
