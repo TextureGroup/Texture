@@ -1502,6 +1502,18 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  // Currently we do not support interactive moves when using async layout. The reason is, we do not have a mechanism
+  // to propagate the "presentation data" element map (containing the speculative in-progress moves) to the layout delegate,
+  // and this can cause exceptions to be thrown from UICV. For example, if you drag an item out of a section,
+  // the element map will still contain N items in that section, even though there's only N-1 shown, and UICV will
+  // throw an exception that you specified an element that doesn't exist.
+  //
+  // In iOS >= 11, this is made much easier by the UIDataSourceTranslating API. In previous versions of iOS our best bet
+  // would be to capture the invalidation contexts that are sent during interactive moves and make our own data source translator.
+  if ([self.collectionViewLayout isKindOfClass:[ASCollectionLayout class]]) {
+    return NO;
+  }
+  
   // Only allow the move if the data source responds to both methods.
   // Otherwise it's too dangerous – this mimics UIKit's behavior.
   if (_asyncDataSourceFlags.collectionNodeCanMoveItem && _asyncDataSourceFlags.collectionNodeMoveItem) {
