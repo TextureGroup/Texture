@@ -101,6 +101,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   NSHashTable<ASCellNode *> *_cellsForLayoutUpdates;
   id<ASCollectionViewLayoutFacilitatorProtocol> _layoutFacilitator;
   CGFloat _leadingScreensForBatching;
+  
+  // When we update our data controller in response to an interactive move,
+  // we don't want to tell the collection view about the change (it knows!)
+  BOOL _updatingInResponseToInteractiveMove;
   BOOL _inverted;
   
   NSUInteger _superBatchUpdateCount;
@@ -218,6 +222,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int numberOfSectionsInCollectionNode:1;
     unsigned int collectionNodeNumberOfItemsInSection:1;
     unsigned int collectionNodeContextForSection:1;
+    unsigned int collectionNodeCanMoveItem:1;
+    unsigned int collectionNodeMoveItem:1;
 
     // Whether this data source conforms to ASCollectionDataSourceInterop
     unsigned int interop:1;
@@ -454,6 +460,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDataSourceFlags.collectionNodeNodeBlockForSupplementaryElement = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeBlockForSupplementaryElementOfKind:atIndexPath:)];
     _asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection = [_asyncDataSource respondsToSelector:@selector(collectionNode:supplementaryElementKindsInSection:)];
     _asyncDataSourceFlags.nodeModelForItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:nodeModelForItemAtIndexPath:)];
+    _asyncDataSourceFlags.collectionNodeCanMoveItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:canMoveItemWithNode:)];
+    _asyncDataSourceFlags.collectionNodeMoveItem = [_asyncDataSource respondsToSelector:@selector(collectionNode:moveItemAtIndexPath:toIndexPath:)];
 
     _asyncDataSourceFlags.interop = [_asyncDataSource conformsToProtocol:@protocol(ASCollectionDataSourceInterop)];
     if (_asyncDataSourceFlags.interop) {
@@ -1492,6 +1500,45 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  // Only allow the move if the data source responds to both methods.
+  // Otherwise it's too dangerous – this mimics UIKit's behavior.
+  if (_asyncDataSourceFlags.collectionNodeCanMoveItem && _asyncDataSourceFlags.collectionNodeMoveItem) {
+    if (auto cellNode = [self nodeForItemAtIndexPath:indexPath]) {
+      GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
+      return [_asyncDataSource collectionNode:collectionNode canMoveItemWithNode:cellNode];
+    }
+  }
+  return NO;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+  ASDisplayNodeAssert(_asyncDataSourceFlags.collectionNodeMoveItem, @"Should not allow interactive collection item movement if data source does not support it.");
+  
+  // Inform the data source first, in case they call nodeForItemAtIndexPath:.
+  // We want to make sure we return them the node for the item they have in mind.
+  if (_asyncDataSourceFlags.collectionNodeMoveItem) {
+    if (auto collectionNode = self.collectionNode) {
+      [_asyncDataSource collectionNode:collectionNode moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+    }
+  }
+  
+  // Now we update our data controller's store.
+  // Get up to date
+  [self waitUntilAllUpdatesAreCommitted];
+  // Set our flag to suppress informing super about the change.
+  ASDisplayNodeAssertFalse(_updatingInResponseToInteractiveMove);
+  _updatingInResponseToInteractiveMove = YES;
+  // Submit the move
+  [self moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+  // Wait for it to finish – should be fast!
+  [self waitUntilAllUpdatesAreCommitted];
+  // Clear the flag
+  _updatingInResponseToInteractiveMove = NO;
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   // If a scroll happenes the current range mode needs to go to full
@@ -2023,7 +2070,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
-  if (!self.asyncDataSource || _superIsPendingDataLoad) {
+  if (!self.asyncDataSource || _superIsPendingDataLoad || _updatingInResponseToInteractiveMove) {
     updates();
     [changeSet executeCompletionHandlerWithFinished:NO];
     return; // if the asyncDataSource has become invalid while we are processing, ignore this request to avoid crashes
@@ -2277,22 +2324,5 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   return;
 }
-
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED // Remove implementations entirely for efficiency if not asserting.
-
-// intercepted due to not being supported by ASCollectionView (prevent bugs caused by usage)
-
-- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath NS_AVAILABLE_IOS(9_0)
-{
-  ASDisplayNodeAssert(![self.asyncDataSource respondsToSelector:_cmd], @"%@ is not supported by ASCollectionView - please remove or disable this data source method.", NSStringFromSelector(_cmd));
-  return NO;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath*)destinationIndexPath NS_AVAILABLE_IOS(9_0)
-{
-  ASDisplayNodeAssert(![self.asyncDataSource respondsToSelector:_cmd], @"%@ is not supported by ASCollectionView - please remove or disable this data source method.", NSStringFromSelector(_cmd));
-}
-
-#endif
 
 @end
