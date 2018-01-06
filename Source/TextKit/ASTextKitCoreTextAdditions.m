@@ -39,6 +39,7 @@ BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attributeName)
                           kCTBaselineInfoAttributeName,
                           kCTBaselineReferenceInfoAttributeName,
                           kCTUnderlineColorAttributeName,
+                          kCTParagraphStyleAttributeName,
                           nil];
   });
   return [coreTextAttributes containsObject:attributeName];
@@ -227,17 +228,33 @@ NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedSt
   CGFloat minimumLineHeight;
   if (CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierMinimumLineHeight, sizeof(minimumLineHeight), &minimumLineHeight))
     newParagraphStyle.minimumLineHeight = minimumLineHeight;
-
+  
+  CGFloat lineSpacing = 0;
 #if TARGET_OS_IOS
-  // kCTParagraphStyleSpecifierLineSpacing -> lineSpacing
-  // Note that kCTParagraphStyleSpecifierLineSpacing is deprecated and will die soon. We should not be using it.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    CGFloat lineSpacing;
-    if (CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierLineSpacing, sizeof(lineSpacing), &lineSpacing))
-        newParagraphStyle.lineSpacing = lineSpacing;
+  // kCTParagraphStyleSpecifierLineSpacing -> lineSpacing
+  // Note that kCTParagraphStyleSpecifierLineSpacing is deprecated and will die soon. We should not be using it.
+  if (CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierLineSpacing, sizeof(lineSpacing), &lineSpacing))
+    newParagraphStyle.lineSpacing = lineSpacing;
 #pragma clang diagnostic pop
 #endif
+  
+  // Attempt to weakly map the following onto -[NSParagraphStyle lineSpacing]:
+  //   - kCTParagraphStyleSpecifierMinimumLineSpacing
+  //   - kCTParagraphStyleSpecifierMaximumLineSpacing
+  //   - kCTParagraphStyleSpecifierLineSpacingAdjustment
+  if (fabs(lineSpacing) <= FLT_EPSILON &&
+      CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierMinimumLineSpacing, sizeof(lineSpacing), &lineSpacing))
+    newParagraphStyle.lineSpacing = lineSpacing;
+  
+  if (fabs(lineSpacing) <= FLT_EPSILON &&
+      CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierMaximumLineSpacing, sizeof(lineSpacing), &lineSpacing))
+    newParagraphStyle.lineSpacing = lineSpacing;
+  
+  if (fabs(lineSpacing) <= FLT_EPSILON &&
+      CTParagraphStyleGetValueForSpecifier(coreTextParagraphStyle, kCTParagraphStyleSpecifierLineSpacingAdjustment, sizeof(lineSpacing), &lineSpacing))
+    newParagraphStyle.lineSpacing = lineSpacing;
 
   // kCTParagraphStyleSpecifierParagraphSpacing -> paragraphSpacing
   CGFloat paragraphSpacing;
