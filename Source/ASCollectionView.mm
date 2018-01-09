@@ -1517,6 +1517,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // In iOS >= 11, this is made much easier by the UIDataSourceTranslating API. In previous versions of iOS our best bet
   // would be to capture the invalidation contexts that are sent during interactive moves and make our own data source translator.
   if ([self.collectionViewLayout isKindOfClass:[ASCollectionLayout class]]) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      as_log_debug(ASCollectionLog(), "Collection node item interactive movement is not supported when using a layout delegate. This message will only be logged once. Node: %@", ASObjectDescriptionMakeTiny(self));
+    });
     return NO;
   }
 
