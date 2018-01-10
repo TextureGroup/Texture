@@ -20,6 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol ASCATransactionQueueObserving <NSObject>
+- (void)prepareForCATransactionCommit;
+@end
+
 AS_SUBCLASSING_RESTRICTED
 @interface ASRunLoopQueue<ObjectType> : NSObject <NSLocking>
 
@@ -47,6 +51,25 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
 
 @end
+
+AS_SUBCLASSING_RESTRICTED
+@interface ASCATransactionQueue : NSObject
+
+@property (nonatomic, readonly) BOOL isEmpty;
+
+/**
+ * The queue to run on main run loop before CATransaction commit.
+ *
+ * @discussion this queue will run after ASRunLoopQueue and before CATransaction commit
+ * to get last chance of updating/coalesce info like interface state.
+ * Each node will only be called once per transaction commit to reflect interface change.
+ */
++ (ASCATransactionQueue *)sharedQueue;
+
+- (void)enqueue:(id<ASCATransactionQueueObserving>)object;
+
+@end
+
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASDeallocQueue : NSObject
