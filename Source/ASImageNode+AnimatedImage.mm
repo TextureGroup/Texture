@@ -55,6 +55,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   }
   
   id <ASAnimatedImageProtocol> previousAnimatedImage = _animatedImage;
+  
   _animatedImage = animatedImage;
   
   if (animatedImage != nil) {
@@ -80,6 +81,11 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   }
   
   [self animatedImageSet:_animatedImage previousAnimatedImage:previousAnimatedImage];
+    
+  // Animated image can take while to dealloc, do it off the main queue
+  if (previousAnimatedImage != nil) {
+    ASPerformBackgroundDeallocation(&previousAnimatedImage);
+  }
 }
 
 - (void)animatedImageSet:(id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(id <ASAnimatedImageProtocol>)previousAnimatedImage
@@ -316,7 +322,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   CFTimeInterval timeBetweenLastFire;
   if (self.lastDisplayLinkFire == 0) {
     timeBetweenLastFire = 0;
-  } else if (AS_AT_LEAST_IOS10){
+  } else if (AS_AVAILABLE_IOS(10)){
     timeBetweenLastFire = displayLink.targetTimestamp - displayLink.timestamp;
   } else {
     timeBetweenLastFire = CACurrentMediaTime() - self.lastDisplayLinkFire;

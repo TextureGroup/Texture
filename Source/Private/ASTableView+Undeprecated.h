@@ -146,7 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the main thread.
  * @warning This method is substantially more expensive than UITableView's version.
  */
--(void)reloadDataWithCompletion:(void (^ _Nullable)())completion;
+-(void)reloadDataWithCompletion:(void (^ _Nullable)(void))completion;
 
 /**
  * Reload everything from scratch, destroying the working range and all cached nodes.

@@ -75,7 +75,7 @@
 
  See issue: https://github.com/facebook/AsyncDisplayKit/issues/1063
  */
-@interface ASPanningOverriddenUITextView : UITextView
+@interface ASPanningOverriddenUITextView : ASTextKitComponentsTextView
 {
   BOOL _shouldBlockPanGesture;
 }
@@ -215,7 +215,7 @@
   ASDN::MutexLocker l(_textKitLock);
 
   // Create and configure the placeholder text view.
-  _placeholderTextKitComponents.textView = [[UITextView alloc] initWithFrame:CGRectZero textContainer:_placeholderTextKitComponents.textContainer];
+  _placeholderTextKitComponents.textView = [[ASTextKitComponentsTextView alloc] initWithFrame:CGRectZero textContainer:_placeholderTextKitComponents.textContainer];
   _placeholderTextKitComponents.textView.userInteractionEnabled = NO;
   _placeholderTextKitComponents.textView.accessibilityElementsHidden = YES;
   configureTextView(_placeholderTextKitComponents.textView);

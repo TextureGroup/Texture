@@ -1,14 +1,36 @@
 ## master
-
 * Add your own contributions to the next release on the line below this with your name.
+- [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
+- [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
+- [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
+- [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
+- [ASCollectionView] Improve performance and behavior of rotation / bounds changes. [Scott Goodson](https://github.com/appleguy) [#431](https://github.com/TextureGroup/Texture/pull/431)
 - [ASCollectionView] Improve index space translation of Flow Layout Delegate methods. [Scott Goodson](https://github.com/appleguy)
+- [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
+- [ASCollectionView] Check if batch fetching is needed if batch fetching parameter has been changed. [#624](https://github.com/TextureGroup/Texture/pull/624) [Garrett Moon](https://github.com/garrettmoon)
+- [ASNetworkImageNode] New delegate callback to tell the consumer whether the image was loaded from cache or download. [Adlai Holler](https://github.com/Adlai-Holler)
+- [Layout] Fixes a deadlock in layout. [#638](https://github.com/TextureGroup/Texture/pull/638) [Garrett Moon](https://github.com/garrettmoon)
+- Updated to be backwards compatible with Xcode 8. [Adlai Holler](https://github.com/Adlai-Holler)
+- [API CHANGES] `ASPerformMainThreadDeallocation` and `ASPerformBackgroundDeallocation` functions take `id *` instead of `id` and they're now more reliable. Also, in Swift, `ASDeallocQueue.sharedDeallocationQueue() -> ASDeallocQueue.sharedDeallocationQueue`. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/651)
+- [Collection/Table] Added direct support for mapping section indexes between data spaces. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/660)
+- [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
+- [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
+- [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
+- Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
+- [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
+- [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
+
+## 2.6
+- [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
+
+## 2.5.1
 - [ASVideoNode] Fix unreleased time observer. [Flo Vouin](https://github.com/flovouin)
 - [PINCache] Set a default .byteLimit to reduce disk usage and startup time. [#595](https://github.com/TextureGroup/Texture/pull/595) [Scott Goodson](https://github.com/appleguy)
 - [ASNetworkImageNode] Fix deadlock in GIF handling. [#582](https://github.com/TextureGroup/Texture/pull/582) [Garrett Moon](https://github.com/garrettmoon)
 - [ASDisplayNode] Add attributed versions of a11y label, hint and value. [#554](https://github.com/TextureGroup/Texture/pull/554) [Alexander Hüllmandel](https://github.com/fruitcoder)
 - [ASCornerRounding] Introduce .cornerRoundingType: CALayer, Precomposited, or Clip Corners. [Scott Goodson](https://github.com/appleguy) [#465](https://github.com/TextureGroup/Texture/pull/465)
 - [Yoga] Add insertYogaNode:atIndex: method. Improve handling of relayouts. [Scott Goodson](https://github.com/appleguy)
-- [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
 
 ## 2.5
 

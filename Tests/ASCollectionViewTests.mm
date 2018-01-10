@@ -867,7 +867,7 @@
   [self waitForExpectationsWithTimeout:3 handler:nil];
 }
 
-- (void)testThatMultipleBatchFetchesDontHappenUnnecessarily
+- (void)disabled_testThatMultipleBatchFetchesDontHappenUnnecessarily
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];

@@ -244,7 +244,7 @@ NS_ASSUME_NONNULL_BEGIN
  *                    Boolean parameter that contains the value YES if all of the related animations completed successfully or
  *                    NO if they were interrupted. This parameter may be nil. If supplied, the block is run on the main thread.
  */
-- (void)performBatchAnimated:(BOOL)animated updates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
+- (void)performBatchAnimated:(BOOL)animated updates:(nullable AS_NOESCAPE void (^)(void))updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
  *  Perform a batch of updates asynchronously, optionally disabling all animations in the batch. This method must be called from the main thread.
@@ -255,7 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
  *                    Boolean parameter that contains the value YES if all of the related animations completed successfully or
  *                    NO if they were interrupted. This parameter may be nil. If supplied, the block is run on the main thread.
  */
-- (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)())updates completion:(nullable void (^)(BOOL finished))completion;
+- (void)performBatchUpdates:(nullable AS_NOESCAPE void (^)(void))updates completion:(nullable void (^)(BOOL finished))completion;
 
 /**
  *  Returns YES if the ASCollectionNode is still processing changes from performBatchUpdates:.
@@ -284,7 +284,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
  */
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())didFinishProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))didFinishProcessingUpdates;
 
 /**
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
@@ -382,7 +382,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the main thread.
  * @warning This method is substantially more expensive than UICollectionView's version.
  */
-- (void)reloadDataWithCompletion:(nullable void (^)())completion;
+- (void)reloadDataWithCompletion:(nullable void (^)(void))completion;
 
 
 /**
@@ -629,6 +629,32 @@ NS_ASSUME_NONNULL_BEGIN
  * @return The supplementary element kinds that exist in the given section, if any.
  */
 - (NSArray<NSString *> *)collectionNode:(ASCollectionNode *)collectionNode supplementaryElementKindsInSection:(NSInteger)section;
+
+/**
+ * Asks the data source if it's possible to move the specified item interactively.
+ *
+ * See @p -[UICollectionViewDataSource collectionView:canMoveItemAtIndexPath:] @c.
+ *
+ * @param collectionNode  The sender.
+ * @param node            The display node for the item that may be moved.
+ *
+ * @return Whether the item represented by @p node may be moved.
+ */
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode canMoveItemWithNode:(ASCellNode *)node;
+
+/**
+ * Called when the user has interactively moved an item. The data source
+ * should update its internal data store to reflect the move. Note that you
+ * should not call [collectionNode moveItemAtIndexPath:toIndexPath:] – the
+ * collection node's internal state will be updated automatically.
+ *
+ * * See @p -[UICollectionViewDataSource collectionView:moveItemAtIndexPath:toIndexPath:] @c.
+ *
+ * @param collectionNode        The sender.
+ * @param sourceIndexPath       The original item index path.
+ * @param destinationIndexPath  The new item index path.
+ */
+- (void)collectionNode:(ASCollectionNode *)collectionNode moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath;
 
 /**
  * Similar to -collectionView:cellForItemAtIndexPath:.
