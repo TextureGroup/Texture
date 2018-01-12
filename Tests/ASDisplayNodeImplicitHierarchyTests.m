@@ -114,6 +114,7 @@
   }
 
   ASSpecTestDisplayNode *node = [[ASSpecTestDisplayNode alloc] init];
+  [node setHierarchyState:ASHierarchyStateRangeManaged];
   node.automaticallyManagesSubnodes = YES;
   node.layoutSpecBlock = ^(ASDisplayNode *weakNode, ASSizeRange constrainedSize) {
     ASAbsoluteLayoutSpec *absoluteLayout = [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[subnodes[3]]];
