@@ -62,11 +62,11 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   });
   
   // These options are taken from UIGraphicsBeginImageContext.
+  CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Host | (opaque ? kCGImageAlphaNoneSkipFirst : kCGImageAlphaPremultipliedFirst);
+  
   if (scale == 0) {
     scale = defaultScale;
   }
-  CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Host | (opaque ? kCGImageAlphaNoneSkipFirst : kCGImageAlphaPremultipliedFirst);
-  
   size_t intWidth = (size_t)ceil(size.width * scale);
   size_t intHeight = (size_t)ceil(size.height * scale);
   size_t bytesPerPixel = 4;
@@ -126,8 +126,9 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
   CGImageRef cgImg = CGImageCreate(width, height, CGBitmapContextGetBitsPerComponent(context), bitsPerPixel, bytesPerRow, CGBitmapContextGetColorSpace(context), CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);
   CGDataProviderRelease(provider);
   
-  // We saved our GState right after setting the CTM so that we could read
-  // the scale here and give it to the UIImage with the default orientation.
+  // We saved our GState right after setting the CTM so that we could restore it
+  // here and get the original scale back.
+  CGContextRestoreGState(context);
   CGFloat scale = CGContextGetCTM(context).a;
   CGContextRelease(context);
   
