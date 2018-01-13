@@ -15,6 +15,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <Foundation/Foundation.h>
 #if TARGET_OS_TV
 #import <AsyncDisplayKit/ASControlNode.h>
 #import <AsyncDisplayKit/ASControlNode+Private.h>
