@@ -67,7 +67,7 @@ end
 
 # Ensure new files have proper header
 new_source_license_header = <<-HEREDOC
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
+//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
