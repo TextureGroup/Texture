@@ -31,9 +31,9 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
 /**
  * Call this to enable the experimental no-copy rendering.
  *
- * Returns YES if it was enabled, or NO if it's too late because
- * rendering has already started. In practice t's fine to call this
- * during -didFinishLaunchingWithOptions:
+ * Returns YES if it was enabled, or NO + assert if it's too late because
+ * rendering has already started. In practice it's fine to call this
+ * during -didFinishLaunchingWithOptions:.
  */
 extern BOOL ASEnableNoCopyRendering(void);
 
