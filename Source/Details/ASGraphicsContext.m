@@ -145,6 +145,10 @@ extern void ASGraphicsEndImageContext()
   }
   
   CGContextRef context = UIGraphicsGetCurrentContext();
-  CGContextRelease(context);
-  UIGraphicsPopContext();
+  if (context) {
+    // We manually allocated this buffer so we need to free it.
+    free(CGBitmapContextGetData(context));
+    CGContextRelease(context);
+    UIGraphicsPopContext();
+  }
 }
