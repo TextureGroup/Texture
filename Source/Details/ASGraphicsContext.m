@@ -51,7 +51,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
 
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
-  void *buf = malloc(bufferSize);
+  void *buf = calloc(bufferSize, 1);
   CGContextRef context = CGBitmapContextCreate(buf, intWidth, intHeight, 8, bytesPerRow, deviceRGB, bitmapInfo);
   
   // Set the CTM to account for iOS orientation & specified scale.
