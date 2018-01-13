@@ -402,6 +402,8 @@
 		CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.m */; };
 		CCCCCCE71EC3F0FC0087FE10 /* NSAttributedString+ASText.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */; };
 		CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.m */; };
+		CCDC9B4D200991D10063C1F8 /* ASGraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCDC9B4E200991D10063C1F8 /* ASGraphicsContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.m */; };
 		CCDD148B1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */; };
 		CCE4F9B31F0D60AC00062E4E /* ASIntegerMapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B21F0D60AC00062E4E /* ASIntegerMapTests.m */; };
 		CCE4F9B51F0DA4F300062E4E /* ASLayoutEngineTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B41F0DA4F300062E4E /* ASLayoutEngineTests.mm */; };
@@ -895,6 +897,8 @@
 		CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSParagraphStyle+ASText.m"; sourceTree = "<group>"; };
 		CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+ASText.h"; sourceTree = "<group>"; };
 		CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+ASText.m"; sourceTree = "<group>"; };
+		CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASGraphicsContext.h; sourceTree = "<group>"; };
+		CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASGraphicsContext.m; sourceTree = "<group>"; };
 		CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionModernDataSourceTests.m; sourceTree = "<group>"; };
 		CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASSectionController.h; sourceTree = "<group>"; };
 		CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IGListAdapter+AsyncDisplayKit.h"; sourceTree = "<group>"; };
@@ -1270,6 +1274,8 @@
 		058D09E1195D050800B7D73C /* Details */ = {
 			isa = PBXGroup;
 			children = (
+				CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */,
+				CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.m */,
 				CC5601391F06E9A700DC4FBE /* ASIntegerMap.h */,
 				CC56013A1F06E9A700DC4FBE /* ASIntegerMap.mm */,
 				CC0F885E1E4280B800576FED /* _ASCollectionViewCell.h */,
@@ -1836,6 +1842,7 @@
 				68EE0DBE1C1B4ED300BA1B99 /* ASMainSerialQueue.h in Headers */,
 				CCCCCCE11EC3EF060087FE10 /* ASTextUtilities.h in Headers */,
 				B350624B1B010EFD0018CF92 /* _ASPendingState.h in Headers */,
+				CCDC9B4D200991D10063C1F8 /* ASGraphicsContext.h in Headers */,
 				E5C347B11ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h in Headers */,
 				CC54A81C1D70079800296A24 /* ASDispatch.h in Headers */,
 				B350624D1B010EFD0018CF92 /* _ASScopeTimer.h in Headers */,
@@ -2268,6 +2275,7 @@
 				E5B078001E69F4EB00C24B5B /* ASElementMap.m in Sources */,
 				9C8898BC1C738BA800D6B02E /* ASTextKitFontSizeAdjuster.mm in Sources */,
 				690ED59B1E36D118000627C0 /* ASImageNode+tvOS.m in Sources */,
+				CCDC9B4E200991D10063C1F8 /* ASGraphicsContext.m in Sources */,
 				CCCCCCD81EC3EF060087FE10 /* ASTextInput.m in Sources */,
 				34EFC7621B701CA400AD841F /* ASBackgroundLayoutSpec.mm in Sources */,
 				DE8BEAC41C2DF3FC00D57C12 /* ASDelegateProxy.m in Sources */,
