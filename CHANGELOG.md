@@ -5,6 +5,16 @@
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
 - [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
+- [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
+- [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
+- [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
+- Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
+- [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
+- [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
+
+## 2.6
+- [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
 - [ASCollectionView] Improve performance and behavior of rotation / bounds changes. [Scott Goodson](https://github.com/appleguy) [#431](https://github.com/TextureGroup/Texture/pull/431)
 - [ASCollectionView] Improve index space translation of Flow Layout Delegate methods. [Scott Goodson](https://github.com/appleguy)
 - [Animated Image] Adds support for animated WebP as well as improves GIF handling. [#605](https://github.com/TextureGroup/Texture/pull/605) [Garrett Moon](https://github.com/garrettmoon)
@@ -14,15 +24,6 @@
 - Updated to be backwards compatible with Xcode 8. [Adlai Holler](https://github.com/Adlai-Holler)
 - [API CHANGES] `ASPerformMainThreadDeallocation` and `ASPerformBackgroundDeallocation` functions take `id *` instead of `id` and they're now more reliable. Also, in Swift, `ASDeallocQueue.sharedDeallocationQueue() -> ASDeallocQueue.sharedDeallocationQueue`. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/651)
 - [Collection/Table] Added direct support for mapping section indexes between data spaces. [Adlai Holler](https://github.com/Adlai-Holler) [#651](https://github.com/TextureGroup/Texture/pull/660)
-- [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
-- [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
-- [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
-- [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
-- Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
-- [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
-
-## 2.6
-- [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
 
 ## 2.5.1
 - [ASVideoNode] Fix unreleased time observer. [Flo Vouin](https://github.com/flovouin)
