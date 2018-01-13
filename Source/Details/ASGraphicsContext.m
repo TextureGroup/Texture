@@ -14,21 +14,41 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
-#import <objc/runtime.h>
+#import <stdatomic.h>
 
-#if AS_ENABLE_NO_COPY_RENDERING
+#pragma mark - Feature Gating
 
-/**
- * We need to store the scale information for each context, for when we go
- * to create a UIImage from the CGImage.
- *
- * These functions access a thread-local stack of scales..
- */
-void ASPushScale(CGFloat scale);
-CGFloat ASPopScale(void);
+// Two flags that we atomically manipulate to control the feature.
+typedef NS_OPTIONS(uint, ASNoCopyFlags) {
+  ASNoCopyEnabled = 1 << 0,
+  ASNoCopyBlocked = 1 << 1
+};
+static atomic_uint __noCopyFlags;
+
+// Check if it's blocked, and set the enabled flag if not.
+extern BOOL ASEnableNoCopyRendering()
+{
+  ASNoCopyFlags expectedFlags = 0;
+  BOOL enabled = atomic_compare_exchange_strong(&__noCopyFlags, &expectedFlags, ASNoCopyEnabled);
+  ASDisplayNodeCAssert(enabled, @"Can't enable no-copy rendering after first render started.");
+  return enabled;
+}
+
+// Check if it's enabled and set the "blocked" flag either way.
+static BOOL ASNoCopyRenderingBlockAndCheckEnabled() {
+  ASNoCopyFlags oldFlags = atomic_fetch_or(&__noCopyFlags, ASNoCopyBlocked);
+  return (oldFlags & ASNoCopyEnabled) != 0;
+}
+
+#pragma mark - Graphics Contexts
 
 extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
 {
+  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+    UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+    return;
+  }
+  
   // Only create device RGB color space once. UIGraphics actually doesn't do this but it's safe.
   static dispatch_once_t onceToken;
   static CGFloat defaultScale;
@@ -66,12 +86,20 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   CGContextTranslateCTM(context, 0, intHeight);
   CGContextScaleCTM(context, scale, -scale);
   
+  // Save the state so we can restore it and recover our scale in GetImageAndEnd
+  CGContextSaveGState(context);
+  
   UIGraphicsPushContext(context);
-  ASPushScale(scale);
 }
 
 extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
 {
+  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+  }
+  
   // Pop the context and make sure we have one.
   CGContextRef context = UIGraphicsGetCurrentContext();
   if (context == NULL) {
@@ -79,7 +107,6 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
     return nil;
   }
   UIGraphicsPopContext();
-  CGFloat scale = ASPopScale();
   
   // Do some math to get the image properties.
   size_t width = CGBitmapContextGetWidth(context);
@@ -91,15 +118,18 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
   // This is the buf that we malloc'd above.
   void *buf = CGBitmapContextGetData(context);
   
-  
   // Wrap it in an NSData, and wrap that in a CGImageProvider.
   NSData *data = [NSData dataWithBytesNoCopy:buf length:bufferSize freeWhenDone:YES];
   CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
   
-  // Options taken from CGBitmapContextCreateImage
+  // Create the CGImage. Options taken from CGBitmapContextCreateImage.
   CGImageRef cgImg = CGImageCreate(width, height, CGBitmapContextGetBitsPerComponent(context), bitsPerPixel, bytesPerRow, CGBitmapContextGetColorSpace(context), CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);
-  CGContextRelease(context);
   CGDataProviderRelease(provider);
+  
+  // We saved our GState right after setting the CTM so that we could read
+  // the scale here and give it to the UIImage with the default orientation.
+  CGFloat scale = CGContextGetCTM(context).a;
+  CGContextRelease(context);
   
   UIImage *result = [[UIImage alloc] initWithCGImage:cgImg scale:scale orientation:UIImageOrientationUp];
   CGImageRelease(cgImg);
@@ -108,73 +138,12 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
 
 extern void ASGraphicsEndImageContext()
 {
+  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+    UIGraphicsEndImageContext();
+    return;
+  }
+  
   CGContextRef context = UIGraphicsGetCurrentContext();
   CGContextRelease(context);
   UIGraphicsPopContext();
-  ASPopScale();
 }
-
-typedef struct {
-  NSUInteger count;
-  CGFloat scales[32];
-} ASContextStack;
-
-pthread_key_t ASContextStackKey;
-
-ASContextStack *ASGetContextStack(BOOL create)
-{
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pthread_key_create(&ASContextStackKey, free);
-  });
-  ASContextStack *stack = pthread_getspecific(ASContextStackKey);
-  if (stack == NULL && create) {
-    stack = malloc(sizeof(ASContextStack));
-    stack->count = 0;
-    pthread_setspecific(ASContextStackKey, stack);
-  }
-  return stack;
-}
-
-CGFloat ASPopScale()
-{
-  ASContextStack *stack = ASGetContextStack(NO);
-  if (stack && stack->count > 0) {
-    CGFloat scale = stack->scales[stack->count];
-    stack->count -= 1;
-    return scale;
-  } else {
-    ASDisplayNodeCFailAssert(@"No context to pop.");
-    return 0;
-  }
-}
-
-void ASPushScale(CGFloat scale)
-{
-  ASContextStack *stack = ASGetContextStack(YES);
-  stack->scales[stack->count] = scale;
-  stack->count += 1;
-}
-
-#else
-
-// No-copy rendering is disabled. Just pass through.
-
-extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
-{
-  UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
-}
-
-extern UIImage *ASGraphicsGetImageAndEndCurrentContext()
-{
-  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  return image;
-}
-
-extern void ASGraphicsEndImageContext()
-{
-  UIGraphicsEndImageContext();
-}
-
-#endif // AS_ENABLE_NO_COPY_RENDERING

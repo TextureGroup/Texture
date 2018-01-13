@@ -16,11 +16,6 @@
 
 @class UIImage;
 
-// A flag to enable this beta feature. See below.
-#ifndef AS_ENABLE_NO_COPY_RENDERING
-#define AS_ENABLE_NO_COPY_RENDERING 0
-#endif
-
 /**
  * Functions for creating one-shot graphics contexts that do not have to copy
  * their contents when an image is generated from them. This is efficient
@@ -32,6 +27,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 ASDISPLAYNODE_EXTERN_C_BEGIN
+
+/**
+ * Call this to enable the experimental no-copy rendering.
+ *
+ * Returns YES if it was enabled, or NO if it's too late because
+ * rendering has already started. In practice t's fine to call this
+ * during -didFinishLaunchingWithOptions:
+ */
+extern BOOL ASEnableNoCopyRendering(void);
 
 /**
  * Creates a one-shot context.
