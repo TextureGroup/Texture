@@ -40,6 +40,13 @@ static BOOL ASNoCopyRenderingBlockAndCheckEnabled() {
   return (oldFlags & ASNoCopyEnabled) != 0;
 }
 
+#pragma mark - Callbacks
+
+void _ASReleaseCGDataProviderData(__unused void *info, const void *data, __unused size_t size)
+{
+  free((void *)data);
+}
+
 #pragma mark - Graphics Contexts
 
 extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
@@ -118,9 +125,8 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
   // This is the buf that we malloc'd above.
   void *buf = CGBitmapContextGetData(context);
   
-  // Wrap it in an NSData, and wrap that in a CGImageProvider.
-  NSData *data = [NSData dataWithBytesNoCopy:buf length:bufferSize freeWhenDone:YES];
-  CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
+  // Wrap it in a CGDataProvider, passing along our release callback for when the CGImage dies.
+  CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, buf, bufferSize, _ASReleaseCGDataProviderData);
   
   // Create the CGImage. Options taken from CGBitmapContextCreateImage.
   CGImageRef cgImg = CGImageCreate(width, height, CGBitmapContextGetBitsPerComponent(context), bitsPerPixel, bytesPerRow, CGBitmapContextGetColorSpace(context), CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);
