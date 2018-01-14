@@ -29,7 +29,7 @@
           selector == @selector(tableView:cellForRowAtIndexPath:) ||
           selector == @selector(tableView:heightForRowAtIndexPath:) ||
           
-          // Selection, highlighting, menu
+          // Selection, highlighting, focus, menu
           selector == @selector(tableView:willSelectRowAtIndexPath:) ||
           selector == @selector(tableView:didSelectRowAtIndexPath:) ||
           selector == @selector(tableView:willDeselectRowAtIndexPath:) ||
@@ -37,6 +37,10 @@
           selector == @selector(tableView:shouldHighlightRowAtIndexPath:) ||
           selector == @selector(tableView:didHighlightRowAtIndexPath:) ||
           selector == @selector(tableView:didUnhighlightRowAtIndexPath:) ||
+          selector == @selector(tableView:canFocusRowAtIndexPath:) ||
+          selector == @selector(tableView:shouldUpdateFocusInContext:) ||
+          selector == @selector(tableView:didUpdateFocusInContext:withAnimationCoordinator:) ||
+          selector == @selector(indexPathForPreferredFocusedViewInTableView:) ||
           selector == @selector(tableView:shouldShowMenuForRowAtIndexPath:) ||
           selector == @selector(tableView:canPerformAction:forRowAtIndexPath:withSender:) ||
           selector == @selector(tableView:performAction:forRowAtIndexPath:withSender:) ||

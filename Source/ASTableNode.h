@@ -605,6 +605,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tableNode:(ASTableNode *)tableNode didHighlightRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)tableNode:(ASTableNode *)tableNode didUnhighlightRowAtIndexPath:(NSIndexPath *)indexPath;
 
+- (BOOL)tableNode:(ASTableNode *)tableNode canFocusRowAtIndexPath:(NSIndexPath *)indexPath API_AVAILABLE(ios(9.0), tvos(9.0));
+- (BOOL)tableNode:(ASTableNode *)tableNode shouldUpdateFocusInContext:(UITableViewFocusUpdateContext *)context API_AVAILABLE(ios(9.0), tvos(9.0));
+- (void)tableNode:(ASTableNode *)tableNode didUpdateFocusInContext:(UITableViewFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator API_AVAILABLE(ios(9.0), tvos(9.0));
+- (nullable NSIndexPath *)indexPathForPreferredFocusedViewInTableNode:(ASTableNode *)tableNode API_AVAILABLE(ios(9.0), tvos(9.0));
+
 - (BOOL)tableNode:(ASTableNode *)tableNode shouldShowMenuForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)tableNode:(ASTableNode *)tableNode canPerformAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender;
 - (void)tableNode:(ASTableNode *)tableNode performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender;
