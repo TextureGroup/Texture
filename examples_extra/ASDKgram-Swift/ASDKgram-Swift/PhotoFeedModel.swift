@@ -109,7 +109,9 @@ final class PhotoFeedModel {
 
 				case .failure(let fail):
 				print(fail)
-				numberOfAdditionsCompletion(0, fail)
+                DispatchQueue.main.async {
+                    numberOfAdditionsCompletion(0, fail)
+                }
 			}
 		}
 	}
