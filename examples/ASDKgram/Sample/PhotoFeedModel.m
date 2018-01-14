@@ -184,9 +184,11 @@
   // early return if reached end of pages
   if (_totalPages) {
     if (_currentPage == _totalPages) {
-      if (block){
-        block(@[]);
-      }
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (block) {
+          block(@[]);
+        }
+      });
       return;
     }
   }
