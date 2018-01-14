@@ -600,7 +600,10 @@ return style. _attr_;
   dispatch_once(&onceToken, ^{
     failSet = [NSMutableSet new];
     [failSet addObject:(id)kCTGlyphInfoAttributeName];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [failSet addObject:(id)kCTCharacterShapeAttributeName];
+#pragma clang diagnostic pop
     [failSet addObject:(id)kCTLanguageAttributeName];
     [failSet addObject:(id)kCTRunDelegateAttributeName];
     [failSet addObject:(id)kCTBaselineClassAttributeName];
@@ -1049,7 +1052,10 @@ style. _attr_ = _attr_; \
 }
 
 - (void)as_setCharacterShape:(NSNumber *)characterShape range:(NSRange)range {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   [self as_setAttribute:(id)kCTCharacterShapeAttributeName value:characterShape range:range];
+#pragma clang diagnostic pop
 }
 
 - (void)as_setRunDelegate:(CTRunDelegateRef)runDelegate range:(NSRange)range {

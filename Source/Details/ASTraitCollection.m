@@ -67,28 +67,17 @@ BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTr
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
 ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceIdiom(UIUserInterfaceIdiom idiom) {
-  if (AS_AVAILABLE_IOS(9)) {
-    switch (idiom) {
-      case UIUserInterfaceIdiomTV:
-        return @"TV";
-      case UIUserInterfaceIdiomPad:
-        return @"Pad";
-      case UIUserInterfaceIdiomPhone:
-        return @"Phone";
-      case UIUserInterfaceIdiomCarPlay:
-        return @"CarPlay";
-      default:
-        return @"Unspecified";
-    }
-  } else {
-    switch (idiom) {
-      case UIUserInterfaceIdiomPad:
-        return @"Pad";
-      case UIUserInterfaceIdiomPhone:
-        return @"Phone";
-      default:
-        return @"Unspecified";
-    }
+  switch (idiom) {
+    case UIUserInterfaceIdiomTV:
+      return @"TV";
+    case UIUserInterfaceIdiomPad:
+      return @"Pad";
+    case UIUserInterfaceIdiomPhone:
+      return @"Phone";
+    case UIUserInterfaceIdiomCarPlay:
+      return @"CarPlay";
+    default:
+      return @"Unspecified";
   }
 }
 
@@ -178,15 +167,11 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 + (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                         containerSize:(CGSize)windowSize
 {
-  UIForceTouchCapability forceTouch = UIForceTouchCapabilityUnknown;
-  if(AS_AVAILABLE_IOS(9)) {
-    forceTouch = traitCollection.forceTouchCapability;
-  }
   return [self traitCollectionWithDisplayScale:traitCollection.displayScale
                             userInterfaceIdiom:traitCollection.userInterfaceIdiom
                            horizontalSizeClass:traitCollection.horizontalSizeClass
                              verticalSizeClass:traitCollection.verticalSizeClass
-                          forceTouchCapability:forceTouch
+                          forceTouchCapability:traitCollection.forceTouchCapability
                                  containerSize:windowSize];
 }
 

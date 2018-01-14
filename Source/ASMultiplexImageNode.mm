@@ -667,13 +667,17 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     }];
   }
 }
-#if TARGET_OS_IOS
+
 - (void)_loadALAssetWithIdentifier:(id)imageIdentifier URL:(NSURL *)assetURL completion:(void (^)(UIImage *image, NSError *error))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
   ASDisplayNodeAssertNotNil(assetURL, @"assetURL is required");
   ASDisplayNodeAssertNotNil(completionBlock, @"completionBlock is required");
-
+  
+  // ALAssetsLibrary was replaced in iOS 8 and deprecated in iOS 9.
+  // We'll drop support very soon.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
   ALAssetsLibrary *assetLibrary = [[ALAssetsLibrary alloc] init];
 
   [assetLibrary assetForURL:assetURL resultBlock:^(ALAsset *asset) {
@@ -685,6 +689,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   } failureBlock:^(NSError *error) {
     completionBlock(nil, error);
   }];
+#pragma clang diagnostic pop
 }
 
 - (void)_loadPHAssetWithRequest:(ASPhotosFrameworkImageRequest *)request identifier:(id)imageIdentifier completion:(void (^)(UIImage *image, NSError *error))completionBlock
@@ -774,7 +779,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   _phImageRequestOperation = newImageRequestOp;
   [phImageRequestQueue addOperation:newImageRequestOp];
 }
-#endif
+
 - (void)_fetchImageWithIdentifierFromCache:(id)imageIdentifier URL:(NSURL *)imageURL completion:(void (^)(UIImage *image))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
