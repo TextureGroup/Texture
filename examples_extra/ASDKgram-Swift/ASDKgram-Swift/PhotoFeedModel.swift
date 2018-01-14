@@ -68,8 +68,9 @@ final class PhotoFeedModel {
 
 		if currentPage == totalPages, currentPage != 0 {
 			DispatchQueue.main.async {
-				return numberOfAdditionsCompletion(0, .customError("No pages left to parse"))
+				numberOfAdditionsCompletion(0, .customError("No pages left to parse"))
 			}
+            return
 		}
 
 		var newPhotos: [PhotoModel] = []
