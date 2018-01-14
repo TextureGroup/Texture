@@ -187,6 +187,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionNodeShouldHighlightItem:1;
     unsigned int collectionNodeDidHighlightItem:1;
     unsigned int collectionNodeDidUnhighlightItem:1;
+    unsigned int collectionNodeCanFocusItem:1;
+    unsigned int collectionNodeShouldUpdateFocus:1;
+    unsigned int collectionNodeDidUpdateFocus:1;
+    unsigned int collectionNodeIndexPathForPreferredFocusedView:1;
     unsigned int collectionNodeShouldShowMenuForItem:1;
     unsigned int collectionNodeCanPerformActionForItem:1;
     unsigned int collectionNodePerformActionForItem:1;
@@ -536,6 +540,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionNodeShouldHighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldHighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeDidHighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didHighlightItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeDidUnhighlightItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didUnhighlightItemAtIndexPath:)];
+    _asyncDelegateFlags.collectionNodeCanFocusItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:canFocusItemAtIndexPath:)];
+    _asyncDelegateFlags.collectionNodeShouldUpdateFocus = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldUpdateFocusInContext:)];
+    _asyncDelegateFlags.collectionNodeDidUpdateFocus = [_asyncDelegate respondsToSelector:@selector(collectionNode:didUpdateFocusInContext:withAnimationCoordinator:)];
+    _asyncDelegateFlags.collectionNodeIndexPathForPreferredFocusedView = [_asyncDelegate respondsToSelector:@selector(indexPathForPreferredFocusedViewInCollectionNode:)];
     _asyncDelegateFlags.collectionNodeShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldShowMenuForItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeCanPerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:canPerformAction:forItemAtIndexPath:sender:)];
     _asyncDelegateFlags.collectionNodePerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:performAction:forItemAtIndexPath:sender:)];
@@ -1440,6 +1448,45 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [_asyncDelegate collectionView:self didUnhighlightItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
   }
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView canFocusItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (_asyncDelegateFlags.collectionNodeCanFocusItem) {
+    GET_COLLECTIONNODE_OR_RETURN(collectionNode, YES);
+    indexPath = [self convertIndexPathToCollectionNode:indexPath];
+    if (indexPath != nil) {
+      return [_asyncDelegate collectionNode:collectionNode canFocusItemAtIndexPath:indexPath];
+    }
+  }
+  return YES;
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context
+{
+  if (_asyncDelegateFlags.collectionNodeShouldUpdateFocus) {
+    GET_COLLECTIONNODE_OR_RETURN(collectionNode, YES);
+    return [_asyncDelegate collectionNode:collectionNode shouldUpdateFocusInContext:context];
+  }
+  return YES;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  if (_asyncDelegateFlags.collectionNodeDidUpdateFocus) {
+    GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
+    return [_asyncDelegate collectionNode:collectionNode didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  }
+  return (void)0;
+}
+
+- (NSIndexPath *)indexPathForPreferredFocusedViewInCollectionView:(UICollectionView *)collectionView
+{
+  if (_asyncDelegateFlags.collectionNodeIndexPathForPreferredFocusedView) {
+    GET_COLLECTIONNODE_OR_RETURN(collectionNode, nil);
+    return [_asyncDelegate indexPathForPreferredFocusedViewInCollectionNode:collectionNode];
+  }
+  return nil;
 }
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldShowMenuForItemAtIndexPath:(nonnull NSIndexPath *)indexPath

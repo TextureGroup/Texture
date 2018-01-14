@@ -747,6 +747,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)collectionNode:(ASCollectionNode *)collectionNode didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)collectionNode:(ASCollectionNode *)collectionNode didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
 
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode canFocusItemAtIndexPath:(NSIndexPath *)indexPath API_AVAILABLE(ios(9.0), tvos(9.0));
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context API_AVAILABLE(ios(9.0), tvos(9.0));
+- (void)collectionNode:(ASCollectionNode *)collectionNode didUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator API_AVAILABLE(ios(9.0), tvos(9.0));
+- (nullable NSIndexPath *)indexPathForPreferredFocusedViewInCollectionNode:(ASCollectionNode *)collectionNode API_AVAILABLE(ios(9.0), tvos(9.0));
+
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;
 - (void)collectionNode:(ASCollectionNode *)collectionNode performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;

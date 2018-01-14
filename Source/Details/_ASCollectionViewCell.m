@@ -52,6 +52,50 @@
   [self.node cellNodeVisibilityEvent:event inScrollView:scrollView withCellFrame:self.frame];
 }
 
+// Focus engine
+- (BOOL)canBecomeFocused
+{
+  ASCellNode *node = self.node;
+  return [node canBecomeFocused];
+}
+
+- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  ASCellNode *node = self.node;
+  return [node didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+}
+
+- (void)setNeedsFocusUpdate
+{
+  ASCellNode *node = self.node;
+  return [node setNeedsFocusUpdate];
+}
+
+- (void)updateFocusIfNeeded
+{
+  ASCellNode *node = self.node;
+  return [node updateFocusIfNeeded];
+}
+
+- (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  ASCellNode *node = self.node;
+  return [node shouldUpdateFocusInContext:context];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
+{
+  ASCellNode *node = self.node;
+  return [node preferredFocusEnvironments];
+}
+
+- (UIView *)preferredFocusedView
+{
+  ASCellNode *node = self.node;
+  return [node preferredFocusedView];
+}
+
+// Selection
 - (void)setSelected:(BOOL)selected
 {
   [super setSelected:selected];
@@ -64,12 +108,14 @@
   [self.node __setHighlightedFromUIKit:highlighted];
 }
 
+// Layout attributes
 - (void)setLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _layoutAttributes = layoutAttributes;
   self.node.layoutAttributes = layoutAttributes;
 }
 
+// Reuse
 - (void)prepareForReuse
 {
   self.layoutAttributes = nil;
