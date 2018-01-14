@@ -106,7 +106,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   return YES;
 }
 
-#if TARGET_OS_TV
 // Focus Engine
 - (BOOL)canBecomeFocused
 {
@@ -144,7 +143,16 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     return nil;
   }
 }
-#endif
+
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments
+{
+  if (self.nodeLoaded) {
+    return @[ _view ];
+  }
+  else {
+    return @[];
+  }
+}
 
 - (BOOL)isFirstResponder
 {

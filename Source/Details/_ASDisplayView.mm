@@ -384,8 +384,6 @@
   return node;
 }
 
-#if TARGET_OS_TV
-#pragma mark - tvOS
 - (BOOL)canBecomeFocused
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
@@ -416,10 +414,16 @@
   return [node shouldUpdateFocusInContext:context];
 }
 
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  return [node preferredFocusEnvironments];
+}
+
 - (UIView *)preferredFocusedView
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   return [node preferredFocusedView];
 }
-#endif
+
 @end
