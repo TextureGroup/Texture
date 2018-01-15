@@ -616,6 +616,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     return;
   }
 
+  #if TARGET_OS_IOS
   // If it's an assets-library URL, we need to fetch it from the assets library.
   if ([[nextImageURL scheme] isEqualToString:kAssetsLibraryURLScheme]) {
     // Load the asset.
@@ -631,6 +632,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
       finishedLoadingBlock(image, nextImageIdentifier, error);
     }];
   }
+  #endif
   else // Otherwise, it's a web URL that we can download.
   {
     // First, check the cache.
@@ -665,7 +667,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     }];
   }
 }
-
+#if TARGET_OS_IOS
 - (void)_loadALAssetWithIdentifier:(id)imageIdentifier URL:(NSURL *)assetURL completion:(void (^)(UIImage *image, NSError *error))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
@@ -777,7 +779,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   _phImageRequestOperation = newImageRequestOp;
   [phImageRequestQueue addOperation:newImageRequestOp];
 }
-
+#endif
 - (void)_fetchImageWithIdentifierFromCache:(id)imageIdentifier URL:(NSURL *)imageURL completion:(void (^)(UIImage *image))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
