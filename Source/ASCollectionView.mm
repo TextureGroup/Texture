@@ -126,15 +126,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionViewInvalidationStyle _nextLayoutInvalidationStyle;
   
   /**
-   * Our layer, retained. Under iOS < 9, when collection views are removed from the hierarchy,
-   * their layers may be deallocated and become dangling pointers. This puts the collection view
-   * into a very dangerous state where pretty much any call will crash it. So we manually retain our layer.
-   *
-   * You should never access this, and it will be nil under iOS >= 9.
-   */
-  CALayer *_retainedLayer;
-  
-  /**
    * If YES, the `UICollectionView` will reload its data on next layout pass so we should not forward any updates to it.
    
    * Rationale:
@@ -315,10 +306,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   self.backgroundColor = [UIColor whiteColor];
   
   [self registerClass:[_ASCollectionViewCell class] forCellWithReuseIdentifier:kReuseIdentifier];
-  
-  if (!AS_AT_LEAST_IOS9) {
-    _retainedLayer = self.layer;
-  }
   
   [self _configureCollectionViewLayout:layout];
   
@@ -2037,28 +2024,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (ASRangeController *)rangeController
 {
   return _rangeController;
-}
-
-/// The UIKit version of this method is only available on iOS >= 9
-- (NSArray<NSIndexPath *> *)asdk_indexPathsForVisibleSupplementaryElementsOfKind:(NSString *)kind
-{
-  if (AS_AVAILABLE_IOS(9)) {
-    return [self indexPathsForVisibleSupplementaryElementsOfKind:kind];
-  }
-
-  // iOS 8 workaround
-  // We cannot use willDisplaySupplementaryView/didEndDisplayingSupplementaryView
-  // because those methods send index paths for _deleted items_ (invalid index paths)
-  [self layoutIfNeeded];
-  NSArray<UICollectionViewLayoutAttributes *> *visibleAttributes = [self.collectionViewLayout layoutAttributesForElementsInRect:self.bounds];
-  NSMutableArray *result = [NSMutableArray array];
-  for (UICollectionViewLayoutAttributes *attributes in visibleAttributes) {
-    if (attributes.representedElementCategory == UICollectionElementCategorySupplementaryView
-        && [attributes.representedElementKind isEqualToString:kind]) {
-      [result addObject:attributes.indexPath];
-    }
-  }
-  return result;
 }
 
 - (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
