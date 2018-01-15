@@ -616,7 +616,6 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     return;
   }
 
-  #if TARGET_OS_IOS
   // If it's an assets-library URL, we need to fetch it from the assets library.
   if ([[nextImageURL scheme] isEqualToString:kAssetsLibraryURLScheme]) {
     // Load the asset.
@@ -625,14 +624,13 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
       finishedLoadingBlock(downloadedImage, nextImageIdentifier, error);
     }];
   }
-  // Likewise, if it's a iOS 8 Photo asset, we need to fetch it accordingly.
+  // Likewise, if it's a Photos asset, we need to fetch it accordingly.
   else if (ASPhotosFrameworkImageRequest *request = [ASPhotosFrameworkImageRequest requestWithURL:nextImageURL]) {
     [self _loadPHAssetWithRequest:request identifier:nextImageIdentifier completion:^(UIImage *image, NSError *error) {
       as_log_verbose(ASImageLoadingLog(), "Acquired image from Photos for %@ %@", weakSelf, nextImageIdentifier);
       finishedLoadingBlock(image, nextImageIdentifier, error);
     }];
   }
-  #endif
   else // Otherwise, it's a web URL that we can download.
   {
     // First, check the cache.

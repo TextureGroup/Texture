@@ -1184,51 +1184,6 @@ style. _attr_ = _attr_; \
   [self as_removeDiscontinuousAttributesInRange:NSMakeRange(length, string.length)];
 }
 
-- (void)as_setClearColorToJoinedEmoji {
-  NSString *str = self.string;
-  if (str.length < 8) return;
-  
-  // Most string do not contains the joined-emoji, test the joiner first.
-  BOOL containsJoiner = NO;
-  {
-    CFStringRef cfStr = (__bridge CFStringRef)str;
-    BOOL needFree = NO;
-    UniChar *chars = NULL;
-    chars = (UniChar *)CFStringGetCharactersPtr(cfStr);
-    if (!chars) {
-      chars = (UniChar *)malloc(str.length * sizeof(UniChar));
-      if (chars) {
-        needFree = YES;
-        CFStringGetCharacters(cfStr, CFRangeMake(0, str.length), chars);
-      }
-    }
-    if (!chars) { // fail to get unichar..
-      containsJoiner = YES;
-    } else {
-      for (int i = 0, max = (int)str.length; i < max; i++) {
-        if (chars[i] == 0x200D) { // 'ZERO WIDTH JOINER' (U+200D)
-          containsJoiner = YES;
-          break;
-        }
-      }
-      if (needFree) free(chars);
-    }
-  }
-  if (!containsJoiner) return;
-  
-  // NSRegularExpression is designed to be immutable and thread safe.
-  static NSRegularExpression *regex;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    regex = [NSRegularExpression regularExpressionWithPattern:@"((👨‍👩‍👧‍👦|👨‍👩‍👦‍👦|👨‍👩‍👧‍👧|👩‍👩‍👧‍👦|👩‍👩‍👦‍👦|👩‍👩‍👧‍👧|👨‍👨‍👧‍👦|👨‍👨‍👦‍👦|👨‍👨‍👧‍👧)+|(👨‍👩‍👧|👩‍👩‍👦|👩‍👩‍👧|👨‍👨‍👦|👨‍👨‍👧))" options:kNilOptions error:nil];
-  });
-  
-  UIColor *clear = [UIColor clearColor];
-  [regex enumerateMatchesInString:str options:kNilOptions range:NSMakeRange(0, str.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-    [self as_setColor:clear range:result.range];
-  }];
-}
-
 - (void)as_removeDiscontinuousAttributesInRange:(NSRange)range {
   NSArray *keys = [NSMutableAttributedString as_allDiscontinuousAttributeKeys];
   for (NSString *key in keys) {
