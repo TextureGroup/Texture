@@ -230,6 +230,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   CGColorRelease(_shadowColor);
 
+  // TODO: This may not be necessary post-iOS-9 when most UIKit assign APIs
+  // were changed to weak.
   if (_longPressGestureRecognizer) {
     _longPressGestureRecognizer.delegate = nil;
     [_longPressGestureRecognizer removeTarget:nil action:NULL];
