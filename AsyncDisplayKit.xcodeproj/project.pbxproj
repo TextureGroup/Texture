@@ -329,10 +329,10 @@
 		CC0F886D1E4286FA00576FED /* ReferenceImages_iOS_10 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */; };
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */; };
 		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CC182493200D52DE00875940 /* Configuration.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248F200D52DE00875940 /* Configuration.h */; };
 		CC182494200D52DE00875940 /* PlankModelRuntime.h in Headers */ = {isa = PBXBuildFile; fileRef = CC182490200D52DE00875940 /* PlankModelRuntime.h */; };
-		CC182495200D52DE00875940 /* Configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = CC182491200D52DE00875940 /* Configuration.m */; };
 		CC182496200D52DE00875940 /* PlankModelRuntime.m in Sources */ = {isa = PBXBuildFile; fileRef = CC182492200D52DE00875940 /* PlankModelRuntime.m */; };
+		CC18249D200D578900875940 /* _ASConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18249B200D578800875940 /* _ASConfiguration.h */; };
+		CC18249E200D578900875940 /* _ASConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = CC18249C200D578900875940 /* _ASConfiguration.m */; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
 		CC2F65EF1E5FFB1600DA57C9 /* ASMutableElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */; };
 		CC3B20841C3F76D600798563 /* ASPendingStateController.h in Headers */ = {isa = PBXBuildFile; fileRef = CC3B20811C3F76D600798563 /* ASPendingStateController.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -825,10 +825,10 @@
 		CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_iOS_10; sourceTree = "<group>"; };
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageNodeTests.m; sourceTree = "<group>"; };
 		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
-		CC18248F200D52DE00875940 /* Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Configuration.h; sourceTree = "<group>"; };
 		CC182490200D52DE00875940 /* PlankModelRuntime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlankModelRuntime.h; sourceTree = "<group>"; };
-		CC182491200D52DE00875940 /* Configuration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Configuration.m; sourceTree = "<group>"; };
 		CC182492200D52DE00875940 /* PlankModelRuntime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlankModelRuntime.m; sourceTree = "<group>"; };
+		CC18249B200D578800875940 /* _ASConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASConfiguration.h; sourceTree = "<group>"; };
+		CC18249C200D578900875940 /* _ASConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _ASConfiguration.m; sourceTree = "<group>"; };
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMutableElementMap.h; sourceTree = "<group>"; };
 		CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMutableElementMap.m; sourceTree = "<group>"; };
@@ -1094,7 +1094,6 @@
 		058D09B1195D04C000B7D73C /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				CC18248D200D529800875940 /* Generated */,
 				CCE04B1D1E313E99006AEBBB /* Collection Data Adapter */,
 				CC58AA4A1E398E1D002C8CB4 /* ASBlockTypes.h */,
 				CCEDDDCC200C2CB900FFCD0A /* ASConfiguration.h */,
@@ -1186,6 +1185,7 @@
 				058D0A42195D058D00B7D73C /* Base */,
 				DE89C1691DCEB9CC00D49D74 /* Debug */,
 				058D09E1195D050800B7D73C /* Details */,
+				CC18248D200D529800875940 /* Generated */,
 				058D0A01195D050800B7D73C /* Private */,
 				AC6456051B0A333200CF11B8 /* Layout */,
 				257754661BED245B00737CA5 /* TextKit */,
@@ -1631,8 +1631,8 @@
 		CC18248E200D52A800875940 /* plank */ = {
 			isa = PBXGroup;
 			children = (
-				CC18248F200D52DE00875940 /* Configuration.h */,
-				CC182491200D52DE00875940 /* Configuration.m */,
+				CC18249B200D578800875940 /* _ASConfiguration.h */,
+				CC18249C200D578900875940 /* _ASConfiguration.m */,
 				CC182490200D52DE00875940 /* PlankModelRuntime.h */,
 				CC182492200D52DE00875940 /* PlankModelRuntime.m */,
 			);
@@ -1865,7 +1865,6 @@
 				CCCCCCD91EC3EF060087FE10 /* ASTextLayout.h in Headers */,
 				A37320101C571B740011FC94 /* ASTextNode+Beta.h in Headers */,
 				9C70F2061CDA4F0C007D6C76 /* ASTraitCollection.h in Headers */,
-				CC182493200D52DE00875940 /* Configuration.h in Headers */,
 				CC6AA2DA1E9F03B900978E87 /* ASDisplayNode+Ancestry.h in Headers */,
 				8021EC1D1D2B00B100799119 /* UIImage+ASConvenience.h in Headers */,
 				B35061FD1B010EFD0018CF92 /* ASDisplayNode+Subclasses.h in Headers */,
@@ -1891,6 +1890,7 @@
 				DE7EF4F81DFF77720082B84A /* ASDisplayNode+FrameworkSubclasses.h in Headers */,
 				CCCCCCD51EC3EF060087FE10 /* ASTextDebugOption.h in Headers */,
 				CC034A091E60BEB400626263 /* ASDisplayNode+Convenience.h in Headers */,
+				CC18249D200D578900875940 /* _ASConfiguration.h in Headers */,
 				254C6B7E1BF94DF4003EC431 /* ASTextKitTailTruncater.h in Headers */,
 				B35062491B010EFD0018CF92 /* _ASCoreAnimationExtras.h in Headers */,
 				68EE0DBE1C1B4ED300BA1B99 /* ASMainSerialQueue.h in Headers */,
@@ -2449,8 +2449,8 @@
 				68355B3E1CB57A60001D4E68 /* ASPINRemoteImageDownloader.m in Sources */,
 				CC034A141E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m in Sources */,
 				509E68661B3AEDD7009B9150 /* CoreGraphics+ASConvenience.m in Sources */,
-				CC182495200D52DE00875940 /* Configuration.m in Sources */,
 				254C6B871BF94F8A003EC431 /* ASTextKitEntityAttribute.m in Sources */,
+				CC18249E200D578900875940 /* _ASConfiguration.m in Sources */,
 				34566CB31BC1213700715E6B /* ASPhotosFrameworkImageRequest.m in Sources */,
 				254C6B831BF94F8A003EC431 /* ASTextKitCoreTextAdditions.m in Sources */,
 				CCCCCCE21EC3EF060087FE10 /* ASTextUtilities.m in Sources */,

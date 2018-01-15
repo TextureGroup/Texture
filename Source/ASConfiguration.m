@@ -12,16 +12,9 @@
 
 #import <AsyncDisplayKit/ASConfiguration.h>
 
+ASExperimentalFeatureName ASExperimentalGraphicsContexts = @"exp_graphics_contexts";
+ASExperimentalFeatureName ASExperimentalTextNode = @"exp_text_node";
+
 @implementation ASConfiguration
-
-#pragma mark - NSCopying
-
-- (id)copyWithZone:(NSZone *)zone
-{
-  ASConfiguration *config = [[ASConfiguration alloc] init];
-  config->_experimentalFeatures = _experimentalFeatures;
-  config->_delegate = _delegate;
-  return config;
-}
 
 @end

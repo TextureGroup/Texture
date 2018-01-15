@@ -12,18 +12,20 @@
 
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/_ASConfiguration.h>
 
 @protocol ASConfigurationDelegate;
 
-typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatureSet) {
-  ASExperimentalGraphicsContexts = 1 << 0,
-  ASExperimentalTextNode = 1 << 1
-};
-
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSString *ASExperimentalFeatureName NS_TYPED_ENUM;
+
+/// See configuration.json for the values of these.
+extern ASExperimentalFeatureName const ASExperimentalGraphicsContexts;
+extern ASExperimentalFeatureName const ASExperimentalTextNode;
+
 AS_SUBCLASSING_RESTRICTED
-@interface ASConfiguration : NSObject <NSCopying>
+@interface ASConfiguration : _ASConfiguration
 
 /**
  * The delegate for configuration-related events.
@@ -31,10 +33,7 @@ AS_SUBCLASSING_RESTRICTED
  */
 @property (strong, nullable) id<ASConfigurationDelegate> delegate;
 
-/**
- * The experiments you want to enable in Texture.
- */
-@property ASExperimentalFeatureSet experimentalFeatures;
+@property (nullable, nonatomic, strong, readonly) NSArray<ASExperimentalFeatureName> * experimentalFeatures;
 
 @end
 

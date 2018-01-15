@@ -9,7 +9,10 @@
     		"type": "array",
     		"items": {
         		"type": "string",
-        		"enum": ["one", "two", "three"]
+        		"enum": [
+                    "exp_graphics_contexts",
+                    "exp_text_node"
+                ]
     		}
 		}
     }

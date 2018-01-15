@@ -16,6 +16,11 @@
 NS_ASSUME_NONNULL_BEGIN
 ASDISPLAYNODE_EXTERN_C_BEGIN
 
+typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatureSet) {
+  ASExperimentalGraphicsContextsFlag = 1 << 0,
+  ASExperimentalTextNodeFlag = 1 << 1
+};
+
 /**
  * Quickly check if an experiment is enabled and notify the delegate
  * that it's been activated.
