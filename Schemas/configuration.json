@@ -1,0 +1,16 @@
+{
+    "id": "configuration.json",
+    "title": "configuration",
+    "description" : "Schema definition of a Texture Configuration",
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+    	"experimentalFeatures": {
+    		"type": "array",
+    		"items": {
+        		"type": "string",
+        		"enum": ["one", "two", "three"]
+    		}
+		}
+    }
+}
