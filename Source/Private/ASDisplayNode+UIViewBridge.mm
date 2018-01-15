@@ -946,6 +946,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)insetsLayoutMarginsFromSafeArea
 {
+  ASDisplayNodeAssertThreadAffinity(self);
   {
     _bridge_prologue_write;
 
@@ -958,7 +959,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     }
   }
 
-  if (!AS_AT_LEAST_IOS11 || _flags.layerBacked) {
+  if (__loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked)) {
     [self layoutMarginsDidChange];
   }
 }
