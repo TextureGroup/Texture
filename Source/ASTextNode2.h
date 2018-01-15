@@ -11,9 +11,7 @@
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
-
-// Import this to get ASTextNodeHighlightStyle
-#import <AsyncDisplayKit/ASTextNode.h>
+#import <AsyncDisplayKit/ASTextNodeCommon.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -328,6 +328,7 @@
 		CC0F886C1E4286FA00576FED /* ReferenceImages_64 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F88691E4286FA00576FED /* ReferenceImages_64 */; };
 		CC0F886D1E4286FA00576FED /* ReferenceImages_iOS_10 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */; };
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */; };
+		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
 		CC2F65EF1E5FFB1600DA57C9 /* ASMutableElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */; };
 		CC3B20841C3F76D600798563 /* ASPendingStateController.h in Headers */ = {isa = PBXBuildFile; fileRef = CC3B20811C3F76D600798563 /* ASPendingStateController.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -819,6 +820,7 @@
 		CC0F88691E4286FA00576FED /* ReferenceImages_64 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_64; sourceTree = "<group>"; };
 		CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_iOS_10; sourceTree = "<group>"; };
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageNodeTests.m; sourceTree = "<group>"; };
+		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMutableElementMap.h; sourceTree = "<group>"; };
 		CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMutableElementMap.m; sourceTree = "<group>"; };
@@ -1158,6 +1160,7 @@
 				055F1A3319ABD3E3004DAFF1 /* ASTableView.mm */,
 				AC7A2C161BDE11DF0093FE1A /* ASTableViewInternal.h */,
 				0574D5E119C110610097DC25 /* ASTableViewProtocols.h */,
+				CC18248B200D49C800875940 /* ASTextNodeCommon.h */,
 				058D09DF195D050800B7D73C /* ASTextNode.h */,
 				A373200E1C571B050011FC94 /* ASTextNode+Beta.h */,
 				058D09E0195D050800B7D73C /* ASTextNode.mm */,
@@ -1783,6 +1786,7 @@
 				696F01EC1DD2AF450049FBD5 /* ASEventLog.h in Headers */,
 				690C35641E055C7B00069B91 /* ASDimensionInternal.h in Headers */,
 				3917EBD41E9C2FC400D04A01 /* _ASCollectionReusableView.h in Headers */,
+				CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */,
 				698371DB1E4379CD00437585 /* ASNodeController+Beta.h in Headers */,
 				6907C2581DC4ECFE00374C66 /* ASObjectDescriptionHelpers.h in Headers */,
 				69E0E8A71D356C9400627613 /* ASEqualityHelpers.h in Headers */,

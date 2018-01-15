@@ -1414,8 +1414,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
       // Mark visited so we only do this once per class.
       classes.insert(c);
       if (s == [ASTextNode class]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         // Direct descendent. Update superclass of c and end.
         class_setSuperclass(c, [ASTextNode2 class]);
+#pragma clang diagnostic pop
         break;
       }
     }
