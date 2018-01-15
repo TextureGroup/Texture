@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASConfigurationManager (Testing)
 
-+ (void)test_resetWithConfiguration:(ASConfiguration *)configuration;
++ (void)test_resetWithConfiguration:(nullable ASConfiguration *)configuration;
 
 @end
 

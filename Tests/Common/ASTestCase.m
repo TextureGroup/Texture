@@ -31,6 +31,8 @@ static __weak ASTestCase *currentTestCase;
 
 - (void)tearDown
 {
+  [ASConfigurationManager test_resetWithConfiguration:nil];
+  
   // Clear out all application windows. Note: the system will retain these sometimes on its
   // own but we'll do our best.
   for (UIWindow *window in [UIApplication sharedApplication].windows) {

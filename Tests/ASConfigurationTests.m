@@ -12,7 +12,7 @@
 #import "ASConfigurationDelegate.h"
 #import "ASConfigurationManager.h"
 
-@interface ASConfigurationTests : XCTestCase <ASConfigurationDelegate>
+@interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
 
 @end
 
