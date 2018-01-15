@@ -87,7 +87,7 @@
     if ([_viewController isKindOfClass:[ASViewController class]]) {
       ASViewController *asViewController = (ASViewController *)_viewController;
       _viewControllerNode = asViewController.node;
-      [_viewController view];
+      [_viewController loadViewIfNeeded];
     } else {
       // Careful to avoid retain cycle
       UIViewController *viewController = _viewController;
