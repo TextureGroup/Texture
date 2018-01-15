@@ -16,12 +16,19 @@
 #import <OCMock/OCMock.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import "OCMockObject+ASAdditions.h"
+#import "ASConfigurationManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASTestCase : XCTestCase
 
 @property (class, nonatomic, nullable, readonly) ASTestCase *currentTestCase;
+
+@end
+
+@interface ASConfigurationManager (Testing)
+
++ (void)test_resetWithConfiguration:(ASConfiguration *)configuration;
 
 @end
 

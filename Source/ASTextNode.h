@@ -17,15 +17,10 @@
 
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASControlNode.h>
-#if ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
-  #import <AsyncDisplayKit/ASTextNode2.h>
-#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASTextNodeDelegate;
-
-#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 
 /**
  * Highlight styles.
@@ -300,8 +295,6 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 
 @end
 
-#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
-
 @interface ASTextNode (Unavailable)
 
 - (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
@@ -333,7 +326,5 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
 @property (nullable, nonatomic, copy) NSAttributedString *truncationAttributedString ASDISPLAYNODE_DEPRECATED_MSG("Use .truncationAttributedText instead.");
 
 @end
-
-#endif
 
 NS_ASSUME_NONNULL_END

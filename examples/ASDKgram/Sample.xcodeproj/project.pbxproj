@@ -36,6 +36,7 @@
 		CC5532171E15CC1E0011C01F /* ASCollectionSectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5532161E15CC1E0011C01F /* ASCollectionSectionController.m */; };
 		CC6350BB1E1C482D002BC613 /* TailLoadingNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6350BA1E1C482D002BC613 /* TailLoadingNode.m */; };
 		CC85250F1E36B392008EABE6 /* FeedHeaderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CC85250E1E36B392008EABE6 /* FeedHeaderNode.m */; };
+		CCEDDDD7200C4C0E00FFCD0A /* TextureConfigDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */; };
 		E5F128F01E09625400B4335F /* PhotoFeedBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F128EF1E09625400B4335F /* PhotoFeedBaseController.m */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +99,7 @@
 		CC6350BA1E1C482D002BC613 /* TailLoadingNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TailLoadingNode.m; sourceTree = "<group>"; };
 		CC85250D1E36B392008EABE6 /* FeedHeaderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedHeaderNode.h; sourceTree = "<group>"; };
 		CC85250E1E36B392008EABE6 /* FeedHeaderNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedHeaderNode.m; sourceTree = "<group>"; };
+		CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TextureConfigDelegate.m; sourceTree = "<group>"; };
 		D09B5DF0BFB37583DE8F3142 /* Pods-Sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample.release.xcconfig"; path = "Pods/Target Support Files/Pods-Sample/Pods-Sample.release.xcconfig"; sourceTree = "<group>"; };
 		E5F128EE1E09612700B4335F /* PhotoFeedBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoFeedBaseController.h; sourceTree = "<group>"; };
 		E5F128EF1E09625400B4335F /* PhotoFeedBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoFeedBaseController.m; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 		05E2128319D4DB510098F589 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
+				CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */,
 				768843511CAA37EF00D8629E /* AppDelegate.h */,
 				768843681CAA37EF00D8629E /* AppDelegate.m */,
 				76229A761CBB79E000B62CEF /* WindowWithStatusBarUnderlay.h */,
@@ -381,13 +384,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Sample-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F012A6F39E0149F18F564F50 /* [CP] Copy Pods Resources */ = {
@@ -424,6 +430,7 @@
 				CC5532171E15CC1E0011C01F /* ASCollectionSectionController.m in Sources */,
 				768843801CAA37EF00D8629E /* AppDelegate.m in Sources */,
 				768843811CAA37EF00D8629E /* CommentFeedModel.m in Sources */,
+				CCEDDDD7200C4C0E00FFCD0A /* TextureConfigDelegate.m in Sources */,
 				7688438E1CAA37EF00D8629E /* PhotoFeedNodeController.m in Sources */,
 				CC6350BB1E1C482D002BC613 /* TailLoadingNode.m in Sources */,
 				CC85250F1E36B392008EABE6 /* FeedHeaderNode.m in Sources */,

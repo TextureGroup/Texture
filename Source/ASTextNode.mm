@@ -18,14 +18,15 @@
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
 
-#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
-#include <mutex>
+#import <mutex>
+#import <unordered_set>
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASConfigurationManager.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -1386,69 +1387,41 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-// Allocate _experimentLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-static ASDN::StaticMutex& _experimentLock = *new ASDN::StaticMutex;
-static ASTextNodeExperimentOptions _experimentOptions;
-static BOOL _hasAllocatedNode;
-
-+ (void)setExperimentOptions:(ASTextNodeExperimentOptions)options
-{
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    ASDN::StaticMutexLocker lock(_experimentLock);
-    
-    // They must call this before allocating any text nodes.
-    ASDisplayNodeAssertFalse(_hasAllocatedNode);
-    
-    _experimentOptions = options;
-    
-    // Set superclass of all subclasses to ASTextNode2
-    if (options & ASTextNodeExperimentSubclasses) {
-      unsigned int classCount;
-      Class originalClass = [ASTextNode class];
-      Class newClass = [ASTextNode2 class];
-      Class *classes = objc_copyClassList(&classCount);
-      for (int i = 0; i < classCount; i++) {
-        Class c = classes[i];
-        if (class_getSuperclass(c) == originalClass) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-          class_setSuperclass(c, newClass);
-#pragma clang diagnostic pop
-        }
-      }
-      free(classes);
-    }
-    
-    if (options & ASTextNodeExperimentDebugging) {
-      [ASTextNode2 enableDebugging];
-    }
-  });
-}
-
 + (id)allocWithZone:(struct _NSZone *)zone
 {
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    ASDN::StaticMutexLocker lock(_experimentLock);
-    _hasAllocatedNode = YES;
-  });
-  
-  // All instances || (random instances && rand() != 0)
-  BOOL useExperiment = (_experimentOptions & ASTextNodeExperimentAllInstances)
-		|| ((_experimentOptions & ASTextNodeExperimentRandomInstances)
-        && (arc4random_uniform(2) != 0));
-  
-  if (useExperiment) {
-    return (ASTextNode *)[ASTextNode2 allocWithZone:zone];
-  } else {
+  // If they're not experimenting, just forward.
+  if (!ASActivateExperimentalFeature(ASExperimentalTextNode)) {
     return [super allocWithZone:zone];
   }
-}
-
-- (BOOL)usingExperiment
-{
-  return NO;
+  
+  // We are plain ASTextNode. Just swap in an ASTextNode2 instead.
+  if (self == [ASTextNode class]) {
+    return (ASTextNode *)[ASTextNode2 allocWithZone:zone];
+  }
+  
+  // We are descended from ASTextNode. We need to change the superclass for the
+  // ASTextNode subclass to ASTextNode2. Keep track of which classes we've done this for.
+  {
+    static std::mutex lock;
+    static std::unordered_set<Class> classes;
+    
+    std::lock_guard<std::mutex> locker(lock);
+    
+    // Walk up the class hierarchy until we find ASTextNode.
+    Class s;
+    for (Class c = self; c != [ASTextNode class]; c = s) {
+      s = class_getSuperclass(c);
+      // Mark visited so we only do this once per class.
+      classes.insert(c);
+      if (s == [ASTextNode class]) {
+        // Direct descendent. Update superclass of c and end.
+        class_setSuperclass(c, [ASTextNode2 class]);
+        break;
+      }
+    }
+  }
+  
+  return [super allocWithZone:zone];
 }
 
 @end
@@ -1476,10 +1449,3 @@ static BOOL _hasAllocatedNode;
 }
 
 @end
-
-#else
-
-@implementation ASTextNode
-@end
-
-#endif

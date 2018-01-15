@@ -40,8 +40,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
-  ASEnableNoCopyRendering();
-  
   // this UIWindow subclass is neccessary to make the status bar opaque
   _window                  = [[WindowWithStatusBarUnderlay alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   _window.backgroundColor  = [UIColor whiteColor];

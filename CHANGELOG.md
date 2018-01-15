@@ -12,6 +12,7 @@
 - [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
 - [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Added an experimental "no-copy" rendering API. See ASGraphicsContext.h for info. [Adlai Holler](https://github.com/Adlai-Holler)
+- Added a configuration API – a unified place to turn on/off experimental Texture features. See `ASConfiguration.h` for info. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
