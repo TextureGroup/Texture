@@ -38,6 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) UIEdgeInsets textContainerInset;
 
+/**
+ * Returns YES if this node is using the experimental implementation. NO otherwise. Will not change.
+ */
+@property (atomic, readonly) BOOL usingExperiment;
+
 @end
 
 NS_ASSUME_NONNULL_END

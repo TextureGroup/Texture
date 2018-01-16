@@ -35,12 +35,10 @@ static const NSInteger kMaxLitterSize = 100;        // max number of kitten cell
   // array of boxed CGSizes corresponding to placekitten.com kittens
   NSMutableArray *_kittenDataSource;
 
-  BOOL _dataSourceLocked;
   NSIndexPath *_blurbNodeIndexPath;
 }
 
 @property (nonatomic, strong) NSMutableArray *kittenDataSource;
-@property (atomic, assign) BOOL dataSourceLocked;
 
 @end
 
@@ -94,12 +92,6 @@ static const NSInteger kMaxLitterSize = 100;        // max number of kitten cell
     [kittens addObject:[NSValue valueWithCGSize:size]];
   }
   return kittens;
-}
-
-- (void)setKittenDataSource:(NSMutableArray *)kittenDataSource {
-  ASDisplayNodeAssert(!self.dataSourceLocked, @"Could not update data source when it is locked !");
-
-  _kittenDataSource = kittenDataSource;
 }
 
 - (void)toggleEditingMode
