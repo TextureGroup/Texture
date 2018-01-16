@@ -188,7 +188,7 @@ AS_SUBCLASSING_RESTRICTED
                                               containerSize:(CGSize)windowSize
                                 fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory;
 
-
+#if TARGET_OS_TV
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
                                             verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                                  displayScale:(CGFloat)displayScale
@@ -196,15 +196,35 @@ AS_SUBCLASSING_RESTRICTED
                                            userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
                                          forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
-#if TARGET_OS_TV
                                            userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
-#endif
                                  preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
                                                 containerSize:(CGSize)windowSize;
-
+#else
++ (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
+                                            verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
+                                                 displayScale:(CGFloat)displayScale
+                                                 displayGamut:(UIDisplayGamut)displayGamut
+                                           userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
+                                         forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
+                                              layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
+                                 preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                                                containerSize:(CGSize)windowSize;
+#endif
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 - (BOOL)isEqualToTraitCollection:(ASTraitCollection *)traitCollection;
+
+@end
+
+@interface ASTraitCollection (Deprecated)
+
++ (ASTraitCollection *)traitCollectionWithDisplayScale:(CGFloat)displayScale
+                                    userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
+                                   horizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
+                                     verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
+                                  forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
+                                         containerSize:(CGSize)windowSize
+  ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
 
 @end
 
