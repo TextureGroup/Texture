@@ -295,19 +295,15 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
 {
-  NSArray *children = self.children;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
-  
   CGSize size = constrainedSize.min;
-  for (id<ASLayoutElement> child in children) {
+  NSArray *sublayouts = ASArrayByFlatMapping(self.children, id<ASLayoutElement> child, ({
     ASLayout *sublayout = [child layoutThatFits:constrainedSize parentSize:constrainedSize.max];
     sublayout.position = CGPointZero;
     
     size.width = MAX(size.width,  sublayout.size.width);
     size.height = MAX(size.height, sublayout.size.height);
-    
-    [sublayouts addObject:sublayout];
-  }
+    sublayout;
+  }));
   
   return [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 }

@@ -719,19 +719,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToCollectionNode:(NSArray<NSIndexPath *> *)indexPaths
 {
-  if (indexPaths == nil) {
-    return nil;
-  }
-
-  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
-
-  for (NSIndexPath *indexPathInView in indexPaths) {
-    NSIndexPath *indexPath = [self convertIndexPathToCollectionNode:indexPathInView];
-    if (indexPath != nil) {
-      [indexPathsArray addObject:indexPath];
-    }
-  }
-  return indexPathsArray;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *indexPathInView, ({
+    [self convertIndexPathToCollectionNode:indexPathInView];
+  }));
 }
 
 - (ASCellNode *)supplementaryNodeForElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
@@ -747,17 +737,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (NSArray *)visibleNodes
 {
   NSArray *indexPaths = [self indexPathsForVisibleItems];
-  NSMutableArray *visibleNodes = [[NSMutableArray alloc] init];
   
-  for (NSIndexPath *indexPath in indexPaths) {
-    ASCellNode *node = [self nodeForItemAtIndexPath:indexPath];
-    if (node) {
-      // It is possible for UICollectionView to return indexPaths before the node is completed.
-      [visibleNodes addObject:node];
-    }
-  }
-  
-  return visibleNodes;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *indexPath, ({
+    [self nodeForItemAtIndexPath:indexPath];
+  }));
 }
 
 - (BOOL)usesSynchronousDataLoading
@@ -2176,13 +2159,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
 
-  NSMutableArray<NSIndexPath *> *uikitIndexPaths = [NSMutableArray arrayWithCapacity:nodes.count];
-  for (ASCellNode *node in nodes) {
-    NSIndexPath *uikitIndexPath = [self indexPathForNode:node];
-    if (uikitIndexPath != nil) {
-      [uikitIndexPaths addObject:uikitIndexPath];
-    }
-  }
+  NSArray *uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, ({
+    [self indexPathForNode:node];
+  }));
   
   [_layoutFacilitator collectionViewWillEditCellsAtIndexPaths:uikitIndexPaths batched:NO];
   

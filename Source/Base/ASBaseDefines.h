@@ -132,22 +132,6 @@
 #define __has_attribute(x) 0 // Compatibility with non-clang compilers.
 #endif
 
-#ifndef NS_CONSUMED
-#if __has_feature(attribute_ns_consumed)
-#define NS_CONSUMED __attribute__((ns_consumed))
-#else
-#define NS_CONSUMED
-#endif
-#endif
-
-#ifndef NS_RETURNS_RETAINED
-#if __has_feature(attribute_ns_returns_retained)
-#define NS_RETURNS_RETAINED __attribute__((ns_returns_retained))
-#else
-#define NS_RETURNS_RETAINED
-#endif
-#endif
-
 #ifndef CF_RETURNS_RETAINED
 #if __has_feature(attribute_cf_returns_retained)
 #define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
@@ -242,43 +226,44 @@
 })
 
 /**
- * Create a new set by mapping `collection` over `work`, ignoring nil.
+ * Generic flat-map that lets you specify result class.
+ * Result class must have -initWithObjects:count:
  */
-#define ASSetByFlatMapping(collection, decl, work) ({ \
-  NSMutableSet *s = [NSMutableSet set]; \
+#define ASCollectionByFlatMapping(resultClass, collection, decl, work) ({ \
+  id _cArray[collection.count]; \
+  NSUInteger _i = 0; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [s addObject:result]; \
+    /* Avoid making a local variable here, or extra retain/release. */ \
+    _cArray[_i] = work; \
+    if (_cArray[_i]) { \
+      _i++; \
     } \
   } \
-  s; \
+  [[resultClass alloc] initWithObjects:_cArray count:_i]; \
 })
 
 /**
- * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
+ * Create a new set by mapping `collection` over `work`, ignoring nil.
  */
-#define ASPointerTableByFlatMapping(collection, decl, work) ({ \
-  NSHashTable *t = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality]; \
-  for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [t addObject:result]; \
-    } \
-  } \
-  t; \
-})
+#define ASSetByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSSet, collection, decl, work)
 
 /**
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
-#define ASArrayByFlatMapping(collection, decl, work) ({ \
-  NSMutableArray *a = [NSMutableArray array]; \
+#define ASArrayByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSArray, collection, decl, work)
+#define ASMutableArrayByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSMutableArray, collection, decl, work)
+
+/**
+ * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
+ *
+ * Can't use ASCollectionByFlatMapping because NSHashTable doesn't support initialization from a C-array.
+ */
+#define ASPointerTableByFlatMapping(collection, decl, work) ({ \
+  NSHashTable *t = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:collection.count]; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [a addObject:result]; \
-    } \
+    /* NSHashTable accepts nil and avoid extra retain/release. */ \
+    [t addObject:work]; \
   } \
-  a; \
+  t; \
 })
+
