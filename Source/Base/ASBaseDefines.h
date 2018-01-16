@@ -226,38 +226,35 @@
 })
 
 /**
- * Generic flat-map that lets you specify result class.
- * Result class must have -initWithObjects:count:
+ * Create a new set by mapping `collection` over `work`, ignoring nil.
  */
-#define ASCollectionByFlatMapping(resultClass, collection, decl, work) ({ \
-  /* Would love to make this unretained but not possible. Tried everything. */ \
-  id _cArray[collection.count]; \
+#define ASSetByFlatMapping(collection, decl, work) ({ \
+  CFTypeRef _cArray[collection.count]; \
   NSUInteger _i = 0; \
   for (decl in collection) {\
-    /* Avoid making a local variable here, or extra retain/release. */ \
-    _cArray[_i] = work; \
-    if (_cArray[_i]) { \
+    if ((_cArray[_i] = (__bridge_retained CFTypeRef)work)) { \
       _i++; \
     } \
   } \
-  [[resultClass alloc] initWithObjects:_cArray count:_i]; \
+  NSSet *result; \
+  if (_i == 0) { \
+    /** Zero fast path. */ \
+    result = [NSSet set]; \
+  } else if (_i == 1) { \
+    /** NSSingleObjectSet is fast. Create one and release. */ \
+    CFTypeRef val = _cArray[0]; \
+    result = [NSSet setWithObject:(__bridge id)val]; \
+    CFBridgingRelease(val); \
+  } else { \
+    CFSetCallBacks cb = kCFTypeSetCallBacks; \
+    cb.retain = NULL; \
+    result = (__bridge NSSet *)CFSetCreate(kCFAllocatorDefault, _cArray, _i, &cb); \
+  } \
+  result; \
 })
 
 /**
- * Create a new set by mapping `collection` over `work`, ignoring nil.
- */
-#define ASSetByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSSet, collection, decl, work)
-
-/**
- * Create a new array by mapping `collection` over `work`, ignoring nil.
- */
-#define ASArrayByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSArray, collection, decl, work)
-#define ASMutableArrayByFlatMapping(collection, decl, work) ASCollectionByFlatMapping(NSMutableArray, collection, decl, work)
-
-/**
  * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
- *
- * Can't use ASCollectionByFlatMapping because NSHashTable doesn't support initialization from a C-array.
  */
 #define ASPointerTableByFlatMapping(collection, decl, work) ({ \
   NSHashTable *t = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:collection.count]; \
@@ -268,3 +265,41 @@
   t; \
 })
 
+/**
+ * Create a new array by mapping `collection` over `work`, ignoring nil.
+ */
+#define ASArrayByFlatMapping(collection, decl, work) ({ \
+  CFTypeRef _cArray[collection.count]; \
+  NSUInteger _i = 0; \
+  for (decl in collection) {\
+    if ((_cArray[_i] = (__bridge_retained CFTypeRef)work)) { \
+      _i++; \
+    } \
+  } \
+  NSArray *result; \
+  if (_i == 0) { \
+    /** Zero array fast path. */ \
+    result = @[]; \
+  } else if (_i == 1) { \
+    /** NSSingleObjectArray is fast. Create one and release. */ \
+    CFTypeRef val = _cArray[0]; \
+    result = [NSArray arrayWithObject:(__bridge id)val]; \
+    CFBridgingRelease(val); \
+  } else { \
+    CFArrayCallBacks cb = kCFTypeArrayCallBacks; \
+    cb.retain = NULL; \
+    result = (__bridge NSArray *)CFArrayCreate(kCFAllocatorDefault, _cArray, _i, &cb); \
+  } \
+  result; \
+})
+
+#define ASMutableArrayByFlatMapping(collection, decl, work) ({ \
+  id _cArray[collection.count]; \
+  NSUInteger _i = 0; \
+  for (decl in collection) {\
+    if ((_cArray[_i] = work)) { \
+      _i++; \
+    } \
+  } \
+  [[NSMutableArray alloc] initWithObjects:_cArray count:_i]; \
+})
