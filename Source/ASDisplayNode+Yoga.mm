@@ -158,8 +158,7 @@
 - (void)setupYogaCalculatedLayout
 {
   YGNodeRef yogaNode = self.style.yogaNode;
-  uint32_t childCount = YGNodeGetChildCount(yogaNode);
-  ASDisplayNodeAssert(childCount == self.yogaChildren.count,
+  ASDisplayNodeAssert(YGNodeGetChildCount(yogaNode) == self.yogaChildren.count,
                       @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
 
   NSArray *sublayouts = ASArrayByFlatMapping(self.yogaChildren, ASDisplayNode *subnode, ({
