@@ -3089,7 +3089,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // and running a measurement pass here is a fine trade-off because preloading any time after this point would be late.
   //
   // Don't force a layout pass if the node is already visible. Soon CoreAnimation will trigger
-  // a (coaloesced, thus more efficient) pass on the backing store, so rely on it instead.
+  // a (coalesced, thus more efficient) pass on the backing store. Rely on it instead.
   BOOL shouldForceLayoutPass = NO;
   {
     ASDN::MutexLocker l(__instanceLock__);
