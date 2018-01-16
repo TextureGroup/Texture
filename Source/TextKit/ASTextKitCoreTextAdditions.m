@@ -98,8 +98,13 @@ NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *co
       cleanAttributes[NSForegroundColorAttributeName] = [UIColor colorWithCGColor:(CGColorRef)coreTextValue];
     }
     // kCTParagraphStyleAttributeName -> NSParagraphStyleAttributeName
-    else if ([coreTextKey isEqualToString:(NSString *)kCTParagraphStyleAttributeName] && ![coreTextValue isKindOfClass:[NSParagraphStyle class]]) {
-      cleanAttributes[NSParagraphStyleAttributeName] = [NSParagraphStyle paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextValue];
+    else if ([coreTextKey isEqualToString:(NSString *)kCTParagraphStyleAttributeName]) {
+      if ([coreTextValue isKindOfClass:[NSParagraphStyle class]]) {
+        cleanAttributes[NSParagraphStyleAttributeName] = (NSParagraphStyle *)coreTextValue;
+      }
+      else {
+        cleanAttributes[NSParagraphStyleAttributeName] = [NSParagraphStyle paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextValue];
+      }
     }
     // kCTStrokeWidthAttributeName -> NSStrokeWidthAttributeName
     else if ([coreTextKey isEqualToString:(NSString *)kCTStrokeWidthAttributeName]) {
