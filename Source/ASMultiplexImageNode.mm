@@ -349,7 +349,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   _dataSource = dataSource;
   _dataSourceFlags.image = [_dataSource respondsToSelector:@selector(multiplexImageNode:imageForImageIdentifier:)];
   _dataSourceFlags.URL = [_dataSource respondsToSelector:@selector(multiplexImageNode:URLForImageIdentifier:)];
-  if (AS_AVAILABLE_IOS_TVOS(8, 10)) {
+  if (AS_AVAILABLE_IOS_TVOS(9, 10)) {
     _dataSourceFlags.asset = [_dataSource respondsToSelector:@selector(multiplexImageNode:assetForLocalIdentifier:)];
   }
 }
