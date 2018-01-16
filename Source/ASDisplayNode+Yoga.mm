@@ -163,7 +163,7 @@
                       @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
 
   NSArray *sublayouts = ASArrayByFlatMapping(self.yogaChildren, ASDisplayNode *subnode, ({
-    [subnode layoutForYogaNode]
+    [subnode layoutForYogaNode];
   }));
 
   // The layout for self should have position CGPointNull, but include the calculated size.
