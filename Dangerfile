@@ -54,7 +54,7 @@ def check_file_header(files_to_check, licenses)
         license_header = full_license(license, filename)
         # Hack for https://github.com/TextureGroup/Texture/issues/745
         # If it's already a "modified-post-Texture" file, leave it with it original copyright year.
-        if data.include "Modifications to this file made after 4/13/2017"
+        if data.include? "Modifications to this file made after 4/13/2017"
           correct_license = true
         elsif data.start_with?(license_header)
           correct_license = true
