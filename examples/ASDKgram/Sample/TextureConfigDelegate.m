@@ -26,7 +26,7 @@
 
 @implementation TextureConfigDelegate
 
-- (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatureSet)features
+- (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatures)features
 {
   if (features & ASExperimentalGraphicsContexts) {
     NSLog(@"Texture activated experimental graphics contexts.");
