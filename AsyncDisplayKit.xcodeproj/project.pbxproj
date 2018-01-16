@@ -99,6 +99,7 @@
 		3917EBD41E9C2FC400D04A01 /* _ASCollectionReusableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3917EBD21E9C2FC400D04A01 /* _ASCollectionReusableView.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3917EBD51E9C2FC400D04A01 /* _ASCollectionReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3917EBD31E9C2FC400D04A01 /* _ASCollectionReusableView.m */; };
 		3C9C128519E616EF00E942A0 /* ASTableViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */; };
+		4496D0731FA9EA6B001CC8D5 /* ASTraitCollectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4496D0721FA9EA6B001CC8D5 /* ASTraitCollectionTests.m */; };
 		4E9127691F64157600499623 /* ASRunLoopQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9127681F64157600499623 /* ASRunLoopQueueTests.m */; };
 		509E68601B3AED8E009B9150 /* ASScrollDirection.m in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E111B371BD7007741D0 /* ASScrollDirection.m */; };
 		509E68611B3AEDA0009B9150 /* ASAbstractLayoutController.h in Headers */ = {isa = PBXBuildFile; fileRef = 205F0E171B37339C007741D0 /* ASAbstractLayoutController.h */; };
@@ -633,6 +634,7 @@
 		3917EBD21E9C2FC400D04A01 /* _ASCollectionReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASCollectionReusableView.h; sourceTree = "<group>"; };
 		3917EBD31E9C2FC400D04A01 /* _ASCollectionReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _ASCollectionReusableView.m; sourceTree = "<group>"; };
 		3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASTableViewTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		4496D0721FA9EA6B001CC8D5 /* ASTraitCollectionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTraitCollectionTests.m; sourceTree = "<group>"; };
 		464052191A3F83C40061C0BA /* ASDataController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ASDataController.h; sourceTree = "<group>"; };
 		4640521A1A3F83C40061C0BA /* ASDataController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASDataController.mm; sourceTree = "<group>"; };
 		4640521B1A3F83C40061C0BA /* ASTableLayoutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTableLayoutController.h; sourceTree = "<group>"; };
@@ -1254,6 +1256,7 @@
 				695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */,
 				699B83501E3C1BA500433FA4 /* ASLayoutSpecTests.m */,
 				4E9127681F64157600499623 /* ASRunLoopQueueTests.m */,
+				4496D0721FA9EA6B001CC8D5 /* ASTraitCollectionTests.m */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -2159,6 +2162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E51B78BF1F028ABF00E32604 /* ASLayoutFlatteningTests.m in Sources */,
+				4496D0731FA9EA6B001CC8D5 /* ASTraitCollectionTests.m in Sources */,
 				29CDC2E21AAE70D000833CA4 /* ASBasicImageDownloaderContextTests.m in Sources */,
 				CC583AD71EF9BDC100134156 /* NSInvocation+ASTestHelpers.m in Sources */,
 				CC051F1F1D7A286A006434CB /* ASCALayerTests.m in Sources */,
