@@ -187,15 +187,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   BOOL _automaticallyAdjustsContentOffset;
   
   CGPoint _deceleratingVelocity;
-  
-  /**
-   * Our layer, retained. Under iOS < 9, when table views are removed from the hierarchy,
-   * their layers may be deallocated and become dangling pointers. This puts the table view
-   * into a very dangerous state where pretty much any call will crash it. So we manually retain our layer.
-   *
-   * You should never access this, and it will be nil under iOS >= 9.
-   */
-  CALayer *_retainedLayer;
 
   CGFloat _nodesConstrainedWidth;
   BOOL _queuedNodeHeightUpdate;
@@ -349,10 +340,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   super.dataSource = (id<UITableViewDataSource>)_proxyDataSource;
   
   [self registerClass:_ASTableViewCell.class forCellReuseIdentifier:kCellReuseIdentifier];
-  
-  if (!AS_AT_LEAST_IOS9) {
-    _retainedLayer = self.layer;
-  }
   
   // iOS 11 automatically uses estimated heights, so disable those (see PR #485)
   if (AS_AT_LEAST_IOS11) {
