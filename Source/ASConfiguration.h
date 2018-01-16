@@ -12,20 +12,20 @@
 
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/_ASConfiguration.h>
+#import <AsyncDisplayKit/ASExperimentalFeatures.h>
 
 @protocol ASConfigurationDelegate;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSString *ASExperimentalFeatureName NS_TYPED_ENUM;
-
-/// See configuration.json for the values of these.
-extern ASExperimentalFeatureName const ASExperimentalGraphicsContexts;
-extern ASExperimentalFeatureName const ASExperimentalTextNode;
-
 AS_SUBCLASSING_RESTRICTED
-@interface ASConfiguration : _ASConfiguration
+@interface ASConfiguration : NSObject <NSCopying>
+
+/**
+ * Create a configuration from the provided JSON object.
+ * The mapping follows the schema in `configuration.json`.
+ */
+- (instancetype)initWithJSONObject:(NSDictionary *)jsonObject;
 
 /**
  * The delegate for configuration-related events.
@@ -33,7 +33,11 @@ AS_SUBCLASSING_RESTRICTED
  */
 @property (strong, nullable) id<ASConfigurationDelegate> delegate;
 
-@property (nullable, nonatomic, strong, readonly) NSArray<ASExperimentalFeatureName> * experimentalFeatures;
+/**
+ * The experimental features to enable in Texture.
+ * See ASExperimentalFeatures for functions to convert to/from a string array.
+ */
+@property ASExperimentalFeatures experimentalFeatures;
 
 @end
 

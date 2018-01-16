@@ -12,7 +12,7 @@
 
 #import "ASGraphicsContext.h"
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfigurationManager.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
 #import <stdatomic.h>

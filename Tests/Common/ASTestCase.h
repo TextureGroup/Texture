@@ -16,7 +16,7 @@
 #import <OCMock/OCMock.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import "OCMockObject+ASAdditions.h"
-#import "ASConfigurationManager.h"
+#import "ASConfigurationInternal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

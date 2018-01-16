@@ -26,7 +26,7 @@
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
-#import <AsyncDisplayKit/ASConfigurationManager.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>

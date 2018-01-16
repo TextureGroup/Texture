@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Texture performed its first behavior related to the feature(s).
  * This can be useful for tracking the impact of the behavior (A/B testing).
  */
-- (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatureSet)features;
+- (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatures)features;
 
 @end
 

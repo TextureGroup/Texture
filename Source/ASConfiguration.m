@@ -11,10 +11,30 @@
 //
 
 #import <AsyncDisplayKit/ASConfiguration.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
-ASExperimentalFeatureName ASExperimentalGraphicsContexts = @"exp_graphics_contexts";
-ASExperimentalFeatureName ASExperimentalTextNode = @"exp_text_node";
+/// Not too performance-sensitive here.
+
+/// Get this from C++, without the extra exception handling.
+#define autotype __auto_type
 
 @implementation ASConfiguration
+
+- (instancetype)initWithJSONObject:(NSDictionary *)jsonObject
+{
+  if (self = [self init]) {
+    autotype featureStrings = ASDynamicCast(jsonObject[@"experimental_features"], NSArray);
+    self.experimentalFeatures = ASExperimentalFeaturesFromArray(featureStrings);
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+  ASConfiguration *config = [[ASConfiguration alloc] init];
+  config.experimentalFeatures = self.experimentalFeatures;
+  config.delegate = self.delegate;
+  return config;
+}
 
 @end

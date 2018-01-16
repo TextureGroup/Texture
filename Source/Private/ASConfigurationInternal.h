@@ -1,5 +1,5 @@
 //
-//  ASConfigurationManager.h
+//  ASConfigurationInternal.h
 //  Texture
 //
 //  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
@@ -16,18 +16,13 @@
 NS_ASSUME_NONNULL_BEGIN
 ASDISPLAYNODE_EXTERN_C_BEGIN
 
-typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatureSet) {
-  ASExperimentalGraphicsContextsFlag = 1 << 0,
-  ASExperimentalTextNodeFlag = 1 << 1
-};
-
 /**
  * Quickly check if an experiment is enabled and notify the delegate
  * that it's been activated.
  *
  * The delegate will be notified asynchronously.
  */
-BOOL ASActivateExperimentalFeature(ASExperimentalFeatureSet option);
+BOOL ASActivateExperimentalFeature(ASExperimentalFeatures option);
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfigurationManager : NSObject
