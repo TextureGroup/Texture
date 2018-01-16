@@ -3079,17 +3079,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
 
-  // Force a layout pass on this node to apply its applicable pending layout, if any, so that its subnodes are inserted/deleted
-  // and start preloading right away.
+  // If this node has ASM enabled and is not yet visible, force a layout pass to apply its applicable pending layout, if any,
+  // so that its subnodes are inserted/deleted and start preloading right away.
   //
-  // - If the node has an up-to-date layout (and subnodes), calling layoutIfNeeded will be fast.
+  // - If it has an up-to-date layout (and subnodes), calling -layoutIfNeeded will be fast.
   //
-  // - If the node doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
-  // (see -__layout and -_u_measureNodeWithBoundsIfNecessary:). This scenario should be uncommon, and running a measurement
-  // pass here is a fine trade-off because preloading any time after this point would be late.
+  // - If it doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
+  // (see -__layout and -_u_measureNodeWithBoundsIfNecessary:). This scenario is uncommon,
+  // and running a measurement pass here is a fine trade-off because preloading any time after this point would be late.
   //
-  // Don't force if the node is already visible. CoreAnimation will soon trigger a (coaloesced) layout pass
-  // on the backing store, which is more efficient.
+  // Don't force a layout pass if the node is already visible. Soon CoreAnimation will trigger
+  // a (coaloesced, thus more efficient) pass on the backing store, so rely on it instead.
   BOOL shouldForceLayoutPass = NO;
   {
     ASDN::MutexLocker l(__instanceLock__);
