@@ -230,6 +230,7 @@
  * Result class must have -initWithObjects:count:
  */
 #define ASCollectionByFlatMapping(resultClass, collection, decl, work) ({ \
+  /* Would love to make this unretained but not possible. Tried everything. */ \
   id _cArray[collection.count]; \
   NSUInteger _i = 0; \
   for (decl in collection) {\

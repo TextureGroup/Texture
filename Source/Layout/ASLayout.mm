@@ -203,7 +203,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
       _sublayoutLayoutElements = nil;
     } else {
       // Add sublayouts layout elements to an internal array to retain it while the layout lives
-      _sublayoutLayoutElements = ASArrayByFlatMapping(_sublayouts, ASLayout *sublayout, ({
+      _sublayoutLayoutElements = ASMutableArrayByFlatMapping(_sublayouts, ASLayout *sublayout, ({
         sublayout.layoutElement;
       }));
     }
