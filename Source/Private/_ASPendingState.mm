@@ -306,9 +306,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   accessibilityActivationPoint = CGPointZero;
   accessibilityPath = nil;
   edgeAntialiasingMask = (kCALayerLeftEdge | kCALayerRightEdge | kCALayerTopEdge | kCALayerBottomEdge);
-  if (AS_AVAILABLE_IOS(9)) {
-    semanticContentAttribute = UISemanticContentAttributeUnspecified;
-  }
+  semanticContentAttribute = UISemanticContentAttributeUnspecified;
 
   return self;
 }
@@ -1092,10 +1090,8 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
     }
   }
 
-  if (AS_AVAILABLE_IOS(9)) {
-    if (flags.setSemanticContentAttribute) {
-      view.semanticContentAttribute = semanticContentAttribute;
-    }
+  if (flags.setSemanticContentAttribute) {
+    view.semanticContentAttribute = semanticContentAttribute;
   }
 
   if (flags.setIsAccessibilityElement)
@@ -1256,9 +1252,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.allowsGroupOpacity = layer.allowsGroupOpacity;
   pendingState.allowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
   pendingState.edgeAntialiasingMask = layer.edgeAntialiasingMask;
-  if (AS_AVAILABLE_IOS(9)) {
-    pendingState.semanticContentAttribute = view.semanticContentAttribute;
-  }
+  pendingState.semanticContentAttribute = view.semanticContentAttribute;
   pendingState.layoutMargins = view.layoutMargins;
   pendingState.preservesSuperviewLayoutMargins = view.preservesSuperviewLayoutMargins;
   if (AS_AVAILABLE_IOS(11)) {
