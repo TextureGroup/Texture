@@ -1,8 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ATTENTION] ASDisplayNode's cornerRadius is a new thread-safe bridged property that should be preferred over CALayer's. Use the latter at your own risk! [Huy Nguyen](https://github.com/nguyenhuy) [#749](https://github.com/TextureGroup/Texture/pull/749).
-- [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollecti
-on. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
+- [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
 - [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
