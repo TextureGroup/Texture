@@ -24,6 +24,7 @@
 #import <unordered_map>
 #import <AsyncDisplayKit/ASDataController.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASFastCollections.h>
 
 // If assertions are enabled, throw. Otherwise log.
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED

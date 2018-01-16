@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASFastCollections.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 
@@ -27,13 +28,10 @@
 
 NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array)
 {
-  NSMutableArray *newArray = [NSMutableArray arrayWithCapacity:array.count];
-  NSInteger i = 0;
-  for (NSArray *subarray in array) {
+  return ASMutableArrayByFlatMapping(array, NSArray *subarray, ({
     ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    newArray[i++] = [subarray mutableCopy];
-  }
-  return newArray;
+    [subarray mutableCopy];
+  }));
 }
 
 void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray<NSIndexPath *> *indexPaths)
@@ -71,31 +69,30 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
 
 NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
-  NSMutableArray *result = [NSMutableArray array];
-  NSInteger section = 0;
-  NSInteger i = 0;
-  for (NSArray *subarray in twoDimensionalArray) {
-    ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    NSInteger itemCount = subarray.count;
-    for (NSInteger item = 0; item < itemCount; item++) {
-      result[i++] = [NSIndexPath indexPathForItem:item inSection:section];
+  NSUInteger c = ASTwoDimensionalArrayGetCount(twoDimensionalArray);
+  return [NSArray fastArrayWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
+    NSInteger section = 0;
+    for (NSArray *subarray in twoDimensionalArray) {
+      ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
+      NSInteger itemCount = subarray.count;
+      for (NSInteger item = 0; item < itemCount; item++) {
+        buffer[(*count)++] = [NSIndexPath indexPathForItem:item inSection:section];
+      }
+      section++;
     }
-    section++;
-  }
-  return result;
+  }];
 }
 
 NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
-  NSMutableArray *result = [NSMutableArray array];
-  NSInteger i = 0;
-  for (NSArray *subarray in twoDimensionalArray) {
-    ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    for (id element in subarray) {
-      result[i++] = element;
+  NSUInteger c = ASTwoDimensionalArrayGetCount(twoDimensionalArray);
+  return [NSArray fastArrayWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
+    for (NSArray *subarray in twoDimensionalArray) {
+      for (id obj in subarray) {
+        buffer[(*count)++] = obj;
+      }
     }
-  }
-  return result;
+  }];
 }
 
 id ASGetElementInTwoDimensionalArray(NSArray *array, NSIndexPath *indexPath)
@@ -113,4 +110,13 @@ id ASGetElementInTwoDimensionalArray(NSArray *array, NSIndexPath *indexPath)
     return nil;
   }
   return innerArray[item];
+}
+
+NSUInteger ASTwoDimensionalArrayGetCount(NSArray<NSArray *> *array)
+{
+  NSUInteger c = 0;
+  for (NSArray *s in array) {
+    c += s.count;
+  }
+  return c;
 }
