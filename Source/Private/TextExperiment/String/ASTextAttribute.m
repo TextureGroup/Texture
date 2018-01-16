@@ -64,7 +64,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
     dic[NSVerticalGlyphFormAttributeName] = All;
     dic[(id)kCTGlyphInfoAttributeName] = CoreText_ASText;
 #if TARGET_OS_IOS
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     dic[(id)kCTCharacterShapeAttributeName] = CoreText_ASText;
+#pragma clang diagnostic pop
 #endif
     dic[(id)kCTRunDelegateAttributeName] = CoreText_ASText;
     dic[(id)kCTBaselineClassAttributeName] = CoreText_ASText;

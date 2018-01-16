@@ -36,6 +36,7 @@
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
@@ -1507,7 +1508,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 2);
       
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
+      ASGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
       
       CGContextRef ctx = UIGraphicsGetCurrentContext();
       if (isRight == YES) {
@@ -1524,11 +1525,9 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       
       // No lock needed, as _clipCornerLayers is only modified on the main thread.
       CALayer *clipCornerLayer = _clipCornerLayers[idx];
-      clipCornerLayer.contents = (id)(UIGraphicsGetImageFromCurrentImageContext().CGImage);
+      clipCornerLayer.contents = (id)(ASGraphicsGetImageAndEndCurrentContext().CGImage);
       clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
       clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 1.0 : 0.0);
-
-      UIGraphicsEndImageContext();
     }
     [self _layoutClipCornersIfNeeded];
   });

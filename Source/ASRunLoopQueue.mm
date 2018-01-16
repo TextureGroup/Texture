@@ -57,11 +57,6 @@ static void runLoopSourceCallback(void *info) {
 
 - (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
 {
-  // Disable background deallocation on iOS 8 and below to avoid crashes related to UIAXDelegateClearer (#2767).
-  if (!AS_AT_LEAST_IOS9) {
-    return;
-  }
-
   if (objectPtr != NULL && *objectPtr != nil) {
     ASDN::MutexLocker l(_queueLock);
     _queue.push_back(*objectPtr);
