@@ -102,7 +102,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   environmentTraitCollection.verticalSizeClass = traitCollection.verticalSizeClass;
   environmentTraitCollection.displayScale = traitCollection.displayScale;
   environmentTraitCollection.userInterfaceIdiom = traitCollection.userInterfaceIdiom;
-  if (AS_AT_LEAST_IOS9) {
+  if (AS_AVAILABLE_IOS(9)) {
     environmentTraitCollection.forceTouchCapability = traitCollection.forceTouchCapability;
   }
   if (AS_AT_LEAST_IOS10) {
@@ -326,7 +326,6 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                        containerSize:(CGSize)windowSize
                          fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory
 {
-  UIForceTouchCapability forceTouch = AS_AT_LEAST_IOS9 ? traitCollection.forceTouchCapability : UIForceTouchCapabilityUnknown;
   UIDisplayGamut displayGamut;
   UITraitEnvironmentLayoutDirection layoutDirection;
   UIContentSizeCategory sizeCategory;
@@ -354,7 +353,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                          displayScale:traitCollection.displayScale
                                          displayGamut:displayGamut
                                    userInterfaceIdiom:traitCollection.userInterfaceIdiom
-                                 forceTouchCapability:forceTouch
+                                 forceTouchCapability:traitCollection.forceTouchCapability
                                       layoutDirection:layoutDirection
 #if TARGET_OS_TV
                                    userInterfaceStyle:userInterfaceStyle

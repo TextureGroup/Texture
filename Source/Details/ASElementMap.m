@@ -47,6 +47,8 @@
 
 - (instancetype)initWithSections:(NSArray<ASSection *> *)sections items:(ASCollectionElementTwoDimensionalArray *)items supplementaryElements:(ASSupplementaryElementDictionary *)supplementaryElements
 {
+  NSCParameterAssert(items.count == sections.count);
+
   if (self = [super init]) {
     _sections = [sections copy];
     _sectionsOfItems = [[NSArray alloc] initWithArray:items copyItems:YES];
@@ -157,8 +159,25 @@
 
 - (NSIndexPath *)convertIndexPath:(NSIndexPath *)indexPath fromMap:(ASElementMap *)map
 {
-  id element = [map elementForItemAtIndexPath:indexPath];
-  return [self indexPathForElement:element];
+  if (indexPath.item == NSNotFound) {
+    // Section index path
+    NSInteger result = [self convertSection:indexPath.section fromMap:map];
+    return (result != NSNotFound ? [NSIndexPath indexPathWithIndex:result] : nil);
+  } else {
+    // Item index path
+    ASCollectionElement *element = [map elementForItemAtIndexPath:indexPath];
+    return [self indexPathForElement:element];
+  }
+}
+
+- (NSInteger)convertSection:(NSInteger)sectionIndex fromMap:(ASElementMap *)map
+{
+  if (![map sectionIndexIsValid:sectionIndex assert:YES]) {
+    return NSNotFound;
+  }
+
+  ASSection *section = map.sections[sectionIndex];
+  return [_sections indexOfObjectIdenticalTo:section];
 }
 
 #pragma mark - NSCopying

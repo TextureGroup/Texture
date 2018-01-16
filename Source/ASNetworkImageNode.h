@@ -83,13 +83,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong, readwrite) NSURL *URL;
 
 /**
- * An array of URLs of increasing cost to download.
- *
- * @discussion By setting an array of URLs, the image property of this node will be managed internally. This means previously
- * directly set images to the image property will be cleared out and replaced by the placeholder (<defaultImage>) image
- * while loading and the final image after the new image data was downloaded and processed.
- */
-@property (nullable, nonatomic, strong, readwrite) NSArray <NSURL *> *URLs;
+  * An array of URLs of increasing cost to download.
+  *
+  * @discussion By setting an array of URLs, the image property of this node will be managed internally. This means previously
+  * directly set images to the image property will be cleared out and replaced by the placeholder (<defaultImage>) image
+  * while loading and the final image after the new image data was downloaded and processed.
+  *
+  * @deprecated This API has been removed for now due to the increased complexity to the class that it brought.
+  * Please use .URL instead.
+  */
+@property (nullable, nonatomic, strong, readwrite) NSArray <NSURL *> *URLs ASDISPLAYNODE_DEPRECATED_MSG("Please use URL instead.");
 
 /**
  * Download and display a new image.

@@ -141,7 +141,7 @@ typedef struct {
   NSArray *accessibilityHeaderElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
-  UISemanticContentAttribute semanticContentAttribute;
+  UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
 
   ASPendingStateFlags _flags;
 }
@@ -573,7 +573,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   _flags.setAsyncTransactionContainer = YES;
 }
 
-- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute {
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute API_AVAILABLE(ios(9.0), tvos(9.0)) {
   semanticContentAttribute = attribute;
   _flags.setSemanticContentAttribute = YES;
 }

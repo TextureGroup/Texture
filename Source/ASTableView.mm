@@ -130,6 +130,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [node __setHighlightedFromUIKit:self.highlighted];
 }
 
+- (BOOL)consumesCellNodeVisibilityEvents
+{
+  ASCellNode *node = self.node;
+  if (node == nil) {
+    return NO;
+  }
+  return ASSubclassOverridesSelector([ASCellNode class], [node class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));
+}
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
   [super setSelected:selected animated:animated];
@@ -178,15 +187,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   BOOL _automaticallyAdjustsContentOffset;
   
   CGPoint _deceleratingVelocity;
-  
-  /**
-   * Our layer, retained. Under iOS < 9, when table views are removed from the hierarchy,
-   * their layers may be deallocated and become dangling pointers. This puts the table view
-   * into a very dangerous state where pretty much any call will crash it. So we manually retain our layer.
-   *
-   * You should never access this, and it will be nil under iOS >= 9.
-   */
-  CALayer *_retainedLayer;
 
   CGFloat _nodesConstrainedWidth;
   BOOL _queuedNodeHeightUpdate;
@@ -341,10 +341,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   [self registerClass:_ASTableViewCell.class forCellReuseIdentifier:kCellReuseIdentifier];
   
-  if (!AS_AT_LEAST_IOS9) {
-    _retainedLayer = self.layer;
-  }
-  
   // iOS 11 automatically uses estimated heights, so disable those (see PR #485)
   if (AS_AT_LEAST_IOS11) {
     super.estimatedRowHeight = 0.0;
@@ -372,8 +368,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [self setAsyncDataSource:nil];
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
-  ASPerformBackgroundDeallocation(_dataController);
-  ASPerformBackgroundDeallocation(_rangeController);
+  ASPerformBackgroundDeallocation(&_dataController);
+  ASPerformBackgroundDeallocation(&_rangeController);
 }
 
 #pragma mark -
@@ -588,18 +584,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSIndexPath *)convertIndexPathFromTableNode:(NSIndexPath *)indexPath waitingIfNeeded:(BOOL)wait
 {
-  // If this is a section index path, we don't currently have a method
-  // to do a mapping.
-  if (indexPath == nil || indexPath.row == NSNotFound) {
-    return indexPath;
-  } else {
-    NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
-    if (viewIndexPath == nil && wait) {
-      [self waitUntilAllUpdatesAreCommitted];
-      return [self convertIndexPathFromTableNode:indexPath waitingIfNeeded:NO];
-    }
-    return viewIndexPath;
+  NSIndexPath *viewIndexPath = [_dataController.visibleMap convertIndexPath:indexPath fromMap:_dataController.pendingMap];
+  if (viewIndexPath == nil && wait) {
+    [self waitUntilAllUpdatesAreCommitted];
+    return [self convertIndexPathFromTableNode:indexPath waitingIfNeeded:NO];
   }
+  return viewIndexPath;
 }
 
 - (NSIndexPath *)convertIndexPathToTableNode:(NSIndexPath *)indexPath
@@ -608,13 +598,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return nil;
   }
 
-  // If this is a section index path, we don't currently have a method
-  // to do a mapping.
-  if (indexPath.row == NSNotFound) {
-    return indexPath;
-  } else {
-    return [_dataController.pendingMap convertIndexPath:indexPath fromMap:_dataController.visibleMap];
-  }
+  return [_dataController.pendingMap convertIndexPath:indexPath fromMap:_dataController.visibleMap];
 }
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToTableNode:(NSArray<NSIndexPath *> *)indexPaths
@@ -983,7 +967,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView willDisplayCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
   ASCollectionElement *element = cell.element;
-  [_visibleElements addObject:element];
+  if (element) {
+    ASDisplayNodeAssertTrue([_dataController.visibleMap elementForItemAtIndexPath:indexPath] == element);
+    [_visibleElements addObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplayCell: %@, %@, %@", cell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
   cellNode.scrollView = tableView;
 
@@ -1003,15 +994,22 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   [_rangeController setNeedsUpdate];
   
-  if (ASSubclassOverridesSelector([ASCellNode class], [cellNode class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:))) {
+  if ([cell consumesCellNodeVisibilityEvents]) {
     [_cellsForVisibilityUpdates addObject:cell];
   }
 }
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  // Retrieve the element from cell instead of visible map because at this point visible map could have been updated and no longer holds the element.
   ASCollectionElement *element = cell.element;
-  [_visibleElements removeObject:element];
+  if (element) {
+    [_visibleElements removeObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for didEndDisplayingCell: %@, %@, %@", cell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
 
   [_rangeController setNeedsUpdate];
