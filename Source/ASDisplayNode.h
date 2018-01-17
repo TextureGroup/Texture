@@ -733,12 +733,28 @@ extern NSInteger const ASDefaultDrawingPriority;
 @property (nonatomic, assign)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
 @property (nonatomic, assign)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone (undefined for layer-backed nodes)
 
-// Content margins
+/**
+ * @abstract Content margins
+ *
+ * @discussion This property is bridged to its UIView counterpart.
+ *
+ * If your layout depends on this property, you should probably enable automaticallyRelayoutOnLayoutMarginsChanges to ensure
+ * that the layout gets automatically updated when the value of this property changes. Or you can override layoutMarginsDidChange
+ * and make all the necessary updates manually.
+ */
 @property (nonatomic, assign)           UIEdgeInsets layoutMargins;
 @property (nonatomic, assign)           BOOL preservesSuperviewLayoutMargins;  // default is NO - set to enable pass-through or cascading behavior of margins from this view’s parent to its children
 - (void)layoutMarginsDidChange;
 
-// Safe area
+/**
+ * @abstract Safe area insets
+ *
+ * @discussion This property is bridged to its UIVIew counterpart.
+ *
+ * If your layout depends on this property, you should probably enable automaticallyRelayoutOnSafeAreaChanges to ensure
+ * that the layout gets automatically updated when the value of this property changes. Or you can override safeAreaInsetsDidChange
+ * and make all the necessary updates manually.
+ */
 @property (nonatomic, readonly)         UIEdgeInsets safeAreaInsets;
 @property (nonatomic, assign)           BOOL insetsLayoutMarginsFromSafeArea;  // Default: YES
 - (void)safeAreaInsetsDidChange;

@@ -904,13 +904,8 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (void)layoutMarginsDidChange
 {
   ASDisplayNodeAssertMainThread();
-  BOOL automaticallyRelayout;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    automaticallyRelayout = _automaticallyRelayoutOnLayoutMarginsChanges;
-  }
 
-  if (automaticallyRelayout) {
+  if (self.automaticallyRelayoutOnLayoutMarginsChanges) {
     [self setNeedsLayout];
   }
 }
@@ -931,17 +926,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_read;
 
-  if (AS_AVAILABLE_IOS(11.0)) {
-    if (!_flags.layerBacked) {
-      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
-    }
-  }
-  return _fallbackInsetsLayoutMarginsFromSafeArea;
+  return [self _locked_insetsLayoutMarginsFromSafeArea];
 }
 
 - (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)insetsLayoutMarginsFromSafeArea
 {
   ASDisplayNodeAssertThreadAffinity(self);
+  BOOL shouldNotifyAboutUpdate;
   {
     _bridge_prologue_write;
 
@@ -952,9 +943,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
         _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
       }
     }
+
+    shouldNotifyAboutUpdate = __loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
   }
 
-  if (__loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked)) {
+  if (shouldNotifyAboutUpdate) {
     [self layoutMarginsDidChange];
   }
 }
@@ -962,13 +955,8 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (void)safeAreaInsetsDidChange
 {
   ASDisplayNodeAssertMainThread();
-  BOOL automaticallyRelayout;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    automaticallyRelayout = _automaticallyRelayoutOnSafeAreaChanges;
-  }
 
-  if (automaticallyRelayout) {
+  if (self.automaticallyRelayoutOnSafeAreaChanges) {
     [self setNeedsLayout];
   }
 
@@ -989,6 +977,16 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_write;
   _setToLayer(cornerRadius, newLayerCornerRadius);
+}
+
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea
+{
+  if (AS_AVAILABLE_IOS(11.0)) {
+    if (!_flags.layerBacked) {
+      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+    }
+  }
+  return _fallbackInsetsLayoutMarginsFromSafeArea;
 }
 
 @end

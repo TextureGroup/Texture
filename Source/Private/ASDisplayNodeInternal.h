@@ -344,6 +344,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 
 @property (nonatomic, assign) CGFloat layerCornerRadius;
 
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea;
+
 @end
 
 NS_ASSUME_NONNULL_END

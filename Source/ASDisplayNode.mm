@@ -845,6 +845,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (void)setFallbackSafeAreaInsets:(UIEdgeInsets)insets
 {
+  BOOL needsManualUpdate;
+  BOOL updatesLayoutMargins;
+
   {
     ASDN::MutexLocker l(__instanceLock__);
     ASDisplayNodeAssertThreadAffinity(self);
@@ -854,10 +857,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     }
 
     _fallbackSafeAreaInsets = insets;
+    needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
+    updatesLayoutMargins = needsManualUpdate && [self _locked_insetsLayoutMarginsFromSafeArea];
   }
-
-  BOOL needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
-  BOOL updatesLayoutMargins = needsManualUpdate && self.insetsLayoutMarginsFromSafeArea;
 
   if (needsManualUpdate) {
     [self safeAreaInsetsDidChange];
@@ -876,6 +878,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   CGRect bounds = self.bounds;
 
   for (ASDisplayNode *child in self.subnodes) {
+    if (AS_AT_LEAST_IOS11 && !child.layerBacked) {
+      // In iOS 11 view-backed nodes already know what their safe area is.
+      continue;
+    }
+
     if (child.viewControllerRoot) {
       // Its safe area is controlled by a view controller. Don't override it.
       continue;

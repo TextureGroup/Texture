@@ -26,6 +26,9 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 
+#import <AsyncDisplayKit/ASDisplayNode+Convenience.h>
+#import <AsyncDisplayKit/ASViewController.h>
+
 @interface _ASDisplayView ()
 @property (nullable, atomic, weak, readwrite) ASDisplayNode *asyncdisplaykit_node;
 
@@ -154,6 +157,16 @@
     }
     self.keepalive_node = nil;
   }
+
+#if DEBUG
+  // This is only to help detect issues when a root-of-view-controller node is reused separately from its view controller.
+  // Avoid overhead in release.
+  if (superview && node.viewControllerRoot) {
+    UIViewController *vc = [node closestViewController];
+
+    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASViewController class]] && ((ASViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
+  }
+#endif
 
   ASDisplayNode *supernode = node.supernode;
   ASDisplayNodeAssert(!supernode.isLayerBacked, @"Shouldn't be possible for superview's node to be layer-backed.");
