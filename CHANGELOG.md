@@ -1,6 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASDisplayNode] Add safeAreaInsets, layoutMargins and related properties to ASDisplayNode [Yevgen Pogribnyi](https://github.com/ypogribnyi)
+- [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
 - [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
