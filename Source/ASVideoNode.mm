@@ -365,7 +365,8 @@ static NSString * const kRate = @"rate";
       }
     }
   } else if (object == _player) {
-    if ([keyPath isEqualToString:kRate]) {
+    //always calls before AVPlayerItemStatusReadyToPlay,cause jump AVPlayerItemStatusReadyToPlay.
+    if ([keyPath isEqualToString:kRate] && (_currentPlayerItem.status == AVPlayerItemStatusReadyToPlay)) {
       if ([change[NSKeyValueChangeNewKey] floatValue] == 0.0) {
         if (self.playerState == ASVideoNodePlayerStatePlaying) {
           self.playerState = ASVideoNodePlayerStatePaused;
