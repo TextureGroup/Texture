@@ -32,6 +32,14 @@ ASDISPLAYNODE_INLINE UIContentSizeCategory AS_UIContentSizeCategoryUnspecified()
   }
 }
 
+ASDISPLAYNODE_INLINE ASPrimitiveContentSizeCategory safePrimitiveContentSizeCategory(ASPrimitiveContentSizeCategory sizeCategory) {
+  if (sizeCategory) {
+    return sizeCategory;
+  } else {
+    return AS_UIContentSizeCategoryUnspecified();
+  }
+}
+
 ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory sizeCategory) {
   if ([sizeCategory isEqualToString:UIContentSizeCategoryExtraSmall]) {
     return UIContentSizeCategoryExtraSmall;
@@ -92,7 +100,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
     .displayGamut = UIDisplayGamutUnspecified,
     .userInterfaceIdiom = UIUserInterfaceIdiomUnspecified,
     .layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified,
-    .preferredContentSizeCategory = ASPrimitiveContentSizeCategoryMake(AS_UIContentSizeCategoryUnspecified()),
+    .preferredContentSizeCategory = AS_UIContentSizeCategoryUnspecified(),
     .containerSize = CGSizeZero,
   };
 }
@@ -115,13 +123,15 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
     #if TARGET_OS_TV
       environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
     #endif
+  } else {
+    environmentTraitCollection.displayGamut = UIDisplayGamutSRGB; // We're on iOS 9 or lower, so this is not a P3 device.
   }
   return environmentTraitCollection;
 }
 
 BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs) {
-  UIContentSizeCategory leftSizeCategory = (UIContentSizeCategory)lhs.preferredContentSizeCategory;
-  UIContentSizeCategory rightSizeCategory = (UIContentSizeCategory)rhs.preferredContentSizeCategory;
+  UIContentSizeCategory leftSizeCategory = (UIContentSizeCategory)safePrimitiveContentSizeCategory(lhs.preferredContentSizeCategory);
+  UIContentSizeCategory rightSizeCategory = (UIContentSizeCategory)safePrimitiveContentSizeCategory(rhs.preferredContentSizeCategory);
 
   return
     lhs.verticalSizeClass == rhs.verticalSizeClass &&
@@ -230,7 +240,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   #if TARGET_OS_TV
     [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
   #endif
-  [props addObject:@{ @"preferredContentSizeCategory": (UIContentSizeCategory)traits.preferredContentSizeCategory }];
+  [props addObject:@{ @"preferredContentSizeCategory": (UIContentSizeCategory)safePrimitiveContentSizeCategory(traits.preferredContentSizeCategory) }];
   [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
   return ASObjectDescriptionMakeWithoutObject(props);
 }
@@ -249,7 +259,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                        forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                             layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                          userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
-               preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+               preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                               containerSize:(CGSize)windowSize
 {
     self = [super init];
@@ -276,7 +286,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                        layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                     userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
-                          preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                          preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                                          containerSize:(CGSize)windowSize
 {
   return [[self alloc] initWithHorizontalSizeClass:horizontalSizeClass
@@ -300,7 +310,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                          userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
                        forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                             layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
-               preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+               preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                               containerSize:(CGSize)windowSize
 {
   self = [super init];
@@ -325,7 +335,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                     userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                        layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
-                          preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                          preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                                          containerSize:(CGSize)windowSize
 {
   return [[self alloc] initWithHorizontalSizeClass:horizontalSizeClass
@@ -383,7 +393,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                  forceTouchCapability:traits.forceTouchCapability
                                       layoutDirection:traits.layoutDirection
                                    userInterfaceStyle:traits.userInterfaceStyle
-                         preferredContentSizeCategory:(UIContentSizeCategory)traits.preferredContentSizeCategory
+                         preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)safePrimitiveContentSizeCategory(traits.preferredContentSizeCategory)
                                         containerSize:traits.containerSize];
 #else
   return [self traitCollectionWithHorizontalSizeClass:traits.horizontalSizeClass
@@ -393,7 +403,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                    userInterfaceIdiom:traits.userInterfaceIdiom
                                  forceTouchCapability:traits.forceTouchCapability
                                       layoutDirection:traits.layoutDirection
-                         preferredContentSizeCategory:(UIContentSizeCategory)traits.preferredContentSizeCategory
+                         preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)safePrimitiveContentSizeCategory(traits.preferredContentSizeCategory)
                                         containerSize:traits.containerSize];
 #endif
 }
@@ -409,7 +419,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 + (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                        containerSize:(CGSize)windowSize
-                         fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory
+                         fallbackContentSizeCategory:(UIContentSizeCategory _Nonnull)fallbackContentSizeCategory
 {
   UIDisplayGamut displayGamut;
   UITraitEnvironmentLayoutDirection layoutDirection;
@@ -425,7 +435,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
       userInterfaceStyle = traitCollection.userInterfaceStyle;
     #endif
   } else {
-    displayGamut = UIDisplayGamutUnspecified;
+    displayGamut = UIDisplayGamutSRGB; // We're on iOS 9 or lower, so this is not a P3 device.
     layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified;
     sizeCategory = fallbackContentSizeCategory;
     #if TARGET_OS_TV

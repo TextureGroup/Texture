@@ -58,6 +58,12 @@ extern ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIConte
 
 #pragma mark - ASPrimitiveTraitCollection
 
+/**
+ * @abstract This is a struct equivalent of ASTraitCollection.
+ *
+ * @discussion It may be not safe to use this structure uninitialized. Please initialize it with ASPrimitiveTraitCollectionMakeDefault()
+ * or ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection*).
+ */
 typedef struct ASPrimitiveTraitCollection {
   UIUserInterfaceSizeClass horizontalSizeClass;
   UIUserInterfaceSizeClass verticalSizeClass;
@@ -175,7 +181,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, assign, readonly) UIUserInterfaceStyle userInterfaceStyle;
 #endif
 
-@property (nonatomic, assign, readonly) UIContentSizeCategory preferredContentSizeCategory;
+@property (nonatomic, assign, readonly) UIContentSizeCategory _Nonnull preferredContentSizeCategory;
 
 @property (nonatomic, assign, readonly) CGSize containerSize;
 
@@ -186,7 +192,7 @@ AS_SUBCLASSING_RESTRICTED
 
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                               containerSize:(CGSize)windowSize
-                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory;
+                                fallbackContentSizeCategory:(UIContentSizeCategory _Nonnull)fallbackContentSizeCategory;
 
 #if TARGET_OS_TV
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
@@ -197,7 +203,7 @@ AS_SUBCLASSING_RESTRICTED
                                          forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                            userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
-                                 preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                                 preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                                                 containerSize:(CGSize)windowSize;
 #else
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
@@ -207,7 +213,7 @@ AS_SUBCLASSING_RESTRICTED
                                            userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
                                          forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
-                                 preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
+                                 preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
                                                 containerSize:(CGSize)windowSize;
 #endif
 
