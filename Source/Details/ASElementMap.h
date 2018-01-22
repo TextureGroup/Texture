@@ -32,11 +32,6 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASElementMap : NSObject <NSCopying, NSFastEnumeration>
 
 /**
- * The total number of elements in this map.
- */
-@property (readonly) NSUInteger count;
-
-/**
  * The number of sections (of items) in this map.
  */
 @property (readonly) NSInteger numberOfSections;
