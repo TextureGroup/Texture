@@ -27,13 +27,10 @@
 
 NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array)
 {
-  NSMutableArray *newArray = [NSMutableArray arrayWithCapacity:array.count];
-  NSInteger i = 0;
-  for (NSArray *subarray in array) {
+  return ASMutableArrayByFlatMapping(array, NSArray *subarray, ({
     ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    newArray[i++] = [subarray mutableCopy];
-  }
-  return newArray;
+    [subarray mutableCopy];
+  }));
 }
 
 void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray<NSIndexPath *> *indexPaths)

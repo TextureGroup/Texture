@@ -607,15 +607,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return nil;
   }
 
-  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray new];
-
-  for (NSIndexPath *indexPathInView in indexPaths) {
-    NSIndexPath *indexPath = [self convertIndexPathToTableNode:indexPathInView];
-    if (indexPath != nil) {
-      [indexPathsArray addObject:indexPath];
-    }
-  }
-  return indexPathsArray;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *indexPathInView, ({
+    [self convertIndexPathToTableNode:indexPathInView];
+  }));
 }
 
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode

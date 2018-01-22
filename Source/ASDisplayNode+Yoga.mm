@@ -158,14 +158,12 @@
 - (void)setupYogaCalculatedLayout
 {
   YGNodeRef yogaNode = self.style.yogaNode;
-  uint32_t childCount = YGNodeGetChildCount(yogaNode);
-  ASDisplayNodeAssert(childCount == self.yogaChildren.count,
+  ASDisplayNodeAssert(YGNodeGetChildCount(yogaNode) == self.yogaChildren.count,
                       @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
 
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:childCount];
-  for (ASDisplayNode *subnode in self.yogaChildren) {
-    [sublayouts addObject:[subnode layoutForYogaNode]];
-  }
+  NSArray *sublayouts = ASArrayByFlatMapping(self.yogaChildren, ASDisplayNode *subnode, ({
+    [subnode layoutForYogaNode];
+  }));
 
   // The layout for self should have position CGPointNull, but include the calculated size.
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));

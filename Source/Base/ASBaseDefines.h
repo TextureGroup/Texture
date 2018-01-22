@@ -132,22 +132,6 @@
 #define __has_attribute(x) 0 // Compatibility with non-clang compilers.
 #endif
 
-#ifndef NS_CONSUMED
-#if __has_feature(attribute_ns_consumed)
-#define NS_CONSUMED __attribute__((ns_consumed))
-#else
-#define NS_CONSUMED
-#endif
-#endif
-
-#ifndef NS_RETURNS_RETAINED
-#if __has_feature(attribute_ns_returns_retained)
-#define NS_RETURNS_RETAINED __attribute__((ns_returns_retained))
-#else
-#define NS_RETURNS_RETAINED
-#endif
-#endif
-
 #ifndef CF_RETURNS_RETAINED
 #if __has_feature(attribute_cf_returns_retained)
 #define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
@@ -245,26 +229,38 @@
  * Create a new set by mapping `collection` over `work`, ignoring nil.
  */
 #define ASSetByFlatMapping(collection, decl, work) ({ \
-  NSMutableSet *s = [NSMutableSet set]; \
+  CFTypeRef _cArray[collection.count]; \
+  NSUInteger _i = 0; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [s addObject:result]; \
+    if ((_cArray[_i] = (__bridge_retained CFTypeRef)work)) { \
+      _i++; \
     } \
   } \
-  s; \
+  NSSet *result; \
+  if (_i == 0) { \
+    /** Zero fast path. */ \
+    result = [NSSet set]; \
+  } else if (_i == 1) { \
+    /** NSSingleObjectSet is fast. Create one and release. */ \
+    CFTypeRef val = _cArray[0]; \
+    result = [NSSet setWithObject:(__bridge id)val]; \
+    CFBridgingRelease(val); \
+  } else { \
+    CFSetCallBacks cb = kCFTypeSetCallBacks; \
+    cb.retain = NULL; \
+    result = (__bridge NSSet *)CFSetCreate(kCFAllocatorDefault, _cArray, _i, &cb); \
+  } \
+  result; \
 })
 
 /**
  * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
  */
 #define ASPointerTableByFlatMapping(collection, decl, work) ({ \
-  NSHashTable *t = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality]; \
+  NSHashTable *t = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:collection.count]; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [t addObject:result]; \
-    } \
+    /* NSHashTable accepts nil and avoid extra retain/release. */ \
+    [t addObject:work]; \
   } \
   t; \
 })
@@ -273,12 +269,37 @@
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
 #define ASArrayByFlatMapping(collection, decl, work) ({ \
-  NSMutableArray *a = [NSMutableArray array]; \
+  CFTypeRef _cArray[collection.count]; \
+  NSUInteger _i = 0; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [a addObject:result]; \
+    if ((_cArray[_i] = (__bridge_retained CFTypeRef)work)) { \
+      _i++; \
     } \
   } \
-  a; \
+  NSArray *result; \
+  if (_i == 0) { \
+    /** Zero array fast path. */ \
+    result = @[]; \
+  } else if (_i == 1) { \
+    /** NSSingleObjectArray is fast. Create one and release. */ \
+    CFTypeRef val = _cArray[0]; \
+    result = [NSArray arrayWithObject:(__bridge id)val]; \
+    CFBridgingRelease(val); \
+  } else { \
+    CFArrayCallBacks cb = kCFTypeArrayCallBacks; \
+    cb.retain = NULL; \
+    result = (__bridge NSArray *)CFArrayCreate(kCFAllocatorDefault, _cArray, _i, &cb); \
+  } \
+  result; \
+})
+
+#define ASMutableArrayByFlatMapping(collection, decl, work) ({ \
+  id _cArray[collection.count]; \
+  NSUInteger _i = 0; \
+  for (decl in collection) {\
+    if ((_cArray[_i] = work)) { \
+      _i++; \
+    } \
+  } \
+  [[NSMutableArray alloc] initWithObjects:_cArray count:_i]; \
 })
