@@ -75,11 +75,6 @@
   return self;
 }
 
-- (NSUInteger)count
-{
-  return _elementToIndexPathMap.count;
-}
-
 - (NSArray<NSIndexPath *> *)itemIndexPaths
 {
   return ASIndexPathsForTwoDimensionalArray(_sectionsOfItems);

@@ -203,9 +203,13 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
       _sublayoutLayoutElements = nil;
     } else {
       // Add sublayouts layout elements to an internal array to retain it while the layout lives
-      _sublayoutLayoutElements = ASMutableArrayByFlatMapping(_sublayouts, ASLayout *sublayout, ({
-        sublayout.layoutElement;
-      }));
+      NSUInteger sublayoutCount = _sublayouts.count;
+      if (sublayoutCount > 0) {
+        _sublayoutLayoutElements = [NSMutableArray arrayWithCapacity:sublayoutCount];
+        for (ASLayout *sublayout in _sublayouts) {
+          [_sublayoutLayoutElements addObject:sublayout.layoutElement];
+        }
+      }
     }
   }
 }
@@ -232,7 +236,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     queue.push_back({sublayout, sublayout.position});
   }
   
-  std::vector<ASLayout *> flattenedSublayouts;
+  NSMutableArray *flattenedSublayouts = [NSMutableArray array];
   
   while (!queue.empty()) {
     const Context context = queue.front();
@@ -251,7 +255,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
                                           position:absolutePosition
                                         sublayouts:@[]];
       }
-      flattenedSublayouts.push_back(layout);
+      [flattenedSublayouts addObject:layout];
     } else if (sublayoutsCount > 0){
       std::vector<Context> sublayoutContexts;
       for (ASLayout *sublayout in sublayouts) {
@@ -261,8 +265,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     }
   }
   
-  NSArray *sublayoutsArray = [NSArray arrayWithObjects:flattenedSublayouts.data() count:flattenedSublayouts.size()];
-  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:sublayoutsArray];
+  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:flattenedSublayouts];
   // All flattened layouts must have this flag enabled
   // to ensure sublayout elements are retained until the layouts are applied.
   layout.retainSublayoutLayoutElements = YES;

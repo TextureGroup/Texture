@@ -69,9 +69,11 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 
 - (NSArray<ASDisplayNode *> *)subnodesForKey:(NSString *)key
 {
-  return ASArrayByFlatMapping([self layoutForKey:key].sublayouts, ASLayout *sublayout, ({
-    (ASDisplayNode *)sublayout.layoutElement;
-  }));
+  NSMutableArray<ASDisplayNode *> *subnodes = [NSMutableArray array];
+  for (ASLayout *sublayout in [self layoutForKey:key].sublayouts) {
+    [subnodes addObject:(ASDisplayNode *)sublayout.layoutElement];
+  }
+  return subnodes;
 }
 
 - (NSArray<ASDisplayNode *> *)insertedSubnodes

@@ -102,9 +102,9 @@
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }
 
-  NSArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
-                                                                   ASCollectionElement *element,
-                                                                   [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
+  NSMutableArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
+                                                                          ASCollectionElement *element,
+                                                                          [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }

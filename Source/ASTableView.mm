@@ -607,9 +607,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     return nil;
   }
 
-  return ASArrayByFlatMapping(indexPaths, NSIndexPath *indexPathInView, ({
-    [self convertIndexPathToTableNode:indexPathInView];
-  }));
+  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray new];
+
+  for (NSIndexPath *indexPathInView in indexPaths) {
+    NSIndexPath *indexPath = [self convertIndexPathToTableNode:indexPathInView];
+    if (indexPath != nil) {
+      [indexPathsArray addObject:indexPath];
+    }
+  }
+  return indexPathsArray;
 }
 
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
