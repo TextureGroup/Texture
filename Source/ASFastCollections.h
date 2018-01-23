@@ -13,62 +13,37 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-@interface NSArray<ObjectType> (ASFast)
+@interface NSObject (ASFastCollections)
 
-+ (NSArray<ObjectType> *)fastArrayWithCapacity:(NSUInteger)capacity
-                                   constructor:(void (AS_NOESCAPE ^)(__strong ObjectType buffer[], NSUInteger *count))body;
-
-@end
-
-@interface NSMutableArray<ObjectType> (ASFast)
-
-+ (NSMutableArray<ObjectType> *)fastArrayWithCapacity:(NSUInteger)capacity
-                                          constructor:(void (AS_NOESCAPE ^)(__strong ObjectType buffer[], NSUInteger *count))body;
+/**
+ * Makes a collection with the given maximum size and constructor body.
+ * Only valid receivers are NSSet, NSMutableSet, NSArray, and NSMutableArray.
+ */
++ (instancetype)fastCollectionWithCapacity:(NSUInteger)capacity
+                               constructor:(void (AS_NOESCAPE ^)(__strong id buffer[], NSUInteger *count))body;
 
 @end
 
-@interface NSSet<ObjectType> (ASFast)
-
-+ (NSSet<ObjectType> *)fastSetWithCapacity:(NSUInteger)capacity
-                               constructor:(void (AS_NOESCAPE ^)(__strong ObjectType buffer[], NSUInteger *count))body;
-
-@end
+#define _ASFlatMap(class, collection, decl, work) \
+({ \
+  __typeof(collection) _lclCollection = (collection); \
+  [class fastCollectionWithCapacity:_lclCollection.count constructor:^(__strong id buf[], NSUInteger *count) { \
+    for (decl in _lclCollection) { \
+      if ((buf[*count] = (work))) { \
+        *count += 1; \
+      } \
+    } \
+  }]; \
+})
 
 /**
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
 #define ASArrayByFlatMapping(collection, decl, work) \
-({ \
-  __typeof(collection) _lclCollection = (collection); \
-  [NSArray fastArrayWithCapacity:_lclCollection.count constructor:^(__strong id buf[], NSUInteger *count) { \
-    for (decl in _lclCollection) { \
-      if ((buf[*count] = (work))) { \
-        *count += 1; \
-      } \
-    } \
-  }]; \
-})
+  _ASFlatMap(NSArray, collection, decl, work)
 
 #define ASMutableArrayByFlatMapping(collection, decl, work) \
-({ \
-  __typeof(collection) _lclCollection = (collection); \
-  [NSMutableArray fastArrayWithCapacity:_lclCollection.count constructor:^(__strong id buf[], NSUInteger *count) { \
-    for (decl in _lclCollection) { \
-      if ((buf[*count] = (work))) { \
-        *count += 1; \
-      } \
-    } \
-  }]; \
-})
+  _ASFlatMap(NSMutableArray, collection, decl, work)
 
 #define ASSetByFlatMapping(collection, decl, work) \
-({ \
-  __typeof(collection) _lclCollection = (collection); \
-  [NSSet fastSetWithCapacity:_lclCollection.count constructor:^(__strong id buf[], NSUInteger *count) { \
-    for (decl in _lclCollection) { \
-      if ((buf[*count] = (work))) { \
-        *count += 1; \
-      } \
-    } \
-  }]; \
-})
+  _ASFlatMap(NSSet, collection, decl, work)

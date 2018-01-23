@@ -47,7 +47,7 @@ const void *ASRetainOrSkip(CFAllocatorRef allocator, const void *value)
   }
 }
 
-@implementation NSArray (ASFast)
+@implementation NSObject (ASFastCollections)
 
 /**
  * We pull a bit of a nasty trick here.
@@ -59,104 +59,59 @@ const void *ASRetainOrSkip(CFAllocatorRef allocator, const void *value)
  */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-+ (NSArray *)fastArrayWithCapacity:(NSUInteger)capacity
-                      constructor:(AS_NOESCAPE void (^)(CFTypeRef buffer[], NSUInteger *count))body
++ (instancetype)fastCollectionWithCapacity:(NSUInteger)capacity constructor:(void (^)(CFTypeRef[], NSUInteger *))body
 #pragma clang diagnostic pop
-
 {
+  NSParameterAssert(self == [NSArray class] || self == [NSMutableArray class] || self == [NSSet class] || self == [NSMutableSet class]);
+  
+  // If they asked for capacity 0, go ahead and allocate space for 1
+  // to make the rest of our code run safely.
+  capacity = MAX(capacity, 1);
+  
   // This will be an array of +1 CFTypeRefs (since the block takes `__strong id[]`)
   CFTypeRef buffer[capacity];
   memset(buffer, 0, sizeof(buffer));
   NSUInteger count = 0;
   body(buffer, &count);
   
-  // N = 0 or 1, use NSArray0 or NSSingleObjectArray
-  if (count == 0) {
-    return @[];
-  } else if (count == 1) {
-    // Transfer our +1 CFTypeRef into ARC
-    return @[ (__bridge_transfer id)buffer[0] ];
+  // N = 0 or 1, immutable, use NSArray0 or NSSingleObjectArray, faster.
+  if (self == [NSArray class] || self == [NSSet class]) {
+    id obj = (__bridge_transfer id)buffer[0];
+    return [[self alloc] initWithObjects:&obj count:count];
   }
   
   // N > 1
-  static CFArrayCallBacks cb;
+  static CFArrayCallBacks arrayCallbacks;
+  static CFSetCallBacks setCallbacks;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    cb = kCFTypeArrayCallBacks;
-    cb.retain = ASRetainOrSkip;
+    arrayCallbacks = kCFTypeArrayCallBacks;
+    arrayCallbacks.retain = ASRetainOrSkip;
+    setCallbacks = kCFTypeSetCallBacks;
+    setCallbacks.retain = ASRetainOrSkip;
   });
   ASSkipRetainCheckOrSetFlag(YES, YES);
-  CFArrayRef result = CFArrayCreate(NULL, buffer, count, &cb);
-  ASSkipRetainCheckOrSetFlag(YES, NO);
-  return (__bridge_transfer NSArray *)result;
-}
-
-@end
-
-@implementation NSMutableArray (ASFast)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-+ (NSArray *)fastArrayWithCapacity:(NSUInteger)capacity
-                       constructor:(AS_NOESCAPE void (^)(CFTypeRef buffer[], NSUInteger *count))body
-#pragma clang diagnostic pop
-
-{
-  // This will be an array of +1 CFTypeRefs (since the block takes `__strong id[]`)
-  CFTypeRef buffer[capacity];
-  memset(buffer, 0, sizeof(buffer));
-  NSUInteger count = 0;
-  body(buffer, &count);
-  
-  static CFArrayCallBacks cb;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cb = kCFTypeArrayCallBacks;
-    cb.retain = ASRetainOrSkip;
-  });
-  CFMutableArrayRef result = CFArrayCreateMutable(NULL, count, &cb);
-  ASSkipRetainCheckOrSetFlag(YES, YES);
-  for (NSUInteger i = 0; i < count; i++) {
-    CFArraySetValueAtIndex(result, i, buffer[i]);
+  id result;
+  if (self == [NSArray class]) {
+    result = (__bridge_transfer NSArray *)CFArrayCreate(NULL, buffer, count, &arrayCallbacks);
+  } else if (self == [NSMutableArray class]) {
+    CFMutableArrayRef cfArray = CFArrayCreateMutable(NULL, count, &arrayCallbacks);
+    for (NSUInteger i = 0; i < count; i++) {
+      CFArraySetValueAtIndex(cfArray, i, buffer[i]);
+    }
+    result = (__bridge_transfer NSMutableArray *)cfArray;
+  } else if (self == [NSSet class]) {
+    result = (__bridge_transfer NSSet *)CFSetCreate(NULL, buffer, count, &setCallbacks);
+  } else if (self == [NSMutableSet class]) {
+    CFMutableSetRef cfSet = CFSetCreateMutable(NULL, count, &setCallbacks);
+    for (NSUInteger i = 0; i < count; i++) {
+      CFSetAddValue(cfSet, buffer[i]);
+    }
+    result = (__bridge_transfer NSMutableSet *)cfSet;
   }
   ASSkipRetainCheckOrSetFlag(YES, NO);
-  return (__bridge_transfer NSMutableArray *)result;
+  return result;
 }
 
 @end
 
-@implementation NSSet (ASFast)
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
-+ (NSSet *)fastSetWithCapacity:(NSUInteger)capacity
-                   constructor:(void (^)(CFTypeRef buffer[], NSUInteger *count))body
-#pragma clang diagnostic pop
-{
-  // This will be an array of +1 CFTypeRefs (since the block takes `__strong id[]`)
-  CFTypeRef buffer[capacity];
-  memset(buffer, 0, sizeof(buffer));
-  NSUInteger count = 0;
-  body(buffer, &count);
-  
-  // N = 0 or 1, use NSArray0 or NSSingleObjectArray
-  if (count == 0) {
-    return [NSSet set];
-  } else if (count == 1) {
-    // Transfer our +1 CFTypeRef into ARC
-    return [NSSet setWithObject:(__bridge_transfer id)buffer[0]];
-  }
-  
-  // N > 1
-  static CFSetCallBacks cb;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cb = kCFTypeSetCallBacks;
-    cb.retain = ASRetainOrSkip;
-  });
-  ASSkipRetainCheckOrSetFlag(YES, YES);
-  CFSetRef result = CFSetCreate(NULL, buffer, count, &cb);
-  ASSkipRetainCheckOrSetFlag(YES, NO);
-  return (__bridge_transfer NSSet *)result;
-}
-
-@end

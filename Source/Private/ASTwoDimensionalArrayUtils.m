@@ -70,7 +70,7 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
 NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
   NSUInteger c = ASTwoDimensionalArrayGetCount(twoDimensionalArray);
-  return [NSArray fastArrayWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
+  return [NSArray fastCollectionWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
     NSInteger section = 0;
     for (NSArray *subarray in twoDimensionalArray) {
       ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
@@ -86,7 +86,7 @@ NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* 
 NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
   NSUInteger c = ASTwoDimensionalArrayGetCount(twoDimensionalArray);
-  return [NSArray fastArrayWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
+  return [NSArray fastCollectionWithCapacity:c constructor:^(__strong id *buffer, NSUInteger *count) {
     for (NSArray *subarray in twoDimensionalArray) {
       for (id obj in subarray) {
         buffer[(*count)++] = obj;
