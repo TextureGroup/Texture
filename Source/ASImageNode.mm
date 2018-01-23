@@ -522,10 +522,9 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
     key.didDisplayNodeContentWithRenderingContext(context, drawParameters);
   }
 
-  // The following `UIGraphicsGetImageFromCurrentImageContext` call will commonly take more than 20ms on an
-  // A5 processor.  Check for cancellation before we call it.
+  // Check cancellation one last time before forming image.
   if (isCancelled()) {
-    UIGraphicsEndImageContext();
+    ASGraphicsEndImageContext();
     return nil;
   }
 
