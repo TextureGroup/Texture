@@ -2349,4 +2349,9 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssert(hasVC);
 }
 
+- (void)testScreenScale
+{
+  XCTAssertEqual(ASScreenScale(), UIScreen.mainScreen.scale);
+}
+
 @end
