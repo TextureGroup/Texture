@@ -80,7 +80,6 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), YES, 1);
     refCtxOpaque = CGContextRetain(UIGraphicsGetCurrentContext());
     ASDisplayNodeCAssert(CGBitmapContextGetBytesPerRow(refCtxOpaque) == 32, @"Expected bytes per row to be aligned to 32. Has CGBitmapGetAlignedBytesPerRow implementation changed?");
-    
     UIGraphicsEndImageContext();
     
     // Make transparent ref context.
