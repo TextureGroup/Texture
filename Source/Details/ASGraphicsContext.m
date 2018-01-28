@@ -60,7 +60,7 @@ static size_t ASGraphicsGetAlignedBytesPerRow(size_t baseValue) {
  * That way the data will be released when the context dies. If they pull an image,
  * we will retain the data object (in a CGDataProvider) before releasing the context.
  */
-static void *__contextDataAssocationKey;
+static UInt8 __contextDataAssociationKey;
 
 #pragma mark - Graphics Contexts
 
@@ -110,7 +110,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   
   // Transfer ownership of the data to the context. So that if the context
   // is destroyed before we create an image from it, the data will be released.
-  objc_setAssociatedObject((__bridge id)context, __contextDataAssocationKey, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   
   // Set the CTM to account for iOS orientation & specified scale.
   // If only we could use CGContextSetBaseCTM. It doesn't
@@ -160,7 +160,7 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
   
   // Retrieve our data and wrap it in a CGDataProvider.
   // Don't worry, the provider doesn't copy the data – it just retains it.
-  NSMutableData *data = objc_getAssociatedObject((__bridge id)context, __contextDataAssocationKey);
+  NSMutableData *data = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
   ASDisplayNodeCAssertNotNil(data, nil);
   CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
   
