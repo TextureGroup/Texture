@@ -29,6 +29,7 @@
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASEditableTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
@@ -87,6 +88,10 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertFalse(n.nodeLoaded, @"%@ should not be loaded", n.debugName);\
 }
 
+@interface UIWindow (Testing)
+// UIWindow has this handy method that is not public but great for testing
+- (UIResponder *)firstResponder;
+@end
 
 @interface ASDisplayNode (HackForTests)
 - (id)initWithViewClass:(Class)viewClass;
@@ -264,16 +269,38 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   dispatch_queue_t queue;
 }
 
-- (void)testOverriddenFirstResponderBehavior {
+- (void)testOverriddenFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestResponderNode alloc] init];
   XCTAssertTrue([node canBecomeFirstResponder]);
   XCTAssertTrue([node becomeFirstResponder]);
 }
 
-- (void)testDefaultFirstResponderBehavior {
+- (void)testDefaultFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
   XCTAssertFalse([node canBecomeFirstResponder]);
   XCTAssertFalse([node becomeFirstResponder]);
+}
+
+- (void)testResponderMethodsBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASEditableTextNode *textNode = [[ASEditableTextNode alloc] init];
+  
+  // We have to add the text node to a window otherwise the responder methods are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:textNode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([textNode canBecomeFirstResponder]);
+  XCTAssertTrue([textNode becomeFirstResponder]);
+  XCTAssertTrue([window firstResponder] == textNode.textView);
+  XCTAssertTrue([textNode resignFirstResponder]);
+  
+  // If the textNode resigns it's first responder the view should not be the first responder
+  XCTAssertTrue([window firstResponder] == nil);
+  XCTAssertFalse([textNode.view isFirstResponder]);
 }
 
 - (void)setUp
