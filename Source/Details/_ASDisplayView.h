@@ -25,8 +25,8 @@
 @interface _ASDisplayView : UIView
 
 /**
- @discussion This property overrides the CALayer category method which implements this via associated objects.
- This should result in much better performance for _ASDisplayLayers.
+ @discussion This property overrides the UIView category method which implements this via associated objects.
+ This should result in much better performance for _ASDisplayView.
  */
 @property (nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
 
