@@ -20,7 +20,15 @@
 // This class is only for use by ASDisplayNode and should never be subclassed or used directly.
 // Note that the "node" property is added to UIView directly via a category in ASDisplayNode.
 
+@class ASDisplayNode;
+
 @interface _ASDisplayView : UIView
+
+/**
+ @discussion This property overrides the CALayer category method which implements this via associated objects.
+ This should result in much better performance for _ASDisplayLayers.
+ */
+@property (nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
 
 // These methods expose a way for ASDisplayNode touch events to let the view call super touch events
 // Some UIKit mechanisms, like UITableView and UICollectionView selection handling, require this to work
