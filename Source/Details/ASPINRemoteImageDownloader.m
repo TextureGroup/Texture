@@ -114,7 +114,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
 @implementation ASPINRemoteImageDownloader
 
-+ (instancetype)sharedDownloader
++ (ASPINRemoteImageDownloader *)sharedDownloader
 {
 
   static dispatch_once_t onceToken = 0;

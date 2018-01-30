@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This is the default downloader used by network backed image nodes if PINRemoteImage and PINCache are
  * available. It uses PINRemoteImage's features to provide caching and progressive image downloads.
  */
-+ (ASPINRemoteImageDownloader *)sharedDownloader;
+@property (class, readonly) ASPINRemoteImageDownloader *sharedDownloader;
 
 
 /**
