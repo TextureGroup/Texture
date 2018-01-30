@@ -303,6 +303,15 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertFalse([textNode.view isFirstResponder]);
 }
 
+- (void)testUnsupportedResponderSetupWillThrow
+{
+  ASTestResponderNode *node = [[ASTestResponderNode alloc] init];
+  [node setViewBlock:^UIView * _Nonnull{
+    return [[UIView alloc] init];
+  }];
+  XCTAssertThrows([node view], @"Externally provided views should be synchronous");
+}
+
 - (void)setUp
 {
   [super setUp];
