@@ -252,9 +252,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 #endif
   
   _viewClass = [self.class viewClass];
-  setFlag(Synchronous, ![_viewClass isSubclassOfClass:[_ASDisplayView class]]);
-
   _layerClass = [self.class layerClass];
+  BOOL isSynchronous = ![_viewClass isSubclassOfClass:[_ASDisplayView class]]
+                        || ![_layerClass isSubclassOfClass:[_ASDisplayLayer class]];
+  setFlag(Synchronous, isSynchronous);
+  
 
   _contentsScaleForDisplay = ASScreenScale();
   _drawingPriority = ASDefaultDrawingPriority;
