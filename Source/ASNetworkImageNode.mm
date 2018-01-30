@@ -697,9 +697,9 @@
           }
           
           //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
-          if (ASInterfaceStateIncludesPreload(self->_interfaceState) == NO) {
-            self->_downloadIdentifier = nil;
-            self->_cacheUUID = nil;
+          if (ASInterfaceStateIncludesPreload(strongSelf->_interfaceState) == NO) {
+            strongSelf->_downloadIdentifier = nil;
+            strongSelf->_cacheUUID = nil;
             return;
           }
           
@@ -719,11 +719,6 @@
           strongSelf->_cacheUUID = nil;
           
           ASPerformBlockOnMainThread(^{
-            __typeof__(self) strongSelf = weakSelf;
-            if (strongSelf == nil) {
-              return;
-            }
-            
             // Grab the lock for the rest of the block
             ASDN::MutexLocker l(strongSelf->__instanceLock__);
             
