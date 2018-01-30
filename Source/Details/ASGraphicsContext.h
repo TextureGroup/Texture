@@ -23,6 +23,9 @@
  *
  * The API mirrors the UIGraphics API, with the exception that forming an image
  * ends the context as well.
+ *
+ * Note: You must not mix-and-match between ASGraphics* and UIGraphics* functions
+ * within the same drawing operation.
  */
 
 NS_ASSUME_NONNULL_BEGIN
