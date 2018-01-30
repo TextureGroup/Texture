@@ -719,6 +719,11 @@
           strongSelf->_cacheUUID = nil;
           
           ASPerformBlockOnMainThread(^{
+            __typeof__(self) strongSelf = weakSelf;
+            if (strongSelf == nil) {
+              return;
+            }
+            
             // Grab the lock for the rest of the block
             ASDN::MutexLocker l(strongSelf->__instanceLock__);
             
