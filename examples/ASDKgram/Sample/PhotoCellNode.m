@@ -294,7 +294,7 @@
 {
   // Docs say method is called from bg but right now it's called from main.
   // Save main thread time by shunting this.
-  if (info.source == ASNetworkImageSourceDownload) {
+  if (info.sourceType == ASNetworkImageSourceDownload) {
     ASPerformBlockOnBackgroundThread(^{
       NSLog(@"Received image %@ from %@ with userInfo %@", image, info.url.path, ASObjectDescriptionMakeTiny(info.userInfo));
     });

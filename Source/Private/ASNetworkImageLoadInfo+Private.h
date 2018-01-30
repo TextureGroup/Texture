@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASNetworkImageLoadInfo ()
 
 - (instancetype)initWithURL:(NSURL *)url
-                     source:(ASNetworkImageSource)source
+                 sourceType:(ASNetworkImageSourceType)sourceType
          downloadIdentifier:(nullable id)downloadIdentifier
                    userInfo:(nullable id)userInfo;
 

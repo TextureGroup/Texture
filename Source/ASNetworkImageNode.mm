@@ -346,7 +346,7 @@
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASDN::MutexUnlocker l(__instanceLock__);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url source:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
           [_delegate imageNode:self didLoadImage:result info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASDN::MutexUnlocker l(__instanceLock__);
@@ -670,7 +670,7 @@
 
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASDN::MutexUnlocker u(__instanceLock__);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL source:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:self.image info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASDN::MutexUnlocker u(__instanceLock__);
@@ -679,7 +679,7 @@
       });
     } else {
       __weak __typeof__(self) weakSelf = self;
-      auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSource imageSource, id userInfo) {
+      auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSourceType imageSource, id userInfo) {
         ASPerformBlockOnBackgroundThread(^{
           __typeof__(self) strongSelf = weakSelf;
           if (strongSelf == nil) {
@@ -733,7 +733,7 @@
             if (imageContainer != nil) {
               if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
                 ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-                auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL source:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+                auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:strongSelf.image info:info];
               } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {
                 ASDN::MutexUnlocker u(strongSelf->__instanceLock__);

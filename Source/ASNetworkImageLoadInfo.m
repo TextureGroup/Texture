@@ -11,11 +11,11 @@
 
 @implementation ASNetworkImageLoadInfo
 
-- (instancetype)initWithURL:(NSURL *)url source:(ASNetworkImageSource)source downloadIdentifier:(id)downloadIdentifier userInfo:(id)userInfo
+- (instancetype)initWithURL:(NSURL *)url sourceType:(ASNetworkImageSourceType)sourceType downloadIdentifier:(id)downloadIdentifier userInfo:(id)userInfo
 {
   if (self = [super init]) {
     _url = [url copy];
-    _source = source;
+    _sourceType = sourceType;
     _downloadIdentifier = downloadIdentifier;
     _userInfo = userInfo;
   }

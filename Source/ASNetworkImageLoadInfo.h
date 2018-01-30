@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, ASNetworkImageSource) {
+typedef NS_ENUM(NSInteger, ASNetworkImageSourceType) {
   ASNetworkImageSourceUnspecified = 0,
   ASNetworkImageSourceSynchronousCache,
   ASNetworkImageSourceAsynchronousCache,
@@ -22,8 +22,8 @@ typedef NS_ENUM(NSInteger, ASNetworkImageSource) {
 AS_SUBCLASSING_RESTRICTED
 @interface ASNetworkImageLoadInfo : NSObject <NSCopying>
 
-/// The source from which the image was loaded.
-@property (readonly) ASNetworkImageSource source;
+/// The type of source from which the image was loaded.
+@property (readonly) ASNetworkImageSourceType sourceType;
 
 /// The image URL that was downloaded.
 @property (readonly) NSURL *url;
