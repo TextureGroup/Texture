@@ -35,6 +35,7 @@
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
+#import <AsyncDisplayKit/ASNetworkImageLoadInfo.h>
 #import <AsyncDisplayKit/ASNetworkImageNode.h>
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 
