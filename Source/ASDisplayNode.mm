@@ -226,12 +226,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
 }
 
-+ (void)load
-{
-  // Ensure this value is cached on the main thread before needed in the background.
-  ASScreenScale();
-}
-
 + (Class)viewClass
 {
   return [_ASDisplayView class];

@@ -14,6 +14,7 @@
 - [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Added an experimental "no-copy" rendering API. See ASGraphicsContext.h for info. [Adlai Holler](https://github.com/Adlai-Holler)
 - Dropped support for iOS 8. [Adlai Holler](https://github.com/Adlai-Holler)
+- Removed +load static initializer from ASDisplayNode. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
