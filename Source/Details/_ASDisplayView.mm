@@ -358,14 +358,64 @@
   [node tintColorDidChange];
 }
 
-- (BOOL)canBecomeFirstResponder {
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node canBecomeFirstResponder];
+// We forward every UIResponder method to give the node a change to overwrite it
+
+- (BOOL)canBecomeFirstResponder
+{
+    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+    return [node __canBecomeFirstResponder];
 }
 
-- (BOOL)canResignFirstResponder {
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node canResignFirstResponder];
+- (BOOL)becomeFirstResponder
+{
+    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+    return [node __becomeFirstResponder];
+}
+
+- (BOOL)canResignFirstResponder
+{
+    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+    return [node __canResignFirstResponder];
+}
+
+- (BOOL)resignFirstResponder
+{
+    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+    return [node __resignFirstResponder];
+}
+
+- (BOOL)isFirstResponder
+{
+    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+    return [node __isFirstResponder];
+}
+
+// This methods are called from ASDisplayNode to let the view decide in what UIResponder state they are not overwritten
+// by a ASDisplayNode subclass
+
+- (BOOL)__canBecomeFirstResponder
+{
+    return [super canBecomeFirstResponder];
+}
+
+- (BOOL)__becomeFirstResponder
+{
+    return [super becomeFirstResponder];
+}
+
+- (BOOL)__canResignFirstResponder
+{
+    return [super canResignFirstResponder];
+}
+
+- (BOOL)__resignFirstResponder
+{
+    return [super resignFirstResponder];
+}
+
+- (BOOL)__isFirstResponder
+{
+    return [super isFirstResponder];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender

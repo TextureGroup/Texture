@@ -540,11 +540,14 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     _viewBlock = nil;
     _viewClass = [view class];
   } else {
+    
     view = [[_viewClass alloc] init];
   }
   
   // Special handling of wrapping UIKit components
   if (checkFlag(Synchronous)) {
+    [self checkResponderCompatibility];
+    
     // UIImageView layers. More details on the flags
     if ([_viewClass isSubclassOfClass:[UIImageView class]]) {
       _flags.canClearContentsOfLayer = NO;
@@ -826,6 +829,93 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 {
   ASDN::MutexLocker l(__instanceLock__);
   _flags.viewEverHadAGestureRecognizerAttached = YES;
+}
+
+#pragma mark UIResponder
+
+- (void)checkResponderCompatibility
+{
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+  // There are certain cases we cannot handle and are not supported:
+  // 1. If the _view class is not a subclass of _ASDisplayView
+  if (checkFlag(Synchronous)) {
+    // 2. At least one UIResponder methods are overwritten in the node subclass
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canBecomeFirstResponder)), @"TBD");
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(becomeFirstResponder)), @"TBD");
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canResignFirstResponder)), @"TBD");
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(resignFirstResponder)), @"TBD");
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), @"TBD");
+  }
+#endif
+}
+
+- (BOOL)__canBecomeFirstResponder
+{
+  if (_view == nil) {
+    // By default we return NO if not view is created yet
+    return NO;
+  }
+  
+  if (checkFlag(Synchronous)) {
+    return [_view canBecomeFirstResponder];
+  } else {
+    return [(_ASDisplayView *)_view __canBecomeFirstResponder];
+  }
+}
+
+- (BOOL)__becomeFirstResponder
+{
+  if (self.isLayerBacked || ![self __canBecomeFirstResponder]) {
+    return NO;
+  }
+
+  // We explicitly create the view in here
+  if (checkFlag(Synchronous)) {
+    return [_view becomeFirstResponder];
+  } else {
+    return [(_ASDisplayView *)_view __canBecomeFirstResponder];
+  }
+}
+
+- (BOOL)__canResignFirstResponder
+{
+  if (_view == nil) {
+    // By default we return YES if no view is created yet
+    return YES;
+  }
+
+  if (checkFlag(Synchronous)) {
+    return [_view canResignFirstResponder];
+  } else {
+    return [(_ASDisplayView *)_view __canResignFirstResponder];
+  }
+}
+
+- (BOOL)__resignFirstResponder
+{
+  if (self.isLayerBacked || ![self canResignFirstResponder]) {
+    return NO;
+  }
+  
+  if (checkFlag(Synchronous)) {
+    return [_view resignFirstResponder];
+  } else {
+    return [(_ASDisplayView *)_view __resignFirstResponder];
+  }
+}
+
+- (BOOL)__isFirstResponder
+{
+  if (_view == nil) {
+    // If no view is created yet we can just return NO as it's unlikely it's the first responder
+    return NO;
+  }
+  
+  if (checkFlag(Synchronous)) {
+    return [_view isFirstResponder];
+  } else {
+    return [(_ASDisplayView *)_view __isFirstResponder];
+  }
 }
 
 #pragma mark <ASDebugNameProvider>

@@ -288,7 +288,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASEditableTextNode *textNode = [[ASEditableTextNode alloc] init];
   
-  // We have to add the text node to a window otherwise the responder methods are undefined
+  // We have to add the text node to a window otherwise the responder methods responses are undefined
   // This will also create the backing view of the node
   [window addSubnode:textNode];
   [window makeKeyAndVisible];
