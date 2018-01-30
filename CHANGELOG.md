@@ -14,6 +14,9 @@
 - [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Added an experimental "no-copy" rendering API. See ASGraphicsContext.h for info. [Adlai Holler](https://github.com/Adlai-Holler)
 - Dropped support for iOS 8. [Adlai Holler](https://github.com/Adlai-Holler)
+- **Breaking** Changes to ASNetworkImageNode: [Adlai Holler](https://github.com/Adlai-Holler)
+  - Modified `ASImageDownloaderCompletion` to add an optional `id userInfo` field. Your custom downloader can pass `nil`.
+  - Modified the last argument to `-[ASNetworkImageNodeDelegate imageNode:didLoadImage:info:]` method from a struct to an object of new class `ASNetworkImageLoadInfo` which includes other metadata about the load operation.
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

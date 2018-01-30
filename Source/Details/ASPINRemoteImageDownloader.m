@@ -235,12 +235,12 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
 #if PIN_ANIMATED_AVAILABLE
       if (result.alternativeRepresentation) {
-        completion(result.alternativeRepresentation, result.error, result.UUID);
+        completion(result.alternativeRepresentation, result.error, result.UUID, result);
       } else {
-        completion(result.image, result.error, result.UUID);
+        completion(result.image, result.error, result.UUID, result);
       }
 #else
-      completion(result.image, result.error, result.UUID);
+      completion(result.image, result.error, result.UUID, result);
 #endif
     }];
   };
