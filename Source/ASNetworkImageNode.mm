@@ -703,6 +703,7 @@
             return;
           }
           
+          UIImage *newImage;
           if (imageContainer != nil) {
             [strongSelf _locked_setCurrentImageQuality:1.0];
             NSData *animatedImageData = [imageContainer asdk_animatedImageData];
@@ -710,7 +711,8 @@
               id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];
               [strongSelf _locked_setAnimatedImage:animatedImage];
             } else {
-              [strongSelf _locked__setImage:[imageContainer asdk_image]];
+              newImage = [imageContainer asdk_image];
+              [strongSelf _locked__setImage:newImage];
             }
             strongSelf->_imageLoaded = YES;
           }
@@ -718,32 +720,32 @@
           strongSelf->_downloadIdentifier = nil;
           strongSelf->_cacheUUID = nil;
           
-          // TODO: Why dispatch to main here?
-          // The docs say the image node delegate methods
-          // are called from background.
-          ASPerformBlockOnMainThread(^{
-            __typeof__(self) strongSelf = weakSelf;
-            if (strongSelf == nil) {
-              return;
-            }
-            
-            // Grab the lock for the rest of the block
-            ASDN::MutexLocker l(strongSelf->__instanceLock__);
-            
-            if (imageContainer != nil) {
-              if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
-                ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
+          void (^calloutBlock)(ASNetworkImageNode *inst);
+          
+          if (newImage) {
+            if (_delegateFlags.delegateDidLoadImageWithInfo) {
+              calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
-                [delegate imageNode:strongSelf didLoadImage:strongSelf.image info:info];
-              } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {
-                ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-                [delegate imageNode:strongSelf didLoadImage:strongSelf.image];
-              }
-            } else if (error && strongSelf->_delegateFlags.delegateDidFailWithError) {
-              ASDN::MutexUnlocker u(strongSelf->__instanceLock__);
-              [delegate imageNode:strongSelf didFailWithError:error];
+                [delegate imageNode:strongSelf didLoadImage:newImage info:info];
+              };
+            } else if (_delegateFlags.delegateDidLoadImage) {
+              calloutBlock = ^(ASNetworkImageNode *strongSelf) {
+                [delegate imageNode:strongSelf didLoadImage:newImage];
+              };
             }
-          });
+          } else if (error && _delegateFlags.delegateDidFailWithError) {
+            calloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              [delegate imageNode:strongSelf didFailWithError:error];
+            };
+          }
+          
+          if (calloutBlock) {
+            ASPerformBlockOnMainThread(^{
+              if (auto strongSelf = weakSelf) {
+                calloutBlock(strongSelf);
+              }
+            });
+          }
         });
       };
 
