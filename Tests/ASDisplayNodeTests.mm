@@ -177,14 +177,22 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 
 @implementation ASSynchronousTestDisplayNodeViaViewClass
-+ (Class)viewClass { return [UIView class]; }
+
++ (Class)viewClass {
+  return [UIView class];
+}
+
 @end
 
 @interface ASSynchronousTestDisplayNodeViaLayerClass : ASDisplayNode
 @end
 
 @implementation ASSynchronousTestDisplayNodeViaLayerClass
-+ (Class)layerClass { return [CALayer class]; }
+
++ (Class)layerClass {
+  return [CALayer class];
+}
+
 @end
 
 @interface UIDisplayNodeTestView : UIView
