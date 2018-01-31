@@ -1,6 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)
+- [ASNetworkImageNode] Fix capturing self in the block while loading image in ASNetworkImageNode. [Denis Mororozov](https://github.com/morozkin) [#777](https://github.com/TextureGroup/Texture/pull/777)
 - [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
 - [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
@@ -11,10 +12,14 @@
 - [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 - [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 - Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
-- [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so the subnodes can preload too. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706)
+- [Automatic Subnode Management] Nodes with ASM enabled now insert/delete their subnodes as soon as they enter preload state, so subnodes can start preloading right away. [Huy Nguyen](https://github.com/nguyenhuy) [#706](https://github.com/TextureGroup/Texture/pull/706) [#751](https://github.com/TextureGroup/Texture/pull/751)
 - [ASCollectionNode] Added support for interactive item movement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Added an experimental "no-copy" rendering API. See ASGraphicsContext.h for info. [Adlai Holler](https://github.com/Adlai-Holler)
 - Dropped support for iOS 8. [Adlai Holler](https://github.com/Adlai-Holler)
+- **Breaking** Changes to ASNetworkImageNode: [Adlai Holler](https://github.com/Adlai-Holler)
+  - Modified `ASImageDownloaderCompletion` to add an optional `id userInfo` field. Your custom downloader can pass `nil`.
+  - Modified the last argument to `-[ASNetworkImageNodeDelegate imageNode:didLoadImage:info:]` method from a struct to an object of new class `ASNetworkImageLoadInfo` which includes other metadata about the load operation.
+- Removed +load static initializer from ASDisplayNode. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
