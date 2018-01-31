@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASNetworkImageNode] Fix capturing self in the block while loading image in ASNetworkImageNode. [Denis Mororozov](https://github.com/morozkin) [#777](https://github.com/TextureGroup/Texture/pull/777)
 - [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
 - [ASRectMap] Replace implementation of ASRectTable with a simpler one based on unordered_map.[Scott Goodson](https://github.com/appleguy) [#719](https://github.com/TextureGroup/Texture/pull/719)
 - [ASCollectionView] Add missing flags for ASCollectionDelegate [Ilya Zheleznikov](https://github.com/ilyailya) [#718](https://github.com/TextureGroup/Texture/pull/718)
