@@ -17,6 +17,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // This class is only for use by ASDisplayNode and should never be subclassed or used directly.
 // Note that the "node" property is added to UIView directly via a category in ASDisplayNode.
 
@@ -28,7 +30,7 @@
  @discussion This property overrides the UIView category method which implements this via associated objects.
  This should result in much better performance for _ASDisplayView.
  */
-@property (nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
 
 // These methods expose a way for ASDisplayNode touch events to let the view call super touch events
 // Some UIKit mechanisms, like UITableView and UICollectionView selection handling, require this to work
@@ -38,3 +40,5 @@
 - (void)__forwardTouchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
 
 @end
+
+NS_ASSUME_NONNULL_END
