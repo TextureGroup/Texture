@@ -173,6 +173,28 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
+@interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaViewClass
+
++ (Class)viewClass {
+  return [UIView class];
+}
+
+@end
+
+@interface ASSynchronousTestDisplayNodeViaLayerClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaLayerClass
+
++ (Class)layerClass {
+  return [CALayer class];
+}
+
+@end
+
 @interface UIDisplayNodeTestView : UIView
 @end
 
@@ -2352,6 +2374,18 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testScreenScale
 {
   XCTAssertEqual(ASScreenScale(), UIScreen.mainScreen.scale);
+}
+
+- (void)testThatIfViewClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaViewClass *node = [[ASSynchronousTestDisplayNodeViaViewClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
+}
+
+- (void)testThatIfLayerClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaLayerClass *node = [[ASSynchronousTestDisplayNodeViaLayerClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
 }
 
 @end
