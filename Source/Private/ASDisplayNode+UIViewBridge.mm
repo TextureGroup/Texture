@@ -191,7 +191,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setCornerRadius:(CGFloat)newCornerRadius
 {
-  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
+  [self updateCornerRoundingWithType:self.cornerRoundingType cornerRadius:newCornerRadius];
 }
 
 - (ASCornerRoundingType)cornerRoundingType
@@ -202,7 +202,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
 {
-  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRadius];
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:self.cornerRadius];
 }
 
 - (NSString *)contentsGravity
