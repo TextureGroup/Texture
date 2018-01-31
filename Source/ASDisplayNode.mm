@@ -3086,15 +3086,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // - If it doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
   // (see -__layout and -_u_measureNodeWithBoundsIfNecessary:). This scenario is uncommon,
   // and running a measurement pass here is a fine trade-off because preloading any time after this point would be late.
-  //
-  // Don't force a layout pass if the node is already visible. Soon CoreAnimation will trigger
-  // a (coalesced, thus more efficient) pass on the backing store. Rely on it instead.
-  BOOL shouldForceLayoutPass = NO;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    shouldForceLayoutPass = _automaticallyManagesSubnodes && !ASInterfaceStateIncludesVisible(_interfaceState);
-  }
-  if (shouldForceLayoutPass) {
+  if (self.automaticallyManagesSubnodes) {
     [self layoutIfNeeded];
   }
 
