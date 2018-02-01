@@ -21,7 +21,8 @@
 
 @implementation PlaceholderNetworkImageNode
 
-- (UIImage *)placeholderImage {
+- (UIImage *)placeholderImage
+{
   return self.placeholderImageOverride;
 }
 

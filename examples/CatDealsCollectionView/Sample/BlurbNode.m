@@ -57,16 +57,15 @@ static CGFloat kTextPadding = 10.0f;
   NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:blurb];
   [string addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"HelveticaNeue-Light" size:16.0f] range:NSMakeRange(0, blurb.length)];
   [string addAttributes:@{
-                          NSLinkAttributeName: [NSURL URLWithString:@"http://lorempixel.com/"],
-                          NSForegroundColorAttributeName: [UIColor blueColor],
-                          NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle | NSUnderlinePatternDot),
-                          }
-                  range:[blurb rangeOfString:@"lorempixel.com"]];
+    NSLinkAttributeName: [NSURL URLWithString:@"http://lorempixel.com/"],
+    NSForegroundColorAttributeName: [UIColor blueColor],
+    NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle | NSUnderlinePatternDot),
+  } range:[blurb rangeOfString:@"lorempixel.com"]];
   [string addAttributes:@{
-                          NSLinkAttributeName: [NSURL URLWithString:@"http://www.catipsum.com/"],
-                          NSForegroundColorAttributeName: [UIColor blueColor],
-                          NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle | NSUnderlinePatternDot),
-                          } range:[blurb rangeOfString:@"catipsum.com"]];
+    NSLinkAttributeName: [NSURL URLWithString:@"http://www.catipsum.com/"],
+    NSForegroundColorAttributeName: [UIColor blueColor],
+    NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle | NSUnderlinePatternDot),
+  } range:[blurb rangeOfString:@"catipsum.com"]];
   _textNode.attributedText = string;
 
   // add it as a subnode, and we're done
@@ -90,7 +89,7 @@ static CGFloat kTextPadding = 10.0f;
   centerSpec.sizingOptions = ASCenterLayoutSpecSizingOptionMinimumY;
   centerSpec.child = _textNode;
   
-  UIEdgeInsets padding =UIEdgeInsetsMake(kTextPadding, kTextPadding, kTextPadding, kTextPadding);
+  UIEdgeInsets padding = UIEdgeInsetsMake(kTextPadding, kTextPadding, kTextPadding, kTextPadding);
   return [ASInsetLayoutSpec insetLayoutSpecWithInsets:padding child:centerSpec];
 }
 

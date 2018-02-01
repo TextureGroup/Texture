@@ -65,23 +65,25 @@ const CGFloat kSoldOutGBHeight = 50.0;
   ASIsRTL();
 }
 
-- (instancetype)initWithViewModel:(ItemViewModel *)viewModel
+- (instancetype)init
 {
   self = [super init];
   if (self != nil) {
-    self.nodeModel = viewModel;
-
-    [self setup];
-    [self updateLabels];
+    [self setupNodes];
     [self updateBackgroundColor];
-    
-    ASSetDebugName(self, @"Item #%zd", viewModel.identifier);
-    self.accessibilityIdentifier = viewModel.titleText;
   }
   return self;
 }
 
-- (void)setup
+- (void)setNodeModel:(ItemViewModel *)nodeModel
+{
+  [super setNodeModel:nodeModel];
+  
+  [self updateLabels];
+  [self updateAccessibilityIdentifier];
+}
+
+- (void)setupNodes
 {
   self.dealImageView = [[PlaceholderNetworkImageNode alloc] init];
   self.dealImageView.delegate = self;
@@ -211,6 +213,12 @@ const CGFloat kSoldOutGBHeight = 50.0;
     self.badge.backgroundColor = [ItemStyles badgeColor];
   }
   self.badge.hidden = !hasBadge;
+}
+
+- (void)updateAccessibilityIdentifier
+{
+  ASSetDebugName(self, @"Item #%zd", self.nodeModel.identifier);
+  self.accessibilityIdentifier = self.nodeModel.titleText;
 }
 
 - (void)updateBackgroundColor
@@ -385,9 +393,6 @@ const CGFloat kSoldOutGBHeight = 50.0;
   
   // Clear the flag that says we've loaded our image
   [self.dealImageView setURL:url];
-}
-
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image {
 }
 
 @end

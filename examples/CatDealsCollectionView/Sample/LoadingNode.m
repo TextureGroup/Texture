@@ -18,24 +18,14 @@
 //
 
 #import "LoadingNode.h"
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 
-@interface LoadingNode ()
-{
+@implementation LoadingNode {
   ASDisplayNode *_loadingSpinner;
 }
 
-@end
-
-@implementation LoadingNode
-
-
-#pragma mark -
-#pragma mark ASCellNode.
+#pragma mark - ASCellNode
 
 - (instancetype)init
 {
@@ -61,7 +51,6 @@
   centerSpec.centeringOptions = ASCenterLayoutSpecCenteringXY;
   centerSpec.sizingOptions = ASCenterLayoutSpecSizingOptionDefault;
   centerSpec.child = _loadingSpinner;
-  
   return centerSpec;
 }
 

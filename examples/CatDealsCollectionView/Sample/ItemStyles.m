@@ -95,9 +95,10 @@ UIFont *kInfoFont;
 
 + (UIImage *)placeholderImage {
   static UIImage *__catFace = nil;
-  if (!__catFace) {
+  static dispatch_once_t onceToken;
+  dispatch_once (&onceToken, ^{
     __catFace = [UIImage imageNamed:@"cat_face"];
-  }
+  });
   return __catFace;
 }
 
