@@ -21,6 +21,7 @@
   - Modified the last argument to `-[ASNetworkImageNodeDelegate imageNode:didLoadImage:info:]` method from a struct to an object of new class `ASNetworkImageLoadInfo` which includes other metadata about the load operation.
 - Removed +load static initializer from ASDisplayNode. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimized ASNetworkImageNode loading and resolved edge cases where the image provided to the delegate was not the image that was loaded. [Adlai Holler](https://github.com/Adlai-Holler) [#778](https://github.com/TextureGroup/Texture/pull/778/)
+- Make `ASCellNode` tint color apply to table view cell accessories. [Vladyslav Chapaev](https://github.com/ShogunPhyched) [#764](https://github.com/TextureGroup/Texture/pull/764)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
