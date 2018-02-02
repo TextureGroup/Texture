@@ -56,7 +56,7 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : NSObject
 
 @property (nonatomic, readonly) BOOL isEmpty;
-
+@property (nonatomic, readonly) BOOL disabled;
 /**
  * The queue to run on main run loop before CATransaction commit.
  *
@@ -67,6 +67,11 @@ AS_SUBCLASSING_RESTRICTED
 + (ASCATransactionQueue *)sharedQueue;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
+
+/**
+ * @abstract Apply a node's interfaceState immediately rather than adding to the queue.
+ */
+- (void)disableInterfaceStateCoalesce;
 
 @end
 

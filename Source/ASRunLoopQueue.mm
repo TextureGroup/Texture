@@ -478,6 +478,7 @@ typedef enum {
   CFRunLoopObserverRef _runLoopObserver;
   NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
   ASDN::RecursiveMutex _internalQueueLock;
+  BOOL _disableInterfaceStateCoalesce;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
   os_activity_t _rootActivity;
@@ -698,6 +699,11 @@ static int const kASASCATransactionQueueOrder = 1000000;
     return;
   }
 
+  if (_disableInterfaceStateCoalesce == YES) {
+    [object prepareForCATransactionCommit];
+    return;
+  }
+
   ASDN::MutexLocker l(_internalQueueLock);
 
   // Check if the object exists.
@@ -722,6 +728,16 @@ static int const kASASCATransactionQueueOrder = 1000000;
 {
   ASDN::MutexLocker l(_internalQueueLock);
   return _internalQueue.count == 0;
+}
+
+- (void)disableInterfaceStateCoalesce
+{
+  _disableInterfaceStateCoalesce = YES;
+}
+
+- (BOOL)disabled
+{
+  return _disableInterfaceStateCoalesce;
 }
 
 @end

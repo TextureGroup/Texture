@@ -2798,19 +2798,28 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
     
     if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
-      dispatch_async(dispatch_get_main_queue(), ^{
+      if ([[ASCATransactionQueue sharedQueue] disabled]) {
         // This block intentionally retains self.
-        __instanceLock__.lock();
-          unsigned isInHierarchy = _flags.isInHierarchy;
-          BOOL isVisible = ASInterfaceStateIncludesVisible(_interfaceState);
-          ASInterfaceState newState = (_interfaceState & ~ASInterfaceStateVisible);
-        __instanceLock__.unlock();
-        
-        if (!isInHierarchy && isVisible) {
-          self.interfaceState = newState;
-        }
-      });
+        dispatch_async(dispatch_get_main_queue(), ^{
+          // This block intentionally retains self.
+          [self _exitVisibleState];
+        });
+      } else {
+        [self _exitVisibleState];
+      }
     }
+  }
+}
+
+- (void)_exitVisibleState {
+  __instanceLock__.lock();
+  unsigned isInHierarchy = _flags.isInHierarchy;
+  BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
+  ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+  __instanceLock__.unlock();
+
+  if (!isInHierarchy && isVisible) {
+    self.interfaceState = newState;
   }
 }
 
@@ -2872,13 +2881,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)setInterfaceState:(ASInterfaceState)newState
 {
   ASDN::MutexLocker l(__instanceLock__);
+  if ([[ASCATransactionQueue sharedQueue] disabled]) {
+    [self applyPendingInterfaceState:newState];
+  } else {
+    ASDN::MutexLocker l(__instanceLock__);
     if (_pendingInterfaceState != newState) {
       _pendingInterfaceState = newState;
       [[ASCATransactionQueue sharedQueue] enqueue:self];
     }
+  }
 }
 
-- (void)applyPendingInterfaceState
+- (void)applyPendingInterfaceState:(ASInterfaceState)newPendingState
 {
   //This method is currently called on the main thread. The assert has been added here because all of the
   //did(Enter|Exit)(Display|Visible|Preload)State methods currently guarantee calling on main.
@@ -2891,6 +2905,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASInterfaceState newState = ASInterfaceStateNone;
   {
     ASDN::MutexLocker l(__instanceLock__);
+    // newPendingState will not be used when ASCATransactionQueue is enabled
+    // and use _pendingInterfaceState instead for interfaceState update.
+    if ([[ASCATransactionQueue sharedQueue] disabled]) {
+      _pendingInterfaceState = newPendingState;
+    }
     oldState = _interfaceState;
     newState = _pendingInterfaceState;
     if (newState == oldState) {
@@ -3000,7 +3019,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)prepareForCATransactionCommit
 {
-  [self applyPendingInterfaceState];
+  [self applyPendingInterfaceState:ASInterfaceStateNone];
 }
 
 - (void)interfaceStateDidChange:(ASInterfaceState)newState fromState:(ASInterfaceState)oldState
