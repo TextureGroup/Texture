@@ -63,8 +63,8 @@ NSArray *badges;
   NSString *urlString = [NSString stringWithFormat:@"http://lorempixel.com/%zd/%zd/cats/%zd/%@",
                          (NSInteger)roundl(size.width),
                          (NSInteger)roundl(size.height), self.catNumber, imageText];
-  urlString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-  
+
+  urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
   return [NSURL URLWithString:urlString];
 }
 
