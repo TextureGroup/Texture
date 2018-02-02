@@ -2788,6 +2788,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   
   if (![self supportsRangeManagedInterfaceState]) {
+    // TODO: Consider merging this codepath with the below, so both range-managed and standalone
+    // nodes wait before firing their exit-visibility handlers. This is more important than it used
+    // to be, as UIViewController transitions now do rehosting at both start & end of animation.
     self.interfaceState = ASInterfaceStateNone;
   } else {
     // This case is important when tearing down hierarchies.  We must deliver a visibileStateDidChange:NO callback, as part our API guarantee that this method can be used for
@@ -2798,28 +2801,25 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
     
     if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
-      if ([[ASCATransactionQueue sharedQueue] disabled]) {
+      void(^exitVisibleInterfaceState)(void) = ^{
         // This block intentionally retains self.
-        dispatch_async(dispatch_get_main_queue(), ^{
-          // This block intentionally retains self.
-          [self _exitVisibleState];
-        });
+        __instanceLock__.lock();
+        unsigned isStillInHierarchy = _flags.isInHierarchy;
+        BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
+        ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+        __instanceLock__.unlock();
+
+        if (!isStillInHierarchy && isVisible) {
+          self.interfaceState = newState;
+        };
+      };
+
+      if ([[ASCATransactionQueue sharedQueue] disabled]) {
+        dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
       } else {
-        [self _exitVisibleState];
+        exitVisibleInterfaceState();
       }
     }
-  }
-}
-
-- (void)_exitVisibleState {
-  __instanceLock__.lock();
-  unsigned isInHierarchy = _flags.isInHierarchy;
-  BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
-  ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
-  __instanceLock__.unlock();
-
-  if (!isInHierarchy && isVisible) {
-    self.interfaceState = newState;
   }
 }
 
