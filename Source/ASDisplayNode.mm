@@ -874,7 +874,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (BOOL)__becomeFirstResponder
 {
-  
   if (self.isLayerBacked || ![self canBecomeFirstResponder]) {
     return NO;
   }

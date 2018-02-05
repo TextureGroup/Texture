@@ -261,6 +261,25 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
+@interface UIResponderNodeTestDisplayViewCallingSuper : _ASDisplayView
+@end
+@implementation UIResponderNodeTestDisplayViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder {
+  return [super becomeFirstResponder];
+}
+@end
+
+@interface UIResponderNodeTestViewCallingSuper : UIView
+@end
+@implementation UIResponderNodeTestViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder {
+  return [super becomeFirstResponder];
+  
+}
+@end
+
 @interface ASDisplayNodeTests : XCTestCase
 @end
 
@@ -269,9 +288,37 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   dispatch_queue_t queue;
 }
 
-- (void)testOverriddenFirstResponderBehavior
+- (void)testOverriddenNodeFirstResponderBehavior
 {
   ASTestDisplayNode *node = [[ASTestResponderNode alloc] init];
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testOverriddenDisplayViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestDisplayViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testOverriddenViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
   XCTAssertTrue([node canBecomeFirstResponder]);
   XCTAssertTrue([node becomeFirstResponder]);
 }
