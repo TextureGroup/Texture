@@ -169,17 +169,21 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
   XCTAssertTrue(queue.isEmpty);
 }
 
-- (void)testASCATransactionQueueDisable {
-  [[ASCATransactionQueue sharedQueue] disableInterfaceStateCoalesce];
+- (void)testASCATransactionQueueDisable
+{
+  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
+  [queue disableInterfaceStateCoalesce];
   QueueObject *object = [[QueueObject alloc] init];
   [[ASCATransactionQueue sharedQueue] enqueue:object];
-  XCTAssertTrue([[ASCATransactionQueue sharedQueue] isEmpty]);
-  XCTAssertTrue([[ASCATransactionQueue sharedQueue] disabled]);
+  XCTAssertTrue([queue isEmpty]);
+  XCTAssertTrue([queue disabled]);
 }
 
-- (void)testASCATransactionQueueProcess {
+- (void)testASCATransactionQueueProcess
+{
+  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
   QueueObject *object = [[QueueObject alloc] init];
-  [[ASCATransactionQueue sharedQueue] enqueue:object];
+  [queue enqueue:object];
   XCTAssertFalse(object.queueObjectProcessed);
   ASCATransactionQueueWait();
   XCTAssertTrue(object.queueObjectProcessed);
