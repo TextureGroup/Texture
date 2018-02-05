@@ -2786,39 +2786,34 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssert(_flags.isExitingHierarchy, @"You should never call -didExitHierarchy directly. Appearance is automatically managed by ASDisplayNode");
   ASDisplayNodeAssert(!_flags.isEnteringHierarchy, @"ASDisplayNode inconsistency. __enterHierarchy and __exitHierarchy are mutually exclusive");
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  
-  if (![self supportsRangeManagedInterfaceState]) {
-    // TODO: Consider merging this codepath with the below, so both range-managed and standalone
-    // nodes wait before firing their exit-visibility handlers. This is more important than it used
-    // to be, as UIViewController transitions now do rehosting at both start & end of animation.
-    self.interfaceState = ASInterfaceStateNone;
-  } else {
-    // This case is important when tearing down hierarchies.  We must deliver a visibileStateDidChange:NO callback, as part our API guarantee that this method can be used for
-    // things like data analytics about user content viewing.  We cannot call the method in the dealloc as any incidental retain operations in client code would fail.
-    // Additionally, it may be that a Standard UIView which is containing us is moving between hierarchies, and we should not send the call if we will be re-added in the
-    // same runloop.  Strategy: strong reference (might be the last!), wait one runloop, and confirm we are still outside the hierarchy (both layer-backed and view-backed).
-    // TODO: This approach could be optimized by only performing the dispatch for root elements + recursively apply the interface state change. This would require a closer
-    // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
-    
-    if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
-      void(^exitVisibleInterfaceState)(void) = ^{
-        // This block intentionally retains self.
-        __instanceLock__.lock();
-        unsigned isStillInHierarchy = _flags.isInHierarchy;
-        BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
-        ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
-        __instanceLock__.unlock();
 
-        if (!isStillInHierarchy && isVisible) {
-          self.interfaceState = newState;
-        };
-      };
+  // This case is important when tearing down hierarchies.  We must deliver a visibileStateDidChange:NO callback, as part our API guarantee that this method can be used for
+  // things like data analytics about user content viewing.  We cannot call the method in the dealloc as any incidental retain operations in client code would fail.
+  // Additionally, it may be that a Standard UIView which is containing us is moving between hierarchies, and we should not send the call if we will be re-added in the
+  // same runloop.  Strategy: strong reference (might be the last!), wait one runloop, and confirm we are still outside the hierarchy (both layer-backed and view-backed).
+  // TODO: This approach could be optimized by only performing the dispatch for root elements + recursively apply the interface state change. This would require a closer
+  // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
+  if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
+    void(^exitVisibleInterfaceState)(void) = ^{
+      // This block intentionally retains self.
+      __instanceLock__.lock();
+      unsigned isStillInHierarchy = _flags.isInHierarchy;
+      BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
+      ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+      __instanceLock__.unlock();
 
-      if ([[ASCATransactionQueue sharedQueue] disabled]) {
-        dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
-      } else {
-        exitVisibleInterfaceState();
+      if (!isStillInHierarchy && isVisible) {
+        if (![self supportsRangeManagedInterfaceState]) {
+          newState = ASInterfaceStateNone;
+        }
+        self.interfaceState = newState;
       }
+    };
+
+    if ([[ASCATransactionQueue sharedQueue] disabled]) {
+      dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
+    } else {
+      exitVisibleInterfaceState();
     }
   }
 }
