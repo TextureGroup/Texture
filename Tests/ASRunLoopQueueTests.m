@@ -12,8 +12,20 @@
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import "ASDisplayNodeTestsHelper.h"
 
 static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run for one millisecond each time.
+
+@interface QueueObject : NSObject <ASCATransactionQueueObserving>
+@property (nonatomic, assign) BOOL queueObjectProcessed;
+@end
+
+@implementation QueueObject
+- (void)prepareForCATransactionCommit
+{
+  self.queueObjectProcessed = YES;
+}
+@end
 
 @interface ASRunLoopQueueTests : XCTestCase
 
@@ -155,6 +167,22 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
   XCTAssertFalse(queue.isEmpty);
   [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:kRunLoopRunTime]];
   XCTAssertTrue(queue.isEmpty);
+}
+
+- (void)testASCATransactionQueueDisable {
+  [[ASCATransactionQueue sharedQueue] disableInterfaceStateCoalesce];
+  QueueObject *object = [[QueueObject alloc] init];
+  [[ASCATransactionQueue sharedQueue] enqueue:object];
+  XCTAssertTrue([[ASCATransactionQueue sharedQueue] isEmpty]);
+  XCTAssertTrue([[ASCATransactionQueue sharedQueue] disabled]);
+}
+
+- (void)testASCATransactionQueueProcess {
+  QueueObject *object = [[QueueObject alloc] init];
+  [[ASCATransactionQueue sharedQueue] enqueue:object];
+  XCTAssertFalse(object.queueObjectProcessed);
+  ASCATransactionQueueWait();
+  XCTAssertTrue(object.queueObjectProcessed);
 }
 
 @end
