@@ -1071,6 +1071,7 @@
       for (NSInteger i = 0; i < c; i++) {
         NSIndexPath *ip = [NSIndexPath indexPathForItem:i inSection:s];
         ASCellNode *node = [cn nodeForItemAtIndexPath:ip];
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.001]];
         if (node.inPreloadState) {
           CGRect frame = [cn.view layoutAttributesForItemAtIndexPath:ip].frame;
           r = CGRectUnion(r, frame);

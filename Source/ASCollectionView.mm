@@ -1511,6 +1511,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
+    _rangeController.contentOffsetHasChanged = YES;
     [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
   }
