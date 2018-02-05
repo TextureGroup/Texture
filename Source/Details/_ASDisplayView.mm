@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 
@@ -358,36 +359,82 @@
   [node tintColorDidChange];
 }
 
-// We forward every UIResponder method to give the node a change to overwrite it
+#pragma mark UIResponder Handling
 
 - (BOOL)canBecomeFirstResponder
 {
-    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  // Prevent an infinite loop in here if [super canBecomeFirstResponder] was called on a
+  // _ASDisplayView subclass
+  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(canBecomeFirstResponder))) {
+    // Check if we can call through to ASDisplayNode subclass directly
+    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(canBecomeFirstResponder))) {
+      return [node canBecomeFirstResponder];
+    } else {
+      // Call through to views superclass as we expect super was called from the
+      // _ASDisplayView subclass and a node subclass does not overwrite canBecomeFirstResponder
+      return [self __canBecomeFirstResponder];
+    }
+  } else {
+    // Call through to internal node __canBecomeFirstResponder that will consider the view in responding
     return [node __canBecomeFirstResponder];
+  }
 }
 
 - (BOOL)becomeFirstResponder
 {
-    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  ASDisplayNode *node = _asyncdisplaykit_node;
+  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(becomeFirstResponder))) {
+    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(becomeFirstResponder))) {
+      return [node becomeFirstResponder];
+    } else {
+      return [self __becomeFirstResponder];
+    }
+  } else {
     return [node __becomeFirstResponder];
+  }
 }
 
 - (BOOL)canResignFirstResponder
 {
-    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  ASDisplayNode *node = _asyncdisplaykit_node;
+  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(canResignFirstResponder))) {
+    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(canResignFirstResponder))) {
+      return [node canResignFirstResponder];
+    } else {
+      return [self __canResignFirstResponder];
+    }
+  } else {
     return [node __canResignFirstResponder];
+  }
 }
 
 - (BOOL)resignFirstResponder
 {
-    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  ASDisplayNode *node = _asyncdisplaykit_node;
+  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(resignFirstResponder))) {
+    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(resignFirstResponder))) {
+      return [node resignFirstResponder];
+    } else {
+      return [self __resignFirstResponder];
+    }
+  } else {
     return [node __resignFirstResponder];
+  }
 }
 
 - (BOOL)isFirstResponder
 {
-    ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  ASDisplayNode *node = _asyncdisplaykit_node;
+  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(isFirstResponder))) {
+    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(isFirstResponder))) {
+      return [node isFirstResponder];
+    } else {
+      return [self __isFirstResponder];
+    }
+  } else {
     return [node __isFirstResponder];
+  }
 }
 
 // This methods are called from ASDisplayNode to let the view decide in what UIResponder state they are not overwritten
