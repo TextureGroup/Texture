@@ -45,6 +45,7 @@
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
   NSHashTable<ASCellNode *> *_visibleNodes;
   ASLayoutRangeMode _currentRangeMode;
+  BOOL _contentOffsetHasChanged;
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
   CFTimeInterval _pendingDisplayNodesTimestamp;
@@ -77,6 +78,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   
   _rangeIsValid = YES;
   _currentRangeMode = ASLayoutRangeModeUnspecified;
+  _contentOffsetHasChanged = NO;
   _preserveCurrentRangeMode = NO;
   _previousScrollDirection = ASScrollDirectionDown | ASScrollDirectionRight;
   
@@ -237,9 +239,13 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   
   ASInterfaceState selfInterfaceState = [self interfaceState];
   ASLayoutRangeMode rangeMode = _currentRangeMode;
-  // If the range mode is explicitly set via updateCurrentRangeWithMode: it will last in that mode until the
-  // range controller becomes visible again or explicitly changes the range mode again
-  if ((!_preserveCurrentRangeMode && ASInterfaceStateIncludesVisible(selfInterfaceState)) || [[self class] isFirstRangeUpdateForRangeMode:rangeMode]) {
+  BOOL updateRangeMode = !_preserveCurrentRangeMode && _contentOffsetHasChanged;
+
+  // If we've never scrolled before, we never update the range mode, so it doesn't jump into Full too early.
+  // This can happen if we have multiple, noisy updates occurring from application code before the user has engaged.
+  // If the range mode is explicitly set via updateCurrentRangeWithMode:, we'll preserve that for at least one update cycle.
+  // Once the user has scrolled and the range is visible, we'll always resume managing the range mode automatically.
+  if ((updateRangeMode && ASInterfaceStateIncludesVisible(selfInterfaceState)) || [[self class] isFirstRangeUpdateForRangeMode:rangeMode]) {
     rangeMode = [ASRangeController rangeModeForInterfaceState:selfInterfaceState currentRangeMode:_currentRangeMode];
   }
 
@@ -412,7 +418,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 //    NSLog(@"custom: %@", visibleNodePathsSet);
 //  }
   [modifiedIndexPaths sortUsingSelector:@selector(compare:)];
-  NSLog(@"Range update complete; modifiedIndexPaths: %@", [self descriptionWithIndexPaths:modifiedIndexPaths]);
+  NSLog(@"Range update complete; modifiedIndexPaths: %@, rangeMode: %d", [self descriptionWithIndexPaths:modifiedIndexPaths], rangeMode);
 #endif
   
   ASSignpostEnd(ASSignpostRangeControllerUpdate);
