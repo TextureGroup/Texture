@@ -856,7 +856,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  if (checkFlag(Synchronous)) {
+  if (checkFlag(Synchronous)
+      || ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(canBecomeFirstResponder))) {
     return [_view canBecomeFirstResponder];
   } else {
     return [(_ASDisplayView *)_view __canBecomeFirstResponder];
@@ -865,15 +866,19 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (BOOL)__becomeFirstResponder
 {
-  if (self.isLayerBacked || ![self __canBecomeFirstResponder]) {
+  
+  if (self.isLayerBacked || ![self canBecomeFirstResponder]) {
     return NO;
   }
-
+  
   // We explicitly create the view in here
-  if (checkFlag(Synchronous)) {
+  [self view];
+
+  if (checkFlag(Synchronous)
+      || ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(becomeFirstResponder))) {
     return [_view becomeFirstResponder];
   } else {
-    return [(_ASDisplayView *)_view __canBecomeFirstResponder];
+    return [(_ASDisplayView *)_view __becomeFirstResponder];
   }
 }
 
@@ -884,7 +889,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return YES;
   }
 
-  if (checkFlag(Synchronous)) {
+  if (checkFlag(Synchronous)
+      || ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(canResignFirstResponder))) {
     return [_view canResignFirstResponder];
   } else {
     return [(_ASDisplayView *)_view __canResignFirstResponder];
@@ -897,7 +903,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  if (checkFlag(Synchronous)) {
+  // We explicitly create the view in here
+  [self view];
+  
+  if (checkFlag(Synchronous)
+      || ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(resignFirstResponder))) {
     return [_view resignFirstResponder];
   } else {
     return [(_ASDisplayView *)_view __resignFirstResponder];
@@ -911,7 +921,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  if (checkFlag(Synchronous)) {
+  if (checkFlag(Synchronous)
+      || ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(isFirstResponder))) {
     return [_view isFirstResponder];
   } else {
     return [(_ASDisplayView *)_view __isFirstResponder];
