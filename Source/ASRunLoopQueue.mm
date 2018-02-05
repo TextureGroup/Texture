@@ -186,27 +186,6 @@ static void runLoopSourceCallback(void *info) {
 
 @end
 
-#pragma mark - ASRunLoopQueue
-
-@interface ASRunLoopQueue () {
-  CFRunLoopRef _runLoop;
-  CFRunLoopSourceRef _runLoopSource;
-  CFRunLoopObserverRef _runLoopObserver;
-  NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
-  ASDN::RecursiveMutex _internalQueueLock;
-
-  // In order to not pollute the top-level activities, each queue has 1 root activity.
-  os_activity_t _rootActivity;
-
-#if ASRunLoopQueueLoggingEnabled
-  NSTimer *_runloopQueueLoggingTimer;
-#endif
-}
-
-@property (nonatomic, copy) void (^queueConsumer)(id dequeuedItem, BOOL isQueueDrained);
-
-@end
-
 #if AS_KDEBUG_ENABLE
 /**
  * This is real, private CA API. Valid as of iOS 10.
@@ -223,7 +202,23 @@ typedef enum {
 @end
 #endif
 
-@implementation ASRunLoopQueue
+#pragma mark - ASAbstractRunLoopQueue
+
+@interface ASAbstractRunLoopQueue (Private)
++ (void)load;
++ (void)registerCATransactionObservers;
+@end
+
+@implementation ASAbstractRunLoopQueue
+
+- (instancetype)init
+{
+  if (self != [super init]) {
+    return nil;
+  }
+  ASDisplayNodeAssert(self.class != [ASAbstractRunLoopQueue class], @"Should never create instances of abstract class ASAbstractRunLoopQueue.");
+  return self;
+}
 
 #if AS_KDEBUG_ENABLE
 + (void)load
@@ -269,6 +264,31 @@ typedef enum {
 }
 
 #endif // AS_KDEBUG_ENABLE
+
+@end
+
+#pragma mark - ASRunLoopQueue
+
+@interface ASRunLoopQueue () {
+  CFRunLoopRef _runLoop;
+  CFRunLoopSourceRef _runLoopSource;
+  CFRunLoopObserverRef _runLoopObserver;
+  NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
+  ASDN::RecursiveMutex _internalQueueLock;
+
+  // In order to not pollute the top-level activities, each queue has 1 root activity.
+  os_activity_t _rootActivity;
+
+#if ASRunLoopQueueLoggingEnabled
+  NSTimer *_runloopQueueLoggingTimer;
+#endif
+}
+
+@property (nonatomic, copy) void (^queueConsumer)(id dequeuedItem, BOOL isQueueDrained);
+
+@end
+
+@implementation ASRunLoopQueue
 
 - (instancetype)initWithRunLoop:(CFRunLoopRef)runloop retainObjects:(BOOL)retainsObjects handler:(void (^)(id _Nullable, BOOL))handlerBlock
 {
@@ -495,51 +515,6 @@ typedef enum {
 // CoreAnimation commit order is 2000000, the goal of this is to process shortly beforehand
 // but after most other scheduled work on the runloop has processed.
 static int const kASASCATransactionQueueOrder = 1000000;
-
-#if AS_KDEBUG_ENABLE
-+ (void)load
-{
-  [self registerCATransactionObservers];
-}
-
-+ (void)registerCATransactionObservers
-{
-  static BOOL privateCAMethodsExist;
-  static dispatch_block_t preLayoutHandler;
-  static dispatch_block_t preCommitHandler;
-  static dispatch_block_t postCommitHandler;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    privateCAMethodsExist = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
-    privateCAMethodsExist &= [CATransaction respondsToSelector:@selector(currentState)];
-    if (!privateCAMethodsExist) {
-      NSLog(@"Private CA methods are gone.");
-    }
-    preLayoutHandler = ^{
-      ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
-    };
-    preCommitHandler = ^{
-      int state = [CATransaction currentState];
-      ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
-      ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
-    };
-    postCommitHandler = ^{
-      ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
-      // Can't add new observers inside an observer. rdar://problem/31253952
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [self registerCATransactionObservers];
-      });
-    };
-  });
-
-  if (privateCAMethodsExist) {
-    [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
-    [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
-    [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
-  }
-}
-
-#endif // AS_KDEBUG_ENABLE
 
 + (ASCATransactionQueue *)sharedQueue
 {

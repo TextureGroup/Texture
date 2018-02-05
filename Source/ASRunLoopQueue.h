@@ -24,8 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)prepareForCATransactionCommit;
 @end
 
+@interface ASAbstractRunLoopQueue : NSObject
+@end
+
 AS_SUBCLASSING_RESTRICTED
-@interface ASRunLoopQueue<ObjectType> : NSObject <NSLocking>
+@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <NSLocking>
 
 /**
  * Create a new queue with the given run loop and handler.
@@ -53,7 +56,7 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 AS_SUBCLASSING_RESTRICTED
-@interface ASCATransactionQueue : NSObject
+@interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
 @property (nonatomic, readonly) BOOL isEmpty;
 @property (nonatomic, readonly) BOOL disabled;
