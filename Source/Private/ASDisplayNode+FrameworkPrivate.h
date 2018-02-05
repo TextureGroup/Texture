@@ -150,6 +150,8 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)enterHierarchyState:(ASHierarchyState)hierarchyState;
 - (void)exitHierarchyState:(ASHierarchyState)hierarchyState;
 
+- (ASInterfaceState)_locked_pendingInterfaceState;
+
 // Changed before calling willEnterHierarchy / didExitHierarchy.
 @property (readonly, assign, getter = isInHierarchy) BOOL inHierarchy;
 // Call willEnterHierarchy if necessary and set inHierarchy = YES if visibility notifications are enabled on all of its parents

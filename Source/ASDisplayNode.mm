@@ -2741,9 +2741,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // Entered or exited range managed state.
   if ((newState & ASHierarchyStateRangeManaged) != (oldState & ASHierarchyStateRangeManaged)) {
     if (newState & ASHierarchyStateRangeManaged) {
-      if (self.supernode) {
-        [self enterInterfaceState:self.supernode->_pendingInterfaceState];
-      }
+      [self enterInterfaceState:[self.supernode _locked_pendingInterfaceState]];
     } else {
       // The case of exiting a range-managed state should be fairly rare.  Adding or removing the node
       // to a view hierarchy will cause its interfaceState to be either fully set or unset (all fields),
@@ -2885,6 +2883,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       [[ASCATransactionQueue sharedQueue] enqueue:self];
     }
   }
+}
+
+- (ASInterfaceState)_locked_pendingInterfaceState
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _pendingInterfaceState;
 }
 
 - (void)applyPendingInterfaceState:(ASInterfaceState)newPendingState
