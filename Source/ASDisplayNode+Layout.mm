@@ -300,13 +300,24 @@ ASLayoutElementStyleExtensibilityForwarding
   }
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
+  NSUInteger calculatedVersion = _calculatedDisplayNodeLayout->version;
 
   // Prefer a newer and not yet applied _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout
   // If there is no such _pending, check if _calculated is valid to reuse (avoiding recalculation below).
-  BOOL pendingLayoutIsPreferred = (_pendingDisplayNodeLayout != nullptr
-                                   && _pendingDisplayNodeLayout->version >= _layoutVersion
-                                   && _pendingDisplayNodeLayout->version > _calculatedDisplayNodeLayout->version); // _pending is not yet applied
-  BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->version >= _layoutVersion
+  BOOL pendingLayoutIsPreferred = NO;
+  if (_pendingDisplayNodeLayout != nullptr) {
+    NSUInteger pendingVersion = _pendingDisplayNodeLayout->version;
+    if (pendingVersion >= _layoutVersion) {
+      if (pendingVersion > calculatedVersion) {
+        pendingLayoutIsPreferred = YES; // Newer _pending
+      } else if (pendingVersion == calculatedVersion
+                 && !ASSizeRangeEqualToSizeRange(_pendingDisplayNodeLayout->constrainedSize,
+                                                 _calculatedDisplayNodeLayout->constrainedSize)) {
+                   pendingLayoutIsPreferred = YES; // _pending with a different constrained size
+                 }
+    }
+  }
+  BOOL calculatedLayoutIsReusable = (calculatedVersion >= _layoutVersion
                                      && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
                                          || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout)));
   if (!pendingLayoutIsPreferred && calculatedLayoutIsReusable) {
