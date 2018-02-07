@@ -36,6 +36,7 @@
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
@@ -225,12 +226,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
 }
 
-+ (void)load
-{
-  // Ensure this value is cached on the main thread before needed in the background.
-  ASScreenScale();
-}
-
 + (Class)viewClass
 {
   return [_ASDisplayView class];
@@ -258,6 +253,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
+  BOOL isSynchronous = ![_viewClass isSubclassOfClass:[_ASDisplayView class]]
+                        || ![_layerClass isSubclassOfClass:[_ASDisplayLayer class]];
+  setFlag(Synchronous, isSynchronous);
+  
+
   _contentsScaleForDisplay = ASScreenScale();
   _drawingPriority = ASDefaultDrawingPriority;
   
@@ -440,7 +440,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
       // is still deallocated on a background thread
       object_setIvar(self, ivar, nil);
       
-      ASPerformMainThreadDeallocation(value);
+      ASPerformMainThreadDeallocation(&value);
     } else {
       as_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
     }
@@ -911,7 +911,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
-    [self _locked_measureNodeWithBoundsIfNecessary:bounds];
+    __instanceLock__.unlock();
+    [self _u_measureNodeWithBoundsIfNecessary:bounds];
+    __instanceLock__.lock();
 
     [self _locked_layoutPlaceholderIfNecessary];
   }
@@ -1505,7 +1507,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 2);
       
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
+      ASGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
       
       CGContextRef ctx = UIGraphicsGetCurrentContext();
       if (isRight == YES) {
@@ -1522,11 +1524,9 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       
       // No lock needed, as _clipCornerLayers is only modified on the main thread.
       CALayer *clipCornerLayer = _clipCornerLayers[idx];
-      clipCornerLayer.contents = (id)(UIGraphicsGetImageFromCurrentImageContext().CGImage);
+      clipCornerLayer.contents = (id)(ASGraphicsGetImageAndEndCurrentContext().CGImage);
       clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
       clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 1.0 : 0.0);
-
-      UIGraphicsEndImageContext();
     }
     [self _layoutClipCornersIfNeeded];
   });
@@ -2760,7 +2760,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     }
   }
 
-  ASDisplayNodeLogEvent(self, @"setHierarchyState: oldState = %@, newState = %@", NSStringFromASHierarchyState(oldState), NSStringFromASHierarchyState(newState));
+  ASDisplayNodeLogEvent(self, @"setHierarchyState: %@", NSStringFromASHierarchyStateChange(oldState, newState));
+  as_log_verbose(ASNodeLog(), "%s%@ %@", sel_getName(_cmd), NSStringFromASHierarchyStateChange(oldState, newState), self);
 }
 
 - (void)willEnterHierarchy
@@ -3076,6 +3077,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
+
+  // If this node has ASM enabled and is not yet visible, force a layout pass to apply its applicable pending layout, if any,
+  // so that its subnodes are inserted/deleted and start preloading right away.
+  //
+  // - If it has an up-to-date layout (and subnodes), calling -layoutIfNeeded will be fast.
+  //
+  // - If it doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
+  // (see -__layout and -_u_measureNodeWithBoundsIfNecessary:). This scenario is uncommon,
+  // and running a measurement pass here is a fine trade-off because preloading any time after this point would be late.
+  if (self.automaticallyManagesSubnodes) {
+    [self layoutIfNeeded];
+  }
+
   [_interfaceStateDelegate didEnterPreloadState];
 }
 

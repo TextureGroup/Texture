@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'Texture'
-  spec.version      = '2.5'
+  spec.version      = '2.6'
   spec.license      =  { :type => 'BSD and Apache 2',  }
   spec.homepage     = 'http://texturegroup.org'
   spec.authors      = { 'Huy Nguyen' => 'huy@pinterest.com', 'Garrett Moon' => 'garrett@excitedpixel.com', 'Scott Goodson' => 'scottgoodson@gmail.com', 'Michael Schneider' => 'schneider@pinterest.com', 'Adlai Holler' => 'adlai@pinterest.com' }
@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
   spec.weak_frameworks = 'Photos','MapKit','AssetsLibrary'
   spec.requires_arc = true
 
-  spec.ios.deployment_target = '8.0'
+  spec.ios.deployment_target = '9.0'
 
   # Uncomment when fixed: issues with tvOS build for release 2.0
   # spec.tvos.deployment_target = '9.0'

@@ -210,7 +210,33 @@ permalink: /showcase.html
 		<br /> 
 		<b>Sorted: Master Your Day</b>
 		</td>
+
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/vingle-very-community/id637534820?mt=8"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple128/v4/09/21/52/09215288-4bab-6f97-240c-6e3a26218af2/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Vingle</b>
+		</td>
+
+		</tr>
 		
+		<tr>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/nl/app/blendle/id947936149?mt=8"><img class="roundrect" src="http://is1.mzstatic.com/image/thumb/Purple118/v4/20/8c/64/208c64e8-a74f-8290-56d4-411d7ef0bb85/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Blendle</b>
+		</td>
+
+		</tr>
+		
+		<tr>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/in/app/mensxp-fashion-grooming-tips/id1253494246?mt=8"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple118/v4/04/78/65/04786577-67dc-ea87-2063-b97a89492e18/source/175x175bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>MensXP</b>
+		</td>
+
 		</tr>
 		
 		</table>
