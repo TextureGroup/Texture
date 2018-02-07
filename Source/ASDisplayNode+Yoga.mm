@@ -94,12 +94,10 @@
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
 {
-  if (AS_AT_LEAST_IOS9) {
-    UIUserInterfaceLayoutDirection layoutDirection =
-    [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
-    self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
-                            ? YGDirectionLTR : YGDirectionRTL);
-  }
+  UIUserInterfaceLayoutDirection layoutDirection =
+  [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
+  self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
+                          ? YGDirectionLTR : YGDirectionRTL);
 }
 
 - (void)setYogaParent:(ASDisplayNode *)yogaParent
@@ -307,7 +305,7 @@
       NSLog(@"node = %@", node);
       NSLog(@"style = %@", node.style);
       NSLog(@"layout = %@", node.yogaCalculatedLayout);
-      YGNodePrint(node.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
+      YGNodePrint(node.style.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
     });
   }
 #endif /* YOGA_LAYOUT_LOGGING */

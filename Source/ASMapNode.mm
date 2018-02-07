@@ -24,6 +24,7 @@
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
@@ -222,7 +223,7 @@
                     
                     CGRect finalImageRect = CGRectMake(0, 0, image.size.width, image.size.height);
                     
-                    UIGraphicsBeginImageContextWithOptions(image.size, YES, image.scale);
+                    ASGraphicsBeginImageContextWithOptions(image.size, YES, image.scale);
                     [image drawAtPoint:CGPointZero];
                     
                     UIImage *pinImage;
@@ -254,8 +255,7 @@
                       }
                     }
                     
-                    image = UIGraphicsGetImageFromCurrentImageContext();
-                    UIGraphicsEndImageContext();
+                    image = ASGraphicsGetImageAndEndCurrentContext();
                   }
                   
                   strongSelf.image = image;

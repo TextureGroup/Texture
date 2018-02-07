@@ -38,7 +38,7 @@ void ASPerformBlockOnMainThread(void (^block)(void));
 void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
 /// For deallocation of objects on a background thread without GCD overhead / thread explosion
-void ASPerformBackgroundDeallocation(id object);
+void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
 
 CGFloat ASScreenScale(void);
 

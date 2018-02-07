@@ -141,7 +141,7 @@ typedef struct {
   NSArray *accessibilityHeaderElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
-  UISemanticContentAttribute semanticContentAttribute;
+  UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
 
   ASPendingStateFlags _flags;
 }
@@ -573,7 +573,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   _flags.setAsyncTransactionContainer = YES;
 }
 
-- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute {
+- (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute API_AVAILABLE(ios(9.0), tvos(9.0)) {
   semanticContentAttribute = attribute;
   _flags.setSemanticContentAttribute = YES;
 }
@@ -1059,23 +1059,20 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   if (flags.setAccessibilityLabel)
     view.accessibilityLabel = accessibilityLabel;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedLabel)
-      view.accessibilityAttributedLabel = accessibilityAttributedLabel;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedLabel)
+    [view setValue:accessibilityAttributedLabel forKey:@"accessibilityAttributedLabel"];
 
   if (flags.setAccessibilityHint)
     view.accessibilityHint = accessibilityHint;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedHint)
-      view.accessibilityAttributedHint = accessibilityAttributedHint;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedHint)
+    [view setValue:accessibilityAttributedHint forKey:@"accessibilityAttributedHint"];
 
   if (flags.setAccessibilityValue)
     view.accessibilityValue = accessibilityValue;
 
-  if (@available(iOS 11.0, *))
-    if (flags.setAccessibilityAttributedValue)
-      view.accessibilityAttributedValue = accessibilityAttributedValue;
+  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedValue)
+    [view setValue:accessibilityAttributedValue forKey:@"accessibilityAttributedValue"];
 
   if (flags.setAccessibilityTraits)
     view.accessibilityTraits = accessibilityTraits;
@@ -1219,11 +1216,13 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
-  if (@available(iOS 11, *)) {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
+  if (AS_AVAILABLE_IOS(11)) {
     pendingState.accessibilityAttributedLabel = view.accessibilityAttributedLabel;
     pendingState.accessibilityAttributedHint = view.accessibilityAttributedHint;
     pendingState.accessibilityAttributedValue = view.accessibilityAttributedValue;
   }
+#endif
   pendingState.accessibilityTraits = view.accessibilityTraits;
   pendingState.accessibilityFrame = view.accessibilityFrame;
   pendingState.accessibilityLanguage = view.accessibilityLanguage;
