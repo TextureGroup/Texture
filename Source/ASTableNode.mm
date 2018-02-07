@@ -104,6 +104,13 @@
   return [self initWithStyle:UITableViewStylePlain];
 }
 
+- (void)dealloc
+{
+  if ([self isNodeLoaded]) {
+    ASDisplayNodeAssert(self.view.superview == nil, @"Node's view should be removed from hierarchy.");
+  }
+}
+
 #pragma mark ASDisplayNode
 
 - (void)didLoad
