@@ -84,6 +84,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
   accessibilityElement.accessibilityHint = node.accessibilityHint;
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
+  accessibilityElement.accessibilityElementsHidden = node.accessibilityElementsHidden;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
   if (AS_AVAILABLE_IOS(11)) {
     accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
@@ -128,7 +129,11 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplayNode *containerNode, id container, NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
-  
+
+  if (node.accessibilityElementsHidden) {
+    return;
+  }
+
   ASDisplayNodePerformBlockOnEveryNodeBFS(node, ^(ASDisplayNode * _Nonnull currentNode) {
     // For every subnode that is layer backed or it's supernode has subtree rasterization enabled
     // we have to create a UIAccessibilityElement as no view for this node exists
@@ -208,6 +213,10 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
   ASDisplayNode *node = view.asyncdisplaykit_node;
+
+  if (node.accessibilityElementsHidden) {
+    return;
+  }
 
   if (node.isAccessibilityContainer) {
     CollectAccessibilityElementsForContainer(node, view, elements);
