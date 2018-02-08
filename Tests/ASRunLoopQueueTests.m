@@ -172,7 +172,7 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
 - (void)testASCATransactionQueueDisable
 {
   ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
-  [queue disableInterfaceStateCoalesce];
+  [queue disable];
   QueueObject *object = [[QueueObject alloc] init];
   [[ASCATransactionQueue sharedQueue] enqueue:object];
   XCTAssertTrue([queue isEmpty]);

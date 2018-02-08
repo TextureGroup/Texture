@@ -496,7 +496,7 @@ typedef enum {
   CFRunLoopRef _runLoop;
   CFRunLoopSourceRef _runLoopSource;
   CFRunLoopObserverRef _runLoopObserver;
-  NSPointerArray *_internalQueue; // Use NSPointerArray so we can decide __strong or __weak per-instance.
+  NSPointerArray *_internalQueue;
   ASDN::RecursiveMutex _internalQueueLock;
   BOOL _disableInterfaceStateCoalesce;
 
@@ -571,9 +571,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
 
 - (void)dealloc
 {
-  if (CFRunLoopContainsSource(_runLoop, _runLoopSource, kCFRunLoopCommonModes)) {
-    CFRunLoopRemoveSource(_runLoop, _runLoopSource, kCFRunLoopCommonModes);
-  }
+  CFRunLoopRemoveSource(_runLoop, _runLoopSource, kCFRunLoopCommonModes);
   CFRelease(_runLoopSource);
   _runLoopSource = nil;
 
@@ -674,7 +672,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
     return;
   }
 
-  if (_disableInterfaceStateCoalesce == YES) {
+  if (_disableInterfaceStateCoalesce) {
     [object prepareForCATransactionCommit];
     return;
   }
@@ -705,7 +703,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
   return _internalQueue.count == 0;
 }
 
-- (void)disableInterfaceStateCoalesce
+- (void)disable
 {
   _disableInterfaceStateCoalesce = YES;
 }

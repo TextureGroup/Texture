@@ -2873,7 +2873,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)setInterfaceState:(ASInterfaceState)newState
 {
-  ASDN::MutexLocker l(__instanceLock__);
   if ([[ASCATransactionQueue sharedQueue] disabled]) {
     [self applyPendingInterfaceState:newState];
   } else {
