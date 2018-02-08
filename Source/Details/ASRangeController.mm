@@ -45,7 +45,7 @@
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
   NSHashTable<ASCellNode *> *_visibleNodes;
   ASLayoutRangeMode _currentRangeMode;
-  BOOL _contentOffsetHasChanged;
+  BOOL _contentHasBeenScrolled;
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
   CFTimeInterval _pendingDisplayNodesTimestamp;
@@ -78,7 +78,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   
   _rangeIsValid = YES;
   _currentRangeMode = ASLayoutRangeModeUnspecified;
-  _contentOffsetHasChanged = NO;
+  _contentHasBeenScrolled = NO;
   _preserveCurrentRangeMode = NO;
   _previousScrollDirection = ASScrollDirectionDown | ASScrollDirectionRight;
   
@@ -247,7 +247,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
   ASInterfaceState selfInterfaceState = [self interfaceState];
   ASLayoutRangeMode rangeMode = _currentRangeMode;
-  BOOL updateRangeMode = (!_preserveCurrentRangeMode && _contentOffsetHasChanged);
+  BOOL updateRangeMode = (!_preserveCurrentRangeMode && _contentHasBeenScrolled);
 
   // If we've never scrolled before, we never update the range mode, so it doesn't jump into Full too early.
   // This can happen if we have multiple, noisy updates occurring from application code before the user has engaged.

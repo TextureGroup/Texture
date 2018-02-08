@@ -1549,14 +1549,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    _rangeController.contentOffsetHasChanged = YES;
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
   }
-  
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     // _cellsForVisibilityUpdates only includes cells for ASCellNode subclasses with overrides of the visibility method.
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged inScrollView:scrollView];
@@ -1595,6 +1591,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging inScrollView:scrollView];
   }

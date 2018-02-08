@@ -103,7 +103,7 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * Property that indicates whether the scroll view for this range controller has ever changed its contentOffset.
  */
-@property (nonatomic, assign) BOOL contentOffsetHasChanged;
+@property (nonatomic, assign) BOOL contentHasBeenScrolled;
 
 @end
 
