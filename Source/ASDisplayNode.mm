@@ -3017,6 +3017,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)prepareForCATransactionCommit
 {
+  // Apply _pendingInterfaceState actual _interfaceState, note that ASInterfaceStateNone is not used.
   [self applyPendingInterfaceState:ASInterfaceStateNone];
 }
 
