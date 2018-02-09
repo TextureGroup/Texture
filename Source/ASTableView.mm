@@ -1219,14 +1219,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewDidScroll:scrollView];
     return;
   }
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    _rangeController.contentOffsetHasChanged = YES;
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
-  }
-  
+  }  
   for (_ASTableViewCell *tableCell in _cellsForVisibilityUpdates) {
     [[tableCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
                                  inScrollView:scrollView
@@ -1278,6 +1274,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewWillBeginDragging:scrollView];
     return;
   }
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging
                                           inScrollView:scrollView

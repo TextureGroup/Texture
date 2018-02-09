@@ -1,5 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.
+- **Important** ASDisplayNode's cornerRadius is a new thread-safe bridged property that should be preferred over CALayer's. Use the latter at your own risk! [Huy Nguyen](https://github.com/nguyenhuy) [#749](https://github.com/TextureGroup/Texture/pull/749).
 - [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)
 - [ASNetworkImageNode] Fix capturing self in the block while loading image in ASNetworkImageNode. [Denis Mororozov](https://github.com/morozkin) [#777](https://github.com/TextureGroup/Texture/pull/777)
 - [ASTraitCollection] Add new properties of UITraitCollection to ASTraitCollection. [Yevgen Pogribnyi](https://github.com/ypogribnyi)
@@ -22,6 +24,7 @@
 - Removed +load static initializer from ASDisplayNode. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimized ASNetworkImageNode loading and resolved edge cases where the image provided to the delegate was not the image that was loaded. [Adlai Holler](https://github.com/Adlai-Holler) [#778](https://github.com/TextureGroup/Texture/pull/778/)
 - Make `ASCellNode` tint color apply to table view cell accessories. [Vladyslav Chapaev](https://github.com/ShogunPhyched) [#764](https://github.com/TextureGroup/Texture/pull/764)
+- Fix ASTextNode2 is accessing backgroundColor off main while sizing / layout is happening. [Michael Schneider](https://github.com/maicki) [#794](https://github.com/TextureGroup/Texture/pull/778/)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
