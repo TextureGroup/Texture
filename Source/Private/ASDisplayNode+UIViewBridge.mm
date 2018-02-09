@@ -186,17 +186,12 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (CGFloat)cornerRadius
 {
   ASDN::MutexLocker l(__instanceLock__);
-  if (_cornerRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
-    return self.layerCornerRadius;
-  } else {
-    return _cornerRadius;
-  }
+  return _cornerRadius;
 }
 
 - (void)setCornerRadius:(CGFloat)newCornerRadius
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
+  [self updateCornerRoundingWithType:self.cornerRoundingType cornerRadius:newCornerRadius];
 }
 
 - (ASCornerRoundingType)cornerRoundingType
@@ -207,8 +202,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRadius];
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:self.cornerRadius];
 }
 
 - (NSString *)contentsGravity

@@ -12,9 +12,11 @@
 
 #import "ASGraphicsContext.h"
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
 #import <stdatomic.h>
+#import <objc/runtime.h>
 
 #pragma mark - Feature Gating
 
@@ -40,12 +42,25 @@ static BOOL ASNoCopyRenderingBlockAndCheckEnabled() {
   return (oldFlags & ASNoCopyEnabled) != 0;
 }
 
-#pragma mark - Callbacks
-
-void _ASReleaseCGDataProviderData(__unused void *info, const void *data, __unused size_t size)
-{
-  free((void *)data);
+/**
+ * Our version of the private CGBitmapGetAlignedBytesPerRow function.
+ *
+ * In both 32-bit and 64-bit, this function rounds up to nearest multiple of 32
+ * in iOS 9, 10, and 11. We'll try to catch if this ever changes by asserting that
+ * the bytes-per-row for a 1x1 context from the system is 32.
+ */
+static size_t ASGraphicsGetAlignedBytesPerRow(size_t baseValue) {
+  // Add 31 then zero out low 5 bits.
+  return (baseValue + 31) & ~0x1F;
 }
+
+/**
+ * A key used to associate CGContextRef -> NSMutableData, nonatomic retain.
+ *
+ * That way the data will be released when the context dies. If they pull an image,
+ * we will retain the data object (in a CGDataProvider) before releasing the context.
+ */
+static UInt8 __contextDataAssociationKey;
 
 #pragma mark - Graphics Contexts
 
@@ -56,34 +71,46 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
     return;
   }
   
-  // Only create device RGB color space once. UIGraphics actually doesn't do this but it's safe.
+  // We use "reference contexts" to get device-specific options that UIKit
+  // uses.
   static dispatch_once_t onceToken;
-  static CGFloat defaultScale;
-  static CGColorSpaceRef deviceRGB;
+  static CGContextRef refCtxOpaque;
+  static CGContextRef refCtxTransparent;
   dispatch_once(&onceToken, ^{
-    deviceRGB = CGColorSpaceCreateDeviceRGB();
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), NO, 0);
-    CGContextRef uikitContext = UIGraphicsGetCurrentContext();
-    defaultScale = CGContextGetCTM(uikitContext).a;
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), YES, 1);
+    refCtxOpaque = CGContextRetain(UIGraphicsGetCurrentContext());
+    ASDisplayNodeCAssert(CGBitmapContextGetBytesPerRow(refCtxOpaque) == 32, @"Expected bytes per row to be aligned to 32. Has CGBitmapGetAlignedBytesPerRow implementation changed?");
+    UIGraphicsEndImageContext();
+    
+    // Make transparent ref context.
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), NO, 1);
+    refCtxTransparent = CGContextRetain(UIGraphicsGetCurrentContext());
     UIGraphicsEndImageContext();
   });
   
   // These options are taken from UIGraphicsBeginImageContext.
-  CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Host | (opaque ? kCGImageAlphaNoneSkipFirst : kCGImageAlphaPremultipliedFirst);
+  CGContextRef refCtx = opaque ? refCtxOpaque : refCtxTransparent;
+  CGBitmapInfo bitmapInfo = CGBitmapContextGetBitmapInfo(refCtx);
   
   if (scale == 0) {
-    scale = defaultScale;
+    scale = ASScreenScale();
   }
   size_t intWidth = (size_t)ceil(size.width * scale);
   size_t intHeight = (size_t)ceil(size.height * scale);
-  size_t bytesPerPixel = 4;
-  size_t bytesPerRow = bytesPerPixel * intWidth;
+  size_t bitsPerComponent = CGBitmapContextGetBitsPerComponent(refCtx);
+  size_t bytesPerRow = CGBitmapContextGetBitsPerPixel(refCtx) * intWidth / 8;
+  bytesPerRow = ASGraphicsGetAlignedBytesPerRow(bytesPerRow);
   size_t bufferSize = bytesPerRow * intHeight;
+  CGColorSpaceRef colorspace = CGBitmapContextGetColorSpace(refCtx);
 
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
-  void *buf = calloc(bufferSize, 1);
-  CGContextRef context = CGBitmapContextCreate(buf, intWidth, intHeight, 8, bytesPerRow, deviceRGB, bitmapInfo);
+  NSMutableData *data = [[NSMutableData alloc] initWithLength:bufferSize];
+  CGContextRef context = CGBitmapContextCreate(data.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
+  
+  // Transfer ownership of the data to the context. So that if the context
+  // is destroyed before we create an image from it, the data will be released.
+  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   
   // Set the CTM to account for iOS orientation & specified scale.
   // If only we could use CGContextSetBaseCTM. It doesn't
@@ -96,7 +123,9 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   // Save the state so we can restore it and recover our scale in GetImageAndEnd
   CGContextSaveGState(context);
   
+  // Transfer context ownership to the UIKit stack.
   UIGraphicsPushContext(context);
+  CGContextRelease(context);
 }
 
 extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
@@ -113,30 +142,41 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
     ASDisplayNodeCFailAssert(@"Can't end image context without having begun one.");
     return nil;
   }
-  UIGraphicsPopContext();
   
-  // Do some math to get the image properties.
-  size_t width = CGBitmapContextGetWidth(context);
-  size_t height = CGBitmapContextGetHeight(context);
-  size_t bitsPerPixel = CGBitmapContextGetBitsPerPixel(context);
-  size_t bytesPerRow = CGBitmapContextGetBytesPerRow(context);
-  size_t bufferSize = bytesPerRow * height;
+  // Read the device-specific ICC-based color space to use for the image.
+  // For DeviceRGB contexts (e.g. UIGraphics), CGBitmapContextCreateImage
+  // generates an image in a device-specific color space (for wide color support).
+  // We replicate that behavior, even though at this time CA does not
+  // require the image to be in this space. Plain DeviceRGB images seem
+  // to be treated exactly the same, but better safe than sorry.
+  static CGColorSpaceRef imageColorSpace;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), YES, 0);
+    UIImage *refImage = UIGraphicsGetImageFromCurrentImageContext();
+    imageColorSpace = CGColorSpaceRetain(CGImageGetColorSpace(refImage.CGImage));
+    ASDisplayNodeCAssertNotNil(imageColorSpace, nil);
+    UIGraphicsEndImageContext();
+  });
   
-  // This is the buf that we malloc'd above.
-  void *buf = CGBitmapContextGetData(context);
-  
-  // Wrap it in a CGDataProvider, passing along our release callback for when the CGImage dies.
-  CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, buf, bufferSize, _ASReleaseCGDataProviderData);
+  // Retrieve our data and wrap it in a CGDataProvider.
+  // Don't worry, the provider doesn't copy the data – it just retains it.
+  NSMutableData *data = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
+  ASDisplayNodeCAssertNotNil(data, nil);
+  CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
   
   // Create the CGImage. Options taken from CGBitmapContextCreateImage.
-  CGImageRef cgImg = CGImageCreate(width, height, CGBitmapContextGetBitsPerComponent(context), bitsPerPixel, bytesPerRow, CGBitmapContextGetColorSpace(context), CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);
+  CGImageRef cgImg = CGImageCreate(CGBitmapContextGetWidth(context), CGBitmapContextGetHeight(context), CGBitmapContextGetBitsPerComponent(context), CGBitmapContextGetBitsPerPixel(context), CGBitmapContextGetBytesPerRow(context), imageColorSpace, CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);
   CGDataProviderRelease(provider);
   
   // We saved our GState right after setting the CTM so that we could restore it
   // here and get the original scale back.
   CGContextRestoreGState(context);
   CGFloat scale = CGContextGetCTM(context).a;
-  CGContextRelease(context);
+  
+  // Note: popping from the UIKit stack will probably destroy the context.
+  context = NULL;
+  UIGraphicsPopContext();
   
   UIImage *result = [[UIImage alloc] initWithCGImage:cgImg scale:scale orientation:UIImageOrientationUp];
   CGImageRelease(cgImg);
@@ -150,11 +190,5 @@ extern void ASGraphicsEndImageContext()
     return;
   }
   
-  CGContextRef context = UIGraphicsGetCurrentContext();
-  if (context) {
-    // We manually allocated this buffer so we need to free it.
-    free(CGBitmapContextGetData(context));
-    CGContextRelease(context);
-    UIGraphicsPopContext();
-  }
+  UIGraphicsPopContext();
 }
