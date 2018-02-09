@@ -1101,7 +1101,7 @@
   [window layoutIfNeeded];
   
   // The initial reload is async, changing the trait collection here should be "mid-update"
-  ASPrimitiveTraitCollection traitCollection;
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
   traitCollection.displayScale = cn.primitiveTraitCollection.displayScale + 1; // Just a dummy change
   traitCollection.containerSize = screenBounds.size;
   cn.primitiveTraitCollection = traitCollection;

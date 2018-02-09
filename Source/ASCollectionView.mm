@@ -126,15 +126,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionViewInvalidationStyle _nextLayoutInvalidationStyle;
   
   /**
-   * Our layer, retained. Under iOS < 9, when collection views are removed from the hierarchy,
-   * their layers may be deallocated and become dangling pointers. This puts the collection view
-   * into a very dangerous state where pretty much any call will crash it. So we manually retain our layer.
-   *
-   * You should never access this, and it will be nil under iOS >= 9.
-   */
-  CALayer *_retainedLayer;
-  
-  /**
    * If YES, the `UICollectionView` will reload its data on next layout pass so we should not forward any updates to it.
    
    * Rationale:
@@ -160,7 +151,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * Counter used to keep track of nested batch updates.
    */
   NSInteger _batchUpdateCount;
-  
+
+  /**
+   * Keep a strong reference to node till view is ready to release.
+   */
+  ASCollectionNode *_keepalive_node;
+
   struct {
     unsigned int scrollViewDidScroll:1;
     unsigned int scrollViewWillBeginDragging:1;
@@ -315,10 +311,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   self.backgroundColor = [UIColor whiteColor];
   
   [self registerClass:[_ASCollectionViewCell class] forCellWithReuseIdentifier:kReuseIdentifier];
-  
-  if (!AS_AT_LEAST_IOS9) {
-    _retainedLayer = self.layer;
-  }
   
   [self _configureCollectionViewLayout:layout];
   
@@ -1562,13 +1554,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
   }
-  
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     // _cellsForVisibilityUpdates only includes cells for ASCellNode subclasses with overrides of the visibility method.
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged inScrollView:scrollView];
@@ -1607,6 +1596,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging inScrollView:scrollView];
   }
@@ -2039,28 +2032,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return _rangeController;
 }
 
-/// The UIKit version of this method is only available on iOS >= 9
-- (NSArray<NSIndexPath *> *)asdk_indexPathsForVisibleSupplementaryElementsOfKind:(NSString *)kind
-{
-  if (AS_AVAILABLE_IOS(9)) {
-    return [self indexPathsForVisibleSupplementaryElementsOfKind:kind];
-  }
-
-  // iOS 8 workaround
-  // We cannot use willDisplaySupplementaryView/didEndDisplayingSupplementaryView
-  // because those methods send index paths for _deleted items_ (invalid index paths)
-  [self layoutIfNeeded];
-  NSArray<UICollectionViewLayoutAttributes *> *visibleAttributes = [self.collectionViewLayout layoutAttributesForElementsInRect:self.bounds];
-  NSMutableArray *result = [NSMutableArray array];
-  for (UICollectionViewLayoutAttributes *attributes in visibleAttributes) {
-    if (attributes.representedElementCategory == UICollectionElementCategorySupplementaryView
-        && [attributes.representedElementKind isEqualToString:kind]) {
-      [result addObject:attributes.indexPath];
-    }
-  }
-  return result;
-}
-
 - (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
 {
   return ASPointerTableByFlatMapping(_visibleElements, id element, element);
@@ -2281,6 +2252,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // we will fetch visible area + leading screens, so we need to check.
   if (visible) {
     [self _checkForBatchFetching];
+  }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+  if (self.superview == nil && newSuperview != nil) {
+    _keepalive_node = self.collectionNode;
+  }
+}
+
+- (void)didMoveToSuperview
+{
+  if (self.superview == nil) {
+    _keepalive_node = nil;
   }
 }
 
