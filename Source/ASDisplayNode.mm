@@ -226,12 +226,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
 }
 
-+ (void)load
-{
-  // Ensure this value is cached on the main thread before needed in the background.
-  ASScreenScale();
-}
-
 + (Class)viewClass
 {
   return [_ASDisplayView class];
@@ -259,6 +253,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
+  BOOL isSynchronous = ![_viewClass isSubclassOfClass:[_ASDisplayView class]]
+                        || ![_layerClass isSubclassOfClass:[_ASDisplayLayer class]];
+  setFlag(Synchronous, isSynchronous);
+  
+
   _contentsScaleForDisplay = ASScreenScale();
   _drawingPriority = ASDefaultDrawingPriority;
   
@@ -3079,16 +3078,15 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
 
+  // If this node has ASM enabled and is not yet visible, force a layout pass to apply its applicable pending layout, if any,
+  // so that its subnodes are inserted/deleted and start preloading right away.
+  //
+  // - If it has an up-to-date layout (and subnodes), calling -layoutIfNeeded will be fast.
+  //
+  // - If it doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
+  // (see -__layout and -_u_measureNodeWithBoundsIfNecessary:). This scenario is uncommon,
+  // and running a measurement pass here is a fine trade-off because preloading any time after this point would be late.
   if (self.automaticallyManagesSubnodes) {
-    // Tell the node to apply its applicable pending layout, if any, so that its subnodes are inserted/deleted
-    // and start preloading right away.
-    //
-    // If this node has an up-to-date layout (and subnodes), calling layoutIfNeeded will be fast.
-    //
-    // If this node doesn't have a calculated or pending layout that fits its current bounds, a measurement pass will occur
-    // (see __layout and _u_measureNodeWithBoundsIfNecessary:).
-    // This scenario should be uncommon, and running a measurement pass here is a fine trade-off because preloading
-    // any time after this point would be late.
     [self layoutIfNeeded];
   }
 

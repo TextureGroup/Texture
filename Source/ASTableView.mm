@@ -114,12 +114,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   if (node) {
     self.backgroundColor = node.backgroundColor;
-    self.selectionStyle = node.selectionStyle;
     self.selectedBackgroundView = node.selectedBackgroundView;
 #if TARGET_OS_IOS
     self.separatorInset = node.separatorInset;
 #endif
+    self.selectionStyle = node.selectionStyle; 
+    self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
+    self.tintColor = node.tintColor;
     
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
     // This is actually a workaround for a bug we are seeing in some rare cases (selected background view
@@ -1217,13 +1219,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewDidScroll:scrollView];
     return;
   }
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
-  }
-  
+  }  
   for (_ASTableViewCell *tableCell in _cellsForVisibilityUpdates) {
     [[tableCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
                                  inScrollView:scrollView
@@ -1275,6 +1274,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewWillBeginDragging:scrollView];
     return;
   }
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging
                                           inScrollView:scrollView
