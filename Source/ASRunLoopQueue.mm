@@ -495,12 +495,12 @@ typedef enum {
 @interface ASCATransactionQueue () {
   CFRunLoopRef _runLoop;
   CFRunLoopSourceRef _runLoopSource;
-  CFRunLoopObserverRef _runLoopObserver;
-  CFRunLoopObserverRef _runLoopPostObserver;
+  CFRunLoopObserverRef _preTransactionObserver;
+  CFRunLoopObserverRef _postTransactionObserver;
   NSPointerArray *_internalQueue;
   ASDN::RecursiveMutex _internalQueueLock;
   BOOL _disableInterfaceStateCoalesce;
-  BOOL _postCATransactionCommit;
+  BOOL _CATransactionCommitInProgress;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
   os_activity_t _rootActivity;
@@ -554,13 +554,14 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
       [weakSelf processQueue];
     };
     void (^postHandlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-      _postCATransactionCommit = NO;
+      ASDN::MutexLocker l(_internalQueueLock);
+      _CATransactionCommitInProgress = NO;
     };
-    _runLoopObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, handlerBlock);
-    _runLoopPostObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueuePostOrder, postHandlerBlock);
+    _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, handlerBlock);
+    _postTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueuePostOrder, postHandlerBlock);
 
-    CFRunLoopAddObserver(_runLoop, _runLoopObserver,  kCFRunLoopCommonModes);
-    CFRunLoopAddObserver(_runLoop, _runLoopPostObserver,  kCFRunLoopCommonModes);
+    CFRunLoopAddObserver(_runLoop, _preTransactionObserver,  kCFRunLoopCommonModes);
+    CFRunLoopAddObserver(_runLoop, _postTransactionObserver,  kCFRunLoopCommonModes);
 
     // It is not guaranteed that the runloop will turn if it has no scheduled work, and this causes processing of
     // the queue to stop. Attaching a custom loop source to the run loop and signal it if new work needs to be done
@@ -586,11 +587,16 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   CFRelease(_runLoopSource);
   _runLoopSource = nil;
 
-  if (CFRunLoopObserverIsValid(_runLoopObserver)) {
-    CFRunLoopObserverInvalidate(_runLoopObserver);
+  if (CFRunLoopObserverIsValid(_preTransactionObserver)) {
+    CFRunLoopObserverInvalidate(_preTransactionObserver);
   }
-  CFRelease(_runLoopObserver);
-  _runLoopObserver = nil;
+  if (CFRunLoopObserverIsValid(_postTransactionObserver)) {
+    CFRunLoopObserverInvalidate(_postTransactionObserver);
+  }
+  CFRelease(_preTransactionObserver);
+  CFRelease(_postTransactionObserver);
+  _preTransactionObserver = nil;
+  _postTransactionObserver = nil;
 }
 
 #if ASRunLoopQueueLoggingEnabled
@@ -609,6 +615,11 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   BOOL isQueueDrained = NO;
   {
     ASDN::MutexLocker l(_internalQueueLock);
+
+    // Mark the queue will end coalescing shortly until after CATransactionCommit.
+    // This will give the queue a chance to apply any further interfaceState changes/enqueue
+    // immediately within current runloop instead of pushing the work to next runloop cycle.
+    _CATransactionCommitInProgress = YES;
 
     NSInteger internalQueueCount = _internalQueue.count;
     // Early-exit if the queue is empty.
@@ -648,9 +659,6 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     }
 
     [_internalQueue compact];
-    if (_internalQueue.count == 0) {
-      isQueueDrained = YES;
-    }
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
@@ -668,21 +676,6 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     }
   }
 
-  // If the queue is not fully drained yet force another run loop to process next batch of items
-  if (!isQueueDrained) {
-    CFRunLoopSourceSignal(_runLoopSource);
-    CFRunLoopWakeUp(_runLoop);
-  }
-
-  ASDN::MutexLocker l(_internalQueueLock);
-  if (_internalQueue.count != 0) {
-    [self processQueue];
-  }
-  // Mark the queue will end coalescing shortly until after CATransactionCommit.
-  // This will give the queue a chance to apply any further interfaceState changes/enqueue
-  // immediately within current runloop instead of pushing the work to next runloop cycle.
-  _postCATransactionCommit = YES;
-
   ASSignpostEnd(ASSignpostRunLoopQueueBatch);
 }
 
@@ -692,7 +685,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     return;
   }
 
-  if (_disableInterfaceStateCoalesce || _postCATransactionCommit) {
+  if (_disableInterfaceStateCoalesce || _CATransactionCommitInProgress) {
     [object prepareForCATransactionCommit];
     return;
   }
