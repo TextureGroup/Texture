@@ -110,6 +110,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 
 /**
+ * A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL alwaysBounceVertical;
+
+/**
+ * A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL alwaysBounceHorizontal;
+
+/**
+ * A Boolean value that controls whether the vertical scroll indicator is visible.
+ * The default value of this property is YES.
+ */
+@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
+
+/**
+ * A Boolean value that controls whether the horizontal scroll indicator is visible.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+
+/**
  * The layout used to organize the node's items.
  *
  * @discussion Assigning a new layout object to this property causes the new layout to be applied (without animations) to the node’s items.
@@ -290,6 +314,19 @@ NS_ASSUME_NONNULL_BEGIN
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
  */
 - (void)waitUntilAllUpdatesAreProcessed;
+
+/**
+ *  Returns YES if the ASCollectionNode contents are completely synchronized with the underlying collection-view layout.
+ */
+@property (nonatomic, readonly) BOOL isSynchronized;
+
+/**
+ *  Schedules a block to be performed (on the main thread) as soon as the completion block is called
+ *  on performBatchUpdates:.
+ *
+ *  When isSynchronized == YES, the block is run block immediately (before the method returns).
+ */
+- (void)onDidFinishSynchronizing:(nullable void (^)(void))didFinishSynchronizing;
 
 /**
  * Inserts one or more sections.

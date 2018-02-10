@@ -300,6 +300,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASCollectionNode waitUntilAllUpdatesAreProcessed] instead.");
 
 /**
+ * See ASCollectionNode.h for full documentation of these methods.
+ */
+@property (nonatomic, readonly) BOOL isSynchronized;
+- (void)onDidFinishSynchronizing:(nullable void (^)(void))completion;
+
+/**
  * Registers the given kind of supplementary node for use in creating node-backed supplementary views.
  *
  * @param elementKind The kind of supplementary node that will be requested through the data source.

@@ -265,6 +265,12 @@ extern NSString * const ASCollectionInvalidUpdateException;
 - (void)waitUntilAllUpdatesAreProcessed;
 
 /**
+ * See ASCollectionNode.h for full documentation of these methods.
+ */
+@property (nonatomic, readonly) BOOL isSynchronized;
+- (void)onDidFinishSynchronizing:(nullable void (^)(void))completion;
+
+/**
  * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information
  * and propagate the information to all visible elements, including ones that are being prepared in background.
  *
@@ -273,6 +279,11 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * @discussion This method can be called on any threads.
  */
 - (void)environmentDidChange;
+
+/**
+ * Reset visibleMap and pendingMap when asyncDataSource and asyncDelegate of collection view become nil.
+ */
+- (void)clearData;
 
 @end
 

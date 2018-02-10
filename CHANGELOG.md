@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
 - [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.
 - **Important** ASDisplayNode's cornerRadius is a new thread-safe bridged property that should be preferred over CALayer's. Use the latter at your own risk! [Huy Nguyen](https://github.com/nguyenhuy) [#749](https://github.com/TextureGroup/Texture/pull/749).
 - [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)
