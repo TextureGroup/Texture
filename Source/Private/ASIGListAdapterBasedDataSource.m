@@ -102,6 +102,11 @@ typedef struct {
   [self.delegate scrollViewWillBeginDragging:scrollView];
 }
 
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
+{
+  [self.delegate scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:targetContentOffset];
+}
+
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
   [self.delegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
