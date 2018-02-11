@@ -607,7 +607,6 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   // This is to avoid needlessly retaining/releasing the objects if we don't have a block.
   std::vector<id> itemsToProcess;
 
-  BOOL isQueueDrained = NO;
   {
     ASDN::MutexLocker l(_internalQueueLock);
 
