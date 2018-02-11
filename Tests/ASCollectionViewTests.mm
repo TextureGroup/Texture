@@ -1050,7 +1050,7 @@
   window.rootViewController = testController;
 
   [window makeKeyAndVisible];
-  // Trigger the initial reload to start
+  // Trigger the initial reload to start 
   [window layoutIfNeeded];
 
   // Test the APIs that monitor ASCollectionNode update handling
