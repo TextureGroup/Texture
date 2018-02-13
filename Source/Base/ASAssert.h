@@ -21,7 +21,7 @@
 #import <pthread.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-#define ASDISPLAYNODE_ASSERTIONS_ENABLED (!defined(NS_BLOCK_ASSERTIONS))
+#define ASDISPLAYNODE_ASSERTIONS_ENABLED (!defined(NS_BLOCK_ASSERTIONS) || !NS_BLOCK_ASSERTIONS)
 
 /**
  * Note: In some cases it would be sufficient to do e.g.:
