@@ -172,12 +172,17 @@
   return self;
 }
 
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
 - (void)dealloc
 {
-  if ([self isNodeLoaded]) {
-    ASDisplayNodeAssert(self.view.superview == nil, @"Node's view should be removed from hierarchy.");
+  if (self.nodeLoaded) {
+    __weak UIView *view = self.view;
+    ASPerformBlockOnMainThread(^{
+      ASDisplayNodeCAssertNil(view.superview, @"Node's view should be removed from hierarchy.");
+    });
   }
 }
+#endif
 
 #pragma mark ASDisplayNode
 
