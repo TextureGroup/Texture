@@ -132,22 +132,6 @@
 #define __has_attribute(x) 0 // Compatibility with non-clang compilers.
 #endif
 
-#ifndef NS_CONSUMED
-#if __has_feature(attribute_ns_consumed)
-#define NS_CONSUMED __attribute__((ns_consumed))
-#else
-#define NS_CONSUMED
-#endif
-#endif
-
-#ifndef NS_RETURNS_RETAINED
-#if __has_feature(attribute_ns_returns_retained)
-#define NS_RETURNS_RETAINED __attribute__((ns_returns_retained))
-#else
-#define NS_RETURNS_RETAINED
-#endif
-#endif
-
 #ifndef CF_RETURNS_RETAINED
 #if __has_feature(attribute_cf_returns_retained)
 #define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
@@ -215,7 +199,8 @@
   static dispatch_once_t onceToken; \
   static pthread_key_t key; \
   dispatch_once(&onceToken, ^{ \
-    pthread_key_create(&key, dtor); \
+    __unused int result = pthread_key_create(&key, dtor); \
+    NSCAssert(result == noErr, @"%s", strerror(result)); \
   }); \
   key; \
 })
@@ -242,43 +227,13 @@
 })
 
 /**
- * Create a new set by mapping `collection` over `work`, ignoring nil.
- */
-#define ASSetByFlatMapping(collection, decl, work) ({ \
-  NSMutableSet *s = [NSMutableSet set]; \
-  for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [s addObject:result]; \
-    } \
-  } \
-  s; \
-})
-
-/**
  * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
  */
 #define ASPointerTableByFlatMapping(collection, decl, work) ({ \
-  NSHashTable *t = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality]; \
+  NSHashTable *t = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:collection.count]; \
   for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [t addObject:result]; \
-    } \
+    /* NSHashTable accepts nil and avoid extra retain/release. */ \
+    [t addObject:work]; \
   } \
   t; \
-})
-
-/**
- * Create a new array by mapping `collection` over `work`, ignoring nil.
- */
-#define ASArrayByFlatMapping(collection, decl, work) ({ \
-  NSMutableArray *a = [NSMutableArray array]; \
-  for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [a addObject:result]; \
-    } \
-  } \
-  a; \
 })

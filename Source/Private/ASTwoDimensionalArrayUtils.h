@@ -54,6 +54,10 @@ extern NSArray *ASElementsInTwoDimensionalArray(NSArray<NSArray *>* twoDimension
  */
 extern id _Nullable ASGetElementInTwoDimensionalArray(NSArray<NSArray *> *array, NSIndexPath *indexPath) AS_WARN_UNUSED_RESULT;
 
+/**
+ * Total number of items.
+ */
+extern NSUInteger ASTwoDimensionalArrayGetCount(NSArray<NSArray *> *array);
 
 ASDISPLAYNODE_EXTERN_C_END
 
