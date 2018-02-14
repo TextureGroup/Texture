@@ -1,6 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
+- [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
 - [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.
 - **Important** ASDisplayNode's cornerRadius is a new thread-safe bridged property that should be preferred over CALayer's. Use the latter at your own risk! [Huy Nguyen](https://github.com/nguyenhuy) [#749](https://github.com/TextureGroup/Texture/pull/749).
 - [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)
@@ -11,7 +12,8 @@
 - [ASNetworkImageNode] Deprecates .URLs in favor of .URL [Garrett Moon](https://github.com/garrettmoon) [#699](https://github.com/TextureGroup/Texture/pull/699)
 - [iOS11] Update project settings and fix errors [Eke](https://github.com/Eke)  [#676](https://github.com/TextureGroup/Texture/pull/676)
 - [ASCornerLayoutSpec] New layout spec class for declarative corner element layout. [#657](https://github.com/TextureGroup/Texture/pull/657) [huangkun](https://github.com/huang-kun)
-- [Layout] Fix an issue that causes a pending layout to be applied multiple times.  [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- [ASDisplayNode layout] Fix an issue that causes a pending layout to be applied multiple times. [Huy Nguyen](https://github.com/nguyenhuy) [#695](https://github.com/TextureGroup/Texture/pull/695)
+- [ASDisplayNode layout] Fix an issue that sometimes causes a node's pending layout to not be applied. [Huy Nguyen](https://github.com/nguyenhuy) [#792](https://github.com/TextureGroup/Texture/pull/792)
 - [ASScrollNode] Ensure the node respects the given size range while calculating its layout. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 - [ASScrollNode] Invalidate the node's calculated layout if its scrollable directions changed. Also add unit tests for the class. [#637](https://github.com/TextureGroup/Texture/pull/637) [Huy Nguyen](https://github.com/nguyenhuy)
 - Add new unit testing to the layout engine. [Adlai Holler](https://github.com/Adlai-Holler) [#424](https://github.com/TextureGroup/Texture/pull/424)
@@ -26,6 +28,7 @@
 - Optimized ASNetworkImageNode loading and resolved edge cases where the image provided to the delegate was not the image that was loaded. [Adlai Holler](https://github.com/Adlai-Holler) [#778](https://github.com/TextureGroup/Texture/pull/778/)
 - Make `ASCellNode` tint color apply to table view cell accessories. [Vladyslav Chapaev](https://github.com/ShogunPhyched) [#764](https://github.com/TextureGroup/Texture/pull/764)
 - Fix ASTextNode2 is accessing backgroundColor off main while sizing / layout is happening. [Michael Schneider](https://github.com/maicki) [#794](https://github.com/TextureGroup/Texture/pull/778/)
+- Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
