@@ -31,8 +31,7 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 void ASInitializeFrameworkMainThread(void)
 {
   ASDisplayNodeThreadIsMain();
-  // Ensure this value is cached on the main thread before needed in the background.
-  ASScreenScale();
+  // Ensure these values are cached on the main thread before needed in the background.
   CALayer *layer = [[[UIView alloc] init] layer];
   defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
   defaultAllowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
