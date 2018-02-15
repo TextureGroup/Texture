@@ -374,11 +374,13 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual((id)nil, node.accessibilityLabel, @"default accessibilityLabel is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityHint, @"default accessibilityHint is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityValue, @"default accessibilityValue is broken %@", hasLoadedView);
-  if (@available(iOS 11.0, *)) {
+
+  if (AS_AVAILABLE_IOS(11)) {
     XCTAssertEqual((id)nil, node.accessibilityAttributedLabel, @"default accessibilityAttributedLabel is broken %@", hasLoadedView);
     XCTAssertEqual((id)nil, node.accessibilityAttributedHint, @"default accessibilityAttributedHint is broken %@", hasLoadedView);
     XCTAssertEqual((id)nil, node.accessibilityAttributedValue, @"default accessibilityAttributedValue is broken %@", hasLoadedView);
   }
+
   XCTAssertEqual(UIAccessibilityTraitNone, node.accessibilityTraits, @"default accessibilityTraits is broken %@", hasLoadedView);
   XCTAssertTrue(CGRectEqualToRect(CGRectZero, node.accessibilityFrame), @"default accessibilityFrame is broken %@", hasLoadedView);
   XCTAssertEqual((id)nil, node.accessibilityLanguage, @"default accessibilityLanguage is broken %@", hasLoadedView);
@@ -479,7 +481,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqualObjects(@"1 of 2", node.accessibilityValue, @"accessibilityValue broken %@", hasLoadedView);
 
   // setting the accessibilityLabel, accessibilityHint and accessibilityValue is supposed to be bridged to the attributed versions
-   if (@available(iOS 11.0, *)) {
+  if (AS_AVAILABLE_IOS(11)) {
     XCTAssertEqualObjects(@"Ship love", node.accessibilityAttributedLabel.string, @"accessibilityAttributedLabel is broken %@", hasLoadedView);
     XCTAssertEqualObjects(@"Awesome things will happen", node.accessibilityAttributedHint.string, @"accessibilityAttributedHint is broken %@", hasLoadedView);
     XCTAssertEqualObjects(@"1 of 2", node.accessibilityAttributedValue.string, @"accessibilityAttributedValue is broken %@", hasLoadedView);
