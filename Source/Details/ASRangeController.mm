@@ -45,7 +45,7 @@
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
   NSHashTable<ASCellNode *> *_visibleNodes;
   ASLayoutRangeMode _currentRangeMode;
-  BOOL _contentOffsetHasChanged;
+  BOOL _contentHasBeenScrolled;
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
   CFTimeInterval _pendingDisplayNodesTimestamp;
@@ -78,7 +78,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   
   _rangeIsValid = YES;
   _currentRangeMode = ASLayoutRangeModeUnspecified;
-  _contentOffsetHasChanged = NO;
+  _contentHasBeenScrolled = NO;
   _preserveCurrentRangeMode = NO;
   _previousScrollDirection = ASScrollDirectionDown | ASScrollDirectionRight;
   
@@ -224,10 +224,6 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
-  if (visibleElements.count == 0) { // if we don't have any visibleNodes currently (scrolled before or after content)...
-    [self _setVisibleNodes:newVisibleNodes];
-    return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
-  }
   ASSignpostStart(ASSignpostRangeControllerUpdate);
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
@@ -236,10 +232,22 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     scrollDirection = _previousScrollDirection;
   }
   _previousScrollDirection = scrollDirection;
-  
+
+  if (visibleElements.count == 0) { // if we don't have any visibleNodes currently (scrolled before or after content)...
+    // Verify the actual state by checking the layout with a "VisibleOnly" range.
+    // This allows us to avoid thrashing through -didExitVisibleState in the case of -reloadData, since that generates didEndDisplayingCell calls.
+    // Those didEndDisplayingCell calls result in items being removed from the visibleElements returned by the _dataSource, even though the layout remains correct.
+    visibleElements = [_layoutController elementsForScrolling:scrollDirection rangeMode:ASLayoutRangeModeVisibleOnly rangeType:ASLayoutRangeTypeDisplay map:map];
+    for (ASCollectionElement *element in visibleElements) {
+      [newVisibleNodes addObject:element.node];
+    }
+    [self _setVisibleNodes:newVisibleNodes];
+    return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
+  }
+
   ASInterfaceState selfInterfaceState = [self interfaceState];
   ASLayoutRangeMode rangeMode = _currentRangeMode;
-  BOOL updateRangeMode = !_preserveCurrentRangeMode && _contentOffsetHasChanged;
+  BOOL updateRangeMode = (!_preserveCurrentRangeMode && _contentHasBeenScrolled);
 
   // If we've never scrolled before, we never update the range mode, so it doesn't jump into Full too early.
   // This can happen if we have multiple, noisy updates occurring from application code before the user has engaged.

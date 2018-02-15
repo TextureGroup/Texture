@@ -216,7 +216,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
    * Counter used to keep track of nested batch updates.
    */
   NSInteger _batchUpdateCount;
-  
+
+  /**
+   * Keep a strong reference to node till view is ready to release.
+   */
+  ASTableNode *_keepalive_node;
+
   struct {
     unsigned int scrollViewDidScroll:1;
     unsigned int scrollViewWillBeginDragging:1;
@@ -1214,14 +1219,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewDidScroll:scrollView];
     return;
   }
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    _rangeController.contentOffsetHasChanged = YES;
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
-  }
-  
+  }  
   for (_ASTableViewCell *tableCell in _cellsForVisibilityUpdates) {
     [[tableCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
                                  inScrollView:scrollView
@@ -1273,6 +1274,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewWillBeginDragging:scrollView];
     return;
   }
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging
                                           inScrollView:scrollView
@@ -1910,6 +1915,20 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // we will fetch visible area + leading screens, so we need to check.
   if (visible) {
     [self _checkForBatchFetching];
+  }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+  if (self.superview == nil && newSuperview != nil) {
+    _keepalive_node = self.tableNode;
+  }
+}
+
+- (void)didMoveToSuperview
+{
+  if (self.superview == nil) {
+    _keepalive_node = nil;
   }
 }
 
