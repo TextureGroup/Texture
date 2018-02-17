@@ -833,6 +833,22 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark UIResponder
 
+#define HANDLE_RESPONDER_METHOD(__sel) \
+  if (checkFlag(Synchronous)) { \
+    /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
+     expect it's a non _ASDisplayView subclass that will respond */ \
+    return [_view __sel]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+    /* If the subclass overwrites canBecomeFirstResponder just call through
+       to it as we expect it will handle it */ \
+      return [_view __sel]; \
+    } else { \
+      /* Call through to _ASDisplayView's superclass to get it handled */ \
+      return [(_ASDisplayView *)_view __##__sel]; \
+    } \
+  } \
+
 - (void)checkResponderCompatibility
 {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
@@ -856,20 +872,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  if (checkFlag(Synchronous)) {
-    // If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
-    // expect it's a non _ASDisplayView subclass that will respond
-    return [_view canBecomeFirstResponder];
-  } else{
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(canBecomeFirstResponder))) {
-      // If the subclass overwrites canBecomeFirstResponder just call through
-      // to it as we expect it will handle it
-      return [_view canBecomeFirstResponder];
-    } else {
-      // Call through to _ASDisplayView's superclass to get it handled
-      return [(_ASDisplayView *)_view __canBecomeFirstResponder];
-    }
-  }
+  HANDLE_RESPONDER_METHOD(canBecomeFirstResponder);
 }
 
 - (BOOL)__becomeFirstResponder
@@ -881,15 +884,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // We explicitly create the view in here as it's supposed to become a first responder
   [self view];
 
-  if (checkFlag(Synchronous)) {
-    return [_view becomeFirstResponder];
-  } else{
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(becomeFirstResponder))) {
-      return [_view becomeFirstResponder];
-    } else {
-      return [(_ASDisplayView *)_view __becomeFirstResponder];
-    }
-  }
+  HANDLE_RESPONDER_METHOD(becomeFirstResponder);
 }
 
 - (BOOL)__canResignFirstResponder
@@ -898,16 +893,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     // By default we return YES if no view is created yet
     return YES;
   }
-
-  if (checkFlag(Synchronous)) {
-    return [_view canResignFirstResponder];
-  } else{
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(canResignFirstResponder))) {
-      return [_view canResignFirstResponder];
-    } else {
-      return [(_ASDisplayView *)_view __canResignFirstResponder];
-    }
-  }
+  
+  HANDLE_RESPONDER_METHOD(canResignFirstResponder);
 }
 
 - (BOOL)__resignFirstResponder
@@ -919,15 +906,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // We explicitly create the view in here
   [self view];
   
-  if (checkFlag(Synchronous)) {
-    return [_view resignFirstResponder];
-  } else{
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(resignFirstResponder))) {
-      return [_view resignFirstResponder];
-    } else {
-      return [(_ASDisplayView *)_view __resignFirstResponder];
-    }
-  }
+  HANDLE_RESPONDER_METHOD(resignFirstResponder);
 }
 
 - (BOOL)__isFirstResponder
@@ -937,15 +916,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  if (checkFlag(Synchronous)) {
-    return [_view isFirstResponder];
-  } else{
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(isFirstResponder))) {
-      return [_view isFirstResponder];
-    } else {
-      return [(_ASDisplayView *)_view __isFirstResponder];
-    }
-  }
+  HANDLE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>
