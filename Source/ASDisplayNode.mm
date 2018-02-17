@@ -540,7 +540,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     _viewBlock = nil;
     _viewClass = [view class];
   } else {
-    
     view = [[_viewClass alloc] init];
   }
   
