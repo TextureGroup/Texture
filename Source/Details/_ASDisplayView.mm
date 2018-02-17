@@ -361,80 +361,49 @@
 
 #pragma mark UIResponder Handling
 
+#define HANDLE_RESPONDER_METHOD(__sel) \
+  ASDisplayNode *node = _asyncdisplaykit_node; \
+  SEL sel = @selector(__sel); \
+  /* Prevent an infinite loop in here if [super canBecomeFirstResponder] was called on a
+  / _ASDisplayView subclass */ \
+  if (ASSubclassOverridesSelector([_ASDisplayView class], [self class], sel)) { \
+    /* Check if we can call through to ASDisplayNode subclass directly */ \
+    if (ASDisplayNodeSubclassOverridesSelector([node class], sel)) { \
+      return [node __sel]; \
+    } else { \
+    /* Call through to views superclass as we expect super was called from the
+      _ASDisplayView subclass and a node subclass does not overwrite canBecomeFirstResponder */ \
+      return [self __##__sel]; \
+    } \
+  } else { \
+    /* Call through to internal node __canBecomeFirstResponder that will consider the view in responding */ \
+    return [node __##__sel]; \
+  } \
+
+
 - (BOOL)canBecomeFirstResponder
 {
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  // Prevent an infinite loop in here if [super canBecomeFirstResponder] was called on a
-  // _ASDisplayView subclass
-  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(canBecomeFirstResponder))) {
-    // Check if we can call through to ASDisplayNode subclass directly
-    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(canBecomeFirstResponder))) {
-      return [node canBecomeFirstResponder];
-    } else {
-      // Call through to views superclass as we expect super was called from the
-      // _ASDisplayView subclass and a node subclass does not overwrite canBecomeFirstResponder
-      return [self __canBecomeFirstResponder];
-    }
-  } else {
-    // Call through to internal node __canBecomeFirstResponder that will consider the view in responding
-    return [node __canBecomeFirstResponder];
-  }
+  HANDLE_RESPONDER_METHOD(canBecomeFirstResponder);
 }
 
 - (BOOL)becomeFirstResponder
 {
-  ASDisplayNode *node = _asyncdisplaykit_node;
-  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(becomeFirstResponder))) {
-    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(becomeFirstResponder))) {
-      return [node becomeFirstResponder];
-    } else {
-      return [self __becomeFirstResponder];
-    }
-  } else {
-    return [node __becomeFirstResponder];
-  }
+  HANDLE_RESPONDER_METHOD(becomeFirstResponder);
 }
 
 - (BOOL)canResignFirstResponder
 {
-  ASDisplayNode *node = _asyncdisplaykit_node;
-  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(canResignFirstResponder))) {
-    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(canResignFirstResponder))) {
-      return [node canResignFirstResponder];
-    } else {
-      return [self __canResignFirstResponder];
-    }
-  } else {
-    return [node __canResignFirstResponder];
-  }
+  HANDLE_RESPONDER_METHOD(canResignFirstResponder);
 }
 
 - (BOOL)resignFirstResponder
 {
-  ASDisplayNode *node = _asyncdisplaykit_node;
-  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(resignFirstResponder))) {
-    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(resignFirstResponder))) {
-      return [node resignFirstResponder];
-    } else {
-      return [self __resignFirstResponder];
-    }
-  } else {
-    return [node __resignFirstResponder];
-  }
+  HANDLE_RESPONDER_METHOD(resignFirstResponder);
 }
 
 - (BOOL)isFirstResponder
 {
-  ASDisplayNode *node = _asyncdisplaykit_node;
-  if (ASSubclassOverridesSelector([_ASDisplayView class], self.class, @selector(isFirstResponder))) {
-    if (ASDisplayNodeSubclassOverridesSelector([node class], @selector(isFirstResponder))) {
-      return [node isFirstResponder];
-    } else {
-      return [self __isFirstResponder];
-    }
-  } else {
-    return [node __isFirstResponder];
-  }
+  HANDLE_RESPONDER_METHOD(isFirstResponder);
 }
 
 // This methods are called from ASDisplayNode to let the view decide in what UIResponder state they are not overwritten
