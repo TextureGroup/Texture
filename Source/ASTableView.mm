@@ -218,7 +218,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
    * Counter used to keep track of nested batch updates.
    */
   NSInteger _batchUpdateCount;
-  
+
+  /**
+   * Keep a strong reference to node till view is ready to release.
+   */
+  ASTableNode *_keepalive_node;
+
   struct {
     unsigned int scrollViewDidScroll:1;
     unsigned int scrollViewWillBeginDragging:1;
@@ -1917,6 +1922,20 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // we will fetch visible area + leading screens, so we need to check.
   if (visible) {
     [self _checkForBatchFetching];
+  }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+  if (self.superview == nil && newSuperview != nil) {
+    _keepalive_node = self.tableNode;
+  }
+}
+
+- (void)didMoveToSuperview
+{
+  if (self.superview == nil) {
+    _keepalive_node = nil;
   }
 }
 
