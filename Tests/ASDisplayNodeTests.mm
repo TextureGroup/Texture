@@ -90,7 +90,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @interface ASDisplayNode (HackForTests)
 - (id)initWithViewClass:(Class)viewClass;
 - (id)initWithLayerClass:(Class)layerClass;
-
+- (void)setInterfaceState:(ASInterfaceState)state;
 // FIXME: Importing ASDisplayNodeInternal.h causes a heap of problems.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
 @end
@@ -120,6 +120,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 
 @implementation ASTestDisplayNode
+
+- (void)setInterfaceState:(ASInterfaceState)state
+{
+  [super setInterfaceState:state];
+  ASCATransactionQueueWait();
+}
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
@@ -2059,9 +2065,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   [supernode addSubnode:subnode];
@@ -2077,9 +2083,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenAddedToContainerThatIsInHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
 
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -2193,8 +2199,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   [node view]; // Node needs to be loaded
   
   [node enterInterfaceState:ASInterfaceStatePreload];
-  
-  
+
   XCTAssertTrue((node.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue((subnode.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue(node.hasPreloaded);

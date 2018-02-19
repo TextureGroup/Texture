@@ -151,7 +151,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * Counter used to keep track of nested batch updates.
    */
   NSInteger _batchUpdateCount;
-  
+
+  /**
+   * Keep a strong reference to node till view is ready to release.
+   */
+  ASCollectionNode *_keepalive_node;
+
   struct {
     unsigned int scrollViewDidScroll:1;
     unsigned int scrollViewWillBeginDragging:1;
@@ -1549,13 +1554,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
   }
-  
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     // _cellsForVisibilityUpdates only includes cells for ASCellNode subclasses with overrides of the visibility method.
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged inScrollView:scrollView];
@@ -1594,6 +1596,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
     [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging inScrollView:scrollView];
   }
@@ -2246,6 +2252,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // we will fetch visible area + leading screens, so we need to check.
   if (visible) {
     [self _checkForBatchFetching];
+  }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+  if (self.superview == nil && newSuperview != nil) {
+    _keepalive_node = self.collectionNode;
+  }
+}
+
+- (void)didMoveToSuperview
+{
+  if (self.superview == nil) {
+    _keepalive_node = nil;
   }
 }
 
