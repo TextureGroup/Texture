@@ -361,8 +361,8 @@
 
 #pragma mark UIResponder Handling
 
-#define HANDLE_RESPONDER_METHOD(__sel) \
-  ASDisplayNode *node = _asyncdisplaykit_node; \
+#define HANDLE_VIEW_RESPONDER_METHOD(__sel) \
+  ASDisplayNode *node = _asyncdisplaykit_node; /* Create strong reference to weak ivar. */ \
   SEL sel = @selector(__sel); \
   /* Prevent an infinite loop in here if [super canBecomeFirstResponder] was called on a
   / _ASDisplayView subclass */ \
@@ -383,55 +383,55 @@
 
 - (BOOL)canBecomeFirstResponder
 {
-  HANDLE_RESPONDER_METHOD(canBecomeFirstResponder);
+  HANDLE_VIEW_RESPONDER_METHOD(canBecomeFirstResponder);
 }
 
 - (BOOL)becomeFirstResponder
 {
-  HANDLE_RESPONDER_METHOD(becomeFirstResponder);
+  HANDLE_VIEW_RESPONDER_METHOD(becomeFirstResponder);
 }
 
 - (BOOL)canResignFirstResponder
 {
-  HANDLE_RESPONDER_METHOD(canResignFirstResponder);
+  HANDLE_VIEW_RESPONDER_METHOD(canResignFirstResponder);
 }
 
 - (BOOL)resignFirstResponder
 {
-  HANDLE_RESPONDER_METHOD(resignFirstResponder);
+  HANDLE_VIEW_RESPONDER_METHOD(resignFirstResponder);
 }
 
 - (BOOL)isFirstResponder
 {
-  HANDLE_RESPONDER_METHOD(isFirstResponder);
+  HANDLE_VIEW_RESPONDER_METHOD(isFirstResponder);
 }
 
-// This methods are called from ASDisplayNode to let the view decide in what UIResponder state they are not overwritten
+// This methods are called from ASDisplayNode to let the view decide in what UIResponder state they are not overridden
 // by a ASDisplayNode subclass
 
 - (BOOL)__canBecomeFirstResponder
 {
-    return [super canBecomeFirstResponder];
+  return [super canBecomeFirstResponder];
 }
 
 - (BOOL)__becomeFirstResponder
 {
-    return [super becomeFirstResponder];
+  return [super becomeFirstResponder];
 }
 
 - (BOOL)__canResignFirstResponder
 {
-    return [super canResignFirstResponder];
+  return [super canResignFirstResponder];
 }
 
 - (BOOL)__resignFirstResponder
 {
-    return [super resignFirstResponder];
+  return [super resignFirstResponder];
 }
 
 - (BOOL)__isFirstResponder
 {
-    return [super isFirstResponder];
+  return [super isFirstResponder];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender

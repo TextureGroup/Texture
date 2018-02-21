@@ -832,7 +832,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark UIResponder
 
-#define HANDLE_RESPONDER_METHOD(__sel) \
+#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
+  /* All responder methods should be called on the main thread */ \
+  ASDisplayNodeAssertMainThread(); \
   if (checkFlag(Synchronous)) { \
     /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
      expect it's a non _ASDisplayView subclass that will respond */ \
@@ -855,11 +857,12 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // 1. If the _view class is not a subclass of _ASDisplayView
   if (checkFlag(Synchronous)) {
     // 2. At least one UIResponder methods are overwritten in the node subclass
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canBecomeFirstResponder)), @"TBD");
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(becomeFirstResponder)), @"TBD");
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canResignFirstResponder)), @"TBD");
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(resignFirstResponder)), @"TBD");
-    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), @"TBD");
+    NSString *message =  @"Overwritting %@ and having a backing view that is not an _ASDisplayView is not supported.";
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canBecomeFirstResponder)), ([NSString stringWithFormat:message, @"canBecomeFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(becomeFirstResponder)), ([NSString stringWithFormat:message, @"becomeFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canResignFirstResponder)), ([NSString stringWithFormat:message, @"canResignFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(resignFirstResponder)), ([NSString stringWithFormat:message, @"resignFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), ([NSString stringWithFormat:message, @"isFirstResponder"]));
   }
 #endif
 }
@@ -871,19 +874,19 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  HANDLE_RESPONDER_METHOD(canBecomeFirstResponder);
+  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
 }
 
 - (BOOL)__becomeFirstResponder
 {
-  if (self.isLayerBacked || ![self canBecomeFirstResponder]) {
+  if (![self canBecomeFirstResponder]) {
     return NO;
   }
   
-  // We explicitly create the view in here as it's supposed to become a first responder
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
 
-  HANDLE_RESPONDER_METHOD(becomeFirstResponder);
+  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
 }
 
 - (BOOL)__canResignFirstResponder
@@ -893,19 +896,19 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return YES;
   }
   
-  HANDLE_RESPONDER_METHOD(canResignFirstResponder);
+  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
 }
 
 - (BOOL)__resignFirstResponder
 {
-  if (self.isLayerBacked || ![self canResignFirstResponder]) {
+  if (![self canResignFirstResponder]) {
     return NO;
   }
   
-  // We explicitly create the view in here
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
   
-  HANDLE_RESPONDER_METHOD(resignFirstResponder);
+  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
 }
 
 - (BOOL)__isFirstResponder
@@ -915,7 +918,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  HANDLE_RESPONDER_METHOD(isFirstResponder);
+  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>

@@ -265,19 +265,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 @implementation UIResponderNodeTestDisplayViewCallingSuper
 - (BOOL)canBecomeFirstResponder { return YES; }
-- (BOOL)becomeFirstResponder {
-  return [super becomeFirstResponder];
-}
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
 @end
 
 @interface UIResponderNodeTestViewCallingSuper : UIView
 @end
 @implementation UIResponderNodeTestViewCallingSuper
 - (BOOL)canBecomeFirstResponder { return YES; }
-- (BOOL)becomeFirstResponder {
-  return [super becomeFirstResponder];
-  
-}
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
 @end
 
 @interface ASDisplayNodeTests : XCTestCase
