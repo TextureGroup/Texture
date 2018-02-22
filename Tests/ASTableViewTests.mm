@@ -877,8 +877,8 @@
   [node waitUntilAllUpdatesAreProcessed];
   
   // Check that numberOfRows in section 0 is 2
-  XCTAssertTrue([node numberOfRowsInSection:0] == 2, @"Number of rows in section 0 should be 2 after reload");
-  XCTAssertTrue([node.view numberOfRowsInSection:0] == 2, @"Number of rows in section 0 should be 2 after reload");
+  XCTAssertEqual([node numberOfRowsInSection:0], 2);
+  XCTAssertEqual([node.view numberOfRowsInSection:0], 2);
 }
 
 @end
