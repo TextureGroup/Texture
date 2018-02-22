@@ -1110,7 +1110,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize NS_RETURNS_RETAINED
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   

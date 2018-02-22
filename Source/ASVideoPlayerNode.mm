@@ -743,7 +743,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 #pragma mark - Layout
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize NS_RETURNS_RETAINED
 {
   CGSize maxSize = constrainedSize.max;
 
@@ -777,7 +777,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
   return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:children];
 }
 
-- (ASLayoutSpec *)defaultLayoutSpecThatFits:(CGSize)maxSize
+- (ASLayoutSpec *)defaultLayoutSpecThatFits:(CGSize)maxSize NS_RETURNS_RETAINED
 {
   _scrubberNode.style.preferredSize = CGSizeMake(maxSize.width, 44.0);
 

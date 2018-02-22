@@ -132,7 +132,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * @param constrainedSize A min and max size. This is computed as described in the description. The ASLayout you
  *                        return MUST have a size between these two sizes.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize;
+- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize NS_RETURNS_RETAINED;
 
 /**
  * In certain advanced cases, you may want to override this method. Overriding this method allows you to receive the
@@ -143,7 +143,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  */
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
                      restrictedToSize:(ASLayoutElementSize)size
-                 relativeToParentSize:(CGSize)parentSize;
+                 relativeToParentSize:(CGSize)parentSize NS_RETURNS_RETAINED;
 
 - (BOOL)implementsLayoutMethod;
 

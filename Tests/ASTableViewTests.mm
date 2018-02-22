@@ -127,7 +127,7 @@
 
 @implementation ASTestTextCellNode
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize NS_RETURNS_RETAINED
 {
   if ([NSThread isMainThread]) {
     _numberOfLayoutsOnMainThread++;
