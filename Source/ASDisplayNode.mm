@@ -545,6 +545,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   // Special handling of wrapping UIKit components
   if (checkFlag(Synchronous)) {
+    [self checkResponderCompatibility];
+    
     // UIImageView layers. More details on the flags
     if ([_viewClass isSubclassOfClass:[UIImageView class]]) {
       _flags.canClearContentsOfLayer = NO;
@@ -826,6 +828,97 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 {
   ASDN::MutexLocker l(__instanceLock__);
   _flags.viewEverHadAGestureRecognizerAttached = YES;
+}
+
+#pragma mark UIResponder
+
+#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
+  /* All responder methods should be called on the main thread */ \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
+     expect it's a non _ASDisplayView subclass that will respond */ \
+    return [_view __sel]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+    /* If the subclass overwrites canBecomeFirstResponder just call through
+       to it as we expect it will handle it */ \
+      return [_view __sel]; \
+    } else { \
+      /* Call through to _ASDisplayView's superclass to get it handled */ \
+      return [(_ASDisplayView *)_view __##__sel]; \
+    } \
+  } \
+
+- (void)checkResponderCompatibility
+{
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+  // There are certain cases we cannot handle and are not supported:
+  // 1. If the _view class is not a subclass of _ASDisplayView
+  if (checkFlag(Synchronous)) {
+    // 2. At least one UIResponder methods are overwritten in the node subclass
+    NSString *message =  @"Overwritting %@ and having a backing view that is not an _ASDisplayView is not supported.";
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canBecomeFirstResponder)), ([NSString stringWithFormat:message, @"canBecomeFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(becomeFirstResponder)), ([NSString stringWithFormat:message, @"becomeFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(canResignFirstResponder)), ([NSString stringWithFormat:message, @"canResignFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(resignFirstResponder)), ([NSString stringWithFormat:message, @"resignFirstResponder"]));
+    ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), ([NSString stringWithFormat:message, @"isFirstResponder"]));
+  }
+#endif
+}
+
+- (BOOL)__canBecomeFirstResponder
+{
+  if (_view == nil) {
+    // By default we return NO if not view is created yet
+    return NO;
+  }
+  
+  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
+}
+
+- (BOOL)__becomeFirstResponder
+{
+  if (![self canBecomeFirstResponder]) {
+    return NO;
+  }
+  
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
+  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
+}
+
+- (BOOL)__canResignFirstResponder
+{
+  if (_view == nil) {
+    // By default we return YES if no view is created yet
+    return YES;
+  }
+  
+  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
+}
+
+- (BOOL)__resignFirstResponder
+{
+  if (![self canResignFirstResponder]) {
+    return NO;
+  }
+  
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+  
+  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
+}
+
+- (BOOL)__isFirstResponder
+{
+  if (_view == nil) {
+    // If no view is created yet we can just return NO as it's unlikely it's the first responder
+    return NO;
+  }
+  
+  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>
