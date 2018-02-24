@@ -29,6 +29,7 @@
 - Make `ASCellNode` tint color apply to table view cell accessories. [Vladyslav Chapaev](https://github.com/ShogunPhyched) [#764](https://github.com/TextureGroup/Texture/pull/764)
 - Fix ASTextNode2 is accessing backgroundColor off main while sizing / layout is happening. [Michael Schneider](https://github.com/maicki) [#794](https://github.com/TextureGroup/Texture/pull/778/)
 - Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
+- Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789] (https://github.com/TextureGroup/Texture/pull/789/)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
