@@ -155,11 +155,11 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   
   ASLayoutSpecBlock _layoutSpecBlock;
   
-  ASDisplayNodeCanBecomeFocusedBlock _canBecomeFocusedBlock;
-  ASDisplayNodeShouldUpdateFocusBlock _shouldUpdateFocusBlock;
-  ASDisplayNodeDidUpdateFocusBlock _didUpdateFocusBlock;
-  ASDisplayNodePreferredFocusEnvironmentsBlock _preferredFocusEnvironmentsBlock;
-  ASDisplayNodePreferredFocusedViewBlock _preferredFocusedViewBlock;
+  ASFocusabilityBlock _canBecomeFocusedBlock;
+  ASFocusUpdateContextBlock _shouldUpdateFocusBlock;
+  ASFocusUpdateAnimationCoordinatorBlock _didUpdateFocusBlock;
+  ASFocusEnvironmentsBlock _preferredFocusEnvironmentsBlock;
+  ASFocusViewBlock _preferredFocusedViewBlock;
 
   std::atomic<int32_t> _transitionID;
   

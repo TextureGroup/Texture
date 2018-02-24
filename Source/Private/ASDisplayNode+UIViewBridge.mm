@@ -888,6 +888,75 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 @end
 
+@implementation ASDisplayNode (InternalMethodBridge)
+
+- (void)_setNeedsFocusUpdate
+{
+  [self setNeedsFocusUpdate];
+}
+
+- (void)_updateFocusIfNeeded
+{
+  [self updateFocusIfNeeded];
+}
+
+- (BOOL)_canBecomeFocused
+{
+  if (_canBecomeFocusedBlock != NULL) {
+    ASDN::MutexLocker l(__instanceLock__);
+    return _canBecomeFocusedBlock(self);
+  }
+  else {
+    return [self canBecomeFocused];
+  }
+}
+
+- (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  if (_shouldUpdateFocusBlock != NULL) {
+    ASDN::MutexLocker l(__instanceLock__);
+    return _shouldUpdateFocusBlock(self, context);
+  }
+  else {
+    return [self shouldUpdateFocusInContext:context];
+  }
+}
+
+- (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  if (_didUpdateFocusBlock != NULL) {
+    ASDN::MutexLocker l(__instanceLock__);
+    return _didUpdateFocusBlock(self, context, coordinator);
+  }
+  else {
+    return [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  }
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments
+{
+  if (_preferredFocusEnvironmentsBlock != NULL) {
+    ASDN::MutexLocker l(__instanceLock__);
+    return _preferredFocusEnvironmentsBlock(self);
+  }
+  else {
+    return [self preferredFocusEnvironments];
+  }
+}
+
+- (UIView *)_preferredFocusedView
+{
+  if (_preferredFocusedViewBlock != NULL) {
+    ASDN::MutexLocker l(__instanceLock__);
+    return _preferredFocusedViewBlock(self);
+  }
+  else {
+    return [self preferredFocusedView];
+  }
+}
+
+@end
+
 #pragma mark - UIViewBridgeAccessibility
 
 // ASDK supports accessibility for view or layer backed nodes. To be able to provide support for layer backed
@@ -1166,75 +1235,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_read;
   return _getFromViewOnly(accessibilityElementCount);
-}
-
-@end
-
-@implementation ASDisplayNode (UIViewBridgePrivate)
-
-- (void)_setNeedsFocusUpdate
-{
-  [self setNeedsFocusUpdate];
-}
-
-- (void)_updateFocusIfNeeded
-{
-  [self updateFocusIfNeeded];
-}
-
-- (BOOL)_canBecomeFocused
-{
-  if (_canBecomeFocusedBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _canBecomeFocusedBlock(self);
-  }
-  else {
-    return [self canBecomeFocused];
-  }
-}
-
-- (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
-{
-  if (_shouldUpdateFocusBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _shouldUpdateFocusBlock(self, context);
-  }
-  else {
-    return [self shouldUpdateFocusInContext:context];
-  }
-}
-
-- (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
-{
-  if (_didUpdateFocusBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _didUpdateFocusBlock(self, context, coordinator);
-  }
-  else {
-    return [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
-  }
-}
-
-- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments
-{
-  if (_preferredFocusEnvironmentsBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _preferredFocusEnvironmentsBlock(self);
-  }
-  else {
-    return [self preferredFocusEnvironments];
-  }
-}
-
-- (UIView *)_preferredFocusedView
-{
-  if (_preferredFocusedViewBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _preferredFocusedViewBlock(self);
-  }
-  else {
-    return [self preferredFocusedView];
-  }
 }
 
 @end

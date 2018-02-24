@@ -1,5 +1,5 @@
 //
-//  ASDisplayNode.mm
+//  ASDisplayNode+UIViewBridge.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ASDisplayNode (UIViewBridgePrivate)
+@interface ASDisplayNode (InternalMethodBridge)
 
 - (void)_setNeedsFocusUpdate;
 - (void)_updateFocusIfNeeded;

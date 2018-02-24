@@ -1,5 +1,5 @@
 //
-//  ASDisplayNode+FocusConvenience.mm
+//  ASDisplayNode+ASFocus.mm
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -13,9 +13,9 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 
-@implementation ASDisplayNode (ASFocusConvenience)
+@implementation ASDisplayNode (ASFocus)
 
-- (void)setCanBecomeFocusedBlock:(ASDisplayNodeCanBecomeFocusedBlock)canBecomeFocusedBlock
+- (void)setCanBecomeFocusedBlock:(ASFocusabilityBlock)canBecomeFocusedBlock
 {
   // For now there should never be an override of canBecomeFocused and a canBecomeFocusedBlock together.
   ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideCanBecomeFocused),
@@ -24,13 +24,13 @@
   _canBecomeFocusedBlock = canBecomeFocusedBlock;
 }
 
-- (ASDisplayNodeCanBecomeFocusedBlock)canBecomeFocusedBlock
+- (ASFocusabilityBlock)canBecomeFocusedBlock
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _canBecomeFocusedBlock;
 }
 
-- (void)setShouldUpdateFocusBlock:(ASDisplayNodeShouldUpdateFocusBlock)shouldUpdateFocusBlock
+- (void)setShouldUpdateFocusBlock:(ASFocusUpdateContextBlock)shouldUpdateFocusBlock
 {
   // For now there should never be an override of shouldUpdateFocusInContext: and a shouldUpdateFocusBlock together.
   ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideShouldUpdateFocus),
@@ -39,13 +39,13 @@
   _shouldUpdateFocusBlock = shouldUpdateFocusBlock;
 }
 
-- (ASDisplayNodeShouldUpdateFocusBlock)shouldUpdateFocusBlock
+- (ASFocusUpdateContextBlock)shouldUpdateFocusBlock
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _shouldUpdateFocusBlock;
 }
 
-- (void)setDidUpdateFocusBlock:(ASDisplayNodeDidUpdateFocusBlock)didUpdateFocusBlock
+- (void)setDidUpdateFocusBlock:(ASFocusUpdateAnimationCoordinatorBlock)didUpdateFocusBlock
 {
   // For now there should never be an override of didUpdateFocusInContext:withAnimationCoordinator: and a didUpdateFocusBlock together.
   ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideDidUpdateFocus),
@@ -54,13 +54,13 @@
   _didUpdateFocusBlock = didUpdateFocusBlock;
 }
 
-- (ASDisplayNodeDidUpdateFocusBlock)didUpdateFocusBlock
+- (ASFocusUpdateAnimationCoordinatorBlock)didUpdateFocusBlock
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _didUpdateFocusBlock;
 }
 
-- (void)setPreferredFocusEnvironmentsBlock:(ASDisplayNodePreferredFocusEnvironmentsBlock)preferredFocusEnvironmentsBlock
+- (void)setPreferredFocusEnvironmentsBlock:(ASFocusEnvironmentsBlock)preferredFocusEnvironmentsBlock
 {
   // For now there should never be an override of preferredFocusEnvironments and a preferredFocusEnvironmentsBlock together.
   ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverridePreferredFocusEnvironments),
@@ -69,13 +69,13 @@
   _preferredFocusEnvironmentsBlock = preferredFocusEnvironmentsBlock;
 }
 
-- (ASDisplayNodePreferredFocusEnvironmentsBlock)preferredFocusEnvironmentsBlock
+- (ASFocusEnvironmentsBlock)preferredFocusEnvironmentsBlock
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _preferredFocusEnvironmentsBlock;
 }
 
-- (void)setPreferredFocusedViewBlock:(ASDisplayNodePreferredFocusedViewBlock)preferredFocusedViewBlock
+- (void)setPreferredFocusedViewBlock:(ASFocusViewBlock)preferredFocusedViewBlock
 {
   // For now there should never be an override of preferredFocusedView and a preferredFocusedViewBlock together.
   ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverridePreferredFocusedView),
@@ -84,7 +84,7 @@
   _preferredFocusedViewBlock = preferredFocusedViewBlock;
 }
 
-- (ASDisplayNodePreferredFocusedViewBlock)preferredFocusedViewBlock
+- (ASFocusViewBlock)preferredFocusedViewBlock
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _preferredFocusedViewBlock;
