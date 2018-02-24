@@ -1179,7 +1179,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 - (void)_updateFocusIfNeeded
 {
-  [self _updateFocusIfNeeded];
+  [self updateFocusIfNeeded];
 }
 
 - (BOOL)_canBecomeFocused

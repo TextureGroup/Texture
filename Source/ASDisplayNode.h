@@ -801,7 +801,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 /**
  * Provides a way to declare a block to provide a preferred focused view without having to subclass ASDisplayNode and
- * implement preferredFocusEnvironments
+ * implement preferredFocusedView
  */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodePreferredFocusedViewBlock preferredFocusedViewBlock;
 
