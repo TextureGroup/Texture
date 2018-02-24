@@ -202,7 +202,11 @@
     .onMainThread();
   }];
 
-  [nodeA layoutThatFits:{{15, 1}, {15, 1}}];
+  [nodeA layoutThatFits:ASSizeRangeMake(fixture5.layout.size)];
+
+  // Assert that node A has layout size and size range from fixture 5
+  XCTAssertTrue(CGSizeEqualToSize(fixture5.layout.size, nodeA.calculatedSize));
+  XCTAssertTrue(ASSizeRangeEqualToSizeRange([fixture5 firstSizeRangeForNode:nodeA], nodeA.constrainedSizeForCalculatedLayout));
 
   // Then switch to fixture 1 and kick off a synchronous layout transition
   // Unapplied pending layouts from the previous measurement pass will be outdated
@@ -217,7 +221,7 @@
 
   [nodeA transitionLayoutWithAnimation:NO shouldMeasureAsync:NO measurementCompletion:nil];
 
-  // Assert that the outdated pending layouts are ignored
+  // Assert that node A picks up new layout size and size range from fixture 1
   XCTAssertTrue(CGSizeEqualToSize(fixture1.layout.size, nodeA.calculatedSize));
   XCTAssertTrue(ASSizeRangeEqualToSizeRange([fixture1 firstSizeRangeForNode:nodeA], nodeA.constrainedSizeForCalculatedLayout));
 
