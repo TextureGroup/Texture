@@ -64,6 +64,34 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize);
 
 /**
+ * ASDisplayNode focusability block. This block can be used instead of implementing canBecomeFocused in subclass
+ */
+typedef BOOL (^ASDisplayNodeCanBecomeFocusedBlock)(__kindof ASDisplayNode *node);
+
+/**
+ * ASDisplayNode should focus update block. This block can be used instead of implementing shouldUpdateFocusInContext: in subclass
+ */
+typedef BOOL (^ASDisplayNodeShouldUpdateFocusBlock)(__kindof ASDisplayNode *node,
+                                                    UIFocusUpdateContext *context);
+
+/**
+ * ASDisplayNode did update focus block. This block can be used instead of implementing didUpdateFocusInContext:withCoordinator in subclass
+ */
+typedef void (^ASDisplayNodeDidUpdateFocusBlock)(__kindof ASDisplayNode *node,
+                                                 UIFocusUpdateContext *context,
+                                                 UIFocusAnimationCoordinator *animationCoordinator);
+
+/**
+ * ASDisplayNode preferred focus environments block. This block can be used instead of implementing preferredFocusEnvironments in subclass
+ */
+typedef NSArray<id<UIFocusEnvironment>> *_Nonnull (^ASDisplayNodePreferredFocusEnvironmentsBlock)(__kindof ASDisplayNode *node) API_AVAILABLE(ios(10.0), tvos(10.0));
+
+/**
+ * ASDisplayNode preferred focus view block. This block can be used instead of implementing preferredFocusView in subclass
+ */
+typedef UIView *_Nullable (^ASDisplayNodePreferredFocusedViewBlock)(__kindof ASDisplayNode *node);
+
+/**
  * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
  * errors that happens in production.
  */
@@ -735,13 +763,23 @@ extern NSInteger const ASDefaultDrawingPriority;
 - (BOOL)canPerformAction:(nonnull SEL)action withSender:(nonnull id)sender;
 
 // Focus Engine
-- (void)setNeedsFocusUpdate API_AVAILABLE(ios(9.0), tvos(9.0));
-- (BOOL)canBecomeFocused API_AVAILABLE(ios(9.0), tvos(9.0));
-- (void)updateFocusIfNeeded API_AVAILABLE(ios(9.0), tvos(9.0));
-- (void)didUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context withAnimationCoordinator:(nonnull UIFocusAnimationCoordinator *)coordinator API_AVAILABLE(ios(9.0), tvos(9.0));
-- (BOOL)shouldUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context API_AVAILABLE(ios(9.0), tvos(9.0));
-- (nullable UIView *)preferredFocusedView API_AVAILABLE(ios(9.0), tvos(9.0));
+- (void)setNeedsFocusUpdate;
+- (void)updateFocusIfNeeded;
+- (BOOL)canBecomeFocused;
+- (void)didUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context withAnimationCoordinator:(nonnull UIFocusAnimationCoordinator *)coordinator;
+- (BOOL)shouldUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context;
+- (nullable UIView *)preferredFocusedView;
 - (nonnull NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0));
+
+@end
+
+@interface ASDisplayNode (ASFocusConvenience)
+
+@property (nonatomic, readwrite, copy, nullable) ASDisplayNodeCanBecomeFocusedBlock canBecomeFocusedBlock;
+@property (nonatomic, readwrite, copy, nullable) ASDisplayNodeShouldUpdateFocusBlock shouldUpdateFocusBlock;
+@property (nonatomic, readwrite, copy, nullable) ASDisplayNodeDidUpdateFocusBlock didUpdateFocusBlock;
+@property (nonatomic, readwrite, copy, nullable) ASDisplayNodePreferredFocusEnvironmentsBlock preferredFocusEnvironmentsBlock API_AVAILABLE(ios(10.0), tvos(10.0));
+@property (nonatomic, readwrite, copy, nullable) ASDisplayNodePreferredFocusedViewBlock preferredFocusedViewBlock;
 
 @end
 

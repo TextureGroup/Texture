@@ -27,6 +27,7 @@
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+UIViewBridge.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
@@ -146,43 +147,43 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)canBecomeFocused
 {
   ASCellNode *node = self.node;
-  return [node canBecomeFocused];
+  return [node _canBecomeFocused];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
   ASCellNode *node = self.node;
-  return [node didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
 }
 
 - (void)setNeedsFocusUpdate
 {
   ASCellNode *node = self.node;
-  return [node setNeedsFocusUpdate];
+  return [node _setNeedsFocusUpdate];
 }
 
 - (void)updateFocusIfNeeded
 {
   ASCellNode *node = self.node;
-  return [node updateFocusIfNeeded];
+  return [node _updateFocusIfNeeded];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
   ASCellNode *node = self.node;
-  return [node shouldUpdateFocusInContext:context];
+  return [node _shouldUpdateFocusInContext:context];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
 {
   ASCellNode *node = self.node;
-  return [node preferredFocusEnvironments];
+  return [node _preferredFocusEnvironments];
 }
 
 - (UIView *)preferredFocusedView
 {
   ASCellNode *node = self.node;
-  return [node preferredFocusedView];
+  return [node _preferredFocusedView];
 }
 
 // Selection

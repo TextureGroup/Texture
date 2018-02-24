@@ -171,6 +171,21 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
   }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFocused))) {
+    overrides |= ASDisplayNodeMethodOverrideCanBecomeFocused;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(shouldUpdateFocusInContext:))) {
+    overrides |= ASDisplayNodeMethodOverrideShouldUpdateFocus;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(didUpdateFocusInContext:withAnimationCoordinator:))) {
+    overrides |= ASDisplayNodeMethodOverrideDidUpdateFocus;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(preferredFocusEnvironments))) {
+    overrides |= ASDisplayNodeMethodOverridePreferredFocusEnvironments;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(preferredFocusedView))) {
+    overrides |= ASDisplayNodeMethodOverridePreferredFocusedView;
+  }
 
   return overrides;
 }

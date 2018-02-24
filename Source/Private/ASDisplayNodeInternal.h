@@ -44,14 +44,19 @@ _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
 
 typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
 {
-  ASDisplayNodeMethodOverrideNone               = 0,
-  ASDisplayNodeMethodOverrideTouchesBegan       = 1 << 0,
-  ASDisplayNodeMethodOverrideTouchesCancelled   = 1 << 1,
-  ASDisplayNodeMethodOverrideTouchesEnded       = 1 << 2,
-  ASDisplayNodeMethodOverrideTouchesMoved       = 1 << 3,
-  ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
-  ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
-  ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
+  ASDisplayNodeMethodOverrideNone                         = 0,
+  ASDisplayNodeMethodOverrideTouchesBegan                 = 1 << 0,
+  ASDisplayNodeMethodOverrideTouchesCancelled             = 1 << 1,
+  ASDisplayNodeMethodOverrideTouchesEnded                 = 1 << 2,
+  ASDisplayNodeMethodOverrideTouchesMoved                 = 1 << 3,
+  ASDisplayNodeMethodOverrideLayoutSpecThatFits           = 1 << 4,
+  ASDisplayNodeMethodOverrideCalcLayoutThatFits           = 1 << 5,
+  ASDisplayNodeMethodOverrideCalcSizeThatFits             = 1 << 6,
+  ASDisplayNodeMethodOverrideCanBecomeFocused             = 1 << 7,
+  ASDisplayNodeMethodOverrideShouldUpdateFocus            = 1 << 8,
+  ASDisplayNodeMethodOverrideDidUpdateFocus               = 1 << 9,
+  ASDisplayNodeMethodOverridePreferredFocusEnvironments   = 1 << 10,
+  ASDisplayNodeMethodOverridePreferredFocusedView         = 1 << 11,
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
@@ -149,6 +154,12 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   UIViewAnimationOptions _defaultLayoutTransitionOptions;
   
   ASLayoutSpecBlock _layoutSpecBlock;
+  
+  ASDisplayNodeCanBecomeFocusedBlock _canBecomeFocusedBlock;
+  ASDisplayNodeShouldUpdateFocusBlock _shouldUpdateFocusBlock;
+  ASDisplayNodeDidUpdateFocusBlock _didUpdateFocusBlock;
+  ASDisplayNodePreferredFocusEnvironmentsBlock _preferredFocusEnvironmentsBlock;
+  ASDisplayNodePreferredFocusedViewBlock _preferredFocusedViewBlock;
 
   std::atomic<int32_t> _transitionID;
   

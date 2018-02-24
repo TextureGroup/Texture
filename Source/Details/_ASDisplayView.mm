@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+UIViewBridge.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 
@@ -387,43 +388,43 @@
 - (BOOL)canBecomeFocused
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node canBecomeFocused];
+  return [node _canBecomeFocused];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
 }
 
 - (void)setNeedsFocusUpdate
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node setNeedsFocusUpdate];
+  return [node _setNeedsFocusUpdate];
 }
 
 - (void)updateFocusIfNeeded
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node updateFocusIfNeeded];
+  return [node _updateFocusIfNeeded];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node shouldUpdateFocusInContext:context];
+  return [node _shouldUpdateFocusInContext:context];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node preferredFocusEnvironments];
+  return [node _preferredFocusEnvironments];
 }
 
 - (UIView *)preferredFocusedView
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node preferredFocusedView];
+  return [node _preferredFocusedView];
 }
 
 @end
