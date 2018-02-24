@@ -775,10 +775,34 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 @interface ASDisplayNode (ASFocusConvenience)
 
+/**
+ * @abstract Provides a way to declare a block that determines whether or not the node can become focused
+ * without having to subclass ASDisplayNode and implement canBecomeFocused
+ */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodeCanBecomeFocusedBlock canBecomeFocusedBlock;
+
+/**
+ * @abstract Provides a way to declare a block that determines whether or not the node should update focus
+ * without having to subclass ASDisplayNode and implement shouldUpdateFocusInContext:
+ */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodeShouldUpdateFocusBlock shouldUpdateFocusBlock;
+
+/**
+ * @abstract Provides a way to declare a block that can respond to a focus update without having to subclass
+ * ASDisplayNode and implement didUpdateFocusInContext:withAnimationCoordinator:
+ */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodeDidUpdateFocusBlock didUpdateFocusBlock;
+
+/**
+ * Provides a way to declare a block to provide an array of preferred focus environments without having to subclass
+ * ASDisplayNode and implement preferredFocusEnvironments
+ */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodePreferredFocusEnvironmentsBlock preferredFocusEnvironmentsBlock API_AVAILABLE(ios(10.0), tvos(10.0));
+
+/**
+ * Provides a way to declare a block to provide a preferred focused view without having to subclass ASDisplayNode and
+ * implement preferredFocusEnvironments
+ */
 @property (nonatomic, readwrite, copy, nullable) ASDisplayNodePreferredFocusedViewBlock preferredFocusedViewBlock;
 
 @end
