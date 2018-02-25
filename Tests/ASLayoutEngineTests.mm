@@ -194,6 +194,9 @@
 {
   [self stubCalculatedLayoutDidChange];
 
+  // Precondition
+  XCTAssertFalse(CGSizeEqualToSize(fixture5.layout.size, fixture1.layout.size));
+
   // First, apply fixture 5 and run a measurement pass, but don't run a layout pass
   // After this step, nodes will have pending layouts that are not yet applied
   [fixture5 apply];
