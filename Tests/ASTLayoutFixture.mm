@@ -58,6 +58,15 @@
   return r;
 }
 
+- (void)withSizeRangesForAllNodesUsingBlock:(void (^)(ASLayoutTestNode * _Nonnull, ASSizeRange))block
+{
+  for (ASLayoutTestNode *node in self.allNodes) {
+    [self withSizeRangesForNode:node block:^(ASSizeRange sizeRange) {
+      block(node, sizeRange);
+    }];
+  }
+}
+
 - (void)withSizeRangesForNode:(ASLayoutTestNode *)node block:(void (^)(ASSizeRange))block
 {
   for (NSValue *value in [_sizeRanges objectForKey:node]) {

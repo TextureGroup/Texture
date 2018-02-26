@@ -1,3 +1,5 @@
+require 'open-uri'
+
 source_pattern = /(\.m|\.mm|\.h)$/
   
 # Sometimes it's a README fix, or something like that - which isn't relevant for
@@ -45,6 +47,7 @@ def check_file_header(files_to_check, licenses)
     
       data = ""
       contents = github.api.get file["contents_url"]
+      print(contents["download_url"])
       open(contents["download_url"]) { |io|
         data += io.read
       }
