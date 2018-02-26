@@ -44,6 +44,9 @@ AS_SUBCLASSING_RESTRICTED
 /// Get the first expected size range for the node.
 - (ASSizeRange)firstSizeRangeForNode:(ASLayoutTestNode *)node;
 
+/// Enumerate all the size ranges for all the nodes using the provided block.
+- (void)withSizeRangesForAllNodesUsingBlock:(void (^)(ASLayoutTestNode *node, ASSizeRange sizeRange))block;
+
 /// Enumerate all the size ranges for the node.
 - (void)withSizeRangesForNode:(ASLayoutTestNode *)node block:(void (^)(ASSizeRange sizeRange))block;
 
