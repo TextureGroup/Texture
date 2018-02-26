@@ -103,6 +103,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)nodeDidLayout;
 
+/**
+ * @abstract Called when the node loads.
+ * @discussion Can be used for operations that are performed after the node's view is available.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)nodeDidLoad;
+
 @end
 
 @interface ASDisplayNode (Subclassing) <ASInterfaceStateDelegate>

@@ -29,6 +29,7 @@
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASEditableTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
@@ -87,11 +88,15 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertFalse(n.nodeLoaded, @"%@ should not be loaded", n.debugName);\
 }
 
+@interface UIWindow (Testing)
+// UIWindow has this handy method that is not public but great for testing
+- (UIResponder *)firstResponder;
+@end
 
 @interface ASDisplayNode (HackForTests)
 - (id)initWithViewClass:(Class)viewClass;
 - (id)initWithLayerClass:(Class)layerClass;
-
+- (void)setInterfaceState:(ASInterfaceState)state;
 // FIXME: Importing ASDisplayNodeInternal.h causes a heap of problems.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
 @end
@@ -121,6 +126,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 
 @implementation ASTestDisplayNode
+
+- (void)setInterfaceState:(ASInterfaceState)state
+{
+  [super setInterfaceState:state];
+  ASCATransactionQueueWait();
+}
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
@@ -169,6 +180,28 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 {
   [super displayWillStartAsynchronously:asynchronously];
   _displayWillStartCount++;
+}
+
+@end
+
+@interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaViewClass
+
++ (Class)viewClass {
+  return [UIView class];
+}
+
+@end
+
+@interface ASSynchronousTestDisplayNodeViaLayerClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaLayerClass
+
++ (Class)layerClass {
+  return [CALayer class];
 }
 
 @end
@@ -228,6 +261,20 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
+@interface UIResponderNodeTestDisplayViewCallingSuper : _ASDisplayView
+@end
+@implementation UIResponderNodeTestDisplayViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
+@end
+
+@interface UIResponderNodeTestViewCallingSuper : UIView
+@end
+@implementation UIResponderNodeTestViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
+@end
+
 @interface ASDisplayNodeTests : XCTestCase
 @end
 
@@ -236,16 +283,75 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   dispatch_queue_t queue;
 }
 
-- (void)testOverriddenFirstResponderBehavior {
+- (void)testOverriddenNodeFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestResponderNode alloc] init];
   XCTAssertTrue([node canBecomeFirstResponder]);
   XCTAssertTrue([node becomeFirstResponder]);
 }
 
-- (void)testDefaultFirstResponderBehavior {
+- (void)testOverriddenDisplayViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestDisplayViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testOverriddenViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testDefaultFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
   XCTAssertFalse([node canBecomeFirstResponder]);
   XCTAssertFalse([node becomeFirstResponder]);
+}
+
+- (void)testResponderMethodsBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASEditableTextNode *textNode = [[ASEditableTextNode alloc] init];
+  
+  // We have to add the text node to a window otherwise the responder methods responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:textNode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([textNode canBecomeFirstResponder]);
+  XCTAssertTrue([textNode becomeFirstResponder]);
+  XCTAssertTrue([window firstResponder] == textNode.textView);
+  XCTAssertTrue([textNode resignFirstResponder]);
+  
+  // If the textNode resigns it's first responder the view should not be the first responder
+  XCTAssertTrue([window firstResponder] == nil);
+  XCTAssertFalse([textNode.view isFirstResponder]);
+}
+
+- (void)testUnsupportedResponderSetupWillThrow
+{
+  ASTestResponderNode *node = [[ASTestResponderNode alloc] init];
+  [node setViewBlock:^UIView * _Nonnull{
+    return [[UIView alloc] init];
+  }];
+  XCTAssertThrows([node view], @"Externally provided views should be synchronous");
 }
 
 - (void)setUp
@@ -2036,9 +2142,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   [supernode addSubnode:subnode];
@@ -2054,9 +2160,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenAddedToContainerThatIsInHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
 
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -2170,8 +2276,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   [node view]; // Node needs to be loaded
   
   [node enterInterfaceState:ASInterfaceStatePreload];
-  
-  
+
   XCTAssertTrue((node.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue((subnode.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue(node.hasPreloaded);
@@ -2352,6 +2457,18 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testScreenScale
 {
   XCTAssertEqual(ASScreenScale(), UIScreen.mainScreen.scale);
+}
+
+- (void)testThatIfViewClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaViewClass *node = [[ASSynchronousTestDisplayNodeViaViewClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
+}
+
+- (void)testThatIfLayerClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaLayerClass *node = [[ASSynchronousTestDisplayNodeViaLayerClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
 }
 
 @end

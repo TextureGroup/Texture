@@ -130,7 +130,8 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
   dispatch_once(&onceToken, ^{
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(1, 1), YES, 0);
     UIImage *refImage = UIGraphicsGetImageFromCurrentImageContext();
-    imageColorSpace = CGImageGetColorSpace(refImage.CGImage);
+    imageColorSpace = CGColorSpaceRetain(CGImageGetColorSpace(refImage.CGImage));
+    ASDisplayNodeCAssertNotNil(imageColorSpace, nil);
     UIGraphicsEndImageContext();
   });
   

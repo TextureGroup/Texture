@@ -96,16 +96,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
  */
 @implementation ASDisplayNode (UIViewBridge)
 
-- (BOOL)canBecomeFirstResponder
-{
-  return NO;
-}
-
-- (BOOL)canResignFirstResponder
-{
-  return YES;
-}
-
 #if TARGET_OS_TV
 // Focus Engine
 - (BOOL)canBecomeFocused
@@ -146,23 +136,34 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 }
 #endif
 
+- (BOOL)canBecomeFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __canBecomeFirstResponder];
+}
+
+- (BOOL)canResignFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __canResignFirstResponder];
+}
+
 - (BOOL)isFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return _view != nil && [_view isFirstResponder];
+  return [self __isFirstResponder];
 }
 
-// Note: this implicitly loads the view if it hasn't been loaded yet.
 - (BOOL)becomeFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return !self.layerBacked && [self canBecomeFirstResponder] && [self.view becomeFirstResponder];
+  return [self __becomeFirstResponder];
 }
 
 - (BOOL)resignFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return !self.layerBacked && [self canResignFirstResponder] && [_view resignFirstResponder];
+  return [self __resignFirstResponder];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
@@ -186,17 +187,12 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (CGFloat)cornerRadius
 {
   ASDN::MutexLocker l(__instanceLock__);
-  if (_cornerRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
-    return self.layerCornerRadius;
-  } else {
-    return _cornerRadius;
-  }
+  return _cornerRadius;
 }
 
 - (void)setCornerRadius:(CGFloat)newCornerRadius
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  [self updateCornerRoundingWithType:_cornerRoundingType cornerRadius:newCornerRadius];
+  [self updateCornerRoundingWithType:self.cornerRoundingType cornerRadius:newCornerRadius];
 }
 
 - (ASCornerRoundingType)cornerRoundingType
@@ -207,8 +203,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setCornerRoundingType:(ASCornerRoundingType)newRoundingType
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  [self updateCornerRoundingWithType:newRoundingType cornerRadius:_cornerRadius];
+  [self updateCornerRoundingWithType:newRoundingType cornerRadius:self.cornerRadius];
 }
 
 - (NSString *)contentsGravity

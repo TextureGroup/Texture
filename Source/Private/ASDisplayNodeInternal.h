@@ -77,7 +77,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 {
 @package
   _ASPendingState *_pendingViewState;
-
+  ASInterfaceState _pendingInterfaceState;
   UIView *_view;
   CALayer *_layer;
 
@@ -274,6 +274,13 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 - (BOOL)__selfOrParentHasVisibilityNotificationsDisabled;
 - (void)__incrementVisibilityNotificationsDisabled;
 - (void)__decrementVisibilityNotificationsDisabled;
+
+// Helper methods for UIResponder forwarding
+- (BOOL)__canBecomeFirstResponder;
+- (BOOL)__becomeFirstResponder;
+- (BOOL)__canResignFirstResponder;
+- (BOOL)__resignFirstResponder;
+- (BOOL)__isFirstResponder;
 
 /// Helper method to summarize whether or not the node run through the display process
 - (BOOL)_implementsDisplay;

@@ -823,7 +823,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     [self _setDownloadIdentifier:[_downloader downloadImageWithURL:imageURL
                                                      callbackQueue:dispatch_get_main_queue()
                                                   downloadProgress:downloadProgressBlock
-                                                        completion:^(id <ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier) {
+                                                        completion:^(id <ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
                                                           // We dereference iVars directly, so we can't have weakSelf going nil on us.
                                                           __typeof__(self) strongSelf = weakSelf;
                                                           if (!strongSelf)
