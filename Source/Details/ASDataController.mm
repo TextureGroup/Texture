@@ -875,8 +875,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (void)clearData
 {
   ASDisplayNodeAssertMainThread();
-  [self waitUntilAllUpdatesAreProcessed];
-  self.visibleMap = self.pendingMap = [[ASElementMap alloc] init];
+  if (_initialReloadDataHasBeenCalled) {
+    [self waitUntilAllUpdatesAreProcessed];
+    self.visibleMap = self.pendingMap = [[ASElementMap alloc] init];
+  }
 }
 
 # pragma mark - Helper methods
