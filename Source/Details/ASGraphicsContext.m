@@ -166,8 +166,7 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_R
   // Don't worry, the provider doesn't copy the data – it just retains it.
   ASCGImageBuffer *buffer = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
   ASDisplayNodeCAssertNotNil(buffer, nil);
-  NSData *data = [buffer createDataAndDestroyBuffer];
-  CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
+  CGDataProviderRef provider = [buffer createDataProviderAndInvalidate];
   
   // Create the CGImage. Options taken from CGBitmapContextCreateImage.
   CGImageRef cgImg = CGImageCreate(CGBitmapContextGetWidth(context), CGBitmapContextGetHeight(context), CGBitmapContextGetBitsPerComponent(context), CGBitmapContextGetBitsPerPixel(context), CGBitmapContextGetBytesPerRow(context), imageColorSpace, CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);

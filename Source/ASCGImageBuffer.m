@@ -39,7 +39,7 @@
   }
 }
 
-- (NSData *)createDataAndDestroyBuffer
+- (CGDataProviderRef)createDataProviderAndInvalidate
 {
   NSCAssert(!_createdNSData, @"Should not create NSData from buffer multiple times.");
   _createdNSData = YES;
@@ -49,10 +49,11 @@
   
   void *buf = _mutableBytes;
   NSUInteger length = _length;
-  return [[NSData alloc] initWithBytesNoCopy:buf length:length deallocator:^(void * _Nonnull bytes, NSUInteger length) {
+  NSData *d = [[NSData alloc] initWithBytesNoCopy:buf length:length deallocator:^(void * _Nonnull bytes, NSUInteger length) {
     __unused int result = munmap(buf, length);
     NSCAssert(result == noErr, @"Failed to unmap cg image buffer: %s", strerror(result));
   }];
+  return CGDataProviderCreateWithCFData((__bridge CFDataRef)d);
 }
 
 @end

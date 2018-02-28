@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) void *mutableBytes NS_RETURNS_INNER_POINTER;
 
-- (NSData *)createDataAndDestroyBuffer NS_RETURNS_RETAINED;
+- (CGDataProviderRef)createDataProviderAndInvalidate;
 
 @end
 
