@@ -253,6 +253,13 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
 }
 
+#if !AS_INITIALIZE_FRAMEWORK_MANUALLY
++ (void)load
+{
+  ASInitializeFrameworkMainThread();
+}
+#endif
+
 + (Class)viewClass
 {
   return [_ASDisplayView class];
@@ -658,6 +665,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   for (ASDisplayNodeDidLoadBlock block in onDidLoadBlocks) {
     block(self);
   }
+
+  [_interfaceStateDelegate nodeDidLoad];
 }
 
 - (void)didLoad
