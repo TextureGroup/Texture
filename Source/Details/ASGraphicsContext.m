@@ -11,14 +11,13 @@
 //
 
 #import "ASGraphicsContext.h"
+#import <AsyncDisplayKit/ASCGImageBuffer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
 #import <stdatomic.h>
 #import <objc/runtime.h>
-#import <sys/mman.h>
-#import <mach/vm_statistics.h>
 
 #pragma mark - Feature Gating
 
@@ -108,18 +107,13 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
   // Use mmap directly so we can tag the memory as CGImage.
-  void *buf = mmap(NULL, bufferSize, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, VM_MAKE_TAG(VM_MEMORY_CGIMAGE), 0);
-  NSCAssert(buf != MAP_FAILED, @"Failed to map memory region.");
-  NSMutableData *data = [[NSMutableData alloc] initWithBytesNoCopy:buf length:bufferSize deallocator:^(void * bytes, NSUInteger length) {
-    __unused int result = munmap(bytes, length);
-    NSCAssert(result == noErr, @"Error unmapping CGImage memory: %s", strerror(result));
-  }];
+  ASCGImageBuffer *buffer = [[ASCGImageBuffer alloc] initWithLength:bufferSize];
   
-  CGContextRef context = CGBitmapContextCreate(buf, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
+  CGContextRef context = CGBitmapContextCreate(buffer.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
   
   // Transfer ownership of the data to the context. So that if the context
   // is destroyed before we create an image from it, the data will be released.
-  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, buffer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   
   // Set the CTM to account for iOS orientation & specified scale.
   // If only we could use CGContextSetBaseCTM. It doesn't
@@ -170,8 +164,9 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_R
   
   // Retrieve our data and wrap it in a CGDataProvider.
   // Don't worry, the provider doesn't copy the data – it just retains it.
-  NSMutableData *data = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
-  ASDisplayNodeCAssertNotNil(data, nil);
+  ASCGImageBuffer *buffer = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
+  ASDisplayNodeCAssertNotNil(buffer, nil);
+  NSData *data = [buffer createDataAndDestroyBuffer];
   CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
   
   // Create the CGImage. Options taken from CGBitmapContextCreateImage.
