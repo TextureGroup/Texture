@@ -456,9 +456,12 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   return _mainSerialQueue.numberOfScheduledBlocks > 0 || _editingTransactionQueueCount > 0;
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
   ASDisplayNodeAssertMainThread();
+  if (!completion) {
+    return;
+  }
   if ([self isProcessingUpdates] == NO) {
     ASPerformBlockOnMainThread(completion);
   } else {
@@ -478,6 +481,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 - (void)onDidFinishSynchronizing:(void (^)())completion {
   ASDisplayNodeAssertMainThread();
+  if (!completion) {
+    return;
+  }
   if ([self isSynchronized]) {
     ASPerformBlockOnMainThread(completion);
   } else {
@@ -493,10 +499,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _synchronized = NO;
 
   [changeSet addCompletionHandler:^(BOOL finished) {
-    self->_synchronized = YES;
+    _synchronized = YES;
     [self onDidFinishProcessingUpdates:^{
-      if (self->_synchronized) {
-        for (ASDataControllerSynchronizationBlock block in self->_onDidFinishSynchronizingBlocks) {
+      if (_synchronized) {
+        for (ASDataControllerSynchronizationBlock block in _onDidFinishSynchronizingBlocks) {
           block();
         }
         [_onDidFinishSynchronizingBlocks removeAllObjects];

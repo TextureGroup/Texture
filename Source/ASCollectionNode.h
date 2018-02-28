@@ -308,25 +308,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
  */
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))didFinishProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))didFinishProcessingUpdates;
 
 /**
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
  */
 - (void)waitUntilAllUpdatesAreProcessed;
-
-/**
- *  Returns YES if the ASCollectionNode contents are completely synchronized with the underlying collection-view layout.
- */
-@property (nonatomic, readonly) BOOL isSynchronized;
-
-/**
- *  Schedules a block to be performed (on the main thread) as soon as the completion block is called
- *  on performBatchUpdates:.
- *
- *  When isSynchronized == YES, the block is run block immediately (before the method returns).
- */
-- (void)onDidFinishSynchronizing:(nullable void (^)(void))didFinishSynchronizing;
 
 /**
  * Inserts one or more sections.

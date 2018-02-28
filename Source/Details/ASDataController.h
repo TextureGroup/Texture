@@ -261,14 +261,14 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * See ASCollectionNode.h for full documentation of these methods.
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreProcessed;
 
 /**
  * See ASCollectionNode.h for full documentation of these methods.
  */
-@property (nonatomic, readonly) BOOL isSynchronized;
-- (void)onDidFinishSynchronizing:(nullable void (^)(void))completion;
+@property (nonatomic, readonly, getter=isSynchronized) BOOL synchronized;
+- (void)onDidFinishSynchronizing:(void (^)(void))completion;
 
 /**
  * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information

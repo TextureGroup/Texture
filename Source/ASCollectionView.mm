@@ -374,7 +374,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_dataController isProcessingUpdates];
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
   [_dataController onDidFinishProcessingUpdates:completion];
 }
@@ -396,7 +396,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_dataController isSynchronized];
 }
 
-- (void)onDidFinishSynchronizing:(nullable void (^)())completion
+- (void)onDidFinishSynchronizing:(void (^)())completion
 {
   [_dataController onDidFinishSynchronizing:completion];
 }
