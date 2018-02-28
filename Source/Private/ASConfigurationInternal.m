@@ -62,7 +62,7 @@
   if (newlyTriggered != 0) {
     id<ASConfigurationDelegate> del = _config.delegate;
     if ([del respondsToSelector:@selector(textureDidActivateExperimentalFeatures:)]) {
-      dispatch_async([self delegateQueue], ^{
+      dispatch_async(self.delegateQueue, ^{
         [del textureDidActivateExperimentalFeatures:newlyTriggered];
       });
     }

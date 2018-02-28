@@ -20,10 +20,10 @@
 
 @implementation ASConfiguration
 
-- (instancetype)initWithJSONObject:(NSDictionary *)jsonObject
+- (instancetype)initWithDictionary:(NSDictionary *)dictionary
 {
-  if (self = [self init]) {
-    autotype featureStrings = ASDynamicCast(jsonObject[@"experimental_features"], NSArray);
+  if (self = [super init]) {
+    autotype featureStrings = ASDynamicCast(dictionary[@"experimental_features"], NSArray);
     self.experimentalFeatures = ASExperimentalFeaturesFromArray(featureStrings);
   }
   return self;
@@ -31,7 +31,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  ASConfiguration *config = [[ASConfiguration alloc] init];
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
   config.experimentalFeatures = self.experimentalFeatures;
   config.delegate = self.delegate;
   return config;

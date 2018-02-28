@@ -22,10 +22,12 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASConfiguration : NSObject <NSCopying>
 
 /**
- * Create a configuration from the provided JSON object.
- * The mapping follows the schema in `configuration.json`.
+ * Initialize this configuration with the provided dictionary,
+ * or nil to create an empty configuration.
+ *
+ * The schema is located in `schemas/configuration.json`.
  */
-- (instancetype)initWithJSONObject:(NSDictionary *)jsonObject;
+- (instancetype)initWithDictionary:(nullable NSDictionary *)dictionary;
 
 /**
  * The delegate for configuration-related events.

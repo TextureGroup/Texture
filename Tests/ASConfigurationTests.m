@@ -1,9 +1,13 @@
 //
 //  ASConfigurationTests.m
-//  AsyncDisplayKitTests
+//  Texture
 //
-//  Created by Adlai on 1/14/18.
-//  Copyright © 2018 Facebook. All rights reserved.
+//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <XCTest/XCTest.h>
@@ -23,7 +27,7 @@
 - (void)testExperimentalFeatureConfig
 {
   // Set the config
-  ASConfiguration *config = [[ASConfiguration alloc] init];
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
   config.experimentalFeatures = ASExperimentalGraphicsContexts;
   config.delegate = self;
   [ASConfigurationManager test_resetWithConfiguration:config];
