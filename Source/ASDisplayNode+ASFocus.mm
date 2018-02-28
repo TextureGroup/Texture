@@ -21,8 +21,7 @@
   if (_canBecomeFocusedBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _canBecomeFocusedBlock(self);
-  }
-  else {
+  } else {
     return [self canBecomeFocused];
   }
 }
@@ -32,8 +31,7 @@
   if (_shouldUpdateFocusBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _shouldUpdateFocusBlock(self, context);
-  }
-  else {
+  } else {
     return [self shouldUpdateFocusInContext:context];
   }
 }
@@ -43,8 +41,7 @@
   if (_didUpdateFocusBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _didUpdateFocusBlock(self, context, coordinator);
-  }
-  else {
+  } else {
     return [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
   }
 }
@@ -54,8 +51,7 @@
   if (_preferredFocusEnvironmentsBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _preferredFocusEnvironmentsBlock(self);
-  }
-  else {
+  } else {
     return [self preferredFocusEnvironments];
   }
 }
@@ -65,8 +61,7 @@
   if (_preferredFocusedViewBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _preferredFocusedViewBlock(self);
-  }
-  else {
+  } else {
     return [self preferredFocusedView];
   }
 }
