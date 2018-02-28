@@ -17,6 +17,8 @@
 #import <UIKit/UIImage.h>
 #import <stdatomic.h>
 #import <objc/runtime.h>
+#import <sys/mman.h>
+#import <mach/vm_statistics.h>
 
 #pragma mark - Feature Gating
 
@@ -105,8 +107,15 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
 
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
-  NSMutableData *data = [[NSMutableData alloc] initWithLength:bufferSize];
-  CGContextRef context = CGBitmapContextCreate(data.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
+  // Use mmap directly so we can tag the memory as CGImage.
+  void *buf = mmap(NULL, bufferSize, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, VM_MAKE_TAG(VM_MEMORY_CGIMAGE), 0);
+  NSCAssert(buf != MAP_FAILED, @"Failed to map memory region.");
+  NSMutableData *data = [[NSMutableData alloc] initWithBytesNoCopy:buf length:bufferSize deallocator:^(void * bytes, NSUInteger length) {
+    __unused int result = munmap(bytes, length);
+    NSCAssert(result == noErr, @"Error unmapping CGImage memory: %s", strerror(result));
+  }];
+  
+  CGContextRef context = CGBitmapContextCreate(buf, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
   
   // Transfer ownership of the data to the context. So that if the context
   // is destroyed before we create an image from it, the data will be released.
@@ -128,7 +137,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   CGContextRelease(context);
 }
 
-extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
+extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
 {
   if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
