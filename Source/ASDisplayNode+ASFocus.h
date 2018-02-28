@@ -1,5 +1,5 @@
 //
-//  ASDisplayNode+UIViewBridge.h
+//  ASDisplayNode+ASFocus.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -14,14 +14,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ASDisplayNode (InternalMethodBridge)
+/**
+ * These methods will call the block implementation if it exists
+ * If a block implementation does not exist, the call will be forwarded to the node implementation
+ */
+@interface ASDisplayNode (ASFocusInternal)
 
-- (void)_setNeedsFocusUpdate;
-- (void)_updateFocusIfNeeded;
 - (BOOL)_canBecomeFocused;
 - (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator;
 - (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context;
-- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments;
+- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0));
 - (nullable UIView *)_preferredFocusedView;
 
 @end

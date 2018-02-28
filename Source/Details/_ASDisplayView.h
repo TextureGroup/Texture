@@ -39,6 +39,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)__forwardTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
 - (void)__forwardTouchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
 
+// These methods expose a way for ASDisplayNode touch events to let the view call super presses events
+- (void)__forwardPressesBegan:(NSSet *)presses withEvent:(UIPressesEvent *)event;
+- (void)__forwardPressesChanged:(NSSet *)presses withEvent:(UIPressesEvent *)event;
+- (void)__forwardPressesEnded:(NSSet *)presses withEvent:(UIPressesEvent *)event;
+- (void)__forwardPressesCancelled:(NSSet *)presses withEvent:(UIPressesEvent *)event;
+
 // These methods expose a way for ASDisplayNode responder methods to let the view call super responder methods
 // They are called from ASDisplayNode to pass through UIResponder methods to the view
 - (BOOL)__canBecomeFirstResponder;
@@ -46,6 +52,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)__canResignFirstResponder;
 - (BOOL)__resignFirstResponder;
 - (BOOL)__isFirstResponder;
+
+// These methods expose a way for ASDisplayNode focus engine methods to allow the view to call super
+// They are called from ASDisplayNode to pass through focus engine methods to the view
+- (BOOL)__canBecomeFocused;
+- (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context;
+- (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator;
+- (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironments;
+- (UIView *)__preferredFocusedView;
 
 @end
 

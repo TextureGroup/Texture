@@ -159,6 +159,18 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(pressesBegan:withEvent:))) {
+    overrides |= ASDisplayNodeMethodOverridePressesBegan;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(pressesChanged:withEvent:))) {
+    overrides |= ASDisplayNodeMethodOverridePressesChanged;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(pressesCancelled:withEvent:))) {
+    overrides |= ASDisplayNodeMethodOverridePressesCancelled;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(pressesEnded:withEvent:))) {
+    overrides |= ASDisplayNodeMethodOverridePressesEnded;
+  }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
   }
@@ -934,6 +946,60 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
   
   HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
+}
+
+#pragma mark - Focus Engine
+- (void)__setNeedsFocusUpdate
+{
+  [_view setNeedsFocusUpdate];
+}
+
+- (void)__updateFocusIfNeeded
+{
+  [_view updateFocusIfNeeded];
+}
+
+- (BOOL)__canBecomeFocused
+{
+  if (_view == nil) {
+    return NO;
+  }
+  
+  return [(_ASDisplayView *)_view __canBecomeFocused];
+}
+
+- (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  if (_view == nil) {
+    return NO;
+  }
+  
+  return [(_ASDisplayView *)_view __shouldUpdateFocusInContext:context];
+}
+
+- (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  if (_view == nil) {
+    return;
+  }
+  
+  [(_ASDisplayView *)_view __didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironments
+{
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+  
+  return [(_ASDisplayView *)_view __preferredFocusEnvironments];
+}
+
+- (UIView *)__preferredFocusedView
+{  
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+  
+  return [(_ASDisplayView *)_view __preferredFocusedView];
 }
 
 #pragma mark <ASDebugNameProvider>
@@ -3287,6 +3353,26 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  // Subclass hook
+}
+
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  // Subclass hook
+}
+
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  // Subclass hook
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)touches withEvent:(UIPressesEvent *)event
+{
+  // Subclass  hook
+}
+
+- (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
 {
   // Subclass hook
 }

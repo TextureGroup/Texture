@@ -20,7 +20,6 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+UIViewBridge.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASPendingStateController.h>
@@ -98,51 +97,46 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 @implementation ASDisplayNode (UIViewBridge)
 
 // Focus Engine
-- (BOOL)canBecomeFocused
-{
-  return NO;
-}
-
 - (void)setNeedsFocusUpdate
 {
   ASDisplayNodeAssertMainThread();
-  [_view setNeedsFocusUpdate];
+  [self __setNeedsFocusUpdate];
 }
 
 - (void)updateFocusIfNeeded
 {
   ASDisplayNodeAssertMainThread();
-  [_view updateFocusIfNeeded];
+  [self __updateFocusIfNeeded];
+}
+
+- (BOOL)canBecomeFocused
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __canBecomeFocused];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
-  return NO;
+  ASDisplayNodeAssertMainThread();
+  return [self __shouldUpdateFocusInContext:context];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
-  
-}
-
-- (UIView *)preferredFocusedView
-{
-  if (self.nodeLoaded) {
-    return _view;
-  }
-  else {
-    return nil;
-  }
+  ASDisplayNodeAssertMainThread();
+  [self __didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments
 {
-  if (self.nodeLoaded) {
-    return @[ _view ];
-  }
-  else {
-    return @[];
-  }
+  ASDisplayNodeAssertMainThread();
+  return [self __preferredFocusEnvironments];
+}
+
+- (UIView *)preferredFocusedView
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __preferredFocusedView];
 }
 
 - (BOOL)canBecomeFirstResponder
@@ -884,75 +878,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_write;
   _setToLayer(cornerRadius, newLayerCornerRadius);
-}
-
-@end
-
-@implementation ASDisplayNode (InternalMethodBridge)
-
-- (void)_setNeedsFocusUpdate
-{
-  [self setNeedsFocusUpdate];
-}
-
-- (void)_updateFocusIfNeeded
-{
-  [self updateFocusIfNeeded];
-}
-
-- (BOOL)_canBecomeFocused
-{
-  if (_canBecomeFocusedBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _canBecomeFocusedBlock(self);
-  }
-  else {
-    return [self canBecomeFocused];
-  }
-}
-
-- (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
-{
-  if (_shouldUpdateFocusBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _shouldUpdateFocusBlock(self, context);
-  }
-  else {
-    return [self shouldUpdateFocusInContext:context];
-  }
-}
-
-- (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
-{
-  if (_didUpdateFocusBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _didUpdateFocusBlock(self, context, coordinator);
-  }
-  else {
-    return [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
-  }
-}
-
-- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments
-{
-  if (_preferredFocusEnvironmentsBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _preferredFocusEnvironmentsBlock(self);
-  }
-  else {
-    return [self preferredFocusEnvironments];
-  }
-}
-
-- (UIView *)_preferredFocusedView
-{
-  if (_preferredFocusedViewBlock != NULL) {
-    ASDN::MutexLocker l(__instanceLock__);
-    return _preferredFocusedViewBlock(self);
-  }
-  else {
-    return [self preferredFocusedView];
-  }
 }
 
 @end

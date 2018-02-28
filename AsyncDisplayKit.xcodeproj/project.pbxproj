@@ -474,8 +474,8 @@
 		E5E2D7301EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5E2D72F1EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm */; };
 		F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */; };
 		FA4FAF15200A850200E735BD /* ASControlNode+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FA4FAF14200A850200E735BD /* ASControlNode+Private.h */; };
+		FA8F067520463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h in Headers */ = {isa = PBXBuildFile; fileRef = FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */; };
 		FA980E662040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */; };
-		FAE4AE312040E7230093AAE8 /* ASDisplayNode+UIViewBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = FAE4AE2F2040E7230093AAE8 /* ASDisplayNode+UIViewBridge.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -982,8 +982,8 @@
 		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDisplayNodeExtrasTests.m; sourceTree = "<group>"; };
 		FA4FAF14200A850200E735BD /* ASControlNode+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASControlNode+Private.h"; sourceTree = "<group>"; };
+		FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+ASFocus.h"; sourceTree = "<group>"; };
 		FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+ASFocus.mm"; sourceTree = "<group>"; };
-		FAE4AE2F2040E7230093AAE8 /* ASDisplayNode+UIViewBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+UIViewBridge.h"; sourceTree = "<group>"; };
 		FB07EABBCF28656C6297BC2D /* Pods-AsyncDisplayKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1118,6 +1118,7 @@
 				CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */,
 				CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */,
 				69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */,
+				FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */,
 				FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */,
 				058D09DB195D050800B7D73C /* ASDisplayNodeExtras.h */,
 				058D09DC195D050800B7D73C /* ASDisplayNodeExtras.mm */,
@@ -1441,7 +1442,6 @@
 				058D0A0A195D050800B7D73C /* ASDisplayNode+DebugTiming.mm */,
 				DE6EA3211C14000600183B10 /* ASDisplayNode+FrameworkPrivate.h */,
 				DE7EF4F71DFF77720082B84A /* ASDisplayNode+FrameworkSubclasses.h */,
-				FAE4AE2F2040E7230093AAE8 /* ASDisplayNode+UIViewBridge.h */,
 				058D0A0B195D050800B7D73C /* ASDisplayNode+UIViewBridge.mm */,
 				058D0A0C195D050800B7D73C /* ASDisplayNodeInternal.h */,
 				6959433D1D70815300B0EE1F /* ASDisplayNodeLayout.h */,
@@ -1773,6 +1773,7 @@
 				E5E2D72E1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
+				FA8F067520463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
 				CCCCCCE31EC3EF060087FE10 /* NSParagraphStyle+ASText.h in Headers */,
 				E58E9E441E941D74004CFC59 /* ASCollectionLayoutContext.h in Headers */,
@@ -1785,7 +1786,6 @@
 				69E0E8A71D356C9400627613 /* ASEqualityHelpers.h in Headers */,
 				698C8B621CAB49FC0052DC3F /* ASLayoutElementExtensibility.h in Headers */,
 				69F10C871C84C35D0026140C /* ASRangeControllerUpdateRangeProtocol+Beta.h in Headers */,
-				FAE4AE312040E7230093AAE8 /* ASDisplayNode+UIViewBridge.h in Headers */,
 				B350623C1B010EFD0018CF92 /* _ASAsyncTransaction.h in Headers */,
 				68355B411CB57A6C001D4E68 /* ASImageContainerProtocolCategories.h in Headers */,
 				7630FFA81C9E267E007A7C0E /* ASVideoNode.h in Headers */,

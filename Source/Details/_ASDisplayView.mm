@@ -21,9 +21,9 @@
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNode+ASFocus.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+UIViewBridge.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
@@ -391,6 +391,66 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   [super touchesCancelled:touches withEvent:event];
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (node.methodOverrides & ASDisplayNodeMethodOverridePressesBegan) {
+    [node pressesBegan:presses withEvent:event];
+  } else {
+    [super pressesBegan:presses withEvent:event];
+  }
+}
+
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (node.methodOverrides & ASDisplayNodeMethodOverridePressesChanged) {
+    [node pressesChanged:presses withEvent:event];
+  } else {
+    [super pressesChanged:presses withEvent:event];
+  }
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (node.methodOverrides & ASDisplayNodeMethodOverridePressesEnded) {
+    [node pressesEnded:presses withEvent:event];
+  } else {
+    [super pressesEnded:presses withEvent:event];
+  }
+}
+
+- (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (node.methodOverrides & ASDisplayNodeMethodOverridePressesCancelled) {
+    [node pressesCancelled:presses withEvent:event];
+  } else {
+    [super pressesCancelled:presses withEvent:event];
+  }
+}
+
+- (void)__forwardPressesBegan:(NSSet *)presses withEvent:(UIPressesEvent *)event
+{
+  [super pressesBegan:presses withEvent:event];
+}
+
+- (void)__forwardPressesChanged:(NSSet *)presses withEvent:(UIPressesEvent *)event
+{
+  [super pressesChanged:presses withEvent:event];
+}
+
+- (void)__forwardPressesEnded:(NSSet *)presses withEvent:(UIPressesEvent *)event
+{
+  [super pressesEnded:presses withEvent:event];
+}
+
+- (void)__forwardPressesCancelled:(NSSet *)presses withEvent:(UIPressesEvent *)event
+{
+  [super pressesCancelled:presses withEvent:event];
+}
+
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
   // REVIEW: We should optimize these types of messages by setting a boolean in the associated ASDisplayNode subclass if
@@ -491,34 +551,34 @@ IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirst
   return node;
 }
 
+- (void)setNeedsFocusUpdate
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  return [node setNeedsFocusUpdate];
+}
+
+- (void)updateFocusIfNeeded
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  return [node updateFocusIfNeeded];
+}
+
 - (BOOL)canBecomeFocused
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   return [node _canBecomeFocused];
 }
 
-- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
-{
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
-}
-
-- (void)setNeedsFocusUpdate
-{
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _setNeedsFocusUpdate];
-}
-
-- (void)updateFocusIfNeeded
-{
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _updateFocusIfNeeded];
-}
-
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   return [node _shouldUpdateFocusInContext:context];
+}
+
+- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
@@ -531,6 +591,31 @@ IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirst
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   return [node _preferredFocusedView];
+}
+
+- (BOOL)__canBecomeFocused
+{
+  return [super canBecomeFocused];
+}
+
+- (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  return [super shouldUpdateFocusInContext:context];
+}
+
+- (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  [super didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironments
+{
+  return [super preferredFocusEnvironments];
+}
+
+- (UIView *)__preferredFocusedView
+{
+  return [super preferredFocusedView];
 }
 
 @end
