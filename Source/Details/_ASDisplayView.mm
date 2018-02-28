@@ -593,6 +593,16 @@ IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirst
   return [node _preferredFocusedView];
 }
 
+- (void)__setNeedsFocusUpdate
+{
+  [super setNeedsFocusUpdate];
+}
+
+- (void)__updateFocusIfNeeded
+{
+  [super updateFocusIfNeeded];
+}
+
 - (BOOL)__canBecomeFocused
 {
   return [super canBecomeFocused];

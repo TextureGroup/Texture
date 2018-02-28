@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // These methods expose a way for ASDisplayNode focus engine methods to allow the view to call super
 // They are called from ASDisplayNode to pass through focus engine methods to the view
+- (void)__setNeedsFocusUpdate;
+- (void)__updateFocusIfNeeded;
 - (BOOL)__canBecomeFocused;
 - (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context;
 - (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator;

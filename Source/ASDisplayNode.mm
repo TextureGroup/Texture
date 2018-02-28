@@ -960,12 +960,20 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 #pragma mark - Focus Engine
 - (void)__setNeedsFocusUpdate
 {
-  [_view setNeedsFocusUpdate];
+  if (_view == nil) {
+    return;
+  }
+  
+  [(_ASDisplayView *)_view __setNeedsFocusUpdate];
 }
 
 - (void)__updateFocusIfNeeded
 {
-  [_view updateFocusIfNeeded];
+  if (_view == nil) {
+    return;
+  }
+  
+  [(_ASDisplayView *)_view __updateFocusIfNeeded];
 }
 
 - (BOOL)__canBecomeFocused
