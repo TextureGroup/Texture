@@ -1,5 +1,5 @@
 //
-//  ASDisplayNode+ASFocus.h
+//  ASDisplayNode+ASFocusInternal.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.

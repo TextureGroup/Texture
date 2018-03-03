@@ -17,7 +17,7 @@
 
 #import "_ASCollectionViewCell.h"
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASDisplayNode+ASFocus.h>
+#import <AsyncDisplayKit/ASDisplayNode+ASFocusInternal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 

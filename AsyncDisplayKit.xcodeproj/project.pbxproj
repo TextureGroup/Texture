@@ -474,8 +474,9 @@
 		E5E2D7301EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5E2D72F1EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm */; };
 		F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */; };
 		FA4FAF15200A850200E735BD /* ASControlNode+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FA4FAF14200A850200E735BD /* ASControlNode+Private.h */; };
-		FA8F067520463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h in Headers */ = {isa = PBXBuildFile; fileRef = FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */; };
 		FA980E662040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm in Sources */ = {isa = PBXBuildFile; fileRef = FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */; };
+		FAAD66CF204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = FAAD66CD204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.h */; };
+		FAAD66D0204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.mm in Sources */ = {isa = PBXBuildFile; fileRef = FAAD66CE204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -982,8 +983,9 @@
 		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F711994D1D20C21100568860 /* ASDisplayNodeExtrasTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDisplayNodeExtrasTests.m; sourceTree = "<group>"; };
 		FA4FAF14200A850200E735BD /* ASControlNode+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASControlNode+Private.h"; sourceTree = "<group>"; };
-		FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+ASFocus.h"; sourceTree = "<group>"; };
 		FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+ASFocus.mm"; sourceTree = "<group>"; };
+		FAAD66CD204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+ASFocusInternal.h"; sourceTree = "<group>"; };
+		FAAD66CE204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+ASFocusInternal.mm"; sourceTree = "<group>"; };
 		FB07EABBCF28656C6297BC2D /* Pods-AsyncDisplayKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1118,7 +1120,6 @@
 				CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */,
 				CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */,
 				69BCE3D71EC6513B007DCCAD /* ASDisplayNode+Layout.mm */,
-				FA8F067320463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h */,
 				FA980E642040BBCE0038D8DC /* ASDisplayNode+ASFocus.mm */,
 				058D09DB195D050800B7D73C /* ASDisplayNodeExtras.h */,
 				058D09DC195D050800B7D73C /* ASDisplayNodeExtras.mm */,
@@ -1437,6 +1438,8 @@
 				AEB7B0191C5962EA00662EF4 /* ASDefaultPlayButton.m */,
 				CC54A81B1D70077A00296A24 /* ASDispatch.h */,
 				E5B2252D1F17E521001E1431 /* ASDispatch.m */,
+				FAAD66CD204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.h */,
+				FAAD66CE204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.mm */,
 				058D0A08195D050800B7D73C /* ASDisplayNode+AsyncDisplay.mm */,
 				058D0A09195D050800B7D73C /* ASDisplayNode+DebugTiming.h */,
 				058D0A0A195D050800B7D73C /* ASDisplayNode+DebugTiming.mm */,
@@ -1773,7 +1776,6 @@
 				E5E2D72E1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
-				FA8F067520463DDA00A4D7D4 /* ASDisplayNode+ASFocus.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
 				CCCCCCE31EC3EF060087FE10 /* NSParagraphStyle+ASText.h in Headers */,
 				E58E9E441E941D74004CFC59 /* ASCollectionLayoutContext.h in Headers */,
@@ -1942,6 +1944,7 @@
 				B35062061B010EFD0018CF92 /* ASNetworkImageNode.h in Headers */,
 				CCA282C81E9EB64B0037E8B7 /* ASDisplayNodeTipState.h in Headers */,
 				34EFC76C1B701CED00AD841F /* ASOverlayLayoutSpec.h in Headers */,
+				FAAD66CF204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.h in Headers */,
 				B35062261B010EFD0018CF92 /* ASRangeController.h in Headers */,
 				34EFC76E1B701CF400AD841F /* ASRatioLayoutSpec.h in Headers */,
 				DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */,
@@ -2366,6 +2369,7 @@
 				6907C25A1DC4ECFE00374C66 /* ASObjectDescriptionHelpers.m in Sources */,
 				B35062051B010EFD0018CF92 /* ASMultiplexImageNode.mm in Sources */,
 				B35062251B010EFD0018CF92 /* ASMutableAttributedStringBuilder.m in Sources */,
+				FAAD66D0204B38A5006D78CA /* ASDisplayNode+ASFocusInternal.mm in Sources */,
 				9019FBBE1ED8061D00C45F72 /* ASYogaLayoutSpec.mm in Sources */,
 				B35062071B010EFD0018CF92 /* ASNetworkImageNode.mm in Sources */,
 				34EFC76D1B701CF100AD841F /* ASOverlayLayoutSpec.mm in Sources */,
