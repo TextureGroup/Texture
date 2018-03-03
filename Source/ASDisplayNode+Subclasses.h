@@ -15,8 +15,6 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <pthread.h>
-
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
