@@ -116,10 +116,23 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   key.attributes = attributes;
   key.constrainedSize = constrainedSize;
 
-  ASTextKitRenderer *renderer = [cache objectForKey:key];
+  static dispatch_queue_t rendererQueue;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    rendererQueue = dispatch_queue_create("org.AsyncDisplayKit.ASTextNode.renderer", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_set_target_queue(rendererQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+  });
+
+  __block ASTextKitRenderer *renderer;
+  dispatch_sync(rendererQueue, ^{
+    renderer = [cache objectForKey:key];
+  });
+
   if (renderer == nil) {
     renderer = [[ASTextKitRenderer alloc] initWithTextKitAttributes:attributes constrainedSize:constrainedSize];
-    [cache setObject:renderer forKey:key];
+    dispatch_barrier_async(rendererQueue, ^{
+      [cache setObject:renderer forKey:key];
+    });
   }
   
   return renderer;
