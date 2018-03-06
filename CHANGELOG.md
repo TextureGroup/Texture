@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASTextNode] Fix an race condition on ASTextKitAttributes [Heberti Almeida](http://github.com/hebertialmeida) [#819]
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
 - [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
