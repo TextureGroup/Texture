@@ -768,7 +768,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
       if (highlightTargetLayer != nil) {
         ASDN::MutexLocker l(__instanceLock__);
-        ASTextKitRenderer *renderer = [self _renderer];
+        ASTextKitRenderer *renderer = [self _locked_renderer];
 
         NSArray *highlightRects = [renderer rectsForTextRange:highlightRange measureOption:ASTextKitRendererMeasureOptionBlock];
         NSMutableArray *converted = [NSMutableArray arrayWithCapacity:highlightRects.count];
