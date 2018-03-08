@@ -222,7 +222,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     // on the special placeholder behavior of ASTextNode.
     _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
     _placeholderInsets = UIEdgeInsetsMake(1.0, 0.0, 1.0, 0.0);
-    _truncationAttributedText = DefaultTruncationAttributedString();
   }
 
   return self;
@@ -1194,16 +1193,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)truncationAttributedText
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return _truncationAttributedText;
+  return _truncationAttributedText ?: DefaultTruncationAttributedString();
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
-  // Handle null reset.
-  if (!truncationAttributedText) {
-    truncationAttributedText = DefaultTruncationAttributedString();
-  }
-  
   {
     ASDN::MutexLocker l(__instanceLock__);
     
