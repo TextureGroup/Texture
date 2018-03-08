@@ -192,9 +192,10 @@
     
     _URL = URL;
     
-    BOOL hasURL = (_URL == nil);
-    if (reset || hasURL) {
-      [self _setCurrentImageQuality:(hasURL ? 0.0 : 1.0)];
+    // If URL is nil and URL was not equal to _URL (checked at the top), then we previously had a URL but it's been nil'd out.
+    BOOL hadURL = (URL == nil);
+    if (reset || hadURL) {
+      [self _setCurrentImageQuality:(hadURL ? 0.0 : 1.0)];
       [self _locked__setImage:_defaultImage];
     }
   }
