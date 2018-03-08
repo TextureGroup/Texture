@@ -32,6 +32,7 @@
 - Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
 - Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789] (https://github.com/TextureGroup/Texture/pull/789/)
 - Optimized thread-local storage by replacing pthread_specific with C11 thread-local variables. [Adlai Holler](https://github.com/Adlai-Holler) [#811] (https://github.com/TextureGroup/Texture/pull/811/)
+- **Breaking** `ASTextNode.truncationAttributedText` is now `null_resettable`, not `nullable`. This changes the Swift API and if you ever read it, expect the `"…"` instead of `nil`. Also fixes the missing lock on the getter for that property. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
