@@ -1193,7 +1193,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)truncationAttributedText
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return _truncationAttributedText ?: DefaultTruncationAttributedString();
+  return _truncationAttributedText;
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText

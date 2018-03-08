@@ -61,7 +61,7 @@ typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
  @abstract The attributedText to use when the text must be truncated.
  @discussion Defaults to a localized ellipsis character.
  */
-@property (null_resettable, nonatomic, copy) NSAttributedString *truncationAttributedText;
+@property (nullable, nonatomic, copy) NSAttributedString *truncationAttributedText;
 
 /**
  @summary The second attributed string appended for truncation.
