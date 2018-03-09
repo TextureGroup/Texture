@@ -141,6 +141,11 @@
     [self _locked_cancelDownloadAndClearImageWithResumePossibility:NO];
   }
   
+  // If our image is being set externally, the image quality is 100%
+  if (imageWasSetExternally) {
+    [self _setCurrentImageQuality:1.0];
+  }
+  
   [self _locked__setImage:image];
 }
 
@@ -227,7 +232,6 @@
   if (!_imageLoaded) {
     [self _setCurrentImageQuality:((_URL == nil) ? 0.0 : 1.0)];
     [self _locked__setImage:defaultImage];
-    
   }
 }
 
