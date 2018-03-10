@@ -212,19 +212,6 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 
 static CGColorRef blackColorRef = NULL;
 static UIColor *defaultTintColor = nil;
-static BOOL defaultAllowsGroupOpacity = YES;
-static BOOL defaultAllowsEdgeAntialiasing = NO;
-
-+ (void)load
-{
-  // Create temporary view to read default values that are based on linked SDK and Info.plist values
-  // Ensure this values cached on the main thread before needed
-  ASDisplayNodeCAssertMainThread();
-  UIView *view = [[UIView alloc] init];
-  defaultAllowsGroupOpacity = view.layer.allowsGroupOpacity;
-  defaultAllowsEdgeAntialiasing = view.layer.allowsEdgeAntialiasing;
-}
-
 
 - (instancetype)init
 {
@@ -251,8 +238,8 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
   tintColor = defaultTintColor;
   isHidden = NO;
   needsDisplayOnBoundsChange = NO;
-  allowsGroupOpacity = defaultAllowsGroupOpacity;
-  allowsEdgeAntialiasing = defaultAllowsEdgeAntialiasing;
+  allowsGroupOpacity = ASDefaultAllowsGroupOpacity();
+  allowsEdgeAntialiasing = ASDefaultAllowsEdgeAntialiasing();
   autoresizesSubviews = YES;
   alpha = 1.0f;
   cornerRadius = 0.0f;
