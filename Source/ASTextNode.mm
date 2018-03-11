@@ -177,6 +177,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   NSArray *_exclusionPaths;
 
   NSAttributedString *_attributedText;
+  NSAttributedString *_truncationAttributedText;
   NSAttributedString *_composedTruncationText;
 
   NSString *_highlightedLinkAttributeName;
@@ -768,7 +769,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
       if (highlightTargetLayer != nil) {
         ASDN::MutexLocker l(__instanceLock__);
-        ASTextKitRenderer *renderer = [self _renderer];
+        ASTextKitRenderer *renderer = [self _locked_renderer];
 
         NSArray *highlightRects = [renderer rectsForTextRange:highlightRange measureOption:ASTextKitRendererMeasureOptionBlock];
         NSMutableArray *converted = [NSMutableArray arrayWithCapacity:highlightRects.count];
@@ -1187,6 +1188,12 @@ static NSAttributedString *DefaultTruncationAttributedString()
     defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
   });
   return defaultTruncationAttributedString;
+}
+
+- (NSAttributedString *)truncationAttributedText
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _truncationAttributedText;
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText

@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
 - [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
 - [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
@@ -31,6 +32,7 @@
 - Fix ASTextNode2 is accessing backgroundColor off main while sizing / layout is happening. [Michael Schneider](https://github.com/maicki) [#794](https://github.com/TextureGroup/Texture/pull/778/)
 - Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
 - Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789] (https://github.com/TextureGroup/Texture/pull/789/)
+- Optimized thread-local storage by replacing pthread_specific with C11 thread-local variables. [Adlai Holler](https://github.com/Adlai-Holler) [#811] (https://github.com/TextureGroup/Texture/pull/811/)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
