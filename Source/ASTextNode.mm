@@ -451,10 +451,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Since truncation text matches style of attributedText, invalidate it now.
   [self _invalidateTruncationText];
   
-  NSUInteger length = attributedText.length;
+  NSUInteger length = _attributedText.length;
   if (length > 0) {
-    self.style.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    self.style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    self.style.ascender = [[self class] ascenderWithAttributedString:_attributedText];
+    self.style.descender = [[_attributedText attribute:NSFontAttributeName atIndex:length - 1 effectiveRange:NULL] descender];
   }
 
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -465,7 +465,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   
   // Accessiblity
-  self.accessibilityLabel = attributedText.string;
+  self.accessibilityLabel = _attributedText.string;
   self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
 }
 
