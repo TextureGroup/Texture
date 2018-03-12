@@ -271,6 +271,49 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 }
 
 /**
+ * Update supplementary nodes of all kinds for sections.
+ *
+ * @param map The element map into which to apply the change.
+ * @param traitCollection The trait collection needed to initialize elements
+ * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
+ */
+- (void)_updateSupplementaryNodesIntoMap:(ASMutableElementMap *)map
+                         traitCollection:(ASPrimitiveTraitCollection)traitCollection
+                   shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                             previousMap:(ASElementMap *)previousMap
+{
+  ASDisplayNodeAssertMainThread();
+  if (!_dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
+    return;
+  }
+
+  NSUInteger sectionCount = [self itemCountsFromDataSource].size();
+  if (sectionCount > 0) {
+    NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
+    for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
+      NSArray<NSIndexPath *> *indexPaths = [self _allIndexPathsForItemsOfKind:kind inSections:sectionIndexes];
+      NSMutableArray<NSIndexPath *> *indexPathsToDeleteForKind = [[NSMutableArray alloc] init];
+      NSMutableArray<NSIndexPath *> *indexPathsToInsertForKind = [[NSMutableArray alloc] init];
+      // If supplementary node does exist and size is now zero, remove it.
+      // If supplementary node doesn't exist and size is now non-zero, insert one.
+      for (NSIndexPath *indexPath in indexPaths) {
+        ASCollectionElement *previousElement = [previousMap supplementaryElementOfKind:kind atIndexPath:indexPath];
+        ASSizeRange newSizeRange = [_dataSource dataController:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
+        BOOL sizeRangeIsZero = ASSizeRangeEqualToSizeRange(ASSizeRangeZero, newSizeRange);
+        if (previousElement != nil && sizeRangeIsZero) {
+          [indexPathsToDeleteForKind addObject:indexPath];
+        } else if (previousElement == nil && !sizeRangeIsZero) {
+          [indexPathsToInsertForKind addObject:indexPath];
+        }
+      }
+
+      [map removeSupplementaryElementsAtIndexPaths:indexPathsToDeleteForKind kind:kind];
+      [self _insertElementsIntoMap:map kind:kind atIndexPaths:indexPathsToInsertForKind traitCollection:traitCollection shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:nil previousMap:previousMap];
+    }
+  }
+}
+
+/**
  * Inserts new elements of a certain kind for some sections
  *
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
@@ -779,13 +822,21 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 - (void)_relayoutAllNodes
 {
   ASDisplayNodeAssertMainThread();
-  for (ASCollectionElement *element in _visibleMap) {
-    // Ignore this element if it is no longer in the latest data. It is still recognized in the UIKit world but will be deleted soon.
-    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
-    if (indexPathInPendingMap == nil) {
-      continue;
-    }
+  // Aggressively repopulate all supplemtary elements
+  // Assuming this method is run on the main serial queue, _pending and _visible maps are synced and can be manipulated directly.
+  // TODO: If there is a layout delegate, it should be able to handle relayouts. Verify that and bail early.
+  ASDisplayNodeAssert(_visibleMap == _pendingMap, @"Expected visible and pending maps to be synchronized: %@", self);
 
+  ASMutableElementMap *newMap = [_pendingMap mutableCopy];
+  [self _updateSupplementaryNodesIntoMap:newMap
+                         traitCollection:[self.node primitiveTraitCollection]
+                   shouldFetchSizeRanges:YES
+                             previousMap:_pendingMap];
+  _pendingMap = [newMap copy];
+  _visibleMap = _pendingMap;
+
+  for (ASCollectionElement *element in _visibleMap) {
+    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
     ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
 

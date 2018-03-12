@@ -68,6 +68,17 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   [_sections removeObjectsAtIndexes:indexes];
 }
 
+- (void)removeSupplementaryElementsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths kind:(NSString *)kind
+{
+  NSMutableDictionary *supplementariesForKind = _supplementaryElements[kind];
+  if (supplementariesForKind == nil) {
+    return;
+  }
+  for (NSIndexPath *indexPath in indexPaths) {
+    supplementariesForKind[indexPath] = nil;
+  }
+}
+
 - (void)removeAllElements
 {
   [_sectionsOfItems removeAllObjects];
