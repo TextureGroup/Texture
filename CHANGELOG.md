@@ -33,6 +33,7 @@
 - Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
 - Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789] (https://github.com/TextureGroup/Texture/pull/789/)
 - Optimized thread-local storage by replacing pthread_specific with C11 thread-local variables. [Adlai Holler](https://github.com/Adlai-Holler) [#811] (https://github.com/TextureGroup/Texture/pull/811/)
+- Fixed a thread-sanitizer warning in ASTextNode. [Adlai Holler](https://github.com/Adlai-Holler) [#830] (https://github.com/TextureGroup/Texture/pull/830/)
 - Fix ASTextNode2 handling background color incorrectly. [Adlai Holler](https://github.com/Adlai-Holler) [#831] (https://github.com/TextureGroup/Texture/pull/831/)
 
 ## 2.6

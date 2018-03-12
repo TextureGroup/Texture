@@ -63,10 +63,13 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
 @property (assign, nonatomic) CGSize constrainedSize;
 @end
 
-@implementation ASTextNodeRendererKey
+@implementation ASTextNodeRendererKey {
+  std::mutex _m;
+}
 
 - (NSUInteger)hash
 {
+  std::lock_guard<std::mutex> _l(_m);
 #pragma clang diagnostic push
 #pragma clang diagnostic warning "-Wpadded"
   struct {
@@ -86,7 +89,14 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
     return YES;
   }
   
-  return _attributes == object.attributes && CGSizeEqualToSize(_constrainedSize, object.constrainedSize);
+  // NOTE: Skip the class check for this specialized, internal Key object.
+
+  // Lock both objects, avoiding deadlock.
+  std::lock(_m, object->_m);
+  std::lock_guard<std::mutex> lk1(_m, std::adopt_lock);
+  std::lock_guard<std::mutex> lk2(object->_m, std::adopt_lock);
+  
+  return _attributes == object->_attributes && CGSizeEqualToSize(_constrainedSize, object->_constrainedSize);
 }
 
 @end
