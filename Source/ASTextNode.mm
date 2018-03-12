@@ -88,6 +88,8 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   if (self == object) {
     return YES;
   }
+  
+  // NOTE: Skip the class check for this specialized, internal Key object.
 
   // Lock both objects, avoiding deadlock.
   std::lock(_m, object->_m);
