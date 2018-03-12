@@ -162,8 +162,7 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_R
     UIGraphicsEndImageContext();
   });
   
-  // Retrieve our data and wrap it in a CGDataProvider.
-  // Don't worry, the provider doesn't copy the data – it just retains it.
+  // Retrieve our buffer and create a CGDataProvider from it.
   ASCGImageBuffer *buffer = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
   ASDisplayNodeCAssertNotNil(buffer, nil);
   CGDataProviderRef provider = [buffer createDataProviderAndInvalidate];
