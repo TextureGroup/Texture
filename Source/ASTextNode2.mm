@@ -359,16 +359,11 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   [self prepareAttributedString:mutableText];
   
-  // Apply background color if needed before drawing. To access the backgroundColor we need to be on the main thread
-  UIColor *backgroundColor = self.backgroundColor;
-  if (CGColorGetAlpha(backgroundColor.CGColor) > 0) {
-    [mutableText addAttribute:NSBackgroundColorAttributeName value:backgroundColor range:NSMakeRange(0, mutableText.length)];
-  }
-  
   return @{
-    @"container": copiedContainer,
-    @"text": mutableText
-  };
+           @"container": copiedContainer,
+           @"text": mutableText,
+           @"bgColor": self.backgroundColor
+           };
 }
 
 /**
@@ -458,15 +453,25 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
++ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextContainer *container = layoutDict[@"container"];
   NSAttributedString *text = layoutDict[@"text"];
+  UIColor *bgColor = layoutDict[@"bgColor"];
   ASTextLayout *layout = [self compatibleLayoutWithContainer:container text:text];
   
   if (isCancelledBlock()) {
     return;
   }
+  
+  // Fill background color.
+  // They may have already drawn into this context in the pre-context block
+  // so unfortunately we have to use the normal blend mode, not copy.
+  if (CGColorGetAlpha(bgColor.CGColor) > 0) {
+    [bgColor setFill];
+    UIRectFillUsingBlendMode(bounds, kCGBlendModeNormal);
+  }
+  
   CGContextRef context = UIGraphicsGetCurrentContext();
   ASDisplayNodeAssert(context, @"This is no good without a context.");
   
