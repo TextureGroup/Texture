@@ -12,7 +12,11 @@
 
 #import <AsyncDisplayKit/ASHashing.h>
 
+#ifdef __LP64__
+#define ELF_STEP(B) T1 = (H << 4) + B; T2 = T1 & 0xF000000000000000; if (T2) T1 ^= (T2 >> 56); T1 &= (~T2); H = T1;
+#else
 #define ELF_STEP(B) T1 = (H << 4) + B; T2 = T1 & 0xF0000000; if (T2) T1 ^= (T2 >> 24); T1 &= (~T2); H = T1;
+#endif
 
 /**
  * The hashing algorithm copied from CoreFoundation CFHashBytes function.
@@ -21,8 +25,8 @@
 NSUInteger ASHashBytes(void *bytesarg, size_t length) {
   /* The ELF hash algorithm, used in the ELF object file format */
   uint8_t *bytes = (uint8_t *)bytesarg;
-  UInt32 H = 0, T1, T2;
-  SInt32 rem = (SInt32)length;
+  NSUInteger H = 0, T1, T2;
+  size_t rem = length;
   while (3 < rem) {
     ELF_STEP(bytes[length - rem]);
     ELF_STEP(bytes[length - rem + 1]);

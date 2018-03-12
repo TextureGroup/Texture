@@ -267,6 +267,7 @@
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     cache = [[NSCache alloc] init];
+    cache.name = @"org.TextureGroup.Texture.CellNodeVisibilityHandlersCache";
   });
   NSNumber *result = [cache objectForKey:self];
   if (result == nil) {

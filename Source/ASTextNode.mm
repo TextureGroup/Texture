@@ -110,6 +110,7 @@ static NSCache *sharedRendererCache()
  dispatch_once(&onceToken, ^{
    __rendererCache = [[NSCache alloc] init];
    __rendererCache.countLimit = 500; // 500 renders cache
+   __rendererCache.name = @"org.TextureGroup.Texture.TextNodeRendererCache";
  });
  return __rendererCache;
 }

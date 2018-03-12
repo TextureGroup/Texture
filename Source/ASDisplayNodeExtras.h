@@ -30,7 +30,7 @@
   #define ASSetDebugName(node, format, ...) node.debugName = [NSString stringWithFormat:format, __VA_ARGS__]
   #define ASSetDebugNames(...) _ASSetDebugNames(self.class, @"" # __VA_ARGS__, __VA_ARGS__, nil)
 #else
-  #define ASSetDebugName(node, name)
+  #define ASSetDebugName(node, format, ...)
   #define ASSetDebugNames(...)
 #endif
 

@@ -72,6 +72,10 @@ os_log_t ASCollectionLog(void);
 #define ASImageLoadingLogEnabled 1
 os_log_t ASImageLoadingLog(void);
 
+/// Log for cache hit rates.
+#define ASCachingLogEnabled 0
+os_log_t ASCachingLog(void);
+
 /// Specialized log for our main thread deallocation trampoline.
 #define ASMainThreadDeallocationLogEnabled 0
 os_log_t ASMainThreadDeallocationLog(void);

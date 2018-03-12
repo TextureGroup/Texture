@@ -47,6 +47,10 @@ os_log_t ASImageLoadingLog() {
   return (ASImageLoadingLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(as_log_create("org.TextureGroup.Texture", "ImageLoading")) : OS_LOG_DISABLED;
 }
 
+os_log_t ASCachingLog() {
+  return (ASCachingLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(as_log_create("org.TextureGroup.Texture", "Caching")) : OS_LOG_DISABLED;
+}
+
 os_log_t ASMainThreadDeallocationLog() {
   return (ASMainThreadDeallocationLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(as_log_create("org.TextureGroup.Texture", "MainDealloc")) : OS_LOG_DISABLED;
 }
