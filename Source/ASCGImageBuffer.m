@@ -1,9 +1,13 @@
 //
 //  ASCGImageBuffer.m
-//  AsyncDisplayKit
+//  Texture
 //
-//  Created by Adlai on 2/28/18.
-//  Copyright © 2018 Facebook. All rights reserved.
+//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASCGImageBuffer.h"
@@ -32,7 +36,7 @@
 {
   if (self = [super init]) {
     _length = length;
-    _isVM = (length >= vm_page_size);
+    _isVM = NO;//(length >= vm_page_size);
     if (_isVM) {
       _mutableBytes = mmap(NULL, length, PROT_WRITE | PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, VM_MAKE_TAG(VM_MEMORY_COREGRAPHICS_DATA), 0);
       if (_mutableBytes == MAP_FAILED) {

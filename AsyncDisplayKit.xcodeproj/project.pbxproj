@@ -2052,7 +2052,7 @@
 			attributes = {
 				CLASSPREFIX = AS;
 				LastUpgradeCheck = 0820;
-				ORGANIZATIONNAME = Facebook;
+				ORGANIZATIONNAME = Pinterest;
 				TargetAttributes = {
 					057D02BE1AC0A66700C7AC3C = {
 						CreatedOnToolsVersion = 6.2;
