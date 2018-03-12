@@ -106,7 +106,6 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
 
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
-  // Use mmap directly so we can tag the memory as CGImage.
   ASCGImageBuffer *buffer = [[ASCGImageBuffer alloc] initWithLength:bufferSize];
   
   CGContextRef context = CGBitmapContextCreate(buffer.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
