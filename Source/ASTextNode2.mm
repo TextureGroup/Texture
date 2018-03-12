@@ -368,6 +368,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 /**
  * If it can't find a compatible layout, this method creates one.
+ *
+ * NOTE: Be careful to copy `text` if needed.
  */
 + (ASTextLayout *)compatibleLayoutWithContainer:(ASTextContainer *)container
                                            text:(NSAttributedString *)text
@@ -386,7 +388,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     cacheValue = [textLayoutCache objectForKey:text];
     if (cacheValue == nil) {
       cacheValue = [[ASTextCacheValue alloc] init];
-      [textLayoutCache setObject:cacheValue forKey:text];
+      [textLayoutCache setObject:cacheValue forKey:[text copy]];
     }
     cacheValue;
   });
@@ -946,11 +948,21 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
 {
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  _pointSizeScaleFactors = [scaleFactors copy];
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    if (ASObjectIsEqual(scaleFactors, _pointSizeScaleFactors)) {
+      return;
+    }
+    
+    _pointSizeScaleFactors = [scaleFactors copy];
+  }
+  
+  [self setNeedsLayout];
 }
 
 - (NSArray *)pointSizeScaleFactors
 {
+  ASDN::MutexLocker l(__instanceLock__);
   return _pointSizeScaleFactors;
 }
 
