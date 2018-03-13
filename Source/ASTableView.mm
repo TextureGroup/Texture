@@ -725,7 +725,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return [_dataController isProcessingUpdates];
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
   [_dataController onDidFinishProcessingUpdates:completion];
 }

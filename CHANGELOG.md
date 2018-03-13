@@ -2,6 +2,7 @@
 * Add your own contributions to the next release on the line below this with your name.
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
+- [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
 - [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
 - [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.

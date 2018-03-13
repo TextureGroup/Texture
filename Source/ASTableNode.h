@@ -238,7 +238,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
  */
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))didFinishProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))didFinishProcessingUpdates;
 
 /**
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
