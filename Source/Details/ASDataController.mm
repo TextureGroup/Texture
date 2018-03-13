@@ -604,6 +604,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
 
     dispatch_block_t completion = ^() {
+      // Decrement atomic queue count before scheduling main thread, to ensure that isProcessingUpdates will be correct.
+      --_editingTransactionQueueCount;
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
         // Step 4: Inform the delegate
@@ -618,7 +620,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
           self.visibleMap = newMap;
         }];
       }];
-      --self->_editingTransactionQueueCount;
     };
 
     // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
