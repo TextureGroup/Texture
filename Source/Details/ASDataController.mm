@@ -69,15 +69,14 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   ASMainSerialQueue *_mainSerialQueue;
 
   dispatch_queue_t _editingTransactionQueue;  // Serial background queue.  Dispatches concurrent layout and manages _editingNodes.
-  dispatch_group_t _editingTransactionGroup;     // Group of all edit transaction blocks. Useful for waiting.
+  dispatch_group_t _editingTransactionGroup;  // Group of all edit transaction blocks. Useful for waiting.
+  std::atomic<int> _editingTransactionGroupCount;
   
   BOOL _initialReloadDataHasBeenCalled;
 
   BOOL _synchronized;
   NSMutableSet<ASDataControllerSynchronizationBlock> *_onDidFinishSynchronizingBlocks;
-  
-  std::atomic<int> _editingTransactionQueueCount;
-  
+
   struct {
     unsigned int supplementaryNodeKindsInSections:1;
     unsigned int supplementaryNodesOfKindInSection:1;
@@ -453,7 +452,15 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (BOOL)isProcessingUpdates
 {
   ASDisplayNodeAssertMainThread();
-  return _mainSerialQueue.numberOfScheduledBlocks > 0 || _editingTransactionQueueCount > 0;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+  // Using dispatch_group_wait is much more expensive than our manually managed count, but it's crucial they always match.
+  BOOL editingTransactionQueueBusy = dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_NOW) != 0;
+  ASDisplayNodeAssert(editingTransactionQueueBusy == (_editingTransactionGroupCount > 0),
+                      @"editingTransactionQueueBusy = %@, but _editingTransactionGroupCount = %d !",
+                      editingTransactionQueueBusy ? @"YES" : @"NO", (int)_editingTransactionGroupCount);
+#endif
+
+  return _mainSerialQueue.numberOfScheduledBlocks > 0 || _editingTransactionGroupCount > 0;
 }
 
 - (void)onDidFinishProcessingUpdates:(void (^)())completion
@@ -468,9 +475,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     dispatch_async(_editingTransactionQueue, ^{
       // Retry the block. If we're done processing updates, it'll run immediately, otherwise
       // wait again for updates to quiesce completely.
-      [_mainSerialQueue performBlockOnMainThread:^{
+      // Don't use _mainSerialQueue so that we don't affect -isProcessingUpdates.
+      dispatch_async(dispatch_get_main_queue(), ^{
         [self onDidFinishProcessingUpdates:completion];
-      }];
+      });
     });
   }
 }
@@ -598,14 +606,14 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   as_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
 
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
-  ++_editingTransactionQueueCount;
+  ++_editingTransactionGroupCount;
   dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
 
     dispatch_block_t completion = ^() {
       // Decrement atomic queue count before scheduling main thread, to ensure that isProcessingUpdates will be correct.
-      --_editingTransactionQueueCount;
+      --_editingTransactionGroupCount;
       [_mainSerialQueue performBlockOnMainThread:^{
         as_activity_scope_leave(&preparationScope);
         // Step 4: Inform the delegate
