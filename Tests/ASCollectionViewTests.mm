@@ -23,8 +23,6 @@
 #import <vector>
 #import <OCMock/OCMock.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import "ASDisplayNodeTestsHelper.h"
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode
 
@@ -862,7 +860,6 @@
   [cn waitUntilAllUpdatesAreProcessed];
   [cn.view layoutIfNeeded];
   ASCellNode *node = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASCATransactionQueueWait();
   XCTAssertTrue(node.visible);
   testController.asyncDelegate->_itemCounts = {0};
   [cn deleteItemsAtIndexPaths: @[[NSIndexPath indexPathForItem:0 inSection:0]]];
@@ -1050,7 +1047,7 @@
   window.rootViewController = testController;
 
   [window makeKeyAndVisible];
-  // Trigger the initial reload to start 
+  // Trigger the initial reload to start
   [window layoutIfNeeded];
 
   // Test the APIs that monitor ASCollectionNode update handling
@@ -1074,7 +1071,7 @@
       for (NSInteger i = 0; i < c; i++) {
         NSIndexPath *ip = [NSIndexPath indexPathForItem:i inSection:s];
         ASCellNode *node = [cn nodeForItemAtIndexPath:ip];
-        ASCATransactionQueueWait();
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.001]];
         if (node.inPreloadState) {
           CGRect frame = [cn.view layoutAttributesForItemAtIndexPath:ip].frame;
           r = CGRectUnion(r, frame);

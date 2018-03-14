@@ -28,6 +28,5 @@ BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block);
 
 void ASDisplayNodeSizeToFitSize(ASDisplayNode *node, CGSize size);
 void ASDisplayNodeSizeToFitSizeRange(ASDisplayNode *node, ASSizeRange sizeRange);
-void ASCATransactionQueueWait(void);
 
 ASDISPLAYNODE_EXTERN_C_END
