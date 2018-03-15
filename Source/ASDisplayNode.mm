@@ -866,10 +866,10 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _flags.viewEverHadAGestureRecognizerAttached = YES;
 }
 
-#pragma mark UIResponder
+#pragma mark UIView + _ASDisplayView
 
-#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
-  /* All responder methods should be called on the main thread */ \
+#define RETURN_NODE_UIVIEW_METHOD(__sel) \
+  /* All UIView methods should be called on the main thread */ \
   ASDisplayNodeAssertMainThread(); \
   if (checkFlag(Synchronous)) { \
     /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
@@ -877,12 +877,72 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return [_view __sel]; \
   } else { \
     if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
-    /* If the subclass overwrites canBecomeFirstResponder just call through
+    /* If the subclass overwrites the selector just call through
        to it as we expect it will handle it */ \
       return [_view __sel]; \
     } else { \
       /* Call through to _ASDisplayView's superclass to get it handled */ \
       return [(_ASDisplayView *)_view __##__sel]; \
+    } \
+  } \
+
+#define RETURN_NODE_UIVIEW_METHOD_WITH_OBJECT(__sel, __var) \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    return [_view performSelector:@selector(__sel) withObject:__var]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+      return [_view performSelector:@selector(__sel) withObject:__var]; \
+    } else { \
+      return [(_ASDisplayView *)_view performSelector:@selector(__##__sel) withObject:__var]; \
+    } \
+  } \
+
+#define RETURN_NODE_UIVIEW_METHOD_WITH_OBJECTS(__sel, __var1, __var2) \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    return [_view performSelector:@selector(__sel) withObject:__var1 withObject:__var2]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+      return [_view performSelector:@selector(__sel) withObject:__var1 withObject:__var2]; \
+    } else { \
+      return [(_ASDisplayView *)_view performSelector:@selector(__##__sel) withObject:__var1 withObject:__var2]; \
+    } \
+  } \
+
+#define HANDLE_NODE_UIVIEW_METHOD(__sel) \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    [_view __sel]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+      [_view __sel]; \
+    } else { \
+      [(_ASDisplayView *)_view __##__sel]; \
+    } \
+  } \
+
+#define HANDLE_NODE_UIVIEW_METHOD_WITH_OBJECT(__sel, __var) \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    [_view performSelector:@selector(__sel) withObject:__var]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+      [_view performSelector:@selector(__sel) withObject:__var]; \
+    } else { \
+      [(_ASDisplayView *)_view performSelector:@selector(__##__sel) withObject:__var]; \
+    } \
+  } \
+
+#define HANDLE_NODE_UIVIEW_METHOD_WITH_OBJECTS(__sel, __var1, __var2) \
+  ASDisplayNodeAssertMainThread(); \
+  if (checkFlag(Synchronous)) { \
+    [_view performSelector:@selector(__sel) withObject:__var1 withObject:__var2]; \
+  } else { \
+    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
+      [_view performSelector:@selector(__sel) withObject:__var1 withObject:__var2]; \
+    } else { \
+      [(_ASDisplayView *)_view performSelector:@selector(__##__sel) withObject:__var1 withObject:__var2]; \
     } \
   } \
 
@@ -910,7 +970,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
+  RETURN_NODE_UIVIEW_METHOD(canBecomeFirstResponder);
 }
 
 - (BOOL)__becomeFirstResponder
@@ -922,7 +982,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
 
-  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
+  RETURN_NODE_UIVIEW_METHOD(becomeFirstResponder);
 }
 
 - (BOOL)__canResignFirstResponder
@@ -932,7 +992,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return YES;
   }
   
-  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
+  RETURN_NODE_UIVIEW_METHOD(canResignFirstResponder);
 }
 
 - (BOOL)__resignFirstResponder
@@ -944,7 +1004,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
   
-  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
+  RETURN_NODE_UIVIEW_METHOD(resignFirstResponder);
 }
 
 - (BOOL)__isFirstResponder
@@ -954,7 +1014,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
+  RETURN_NODE_UIVIEW_METHOD(isFirstResponder);
 }
 
 #pragma mark - Focus Engine
@@ -964,7 +1024,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return;
   }
   
-  [(_ASDisplayView *)_view __setNeedsFocusUpdate];
+  HANDLE_NODE_UIVIEW_METHOD(setNeedsFocusUpdate);
 }
 
 - (void)__updateFocusIfNeeded
@@ -973,7 +1033,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return;
   }
   
-  [(_ASDisplayView *)_view __updateFocusIfNeeded];
+  HANDLE_NODE_UIVIEW_METHOD(updateFocusIfNeeded);
 }
 
 - (BOOL)__canBecomeFocused
@@ -982,7 +1042,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  return [(_ASDisplayView *)_view __canBecomeFocused];
+  RETURN_NODE_UIVIEW_METHOD(canBecomeFocused);
 }
 
 - (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
@@ -991,7 +1051,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return NO;
   }
   
-  return [(_ASDisplayView *)_view __shouldUpdateFocusInContext:context];
+  RETURN_NODE_UIVIEW_METHOD_WITH_OBJECT(shouldUpdateFocusInContext:, context);
 }
 
 - (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
@@ -1000,7 +1060,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return;
   }
   
-  [(_ASDisplayView *)_view __didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  HANDLE_NODE_UIVIEW_METHOD_WITH_OBJECTS(didUpdateFocusInContext:withAnimationCoordinator:, context, coordinator);
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironments
@@ -1008,7 +1068,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
   
-  return [(_ASDisplayView *)_view __preferredFocusEnvironments];
+  RETURN_NODE_UIVIEW_METHOD(preferredFocusEnvironments);
 }
 
 - (UIView *)__preferredFocusedView
@@ -1016,7 +1076,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Note: This implicitly loads the view if it hasn't been loaded yet.
   [self view];
   
-  return [(_ASDisplayView *)_view __preferredFocusedView];
+  RETURN_NODE_UIVIEW_METHOD(preferredFocusedView);
 }
 
 #pragma mark <ASDebugNameProvider>
