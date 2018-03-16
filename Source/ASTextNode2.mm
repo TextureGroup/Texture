@@ -360,10 +360,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self prepareAttributedString:mutableText];
   
   return @{
-           @"container": copiedContainer,
-           @"text": mutableText,
-           @"bgColor": self.backgroundColor
-           };
+    @"container": copiedContainer,
+    @"text": mutableText,
+    @"bgColor": self.backgroundColor ?: [NSNull null]
+  };
 }
 
 /**
@@ -469,7 +469,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Fill background color.
   // They may have already drawn into this context in the pre-context block
   // so unfortunately we have to use the normal blend mode, not copy.
-  if (CGColorGetAlpha(bgColor.CGColor) > 0) {
+  if (bgColor && bgColor != (id)[NSNull null] && CGColorGetAlpha(bgColor.CGColor) > 0) {
     [bgColor setFill];
     UIRectFillUsingBlendMode(bounds, kCGBlendModeNormal);
   }
