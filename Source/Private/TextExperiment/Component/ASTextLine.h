@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ASTextLine : NSObject
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical;
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical NS_RETURNS_RETAINED;
 
 @property (nonatomic) NSUInteger index;     ///< line index
 @property (nonatomic) NSUInteger row;       ///< line row
@@ -73,7 +73,7 @@ typedef NS_ENUM(NSUInteger, ASTextRunGlyphDrawMode) {
 @interface ASTextRunGlyphRange : NSObject
 @property (nonatomic) NSRange glyphRangeInRun;
 @property (nonatomic) ASTextRunGlyphDrawMode drawMode;
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode;
++ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode NS_RETURNS_RETAINED;
 @end
 
 NS_ASSUME_NONNULL_END

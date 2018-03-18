@@ -372,7 +372,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
  * NOTE: Be careful to copy `text` if needed.
  */
 + (ASTextLayout *)compatibleLayoutWithContainer:(ASTextContainer *)container
-                                           text:(NSAttributedString *)text
+                                           text:(NSAttributedString *)text NS_RETURNS_RETAINED
 
 {
   // Allocate layoutCacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)

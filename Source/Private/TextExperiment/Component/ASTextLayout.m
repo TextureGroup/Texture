@@ -99,18 +99,18 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   id<ASTextLinePositionModifier> _linePositionModifier;
 }
 
-+ (instancetype)containerWithSize:(CGSize)size {
++ (instancetype)containerWithSize:(CGSize)size NS_RETURNS_RETAINED {
   return [self containerWithSize:size insets:UIEdgeInsetsZero];
 }
 
-+ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets {
++ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets NS_RETURNS_RETAINED {
   ASTextContainer *one = [self new];
   one.size = ASTextClipCGSize(size);
   one.insets = insets;
   return one;
 }
 
-+ (instancetype)containerWithPath:(UIBezierPath *)path {
++ (instancetype)containerWithPath:(UIBezierPath *)path NS_RETURNS_RETAINED {
   ASTextContainer *one = [self new];
   one.path = path;
   return one;

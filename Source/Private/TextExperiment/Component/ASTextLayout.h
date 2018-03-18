@@ -53,13 +53,13 @@ extern const CGSize ASTextContainerMaxSize;
 @interface ASTextContainer : NSObject <NSCoding, NSCopying>
 
 /// Creates a container with the specified size. @param size The size.
-+ (instancetype)containerWithSize:(CGSize)size;
++ (instancetype)containerWithSize:(CGSize)size NS_RETURNS_RETAINED;
 
 /// Creates a container with the specified size and insets. @param size The size. @param insets The text insets.
-+ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets;
++ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets NS_RETURNS_RETAINED;
 
 /// Creates a container with the specified path. @param path The path.
-+ (instancetype)containerWithPath:(nullable UIBezierPath *)path;
++ (instancetype)containerWithPath:(nullable UIBezierPath *)path NS_RETURNS_RETAINED;
 
 /// The constrained size. (if the size is larger than ASTextContainerMaxSize, it will be clipped)
 @property CGSize size;

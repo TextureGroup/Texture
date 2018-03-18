@@ -166,7 +166,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size
                                position:(CGPoint)position
-                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts
+                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithLayoutElement:layoutElement
                                         size:size
@@ -176,7 +176,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size
-                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts
+                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts NS_RETURNS_RETAINED
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
@@ -184,7 +184,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
                             sublayouts:sublayouts];
 }
 
-+ (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement size:(CGSize)size
++ (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement size:(CGSize)size NS_RETURNS_RETAINED
 {
   return [self layoutWithLayoutElement:layoutElement
                                   size:size
@@ -216,7 +216,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 #pragma mark - Layout Flattening
 
-- (ASLayout *)filteredNodeLayoutTree
+- (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED
 {
   if (ASLayoutIsFlattened(self)) {
     // All flattened layouts must have this flag enabled

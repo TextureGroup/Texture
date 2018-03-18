@@ -36,8 +36,8 @@ typedef NS_ENUM(NSInteger, ASTextAffinity) {
 @property (nonatomic, readonly) NSInteger offset;
 @property (nonatomic, readonly) ASTextAffinity affinity;
 
-+ (instancetype)positionWithOffset:(NSInteger)offset;
-+ (instancetype)positionWithOffset:(NSInteger)offset affinity:(ASTextAffinity) affinity;
++ (instancetype)positionWithOffset:(NSInteger)offset NS_RETURNS_RETAINED;
++ (instancetype)positionWithOffset:(NSInteger)offset affinity:(ASTextAffinity) affinity NS_RETURNS_RETAINED;
 
 - (NSComparisonResult)compare:(id)otherPosition;
 
@@ -57,10 +57,10 @@ typedef NS_ENUM(NSInteger, ASTextAffinity) {
 @property (nonatomic, readonly) ASTextPosition *end;
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
-+ (instancetype)rangeWithRange:(NSRange)range;
-+ (instancetype)rangeWithRange:(NSRange)range affinity:(ASTextAffinity) affinity;
-+ (instancetype)rangeWithStart:(ASTextPosition *)start end:(ASTextPosition *)end;
-+ (instancetype)defaultRange; ///< <{0,0} Forward>
++ (instancetype)rangeWithRange:(NSRange)range NS_RETURNS_RETAINED;
++ (instancetype)rangeWithRange:(NSRange)range affinity:(ASTextAffinity) affinity NS_RETURNS_RETAINED;
++ (instancetype)rangeWithStart:(ASTextPosition *)start end:(ASTextPosition *)end NS_RETURNS_RETAINED;
++ (instancetype)defaultRange NS_RETURNS_RETAINED; ///< <{0,0} Forward>
 
 - (NSRange)asRange;
 

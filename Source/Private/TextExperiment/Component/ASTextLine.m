@@ -16,7 +16,7 @@
   CGFloat _firstGlyphPos; // first glyph position for baseline, typically 0.
 }
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical {
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical NS_RETURNS_RETAINED {
   if (!CTLine) return nil;
   ASTextLine *line = [self new];
   line->_position = position;
@@ -157,7 +157,7 @@
 
 
 @implementation ASTextRunGlyphRange
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode {
++ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode NS_RETURNS_RETAINED {
   ASTextRunGlyphRange *one = [self new];
   one.glyphRangeInRun = range;
   one.drawMode = mode;

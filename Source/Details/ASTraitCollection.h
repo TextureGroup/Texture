@@ -179,14 +179,14 @@ AS_SUBCLASSING_RESTRICTED
 
 @property (nonatomic, assign, readonly) CGSize containerSize;
 
-+ (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits;
++ (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits NS_RETURNS_RETAINED;
 
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
-                                              containerSize:(CGSize)windowSize;
+                                              containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                               containerSize:(CGSize)windowSize
-                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory;
+                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory NS_RETURNS_RETAINED;
 
 #if TARGET_OS_TV
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
@@ -198,7 +198,7 @@ AS_SUBCLASSING_RESTRICTED
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                            userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
                                  preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
-                                                containerSize:(CGSize)windowSize;
+                                                containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 #else
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
                                             verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
@@ -208,7 +208,7 @@ AS_SUBCLASSING_RESTRICTED
                                          forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                  preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
-                                                containerSize:(CGSize)windowSize;
+                                                containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 #endif
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
@@ -224,7 +224,7 @@ AS_SUBCLASSING_RESTRICTED
                                      verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                          containerSize:(CGSize)windowSize
-  ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
+  NS_RETURNS_RETAINED ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
 
 @end
 

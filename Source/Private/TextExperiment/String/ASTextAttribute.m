@@ -109,7 +109,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextBackedString
 
-+ (instancetype)stringWithString:(NSString *)string {
++ (instancetype)stringWithString:(NSString *)string NS_RETURNS_RETAINED {
   ASTextBackedString *one = [self new];
   one.string = string;
   return one;
@@ -136,7 +136,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextBinding
 
-+ (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm {
++ (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm NS_RETURNS_RETAINED {
   ASTextBinding *one = [self new];
   one.deleteConfirm = deleteConfirm;
   return one;
@@ -163,7 +163,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextShadow
 
-+ (instancetype)shadowWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius {
++ (instancetype)shadowWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius NS_RETURNS_RETAINED {
   ASTextShadow *one = [self new];
   one.color = color;
   one.offset = offset;
@@ -171,7 +171,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   return one;
 }
 
-+ (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow {
++ (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow NS_RETURNS_RETAINED {
   if (!nsShadow) return nil;
   ASTextShadow *shadow = [self new];
   shadow.offset = nsShadow.shadowOffset;
@@ -232,12 +232,12 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   return self;
 }
 
-+ (instancetype)decorationWithStyle:(ASTextLineStyle)style {
++ (instancetype)decorationWithStyle:(ASTextLineStyle)style NS_RETURNS_RETAINED {
   ASTextDecoration *one = [self new];
   one.style = style;
   return one;
 }
-+ (instancetype)decorationWithStyle:(ASTextLineStyle)style width:(NSNumber *)width color:(UIColor *)color {
++ (instancetype)decorationWithStyle:(ASTextLineStyle)style width:(NSNumber *)width color:(UIColor *)color NS_RETURNS_RETAINED {
   ASTextDecoration *one = [self new];
   one.style = style;
   one.width = width;
@@ -272,7 +272,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextBorder
 
-+ (instancetype)borderWithLineStyle:(ASTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color {
++ (instancetype)borderWithLineStyle:(ASTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color NS_RETURNS_RETAINED {
   ASTextBorder *one = [self new];
   one.lineStyle = lineStyle;
   one.strokeWidth = width;
@@ -280,7 +280,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   return one;
 }
 
-+ (instancetype)borderWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius {
++ (instancetype)borderWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius NS_RETURNS_RETAINED {
   ASTextBorder *one = [self new];
   one.fillColor = color;
   one.cornerRadius = cornerRadius;
@@ -336,7 +336,7 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextAttachment
 
-+ (instancetype)attachmentWithContent:(id)content {
++ (instancetype)attachmentWithContent:(id)content NS_RETURNS_RETAINED {
   ASTextAttachment *one = [self new];
   one.content = content;
   return one;
@@ -373,13 +373,13 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
 
 @implementation ASTextHighlight
 
-+ (instancetype)highlightWithAttributes:(NSDictionary *)attributes {
++ (instancetype)highlightWithAttributes:(NSDictionary *)attributes NS_RETURNS_RETAINED {
   ASTextHighlight *one = [self new];
   one.attributes = attributes;
   return one;
 }
 
-+ (instancetype)highlightWithBackgroundColor:(UIColor *)color {
++ (instancetype)highlightWithBackgroundColor:(UIColor *)color NS_RETURNS_RETAINED {
   ASTextBorder *highlightBorder = [ASTextBorder new];
   highlightBorder.insets = UIEdgeInsetsMake(-2, -1, -2, -1);
   highlightBorder.cornerRadius = 3;
