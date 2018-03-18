@@ -1990,7 +1990,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (_layoutInspectorFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
     return [self.layoutInspector collectionView:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
   }
-
+  
   ASDisplayNodeAssert(NO, @"To support supplementary nodes in ASCollectionView, it must have a layoutInspector for layout inspection. (See ASCollectionViewFlowLayoutInspector for an example.)");
   return ASSizeRangeMake(CGSizeZero, CGSizeZero);
 }
