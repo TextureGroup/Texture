@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
+#import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASDispatch.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASElementMap.h>
@@ -283,13 +284,12 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
                              previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
-  if (!_dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
-    return;
-  }
 
   NSUInteger sectionCount = [self itemCountsFromDataSource].size();
+  BOOL canDelegate = self.layoutDelegate;
   if (sectionCount > 0) {
     NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
+    ASSizeRange newSizeRange;
     for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
       NSArray<NSIndexPath *> *indexPaths = [self _allIndexPathsForItemsOfKind:kind inSections:sectionIndexes];
       NSMutableArray<NSIndexPath *> *indexPathsToDeleteForKind = [[NSMutableArray alloc] init];
@@ -298,7 +298,15 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       // If supplementary node doesn't exist and size is now non-zero, insert one.
       for (NSIndexPath *indexPath in indexPaths) {
         ASCollectionElement *previousElement = [previousMap supplementaryElementOfKind:kind atIndexPath:indexPath];
-        ASSizeRange newSizeRange = [_dataSource dataController:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
+        if (canDelegate) {
+          ASCollectionLayoutContext *context = [self.layoutDelegate layoutContextWithElements:previousMap];
+          Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
+          ASCollectionLayoutState *layoutState = [layoutDelegateClass calculateLayoutWithContext:context];
+          UICollectionViewLayoutAttributes *attrs = [layoutState layoutAttributesForSupplementaryElementOfKind:kind atIndexPath:indexPath];
+          newSizeRange = attrs ? ASSizeRangeMake(attrs.size, attrs.size) : ASSizeRangeMake(CGSizeZero, CGSizeZero);
+        } else {
+          newSizeRange = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
+        }
         BOOL sizeRangeIsZero = ASSizeRangeEqualToSizeRange(ASSizeRangeZero, newSizeRange);
         if (previousElement != nil && sizeRangeIsZero) {
           [indexPathsToDeleteForKind addObject:indexPath];
@@ -824,7 +832,6 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   ASDisplayNodeAssertMainThread();
   // Aggressively repopulate all supplemtary elements
   // Assuming this method is run on the main serial queue, _pending and _visible maps are synced and can be manipulated directly.
-  // TODO: If there is a layout delegate, it should be able to handle relayouts. Verify that and bail early.
   ASDisplayNodeAssert(_visibleMap == _pendingMap, @"Expected visible and pending maps to be synchronized: %@", self);
 
   ASMutableElementMap *newMap = [_pendingMap mutableCopy];
