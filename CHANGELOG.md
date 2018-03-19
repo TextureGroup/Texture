@@ -2,6 +2,7 @@
 * Add your own contributions to the next release on the line below this with your name.
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
+- [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
 - [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
 - [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.
@@ -31,10 +32,11 @@
 - Make `ASCellNode` tint color apply to table view cell accessories. [Vladyslav Chapaev](https://github.com/ShogunPhyched) [#764](https://github.com/TextureGroup/Texture/pull/764)
 - Fix ASTextNode2 is accessing backgroundColor off main while sizing / layout is happening. [Michael Schneider](https://github.com/maicki) [#794](https://github.com/TextureGroup/Texture/pull/778/)
 - Pass scrollViewWillEndDragging delegation through in ASIGListAdapterDataSource for IGListKit integration. [#796](https://github.com/TextureGroup/Texture/pull/796)
-- Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789] (https://github.com/TextureGroup/Texture/pull/789/)
-- Optimized thread-local storage by replacing pthread_specific with C11 thread-local variables. [Adlai Holler](https://github.com/Adlai-Holler) [#811] (https://github.com/TextureGroup/Texture/pull/811/)
-- Fixed a thread-sanitizer warning in ASTextNode. [Adlai Holler](https://github.com/Adlai-Holler) [#830] (https://github.com/TextureGroup/Texture/pull/830/)
+- Fix UIResponder handling with view backing ASDisplayNode. [Michael Schneider](https://github.com/maicki) [#789](https://github.com/TextureGroup/Texture/pull/789/)
+- Optimized thread-local storage by replacing pthread_specific with C11 thread-local variables. [Adlai Holler](https://github.com/Adlai-Holler) [#811](https://github.com/TextureGroup/Texture/pull/811/)
+- Fixed a thread-sanitizer warning in ASTextNode. [Adlai Holler](https://github.com/Adlai-Holler) [#830](https://github.com/TextureGroup/Texture/pull/830/)
 - Fix ASTextNode2 handling background color incorrectly. [Adlai Holler](https://github.com/Adlai-Holler) [#831] (https://github.com/TextureGroup/Texture/pull/831/)
+- [NoCopyRendering] Improved performance & fixed image memory not being tagged in Instruments. [Adlai Holler](https://github.com/Adlai-Holler) [#833](https://github.com/TextureGroup/Texture/pull/833/)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

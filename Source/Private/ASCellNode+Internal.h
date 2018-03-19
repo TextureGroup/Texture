@@ -63,7 +63,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (atomic, weak, nullable) id<ASRangeManagingNode> owningNode;
 
-@property (nonatomic, assign) BOOL shouldUseUIKitCell;
+@property (nonatomic, readonly) BOOL shouldUseUIKitCell;
+
+@end
+
+@class ASWrapperCellNode;
+
+typedef CGSize (^ASSizeForItemBlock)(ASWrapperCellNode *node, CGSize collectionSize);
+typedef UICollectionViewCell * _Nonnull(^ASCellForItemBlock)(ASWrapperCellNode *node);
+typedef UICollectionReusableView * _Nonnull(^ASViewForSupplementaryBlock)(ASWrapperCellNode *node);
+
+@interface ASWrapperCellNode : ASCellNode
+
+@property (nonatomic, copy, readonly) ASSizeForItemBlock sizeForItemBlock;
+@property (nonatomic, copy, readonly) ASCellForItemBlock cellForItemBlock;
+@property (nonatomic, copy, readonly) ASViewForSupplementaryBlock viewForSupplementaryBlock;
 
 @end
 
