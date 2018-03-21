@@ -263,7 +263,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
-@interface ASTestViewController: ASViewController<ASDisplayNode*>
+@interface ASTestViewController: ASViewController<ASDisplayNode *>
 @end
 @implementation ASTestViewController
 - (BOOL)prefersStatusBarHidden { return YES; }
