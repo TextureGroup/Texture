@@ -141,6 +141,11 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 
 @end
 
+#if TARGET_OS_TV
+@interface ASImageNode (tvOS)
+@end
+#endif
+
 @interface ASImageNode (AnimatedImage)
 
 /**
