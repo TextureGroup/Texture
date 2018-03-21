@@ -108,7 +108,7 @@ ASDISPLAYNODE_EXTERN_C_END
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size
                                position:(CGPoint)position
-                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts AS_WARN_UNUSED_RESULT;
+                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * Convenience initializer that has CGPointNull position.
@@ -122,7 +122,7 @@ ASDISPLAYNODE_EXTERN_C_END
  */
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size
-                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts AS_WARN_UNUSED_RESULT;
+                             sublayouts:(nullable NSArray<ASLayout *> *)sublayouts NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * Convenience that has CGPointNull position and no sublayouts.
@@ -133,11 +133,11 @@ ASDISPLAYNODE_EXTERN_C_END
  * @param size             The size of this layout.
  */
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
-                                   size:(CGSize)size AS_WARN_UNUSED_RESULT;
+                                   size:(CGSize)size NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 /**
  * Traverses the existing layout tree and generates a new tree that represents only ASDisplayNode layouts
  */
-- (ASLayout *)filteredNodeLayoutTree AS_WARN_UNUSED_RESULT;
+- (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 @end
 

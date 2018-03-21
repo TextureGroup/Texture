@@ -45,7 +45,7 @@ static void runLoopSourceCallback(void *info) {
   ASDN::RecursiveMutex _queueLock;
 }
 
-+ (ASDeallocQueue *)sharedDeallocationQueue
++ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
@@ -516,7 +516,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
 // and kASASCATransactionQueuePostOrder will apply interface change immediately.
 static int const kASASCATransactionQueuePostOrder = 3000000;
 
-+ (ASCATransactionQueue *)sharedQueue
++ (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED
 {
   static dispatch_once_t onceToken;
   static ASCATransactionQueue *sharedQueue;

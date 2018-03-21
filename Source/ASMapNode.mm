@@ -263,7 +263,7 @@
   }];
 }
 
-+ (UIImage *)defaultPinImageWithCenterOffset:(CGPoint *)centerOffset
++ (UIImage *)defaultPinImageWithCenterOffset:(CGPoint *)centerOffset NS_RETURNS_RETAINED
 {
   static MKAnnotationView *pin;
   static dispatch_once_t onceToken;
