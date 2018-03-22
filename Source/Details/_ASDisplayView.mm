@@ -566,31 +566,41 @@ IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirst
 - (BOOL)canBecomeFocused
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _canBecomeFocused];
+  return [node __canBecomeFocusedWithUIKitFallbackBlock:^BOOL{
+    return [super canBecomeFocused];
+  }];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _shouldUpdateFocusInContext:context];
+  return [node __shouldUpdateFocusInContext:context withUIKitFallbackBlock:^BOOL{
+    return [super shouldUpdateFocusInContext:context];
+  }];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  return [node __didUpdateFocusInContext:context withAnimationCoordinator:coordinator withUIKitFallbackBlock:^{
+    [super didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  }];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _preferredFocusEnvironments];
+  return [node __preferredFocusEnvironmentsWithUIKitFallbackBlock:^NSArray<id<UIFocusEnvironment>> * _Nonnull{
+    return [super preferredFocusEnvironments];
+  }];
 }
 
 - (UIView *)preferredFocusedView
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return [node _preferredFocusedView];
+  return [node __preferredFocusedViewWithUIKitFallbackBlock:^UIView * _Nullable{
+    return [super preferredFocusedView];
+  }];
 }
 
 - (void)__setNeedsFocusUpdate

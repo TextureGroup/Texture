@@ -144,46 +144,38 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 }
 
 // Focus Engine
-- (void)setNeedsFocusUpdate
-{
-  ASCellNode *node = self.node;
-  return [node setNeedsFocusUpdate];
-}
-
-- (void)updateFocusIfNeeded
-{
-  ASCellNode *node = self.node;
-  return [node updateFocusIfNeeded];
-}
-
 - (BOOL)canBecomeFocused
 {
-  ASCellNode *node = self.node;
-  return [node _canBecomeFocused];
+  return [self.node __canBecomeFocusedWithUIKitFallbackBlock:^BOOL{
+    return [super canBecomeFocused];
+  }];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
-  ASCellNode *node = self.node;
-  return [node _shouldUpdateFocusInContext:context];
+  return [self.node __shouldUpdateFocusInContext:context withUIKitFallbackBlock:^BOOL{
+    return [super shouldUpdateFocusInContext:context];
+  }];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
-  ASCellNode *node = self.node;
-  return [node _didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  [super didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  [self.node __didUpdateFocusInContext:context withAnimationCoordinator:coordinator withUIKitFallbackBlock:nil];
 }
 
 - (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
 {
-  ASCellNode *node = self.node;
-  return [node _preferredFocusEnvironments];
+  return [self.node __preferredFocusEnvironmentsWithUIKitFallbackBlock:^NSArray<id<UIFocusEnvironment>> * _Nonnull{
+    return [super preferredFocusEnvironments];
+  }];
 }
 
 - (UIView *)preferredFocusedView
 {
-  ASCellNode *node = self.node;
-  return [node _preferredFocusedView];
+  return [self.node __preferredFocusedViewWithUIKitFallbackBlock:^UIView * _Nullable{
+    return [super preferredFocusedView];
+  }];
 }
 
 // Selection

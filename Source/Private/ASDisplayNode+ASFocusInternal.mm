@@ -16,53 +16,65 @@
 
 @implementation ASDisplayNode (ASFocusInternal)
 
-- (BOOL)_canBecomeFocused
+- (BOOL)__canBecomeFocusedWithUIKitFallbackBlock:(BOOL (^)())fallbackBlock
 {
   if (_canBecomeFocusedBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _canBecomeFocusedBlock(self);
-  } else {
+  } else if (self.methodOverrides & ASDisplayNodeMethodOverrideCanBecomeFocused) {
     return [self canBecomeFocused];
+  } else {
+    return fallbackBlock();
   }
 }
 
-- (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+- (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context withUIKitFallbackBlock:(BOOL (^)())fallbackBlock
 {
   if (_shouldUpdateFocusBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _shouldUpdateFocusBlock(self, context);
-  } else {
+  } else if (self.methodOverrides & ASDisplayNodeMethodOverrideShouldUpdateFocus) {
     return [self shouldUpdateFocusInContext:context];
+  } else {
+    return fallbackBlock();
   }
 }
 
-- (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+- (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator withUIKitFallbackBlock:(void (^)())fallbackBlock
 {
   if (_didUpdateFocusBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
-    return _didUpdateFocusBlock(self, context, coordinator);
+    _didUpdateFocusBlock(self, context, coordinator);
+  } else if (self.methodOverrides & ASDisplayNodeMethodOverrideDidUpdateFocus) {
+    [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
   } else {
-    return [self didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+    if (fallbackBlock != nil) {
+      fallbackBlock();
+    }
   }
 }
 
-- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
+- (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironmentsWithUIKitFallbackBlock:(NSArray<id<UIFocusEnvironment>> * _Nonnull (^)())fallbackBlock API_AVAILABLE(ios(10.0), tvos(10.0))
 {
   if (_preferredFocusEnvironmentsBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _preferredFocusEnvironmentsBlock(self);
-  } else {
+  } else if (self.methodOverrides & ASDisplayNodeMethodOverridePreferredFocusEnvironments) {
     return [self preferredFocusEnvironments];
+  } else {
+    return fallbackBlock();
   }
 }
 
-- (UIView *)_preferredFocusedView
+- (UIView *)__preferredFocusedViewWithUIKitFallbackBlock:(UIView * _Nullable (^)())fallbackBlock
 {
   if (_preferredFocusedViewBlock != NULL) {
     ASDN::MutexLocker l(__instanceLock__);
     return _preferredFocusedViewBlock(self);
-  } else {
+  } else if (self.methodOverrides & ASDisplayNodeMethodOverridePreferredFocusedView) {
     return [self preferredFocusedView];
+  } else {
+    return fallbackBlock();
   }
 }
 

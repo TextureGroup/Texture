@@ -20,11 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ASDisplayNode (ASFocusInternal)
 
-- (BOOL)_canBecomeFocused;
-- (void)_didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator;
-- (BOOL)_shouldUpdateFocusInContext:(UIFocusUpdateContext *)context;
-- (NSArray<id<UIFocusEnvironment>> *)_preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0));
-- (nullable UIView *)_preferredFocusedView;
+- (BOOL)__canBecomeFocusedWithUIKitFallbackBlock:(BOOL (^)(void))fallbackBlock;
+- (void)__didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator withUIKitFallbackBlock:(void (^_Nullable)(void))fallbackBlock;
+- (BOOL)__shouldUpdateFocusInContext:(UIFocusUpdateContext *)context withUIKitFallbackBlock:(BOOL (^)(void))fallbackBlock;
+- (NSArray<id<UIFocusEnvironment>> *)__preferredFocusEnvironmentsWithUIKitFallbackBlock:(NSArray<id<UIFocusEnvironment>> * (^)(void))fallbackBlock API_AVAILABLE(ios(10.0), tvos(10.0));
+- (nullable UIView *)__preferredFocusedViewWithUIKitFallbackBlock:(UIView *_Nullable (^)(void))fallbackBlock;
 
 @end
 
