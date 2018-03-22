@@ -96,45 +96,48 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
  */
 @implementation ASDisplayNode (UIViewBridge)
 
-#if TARGET_OS_TV
 // Focus Engine
-- (BOOL)canBecomeFocused
-{
-  return NO;
-}
-
 - (void)setNeedsFocusUpdate
 {
   ASDisplayNodeAssertMainThread();
-  [_view setNeedsFocusUpdate];
+  [self __setNeedsFocusUpdate];
 }
 
 - (void)updateFocusIfNeeded
 {
   ASDisplayNodeAssertMainThread();
-  [_view updateFocusIfNeeded];
+  [self __updateFocusIfNeeded];
+}
+
+- (BOOL)canBecomeFocused
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __canBecomeFocused];
 }
 
 - (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
 {
-  return NO;
+  ASDisplayNodeAssertMainThread();
+  return [self __shouldUpdateFocusInContext:context];
 }
 
 - (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
 {
-  
+  ASDisplayNodeAssertMainThread();
+  [self __didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments
+{
+  ASDisplayNodeAssertMainThread();
+  return [self __preferredFocusEnvironments];
 }
 
 - (UIView *)preferredFocusedView
 {
-  if (self.nodeLoaded) {
-    return _view;
-  }
-  else {
-    return nil;
-  }
+  ASDisplayNodeAssertMainThread();
+  return [self __preferredFocusedView];
 }
-#endif
 
 - (BOOL)canBecomeFirstResponder
 {
@@ -1160,7 +1163,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 }
 
 @end
-
 
 #pragma mark - ASAsyncTransactionContainer
 

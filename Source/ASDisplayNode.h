@@ -64,6 +64,34 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize);
 
 /**
+ * ASDisplayNode focusability block. This block can be used instead of implementing canBecomeFocused in subclass
+ */
+typedef BOOL (^ASFocusabilityBlock)(__kindof ASDisplayNode *node);
+
+/**
+ * ASDisplayNode focus update block. This block can be used instead of implementing shouldUpdateFocusInContext: in subclass
+ */
+typedef BOOL (^ASFocusUpdateContextBlock)(__kindof ASDisplayNode *node, UIFocusUpdateContext *context);
+
+/**
+ * ASDisplayNode focus update animation coordinator block. This block can be used instead of implementing
+ * didUpdateFocusInContext:withCoordinator in subclass
+ */
+typedef void (^ASFocusUpdateAnimationCoordinatorBlock)(__kindof ASDisplayNode *node,
+                                                       UIFocusUpdateContext *context,
+                                                       UIFocusAnimationCoordinator *animationCoordinator);
+
+/**
+ * ASDisplayNode focus environments block. This block can be used instead of implementing preferredFocusEnvironments in subclass
+ */
+typedef NSArray<id<UIFocusEnvironment>> *_Nonnull (^ASFocusEnvironmentsBlock)(__kindof ASDisplayNode *node);
+
+/**
+ * ASDisplayNode focused view block. This block can be used instead of implementing preferredFocusView in subclass
+ */
+typedef UIView *_Nullable (^ASFocusViewBlock)(__kindof ASDisplayNode *node);
+
+/**
  * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
  * errors that happens in production.
  */
@@ -734,15 +762,48 @@ extern NSInteger const ASDefaultDrawingPriority;
 - (BOOL)isFirstResponder;
 - (BOOL)canPerformAction:(nonnull SEL)action withSender:(nonnull id)sender;
 
-#if TARGET_OS_TV
-//Focus Engine
+// Focus Engine
 - (void)setNeedsFocusUpdate;
-- (BOOL)canBecomeFocused;
 - (void)updateFocusIfNeeded;
+- (BOOL)canBecomeFocused;
 - (void)didUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context withAnimationCoordinator:(nonnull UIFocusAnimationCoordinator *)coordinator;
 - (BOOL)shouldUpdateFocusInContext:(nonnull UIFocusUpdateContext *)context;
 - (nullable UIView *)preferredFocusedView;
-#endif
+- (nonnull NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0));
+
+@end
+
+@interface ASDisplayNode (ASFocus)
+
+/**
+ * @abstract Provides a way to declare a block that determines whether or not the node can become focused
+ * without having to subclass ASDisplayNode and implement canBecomeFocused
+ */
+@property (nonatomic, readwrite, copy, nullable) ASFocusabilityBlock canBecomeFocusedBlock;
+
+/**
+ * @abstract Provides a way to declare a block that determines whether or not the node should update focus
+ * without having to subclass ASDisplayNode and implement shouldUpdateFocusInContext:
+ */
+@property (nonatomic, readwrite, copy, nullable) ASFocusUpdateContextBlock shouldUpdateFocusBlock;
+
+/**
+ * @abstract Provides a way to declare a block that can respond to a focus update without having to subclass
+ * ASDisplayNode and implement didUpdateFocusInContext:withAnimationCoordinator:
+ */
+@property (nonatomic, readwrite, copy, nullable) ASFocusUpdateAnimationCoordinatorBlock didUpdateFocusBlock;
+
+/**
+ * Provides a way to declare a block to provide an array of preferred focus environments without having to subclass
+ * ASDisplayNode and implement preferredFocusEnvironments
+ */
+@property (nonatomic, readwrite, copy, nullable) ASFocusEnvironmentsBlock preferredFocusEnvironmentsBlock API_AVAILABLE(ios(10.0), tvos(10.0));
+
+/**
+ * Provides a way to declare a block to provide a preferred focused view without having to subclass ASDisplayNode and
+ * implement preferredFocusedView
+ */
+@property (nonatomic, readwrite, copy, nullable) ASFocusViewBlock preferredFocusedViewBlock;
 
 @end
 

@@ -771,6 +771,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)collectionNode:(ASCollectionNode *)collectionNode didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 - (void)collectionNode:(ASCollectionNode *)collectionNode didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
 
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode canFocusItemAtIndexPath:(NSIndexPath *)indexPath;
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context;
+- (void)collectionNode:(ASCollectionNode *)collectionNode didUpdateFocusInContext:(UICollectionViewFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator;
+- (nullable NSIndexPath *)indexPathForPreferredFocusedViewInCollectionNode:(ASCollectionNode *)collectionNode;
+
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath;
 - (BOOL)collectionNode:(ASCollectionNode *)collectionNode canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;
 - (void)collectionNode:(ASCollectionNode *)collectionNode performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender;

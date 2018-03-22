@@ -26,6 +26,7 @@
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNode+ASFocusInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -142,6 +143,42 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return ASSubclassOverridesSelector([ASCellNode class], [node class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));
 }
 
+// Focus Engine
+- (BOOL)canBecomeFocused
+{
+  return [self.node __canBecomeFocusedWithUIKitFallbackBlock:^BOOL{
+    return [super canBecomeFocused];
+  }];
+}
+
+- (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  return [self.node __shouldUpdateFocusInContext:context withUIKitFallbackBlock:^BOOL{
+    return [super shouldUpdateFocusInContext:context];
+  }];
+}
+
+- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  [super didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  [self.node __didUpdateFocusInContext:context withAnimationCoordinator:coordinator withUIKitFallbackBlock:nil];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
+{
+  return [self.node __preferredFocusEnvironmentsWithUIKitFallbackBlock:^NSArray<id<UIFocusEnvironment>> * _Nonnull{
+    return [super preferredFocusEnvironments];
+  }];
+}
+
+- (UIView *)preferredFocusedView
+{
+  return [self.node __preferredFocusedViewWithUIKitFallbackBlock:^UIView * _Nullable{
+    return [super preferredFocusedView];
+  }];
+}
+
+// Selection
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
   [super setSelected:selected animated:animated];
@@ -154,6 +191,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [self.node __setHighlightedFromUIKit:highlighted];
 }
 
+// Reuse
 - (void)prepareForReuse
 {
   // Need to clear element before UIKit calls setSelected:NO / setHighlighted:NO on its cells
@@ -255,6 +293,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeDidHighlightRow:1;
     unsigned int tableViewDidUnhighlightRow:1;
     unsigned int tableNodeDidUnhighlightRow:1;
+    unsigned int tableNodeCanFocusRow:1;
+    unsigned int tableNodeShouldUpdateFocus:1;
+    unsigned int tableNodeDidUpdateFocus:1;
+    unsigned int tableNodeIndexPathForPreferredFocusedView:1;
     unsigned int tableViewShouldShowMenuForRow:1;
     unsigned int tableNodeShouldShowMenuForRow:1;
     unsigned int tableViewCanPerformActionForRow:1;
@@ -502,6 +544,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.tableNodeDidHighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didHighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableView:didUnhighlightRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeDidUnhighlightRow = [_asyncDelegate respondsToSelector:@selector(tableNode:didUnhighlightRowAtIndexPath:)];
+    _asyncDelegateFlags.tableNodeCanFocusRow = [_asyncDelegate respondsToSelector:@selector(tableNode:canFocusRowAtIndexPath:)];
+    _asyncDelegateFlags.tableNodeShouldUpdateFocus = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldUpdateFocusInContext:)];
+    _asyncDelegateFlags.tableNodeDidUpdateFocus = [_asyncDelegate respondsToSelector:@selector(tableNode:didUpdateFocusInContext:withAnimationCoordinator:)];
+    _asyncDelegateFlags.tableNodeIndexPathForPreferredFocusedView = [_asyncDelegate respondsToSelector:@selector(indexPathForPreferredFocusedViewInTableNode:)];
     _asyncDelegateFlags.tableViewShouldShowMenuForRow = [_asyncDelegate respondsToSelector:@selector(tableView:shouldShowMenuForRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeShouldShowMenuForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:shouldShowMenuForRowAtIndexPath:)];
     _asyncDelegateFlags.tableViewCanPerformActionForRow = [_asyncDelegate respondsToSelector:@selector(tableView:canPerformAction:forRowAtIndexPath:withSender:)];
@@ -1166,6 +1212,45 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [_asyncDelegate tableView:self didUnhighlightRowAtIndexPath:indexPath];
 #pragma clang diagnostic pop
   }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canFocusRowAtIndexPath:(nonnull NSIndexPath *)indexPath
+{
+  if (_asyncDelegateFlags.tableNodeCanFocusRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, YES);
+    indexPath = [self convertIndexPathToTableNode:indexPath];
+    if (indexPath != nil) {
+      return [_asyncDelegate tableNode:tableNode canFocusRowAtIndexPath:indexPath];
+    }
+  }
+  return YES;
+}
+
+- (BOOL)tableView:(UITableView *)tableView shouldUpdateFocusInContext:(UITableViewFocusUpdateContext *)context
+{
+  if (_asyncDelegateFlags.tableNodeShouldUpdateFocus) {
+    GET_TABLENODE_OR_RETURN(tableNode, YES);
+    return [_asyncDelegate tableNode:tableNode shouldUpdateFocusInContext:context];
+  }
+  return YES;
+}
+
+- (void)tableView:(UITableView *)tableView didUpdateFocusInContext:(UITableViewFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  if (_asyncDelegateFlags.tableNodeDidUpdateFocus) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
+    return [_asyncDelegate tableNode:tableNode didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  }
+  return (void)0;
+}
+
+- (nullable NSIndexPath *)indexPathForPreferredFocusedViewInTableView:(UITableView *)tableView
+{
+  if (_asyncDelegateFlags.tableNodeIndexPathForPreferredFocusedView) {
+    GET_TABLENODE_OR_RETURN(tableNode, nil);
+    return [_asyncDelegate indexPathForPreferredFocusedViewInTableNode:tableNode];
+  }
+  return nil;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldShowMenuForRowAtIndexPath:(nonnull NSIndexPath *)indexPath

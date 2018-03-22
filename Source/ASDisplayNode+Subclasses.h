@@ -472,6 +472,40 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
 
+#pragma mark - Press handling
+/** @name Press handling */
+
+/**
+ * @abstract Tells the node when presses began in its view.
+ *
+ * @param presses A set of UIPress instances.
+ * @param event A UIPressesEvent associated with the presses.
+ */
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(nullable UIPressesEvent *)event;
+
+/**
+ * @abstract Tells the node when presses changed in its view.
+ *
+ * @param presses A set of UIPress instances.
+ * @param event A UIPressesEvent associated with the presses.
+ */
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(nullable UIPressesEvent *)event;
+
+/**
+ * @abstract Tells the node when presses ended in its view.
+ *
+ * @param presses A set of UIPress instances.
+ * @param event A UIPressesEvent associated with the presses.
+ */
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(nullable UIPressesEvent *)event;
+
+/**
+ * @abstract Tells the node when presses were cancelled in its view.
+ *
+ * @param presses A set of UIPress instances.
+ * @param event A UIPressesEvent associated with the presses.
+ */
+- (void)pressesCancelled:(nullable NSSet<UIPress *> *)presses withEvent:(nullable UIPressesEvent *)event;
 
 #pragma mark - Managing Gesture Recognizers
 /** @name Managing Gesture Recognizers */

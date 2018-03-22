@@ -153,6 +153,15 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
 - (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
 
+/*
+ * ASCellNode can override press events in order to perform special actions for the containing node. If the press is not
+ * handled, the super method should be called.
+ */
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(nullable UIPressesEvent *)event;
+- (void)pressesChanged:(NSSet<UITouch *> *)presses withEvent:(nullable UIPressesEvent *)event;
+- (void)pressesEnded:(NSSet<UITouch *> *)presses withEvent:(nullable UIPressesEvent *)event;
+- (void)pressesCancelled:(nullable NSSet<UITouch *> *)presses withEvent:(nullable UIPressesEvent *)event;
+
 /** 
  * Called by the system when ASCellNode is used with an ASCollectionNode.  It will not be called by ASTableNode.
  * When the UICollectionViewLayout object returns a new UICollectionViewLayoutAttributes object, the corresponding ASCellNode will be updated.

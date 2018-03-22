@@ -17,6 +17,7 @@
 
 #import "_ASCollectionViewCell.h"
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <AsyncDisplayKit/ASDisplayNode+ASFocusInternal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
@@ -52,6 +53,42 @@
   [self.node cellNodeVisibilityEvent:event inScrollView:scrollView withCellFrame:self.frame];
 }
 
+// Focus Engine
+- (BOOL)canBecomeFocused
+{
+  return [self.node __canBecomeFocusedWithUIKitFallbackBlock:^BOOL{
+    return [super canBecomeFocused];
+  }];
+}
+
+- (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
+{
+  return [self.node __shouldUpdateFocusInContext:context withUIKitFallbackBlock:^BOOL{
+    return [super shouldUpdateFocusInContext:context];
+  }];
+}
+
+- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
+{
+  [super didUpdateFocusInContext:context withAnimationCoordinator:coordinator];
+  [self.node __didUpdateFocusInContext:context withAnimationCoordinator:coordinator withUIKitFallbackBlock:nil];
+}
+
+- (NSArray<id<UIFocusEnvironment>> *)preferredFocusEnvironments API_AVAILABLE(ios(10.0), tvos(10.0))
+{
+  return [self.node __preferredFocusEnvironmentsWithUIKitFallbackBlock:^NSArray<id<UIFocusEnvironment>> * _Nonnull{
+    return [super preferredFocusEnvironments];
+  }];
+}
+
+- (UIView *)preferredFocusedView
+{
+  return [self.node __preferredFocusedViewWithUIKitFallbackBlock:^UIView * _Nullable{
+    return [super preferredFocusedView];
+  }];
+}
+
+// Selection
 - (void)setSelected:(BOOL)selected
 {
   [super setSelected:selected];
@@ -64,12 +101,14 @@
   [self.node __setHighlightedFromUIKit:highlighted];
 }
 
+// Layout attributes
 - (void)setLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _layoutAttributes = layoutAttributes;
   self.node.layoutAttributes = layoutAttributes;
 }
 
+// Reuse
 - (void)prepareForReuse
 {
   self.layoutAttributes = nil;

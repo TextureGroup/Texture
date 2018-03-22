@@ -223,6 +223,34 @@
   [(_ASDisplayView *)self.view __forwardTouchesCancelled:touches withEvent:event];
 }
 
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self.view isKindOfClass:_ASDisplayView.class], @"ASCellNode views must be of type _ASDisplayView");
+  [(_ASDisplayView *)self.view __forwardPressesBegan:presses withEvent:event];
+}
+
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self.view isKindOfClass:_ASDisplayView.class], @"ASCellNode views must be of type _ASDisplayView");
+  [(_ASDisplayView *)self.view __forwardPressesChanged:presses withEvent:event];
+}
+
+- (void)pressesEnded:(NSSet<UITouch *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self.view isKindOfClass:_ASDisplayView.class], @"ASCellNode views must be of type _ASDisplayView");
+  [(_ASDisplayView *)self.view __forwardPressesEnded:presses withEvent:event];
+}
+
+- (void)pressesCancelled:(NSSet<UITouch *> *)presses withEvent:(UIPressesEvent *)event
+{
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert([self.view isKindOfClass:_ASDisplayView.class], @"ASCellNode views must be of type _ASDisplayView");
+  [(_ASDisplayView *)self.view __forwardPressesCancelled:presses withEvent:event];
+}
+
 #pragma clang diagnostic pop
 
 - (void)setLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
