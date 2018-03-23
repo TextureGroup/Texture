@@ -11,6 +11,7 @@
 //
 
 #import "ASGraphicsContext.h"
+#import <AsyncDisplayKit/ASCGImageBuffer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <UIKit/UIGraphics.h>
@@ -105,12 +106,13 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
 
   // We create our own buffer, and wrap the context around that. This way we can prevent
   // the copy that usually gets made when you form a CGImage from the context.
-  NSMutableData *data = [[NSMutableData alloc] initWithLength:bufferSize];
-  CGContextRef context = CGBitmapContextCreate(data.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
+  ASCGImageBuffer *buffer = [[ASCGImageBuffer alloc] initWithLength:bufferSize];
+  
+  CGContextRef context = CGBitmapContextCreate(buffer.mutableBytes, intWidth, intHeight, bitsPerComponent, bytesPerRow, colorspace, bitmapInfo);
   
   // Transfer ownership of the data to the context. So that if the context
   // is destroyed before we create an image from it, the data will be released.
-  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject((__bridge id)context, &__contextDataAssociationKey, buffer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   
   // Set the CTM to account for iOS orientation & specified scale.
   // If only we could use CGContextSetBaseCTM. It doesn't
@@ -128,7 +130,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   CGContextRelease(context);
 }
 
-extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
+extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
 {
   if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -159,11 +161,10 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext()
     UIGraphicsEndImageContext();
   });
   
-  // Retrieve our data and wrap it in a CGDataProvider.
-  // Don't worry, the provider doesn't copy the data – it just retains it.
-  NSMutableData *data = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
-  ASDisplayNodeCAssertNotNil(data, nil);
-  CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)data);
+  // Retrieve our buffer and create a CGDataProvider from it.
+  ASCGImageBuffer *buffer = objc_getAssociatedObject((__bridge id)context, &__contextDataAssociationKey);
+  ASDisplayNodeCAssertNotNil(buffer, nil);
+  CGDataProviderRef provider = [buffer createDataProviderAndInvalidate];
   
   // Create the CGImage. Options taken from CGBitmapContextCreateImage.
   CGImageRef cgImg = CGImageCreate(CGBitmapContextGetWidth(context), CGBitmapContextGetHeight(context), CGBitmapContextGetBitsPerComponent(context), CGBitmapContextGetBitsPerPixel(context), CGBitmapContextGetBytesPerRow(context), imageColorSpace, CGBitmapContextGetBitmapInfo(context), provider, NULL, true, kCGRenderingIntentDefault);

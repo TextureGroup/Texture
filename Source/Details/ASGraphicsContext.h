@@ -52,7 +52,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
  *
  * Behavior is the same as UIGraphicsGetImageFromCurrentImageContext followed by UIGraphicsEndImageContext.
  */
-extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext(void);
+extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext(void) NS_RETURNS_RETAINED;
 
 /**
  * Call this if you want to end the current context without making an image.

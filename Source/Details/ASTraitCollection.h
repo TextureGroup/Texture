@@ -58,6 +58,14 @@ extern ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIConte
 
 #pragma mark - ASPrimitiveTraitCollection
 
+/**
+ * @abstract This is an internal struct-representation of ASTraitCollection.
+ *
+ * @discussion This struct is for internal use only. Framework users should always use ASTraitCollection.
+ *
+ * If you use ASPrimitiveTraitCollection, please do make sure to initialize it with ASPrimitiveTraitCollectionMakeDefault()
+ * or ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection*).
+ */
 typedef struct ASPrimitiveTraitCollection {
   UIUserInterfaceSizeClass horizontalSizeClass;
   UIUserInterfaceSizeClass verticalSizeClass;
@@ -112,17 +120,23 @@ ASDISPLAYNODE_EXTERN_C_END
 @protocol ASTraitEnvironment <NSObject>
 
 /**
- * Returns a struct-representation of the environment's ASEnvironmentDisplayTraits. This only exists as a internal
- * convenience method. Users should access the trait collections through the NSObject based asyncTraitCollection API
+ * @abstract Returns a struct-representation of the environment's ASEnvironmentDisplayTraits.
+ *
+ * @discussion This only exists as an internal convenience method. Users should access the trait collections through
+ * the NSObject based asyncTraitCollection API
  */
 - (ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 /**
- * Sets a trait collection on this environment state.
+ * @abstract Sets a trait collection on this environment state.
+ *
+ * @discussion This only exists as an internal convenience method. Users should not override trait collection using it.
+ * Use [ASViewController overrideDisplayTraitsWithTraitCollection] block instead.
  */
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
+ * @abstract Returns the thread-safe UITraitCollection equivalent.
  */
 - (ASTraitCollection *)asyncTraitCollection;
 
@@ -179,14 +193,12 @@ AS_SUBCLASSING_RESTRICTED
 
 @property (nonatomic, assign, readonly) CGSize containerSize;
 
-+ (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits;
-
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
-                                              containerSize:(CGSize)windowSize;
+                                              containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                               containerSize:(CGSize)windowSize
-                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory;
+                                fallbackContentSizeCategory:(UIContentSizeCategory)fallbackContentSizeCategory NS_RETURNS_RETAINED;
 
 #if TARGET_OS_TV
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
@@ -198,7 +210,7 @@ AS_SUBCLASSING_RESTRICTED
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                            userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
                                  preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
-                                                containerSize:(CGSize)windowSize;
+                                                containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 #else
 + (ASTraitCollection *)traitCollectionWithHorizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
                                             verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
@@ -208,15 +220,27 @@ AS_SUBCLASSING_RESTRICTED
                                          forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                               layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                  preferredContentSizeCategory:(UIContentSizeCategory)preferredContentSizeCategory
-                                                containerSize:(CGSize)windowSize;
+                                                containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;
 #endif
 
-- (ASPrimitiveTraitCollection)primitiveTraitCollection;
 - (BOOL)isEqualToTraitCollection:(ASTraitCollection *)traitCollection;
 
 @end
 
+/**
+ * These are internal helper methods. Should never be called by the framework users.
+ */
+@interface ASTraitCollection (PrimitiveTraits)
+
++ (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits NS_RETURNS_RETAINED;
+
+- (ASPrimitiveTraitCollection)primitiveTraitCollection;
+
+@end
+
 @interface ASTraitCollection (Deprecated)
+
+- (instancetype)init ASDISPLAYNODE_DEPRECATED_MSG("The default constructor of this class is going to become unavailable. Use other constructors instead.");
 
 + (ASTraitCollection *)traitCollectionWithDisplayScale:(CGFloat)displayScale
                                     userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
@@ -224,7 +248,7 @@ AS_SUBCLASSING_RESTRICTED
                                      verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                          containerSize:(CGSize)windowSize
-  ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
+  NS_RETURNS_RETAINED ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
 
 @end
 

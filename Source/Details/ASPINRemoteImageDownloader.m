@@ -114,7 +114,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
 @implementation ASPINRemoteImageDownloader
 
-+ (ASPINRemoteImageDownloader *)sharedDownloader
++ (ASPINRemoteImageDownloader *)sharedDownloader NS_RETURNS_RETAINED
 {
 
   static dispatch_once_t onceToken = 0;

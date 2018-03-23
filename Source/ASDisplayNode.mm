@@ -462,7 +462,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
  *
  * Result is of type NSValue<[Ivar]>
  */
-+ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation
++ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation NS_RETURNS_RETAINED
 {
   static NSCache<Class, NSValue *> *ivarsCache;
   static dispatch_once_t onceToken;
