@@ -44,7 +44,7 @@
   NSURL *_URL;
   UIImage *_defaultImage;
 
-  std::atomic_uint _cacheToken;
+  NSUUID *_cacheUUID;
   id _downloadIdentifier;
   // The download identifier that we have set a progress block on, if any.
   id _downloadIdentifierForProgressBlock;
@@ -537,7 +537,7 @@
   }
   _downloadIdentifier = nil;
 
-  _cacheToken++;
+  _cacheUUID = nil;
 }
 
 - (void)_downloadImageWithCompletion:(void (^)(id <ASImageContainerProtocol> imageContainer, NSError*, id downloadIdentifier, id userInfo))finished
@@ -685,7 +685,7 @@
           //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
           if (ASInterfaceStateIncludesPreload(strongSelf->_interfaceState) == NO) {
             strongSelf->_downloadIdentifier = nil;
-            strongSelf->_cacheToken++;
+            strongSelf->_cacheUUID = nil;
             return;
           }
           
@@ -704,7 +704,7 @@
           }
           
           strongSelf->_downloadIdentifier = nil;
-          strongSelf->_cacheToken++;
+          strongSelf->_cacheUUID = nil;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
           
@@ -738,15 +738,16 @@
       // As the _cache and _downloader is only set once in the intializer we don't have to use a
       // lock in here
       if (_cache != nil) {
-        auto token = _cacheToken.load();
+        NSUUID *cacheUUID = [NSUUID UUID];
+        ASLockedSelf(_cacheUUID = cacheUUID);
 
         as_log_verbose(ASImageLoadingLog(), "Decaching image for %@ url: %@", self, URL);
         
         ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer) {
-          // If the cache token changed, that means this request was cancelled.
-          auto currentToken = _cacheToken.load();
+          // If the cache UUID changed, that means this request was cancelled.
+          auto currentCacheUUID = ASLockedSelf(_cacheUUID);
           
-          if (currentToken != token) {
+          if (!ASObjectIsEqual(currentCacheUUID, cacheUUID)) {
             return;
           }
           
