@@ -15,21 +15,21 @@
 #import <AsyncDisplayKit/ASConfigurationDelegate.h>
 #import <stdatomic.h>
 
-@interface ASConfigurationManager () {
+#define ASGetSharedConfigMgr() (__bridge ASConfigurationManager *)ASConfigurationManager.sharedInstance
+
+@implementation ASConfigurationManager {
+  ASConfiguration *_config;
+  dispatch_queue_t _delegateQueue;
   _Atomic(ASExperimentalFeatures) _activatedExperiments;
 }
-@property (nonatomic, readonly) dispatch_queue_t delegateQueue;
-@property (nonatomic, readonly) ASConfiguration *config;
-@end
 
-@implementation ASConfigurationManager
-
-+ (__unsafe_unretained ASConfigurationManager *)sharedInstance
+/// Return CFTypeRef to avoid retain/release on this singleton.
++ (CFTypeRef)sharedInstance
 {
-  static ASConfigurationManager *inst;
+  static CFTypeRef inst;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    inst = [[ASConfigurationManager alloc] init];
+    inst = (__bridge_retained CFTypeRef)[[ASConfigurationManager alloc] init];
   });
   return inst;
 }
@@ -60,12 +60,10 @@
   
   // Notify delegate if needed.
   if (newlyTriggered != 0) {
-    id<ASConfigurationDelegate> del = _config.delegate;
-    if ([del respondsToSelector:@selector(textureDidActivateExperimentalFeatures:)]) {
-      dispatch_async(self.delegateQueue, ^{
-        [del textureDidActivateExperimentalFeatures:newlyTriggered];
-      });
-    }
+    __unsafe_unretained id<ASConfigurationDelegate> del = _config.delegate;
+    dispatch_async(_delegateQueue, ^{
+      [del textureDidActivateExperimentalFeatures:newlyTriggered];
+    });
   }
   
   return (enabled != 0);
@@ -74,7 +72,7 @@
 #if DEBUG
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration
 {
-  ASConfigurationManager *inst = [self sharedInstance];
+  ASConfigurationManager *inst = ASGetSharedConfigMgr();
   inst->_config = configuration;
   atomic_store(&inst->_activatedExperiments, 0);
 }
@@ -84,6 +82,5 @@
 
 BOOL ASActivateExperimentalFeature(ASExperimentalFeatures feature)
 {
-  __unsafe_unretained ASConfigurationManager *inst = [ASConfigurationManager sharedInstance];
-  return [inst activateExperimentalFeature:feature];
+  return [ASGetSharedConfigMgr() activateExperimentalFeature:feature];
 }

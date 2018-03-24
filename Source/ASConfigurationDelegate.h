@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Used to communicate configuration-related events to the client.
  */
 @protocol ASConfigurationDelegate <NSObject>
-@optional
 
 /**
  * Texture performed its first behavior related to the feature(s).

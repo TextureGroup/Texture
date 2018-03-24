@@ -328,6 +328,7 @@
 		CC0F886D1E4286FA00576FED /* ReferenceImages_iOS_10 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */; };
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */; };
 		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CC224E962066CA6D00BBA57F /* configuration.json in Resources */ = {isa = PBXBuildFile; fileRef = CC224E952066CA6D00BBA57F /* configuration.json */; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
 		CC2F65EF1E5FFB1600DA57C9 /* ASMutableElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */; };
 		CC3B20841C3F76D600798563 /* ASPendingStateController.h in Headers */ = {isa = PBXBuildFile; fileRef = CC3B20811C3F76D600798563 /* ASPendingStateController.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -827,6 +828,7 @@
 		CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_iOS_10; sourceTree = "<group>"; };
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageNodeTests.m; sourceTree = "<group>"; };
 		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
+		CC224E952066CA6D00BBA57F /* configuration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = configuration.json; sourceTree = "<group>"; };
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMutableElementMap.h; sourceTree = "<group>"; };
 		CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMutableElementMap.m; sourceTree = "<group>"; };
@@ -1063,6 +1065,7 @@
 			isa = PBXGroup;
 			children = (
 				058D09B1195D04C000B7D73C /* Source */,
+				CC224E942066CA6D00BBA57F /* Schemas */,
 				058D09C5195D04C000B7D73C /* Tests */,
 				058D09AE195D04C000B7D73C /* Frameworks */,
 				058D09AD195D04C000B7D73C /* Products */,
@@ -1632,6 +1635,14 @@
 			path = Layout;
 			sourceTree = "<group>";
 		};
+		CC224E942066CA6D00BBA57F /* Schemas */ = {
+			isa = PBXGroup;
+			children = (
+				CC224E952066CA6D00BBA57F /* configuration.json */,
+			);
+			path = Schemas;
+			sourceTree = "<group>";
+		};
 		CC583ABF1EF9BAB400134156 /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -2141,6 +2152,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC224E962066CA6D00BBA57F /* configuration.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
