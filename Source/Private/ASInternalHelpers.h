@@ -76,6 +76,14 @@ ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
   }
 }
 
+ASDISPLAYNODE_INLINE BOOL ASCompareAssignCopy(id _Nullable __strong * _Nonnull objPtr, id<NSCopying> newObj) {
+  BOOL result = !(*objPtr == newObj || [*objPtr isEqual:newObj]);
+  if (result) {
+    *objPtr = [newObj copyWithZone:NULL];
+  }
+  return result;
+}
+
 /**
  @summary Conditionally performs UIView geometry changes in the given block without animation.
  

@@ -21,11 +21,12 @@
 #if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
-#include <mutex>
+#import <mutex>
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -40,6 +41,7 @@
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 /**
  * If set, we will record all values set to attributedText into an array
@@ -323,13 +325,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (ASTextKitRenderer *)_renderer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return [self _locked_renderer];
 }
 
 - (ASTextKitRenderer *)_rendererWithBounds:(CGRect)bounds
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return [self _locked_rendererWithBounds:bounds];
 }
 
@@ -365,27 +367,19 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
 {
-  __instanceLock__.lock();
-    BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(textContainerInset, _textContainerInset);
-    if (needsUpdate) {
-      _textContainerInset = textContainerInset;
-    }
-  __instanceLock__.unlock();
-
-  if (needsUpdate) {
+  if (ASLockedSelfCompareAssignCustom(_textContainerInset, textContainerInset, UIEdgeInsetsEqualToEdgeInsets)) {
     [self setNeedsLayout];
   }
 }
 
 - (UIEdgeInsets)textContainerInset
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _textContainerInset;
+  return ASLockedSelf(_textContainerInset);
 }
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
   ASDisplayNodeAssert(constrainedSize.height >= 0, @"Constrained height for text (%f) is too short", constrainedSize.height);
@@ -434,7 +428,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSAttributedString *)attributedText
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _attributedText;
 }
 
@@ -447,7 +441,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   // Don't hold textLock for too long.
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     if (ASObjectIsEqual(attributedText, _attributedText)) {
       return;
     }
@@ -484,7 +478,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setExclusionPaths:(NSArray *)exclusionPaths
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
   
     if (ASObjectIsEqual(exclusionPaths, _exclusionPaths)) {
       return;
@@ -499,7 +493,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSArray *)exclusionPaths
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _exclusionPaths;
 }
@@ -508,7 +502,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return [[ASTextNodeDrawParameter alloc] initWithRendererAttributes:[self _locked_rendererAttributes]
                                                      backgroundColor:self.backgroundColor
@@ -560,7 +554,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASDisplayNodeAssertMainThread();
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASTextKitRenderer *renderer = [self _locked_renderer];
   NSRange visibleRange = renderer.firstVisibleRange;
@@ -687,14 +681,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (ASTextNodeHighlightStyle)highlightStyle
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _highlightStyle;
 }
 
 - (void)setHighlightStyle:(ASTextNodeHighlightStyle)highlightStyle
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   _highlightStyle = highlightStyle;
 }
@@ -778,7 +772,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       }
 
       if (highlightTargetLayer != nil) {
-        ASDN::MutexLocker l(__instanceLock__);
+        ASLockScopeSelf();
         ASTextKitRenderer *renderer = [self _locked_renderer];
 
         NSArray *highlightRects = [renderer rectsForTextRange:highlightRange measureOption:ASTextKitRendererMeasureOptionBlock];
@@ -866,7 +860,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (NSArray *)_rectsForTextRange:(NSRange)textRange measureOption:(ASTextKitRendererMeasureOption)measureOption
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   NSArray *rects = [[self _locked_renderer] rectsForTextRange:textRange measureOption:measureOption];
   NSMutableArray *adjustedRects = [NSMutableArray array];
@@ -884,7 +878,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGRect)trailingRect
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   CGRect rect = [[self _locked_renderer] trailingRect];
   return ASTextNodeAdjustRenderRectForShadowPadding(rect, self.shadowPadding);
@@ -892,7 +886,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGRect)frameForTextRange:(NSRange)textRange
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   CGRect frame = [[self _locked_renderer] frameForTextRange:textRange];
   return ASTextNodeAdjustRenderRectForShadowPadding(frame, self.shadowPadding);
@@ -902,7 +896,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   _placeholderColor = placeholderColor;
 
@@ -919,7 +913,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
     return nil;
   }
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASGraphicsBeginImageContextWithOptions(size, NO, 1.0);
   [self.placeholderColor setFill];
@@ -1000,7 +994,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   if (inAdditionalTruncationMessage) {
     NSRange visibleRange = NSMakeRange(0, 0);
     {
-      ASDN::MutexLocker l(__instanceLock__);
+      ASLockScopeSelf();
       visibleRange = [self _locked_renderer].firstVisibleRange;
     }
     NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
@@ -1079,14 +1073,14 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (BOOL)_pendingLinkTap
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && _delegate != nil;
 }
 
 - (BOOL)_pendingTruncationTap
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
@@ -1095,31 +1089,29 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGColorRef)shadowColor
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  return _shadowColor;
+  return ASLockedSelf(_shadowColor);
 }
 
 - (void)setShadowColor:(CGColorRef)shadowColor
 {
-  __instanceLock__.lock();
+  [self lock];
 
   if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
     CGColorRelease(_shadowColor);
     _shadowColor = CGColorRetain(shadowColor);
     _cachedShadowUIColor = [UIColor colorWithCGColor:shadowColor];
-    __instanceLock__.unlock();
+    [self unlock];
     
     [self setNeedsDisplay];
     return;
   }
 
-  __instanceLock__.unlock();
+  [self unlock];
 }
 
 - (CGSize)shadowOffset
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowOffset;
 }
@@ -1127,7 +1119,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) {
       return;
@@ -1140,7 +1132,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGFloat)shadowOpacity
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowOpacity;
 }
@@ -1148,7 +1140,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (void)setShadowOpacity:(CGFloat)shadowOpacity
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_shadowOpacity == shadowOpacity) {
       return;
@@ -1162,7 +1154,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGFloat)shadowRadius
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowRadius;
 }
@@ -1170,7 +1162,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (void)setShadowRadius:(CGFloat)shadowRadius
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_shadowRadius == shadowRadius) {
       return;
@@ -1184,7 +1176,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (UIEdgeInsets)shadowPadding
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return [self _locked_renderer].shadower.shadowPadding;
 }
 
@@ -1202,14 +1194,14 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSAttributedString *)truncationAttributedText
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _truncationAttributedText;
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (ASObjectIsEqual(_truncationAttributedText, truncationAttributedText)) {
       return;
@@ -1224,7 +1216,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (ASObjectIsEqual(_additionalTruncationMessage, additionalTruncationMessage)) {
       return;
@@ -1239,7 +1231,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_truncationMode == truncationMode) {
       return;
@@ -1253,7 +1245,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)isTruncated
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return [[self _locked_renderer] isTruncated];
 }
@@ -1261,7 +1253,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setPointSizeScaleFactors:(NSArray *)pointSizeScaleFactors
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     if ([_pointSizeScaleFactors isEqualToArray:pointSizeScaleFactors]) {
       return;
     }
@@ -1275,7 +1267,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_maximumNumberOfLines == maximumNumberOfLines) {
       return;
@@ -1289,7 +1281,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSUInteger)lineCount
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return [[self _locked_renderer] lineCount];
 }
@@ -1299,7 +1291,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)_invalidateTruncationText
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     _composedTruncationText = nil;
   }
 
@@ -1312,7 +1304,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSRange)_additionalTruncationMessageRangeWithVisibleRange:(NSRange)visibleRange
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   // Check if we even have an additional truncation message.
   if (!_additionalTruncationMessage) {

@@ -22,7 +22,7 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -305,11 +305,11 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
   drawParameters->_image = [self _locked_Image];
-  drawParameters->_bounds = [self threadSafeBounds];
+  drawParameters->_bounds = self.bounds;
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;
@@ -325,7 +325,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   // Hack for now to retain the weak entry that was created while this drawing happened
   drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     _weakCacheEntry = entry;
   };
   

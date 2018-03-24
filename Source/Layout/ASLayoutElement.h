@@ -174,7 +174,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
 - (void)style:(__kindof ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName;
 @end
 
-@interface ASLayoutElementStyle : NSObject <ASStackLayoutElement, ASAbsoluteLayoutElement, ASLayoutElementExtensibility>
+@interface ASLayoutElementStyle : NSObject <ASStackLayoutElement, ASAbsoluteLayoutElement, ASLayoutElementExtensibility, NSLocking>
 
 /**
  * @abstract Initializes the layoutElement style with a specified delegate

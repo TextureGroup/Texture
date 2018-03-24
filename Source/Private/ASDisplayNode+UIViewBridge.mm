@@ -21,7 +21,6 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASPendingStateController.h>
 
 /**
@@ -45,8 +44,8 @@
 #define __loaded(node) (node->_view != nil || (node->_layer != nil && node->_flags.layerBacked))
 
 #if DISPLAYNODE_USE_LOCKS
-#define _bridge_prologue_read ASDN::MutexLocker l(__instanceLock__); ASDisplayNodeAssertThreadAffinity(self)
-#define _bridge_prologue_write ASDN::MutexLocker l(__instanceLock__)
+#define _bridge_prologue_read ASLockScopeSelf(); ASDisplayNodeAssertThreadAffinity(self)
+#define _bridge_prologue_write ASLockScopeSelf()
 #else
 #define _bridge_prologue_read ASDisplayNodeAssertThreadAffinity(self)
 #define _bridge_prologue_write
@@ -186,7 +185,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (CGFloat)cornerRadius
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _cornerRadius;
 }
 
@@ -197,7 +196,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (ASCornerRoundingType)cornerRoundingType
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _cornerRoundingType;
 }
 

@@ -18,7 +18,6 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
@@ -35,6 +34,9 @@
 #import <AsyncDisplayKit/_ASScopeTimer.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -93,7 +95,7 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
 
 _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
 {
-  ASDN::MutexLocker l(node->__instanceLock__);
+  ASLockScope(node);
   _ASPendingState *result = node->_pendingViewState;
   if (result == nil) {
     result = [[_ASPendingState alloc] init];
@@ -357,6 +359,16 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
   
   return self;
+}
+
+- (void)lock
+{
+  __instanceLock__.lock();
+}
+
+- (void)unlock
+{
+  __instanceLock__.unlock();
 }
 
 - (void)setViewBlock:(ASDisplayNodeViewBlock)viewBlock

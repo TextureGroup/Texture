@@ -232,6 +232,22 @@
   ((c *) ([__val class] == [c class] ? __val : nil));\
 })
 
+// Compare two primitives, assign if different. Returns whether the assignment happened.
+#define ASCompareAssign(lvalue, newValue) ({  \
+  BOOL result = (lvalue != newValue);        \
+  if (result) { lvalue = newValue; }         \
+  result;                                       \
+})
+
+// e.g. ASCompareAssignCustom(_myInsets, insets, UIEdgeInsetsEqualToEdgeInsets)
+#define ASCompareAssignCustom(lvalue, newValue, isequal) ({  \
+  BOOL result = !(isequal(lvalue, newValue));               \
+  if (result) { lvalue = newValue; }                        \
+  result;                                                      \
+})
+
+// Also see function `ASCompareAssignCopy` in ASInternalHelpers.h.
+
 /**
  * Create a new set by mapping `collection` over `work`, ignoring nil.
  */
