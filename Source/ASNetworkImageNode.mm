@@ -213,8 +213,7 @@
 
 - (NSURL *)URL
 {
-  ASLockScopeSelf();
-  return _URL;
+  return ASLockedSelf(_URL);
 }
 
 - (void)setDefaultImage:(UIImage *)defaultImage
