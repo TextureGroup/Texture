@@ -24,6 +24,10 @@
 {
   if (self = [super init]) {
     autotype featureStrings = ASDynamicCast(dictionary[@"experimental_features"], NSArray);
+    autotype version = ASDynamicCast(dictionary[@"version"], NSNumber).integerValue;
+    if (version != ASConfigurationSchemaCurrentVersion) {
+      NSLog(@"Texture warning: configuration schema is old version (%zd vs %zd)", version, ASConfigurationSchemaCurrentVersion);
+    }
     self.experimentalFeatures = ASExperimentalFeaturesFromArray(featureStrings);
   }
   return self;
@@ -39,7 +43,7 @@
 
 @end
 
-//#define AS_FIXED_CONFIG_JSON "{ \"experimental_features\": [ \"exp_text_node\" ] }"
+//#define AS_FIXED_CONFIG_JSON "{ \"version\" : 1, \"experimental_features\": [ \"exp_text_node\" ] }"
 
 #ifdef AS_FIXED_CONFIG_JSON
 

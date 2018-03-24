@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
@@ -494,7 +495,6 @@ typedef enum {
   CFRunLoopObserverRef _postTransactionObserver;
   NSPointerArray *_internalQueue;
   ASDN::RecursiveMutex _internalQueueLock;
-  BOOL _disableInterfaceStateCoalesce;
   BOOL _CATransactionCommitInProgress;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
@@ -671,7 +671,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     return;
   }
 
-  if (_disableInterfaceStateCoalesce || _CATransactionCommitInProgress) {
+  if (!ASActivateExperimentalFeature(ASExperimentalInterfaceStateCoalescing) || _CATransactionCommitInProgress) {
     [object prepareForCATransactionCommit];
     return;
   }
@@ -700,16 +700,6 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
 {
   ASDN::MutexLocker l(_internalQueueLock);
   return _internalQueue.count == 0;
-}
-
-- (void)disable
-{
-  _disableInterfaceStateCoalesce = YES;
-}
-
-- (BOOL)disabled
-{
-  return _disableInterfaceStateCoalesce;
 }
 
 @end

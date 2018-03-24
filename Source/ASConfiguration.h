@@ -18,6 +18,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static NSInteger const ASConfigurationSchemaCurrentVersion = 1;
+
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfiguration : NSObject <NSCopying>
 
