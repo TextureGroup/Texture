@@ -234,16 +234,16 @@
 
 // Compare two primitives, assign if different. Returns whether the assignment happened.
 #define ASCompareAssign(lvalue, newValue) ({  \
-  BOOL result = (lvalue != newValue);        \
-  if (result) { lvalue = newValue; }         \
-  result;                                       \
+  BOOL result = (lvalue != newValue);         \
+  if (result) { lvalue = newValue; }          \
+  result;                                     \
 })
 
 // e.g. ASCompareAssignCustom(_myInsets, insets, UIEdgeInsetsEqualToEdgeInsets)
 #define ASCompareAssignCustom(lvalue, newValue, isequal) ({  \
-  BOOL result = !(isequal(lvalue, newValue));               \
-  if (result) { lvalue = newValue; }                        \
-  result;                                                      \
+  BOOL result = !(isequal(lvalue, newValue));                \
+  if (result) { lvalue = newValue; }                         \
+  result;                                                    \
 })
 
 // Also see function `ASCompareAssignCopy` in ASInternalHelpers.h.
