@@ -88,7 +88,7 @@ ASDISPLAYNODE_EXTERN_C_END
   @result An NSParagraphStyle initialized with as many of the paragraph specifiers from `coreTextParagraphStyle` as possible.
 
  */
-+ (instancetype)paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextParagraphStyle;
++ (instancetype)paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextParagraphStyle NS_RETURNS_RETAINED;
 
 @end
 

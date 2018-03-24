@@ -213,7 +213,7 @@ static BOOL __enableHitTestDebug = NO;
 
 @interface _ASRangeDebugOverlayView : UIView
 
-+ (instancetype)sharedInstance;
++ (instancetype)sharedInstance NS_RETURNS_RETAINED;
 
 - (void)addRangeController:(ASRangeController *)rangeController;
 
@@ -311,7 +311,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   return [[NSClassFromString(@"UIApplication") sharedApplication] keyWindow];
 }
 
-+ (instancetype)sharedInstance
++ (_ASRangeDebugOverlayView *)sharedInstance NS_RETURNS_RETAINED
 {
   static _ASRangeDebugOverlayView *__rangeDebugOverlay = nil;
   
@@ -752,7 +752,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
     return rangeBarImageNode;
 }
 
-+ (NSAttributedString *)whiteAttributedStringFromString:(NSString *)string withSize:(CGFloat)size
++ (NSAttributedString *)whiteAttributedStringFromString:(NSString *)string withSize:(CGFloat)size NS_RETURNS_RETAINED
 {
   NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor whiteColor],
                                NSFontAttributeName            : [UIFont systemFontOfSize:size]};

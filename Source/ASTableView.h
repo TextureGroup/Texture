@@ -219,7 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
  * See ASTableNode.h for full documentation of these methods.
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASTableNode waitUntilAllUpdatesAreProcessed] instead.");
 
 - (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");

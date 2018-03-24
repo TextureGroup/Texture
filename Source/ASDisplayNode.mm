@@ -462,7 +462,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
  *
  * Result is of type NSValue<[Ivar]>
  */
-+ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation
++ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation NS_RETURNS_RETAINED
 {
   static NSCache<Class, NSValue *> *ivarsCache;
   static dispatch_once_t onceToken;
@@ -1046,15 +1046,11 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  // Use a pthread specific to mark when this method is called re-entrant on same thread.
   // We only want one calculateLayout signpost interval per thread.
-  // This is fast enough to do it unconditionally.
-  auto key = ASPthreadStaticKey(NULL);
-  BOOL isRootCall = (pthread_getspecific(key) == NULL);
+  static _Thread_local NSInteger tls_callDepth;
   as_activity_scope_verbose(as_activity_create("Calculate node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   as_log_verbose(ASLayoutLog(), "Calculating layout for %@ sizeRange %@", self, NSStringFromASSizeRange(constrainedSize));
-  if (isRootCall) {
-    pthread_setspecific(key, kCFBooleanTrue);
+  if (tls_callDepth++ == 0) {
     ASSignpostStart(ASSignpostCalculateLayout);
   }
 
@@ -1063,8 +1059,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
   as_log_verbose(ASLayoutLog(), "Calculated layout %@", result);
 
-  if (isRootCall) {
-    pthread_setspecific(key, NULL);
+  if (--tls_callDepth == 0) {
     ASSignpostEnd(ASSignpostCalculateLayout);
   }
   return result;
@@ -3606,40 +3601,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // Subclass override
 }
-
-#if TARGET_OS_TV
-#pragma mark - UIFocusEnvironment Protocol (tvOS)
-
-- (void)setNeedsFocusUpdate
-{
-  
-}
-
-- (void)updateFocusIfNeeded
-{
-  
-}
-
-- (BOOL)shouldUpdateFocusInContext:(UIFocusUpdateContext *)context
-{
-  return NO;
-}
-
-- (void)didUpdateFocusInContext:(UIFocusUpdateContext *)context withAnimationCoordinator:(UIFocusAnimationCoordinator *)coordinator
-{
-  
-}
-
-- (UIView *)preferredFocusedView
-{
-  if (self.nodeLoaded) {
-    return self.view;
-  } else {
-    return nil;
-  }
-}
-#endif
-
 @end
 
 #pragma mark - ASDisplayNode (Debugging)
