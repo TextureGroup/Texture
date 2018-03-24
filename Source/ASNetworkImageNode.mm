@@ -41,7 +41,7 @@
   NSURL *_URL;
   UIImage *_defaultImage;
 
-  NSUUID *_cacheUUID;
+  NSInteger _cacheSentinel;
   id _downloadIdentifier;
   // The download identifier that we have set a progress block on, if any.
   id _downloadIdentifierForProgressBlock;
@@ -549,8 +549,7 @@
     }
   }
   _downloadIdentifier = nil;
-
-  _cacheUUID = nil;
+  _cacheSentinel++;
 }
 
 - (void)_downloadImageWithCompletion:(void (^)(id <ASImageContainerProtocol> imageContainer, NSError*, id downloadIdentifier, id userInfo))finished
@@ -698,7 +697,7 @@
           //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)
           if (ASInterfaceStateIncludesPreload(strongSelf->_interfaceState) == NO) {
             strongSelf->_downloadIdentifier = nil;
-            strongSelf->_cacheUUID = nil;
+            strongSelf->_cacheSentinel++;
             return;
           }
           
@@ -717,7 +716,7 @@
           }
           
           strongSelf->_downloadIdentifier = nil;
-          strongSelf->_cacheUUID = nil;
+          strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
           
@@ -751,21 +750,19 @@
       // As the _cache and _downloader is only set once in the intializer we don't have to use a
       // lock in here
       if (_cache != nil) {
-        NSUUID *cacheUUID = [NSUUID UUID];
         __instanceLock__.lock();
-          _cacheUUID = cacheUUID;
+          NSInteger cacheSentinel = _cacheSentinel;
         __instanceLock__.unlock();
 
         as_log_verbose(ASImageLoadingLog(), "Decaching image for %@ url: %@", self, URL);
         
         ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer) {
-          // If the cache UUID changed, that means this request was cancelled.
-          __instanceLock__.lock();
-          NSUUID *currentCacheUUID = _cacheUUID;
-          __instanceLock__.unlock();
-          
-          if (!ASObjectIsEqual(currentCacheUUID, cacheUUID)) {
-            return;
+          // If the cache sentinel changed, that means this request was cancelled.
+          {
+            ASDN::MutexLocker l(__instanceLock__);
+            if (_cacheSentinel != cacheSentinel) {
+              return;
+            }
           }
           
           if ([imageContainer asdk_image] == nil && _downloader != nil) {
