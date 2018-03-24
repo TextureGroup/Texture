@@ -38,3 +38,26 @@
 }
 
 @end
+
+//#define AS_FIXED_CONFIG_JSON "{ \"experimental_features\": [ \"exp_text_node\" ] }"
+
+#ifdef AS_FIXED_CONFIG_JSON
+
+@implementation ASConfiguration (UserProvided)
+
++ (ASConfiguration *)textureConfiguration NS_RETURNS_RETAINED
+{
+  NSData *data = [@AS_FIXED_CONFIG_JSON dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *error;
+  NSDictionary *d = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+  if (!d) {
+    NSAssert(NO, @"Error parsing fixed config string '%s': %@", AS_FIXED_CONFIG_JSON, error);
+    return nil;
+  } else {
+    return [[ASConfiguration alloc] initWithDictionary:d];
+  }
+}
+
+@end
+
+#endif // AS_FIXED_CONFIG_JSON

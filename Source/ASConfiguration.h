@@ -47,9 +47,14 @@ AS_SUBCLASSING_RESTRICTED
  * Implement this method in a category to make your
  * configuration available to Texture. It will be read
  * only once and copied.
+ *
+ * NOTE: To specify your configuration at compile-time, you can
+ * define AS_FIXED_CONFIG_JSON as a C-string of JSON. This method
+ * will then be implemented to parse that string and generate
+ * a configuration.
  */
 @interface ASConfiguration (UserProvided)
-+ (ASConfiguration *)textureConfiguration;
++ (ASConfiguration *)textureConfiguration NS_RETURNS_RETAINED;
 @end
 
 NS_ASSUME_NONNULL_END
