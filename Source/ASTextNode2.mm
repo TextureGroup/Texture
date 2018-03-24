@@ -994,22 +994,14 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
-  {
-    ASLockScopeSelf();
-    
-    if (ASObjectIsEqual(_truncationAttributedText, truncationAttributedText)) {
-      return;
-    }
-    
-    _truncationAttributedText = [truncationAttributedText copy];
+  if (ASLockedSelfCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
+    [self _invalidateTruncationText];
   }
-  
-  [self _invalidateTruncationText];
 }
 
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
-  if (ASLockedSelfCompareAssignCopy(&_additionalTruncationMessage, additionalTruncationMessage)) {
+  if (ASLockedSelfCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
     [self _invalidateTruncationText];
   }
 }

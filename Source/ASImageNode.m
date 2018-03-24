@@ -40,8 +40,6 @@
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
-#include <functional>
-
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
 typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
@@ -212,7 +210,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return nil;
   }
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASGraphicsBeginImageContextWithOptions(size, NO, 1);
   [self.placeholderColor setFill];
@@ -226,9 +224,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  __instanceLock__.lock();
-  UIImage *image = _image;
-  __instanceLock__.unlock();
+  UIImage *image = self.image;
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];
@@ -241,7 +237,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (void)setImage:(UIImage *)image
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   [self _locked_setImage:image];
 }
 
@@ -284,13 +280,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (UIImage *)image
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _image;
-}
-
-- (UIImage *)_locked_Image
-{
-  return _image;
+  return ASLockedSelf(_image);
 }
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
@@ -308,7 +298,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASLockScopeSelf();
   
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
-  drawParameters->_image = [self _locked_Image];
+  drawParameters->_image = _image;
   drawParameters->_bounds = self.bounds;
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
@@ -441,17 +431,17 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   return entry.value;
 }
 
-static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
-// Allocate cacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
-
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
+  static NSLock *cacheLock;
+  static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    cacheLock = [[NSLock alloc] init];
+    cache = [[ASWeakMap alloc] init];
+  });
   {
-    ASDN::StaticMutexLocker l(cacheLock);
-    if (!cache) {
-      cache = [[ASWeakMap alloc] init];
-    }
+    ASLockScopeUnowned(cacheLock);
     ASWeakMapEntry *entry = [cache entryForKey:key];
     if (entry != nil) {
       return entry;
@@ -464,10 +454,8 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
     return nil;
   }
 
-  {
-    ASDN::StaticMutexLocker l(cacheLock);
-    return [cache setObject:contents forKey:key];
-  }
+  ASLockScopeUnowned(cacheLock);
+  return [cache setObject:contents forKey:key];
 }
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
@@ -541,11 +529,12 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 {
   [super displayDidFinish];
 
-  __instanceLock__.lock();
+  
+  [self lock];
     void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
     UIImage *image = _image;
     BOOL hasDebugLabel = (_debugLabelNode != nil);
-  __instanceLock__.unlock();
+  [self unlock];
 
   // Update the debug label if necessary
   if (hasDebugLabel) {
@@ -569,9 +558,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
     displayCompletionBlock(NO);
 
-    __instanceLock__.lock();
-      _displayCompletionBlock = nil;
-    __instanceLock__.unlock();
+    ASLockedSelf(_displayCompletionBlock = nil);
   }
 }
 
@@ -584,12 +571,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
 
   // Stash the block and call-site queue. We'll invoke it in -displayDidFinish.
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    if (_displayCompletionBlock != displayCompletionBlock) {
-      _displayCompletionBlock = displayCompletionBlock;
-    }
-  }
+  ASLockedSelf(_displayCompletionBlock = displayCompletionBlock);
 
   [self setNeedsDisplay];
 }
@@ -599,18 +581,15 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 - (void)clearContents
 {
   [super clearContents];
-    
-  __instanceLock__.lock();
-    _weakCacheEntry = nil;  // release contents from the cache.
-  __instanceLock__.unlock();
+  
+  ASLockedSelf(_weakCacheEntry = nil); // release contents from the cache.
 }
 
 #pragma mark - Cropping
 
 - (BOOL)isCropEnabled
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _cropEnabled;
+  return ASLockedSelf(_cropEnabled);
 }
 
 - (void)setCropEnabled:(BOOL)cropEnabled
@@ -620,93 +599,75 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
 - (void)setCropEnabled:(BOOL)cropEnabled recropImmediately:(BOOL)recropImmediately inBounds:(CGRect)cropBounds
 {
-  __instanceLock__.lock();
-  if (_cropEnabled == cropEnabled) {
-    __instanceLock__.unlock();
-    return;
-  }
-
-  _cropEnabled = cropEnabled;
-  _cropDisplayBounds = cropBounds;
-  
-  UIImage *image = _image;
-  __instanceLock__.unlock();
-
-  // If we have an image to display, display it, respecting our recrop flag.
-  if (image != nil) {
-    ASPerformBlockOnMainThread(^{
-      if (recropImmediately)
-        [self displayImmediately];
-      else
-        [self setNeedsDisplay];
-    });
+  ASLockScopeSelf();
+  if (ASCompareAssign(_cropEnabled, cropEnabled)) {
+    _cropEnabled = cropEnabled;
+    _cropDisplayBounds = cropBounds;
+    
+    UIImage *image = _image;
+    
+    // If we have an image to display, display it, respecting our recrop flag.
+    if (image != nil) {
+      ASPerformBlockOnMainThread(^{
+        if (recropImmediately)
+          [self displayImmediately];
+        else
+          [self setNeedsDisplay];
+      });
+    }
   }
 }
 
 - (CGRect)cropRect
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _cropRect;
+  return ASLockedSelf(_cropRect);
 }
 
 - (void)setCropRect:(CGRect)cropRect
 {
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    if (CGRectEqualToRect(_cropRect, cropRect)) {
-      return;
-    }
+  if (ASLockedSelfCompareAssignCustom(_cropRect, cropRect, CGRectEqualToRect)) {
+    // TODO: this logic needs to be updated to respect cropRect.
+    CGSize boundsSize = self.bounds.size;
+    CGSize imageSize = self.image.size;
 
-    _cropRect = cropRect;
+    BOOL isCroppingImage = ((boundsSize.width < imageSize.width) || (boundsSize.height < imageSize.height));
+
+    // Re-display if we need to.
+    ASPerformBlockOnMainThread(^{
+      if (self.nodeLoaded && self.contentMode == UIViewContentModeScaleAspectFill && isCroppingImage)
+        [self setNeedsDisplay];
+    });
   }
-
-  // TODO: this logic needs to be updated to respect cropRect.
-  CGSize boundsSize = self.bounds.size;
-  CGSize imageSize = self.image.size;
-
-  BOOL isCroppingImage = ((boundsSize.width < imageSize.width) || (boundsSize.height < imageSize.height));
-
-  // Re-display if we need to.
-  ASPerformBlockOnMainThread(^{
-    if (self.nodeLoaded && self.contentMode == UIViewContentModeScaleAspectFill && isCroppingImage)
-      [self setNeedsDisplay];
-  });
 }
 
 - (BOOL)forceUpscaling
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _forceUpscaling;
+  return ASLockedSelf(_forceUpscaling);
 }
 
 - (void)setForceUpscaling:(BOOL)forceUpscaling
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _forceUpscaling = forceUpscaling;
+  ASLockedSelf(_forceUpscaling = forceUpscaling);
 }
 
 - (CGSize)forcedSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _forcedSize;
+  return ASLockedSelf(_forcedSize);
 }
 
 - (void)setForcedSize:(CGSize)forcedSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _forcedSize = forcedSize;
+  ASLockedSelf(_forcedSize = forcedSize);
 }
 
 - (asimagenode_modification_block_t)imageModificationBlock
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _imageModificationBlock;
+  return ASLockedSelf(_imageModificationBlock);
 }
 
 - (void)setImageModificationBlock:(asimagenode_modification_block_t)imageModificationBlock
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  _imageModificationBlock = imageModificationBlock;
+  ASLockedSelf(_imageModificationBlock = imageModificationBlock);
 }
 
 #pragma mark - Debug

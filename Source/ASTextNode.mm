@@ -477,25 +477,15 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setExclusionPaths:(NSArray *)exclusionPaths
 {
-  {
-    ASLockScopeSelf();
-  
-    if (ASObjectIsEqual(exclusionPaths, _exclusionPaths)) {
-      return;
-    }
-    
-    _exclusionPaths = [exclusionPaths copy];
+  if (ASLockedSelfCompareAssignCopy(_exclusionPaths, exclusionPaths)) {
+    [self setNeedsLayout];
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsLayout];
-  [self setNeedsDisplay];
 }
 
 - (NSArray *)exclusionPaths
 {
-  ASLockScopeSelf();
-  
-  return _exclusionPaths;
+  return ASLockedSelf(_exclusionPaths);
 }
 
 #pragma mark - Drawing
@@ -896,12 +886,9 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
-  ASLockScopeSelf();
-  
-  _placeholderColor = placeholderColor;
-
-  // prevent placeholders if we don't have a color
-  self.placeholderEnabled = placeholderColor != nil;
+  if (ASLockedSelfCompareAssignCopy(_placeholderColor, placeholderColor)) {
+    self.placeholderEnabled = CGColorGetAlpha(placeholderColor.CGColor) > 0;
+  }
 }
 
 - (UIImage *)placeholderImage
@@ -1111,67 +1098,38 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGSize)shadowOffset
 {
-  ASLockScopeSelf();
-  
-  return _shadowOffset;
+  return ASLockedSelf(_shadowOffset);
 }
 
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
-  {
-    ASLockScopeSelf();
-    
-    if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) {
-      return;
-    }
-    _shadowOffset = shadowOffset;
+  if (ASLockedSelfCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize)) {
+    [self setNeedsDisplay];
   }
-
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowOpacity
 {
-  ASLockScopeSelf();
-  
-  return _shadowOpacity;
+  return ASLockedSelf(_shadowOpacity);
 }
 
 - (void)setShadowOpacity:(CGFloat)shadowOpacity
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_shadowOpacity == shadowOpacity) {
-      return;
-    }
-    
-    _shadowOpacity = shadowOpacity;
+  if (ASLockedSelfCompareAssign(_shadowOpacity, shadowOpacity)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowRadius
 {
-  ASLockScopeSelf();
-  
-  return _shadowRadius;
+  return ASLockedSelf(_shadowRadius);
 }
 
 - (void)setShadowRadius:(CGFloat)shadowRadius
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_shadowRadius == shadowRadius) {
-      return;
-    }
-    
-    _shadowRadius = shadowRadius;
+  if (ASLockedSelfCompareAssign(_shadowRadius, shadowRadius)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (UIEdgeInsets)shadowPadding
@@ -1194,96 +1152,52 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSAttributedString *)truncationAttributedText
 {
-  ASLockScopeSelf();
-  return _truncationAttributedText;
+  return ASLockedSelf(_truncationAttributedText);
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
-  {
-    ASLockScopeSelf();
-    
-    if (ASObjectIsEqual(_truncationAttributedText, truncationAttributedText)) {
-      return;
-    }
-
-    _truncationAttributedText = [truncationAttributedText copy];
+  if (ASLockedSelfCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
+    [self _invalidateTruncationText];
   }
-
-  [self _invalidateTruncationText];
 }
 
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
-  {
-    ASLockScopeSelf();
-    
-    if (ASObjectIsEqual(_additionalTruncationMessage, additionalTruncationMessage)) {
-      return;
-    }
-
-    _additionalTruncationMessage = [additionalTruncationMessage copy];
+  if (ASLockedSelfCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
+    [self _invalidateTruncationText];
   }
-
-  [self _invalidateTruncationText];
 }
 
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_truncationMode == truncationMode) {
-      return;
-    }
-
-    _truncationMode = truncationMode;
+  if (ASLockedSelfCompareAssign(_truncationMode, truncationMode)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (BOOL)isTruncated
 {
-  ASLockScopeSelf();
-  
-  return [[self _locked_renderer] isTruncated];
+  return ASLockedSelf([[self _locked_renderer] isTruncated]);
 }
 
 - (void)setPointSizeScaleFactors:(NSArray *)pointSizeScaleFactors
 {
-  {
-    ASLockScopeSelf();
-    if ([_pointSizeScaleFactors isEqualToArray:pointSizeScaleFactors]) {
-      return;
-    }
-    
-    _pointSizeScaleFactors = pointSizeScaleFactors;
+  if (ASLockedSelfCompareAssignCopy(_pointSizeScaleFactors, pointSizeScaleFactors)) {
+    [self setNeedsDisplay];
   }
-
-  [self setNeedsDisplay];
 }
 
 - (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_maximumNumberOfLines == maximumNumberOfLines) {
-      return;
-    }
-
-    _maximumNumberOfLines = maximumNumberOfLines;
+  if (ASLockedSelfCompareAssign(_maximumNumberOfLines, maximumNumberOfLines)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (NSUInteger)lineCount
 {
-  ASLockScopeSelf();
-  
-  return [[self _locked_renderer] lineCount];
+  return ASLockedSelf([[self _locked_renderer] lineCount]);
 }
 
 #pragma mark - Truncation Message

@@ -246,7 +246,11 @@
   result;                                                    \
 })
 
-// Also see function `ASCompareAssignCopy` in ASInternalHelpers.h.
+#define ASCompareAssignCopy(lvalue, newValue) ({           \
+  BOOL result = !ASObjectIsEqual(lvalue, newValue);        \
+  if (result) { lvalue = [newValue copyWithZone:NULL]; }   \
+  result;                                                  \
+})
 
 /**
  * Create a new set by mapping `collection` over `work`, ignoring nil.

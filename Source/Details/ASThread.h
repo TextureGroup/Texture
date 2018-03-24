@@ -42,20 +42,23 @@ static inline BOOL ASDisplayNodeThreadIsMain()
   id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
   [__lockToken lock];
 
+/// Same as ASLockScope(1) but lock isn't retained (be careful).
+#define ASLockScopeUnowned(nsLocking) \
+  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
+  [__lockToken lock];
+
 ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
+  [*lockPtr unlock];
+}
+
+ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
   [*lockPtr unlock];
 }
 
 /**
  * Same as ASLockScope(1) but it uses self, so we can skip retain/release.
  */
-#define ASLockScopeSelf() \
-  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeSelfCleanup))) = self; \
-  [__lockToken lock];
-
-ASDISPLAYNODE_INLINE void _ASLockScopeSelfCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
-  [*lockPtr unlock];
-}
+#define ASLockScopeSelf() ASLockScopeUnowned(self)
 
 /// One-liner while holding the lock.
 #define ASLocked(nsLocking, expr) ({ ASLockScope(nsLocking); expr; })
