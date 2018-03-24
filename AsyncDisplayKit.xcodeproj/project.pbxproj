@@ -413,15 +413,15 @@
 		CCE4F9B51F0DA4F300062E4E /* ASLayoutEngineTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B41F0DA4F300062E4E /* ASLayoutEngineTests.mm */; };
 		CCE4F9BA1F0DBB5000062E4E /* ASLayoutTestNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B71F0DBA5000062E4E /* ASLayoutTestNode.mm */; };
 		CCE4F9BE1F0ECE5200062E4E /* ASTLayoutFixture.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9BD1F0ECE5200062E4E /* ASTLayoutFixture.mm */; };
+		CCED5E3E2020D36800395C40 /* ASNetworkImageLoadInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCED5E3F2020D36800395C40 /* ASNetworkImageLoadInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.m */; };
+		CCED5E412020D49D00395C40 /* ASNetworkImageLoadInfo+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CCEDDDCA200C2AC300FFCD0A /* ASConfigurationInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */; };
 		CCEDDDCB200C2AC300FFCD0A /* ASConfigurationInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDC9200C2AC300FFCD0A /* ASConfigurationInternal.m */; };
 		CCEDDDCD200C2CB900FFCD0A /* ASConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDCC200C2CB900FFCD0A /* ASConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCEDDDCF200C42A200FFCD0A /* ASConfigurationDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDCE200C42A200FFCD0A /* ASConfigurationDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCEDDDD1200C488000FFCD0A /* ASConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD0200C488000FFCD0A /* ASConfiguration.m */; };
 		CCEDDDD9200C518800FFCD0A /* ASConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */; };
-		CCED5E3E2020D36800395C40 /* ASNetworkImageLoadInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CCED5E3F2020D36800395C40 /* ASNetworkImageLoadInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.m */; };
-		CCED5E412020D49D00395C40 /* ASNetworkImageLoadInfo+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */; };
@@ -929,15 +929,15 @@
 		CCE4F9BB1F0EA67F00062E4E /* debugbreak.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = debugbreak.h; sourceTree = "<group>"; };
 		CCE4F9BC1F0ECE5200062E4E /* ASTLayoutFixture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTLayoutFixture.h; sourceTree = "<group>"; };
 		CCE4F9BD1F0ECE5200062E4E /* ASTLayoutFixture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTLayoutFixture.mm; sourceTree = "<group>"; };
+		CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASNetworkImageLoadInfo.h; sourceTree = "<group>"; };
+		CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageLoadInfo.m; sourceTree = "<group>"; };
+		CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASNetworkImageLoadInfo+Private.h"; sourceTree = "<group>"; };
 		CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASConfigurationInternal.h; sourceTree = "<group>"; };
 		CCEDDDC9200C2AC300FFCD0A /* ASConfigurationInternal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASConfigurationInternal.m; sourceTree = "<group>"; };
 		CCEDDDCC200C2CB900FFCD0A /* ASConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASConfiguration.h; sourceTree = "<group>"; };
 		CCEDDDCE200C42A200FFCD0A /* ASConfigurationDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASConfigurationDelegate.h; sourceTree = "<group>"; };
 		CCEDDDD0200C488000FFCD0A /* ASConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASConfiguration.m; sourceTree = "<group>"; };
 		CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASConfigurationTests.m; sourceTree = "<group>"; };
-		CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASNetworkImageLoadInfo.h; sourceTree = "<group>"; };
-		CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageLoadInfo.m; sourceTree = "<group>"; };
-		CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASNetworkImageLoadInfo+Private.h"; sourceTree = "<group>"; };
 		D3779BCFF841AD3EB56537ED /* Pods-AsyncDisplayKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		D785F6601A74327E00291744 /* ASScrollNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASScrollNode.h; sourceTree = "<group>"; };
 		D785F6611A74327E00291744 /* ASScrollNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASScrollNode.mm; sourceTree = "<group>"; };
@@ -1101,8 +1101,6 @@
 			isa = PBXGroup;
 			children = (
 				058D0A42195D058D00B7D73C /* Base */,
-				CC7AF197200D9E8400A21BDE /* ASExperimentalFeatures.m */,
-				CC7AF195200D9BD500A21BDE /* ASExperimentalFeatures.h */,
 				CCE04B1D1E313E99006AEBBB /* Collection Data Adapter */,
 				DE89C1691DCEB9CC00D49D74 /* Debug */,
 				058D09E1195D050800B7D73C /* Details */,
@@ -1148,6 +1146,8 @@
 				058D09DC195D050800B7D73C /* ASDisplayNodeExtras.mm */,
 				0587F9BB1A7309ED00AFF0BA /* ASEditableTextNode.h */,
 				0587F9BC1A7309ED00AFF0BA /* ASEditableTextNode.mm */,
+				CC7AF195200D9BD500A21BDE /* ASExperimentalFeatures.h */,
+				CC7AF197200D9E8400A21BDE /* ASExperimentalFeatures.m */,
 				058D09DD195D050800B7D73C /* ASImageNode.h */,
 				058D09DE195D050800B7D73C /* ASImageNode.mm */,
 				68355B2E1CB5799E001D4E68 /* ASImageNode+AnimatedImage.mm */,
@@ -1218,7 +1218,6 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */,
 				DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.m */,
 				AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.m */,
 				696FCB301D6E46050093471E /* ASBackgroundLayoutSpecSnapshotTests.mm */,
@@ -1231,6 +1230,7 @@
 				CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */,
 				2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m */,
 				9F06E5CC1B4CAF4200F015D8 /* ASCollectionViewTests.mm */,
+				CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */,
 				2911485B1A77147A005D0878 /* ASControlNodeTests.m */,
 				1A6C000F1FAB4ED400D05926 /* ASCornerLayoutSpecSnapshotTests.mm */,
 				ACF6ED541B178DC700DA7C62 /* ASDimensionTests.mm */,
