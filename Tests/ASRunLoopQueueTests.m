@@ -10,7 +10,8 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <XCTest/XCTest.h>
+#import "ASTestCase.h"
+
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import "ASDisplayNodeTestsHelper.h"
 
@@ -27,7 +28,7 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
 }
 @end
 
-@interface ASRunLoopQueueTests : XCTestCase
+@interface ASRunLoopQueueTests : ASTestCase
 
 @end
 
@@ -169,24 +170,29 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
   XCTAssertTrue(queue.isEmpty);
 }
 
-- (void)testASCATransactionQueueDisable
+- (void)testASCATransactionQueueDisabled
 {
   ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
-  [queue disable];
   QueueObject *object = [[QueueObject alloc] init];
   [[ASCATransactionQueue sharedQueue] enqueue:object];
   XCTAssertTrue([queue isEmpty]);
-  XCTAssertTrue([queue disabled]);
+  XCTAssertFalse(queue.enabled);
 }
 
 - (void)testASCATransactionQueueProcess
 {
+  // Enable coalescing.
+  ASConfiguration *config = [[ASConfiguration alloc] init];
+  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  
   ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
   QueueObject *object = [[QueueObject alloc] init];
   [queue enqueue:object];
   XCTAssertFalse(object.queueObjectProcessed);
   ASCATransactionQueueWait();
   XCTAssertTrue(object.queueObjectProcessed);
+  XCTAssertTrue(queue.enabled);
 }
 
 @end

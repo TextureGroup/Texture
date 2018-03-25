@@ -59,6 +59,9 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
 @property (atomic, readonly) BOOL isEmpty;
+
+@property (atomic, readonly, getter=isEnabled) BOOL enabled;
+
 /**
  * The queue to run on main run loop before CATransaction commit.
  *

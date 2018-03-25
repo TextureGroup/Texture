@@ -671,7 +671,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     return;
   }
 
-  if (!ASActivateExperimentalFeature(ASExperimentalInterfaceStateCoalescing) || _CATransactionCommitInProgress) {
+  if (!self.enabled || _CATransactionCommitInProgress) {
     [object prepareForCATransactionCommit];
     return;
   }
@@ -700,6 +700,11 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
 {
   ASDN::MutexLocker l(_internalQueueLock);
   return _internalQueue.count == 0;
+}
+
+- (BOOL)isEnabled
+{
+  return ASActivateExperimentalFeature(ASExperimentalInterfaceStateCoalescing);
 }
 
 @end
