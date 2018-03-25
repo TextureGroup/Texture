@@ -177,10 +177,10 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
   config.experimentalFeatures = kNilOptions;
   [ASConfigurationManager test_resetWithConfiguration:config];
   
-  ASCATransactionQueue *queue = ASCATransactionQueue.sharedQueue;
+  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
   QueueObject *object = [[QueueObject alloc] init];
   XCTAssertFalse(object.queueObjectProcessed);
-  [[ASCATransactionQueue sharedQueue] enqueue:object];
+  [queue enqueue:object];
   XCTAssertTrue(object.queueObjectProcessed);
   XCTAssertTrue([queue isEmpty]);
   XCTAssertFalse(queue.enabled);
@@ -188,11 +188,11 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
 
 - (void)testASCATransactionQueueProcess
 {
-  ASCATransactionQueue *queue = ASCATransactionQueue.sharedQueue;
+  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
   QueueObject *object = [[QueueObject alloc] init];
   [queue enqueue:object];
   XCTAssertFalse(object.queueObjectProcessed);
-  ASCATransactionQueueWait();
+  ASCATransactionQueueWait(queue);
   XCTAssertTrue(object.queueObjectProcessed);
   XCTAssertTrue(queue.enabled);
 }

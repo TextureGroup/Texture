@@ -131,7 +131,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 - (void)setInterfaceState:(ASInterfaceState)state
 {
   [super setInterfaceState:state];
-  ASCATransactionQueueWait();
+  ASCATransactionQueueWait(nil);
 }
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
