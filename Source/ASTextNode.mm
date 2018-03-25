@@ -1322,30 +1322,21 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
   
   // We are descended from ASTextNode. We need to change the superclass for the
-  // ASTextNode subclass to ASTextNode2. Keep track of which classes we've done this for.
-  {
-    static std::mutex lock;
-    static std::unordered_set<Class> classes;
-    
-    std::lock_guard<std::mutex> locker(lock);
-    
-    // Walk up the class hierarchy until we find ASTextNode.
-    Class s;
-    for (Class c = self; c != [ASTextNode class]; c = s) {
-      s = class_getSuperclass(c);
-      // Mark visited so we only do this once per class.
-      classes.insert(c);
-      if (s == [ASTextNode class]) {
+  // ASTextNode subclass to ASTextNode2.
+  // Walk up the class hierarchy until we find ASTextNode.
+  Class s;
+  for (Class c = self; c != [ASTextNode class]; c = s) {
+    s = class_getSuperclass(c);
+    if (s == [ASTextNode class]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        // Direct descendent. Update superclass of c and end.
-        class_setSuperclass(c, [ASTextNode2 class]);
+      // Direct descendent. Update superclass of c and end.
+      class_setSuperclass(c, [ASTextNode2 class]);
 #pragma clang diagnostic pop
-        break;
-      }
+      break;
     }
   }
-  
+
   return [super allocWithZone:zone];
 }
 
