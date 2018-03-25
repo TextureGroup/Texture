@@ -743,7 +743,7 @@
         
         ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer) {
           // If the cache sentinel changed, that means this request was cancelled.
-          if (ASLockedSelf(_cacheSentinel != cacheSentinel) {
+          if (ASLockedSelf(_cacheSentinel != cacheSentinel)) {
             return;
           }
           
