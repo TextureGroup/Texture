@@ -59,7 +59,9 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
 @property (atomic, readonly) BOOL isEmpty;
-@property (atomic, readonly) BOOL disabled;
+
+@property (atomic, readonly, getter=isEnabled) BOOL enabled;
+
 /**
  * The queue to run on main run loop before CATransaction commit.
  *
@@ -71,11 +73,6 @@ AS_SUBCLASSING_RESTRICTED
 + (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
-
-/**
- * @abstract Apply a node's interfaceState immediately rather than adding to the queue.
- */
-- (void)disable;
 
 @end
 

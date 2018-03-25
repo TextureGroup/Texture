@@ -13,35 +13,11 @@
 #import "ASGraphicsContext.h"
 #import <AsyncDisplayKit/ASCGImageBuffer.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
-#import <stdatomic.h>
 #import <objc/runtime.h>
-
-#pragma mark - Feature Gating
-
-// Two flags that we atomically manipulate to control the feature.
-typedef NS_OPTIONS(uint, ASNoCopyFlags) {
-  ASNoCopyEnabled = 1 << 0,
-  ASNoCopyBlocked = 1 << 1
-};
-static atomic_uint __noCopyFlags;
-
-// Check if it's blocked, and set the enabled flag if not.
-extern BOOL ASEnableNoCopyRendering()
-{
-  ASNoCopyFlags expectedFlags = 0;
-  BOOL enabled = atomic_compare_exchange_strong(&__noCopyFlags, &expectedFlags, ASNoCopyEnabled);
-  ASDisplayNodeCAssert(enabled, @"Can't enable no-copy rendering after first render started.");
-  return enabled;
-}
-
-// Check if it's enabled and set the "blocked" flag either way.
-static BOOL ASNoCopyRenderingBlockAndCheckEnabled() {
-  ASNoCopyFlags oldFlags = atomic_fetch_or(&__noCopyFlags, ASNoCopyBlocked);
-  return (oldFlags & ASNoCopyEnabled) != 0;
-}
 
 /**
  * Our version of the private CGBitmapGetAlignedBytesPerRow function.
@@ -67,7 +43,7 @@ static UInt8 __contextDataAssociationKey;
 
 extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
 {
-  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+  if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
     return;
   }
@@ -132,7 +108,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
 
 extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
 {
-  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+  if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
@@ -186,7 +162,7 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_R
 
 extern void ASGraphicsEndImageContext()
 {
-  if (!ASNoCopyRenderingBlockAndCheckEnabled()) {
+  if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsEndImageContext();
     return;
   }
