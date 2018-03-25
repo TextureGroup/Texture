@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASPINRemoteImageDownloader] Allow cache to provide animated image. [Max Wang](https://github.com/wsdwsd0829) [#850](https://github.com/TextureGroup/Texture/pull/850)
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
 - [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
