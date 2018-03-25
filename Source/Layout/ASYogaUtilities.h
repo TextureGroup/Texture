@@ -32,7 +32,7 @@
 
 extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 #pragma mark - Yoga Type Conversion Helpers
 
@@ -79,6 +79,6 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
     YGNodeStyleSet##property(yogaNode, edge, YGUndefined); \
   } \
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 #endif /* YOGA */

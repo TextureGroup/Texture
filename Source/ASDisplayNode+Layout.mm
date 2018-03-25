@@ -197,7 +197,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASDisplayNode (ASLayoutElementStylability)
 
-- (instancetype)styledWithBlock:(AS_NOESCAPE void (^)(__kindof ASLayoutElementStyle *style))styleBlock
+- (instancetype)styledWithBlock:(NS_NOESCAPE void (^)(__kindof ASLayoutElementStyle *style))styleBlock
 {
   styleBlock(self.style);
   return self;

@@ -120,13 +120,11 @@ typedef NS_ENUM(NSUInteger, ASHorizontalAlignment) {
   /** Right aligned */
   ASHorizontalAlignmentRight,
 
-  // After 2.0 has landed, we'll add ASDISPLAYNODE_DEPRECATED here - for now, avoid triggering errors for projects with -Werror
-  /** @deprecated Use ASHorizontalAlignmentLeft instead */
-  ASAlignmentLeft ASDISPLAYNODE_DEPRECATED = ASHorizontalAlignmentLeft,
+  ASAlignmentLeft AS_DEPRECATED = ASHorizontalAlignmentLeft,
   /** @deprecated Use ASHorizontalAlignmentMiddle instead */
-  ASAlignmentMiddle ASDISPLAYNODE_DEPRECATED = ASHorizontalAlignmentMiddle,
+  ASAlignmentMiddle AS_DEPRECATED = ASHorizontalAlignmentMiddle,
   /** @deprecated Use ASHorizontalAlignmentRight instead */
-  ASAlignmentRight ASDISPLAYNODE_DEPRECATED = ASHorizontalAlignmentRight,
+  ASAlignmentRight AS_DEPRECATED = ASHorizontalAlignmentRight,
 };
 
 /** Orientation of children along vertical axis */
@@ -140,11 +138,10 @@ typedef NS_ENUM(NSUInteger, ASVerticalAlignment) {
   /** Bottom aligned */
   ASVerticalAlignmentBottom,
 
-  // After 2.0 has landed, we'll add ASDISPLAYNODE_DEPRECATED here - for now, avoid triggering errors for projects with -Werror
   /** @deprecated Use ASVerticalAlignmentTop instead */
-  ASAlignmentTop ASDISPLAYNODE_DEPRECATED = ASVerticalAlignmentTop,
+  ASAlignmentTop AS_DEPRECATED = ASVerticalAlignmentTop,
   /** @deprecated Use ASVerticalAlignmentCenter instead */
-  ASAlignmentCenter ASDISPLAYNODE_DEPRECATED = ASVerticalAlignmentCenter,
+  ASAlignmentCenter AS_DEPRECATED = ASVerticalAlignmentCenter,
   /** @deprecated Use ASVerticalAlignmentBottom instead */
-  ASAlignmentBottom ASDISPLAYNODE_DEPRECATED = ASVerticalAlignmentBottom,
+  ASAlignmentBottom AS_DEPRECATED = ASVerticalAlignmentBottom,
 };

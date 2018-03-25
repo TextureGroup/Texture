@@ -19,7 +19,7 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDimension.h>
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - ASLayoutElementSize
@@ -48,7 +48,7 @@ typedef struct {
 /**
  * Returns an ASLayoutElementSize with default values.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMake()
+NS_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMake()
 {
   return (ASLayoutElementSize){
     .width = ASDimensionAuto,
@@ -63,7 +63,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSi
 /**
  * Returns an ASLayoutElementSize with the specified CGSize values as width and height.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMakeFromCGSize(CGSize size)
+NS_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMakeFromCGSize(CGSize size)
 {
   ASLayoutElementSize s = ASLayoutElementSizeMake();
   s.width = ASDimensionMakeWithPoints(size.width);
@@ -74,7 +74,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSi
 /**
  * Returns whether two sizes are equal.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutElementSizeEqualToLayoutElementSize(ASLayoutElementSize lhs, ASLayoutElementSize rhs)
+NS_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutElementSizeEqualToLayoutElementSize(ASLayoutElementSize lhs, ASLayoutElementSize rhs)
 {
   return (ASDimensionEqualToDimension(lhs.width, rhs.width)
   && ASDimensionEqualToDimension(lhs.height, rhs.height)
@@ -102,11 +102,11 @@ extern AS_WARN_UNUSED_RESULT ASSizeRange ASLayoutElementSizeResolveAutoSize(ASLa
  * Resolve the given size to a parent size. Uses internally ASLayoutElementSizeResolveAutoSize with {INFINITY, INFINITY} as
  * as autoASSizeRange. For more information look at ASLayoutElementSizeResolveAutoSize.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASLayoutElementSizeResolve(ASLayoutElementSize size, const CGSize parentSize)
+NS_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASLayoutElementSizeResolve(ASLayoutElementSize size, const CGSize parentSize)
 {
   return ASLayoutElementSizeResolveAutoSize(size, parentSize, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
 }
 
 
 NS_ASSUME_NONNULL_END
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END

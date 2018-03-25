@@ -1132,7 +1132,7 @@ static void _addTonsOfSubnodes(ASDisplayNode *parent, NSUInteger fanout, NSUInte
   return [self _getDeepSubnodeForRoot:subnodes[index] withIndices:otherIndices];
 }
 
-static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point2, CGFloat epsilon) {
+NS_INLINE BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point2, CGFloat epsilon) {
   CGFloat absEpsilon =  fabs(epsilon);
   BOOL xOK = fabs(point1.x - point2.x) < absEpsilon;
   BOOL yOK = fabs(point1.y - point2.y) < absEpsilon;

@@ -20,7 +20,7 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 // This protocol defines the core properties that ASDisplayNode and CALayer share, for managing contents.
 @protocol ASResizableContents
@@ -91,6 +91,6 @@ extern UIImage *ASDisplayNodeStretchableBoxContentsWithColor(UIColor *color, CGS
 extern BOOL ASDisplayNodeLayerHasAnimations(CALayer *layer);
 
 // This function is a less generalized version of ASDisplayNodeSetResizableContents.
-extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image) ASDISPLAYNODE_DEPRECATED;
+extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image) AS_DEPRECATED;
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END

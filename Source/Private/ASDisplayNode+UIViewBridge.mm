@@ -58,7 +58,7 @@
 /// *warning* the lock should *not* be released until the pending state is updated if this method
 /// returns NO. Otherwise, the pending state can be scheduled and flushed *before* you get a chance
 /// to apply it.
-ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNode *node) {
+NS_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNode *node) {
   BOOL loaded = __loaded(node);
   if (ASDisplayNodeThreadIsMain()) {
     return loaded;

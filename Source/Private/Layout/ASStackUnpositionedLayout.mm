@@ -358,7 +358,7 @@ static std::function<CGFloat(const ASStackLayoutSpecItem &)> flexFactorInViolati
   }
 }
 
-static inline CGFloat scaledFlexShrinkFactor(const ASStackLayoutSpecItem &item,
+NS_INLINE CGFloat scaledFlexShrinkFactor(const ASStackLayoutSpecItem &item,
                                              const ASStackLayoutSpecStyle &style,
                                              const CGFloat flexFactorSum)
 {
@@ -430,7 +430,7 @@ static std::function<CGFloat(const ASStackLayoutSpecItem &)> flexAdjustmentInVio
   }
 }
 
-ASDISPLAYNODE_INLINE BOOL isFlexibleInBothDirections(const ASStackLayoutSpecChild &child)
+NS_INLINE BOOL isFlexibleInBothDirections(const ASStackLayoutSpecChild &child)
 {
     return child.style.flexGrow > 0 && child.style.flexShrink > 0;
 }
@@ -543,7 +543,7 @@ CGFloat ASStackUnpositionedLayout::computeStackViolation(const CGFloat stackDime
  If we have a single flexible (both shrinkable and growable) child, and our allowed size range is set to a specific
  number then we may avoid the first "intrinsic" size calculation.
  */
-ASDISPLAYNODE_INLINE BOOL useOptimizedFlexing(const std::vector<ASStackLayoutSpecChild> &children,
+NS_INLINE BOOL useOptimizedFlexing(const std::vector<ASStackLayoutSpecChild> &children,
                                               const ASStackLayoutSpecStyle &style,
                                               const ASSizeRange &sizeRange)
 {

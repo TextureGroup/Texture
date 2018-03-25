@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 extern CGPoint const ASPointNull; // {NAN, NAN}
 
@@ -43,7 +43,7 @@ extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, co
  */
 extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 /**
  * A node in the layout tree that represents the size and position of the object that created it (ASLayoutElement).
@@ -143,7 +143,7 @@ ASDISPLAYNODE_EXTERN_C_END
 
 @interface ASLayout (Unavailable)
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

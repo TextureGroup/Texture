@@ -14,7 +14,7 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * When std::hash is unavailable, this function will hash a bucket o' bits real fast.
@@ -42,5 +42,5 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  */
 NSUInteger ASHashBytes(void *bytes, size_t length);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 NS_ASSUME_NONNULL_END

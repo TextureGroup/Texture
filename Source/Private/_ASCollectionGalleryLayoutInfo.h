@@ -25,6 +25,6 @@
          minimumInteritemSpacing:(CGFloat)minimumInteritemSpacing
                     sectionInset:(UIEdgeInsets)sectionInset NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end

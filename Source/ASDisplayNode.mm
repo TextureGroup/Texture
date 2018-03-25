@@ -1910,7 +1910,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
   return transform;
 }
 
-static inline CATransform3D _calculateTransformFromReferenceToTarget(ASDisplayNode *referenceNode, ASDisplayNode *targetNode)
+NS_INLINE CATransform3D _calculateTransformFromReferenceToTarget(ASDisplayNode *referenceNode, ASDisplayNode *targetNode)
 {
   ASDisplayNode *ancestor = ASDisplayNodeFindClosestCommonAncestor(referenceNode, targetNode);
 
@@ -2030,7 +2030,7 @@ static inline CATransform3D _calculateTransformFromReferenceToTarget(ASDisplayNo
 
 #pragma mark - Managing the Node Hierarchy
 
-ASDISPLAYNODE_INLINE bool shouldDisableNotificationsForMovingBetweenParents(ASDisplayNode *from, ASDisplayNode *to) {
+NS_INLINE bool shouldDisableNotificationsForMovingBetweenParents(ASDisplayNode *from, ASDisplayNode *to) {
   if (!from || !to) return NO;
   if (from.isSynchronous) return NO;
   if (to.isSynchronous) return NO;
@@ -2039,17 +2039,17 @@ ASDISPLAYNODE_INLINE bool shouldDisableNotificationsForMovingBetweenParents(ASDi
 }
 
 /// Returns incremented value of i if i is not NSNotFound
-ASDISPLAYNODE_INLINE NSInteger incrementIfFound(NSInteger i) {
+NS_INLINE NSInteger incrementIfFound(NSInteger i) {
   return i == NSNotFound ? NSNotFound : i + 1;
 }
 
 /// Returns if a node is a member of a rasterized tree
-ASDISPLAYNODE_INLINE BOOL canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subnode) {
+NS_INLINE BOOL canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subnode) {
   return (subnode.isLayerBacked == NO && node.isLayerBacked == NO);
 }
 
 /// Returns if node is a member of a rasterized tree
-ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
+NS_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return (node.rasterizesSubtree || (node.hierarchyState & ASHierarchyStateRasterized));
 }
 

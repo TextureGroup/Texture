@@ -219,9 +219,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASTextNode (Unavailable)
 
-- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
 @end
 
@@ -236,7 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see attributedText
  */
-@property (nullable, nonatomic, copy) NSAttributedString *attributedString ASDISPLAYNODE_DEPRECATED_MSG("Use .attributedText instead.");
+@property (nullable, nonatomic, copy) NSAttributedString *attributedString AS_DEPRECATED_MSG("Use .attributedText instead.");
 
 
 /**
@@ -245,7 +245,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see truncationAttributedText
  */
-@property (nullable, nonatomic, copy) NSAttributedString *truncationAttributedString ASDISPLAYNODE_DEPRECATED_MSG("Use .truncationAttributedText instead.");
+@property (nullable, nonatomic, copy) NSAttributedString *truncationAttributedString AS_DEPRECATED_MSG("Use .truncationAttributedText instead.");
 
 @end
 

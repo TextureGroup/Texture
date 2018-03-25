@@ -31,7 +31,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, weak, readonly) ASCollectionElement *collectionElement;
 
 - (instancetype)initWithItemSize:(CGSize)itemSize collectionElement:(ASCollectionElement *)collectionElement;
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

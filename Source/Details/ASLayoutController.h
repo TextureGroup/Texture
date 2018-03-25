@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASCollectionElement, ASElementMap;
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 struct ASDirectionalScreenfulBuffer {
   CGFloat positiveDirection; // Positive relative to iOS Core Animation layer coordinate space.
@@ -33,7 +33,7 @@ struct ASDirectionalScreenfulBuffer {
 };
 typedef struct ASDirectionalScreenfulBuffer ASDirectionalScreenfulBuffer;
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 @protocol ASLayoutController <NSObject>
 

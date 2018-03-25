@@ -15,6 +15,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASImageProtocols.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -36,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) ASBasicImageDownloader *sharedImageDownloader;
 + (ASBasicImageDownloader *)sharedImageDownloader NS_RETURNS_RETAINED;
 
-+ (instancetype)new __attribute__((unavailable("+[ASBasicImageDownloader sharedImageDownloader] must be used.")));
-- (instancetype)init __attribute__((unavailable("+[ASBasicImageDownloader sharedImageDownloader] must be used.")));
++ (instancetype)new AS_UNAVAILABLE("+[ASBasicImageDownloader sharedImageDownloader] must be used.");
+- (instancetype)init AS_UNAVAILABLE("+[ASBasicImageDownloader sharedImageDownloader] must be used.");
 
 @end
 

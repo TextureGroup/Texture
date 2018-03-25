@@ -33,9 +33,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
-ASDISPLAYNODE_INLINE CGFloat ASCGFloatFromString(NSString *string)
+NS_INLINE CGFloat ASCGFloatFromString(NSString *string)
 {
 #if CGFLOAT_IS_DOUBLE
   return string.doubleValue;
@@ -44,7 +44,7 @@ ASDISPLAYNODE_INLINE CGFloat ASCGFloatFromString(NSString *string)
 #endif
 }
 
-ASDISPLAYNODE_INLINE CGFloat ASCGFloatFromNumber(NSNumber *number)
+NS_INLINE CGFloat ASCGFloatFromNumber(NSNumber *number)
 {
 #if CGFLOAT_IS_DOUBLE
   return number.doubleValue;
@@ -53,11 +53,11 @@ ASDISPLAYNODE_INLINE CGFloat ASCGFloatFromNumber(NSNumber *number)
 #endif
 }
 
-ASDISPLAYNODE_INLINE BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
+NS_INLINE BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
 {
   return fabs(size1.width - size2.width) < delta && fabs(size1.height - size2.height) < delta;
 };
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

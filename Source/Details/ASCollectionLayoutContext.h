@@ -32,7 +32,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, weak, readonly) ASElementMap *elements;
 @property (nonatomic, strong, readonly, nullable) id additionalInfo;
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

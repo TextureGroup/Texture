@@ -25,7 +25,7 @@
   #define ASEnableVerboseLogging 0
 #endif
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * Disable all logging.
@@ -76,7 +76,7 @@ os_log_t ASImageLoadingLog(void);
 #define ASMainThreadDeallocationLogEnabled 0
 os_log_t ASMainThreadDeallocationLog(void);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 /**
  * The activity tracing system changed a lot between iOS 9 and 10.

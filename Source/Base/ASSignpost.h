@@ -40,7 +40,7 @@ typedef NS_ENUM(uintptr_t, ASSignpostColor) {
   ASSignpostColorDefault
 };
 
-static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
+NS_INLINE ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
   if (colorPref == ASSignpostColorDefault) {
     return (ASSignpostColor)((name / 25) % 4);
   } else {

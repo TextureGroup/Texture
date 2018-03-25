@@ -33,7 +33,7 @@ typedef NS_OPTIONS(NSInteger, ASScrollDirection) {
 extern const ASScrollDirection ASScrollDirectionHorizontalDirections;
 extern const ASScrollDirection ASScrollDirectionVerticalDirections;
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 BOOL ASScrollDirectionContainsVerticalDirection(ASScrollDirection scrollDirection);
 BOOL ASScrollDirectionContainsHorizontalDirection(ASScrollDirection scrollDirection);
@@ -44,6 +44,6 @@ BOOL ASScrollDirectionContainsUp(ASScrollDirection scrollDirection);
 BOOL ASScrollDirectionContainsDown(ASScrollDirection scrollDirection);
 ASScrollDirection ASScrollDirectionApplyTransform(ASScrollDirection scrollDirection, CGAffineTransform transform);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

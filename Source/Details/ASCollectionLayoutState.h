@@ -42,7 +42,7 @@ AS_SUBCLASSING_RESTRICTED
 /// The final content size of the collection's layout
 @property (nonatomic, assign, readonly) CGSize contentSize;
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Designated initializer.

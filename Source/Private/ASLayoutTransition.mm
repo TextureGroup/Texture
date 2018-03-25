@@ -34,7 +34,7 @@
  * Search the whole layout stack if at least one layout has a layoutElement object that can not be layed out asynchronous.
  * This can be the case for example if a node was already loaded
  */
-static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
+NS_INLINE BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   // Queue used to keep track of sublayouts while traversing this layout in a BFS fashion.
   std::queue<ASLayout *> queue;
   queue.push(layout);
@@ -226,7 +226,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 /**
  * @abstract Stores the nodes at the given indexes in the `storedNodes` array, storing indexes in a `storedPositions` c++ vector.
  */
-static inline std::vector<NSUInteger> findNodesInLayoutAtIndexes(ASLayout *layout,
+NS_INLINE std::vector<NSUInteger> findNodesInLayoutAtIndexes(ASLayout *layout,
                                                                  NSIndexSet *indexes,
                                                                  NSArray<ASDisplayNode *> * __strong *storedNodes)
 {
@@ -237,7 +237,7 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexes(ASLayout *layou
  * @abstract Stores the nodes at the given indexes in the `storedNodes` array, storing indexes in a `storedPositions` c++ vector.
  * @discussion If the node exists in the `filteredNodes` array, the node is not added to `storedNodes`.
  */
-static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNodes(ASLayout *layout,
+NS_INLINE std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNodes(ASLayout *layout,
                                                                                   NSIndexSet *indexes,
                                                                                   NSArray<ASDisplayNode *> *filteredNodes,
                                                                                   NSArray<ASDisplayNode *> * __strong *storedNodes)

@@ -27,10 +27,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 void ASPerformBlockOnMainThread(void (^block)(void));
 void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 #if ASEVENTLOG_ENABLE
   #define ASDisplayNodeLogEvent(node, ...) [node.eventLog logEventWithBacktrace:(AS_SAVE_EVENT_BACKTRACES ? [NSThread callStackSymbols] : nil) format:__VA_ARGS__]

@@ -61,7 +61,7 @@
 /// Dispatches the given block synchronously onto a different thread.
 /// This is useful for testing non-main-thread behavior because `dispatch_sync`
 /// will often use the current thread.
-static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
+NS_INLINE void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   dispatch_group_t group = dispatch_group_create();
   dispatch_queue_t q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
   dispatch_group_enter(group);
@@ -89,7 +89,7 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   ASPendingStateController *ctrl = [ASPendingStateController sharedInstance];
   __block BOOL didDealloc = NO;
   @autoreleasepool {
-    __attribute__((objc_precise_lifetime)) ASBridgedPropertiesTestNode *node = [ASBridgedPropertiesTestNode new];
+    ASBridgedPropertiesTestNode *node NS_VALID_UNTIL_END_OF_SCOPE = [ASBridgedPropertiesTestNode new];
     node.onDealloc = ^{
       didDealloc = YES;
     };

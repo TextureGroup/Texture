@@ -19,14 +19,14 @@
 
 #import <tgmath.h>
 
-static inline CGSize _insetSize(CGSize size, UIEdgeInsets insets)
+NS_INLINE CGSize _insetSize(CGSize size, UIEdgeInsets insets)
 {
   size.width -= (insets.left + insets.right);
   size.height -= (insets.top + insets.bottom);
   return size;
 }
 
-static inline UIEdgeInsets _invertInsets(UIEdgeInsets insets)
+NS_INLINE UIEdgeInsets _invertInsets(UIEdgeInsets insets)
 {
   return {
     .top = -insets.top,

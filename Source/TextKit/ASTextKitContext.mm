@@ -24,7 +24,7 @@
 @implementation ASTextKitContext
 {
   // All TextKit operations (even non-mutative ones) must be executed serially.
-  std::shared_ptr<ASDN::Mutex> __instanceLock__;
+  NSLock *__instanceLock__;
 
   NSLayoutManager *_layoutManager;
   NSTextStorage *_textStorage;
@@ -44,7 +44,7 @@
     static ASDN::StaticMutex& __staticMutex = *new ASDN::StaticMutex;
     ASDN::StaticMutexLocker l(__staticMutex);
     
-    __instanceLock__ = std::make_shared<ASDN::Mutex>();
+    __instanceLock__ = [[NSLock alloc] init];
     
     // Create the TextKit component stack with our default configuration.
     
@@ -74,7 +74,7 @@
                                                           NSTextStorage *,
                                                           NSTextContainer *))block
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASLockScopeUnowned(__instanceLock__);
   if (block) {
     block(_layoutManager, _textStorage, _textContainer);
   }

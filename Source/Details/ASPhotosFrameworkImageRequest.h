@@ -66,6 +66,9 @@ API_AVAILABLE(ios(8.0), tvos(10.0))
  */
 @property (nonatomic, readonly) NSURL *url;
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @end
 
 NS_ASSUME_NONNULL_END

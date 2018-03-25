@@ -144,7 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion This is the best time to add gesture recognizers to the view.
  */
-- (void)didLoad ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didLoad NS_REQUIRES_SUPER;
 
 
 #pragma mark - Layout
@@ -155,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Subclasses override this method to layout all subnodes or subviews.
  */
-- (void)layout ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)layout NS_REQUIRES_SUPER;
 
 /**
  * @abstract Called on the main thread by the view's -layoutSubviews, after -layout.
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Gives a chance for subclasses to perform actions after the subclass and superclass have finished laying
  * out.
  */
-- (void)layoutDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)layoutDidFinish NS_REQUIRES_SUPER;
 
 /**
  * @abstract Called on a background thread if !isNodeLoaded - called on the main thread if isNodeLoaded.
@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion When the .calculatedLayout property is set to a new ASLayout (directly from -calculateLayoutThatFits: or
  * calculated via use of -layoutSpecThatFits:), subclasses may inspect it here.
  */
-- (void)calculatedLayoutDidChange ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)calculatedLayoutDidChange NS_REQUIRES_SUPER;
 
 
 #pragma mark - Layout calculation
@@ -255,17 +255,17 @@ NS_ASSUME_NONNULL_BEGIN
   * For descriptions, see <ASInterfaceStateDelegate> definition.
   */
 
-- (void)didEnterVisibleState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitVisibleState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterVisibleState NS_REQUIRES_SUPER;
+- (void)didExitVisibleState  NS_REQUIRES_SUPER;
 
-- (void)didEnterDisplayState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitDisplayState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterDisplayState NS_REQUIRES_SUPER;
+- (void)didExitDisplayState  NS_REQUIRES_SUPER;
 
-- (void)didEnterPreloadState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitPreloadState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterPreloadState NS_REQUIRES_SUPER;
+- (void)didExitPreloadState  NS_REQUIRES_SUPER;
 
 - (void)interfaceStateDidChange:(ASInterfaceState)newState
-                      fromState:(ASInterfaceState)oldState ASDISPLAYNODE_REQUIRES_SUPER;
+                      fromState:(ASInterfaceState)oldState NS_REQUIRES_SUPER;
 
 /**
  * @abstract Called when the node's ASTraitCollection changes
@@ -292,7 +292,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @note Called on the display queue and/or main queue (MUST BE THREAD SAFE)
  */
 + (void)drawRect:(CGRect)bounds withParameters:(nullable id)parameters
-                                   isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock
+                                   isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock
                                  isRasterizing:(BOOL)isRasterizing;
 
 /**
@@ -309,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @note Called on the display queue and/or main queue (MUST BE THREAD SAFE)
  */
 + (nullable UIImage *)displayWithParameters:(nullable id)parameters
-                                isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock;
+                                isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock;
 
 /**
  * @abstract Delegate override for drawParameters
@@ -330,7 +330,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note Called on the main thread only
  */
-- (void)displayWillStart ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use displayWillStartAsynchronously: instead.");
+- (void)displayWillStart NS_REQUIRES_SUPER AS_DEPRECATED_MSG("Use displayWillStartAsynchronously: instead.");
 
 /**
  * @abstract Indicates that the receiver is about to display.
@@ -340,7 +340,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note Called on the main thread only
  */
-- (void)displayWillStartAsynchronously:(BOOL)asynchronously ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)displayWillStartAsynchronously:(BOOL)asynchronously NS_REQUIRES_SUPER;
 
 /**
  * @abstract Indicates that the receiver has finished displaying.
@@ -350,17 +350,17 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note Called on the main thread only
  */
-- (void)displayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)displayDidFinish NS_REQUIRES_SUPER;
 
 /**
  * Called just before the view is added to a window.
  */
-- (void)willEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)willEnterHierarchy NS_REQUIRES_SUPER;
 
 /**
  * Called after the view is removed from the window.
  */
-- (void)didExitHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didExitHierarchy NS_REQUIRES_SUPER;
 
 /**
  * @abstract Whether the view or layer of this display node is currently in a window
@@ -374,7 +374,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Called by -recursivelyClearContents. Always called on main thread. Base class implements self.contents = nil, clearing any backing
  * store, for asynchronous regeneration when needed.
  */
-- (void)clearContents ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)clearContents NS_REQUIRES_SUPER;
 
 /**
  * @abstract Indicates that the receiver is about to display its subnodes. This method is not called if there are no
@@ -385,7 +385,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Subclasses may override this method to be notified when subnode display (asynchronous or synchronous) is
  * about to begin.
  */
-- (void)subnodeDisplayWillStart:(ASDisplayNode *)subnode ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)subnodeDisplayWillStart:(ASDisplayNode *)subnode NS_REQUIRES_SUPER;
 
 /**
  * @abstract Indicates that the receiver is finished displaying its subnodes. This method is not called if there are
@@ -396,7 +396,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Subclasses may override this method to be notified when subnode display (asynchronous or synchronous) has
  * completed.
  */
-- (void)subnodeDisplayDidFinish:(ASDisplayNode *)subnode ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)subnodeDisplayDidFinish:(ASDisplayNode *)subnode NS_REQUIRES_SUPER;
 
 /**
  * @abstract Marks the receiver's bounds as needing to be redrawn, with a scale value.
@@ -446,7 +446,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param touches A set of UITouch instances.
  * @param event A UIEvent associated with the touch.
  */
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
 
 /**
  * @abstract Tells the node when touches moved in its view.
@@ -454,7 +454,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param touches A set of UITouch instances.
  * @param event A UIEvent associated with the touch.
  */
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
 
 /**
  * @abstract Tells the node when touches ended in its view.
@@ -462,7 +462,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param touches A set of UITouch instances.
  * @param event A UIEvent associated with the touch.
  */
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
 
 /**
  * @abstract Tells the node when touches was cancelled in its view.
@@ -470,7 +470,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param touches A set of UITouch instances.
  * @param event A UIEvent associated with the touch.
  */
-- (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
 
 
 #pragma mark - Managing Gesture Recognizers

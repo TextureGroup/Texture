@@ -41,7 +41,7 @@ AS_SUBCLASSING_RESTRICTED
  */
 - (instancetype)initWithRects:(NSArray<NSValue *> *)rects;
 
-@property (nullable, nonatomic, strong) __attribute__((NSObject)) CGColorRef highlightColor;
+@property (nullable, nonatomic, strong) AS_NSOBJECT CGColorRef highlightColor;
 @property (nonatomic, weak) CALayer *targetLayer;
 
 @end

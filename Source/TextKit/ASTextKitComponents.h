@@ -22,8 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASTextKitComponentsTextView : UITextView
 - (instancetype)initWithFrame:(CGRect)frame textContainer:(nullable NSTextContainer *)textContainer NS_DESIGNATED_INITIALIZER;
-- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder __unavailable;
-- (instancetype)init __unavailable;
+- (nullable instancetype)initWithCoder:(NSCoder *)aDecoder NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 @end
 
 AS_SUBCLASSING_RESTRICTED

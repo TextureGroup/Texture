@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 #pragma mark - ASPrimitiveContentSizeCategory
 
@@ -71,11 +71,11 @@ typedef struct ASPrimitiveTraitCollection {
   UIUserInterfaceSizeClass verticalSizeClass;
 
   CGFloat displayScale;
-  UIDisplayGamut displayGamut;
+  UIDisplayGamut displayGamut API_AVAILABLE(ios(10.0));
 
   UIUserInterfaceIdiom userInterfaceIdiom;
   UIForceTouchCapability forceTouchCapability;
-  UITraitEnvironmentLayoutDirection layoutDirection;
+  UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
 #if TARGET_OS_TV
   UIUserInterfaceStyle userInterfaceStyle;
 #endif
@@ -112,7 +112,7 @@ extern NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollecti
  */
 extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 /**
  * Abstraction on top of UITraitCollection for propagation within AsyncDisplayKit-Layout
@@ -180,11 +180,11 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, assign, readonly) UIUserInterfaceSizeClass verticalSizeClass;
 
 @property (nonatomic, assign, readonly) CGFloat displayScale;
-@property (nonatomic, assign, readonly) UIDisplayGamut displayGamut;
+@property (nonatomic, assign, readonly) UIDisplayGamut displayGamut API_AVAILABLE(ios(10.0));
 
 @property (nonatomic, assign, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (nonatomic, assign, readonly) UIForceTouchCapability forceTouchCapability;
-@property (nonatomic, assign, readonly) UITraitEnvironmentLayoutDirection layoutDirection;
+@property (nonatomic, assign, readonly) UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
 #if TARGET_OS_TV
 @property (nonatomic, assign, readonly) UIUserInterfaceStyle userInterfaceStyle;
 #endif
@@ -240,7 +240,7 @@ AS_SUBCLASSING_RESTRICTED
 
 @interface ASTraitCollection (Deprecated)
 
-- (instancetype)init ASDISPLAYNODE_DEPRECATED_MSG("The default constructor of this class is going to become unavailable. Use other constructors instead.");
+- (instancetype)init AS_DEPRECATED_MSG("The default constructor of this class is going to become unavailable. Use other constructors instead.");
 
 + (ASTraitCollection *)traitCollectionWithDisplayScale:(CGFloat)displayScale
                                     userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
@@ -248,7 +248,7 @@ AS_SUBCLASSING_RESTRICTED
                                      verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                          containerSize:(CGSize)windowSize
-  NS_RETURNS_RETAINED ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
+  NS_RETURNS_RETAINED AS_DEPRECATED_MSG("Use full version of this method instead.");
 
 @end
 
