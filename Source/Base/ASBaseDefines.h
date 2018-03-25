@@ -239,6 +239,9 @@
   result;                                     \
 })
 
+#define ASCompareAssignObjects(lvalue, newValue) \
+  ASCompareAssignCustom(lvalue, newValue, ASObjectIsEqual)
+
 // e.g. ASCompareAssignCustom(_myInsets, insets, UIEdgeInsetsEqualToEdgeInsets)
 #define ASCompareAssignCustom(lvalue, newValue, isequal) ({  \
   BOOL result = !(isequal(lvalue, newValue));                \

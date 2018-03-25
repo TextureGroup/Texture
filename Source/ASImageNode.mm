@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
@@ -309,7 +310,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
   drawParameters->_image = [self _locked_Image];
-  drawParameters->_bounds = self.bounds;
+  drawParameters->_bounds = [self threadSafeBounds];
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;

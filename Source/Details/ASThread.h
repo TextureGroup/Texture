@@ -24,7 +24,7 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 
-static inline BOOL ASDisplayNodeThreadIsMain()
+ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
 {
   return 0 != pthread_main_np();
 }
@@ -66,14 +66,17 @@ ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unre
 /// Faster self-version.
 #define ASLockedSelf(expr) ({ ASLockScopeSelf(); expr; })
 
-#define ASLockedSelfCompareAssign(valuePtr, newValue) \
-  ASLockedSelf(ASCompareAssign(valuePtr, newValue))
+#define ASLockedSelfCompareAssign(lvalue, newValue) \
+  ASLockedSelf(ASCompareAssign(lvalue, newValue))
 
-#define ASLockedSelfCompareAssignCustom(valuePtr, newValue, isequal) \
-  ASLockedSelf(ASCompareAssignCustom(valuePtr, newValue, isequal))
+#define ASLockedSelfCompareAssignObjects(lvalue, newValue) \
+  ASLockedSelf(ASCompareAssignObjects(lvalue, newValue))
 
-#define ASLockedSelfCompareAssignCopy(objPtr, obj) \
-  ASLockedSelf(ASCompareAssignCopy(objPtr, obj))
+#define ASLockedSelfCompareAssignCustom(lvalue, newValue, isequal) \
+  ASLockedSelf(ASCompareAssignCustom(lvalue, newValue, isequal))
+
+#define ASLockedSelfCompareAssignCopy(lvalue, obj) \
+  ASLockedSelf(ASCompareAssignCopy(lvalue, obj))
 
 #define ASUnlockScope(nsLocking) \
   id<NSLocking> __lockToken __attribute__((cleanup(_ASUnlockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
