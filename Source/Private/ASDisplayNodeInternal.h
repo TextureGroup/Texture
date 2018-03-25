@@ -76,6 +76,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
 @package
+  ASDN::RecursiveMutex __instanceLock__;
+
   _ASPendingState *_pendingViewState;
   ASInterfaceState _pendingInterfaceState;
   UIView *_view;

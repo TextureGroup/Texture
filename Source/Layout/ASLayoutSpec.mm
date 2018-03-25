@@ -259,6 +259,18 @@ ASLayoutElementStyleExtensibilityForwarding
   return result;
 }
 
+#pragma mark - NSLocking
+
+- (void)lock
+{
+  __instanceLock__.lock();
+}
+
+- (void)unlock
+{
+  __instanceLock__.unlock();
+}
+
 @end
 
 #pragma mark - ASWrapperLayoutSpec

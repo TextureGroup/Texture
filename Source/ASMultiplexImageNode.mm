@@ -22,12 +22,14 @@
 #endif
 
 #import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 #if AS_PIN_REMOTE_IMAGE
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
@@ -357,23 +359,21 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (void)setShouldRenderProgressImages:(BOOL)shouldRenderProgressImages
 {
-  __instanceLock__.lock();
+  [self lock];
   if (shouldRenderProgressImages == _shouldRenderProgressImages) {
-    __instanceLock__.unlock();
+    [self unlock];
     return;
   }
   
   _shouldRenderProgressImages = shouldRenderProgressImages;
   
-  
-  __instanceLock__.unlock();
+  [self unlock];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (BOOL)shouldRenderProgressImages
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _shouldRenderProgressImages;
+  return ASLockedSelf(_shouldRenderProgressImages);
 }
 
 #pragma mark -
