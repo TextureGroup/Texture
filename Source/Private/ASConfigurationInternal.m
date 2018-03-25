@@ -34,12 +34,22 @@
   return inst;
 }
 
++ (ASConfiguration *)defaultConfiguration NS_RETURNS_RETAINED
+{
+  ASConfiguration *config = [[ASConfiguration alloc] init];
+  // On by default for now, pending fix for https://github.com/TextureGroup/Texture/issues/853
+  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  return config;
+}
+
 - (instancetype)init
 {
   if (self = [super init]) {
     _delegateQueue = dispatch_queue_create("org.TextureGroup.Texture.ConfigNotifyQueue", DISPATCH_QUEUE_SERIAL);
     if ([ASConfiguration respondsToSelector:@selector(textureConfiguration)]) {
       _config = [[ASConfiguration textureConfiguration] copy];
+    } else {
+      _config = [ASConfigurationManager defaultConfiguration];
     }
   }
   return self;
@@ -73,7 +83,7 @@
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration
 {
   ASConfigurationManager *inst = ASGetSharedConfigMgr();
-  inst->_config = configuration;
+  inst->_config = configuration ?: [self defaultConfiguration];
   atomic_store(&inst->_activatedExperiments, 0);
 }
 #endif
