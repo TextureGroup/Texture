@@ -24,7 +24,7 @@
 
 // UIContentSizeCategoryUnspecified is available only in iOS 10.0 and later.
 // This is used for compatibility with older iOS versions.
-ASDISPLAYNODE_INLINE UIContentSizeCategory AS_UIContentSizeCategoryUnspecified() {
+NS_INLINE UIContentSizeCategory AS_UIContentSizeCategoryUnspecified() {
   if (AS_AVAILABLE_IOS(10)) {
     return UIContentSizeCategoryUnspecified;
   } else {
@@ -32,7 +32,7 @@ ASDISPLAYNODE_INLINE UIContentSizeCategory AS_UIContentSizeCategoryUnspecified()
   }
 }
 
-ASDISPLAYNODE_INLINE UIContentSizeCategory _Nonnull AS_safeContentSizeCategory(UIContentSizeCategory _Nullable sizeCategory) {
+NS_INLINE UIContentSizeCategory _Nonnull AS_safeContentSizeCategory(UIContentSizeCategory _Nullable sizeCategory) {
   return sizeCategory ? sizeCategory : AS_UIContentSizeCategoryUnspecified();
 }
 
@@ -147,7 +147,7 @@ BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTr
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceIdiom(UIUserInterfaceIdiom idiom) {
+NS_INLINE NSString *AS_NSStringFromUIUserInterfaceIdiom(UIUserInterfaceIdiom idiom) {
   switch (idiom) {
     case UIUserInterfaceIdiomTV:
       return @"TV";
@@ -163,7 +163,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceIdiom(UIUserInterfa
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIForceTouchCapability(UIForceTouchCapability capability) {
+NS_INLINE NSString *AS_NSStringFromUIForceTouchCapability(UIForceTouchCapability capability) {
   switch (capability) {
     case UIForceTouchCapabilityAvailable:
       return @"Available";
@@ -175,7 +175,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIForceTouchCapability(UIForceTouc
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceSizeClass(UIUserInterfaceSizeClass sizeClass) {
+NS_INLINE NSString *AS_NSStringFromUIUserInterfaceSizeClass(UIUserInterfaceSizeClass sizeClass) {
   switch (sizeClass) {
     case UIUserInterfaceSizeClassCompact:
       return @"Compact";
@@ -187,7 +187,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceSizeClass(UIUserInt
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIDisplayGamut(UIDisplayGamut displayGamut) {
+NS_INLINE NSString *AS_NSStringFromUIDisplayGamut(UIDisplayGamut displayGamut) {
   switch (displayGamut) {
     case UIDisplayGamutSRGB:
       return @"sRGB";
@@ -199,7 +199,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIDisplayGamut(UIDisplayGamut disp
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentLayoutDirection(UITraitEnvironmentLayoutDirection layoutDirection) {
+NS_INLINE NSString *AS_NSStringFromUITraitEnvironmentLayoutDirection(UITraitEnvironmentLayoutDirection layoutDirection) {
   switch (layoutDirection) {
     case UITraitEnvironmentLayoutDirectionLeftToRight:
       return @"LeftToRight";
@@ -212,7 +212,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentLayoutDirection(
 
 #if TARGET_OS_TV
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfaceStyle userInterfaceStyle) {
+NS_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfaceStyle userInterfaceStyle) {
   switch (userInterfaceStyle) {
     case UIUserInterfaceStyleLight:
       return @"Light";

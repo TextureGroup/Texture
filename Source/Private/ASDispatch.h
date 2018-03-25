@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * Like dispatch_apply, but you can set the thread count. 0 means 2*active CPUs.
@@ -36,4 +36,4 @@ void ASDispatchApply(size_t iterationCount, dispatch_queue_t queue, NSUInteger t
  */
 void ASDispatchAsync(size_t iterationCount, dispatch_queue_t queue, NSUInteger threadCount, NS_NOESCAPE void(^work)(size_t i));
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END

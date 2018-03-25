@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 FOUNDATION_EXPORT ASDirectionalScreenfulBuffer ASDirectionalScreenfulBufferHorizontal(ASScrollDirection scrollDirection, ASRangeTuningParameters rangeTuningParameters);
 
@@ -28,7 +28,7 @@ FOUNDATION_EXPORT ASDirectionalScreenfulBuffer ASDirectionalScreenfulBufferVerti
 
 FOUNDATION_EXPORT CGRect CGRectExpandToRangeWithScrollableDirections(CGRect rect, ASRangeTuningParameters tuningParameters, ASScrollDirection scrollableDirections, ASScrollDirection scrollDirection);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 @interface ASAbstractLayoutController : NSObject <ASLayoutController>
 
@@ -36,9 +36,9 @@ ASDISPLAYNODE_EXTERN_C_END
 
 @interface ASAbstractLayoutController (Unavailable)
 
-- (NSHashTable *)indexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType __unavailable;
+- (NSHashTable *)indexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType NS_UNAVAILABLE;
 
-- (void)allIndexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable * _Nullable * _Nullable)displaySet preloadSet:(NSHashTable * _Nullable * _Nullable)preloadSet __unavailable;
+- (void)allIndexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable * _Nullable * _Nullable)displaySet preloadSet:(NSHashTable * _Nullable * _Nullable)preloadSet NS_UNAVAILABLE;
 
 @end
 

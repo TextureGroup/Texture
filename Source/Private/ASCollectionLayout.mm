@@ -373,14 +373,14 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 
 # pragma mark - Convenient inline functions
 
-ASDISPLAYNODE_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
+NS_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
 {
   // The layout delegate consulted us that this element must fit within this size,
   // and the only way to achieve that without asking it again is to use an exact size range here.
   return ASSizeRangeMake(size);
 }
 
-ASDISPLAYNODE_INLINE void ASCollectionLayoutSetSizeToElement(CGSize size, ASCollectionElement *element)
+NS_INLINE void ASCollectionLayoutSetSizeToElement(CGSize size, ASCollectionElement *element)
 {
   if (ASCellNode *node = element.node) {
     if (! CGSizeEqualToSize(size, node.frame.size)) {

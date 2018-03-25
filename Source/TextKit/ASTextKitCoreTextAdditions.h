@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 /**
  @abstract Returns whether a given attribute is an unsupported Core Text attribute.
  @param attributeName The name of the attribute
@@ -69,7 +69,7 @@ extern NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDiction
  */
 extern NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedString *dirtyAttributedString);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 #pragma mark -
 #pragma mark -

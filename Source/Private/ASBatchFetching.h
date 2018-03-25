@@ -19,7 +19,7 @@
 
 #import <AsyncDisplayKit/ASScrollDirection.h>
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -81,4 +81,4 @@ extern BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 _Nullable id<ASBatchFetchingDelegate> delegate);
 
 NS_ASSUME_NONNULL_END
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END

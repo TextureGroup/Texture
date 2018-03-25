@@ -38,7 +38,7 @@
             identifier:(NSString *)identifier;
 @end
 
-__attribute__((overloadable)) static inline ASDisplayNode *ASDisplayNodeWithBackgroundColor(UIColor *backgroundColor, CGSize size) {
+AS_OVERLOADABLE NS_INLINE ASDisplayNode *ASDisplayNodeWithBackgroundColor(UIColor *backgroundColor, CGSize size) {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.layerBacked = YES;
   node.backgroundColor = backgroundColor;
@@ -47,7 +47,7 @@ __attribute__((overloadable)) static inline ASDisplayNode *ASDisplayNodeWithBack
   return node;
 }
 
-__attribute__((overloadable)) static inline ASDisplayNode *ASDisplayNodeWithBackgroundColor(UIColor *backgroundColor)
+AS_OVERLOADABLE NS_INLINE ASDisplayNode *ASDisplayNodeWithBackgroundColor(UIColor *backgroundColor)
 {
   return ASDisplayNodeWithBackgroundColor(backgroundColor, CGSizeZero);
 }

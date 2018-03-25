@@ -47,7 +47,7 @@ AS_SUBCLASSING_RESTRICTED
 
  Callers MUST NOT keep a ref to these internal objects and use them later.  This WILL cause crashes in your application.
  */
-- (void)performBlockWithLockedTextKitComponents:(AS_NOESCAPE void (^)(NSLayoutManager *layoutManager,
+- (void)performBlockWithLockedTextKitComponents:(void (NS_NOESCAPE ^)(NSLayoutManager *layoutManager,
                                                           NSTextStorage *textStorage,
                                                           NSTextContainer *textContainer))block;
 

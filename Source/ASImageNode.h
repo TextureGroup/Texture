@@ -195,7 +195,7 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 
 @end
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * @abstract Image modification block that rounds (and optionally adds a border to) an image.
@@ -221,5 +221,5 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
  */
 asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 NS_ASSUME_NONNULL_END

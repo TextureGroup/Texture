@@ -28,13 +28,13 @@ typedef struct {
   CGFloat foot;
 } ASRowEdge;
 
-static inline CGSize ASTextClipCGSize(CGSize size) {
+NS_INLINE CGSize ASTextClipCGSize(CGSize size) {
   if (size.width > ASTextContainerMaxSize.width) size.width = ASTextContainerMaxSize.width;
   if (size.height > ASTextContainerMaxSize.height) size.height = ASTextContainerMaxSize.height;
   return size;
 }
 
-static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
+NS_INLINE UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
   UIEdgeInsets one;
   one.top = insets.left;
   one.left = insets.bottom;

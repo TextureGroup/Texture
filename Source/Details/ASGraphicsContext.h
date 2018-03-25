@@ -29,7 +29,7 @@
  */
 
 NS_ASSUME_NONNULL_BEGIN
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * Call this to enable the experimental no-copy rendering.
@@ -61,5 +61,5 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext(void) NS_RETUR
  */
 extern void ASGraphicsEndImageContext(void);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 NS_ASSUME_NONNULL_END

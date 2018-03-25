@@ -155,7 +155,7 @@ typedef struct {
  * Note we can't read bounds and position in the background, so we have to keep the frame
  * value intact until application time (now).
  */
-ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *state, CALayer *layer) {
+NS_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *state, CALayer *layer) {
   ASPendingStateFlags flags = state->_flags;
   if (flags.setFrame) {
     CGRect _bounds = CGRectZero;

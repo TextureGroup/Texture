@@ -45,9 +45,9 @@ AS_SUBCLASSING_RESTRICTED
  */
 - (instancetype)initWithLayoutDelegate:(id<ASCollectionLayoutDelegate>)layoutDelegate NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder __unavailable;
+- (instancetype)initWithCoder:(NSCoder *)aDecoder NS_UNAVAILABLE;
 
 @end
 

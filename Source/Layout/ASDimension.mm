@@ -25,7 +25,7 @@
 
 ASDimension const ASDimensionAuto = {ASDimensionUnitAuto, 0};
 
-ASOVERLOADABLE ASDimension ASDimensionMake(NSString *dimension)
+AS_OVERLOADABLE ASDimension ASDimensionMake(NSString *dimension)
 {
   if (dimension.length > 0) {
     

@@ -24,7 +24,7 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 
-ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
+NS_INLINE BOOL ASDisplayNodeThreadIsMain()
 {
   return 0 != pthread_main_np();
 }
@@ -39,19 +39,19 @@ ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
  * retains the locked object until it can be unlocked, which is nice.
  */
 #define ASLockScope(nsLocking) \
-  id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
+  id<NSLocking> __lockToken AS_CLEANUP(_ASLockScopeCleanup) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
   [__lockToken lock];
 
 /// Same as ASLockScope(1) but lock isn't retained (be careful).
 #define ASLockScopeUnowned(nsLocking) \
-  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
+  __unsafe_unretained id<NSLocking> __lockToken AS_CLEANUP(_ASLockScopeUnownedCleanup) = nsLocking; \
   [__lockToken lock];
 
-ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
+NS_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
   [*lockPtr unlock];
 }
 
-ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
+NS_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
   [*lockPtr unlock];
 }
 
@@ -79,10 +79,10 @@ ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unre
   ASLockedSelf(ASCompareAssignCopy(lvalue, obj))
 
 #define ASUnlockScope(nsLocking) \
-  id<NSLocking> __lockToken __attribute__((cleanup(_ASUnlockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
+  id<NSLocking> __lockToken AS_CLEANUP(_ASUnlockScopeCleanup) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
   [__lockToken unlock];
 
-ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
+NS_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
   [*lockPtr lock];
 }
 
@@ -143,7 +143,7 @@ namespace ASDN {
   public:
 #if !TIME_LOCKER
 
-    Locker (T &l) ASDISPLAYNODE_NOTHROW : _l (l) {
+    Locker (T &l) noexcept : _l (l) {
       _l.lock ();
     }
 
@@ -157,7 +157,7 @@ namespace ASDN {
 
 #else
 
-    Locker (T &l, const char *name = NULL) ASDISPLAYNODE_NOTHROW : _l (l), _name(name) {
+    Locker (T &l, const char *name = NULL) AS_NOTHROW : _l (l), _name(name) {
       _ti = CACurrentMediaTime();
       _l.lock ();
     }
@@ -187,7 +187,7 @@ namespace ASDN {
   public:
 #if !TIME_LOCKER
     
-    SharedLocker (std::shared_ptr<T> const& l) ASDISPLAYNODE_NOTHROW : _l (l) {
+    SharedLocker (std::shared_ptr<T> const& l) noexcept : _l (l) {
       ASDisplayNodeCAssertTrue(_l != nullptr);
       _l->lock ();
     }
@@ -202,7 +202,7 @@ namespace ASDN {
     
 #else
     
-    SharedLocker (std::shared_ptr<T> const& l, const char *name = NULL) ASDISPLAYNODE_NOTHROW : _l (l), _name(name) {
+    SharedLocker (std::shared_ptr<T> const& l, const char *name = NULL) AS_NOTHROW : _l (l), _name(name) {
       _ti = CACurrentMediaTime();
       _l->lock ();
     }
@@ -224,7 +224,7 @@ namespace ASDN {
   {
     T &_l;
   public:
-    Unlocker (T &l) ASDISPLAYNODE_NOTHROW : _l (l) { _l.unlock (); }
+    Unlocker (T &l) noexcept : _l (l) { _l.unlock (); }
     ~Unlocker () {_l.lock ();}
     Unlocker(Unlocker<T>&) = delete;
     Unlocker &operator=(Unlocker<T>&) = delete;
@@ -235,7 +235,7 @@ namespace ASDN {
   {
     std::shared_ptr<T> _l;
   public:
-    SharedUnlocker (std::shared_ptr<T> const& l) ASDISPLAYNODE_NOTHROW : _l (l) { _l->unlock (); }
+    SharedUnlocker (std::shared_ptr<T> const& l) noexcept : _l (l) { _l->unlock (); }
     ~SharedUnlocker () { _l->lock (); }
     SharedUnlocker(SharedUnlocker<T>&) = delete;
     SharedUnlocker &operator=(SharedUnlocker<T>&) = delete;
@@ -438,7 +438,7 @@ namespace ASDN {
   {
     ReadWriteLock &_lock;
   public:
-    ReadWriteLockReadLocker(ReadWriteLock &lock) ASDISPLAYNODE_NOTHROW : _lock(lock) {
+    ReadWriteLockReadLocker(ReadWriteLock &lock) noexcept : _lock(lock) {
       _lock.readlock();
     }
 
@@ -455,7 +455,7 @@ namespace ASDN {
   {
     ReadWriteLock &_lock;
   public:
-    ReadWriteLockWriteLocker(ReadWriteLock &lock) ASDISPLAYNODE_NOTHROW : _lock(lock) {
+    ReadWriteLockWriteLocker(ReadWriteLock &lock) noexcept : _lock(lock) {
       _lock.writelock();
     }
 

@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * Represents x and y coordinates of a page.
@@ -59,7 +59,7 @@ extern CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSiz
  */
 extern NSPointerArray * _Nullable ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 /**
  * An alias for an NSMapTable created to store objects using ASPageCoordinates as keys.

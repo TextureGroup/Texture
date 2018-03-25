@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Helper class for operation on two-dimensional array, where the objects of the root array are each arrays
  */
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  * Deep mutable copy of an array that contains arrays, which contain objects.  It will go one level deep into the array to copy.
@@ -55,6 +55,6 @@ extern NSArray *ASElementsInTwoDimensionalArray(NSArray<NSArray *>* twoDimension
 extern id _Nullable ASGetElementInTwoDimensionalArray(NSArray<NSArray *> *array, NSIndexPath *indexPath) AS_WARN_UNUSED_RESULT;
 
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

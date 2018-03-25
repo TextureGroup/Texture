@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 void ASInitializeFrameworkMainThread(void);
 
@@ -63,9 +63,9 @@ BOOL ASClassRequiresMainThreadDeallocation(Class _Nullable c);
 
 Class _Nullable ASGetClassFromType(const char * _Nullable type);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
-ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
+NS_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
   switch (info) {
     case kCGImageAlphaNone:
     case kCGImageAlphaNoneSkipLast:
@@ -85,7 +85,7 @@ ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
  @param withoutAnimation Set to `YES` to perform given block without animation
  @param block Perform UIView geometry changes within the passed block
  */
-ASDISPLAYNODE_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)(void)) {
+NS_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)(void)) {
   if (withoutAnimation) {
     [UIView performWithoutAnimation:block];
   } else {
@@ -93,7 +93,7 @@ ASDISPLAYNODE_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, 
   }
 }
 
-ASDISPLAYNODE_INLINE void ASBoundsAndPositionForFrame(CGRect rect, CGPoint origin, CGPoint anchorPoint, CGRect *bounds, CGPoint *position)
+NS_INLINE void ASBoundsAndPositionForFrame(CGRect rect, CGPoint origin, CGPoint anchorPoint, CGRect *bounds, CGPoint *position)
 {
   *bounds   = (CGRect){ origin, rect.size };
   *position = CGPointMake(rect.origin.x + rect.size.width * anchorPoint.x,

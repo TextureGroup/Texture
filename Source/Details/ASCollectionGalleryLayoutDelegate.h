@@ -103,7 +103,7 @@ AS_SUBCLASSING_RESTRICTED
  */
 - (instancetype)initWithScrollableDirections:(ASScrollDirection)scrollableDirections NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription;
 @end
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 NSString *ASGetDescriptionValueString(id object);
 
@@ -72,6 +72,6 @@ NSString *ASObjectDescriptionMakeTiny(__autoreleasing id _Nullable object);
 
 NSString * _Nullable ASStringWithQuotesIfMultiword(NSString * _Nullable string);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

@@ -91,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Init not available for ASWrapperLayoutSpec
  */
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

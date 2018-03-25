@@ -39,22 +39,22 @@ extern void ASPerformMainThreadDeallocation(id _Nullable __strong * _Nonnull obj
 
 // Because inline methods can't be extern'd and need to be part of the translation unit of code
 // that compiles with them to actually inline, we both declare and define these in the header.
-ASDISPLAYNODE_INLINE BOOL ASInterfaceStateIncludesVisible(ASInterfaceState interfaceState)
+NS_INLINE BOOL ASInterfaceStateIncludesVisible(ASInterfaceState interfaceState)
 {
   return ((interfaceState & ASInterfaceStateVisible) == ASInterfaceStateVisible);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASInterfaceStateIncludesDisplay(ASInterfaceState interfaceState)
+NS_INLINE BOOL ASInterfaceStateIncludesDisplay(ASInterfaceState interfaceState)
 {
   return ((interfaceState & ASInterfaceStateDisplay) == ASInterfaceStateDisplay);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASInterfaceStateIncludesPreload(ASInterfaceState interfaceState)
+NS_INLINE BOOL ASInterfaceStateIncludesPreload(ASInterfaceState interfaceState)
 {
   return ((interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASInterfaceStateIncludesMeasureLayout(ASInterfaceState interfaceState)
+NS_INLINE BOOL ASInterfaceStateIncludesMeasureLayout(ASInterfaceState interfaceState)
 {
   return ((interfaceState & ASInterfaceStateMeasureLayout) == ASInterfaceStateMeasureLayout);
 }
@@ -106,7 +106,7 @@ __unused static NSString * _Nonnull NSStringFromASInterfaceStateChange(ASInterfa
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 /**
  Returns the appropriate interface state for a given ASDisplayNode and window
@@ -151,12 +151,12 @@ extern void ASDisplayNodePerformBlockOnEverySubnode(ASDisplayNode *node, BOOL tr
 /**
  Given a display node, traverses up the layer tree hierarchy, returning the first display node that passes block.
  */
-extern ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernode(ASDisplayNode * _Nullable node, BOOL (^block)(ASDisplayNode *node)) AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Use the `supernodes` property instead.");
+extern ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernode(ASDisplayNode * _Nullable node, BOOL (^block)(ASDisplayNode *node)) AS_WARN_UNUSED_RESULT AS_DEPRECATED_MSG("Use the `supernodes` property instead.");
 
 /**
  Given a display node, traverses up the layer tree hierarchy, returning the first display node of kind class.
  */
-extern __kindof ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernodeOfClass(ASDisplayNode *start, Class c) AS_WARN_UNUSED_RESULT  ASDISPLAYNODE_DEPRECATED_MSG("Use the `supernodeOfClass:includingSelf:` method instead.");
+extern __kindof ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernodeOfClass(ASDisplayNode *start, Class c) AS_WARN_UNUSED_RESULT  AS_DEPRECATED_MSG("Use the `supernodeOfClass:includingSelf:` method instead.");
 
 /**
  * Given a layer, find the window it lives in, if any.
@@ -220,6 +220,6 @@ extern void ASDisplayNodeEnableHierarchyNotifications(ASDisplayNode *node);
 // Not to be called directly.
 extern void _ASSetDebugNames(Class _Nonnull owningClass, NSString * _Nonnull names, ASDisplayNode * _Nullable object, ...);
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

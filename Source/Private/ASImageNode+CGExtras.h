@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+CF_EXTERN_C_BEGIN
 
 
 /**
@@ -41,4 +41,4 @@ extern void ASCroppedImageBackingSizeAndDrawRectInBounds(CGSize sourceImageSize,
                                                          CGRect *outDrawRect
                                                          );
 
-ASDISPLAYNODE_EXTERN_C_END
+CF_EXTERN_C_END

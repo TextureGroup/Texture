@@ -15,6 +15,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,14 +40,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CATransform3D transform;
 @property (nonatomic, assign) CATransform3D sublayerTransform;
 @property (nonatomic, assign) BOOL needsDisplayOnBoundsChange;
-@property (nonatomic, strong) __attribute__((NSObject)) CGColorRef shadowColor;
+@property (nullable, nonatomic, strong) AS_NSOBJECT CGColorRef shadowColor;
 @property (nonatomic, assign) CGFloat shadowOpacity;
 @property (nonatomic, assign) CGSize shadowOffset;
 @property (nonatomic, assign) CGFloat shadowRadius;
 @property (nonatomic, assign) CGFloat borderWidth;
 @property (nonatomic, assign, getter = isOpaque) BOOL opaque;
-@property (nonatomic, strong) __attribute__((NSObject)) CGColorRef borderColor;
-@property (nonatomic, strong) __attribute__((NSObject)) CGColorRef backgroundColor;
+@property (nullable, nonatomic, strong) AS_NSOBJECT CGColorRef borderColor;
+@property (nullable, nonatomic, strong) AS_NSOBJECT CGColorRef backgroundColor;
 @property (nonatomic, assign) BOOL allowsGroupOpacity;
 @property (nonatomic, assign) BOOL allowsEdgeAntialiasing;
 @property (nonatomic, assign) unsigned int edgeAntialiasingMask;
