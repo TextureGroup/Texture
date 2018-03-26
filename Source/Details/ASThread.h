@@ -15,8 +15,6 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#pragma once
-
 #import <assert.h>
 #import <pthread.h>
 #import <stdbool.h>
@@ -26,9 +24,66 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 
-static inline BOOL ASDisplayNodeThreadIsMain()
+ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
 {
   return 0 != pthread_main_np();
+}
+
+/**
+ * Adds the lock to the current scope.
+ *
+ * A C version of the C++ lockers. Pass in any id<NSLocking>.
+ * One benefit this has over C++ lockers is that the lock is retained. We
+ * had bugs in the past where an object would be deallocated while someone
+ * had locked its instanceLock, and we'd get a crash. This macro
+ * retains the locked object until it can be unlocked, which is nice.
+ */
+#define ASLockScope(nsLocking) \
+  id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
+  [__lockToken lock];
+
+/// Same as ASLockScope(1) but lock isn't retained (be careful).
+#define ASLockScopeUnowned(nsLocking) \
+  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
+  [__lockToken lock];
+
+ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
+  [*lockPtr unlock];
+}
+
+ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
+  [*lockPtr unlock];
+}
+
+/**
+ * Same as ASLockScope(1) but it uses self, so we can skip retain/release.
+ */
+#define ASLockScopeSelf() ASLockScopeUnowned(self)
+
+/// One-liner while holding the lock.
+#define ASLocked(nsLocking, expr) ({ ASLockScope(nsLocking); expr; })
+
+/// Faster self-version.
+#define ASLockedSelf(expr) ({ ASLockScopeSelf(); expr; })
+
+#define ASLockedSelfCompareAssign(lvalue, newValue) \
+  ASLockedSelf(ASCompareAssign(lvalue, newValue))
+
+#define ASLockedSelfCompareAssignObjects(lvalue, newValue) \
+  ASLockedSelf(ASCompareAssignObjects(lvalue, newValue))
+
+#define ASLockedSelfCompareAssignCustom(lvalue, newValue, isequal) \
+  ASLockedSelf(ASCompareAssignCustom(lvalue, newValue, isequal))
+
+#define ASLockedSelfCompareAssignCopy(lvalue, obj) \
+  ASLockedSelf(ASCompareAssignCopy(lvalue, obj))
+
+#define ASUnlockScope(nsLocking) \
+  id<NSLocking> __lockToken __attribute__((cleanup(_ASUnlockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
+  [__lockToken unlock];
+
+ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
+  [*lockPtr lock];
 }
 
 #ifdef __cplusplus
@@ -55,13 +110,10 @@ static inline BOOL ASDisplayNodeThreadIsMain()
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
 // evaluation of x_ can be compiled out.)
-#define ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(x_) do { \
-  _Pragma("clang diagnostic push"); \
-  _Pragma("clang diagnostic ignored \"-Wunused-variable\""); \
-  volatile int res = (x_); \
-  ASDisplayNodeCAssert(res == 0, @"Expected %@ to return 0, got %d instead", @#x_, res); \
-  _Pragma("clang diagnostic pop"); \
-} while (0)
+#define ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(x_) ({ \
+  __unused int res = (x_); \
+  ASDisplayNodeCAssert(res == 0, @"Expected %s to return 0, got %d instead. Error: %s", #x_, res, strerror(res)); \
+})
 
 /**
  * Assert if the current thread owns a mutex.

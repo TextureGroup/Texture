@@ -57,6 +57,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL usesSynchronousDataLoading;
 
+/**
+ *  Returns YES if the ASCollectionNode contents are completely synchronized with the underlying collection-view layout.
+ */
+@property (nonatomic, readonly, getter=isSynchronized) BOOL synchronized;
+
+/**
+ *  Schedules a block to be performed (on the main thread) as soon as the completion block is called
+ *  on performBatchUpdates:.
+ *
+ *  When isSynchronized == YES, the block is run block immediately (before the method returns).
+ */
+- (void)onDidFinishSynchronizing:(void (^)(void))didFinishSynchronizing;
+
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 
 - (instancetype)initWithLayoutDelegate:(id<ASCollectionLayoutDelegate>)layoutDelegate layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;

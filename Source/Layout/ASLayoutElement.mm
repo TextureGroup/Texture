@@ -176,6 +176,18 @@ do {\
   return self;
 }
 
+#pragma mark - NSLocking
+
+- (void)lock
+{
+  __instanceLock__.lock();
+}
+
+- (void)unlock
+{
+  __instanceLock__.unlock();
+}
+
 #pragma mark - ASLayoutElementStyleSize
 
 - (ASLayoutElementSize)size

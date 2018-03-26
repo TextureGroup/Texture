@@ -776,8 +776,11 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   return (self.nodeLoaded ? [self.view isProcessingUpdates] : NO);
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
+  if (!completion) {
+    return;
+  }
   if (!self.nodeLoaded) {
     completion();
   } else {
