@@ -385,7 +385,7 @@
 		CCA282D01E9EBF6C0037E8B7 /* ASTipsWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */; };
 		CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */; };
 		CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62D1EECC2A80060C137 /* ASAssert.m */; };
-		CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */ = {isa = PBXBuildFile; fileRef = CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */ = {isa = PBXBuildFile; fileRef = CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCAA0B80206ADBF30057B336 /* ASRecursiveUnfairLock.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAA0B7E206ADBF30057B336 /* ASRecursiveUnfairLock.m */; };
 		CCAA0B82206ADECB0057B336 /* ASRecursiveUnfairLockTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAA0B81206ADECB0057B336 /* ASRecursiveUnfairLockTests.m */; };
 		CCB1F95A1EFB60A5009C7475 /* ASLog.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB1F9591EFB60A5009C7475 /* ASLog.m */; };
@@ -420,7 +420,7 @@
 		CCED5E3E2020D36800395C40 /* ASNetworkImageLoadInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCED5E3F2020D36800395C40 /* ASNetworkImageLoadInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.m */; };
 		CCED5E412020D49D00395C40 /* ASNetworkImageLoadInfo+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		CCEDDDCA200C2AC300FFCD0A /* ASConfigurationInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */; };
+		CCEDDDCA200C2AC300FFCD0A /* ASConfigurationInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCEDDDCB200C2AC300FFCD0A /* ASConfigurationInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDC9200C2AC300FFCD0A /* ASConfigurationInternal.m */; };
 		CCEDDDCD200C2CB900FFCD0A /* ASConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDCC200C2CB900FFCD0A /* ASConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCEDDDCF200C42A200FFCD0A /* ASConfigurationDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEDDDCE200C42A200FFCD0A /* ASConfigurationDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };

@@ -15,7 +15,8 @@
         		"enum": [
                     "exp_graphics_contexts",
                     "exp_text_node",
-                    "exp_interface_state_coalesce"
+                    "exp_interface_state_coalesce",
+                    "exp_recursive_unfair_lock"
                 ]
     		}
 		}

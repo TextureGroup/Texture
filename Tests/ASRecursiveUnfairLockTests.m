@@ -9,6 +9,7 @@
 #import "ASTestCase.h"
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 #import <stdatomic.h>
+#import <os/lock.h>
 
 @interface ASRecursiveUnfairLockTests : ASTestCase
 
@@ -52,10 +53,10 @@
   [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
-- (void)testThatUnlockingWithoutHoldingAsserts
+- (void)testThatUnlockingWithoutHoldingMakesAssertion
 {
 #ifdef NS_BLOCK_ASSERTIONS
-#warning Assertions should be on for `testThatUnlockingWithoutHoldingAsserts`
+#warning Assertions should be on for `testThatUnlockingWithoutHoldingMakesAssertion`
   NSLog(@"Passing because assertions are off.");
 #else
   ASRecursiveUnfairLockLock(&lock);
@@ -69,15 +70,16 @@
 #endif
 }
 
-#define CHAOS_TEST_BODY(prefix, infix, postfix) \
-for (int i = 0; i < 16; i++) {\
+#define CHAOS_TEST_BODY(contested, prefix, infix, postfix) \
+dispatch_group_t g = dispatch_group_create(); \
+for (int i = 0; i < (contested ? 16 : 2); i++) {\
 dispatch_group_enter(g);\
 [NSThread detachNewThreadWithBlock:^{\
-  for (int i = 0; i < 10000; i++) {\
+  for (int i = 0; i < 20000; i++) {\
     prefix;\
-    *valuePtr += 150;\
+    value += 150;\
     infix;\
-    *valuePtr -= 150;\
+    value -= 150;\
     postfix;\
   }\
   dispatch_group_leave(g);\
@@ -85,27 +87,51 @@ dispatch_group_enter(g);\
 }\
 dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
 
-- (void)testChaos
+#pragma mark - Correctness Tests
+
+- (void)testRecursiveUnfairLockContested
 {
-  // First try without the lock and assert that the value
-  // is corrupted.
-  int value = 0;
-  int * const valuePtr = &value;
-  dispatch_group_t g = dispatch_group_create();
-  CFTimeInterval startNoLock = CACurrentMediaTime();
-  CHAOS_TEST_BODY({}, {}, {});
-  CFTimeInterval noLockDuration = CACurrentMediaTime() - startNoLock;
-  XCTAssertNotEqual(value, 0);
-  
-  // Then try with our lock.
-  value = 0;
-  CFTimeInterval startWithLock = CACurrentMediaTime();
-  CHAOS_TEST_BODY(ASRecursiveUnfairLockLock(&lock), {}, ASRecursiveUnfairLockUnlock(&lock));
-  CFTimeInterval lockedDuration = CACurrentMediaTime() - startWithLock;
+  __block int value = 0;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(YES, ASRecursiveUnfairLockLock(&lock), {}, ASRecursiveUnfairLockUnlock(&lock));
+  }];
   XCTAssertEqual(value, 0);
-  
-  // Now try with recursive pthread_mutex
-  value = 0;
+}
+
+- (void)testRecursiveUnfairLockUncontested
+{
+  __block int value = 0;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(NO, ASRecursiveUnfairLockLock(&lock), {}, ASRecursiveUnfairLockUnlock(&lock));
+  }];
+  XCTAssertEqual(value, 0);
+}
+
+#pragma mark - Lock performance tests
+
+#if RUN_LOCK_PERF_TESTS
+- (void)testNoLockContested
+{
+  __block int value = 0;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(YES, {}, {}, {});
+  }];
+  XCTAssertNotEqual(value, 0);
+}
+
+- (void)testPlainUnfairLockContested
+{
+  __block int value = 0;
+  __block os_unfair_lock unfairLock = OS_UNFAIR_LOCK_INIT;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(YES, os_unfair_lock_lock(&unfairLock), {}, os_unfair_lock_unlock(&unfairLock));
+  }];
+  XCTAssertEqual(value, 0);
+}
+
+- (void)testRecursiveMutexContested
+{
+  __block int value = 0;
   pthread_mutexattr_t attr;
   pthread_mutexattr_init (&attr);
   pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -113,38 +139,34 @@ dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
   pthread_mutex_init (&m, &attr);
   pthread_mutexattr_destroy (&attr);
   
-  CFTimeInterval startWithMutex = CACurrentMediaTime();
-  CHAOS_TEST_BODY(pthread_mutex_lock(&m), {}, pthread_mutex_unlock(&m));
-  CFTimeInterval mutexDuration = CACurrentMediaTime() - startWithMutex;
-  NSLog(@"Duration no lock %.2fms, with lock %.2fms, mutex %.2fms", noLockDuration * 1000, lockedDuration * 1000, mutexDuration * 1000);
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(YES, pthread_mutex_lock(&m), {}, pthread_mutex_unlock(&m));
+  }];
+  pthread_mutex_destroy(&m);
+}
+
+- (void)testNoLockUncontested
+{
+  __block int value = 0;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(NO, {}, {}, {});
+  }];
+  XCTAssertNotEqual(value, 0);
+}
+
+- (void)testPlainUnfairLockUncontested
+{
+  __block int value = 0;
+  __block os_unfair_lock unfairLock = OS_UNFAIR_LOCK_INIT;
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(NO, os_unfair_lock_lock(&unfairLock), {}, os_unfair_lock_unlock(&unfairLock));
+  }];
   XCTAssertEqual(value, 0);
 }
 
-// Same as `testChaos` but we lock the locks twice, then do one op, then
-// unlock once, then another op, then unlock again.
-- (void)testChaosRecursiveLock
+- (void)testRecursiveMutexUncontested
 {
-  // First try without the lock and assert that the value
-  // is corrupted.
-  int value = 0;
-  int * const valuePtr = &value;
-  dispatch_group_t g = dispatch_group_create();
-  CFTimeInterval startNoLock = CACurrentMediaTime();
-  CHAOS_TEST_BODY({}, {}, {});
-  CFTimeInterval noLockDuration = CACurrentMediaTime() - startNoLock;
-  XCTAssertNotEqual(value, 0);
-  
-  // Then try with our lock.
-  value = 0;
-  CFTimeInterval startWithLock = CACurrentMediaTime();
-  CHAOS_TEST_BODY({ ASRecursiveUnfairLockLock(&lock); ASRecursiveUnfairLockLock(&lock); },
-                  ASRecursiveUnfairLockUnlock(&lock),
-                  ASRecursiveUnfairLockUnlock(&lock));
-  CFTimeInterval lockedDuration = CACurrentMediaTime() - startWithLock;
-  XCTAssertEqual(value, 0);
-  
-  // Now try with recursive pthread_mutex
-  value = 0;
+  __block int value = 0;
   pthread_mutexattr_t attr;
   pthread_mutexattr_init (&attr);
   pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -152,13 +174,11 @@ dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
   pthread_mutex_init (&m, &attr);
   pthread_mutexattr_destroy (&attr);
   
-  CFTimeInterval startWithMutex = CACurrentMediaTime();
-  CHAOS_TEST_BODY({ pthread_mutex_lock(&m); pthread_mutex_lock(&m); },
-                  pthread_mutex_unlock(&m),
-                  pthread_mutex_unlock(&m));
-  CFTimeInterval mutexDuration = CACurrentMediaTime() - startWithMutex;
-  NSLog(@"Duration no lock %.2fms, with lock %.2fms, mutex %.2fms", noLockDuration * 1000, lockedDuration * 1000, mutexDuration * 1000);
-  XCTAssertEqual(value, 0);
+  [self measureBlock:^{
+    CHAOS_TEST_BODY(NO, pthread_mutex_lock(&m), {}, pthread_mutex_unlock(&m));
+  }];
+  pthread_mutex_destroy(&m);
 }
 
+#endif // RUN_LOCK_PERF_TESTS
 @end

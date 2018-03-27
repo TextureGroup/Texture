@@ -9,9 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <pthread/pthread.h>
 #import <os/lock.h>
-#import <stdatomic.h>
 
-#define AS_RECURSIVE_UNFAIR_LOCK_INIT ((ASRecursiveUnfairLock){ OS_UNFAIR_LOCK_INIT, ATOMIC_VAR_INIT(NULL), 0})
+// Don't import C-only header if we're in a C++ file
+#ifndef __cplusplus
+#import <stdatomic.h>
+#endif
+
+// Note: We don't use ATOMIC_VAR_INIT here because C++ compilers don't like it,
+// and it literally does absolutely nothing.
+#define AS_RECURSIVE_UNFAIR_LOCK_INIT ((ASRecursiveUnfairLock){ OS_UNFAIR_LOCK_INIT, NULL, 0})
 
 NS_ASSUME_NONNULL_BEGIN
 
