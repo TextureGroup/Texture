@@ -352,7 +352,7 @@
 
   [_videoNode setInterfaceState:ASInterfaceStateVisible | ASInterfaceStateDisplay | ASInterfaceStatePreload];
   [_videoNode prepareToPlayAsset:assetMock withKeys:_requestedKeys];
-  ASCATransactionQueueWait();
+  ASCATransactionQueueWait(nil);
   [_videoNode pause];
   _videoNode.shouldBePlaying = YES;
   XCTAssertFalse(_videoNode.isPlaying);

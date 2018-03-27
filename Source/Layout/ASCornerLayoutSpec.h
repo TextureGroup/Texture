@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param location The corner position option.
  @return An ASCornerLayoutSpec object with a given child and an layoutElement that act as corner.
  */
-+ (instancetype)cornerLayoutSpecWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location AS_WARN_UNUSED_RESULT;
++ (instancetype)cornerLayoutSpecWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  A layoutElement object that is laid out to a corner on the child.

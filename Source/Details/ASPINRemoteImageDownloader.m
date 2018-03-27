@@ -114,7 +114,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
 @implementation ASPINRemoteImageDownloader
 
-+ (ASPINRemoteImageDownloader *)sharedDownloader
++ (ASPINRemoteImageDownloader *)sharedDownloader NS_RETURNS_RETAINED
 {
 
   static dispatch_once_t onceToken = 0;
@@ -204,7 +204,15 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 {
   [[self sharedPINRemoteImageManager] imageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode completion:^(PINRemoteImageManagerResult * _Nonnull result) {
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
+#if PIN_ANIMATED_AVAILABLE
+      if (result.alternativeRepresentation) {
+        completion(result.alternativeRepresentation);
+      } else {
+        completion(result.image);
+      }
+#else
       completion(result.image);
+#endif
     }];
   }];
 }

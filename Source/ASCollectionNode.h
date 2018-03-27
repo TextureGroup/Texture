@@ -110,6 +110,30 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 
 /**
+ * A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL alwaysBounceVertical;
+
+/**
+ * A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL alwaysBounceHorizontal;
+
+/**
+ * A Boolean value that controls whether the vertical scroll indicator is visible.
+ * The default value of this property is YES.
+ */
+@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
+
+/**
+ * A Boolean value that controls whether the horizontal scroll indicator is visible.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+
+/**
  * The layout used to organize the node's items.
  *
  * @discussion Assigning a new layout object to this property causes the new layout to be applied (without animations) to the node’s items.
@@ -284,7 +308,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  Calling -waitUntilAllUpdatesAreProcessed is one way to flush any pending update completion blocks.
  */
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))didFinishProcessingUpdates;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))didFinishProcessingUpdates;
 
 /**
  *  Blocks execution of the main thread until all section and item updates are committed to the view. This method must be called from the main thread.
