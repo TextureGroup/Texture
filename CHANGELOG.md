@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
