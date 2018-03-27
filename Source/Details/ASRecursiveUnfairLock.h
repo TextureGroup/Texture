@@ -11,21 +11,29 @@
 #import <os/lock.h>
 #import <stdatomic.h>
 
-__IOS_AVAILABLE(10.0)
+#define AS_RECURSIVE_UNFAIR_LOCK_INIT ((ASRecursiveUnfairLock){ OS_UNFAIR_LOCK_INIT, ATOMIC_VAR_INIT(NULL), 0})
+
+NS_ASSUME_NONNULL_BEGIN
+
+OS_UNFAIR_LOCK_AVAILABILITY
 typedef struct {
-  os_unfair_lock lock;
-  _Atomic(pthread_t) thread;
-  int count;                  // Protected by lock
+  os_unfair_lock _lock;
+  _Atomic(pthread_t) _thread;
+  int _count;                  // Protected by lock
 } ASRecursiveUnfairLock;
 
 CF_EXTERN_C_BEGIN
 
-#define AS_RECURSIVE_UNFAIR_LOCK_INIT ((ASRecursiveUnfairLock){ OS_UNFAIR_LOCK_INIT, ATOMIC_VAR_INIT(NULL), 0})
-
-__IOS_AVAILABLE(10.0)
+/**
+ * Lock, blocking if needed.
+ */
+OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l);
 
-__IOS_AVAILABLE(10.0)
+/**
+ * Try to lock without blocking. Returns whether we took the lock.
+ */
+OS_UNFAIR_LOCK_AVAILABILITY
 BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
 
 /**
@@ -33,7 +41,9 @@ BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
  * the lock will result in an assertion failure, and undefined
  * behavior if foundation assertions are disabled.
  */
-__IOS_AVAILABLE(10.0)
+OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockUnlock(ASRecursiveUnfairLock *l);
 
 CF_EXTERN_C_END
+
+NS_ASSUME_NONNULL_END

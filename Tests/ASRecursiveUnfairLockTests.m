@@ -26,7 +26,7 @@
 
 - (void)testTheAtomicIsLockFree
 {
-  XCTAssertTrue(atomic_is_lock_free(&lock.thread));
+  XCTAssertTrue(atomic_is_lock_free(&lock._thread));
 }
 
 - (void)testRelockingFromSameThread
