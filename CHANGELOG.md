@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Add safeAreaInsets, layoutMargins and related properties to ASDisplayNode, with full support for older OS versions [Yevgen Pogribnyi](https://github.com/ypogribnyi) [#685](https://github.com/TextureGroup/Texture/pull/685)
 - [ASPINRemoteImageDownloader] Allow cache to provide animated image. [Max Wang](https://github.com/wsdwsd0829) [#850](https://github.com/TextureGroup/Texture/pull/850)
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).

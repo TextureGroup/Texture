@@ -204,6 +204,15 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   UIBezierPath *_accessibilityPath;
   BOOL _isAccessibilityContainer;
 
+  // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
+  UIEdgeInsets _fallbackSafeAreaInsets;
+  BOOL _fallbackInsetsLayoutMarginsFromSafeArea;
+
+  BOOL _automaticallyRelayoutOnSafeAreaChanges;
+  BOOL _automaticallyRelayoutOnLayoutMarginsChanges;
+
+  BOOL _isViewControllerRoot;
+
   // performance measurement
   ASDisplayNodePerformanceMeasurementOptions _measurementOptions;
   NSTimeInterval _layoutSpecTotalTime;
@@ -335,11 +344,16 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
  */
 - (void)nodeViewDidAddGestureRecognizer;
 
+// Recalculates fallbackSafeAreaInsets for the subnodes
+- (void)_fallbackUpdateSafeAreaOnChildren;
+
 @end
 
 @interface ASDisplayNode (InternalPropertyBridge)
 
 @property (nonatomic, assign) CGFloat layerCornerRadius;
+
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea;
 
 @end
 

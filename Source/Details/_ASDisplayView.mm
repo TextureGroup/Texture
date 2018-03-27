@@ -21,11 +21,13 @@
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNode+Convenience.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASViewController.h>
 
 #pragma mark - _ASDisplayViewMethodOverrides
 
@@ -233,6 +235,16 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     }
     self.keepalive_node = nil;
   }
+
+#if DEBUG
+  // This is only to help detect issues when a root-of-view-controller node is reused separately from its view controller.
+  // Avoid overhead in release.
+  if (superview && node.viewControllerRoot) {
+    UIViewController *vc = [node closestViewController];
+
+    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASViewController class]] && ((ASViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
+  }
+#endif
 
   ASDisplayNode *supernode = node.supernode;
   ASDisplayNodeAssert(!supernode.isLayerBacked, @"Shouldn't be possible for superview's node to be layer-backed.");
@@ -479,6 +491,22 @@ IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirst
   // We forward responder-chain actions to our node if we can't handle them ourselves. See -targetForAction:withSender:.
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   return ([super canPerformAction:action withSender:sender] || [node respondsToSelector:action]);
+}
+
+- (void)layoutMarginsDidChange
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  [super layoutMarginsDidChange];
+
+  [node layoutMarginsDidChange];
+}
+
+- (void)safeAreaInsetsDidChange
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  [super safeAreaInsetsDidChange];
+
+  [node safeAreaInsetsDidChange];
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector
