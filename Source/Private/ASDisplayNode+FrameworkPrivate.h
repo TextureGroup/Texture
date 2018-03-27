@@ -234,7 +234,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  * ASNetworkImageNode and ASMultiplexImageNode set this to YES, because they load data from a database or server,
  * and are expected to support a placeholder state given that display is often blocked on slow data fetching.
  */
-@property (nonatomic, assign) BOOL shouldBypassEnsureDisplay;
+@property (atomic) BOOL shouldBypassEnsureDisplay;
 
 /**
  * @abstract Checks whether a node should be scheduled for display, considering its current and new interface states.

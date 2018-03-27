@@ -18,7 +18,6 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
@@ -35,6 +34,9 @@
 #import <AsyncDisplayKit/_ASScopeTimer.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -93,7 +95,7 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
 
 _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
 {
-  ASDN::MutexLocker l(node->__instanceLock__);
+  ASLockScope(node);
   _ASPendingState *result = node->_pendingViewState;
   if (result == nil) {
     result = [[_ASPendingState alloc] init];
@@ -367,6 +369,16 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return self;
 }
 
+- (void)lock
+{
+  __instanceLock__.lock();
+}
+
+- (void)unlock
+{
+  __instanceLock__.unlock();
+}
+
 - (void)setViewBlock:(ASDisplayNodeViewBlock)viewBlock
 {
   ASDisplayNodeAssertFalse(self.nodeLoaded);
@@ -470,7 +482,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
  *
  * Result is of type NSValue<[Ivar]>
  */
-+ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation
++ (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation NS_RETURNS_RETAINED
 {
   static NSCache<Class, NSValue *> *ivarsCache;
   static dispatch_once_t onceToken;
@@ -3010,7 +3022,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       }
     };
 
-    if ([[ASCATransactionQueue sharedQueue] disabled]) {
+    if (!ASCATransactionQueue.sharedQueue.enabled) {
       dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
     } else {
       exitVisibleInterfaceState();
@@ -3075,7 +3087,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)setInterfaceState:(ASInterfaceState)newState
 {
-  if ([[ASCATransactionQueue sharedQueue] disabled]) {
+  if (!ASCATransactionQueue.sharedQueue.enabled) {
     [self applyPendingInterfaceState:newState];
   } else {
     ASDN::MutexLocker l(__instanceLock__);
@@ -3107,7 +3119,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDN::MutexLocker l(__instanceLock__);
     // newPendingState will not be used when ASCATransactionQueue is enabled
     // and use _pendingInterfaceState instead for interfaceState update.
-    if ([[ASCATransactionQueue sharedQueue] disabled]) {
+    if (!ASCATransactionQueue.sharedQueue.enabled) {
       _pendingInterfaceState = newPendingState;
     }
     oldState = _interfaceState;

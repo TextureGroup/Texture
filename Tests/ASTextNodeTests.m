@@ -17,6 +17,8 @@
 
 #import <CoreText/CoreText.h>
 
+#import "ASTestCase.h"
+
 #import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/ASLayout.h>
@@ -31,6 +33,10 @@
 @property (nonatomic, copy, readonly) NSString *tappedLinkAttribute;
 @property (nonatomic, assign, readonly) id tappedLinkValue;
 
+@end
+@interface ASTextNodeSubclass : ASTextNode
+@end
+@interface ASTextNodeSecondSubclass : ASTextNodeSubclass
 @end
 
 @implementation ASTextNodeTestDelegate
@@ -235,4 +241,23 @@
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
 }
 
+- (void)testThatTheExperimentWorksCorrectly
+{
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalTextNode;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  
+  ASTextNode *plainTextNode = [[ASTextNode alloc] init];
+  XCTAssertEqualObjects(plainTextNode.class, [ASTextNode2 class]);
+  
+  ASTextNodeSecondSubclass *sc2 = [[ASTextNodeSecondSubclass alloc] init];
+  XCTAssertEqualObjects([ASTextNodeSubclass superclass], [ASTextNode2 class]);
+  XCTAssertEqualObjects(sc2.superclass, [ASTextNodeSubclass class]);
+}
+
+@end
+
+@implementation ASTextNodeSubclass
+@end
+@implementation ASTextNodeSecondSubclass
 @end

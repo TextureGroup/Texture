@@ -38,8 +38,6 @@
 @interface ASControlNode ()
 {
 @private
-  ASDN::RecursiveMutex _controlLock;
-  
   // Control Attributes
   BOOL _enabled;
   BOOL _highlighted;
@@ -298,7 +296,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   // ASControlNode cannot be layer backed if adding a target
   ASDisplayNodeAssert(!self.isLayerBacked, @"ASControlNode is layer backed, will never be able to call target in target:action: pair.");
   
-  ASDN::MutexLocker l(_controlLock);
+  ASLockScopeSelf();
 
   if (!_controlEventDispatchTable) {
     _controlEventDispatchTable = [[NSMutableDictionary alloc] initWithCapacity:kASControlNodeEventDispatchTableInitialCapacity]; // enough to handle common types without re-hashing the dictionary when adding entries.
@@ -352,7 +350,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   NSParameterAssert(target);
   NSParameterAssert(controlEvent != 0 && controlEvent != ASControlNodeEventAllEvents);
 
-  ASDN::MutexLocker l(_controlLock);
+  ASLockScopeSelf();
   
   // Grab the event target action array for this event.
   NSMutableArray *eventTargetActionArray = _controlEventDispatchTable[_ASControlNodeEventKeyForControlEvent(controlEvent)];
@@ -374,7 +372,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 
 - (NSSet *)allTargets
 {
-  ASDN::MutexLocker l(_controlLock);
+  ASLockScopeSelf();
   
   NSMutableSet *targets = [[NSMutableSet alloc] init];
 
@@ -393,7 +391,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 {
   NSParameterAssert(controlEventMask != 0);
   
-  ASDN::MutexLocker l(_controlLock);
+  ASLockScopeSelf();
 
   // Enumerate the events in the mask, removing the target-action pair for each control event included in controlEventMask.
   _ASEnumerateControlEventsIncludedInMaskWithBlock(controlEventMask, ^
@@ -435,31 +433,31 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   
   NSMutableArray *resolvedEventTargetActionArray = [[NSMutableArray<ASControlTargetAction *> alloc] init];
   
-  _controlLock.lock();
-
-  // Enumerate the events in the mask, invoking the target-action pairs for each.
-  _ASEnumerateControlEventsIncludedInMaskWithBlock(controlEvents, ^
-    (ASControlNodeEvent controlEvent)
-    {
-      // Iterate on each target action pair
-      for (ASControlTargetAction *targetAction in _controlEventDispatchTable[_ASControlNodeEventKeyForControlEvent(controlEvent)]) {
-        ASControlTargetAction *resolvedTargetAction = [[ASControlTargetAction alloc] init];
-        resolvedTargetAction.action = targetAction.action;
-        resolvedTargetAction.target = targetAction.target;
-        
-        // NSNull means that a nil target was set, so start at self and travel the responder chain
-        if (!resolvedTargetAction.target && targetAction.createdWithNoTarget) {
-          // if the target cannot perform the action, travel the responder chain to try to find something that does
-          resolvedTargetAction.target = [self.view targetForAction:resolvedTargetAction.action withSender:self];
+  {
+    ASLockScopeSelf();
+    
+    // Enumerate the events in the mask, invoking the target-action pairs for each.
+    _ASEnumerateControlEventsIncludedInMaskWithBlock(controlEvents, ^
+      (ASControlNodeEvent controlEvent)
+      {
+        // Iterate on each target action pair
+        for (ASControlTargetAction *targetAction in _controlEventDispatchTable[_ASControlNodeEventKeyForControlEvent(controlEvent)]) {
+          ASControlTargetAction *resolvedTargetAction = [[ASControlTargetAction alloc] init];
+          resolvedTargetAction.action = targetAction.action;
+          resolvedTargetAction.target = targetAction.target;
+          
+          // NSNull means that a nil target was set, so start at self and travel the responder chain
+          if (!resolvedTargetAction.target && targetAction.createdWithNoTarget) {
+            // if the target cannot perform the action, travel the responder chain to try to find something that does
+            resolvedTargetAction.target = [self.view targetForAction:resolvedTargetAction.action withSender:self];
+          }
+          
+          if (resolvedTargetAction.target) {
+            [resolvedEventTargetActionArray addObject:resolvedTargetAction];
+          }
         }
-        
-        if (resolvedTargetAction.target) {
-          [resolvedEventTargetActionArray addObject:resolvedTargetAction];
-        }
-      }
-    });
-  
-  _controlLock.unlock();
+      });
+  }
   
   //We don't want to hold the lock while calling out, we could potentially walk up the ownership tree causing a deadlock.
 #pragma clang diagnostic push

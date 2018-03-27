@@ -283,7 +283,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                        layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                                     userInterfaceStyle:(UIUserInterfaceStyle)userInterfaceStyle
                           preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
-                                         containerSize:(CGSize)windowSize
+                                         containerSize:(CGSize)windowSize NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithHorizontalSizeClass:horizontalSizeClass
                                  verticalSizeClass:verticalSizeClass
@@ -332,7 +332,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                        layoutDirection:(UITraitEnvironmentLayoutDirection)layoutDirection
                           preferredContentSizeCategory:(UIContentSizeCategory _Nonnull)preferredContentSizeCategory
-                                         containerSize:(CGSize)windowSize
+                                         containerSize:(CGSize)windowSize NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithHorizontalSizeClass:horizontalSizeClass
                                  verticalSizeClass:verticalSizeClass
@@ -348,7 +348,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 #endif
 
 + (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
-                                       containerSize:(CGSize)windowSize
+                                       containerSize:(CGSize)windowSize NS_RETURNS_RETAINED
 {
   return [self traitCollectionWithUITraitCollection:traitCollection
                                       containerSize:windowSize
@@ -358,7 +358,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 + (instancetype)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                        containerSize:(CGSize)windowSize
-                         fallbackContentSizeCategory:(UIContentSizeCategory _Nonnull)fallbackContentSizeCategory
+                         fallbackContentSizeCategory:(UIContentSizeCategory _Nonnull)fallbackContentSizeCategory NS_RETURNS_RETAINED
 {
   UIDisplayGamut displayGamut;
   UITraitEnvironmentLayoutDirection layoutDirection;
@@ -435,7 +435,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 @implementation ASTraitCollection (PrimitiveTraits)
 
-+ (instancetype)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits
++ (instancetype)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits NS_RETURNS_RETAINED
 {
 #if TARGET_OS_TV
   return [self traitCollectionWithHorizontalSizeClass:traits.horizontalSizeClass
@@ -514,7 +514,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
                                    horizontalSizeClass:(UIUserInterfaceSizeClass)horizontalSizeClass
                                      verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
-                                         containerSize:(CGSize)windowSize
+                                         containerSize:(CGSize)windowSize NS_RETURNS_RETAINED
 {
 #if TARGET_OS_TV
   return [self traitCollectionWithHorizontalSizeClass:horizontalSizeClass

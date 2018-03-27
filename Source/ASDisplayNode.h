@@ -127,7 +127,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : NSObject
+@interface ASDisplayNode : NSObject <NSLocking>
 
 /** @name Initializing a node object */
 
