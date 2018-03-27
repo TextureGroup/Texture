@@ -1121,6 +1121,8 @@
 				DECBD6E61BE56E1900CF4905 /* ASButtonNode.mm */,
 				CCEDDDCC200C2CB900FFCD0A /* ASConfiguration.h */,
 				CCEDDDD0200C488000FFCD0A /* ASConfiguration.m */,
+				CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */,
+				CCEDDDC9200C2AC300FFCD0A /* ASConfigurationInternal.m */,
 				CCEDDDCE200C42A200FFCD0A /* ASConfigurationDelegate.h */,
 				055F1A3A19ABD43F004DAFF1 /* ASCellNode.h */,
 				AC6456071B0A335000CF11B8 /* ASCellNode.mm */,
@@ -1423,8 +1425,6 @@
 		058D0A01195D050800B7D73C /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				CCEDDDC8200C2AC300FFCD0A /* ASConfigurationInternal.h */,
-				CCEDDDC9200C2AC300FFCD0A /* ASConfigurationInternal.m */,
 				CCE04B2A1E313EDA006AEBBB /* Collection Data Adapter */,
 				E52F8AEE1EAE659600B5A912 /* Collection Layout */,
 				6947B0BB1E36B4E30007C478 /* Layout */,
