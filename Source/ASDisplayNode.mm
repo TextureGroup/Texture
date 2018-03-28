@@ -58,6 +58,8 @@
   #define TIME_SCOPED(outVar)
 #endif
 
+#define ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR 0
+
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
 NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 
@@ -2898,48 +2900,35 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // same runloop.  Strategy: strong reference (might be the last!), wait one runloop, and confirm we are still outside the hierarchy (both layer-backed and view-backed).
   // TODO: This approach could be optimized by only performing the dispatch for root elements + recursively apply the interface state change. This would require a closer
   // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
-  if (!ASCATransactionQueue.sharedQueue.enabled) {
-    if (![self supportsRangeManagedInterfaceState]) {
-      self.interfaceState = ASInterfaceStateNone;
-    } else {
-      if (ASInterfaceStateIncludesVisible(self.interfaceState)) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-          // This block intentionally retains self.
-          __instanceLock__.lock();
-          unsigned isInHierarchy = _flags.isInHierarchy;
-          BOOL isVisible = ASInterfaceStateIncludesVisible(_interfaceState);
-          ASInterfaceState newState = (_interfaceState & ~ASInterfaceStateVisible);
-          __instanceLock__.unlock();
-          if (!isInHierarchy && isVisible) {
-            self.interfaceState = newState;
-          }
-        });
-      }
-    }
-  } else {
-    // TODO(wsdwsd0829): rework on this piece code that alter interface behavior of non-interfaceCoalescing.
-    if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
-      void(^exitVisibleInterfaceState)(void) = ^{
-        // This block intentionally retains self.
-        __instanceLock__.lock();
-        unsigned isStillInHierarchy = _flags.isInHierarchy;
-        BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
-        ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
-        __instanceLock__.unlock();
 
-        if (!isStillInHierarchy && isVisible) {
-          if (![self supportsRangeManagedInterfaceState]) {
-            newState = ASInterfaceStateNone;
-          }
-          self.interfaceState = newState;
+#if !ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
+  if (![self supportsRangeManagedInterfaceState]) {
+    self.interfaceState = ASInterfaceStateNone;
+  }
+#endif
+  if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
+    void(^exitVisibleInterfaceState)(void) = ^{
+      // This block intentionally retains self.
+      __instanceLock__.lock();
+      unsigned isStillInHierarchy = _flags.isInHierarchy;
+      BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
+      ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+      __instanceLock__.unlock();
+      // TODO(wsdwsd0829): Rework this code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
+      if (!isStillInHierarchy && isVisible) {
+        if (![self supportsRangeManagedInterfaceState]) {
+          newState = ASInterfaceStateNone;
         }
-      };
-
-      if (!ASCATransactionQueue.sharedQueue.enabled) {
-        dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
-      } else {
-        exitVisibleInterfaceState();
+#if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
+        self.interfaceState = newState;
+#endif
       }
+    };
+
+    if (!ASCATransactionQueue.sharedQueue.enabled) {
+      dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
+    } else {
+      exitVisibleInterfaceState();
     }
   }
 }
