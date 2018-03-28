@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Add safeAreaInsets, layoutMargins and related properties to ASDisplayNode, with full support for older OS versions [Yevgen Pogribnyi](https://github.com/ypogribnyi) [#685](https://github.com/TextureGroup/Texture/pull/685)
 - [ASPINRemoteImageDownloader] Allow cache to provide animated image. [Max Wang](https://github.com/wsdwsd0829) [#850](https://github.com/TextureGroup/Texture/pull/850)
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
@@ -41,6 +42,7 @@
 - [NoCopyRendering] Improved performance & fixed image memory not being tagged in Instruments. [Adlai Holler](https://github.com/Adlai-Holler) [#833](https://github.com/TextureGroup/Texture/pull/833/)
 - Use `NS_RETURNS_RETAINED` macro to make our methods a tiny bit faster. [Adlai Holler](https://github.com/Adlai-Holler) [#843](https://github.com/TextureGroup/Texture/pull/843/)
 - `ASDisplayNode, ASLayoutSpec, and ASLayoutElementStyle` now conform to `NSLocking`. They act as recursive locks. Useful locking macros have been added as `ASThread.h`. Subclasses / client code can lock these objects but should be careful as usual when dealing with locks. [Adlai Holler](https://github.com/Adlai-Holler)
+- Introduces `ASRecursiveUnfairLock` as an experiment to improve locking performance. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

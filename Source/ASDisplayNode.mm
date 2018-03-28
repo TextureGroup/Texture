@@ -284,6 +284,14 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _flags.canClearContentsOfLayer = YES;
   _flags.canCallSetNeedsDisplayOfLayer = YES;
+
+  _fallbackSafeAreaInsets = UIEdgeInsetsZero;
+  _fallbackInsetsLayoutMarginsFromSafeArea = YES;
+  _isViewControllerRoot = NO;
+
+  _automaticallyRelayoutOnSafeAreaChanges = NO;
+  _automaticallyRelayoutOnLayoutMarginsChanges = NO;
+
   ASDisplayNodeLogEvent(self, @"init");
 }
 
@@ -853,7 +861,104 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _flags.viewEverHadAGestureRecognizerAttached = YES;
 }
 
-#pragma mark UIResponder
+- (UIEdgeInsets)fallbackSafeAreaInsets
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _fallbackSafeAreaInsets;
+}
+
+- (void)setFallbackSafeAreaInsets:(UIEdgeInsets)insets
+{
+  BOOL needsManualUpdate;
+  BOOL updatesLayoutMargins;
+
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    ASDisplayNodeAssertThreadAffinity(self);
+
+    if (UIEdgeInsetsEqualToEdgeInsets(insets, _fallbackSafeAreaInsets)) {
+      return;
+    }
+
+    _fallbackSafeAreaInsets = insets;
+    needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
+    updatesLayoutMargins = needsManualUpdate && [self _locked_insetsLayoutMarginsFromSafeArea];
+  }
+
+  if (needsManualUpdate) {
+    [self safeAreaInsetsDidChange];
+  }
+
+  if (updatesLayoutMargins) {
+    [self layoutMarginsDidChange];
+  }
+}
+
+- (void)_fallbackUpdateSafeAreaOnChildren
+{
+  ASDisplayNodeAssertThreadAffinity(self);
+
+  UIEdgeInsets insets = self.safeAreaInsets;
+  CGRect bounds = self.bounds;
+
+  for (ASDisplayNode *child in self.subnodes) {
+    if (AS_AT_LEAST_IOS11 && !child.layerBacked) {
+      // In iOS 11 view-backed nodes already know what their safe area is.
+      continue;
+    }
+
+    if (child.viewControllerRoot) {
+      // Its safe area is controlled by a view controller. Don't override it.
+      continue;
+    }
+
+    CGRect childFrame = child.frame;
+    UIEdgeInsets childInsets = UIEdgeInsetsMake(MAX(insets.top    - (CGRectGetMinY(childFrame) - CGRectGetMinY(bounds)), 0),
+                                                MAX(insets.left   - (CGRectGetMinX(childFrame) - CGRectGetMinX(bounds)), 0),
+                                                MAX(insets.bottom - (CGRectGetMaxY(bounds) - CGRectGetMaxY(childFrame)), 0),
+                                                MAX(insets.right  - (CGRectGetMaxX(bounds) - CGRectGetMaxX(childFrame)), 0));
+
+    child.fallbackSafeAreaInsets = childInsets;
+  }
+}
+
+- (BOOL)isViewControllerRoot
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _isViewControllerRoot;
+}
+
+- (void)setViewControllerRoot:(BOOL)flag
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _isViewControllerRoot = flag;
+}
+
+- (BOOL)automaticallyRelayoutOnSafeAreaChanges
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _automaticallyRelayoutOnSafeAreaChanges;
+}
+
+- (void)setAutomaticallyRelayoutOnSafeAreaChanges:(BOOL)flag
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _automaticallyRelayoutOnSafeAreaChanges = flag;
+}
+
+- (BOOL)automaticallyRelayoutOnLayoutMarginsChanges
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _automaticallyRelayoutOnLayoutMarginsChanges;
+}
+
+- (void)setAutomaticallyRelayoutOnLayoutMarginsChanges:(BOOL)flag
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  _automaticallyRelayoutOnLayoutMarginsChanges = flag;
+}
+
+#pragma mark - UIResponder
 
 #define HANDLE_NODE_RESPONDER_METHOD(__sel) \
   /* All responder methods should be called on the main thread */ \
@@ -1044,6 +1149,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
       [self layoutDidFinish];
     });
   }
+
+  [self _fallbackUpdateSafeAreaOnChildren];
 }
 
 - (void)layoutDidFinish
