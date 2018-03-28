@@ -79,14 +79,13 @@
   return (enabled != 0);
 }
 
-#if DEBUG
+// Define this even when !DEBUG, since we may run our tests in release mode.
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration
 {
   ASConfigurationManager *inst = ASGetSharedConfigMgr();
   inst->_config = configuration ?: [self defaultConfiguration];
   atomic_store(&inst->_activatedExperiments, 0);
 }
-#endif
 
 @end
 

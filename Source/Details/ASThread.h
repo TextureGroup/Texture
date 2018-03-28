@@ -15,14 +15,19 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <Foundation/Foundation.h>
+
 #import <assert.h>
+#import <os/lock.h>
 #import <pthread.h>
 #import <stdbool.h>
 #import <stdlib.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
-
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
 {
@@ -110,7 +115,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
 // evaluation of x_ can be compiled out.)
-#define ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(x_) ({ \
+#define AS_POSIX_ASSERT_NOERR(x_) ({ \
   __unused int res = (x_); \
   ASDisplayNodeCAssert(res == 0, @"Expected %s to return 0, got %d instead. Error: %s", #x_, res, strerror(res)); \
 })
@@ -229,25 +234,26 @@ namespace ASDN {
     Unlocker(Unlocker<T>&) = delete;
     Unlocker &operator=(Unlocker<T>&) = delete;
   };
-  
-  template<class T>
-  class SharedUnlocker
-  {
-    std::shared_ptr<T> _l;
-  public:
-    SharedUnlocker (std::shared_ptr<T> const& l) ASDISPLAYNODE_NOTHROW : _l (l) { _l->unlock (); }
-    ~SharedUnlocker () { _l->lock (); }
-    SharedUnlocker(SharedUnlocker<T>&) = delete;
-    SharedUnlocker &operator=(SharedUnlocker<T>&) = delete;
-  };
 
+  // Set once in Mutex constructor. Linker fails if this is a member variable. ??
+  static BOOL gMutex_unfair;
+  
+// Silence unguarded availability warnings in here, because
+// perf is critical and we will check availability once
+// and not again.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
   struct Mutex
   {
     /// Constructs a non-recursive mutex (the default).
     Mutex () : Mutex (false) {}
 
     ~Mutex () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_destroy (&_m));
+      if (gMutex_unfair) {
+        // nop
+      } else {
+        AS_POSIX_ASSERT_NOERR(pthread_mutex_destroy (&_m));
+      }
 #if CHECK_LOCKING_SAFETY
       _owner = 0;
       _count = 0;
@@ -257,8 +263,16 @@ namespace ASDN {
     Mutex (const Mutex&) = delete;
     Mutex &operator=(const Mutex&) = delete;
 
-    void lock () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_lock (this->mutex()));
+    void lock() {
+      if (gMutex_unfair) {
+        if (_recursive) {
+          ASRecursiveUnfairLockLock(&_runfair);
+        } else {
+          os_unfair_lock_lock(&_unfair);
+        }
+      } else {
+        AS_POSIX_ASSERT_NOERR(pthread_mutex_lock(&_m));
+      }
 #if CHECK_LOCKING_SAFETY
       mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
       if (thread_id != _owner) {
@@ -287,7 +301,15 @@ namespace ASDN {
         _owner = 0;
       }
 #endif
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_unlock (this->mutex()));
+      if (gMutex_unfair) {
+        if (_recursive) {
+          ASRecursiveUnfairLockUnlock(&_runfair);
+        } else {
+          os_unfair_lock_unlock(&_unfair);
+        }
+      } else {
+        AS_POSIX_ASSERT_NOERR(pthread_mutex_unlock(&_m));
+      }
     }
 
     pthread_mutex_t *mutex () { return &_m; }
@@ -300,29 +322,57 @@ namespace ASDN {
     
   protected:
     explicit Mutex (bool recursive) {
-      if (!recursive) {
-        ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_init (&_m, NULL));
+      
+      // Check if we can use unfair lock and store in static var.
+      static dispatch_once_t onceToken;
+      dispatch_once(&onceToken, ^{
+        if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+          gMutex_unfair = ASActivateExperimentalFeature(ASExperimentalUnfairLock);
+        }
+      });
+      
+      _recursive = recursive;
+      
+      if (gMutex_unfair) {
+        if (recursive) {
+          _runfair = AS_RECURSIVE_UNFAIR_LOCK_INIT;
+        } else {
+          _unfair = OS_UNFAIR_LOCK_INIT;
+        }
       } else {
-        pthread_mutexattr_t attr;
-        ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutexattr_init (&attr));
-        ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE));
-        ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_init (&_m, &attr));
-        ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutexattr_destroy (&attr));
+        if (!recursive) {
+          AS_POSIX_ASSERT_NOERR(pthread_mutex_init (&_m, NULL));
+        } else {
+          // Fall back to recursive mutex.
+          static pthread_mutexattr_t attr;
+          static dispatch_once_t onceToken;
+          dispatch_once(&onceToken, ^{
+            AS_POSIX_ASSERT_NOERR(pthread_mutexattr_init (&attr));
+            AS_POSIX_ASSERT_NOERR(pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE));
+          });
+          AS_POSIX_ASSERT_NOERR(pthread_mutex_init(&_m, &attr));
+        }
       }
 #if CHECK_LOCKING_SAFETY
       _owner = 0;
       _count = 0;
 #endif
     }
-
+    
   private:
-    pthread_mutex_t _m;
+    BOOL _recursive;
+    union {
+      os_unfair_lock _unfair;
+      ASRecursiveUnfairLock _runfair;
+      pthread_mutex_t _m;
+    };
 #if CHECK_LOCKING_SAFETY
     mach_port_t _owner;
     uint32_t _count;
 #endif
   };
-
+#pragma clang diagnostic pop // ignored "-Wunguarded-availability"
+  
   /**
    Obj-C doesn't allow you to pass parameters to C++ ivar constructors.
    Provide a convenience to change the default from non-recursive to recursive.
@@ -340,7 +390,6 @@ namespace ASDN {
   typedef Locker<Mutex> MutexLocker;
   typedef SharedLocker<Mutex> MutexSharedLocker;
   typedef Unlocker<Mutex> MutexUnlocker;
-  typedef SharedUnlocker<Mutex> MutexSharedUnlocker;
 
   /**
    If you are creating a static mutex, use StaticMutex. This avoids expensive constructor overhead at startup (or worse, ordering
@@ -358,11 +407,11 @@ namespace ASDN {
     StaticMutex &operator=(const StaticMutex&) = delete;
 
     void lock () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_lock (this->mutex()));
+      AS_POSIX_ASSERT_NOERR(pthread_mutex_lock (this->mutex()));
     }
 
     void unlock () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_mutex_unlock (this->mutex()));
+      AS_POSIX_ASSERT_NOERR(pthread_mutex_unlock (this->mutex()));
     }
 
     pthread_mutex_t *mutex () { return &_m; }
@@ -373,100 +422,6 @@ namespace ASDN {
 
   typedef Locker<StaticMutex> StaticMutexLocker;
   typedef Unlocker<StaticMutex> StaticMutexUnlocker;
-
-  struct Condition
-  {
-    Condition () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_cond_init(&_c, NULL));
-    }
-
-    ~Condition () {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_cond_destroy(&_c));
-    }
-
-    // non-copyable.
-    Condition(const Condition&) = delete;
-    Condition &operator=(const Condition&) = delete;
-
-    void signal() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_cond_signal(&_c));
-    }
-
-    void wait(Mutex &m) {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_cond_wait(&_c, m.mutex()));
-    }
-
-    pthread_cond_t *condition () {
-      return &_c;
-    }
-
-  private:
-    pthread_cond_t _c;
-  };
-
-  struct ReadWriteLock
-  {
-    ReadWriteLock() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&_rwlock, NULL));
-    }
-
-    ~ReadWriteLock() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_rwlock_destroy(&_rwlock));
-    }
-
-    // non-copyable.
-    ReadWriteLock(const ReadWriteLock&) = delete;
-    ReadWriteLock &operator=(const ReadWriteLock&) = delete;
-
-    void readlock() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&_rwlock));
-    }
-
-    void writelock() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&_rwlock));
-    }
-
-    void unlock() {
-      ASDISPLAYNODE_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&_rwlock));
-    }
-
-  private:
-    pthread_rwlock_t _rwlock;
-  };
-
-  class ReadWriteLockReadLocker
-  {
-    ReadWriteLock &_lock;
-  public:
-    ReadWriteLockReadLocker(ReadWriteLock &lock) ASDISPLAYNODE_NOTHROW : _lock(lock) {
-      _lock.readlock();
-    }
-
-    ~ReadWriteLockReadLocker() {
-      _lock.unlock();
-    }
-
-    // non-copyable.
-    ReadWriteLockReadLocker(const ReadWriteLockReadLocker&) = delete;
-    ReadWriteLockReadLocker &operator=(const ReadWriteLockReadLocker&) = delete;
-  };
-
-  class ReadWriteLockWriteLocker
-  {
-    ReadWriteLock &_lock;
-  public:
-    ReadWriteLockWriteLocker(ReadWriteLock &lock) ASDISPLAYNODE_NOTHROW : _lock(lock) {
-      _lock.writelock();
-    }
-
-    ~ReadWriteLockWriteLocker() {
-      _lock.unlock();
-    }
-
-    // non-copyable.
-    ReadWriteLockWriteLocker(const ReadWriteLockWriteLocker&) = delete;
-    ReadWriteLockWriteLocker &operator=(const ReadWriteLockWriteLocker&) = delete;
-  };
 
 } // namespace ASDN
 
