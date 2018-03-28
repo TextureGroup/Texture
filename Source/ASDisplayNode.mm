@@ -57,7 +57,9 @@
 #else
   #define TIME_SCOPED(outVar)
 #endif
-
+// This is trying to merge non-rangeManaged with rangeManaged, so both range-managed and standalone nodes wait before firing their exit-visibility handlers, as UIViewController transitions now do rehosting at both start & end of animation.
+// Enable this will mitigate interface updating state when coalescing disabled.
+// TODO(wsdwsd0829): Rework enabling code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
 #define ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR 0
 
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
@@ -3022,7 +3024,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
       ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
       __instanceLock__.unlock();
-      // TODO(wsdwsd0829): Rework this code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
       if (!isStillInHierarchy && isVisible) {
 #if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
         if (![self supportsRangeManagedInterfaceState]) {
