@@ -79,7 +79,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   ASDN::RecursiveMutex __instanceLock__;
 
   _ASPendingState *_pendingViewState;
-  ASInterfaceState _pendingInterfaceState;
+
   UIView *_view;
   CALayer *_layer;
 
