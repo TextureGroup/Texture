@@ -2904,6 +2904,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 #if !ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
   if (![self supportsRangeManagedInterfaceState]) {
     self.interfaceState = ASInterfaceStateNone;
+    return;
   }
 #endif
   if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
@@ -2916,12 +2917,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       __instanceLock__.unlock();
       // TODO(wsdwsd0829): Rework this code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
       if (!isStillInHierarchy && isVisible) {
+#if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
         if (![self supportsRangeManagedInterfaceState]) {
           newState = ASInterfaceStateNone;
         }
-#if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
-        self.interfaceState = newState;
 #endif
+        self.interfaceState = newState;
       }
     };
 
