@@ -340,9 +340,9 @@ namespace ASDN {
           _unfair = OS_UNFAIR_LOCK_INIT;
         }
       } else {
-          if (!recursive) {
-            AS_POSIX_ASSERT_NOERR(pthread_mutex_init (&_m, NULL));
-          } else {
+        if (!recursive) {
+          AS_POSIX_ASSERT_NOERR(pthread_mutex_init (&_m, NULL));
+        } else {
           // Fall back to recursive mutex.
           static pthread_mutexattr_t attr;
           static dispatch_once_t onceToken;
@@ -371,7 +371,8 @@ namespace ASDN {
     uint32_t _count;
 #endif
   };
-
+#pragma clang diagnostic pop // ignored "-Wunguarded-availability"
+  
   /**
    Obj-C doesn't allow you to pass parameters to C++ ivar constructors.
    Provide a convenience to change the default from non-recursive to recursive.

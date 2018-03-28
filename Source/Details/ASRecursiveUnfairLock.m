@@ -17,7 +17,8 @@
  * the minimum possible constraint on the hardware. The default, `memory_order_seq_cst`
  * demands that there be a total order of all such modifications as seen by all threads.
  * Acquire/release only requires that modifications to this specific atomic are
- * atomic across acquire/release pairs. http://en.cppreference.com/w/cpp/atomic/memory_order
+ * synchronized across acquire/release pairs.
+ * http://en.cppreference.com/w/cpp/atomic/memory_order
  *
  * Note also that the unfair_lock involves a thread fence as well, so we don't need to
  * take care of synchronizing other values. Just the thread value.
@@ -32,7 +33,9 @@ void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l)
   
   // Try to lock without blocking. If we fail, check what thread owns it.
   // Note that the owning thread CAN CHANGE freely, but it can't become `self`
-  // because only we are `self`. So the value of (thread != self) cannot change on us.
+  // because only we are `self`. And if it's already `self` then we already have
+  // the lock, because we reset it to NULL before we unlock. So (thread == self) is
+  // invariant.
   
   if (!os_unfair_lock_trylock(&l->_lock) && (rul_get_thread(l) != (s = pthread_self()))) {
     // Owned by other thread. Possibly other threads are waiting too. Block.
@@ -45,17 +48,12 @@ void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l)
 
 BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l)
 {
-  // Just a cache for pthread_self so that we never call it twice.
+  // Same logic as `Lock` function, see comments there.
   pthread_t s = NULL;
   
-  // Try to lock without blocking. If we fail, check what thread owns it.
-  // Note that the owning thread CAN CHANGE freely, but it can't become `self`
-  // because only we are `self`. So the value of (thread != self) cannot change on us.
   if (!os_unfair_lock_trylock(&l->_lock) && (rul_get_thread(l) != (s = pthread_self()))) {
-    // Owned by other thread. Fail.
     return NO;
   }
-  // Now we've got the lock. Update the thread pointer and count.
   rul_set_thread(l, s ?: pthread_self());
   l->_count++;
   return YES;
