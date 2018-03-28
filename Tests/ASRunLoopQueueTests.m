@@ -2,8 +2,8 @@
 //  ASRunLoopQueueTests.m
 //  Texture
 //
-//  Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
+//  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 //
@@ -13,22 +13,10 @@
 #import "ASTestCase.h"
 
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
-#import "ASDisplayNodeTestsHelper.h"
 
 static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run for one millisecond each time.
 
-@interface QueueObject : NSObject <ASCATransactionQueueObserving>
-@property (nonatomic, assign) BOOL queueObjectProcessed;
-@end
-
-@implementation QueueObject
-- (void)prepareForCATransactionCommit
-{
-  self.queueObjectProcessed = YES;
-}
-@end
-
-@interface ASRunLoopQueueTests : ASTestCase
+@interface ASRunLoopQueueTests : XCTestCase
 
 @end
 
@@ -168,33 +156,6 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
   XCTAssertFalse(queue.isEmpty);
   [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:kRunLoopRunTime]];
   XCTAssertTrue(queue.isEmpty);
-}
-
-- (void)testASCATransactionQueueDisable
-{
-  // Disable coalescing.
-  ASConfiguration *config = [[ASConfiguration alloc] init];
-  config.experimentalFeatures = kNilOptions;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-  
-  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
-  QueueObject *object = [[QueueObject alloc] init];
-  XCTAssertFalse(object.queueObjectProcessed);
-  [queue enqueue:object];
-  XCTAssertTrue(object.queueObjectProcessed);
-  XCTAssertTrue([queue isEmpty]);
-  XCTAssertFalse(queue.enabled);
-}
-
-- (void)testASCATransactionQueueProcess
-{
-  ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
-  QueueObject *object = [[QueueObject alloc] init];
-  [queue enqueue:object];
-  XCTAssertFalse(object.queueObjectProcessed);
-  ASCATransactionQueueWait(queue);
-  XCTAssertTrue(object.queueObjectProcessed);
-  XCTAssertTrue(queue.enabled);
 }
 
 @end

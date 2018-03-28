@@ -6,7 +6,6 @@
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
 - [ASWrapperCellNode] Introduce a new class allowing more control of UIKit passthrough cells.
 - [ASDisplayNode] Consolidate main thread initialization and allow apps to invoke it manually instead of +load.
-- [ASRunloopQueue] Introduce new runloop queue(ASCATransactionQueue) to coalesce Interface state update calls for view controller transitions.
 - [ASRangeController] Fix stability of "minimum" rangeMode if the app has more than one layout before scrolling.
 - **Important** ASDisplayNode's cornerRadius is a new thread-safe bridged property that should be preferred over CALayer's. Use the latter at your own risk! [Huy Nguyen](https://github.com/nguyenhuy) [#749](https://github.com/TextureGroup/Texture/pull/749).
 - [ASCellNode] Adds mapping for UITableViewCell focusStyle [Alex Hill](https://github.com/alexhillc) [#727](https://github.com/TextureGroup/Texture/pull/727)

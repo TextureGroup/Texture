@@ -18,7 +18,6 @@
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -62,16 +61,4 @@ void ASDisplayNodeSizeToFitSizeRange(ASDisplayNode *node, ASSizeRange sizeRange)
 {
   CGSize sizeThatFits = [node layoutThatFits:sizeRange].size;
   node.bounds = (CGRect){.origin = CGPointZero, .size = sizeThatFits};
-}
-
-void ASCATransactionQueueWait(ASCATransactionQueue *q)
-{
-  if (!q) { q = ASCATransactionQueue.sharedQueue; }
-  NSDate *date = [NSDate dateWithTimeIntervalSinceNow:1];
-  BOOL whileResult = YES;
-  while ([date timeIntervalSinceNow] > 0 &&
-         (whileResult = ![q isEmpty])) {
-    [[NSRunLoop currentRunLoop] runUntilDate:
-     [NSDate dateWithTimeIntervalSinceNow:0.01]];
-  }
 }
