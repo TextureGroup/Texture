@@ -23,6 +23,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalGraphicsContexts = 1 << 0,                  // exp_graphics_contexts
   ASExperimentalTextNode = 1 << 1,                          // exp_text_node
   ASExperimentalInterfaceStateCoalescing = 1 << 2,          // exp_interface_state_coalesce
+  ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

@@ -10,6 +10,9 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+/// Note this has to be public because it's imported by public header ASThread.h =/
+/// It will be private again after exp_unfair_lock ends.
+
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASConfiguration.h>
 
