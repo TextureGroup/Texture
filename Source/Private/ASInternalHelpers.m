@@ -193,16 +193,34 @@ CGSize ASCeilSizeValues(CGSize s)
   return CGSizeMake(ASCeilPixelValue(s.width), ASCeilPixelValue(s.height));
 }
 
+// With 3x devices layouts will often to compute to pixel bounds but
+// include garbage values beyond the precision of a float/double.
+// This garbage can result in a pixel value being rounded up when it isn't
+// necessary.
+//
+// For example, imagine a layout that comes back with a height of 100.666666666669
+// for a 3x device:
+// 100.666666666669 * 3 = 302.00000000000699
+// ceil(302.00000000000699) = 303
+//
+// If we use FLT_EPSILON to get rid of the garbage at the end of the value,
+// things work as expected:
+// (100.666666666669 - FLT_EPSILON) * 3 = 301.99999964237912
+// ceil(301.99999964237912) = 302
+//
+// For even more conversation around this, see:
+// https://github.com/TextureGroup/Texture/issues/838
 CGFloat ASCeilPixelValue(CGFloat f)
 {
   CGFloat scale = ASScreenScale();
-  return ceil(f * scale) / scale;
+  return ceil((f - FLT_EPSILON) * scale) / scale;
 }
 
+// See ASCeilPixelValue for an explanation of (f - FLT_EPSILON)
 CGFloat ASRoundPixelValue(CGFloat f)
 {
   CGFloat scale = ASScreenScale();
-  return round(f * scale) / scale;
+  return round((f - FLT_EPSILON) * scale) / scale;
 }
 
 @implementation NSIndexPath (ASInverseComparison)
