@@ -57,6 +57,10 @@
 #else
   #define TIME_SCOPED(outVar)
 #endif
+// This is trying to merge non-rangeManaged with rangeManaged, so both range-managed and standalone nodes wait before firing their exit-visibility handlers, as UIViewController transitions now do rehosting at both start & end of animation.
+// Enable this will mitigate interface updating state when coalescing disabled.
+// TODO(wsdwsd0829): Rework enabling code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
+#define ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR 0
 
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
 NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
@@ -3005,6 +3009,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // same runloop.  Strategy: strong reference (might be the last!), wait one runloop, and confirm we are still outside the hierarchy (both layer-backed and view-backed).
   // TODO: This approach could be optimized by only performing the dispatch for root elements + recursively apply the interface state change. This would require a closer
   // integration with _ASDisplayLayer to ensure that the superlayer pointer has been cleared by this stage (to check if we are root or not), or a different delegate call.
+
+#if !ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
+  if (![self supportsRangeManagedInterfaceState]) {
+    self.interfaceState = ASInterfaceStateNone;
+    return;
+  }
+#endif
   if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
     void(^exitVisibleInterfaceState)(void) = ^{
       // This block intentionally retains self.
@@ -3013,11 +3024,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
       ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
       __instanceLock__.unlock();
-
       if (!isStillInHierarchy && isVisible) {
+#if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
         if (![self supportsRangeManagedInterfaceState]) {
           newState = ASInterfaceStateNone;
         }
+#endif
         self.interfaceState = newState;
       }
     };
