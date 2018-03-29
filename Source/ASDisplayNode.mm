@@ -1009,12 +1009,12 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (BOOL)__becomeFirstResponder
 {
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
   if (![self canBecomeFirstResponder]) {
     return NO;
   }
-  
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
 
   HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
 }
@@ -1031,12 +1031,12 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 - (BOOL)__resignFirstResponder
 {
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
   if (![self canResignFirstResponder]) {
     return NO;
   }
-  
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
   
   HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
 }
