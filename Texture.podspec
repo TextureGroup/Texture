@@ -61,4 +61,5 @@ Pod::Spec.new do |spec|
   # Include optional PINRemoteImage module
   spec.default_subspec = 'PINRemoteImage'
 
+  spec.social_media_url = 'https://twitter.com/TextureiOS'
 end
