@@ -47,46 +47,48 @@ typedef NS_OPTIONS(NSUInteger, ASMapNodeShowAnnotationsOptions)
     this will in effect be overwritten and become the value of the .region property on that object.
     Defaults to MKCoordinateRegionForMapRect(MKMapRectWorld).
  */
-@property (nonatomic, assign) MKCoordinateRegion region;
+@property (nonatomic) MKCoordinateRegion region;
 
 /**
  This is the MKMapView that is the live map part of ASMapNode. This will be nil if .liveMap = NO. Note, MKMapView is *not* thread-safe.
  */
-@property (nullable, nonatomic, readonly) MKMapView *mapView;
+@property (nullable, atomic, readonly) MKMapView *mapView;
 
 /**
  Set this to YES to turn the snapshot into an interactive MKMapView and vice versa. Defaults to NO. This property may be set on a background thread before the node is loaded, and will automatically be actioned, once the node is loaded. 
  */
-@property (nonatomic, assign, getter=isLiveMap) BOOL liveMap;
+@property (atomic, getter=isLiveMap) BOOL liveMap;
 
 /**
  @abstract Whether ASMapNode should automatically request a new map snapshot to correspond to the new node size.
  @default Default value is YES.
  @discussion If mapSize is set then this will be set to NO, since the size will be the same in all orientations.
  */
-@property (nonatomic, assign) BOOL needsMapReloadOnBoundsChange;
+@property (atomic) BOOL needsMapReloadOnBoundsChange;
 
 /**
  Set the delegate of the MKMapView. This can be set even before mapView is created and will be set on the map in the case that the liveMap mode is engaged.
+ 
+ If the live map view has been created, this may only be set on the main thread.
  */
 @property (nonatomic, weak) id <MKMapViewDelegate> mapDelegate;
 
 /**
  * @abstract The annotations to display on the map.
  */
-@property (nonatomic, copy) NSArray<id<MKAnnotation>> *annotations;
+@property (atomic, copy) NSArray<id<MKAnnotation>> *annotations;
 
 /**
  * @abstract This property specifies how to show the annotations.
  * @default Default value is ASMapNodeShowAnnotationsIgnored
  */
-@property (nonatomic, assign) ASMapNodeShowAnnotationsOptions showAnnotationsOptions;
+@property (atomic) ASMapNodeShowAnnotationsOptions showAnnotationsOptions;
 
 /**
  * @abstract The block which should return annotation image for static map based on provided annotation.
  * @discussion This block is executed on an arbitrary serial queue. If this block is nil, standard pin is used.
  */
-@property (nonatomic, copy, nullable) UIImage * _Nullable (^imageForStaticMapAnnotationBlock)(id<MKAnnotation> annotation, CGPoint *centerOffset);
+@property (nullable, atomic, copy) UIImage * _Nullable (^imageForStaticMapAnnotationBlock)(id<MKAnnotation> annotation, CGPoint *centerOffset);
 
 @end
 

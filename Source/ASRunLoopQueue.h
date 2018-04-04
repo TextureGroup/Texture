@@ -50,8 +50,8 @@ AS_SUBCLASSING_RESTRICTED
 
 @property (atomic, readonly) BOOL isEmpty;
 
-@property (nonatomic, assign) NSUInteger batchSize;           // Default == 1.
-@property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
+@property (nonatomic) NSUInteger batchSize;           // Default == 1.
+@property (nonatomic) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
 
 @end
 

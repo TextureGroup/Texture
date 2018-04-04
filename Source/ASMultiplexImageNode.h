@@ -93,7 +93,7 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
  * highest-quality image).  If that image is not immediately available or cached, the node can download and display
  * lesser-quality images.  Set `downloadsIntermediateImages` to YES to enable this behaviour.
  */
-@property (nonatomic, readwrite, assign) BOOL downloadsIntermediateImages;
+@property (nonatomic, readwrite) BOOL downloadsIntermediateImages;
 
 /**
  * @abstract An array of identifiers representing various versions of an image for ASMultiplexImageNode to display.
@@ -129,7 +129,7 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
  * image will be displayed as the image downloads. Regardless of this properties value, progress renders will
  * only occur when the node is visible. Defaults to YES.
  */
-@property (nonatomic, assign, readwrite) BOOL shouldRenderProgressImages;
+@property (nonatomic, readwrite) BOOL shouldRenderProgressImages;
 
 /**
  * @abstract The image manager that this image node should use when requesting images from the Photos framework. If this is `nil` (the default), then `PHImageManager.defaultManager` is used.

@@ -61,8 +61,8 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
 #pragma mark - ASTextKitRenderer
 
 @interface ASTextNodeRendererKey : NSObject
-@property (assign, nonatomic) ASTextKitAttributes attributes;
-@property (assign, nonatomic) CGSize constrainedSize;
+@property (nonatomic) ASTextKitAttributes attributes;
+@property (nonatomic) CGSize constrainedSize;
 @end
 
 @implementation ASTextNodeRendererKey {
@@ -181,6 +181,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGSize _shadowOffset;
   CGColorRef _shadowColor;
   UIColor *_cachedShadowUIColor;
+  UIColor *_placeholderColor;
   CGFloat _shadowOpacity;
   CGFloat _shadowRadius;
   
@@ -883,6 +884,11 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 }
 
 #pragma mark - Placeholders
+
+- (UIColor *)placeholderColor
+{
+  return ASLockedSelf(_placeholderColor);
+}
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {

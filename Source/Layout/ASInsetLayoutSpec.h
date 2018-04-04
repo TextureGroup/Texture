@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ASInsetLayoutSpec : ASLayoutSpec
 
-@property (nonatomic, assign) UIEdgeInsets insets;
+@property (nonatomic) UIEdgeInsets insets;
 
 /**
  @param insets The amount of space to inset on each side.

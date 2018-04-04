@@ -41,21 +41,21 @@
 @interface _ASCollectionPendingState : NSObject
 @property (weak, nonatomic) id <ASCollectionDelegate>   delegate;
 @property (weak, nonatomic) id <ASCollectionDataSource> dataSource;
-@property (strong, nonatomic) UICollectionViewLayout *collectionViewLayout;
-@property (nonatomic, assign) ASLayoutRangeMode rangeMode;
-@property (nonatomic, assign) BOOL allowsSelection; // default is YES
-@property (nonatomic, assign) BOOL allowsMultipleSelection; // default is NO
-@property (nonatomic, assign) BOOL inverted; //default is NO
-@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
-@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (nonatomic) UICollectionViewLayout *collectionViewLayout;
+@property (nonatomic) ASLayoutRangeMode rangeMode;
+@property (nonatomic) BOOL allowsSelection; // default is YES
+@property (nonatomic) BOOL allowsMultipleSelection; // default is NO
+@property (nonatomic) BOOL inverted; //default is NO
+@property (nonatomic) BOOL usesSynchronousDataLoading;
+@property (nonatomic) CGFloat leadingScreensForBatching;
 @property (weak, nonatomic) id <ASCollectionViewLayoutInspecting> layoutInspector;
-@property (nonatomic, assign) BOOL alwaysBounceVertical;
-@property (nonatomic, assign) BOOL alwaysBounceHorizontal;
-@property (nonatomic, assign) UIEdgeInsets contentInset;
-@property (nonatomic, assign) CGPoint contentOffset;
-@property (nonatomic, assign) BOOL animatesContentOffset;
-@property (nonatomic, assign) BOOL showsVerticalScrollIndicator;
-@property (nonatomic, assign) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic) BOOL alwaysBounceVertical;
+@property (nonatomic) BOOL alwaysBounceHorizontal;
+@property (nonatomic) UIEdgeInsets contentInset;
+@property (nonatomic) CGPoint contentOffset;
+@property (nonatomic) BOOL animatesContentOffset;
+@property (nonatomic) BOOL showsVerticalScrollIndicator;
+@property (nonatomic) BOOL showsHorizontalScrollIndicator;
 @end
 
 @implementation _ASCollectionPendingState

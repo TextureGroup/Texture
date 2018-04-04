@@ -171,7 +171,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
   }
-  _animatedImageRunLoopMode = runLoopMode;
+  _animatedImageRunLoopMode = [runLoopMode copy];
 }
 
 - (void)setShouldAnimate:(BOOL)shouldAnimate

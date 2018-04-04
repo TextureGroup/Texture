@@ -61,13 +61,13 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 /**
  * ASDisplayNode layout spec block. This block can be used instead of implementing layoutSpecThatFits: in subclass
  */
-typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize);
+typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode *node, ASSizeRange constrainedSize);
 
 /**
  * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
  * errors that happens in production.
  */
-typedef void (^ASDisplayNodeNonFatalErrorBlock)(__kindof NSError * _Nonnull error);
+typedef void (^ASDisplayNodeNonFatalErrorBlock)(NSError *error);
 
 /**
  * Interface state is available on ASDisplayNode and ASViewController, and
@@ -221,7 +221,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @return NO if the node wraps a _ASDisplayView, YES otherwise.
  */
-@property (atomic, readonly, assign, getter=isSynchronous) BOOL synchronous;
+@property (atomic, readonly, getter=isSynchronous) BOOL synchronous;
 
 /** @name Getting view and layer */
 
@@ -234,21 +234,21 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @warning The first access to it must be on the main thread, and should only be used on the main thread thereafter as 
  * well.
  */
-@property (nonatomic, readonly, strong) UIView *view;
+@property (atomic, readonly) UIView *view;
 
 /** 
  * @abstract Returns whether a node's backing view or layer is loaded.
  *
  * @return YES if a view is loaded, or if layerBacked is YES and layer is not nil; NO otherwise.
  */
-@property (nonatomic, readonly, assign, getter=isNodeLoaded) BOOL nodeLoaded;
+@property (atomic, readonly, getter=isNodeLoaded) BOOL nodeLoaded;
 
 /** 
  * @abstract Returns whether the node rely on a layer instead of a view.
  *
  * @return YES if the node rely on a layer, NO otherwise.
  */
-@property (nonatomic, assign, getter=isLayerBacked) BOOL layerBacked;
+@property (atomic, getter=isLayerBacked) BOOL layerBacked;
 
 /** 
  * @abstract Returns a layer.
@@ -259,28 +259,28 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @warning The first access to it must be on the main thread, and should only be used on the main thread thereafter as 
  * well.
  */
-@property (nonatomic, readonly, strong) CALayer * _Nonnull layer;
+@property (atomic, readonly) CALayer * layer;
 
 /**
  * Returns YES if the node is – at least partially – visible in a window.
  *
  * @see didEnterVisibleState and didExitVisibleState
  */
-@property (readonly, getter=isVisible) BOOL visible;
+@property (atomic, readonly, getter=isVisible) BOOL visible;
 
 /**
  * Returns YES if the node is in the preloading interface state.
  *
  * @see didEnterPreloadState and didExitPreloadState
  */
-@property (readonly, getter=isInPreloadState) BOOL inPreloadState;
+@property (atomic, readonly, getter=isInPreloadState) BOOL inPreloadState;
 
 /**
  * Returns YES if the node is in the displaying interface state.
  *
  * @see didEnterDisplayState and didExitDisplayState
  */
-@property (readonly, getter=isInDisplayState) BOOL inDisplayState;
+@property (atomic, readonly, getter=isInDisplayState) BOOL inDisplayState;
 
 /**
  * @abstract Returns the Interface State of the node.
@@ -289,7 +289,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @see ASInterfaceState
  */
-@property (readonly) ASInterfaceState interfaceState;
+@property (atomic, readonly) ASInterfaceState interfaceState;
 
 /**
  * @abstract Class property that allows to set a block that can be called on non-fatal errors. This
@@ -371,12 +371,12 @@ extern NSInteger const ASDefaultDrawingPriority;
 /** 
  * @abstract The receiver's immediate subnodes.
  */
-@property (nonatomic, readonly, copy) NSArray<ASDisplayNode *> *subnodes;
+@property (nullable, atomic, readonly, copy) NSArray<ASDisplayNode *> *subnodes;
 
 /** 
  * @abstract The receiver's supernode.
  */
-@property (nonatomic, readonly, weak) ASDisplayNode *supernode;
+@property (nullable, atomic, readonly, weak) ASDisplayNode *supernode;
 
 
 /** @name Drawing and Updating the View */
@@ -409,7 +409,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * Note: this has nothing to do with -[CALayer drawsAsynchronously].
  */
-@property (nonatomic, assign) BOOL displaysAsynchronously;
+@property (atomic) BOOL displaysAsynchronously;
 
 /** 
  * @abstract Prevent the node's layer from displaying.
@@ -423,12 +423,12 @@ extern NSInteger const ASDefaultDrawingPriority;
  * If a setNeedsDisplay occurs while displaySuspended is YES, and displaySuspended is set to NO, then the 
  * layer will be automatically displayed.
  */
-@property (nonatomic, assign) BOOL displaySuspended;
+@property (atomic) BOOL displaySuspended;
 
 /**
  * @abstract Whether size changes should be animated. Default to YES.
  */
-@property (nonatomic, assign) BOOL shouldAnimateSizeChanges;
+@property (atomic) BOOL shouldAnimateSizeChanges;
 
 /** 
  * @abstract Prevent the node and its descendants' layer from displaying.
@@ -457,14 +457,14 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @discussion Defaults to NO.
  */
-@property (nonatomic, assign) BOOL placeholderEnabled;
+@property (atomic) BOOL placeholderEnabled;
 
 /**
  * @abstract Set the time it takes to fade out the placeholder when a node's contents are finished displaying.
  *
  * @discussion Defaults to 0 seconds.
  */
-@property (nonatomic, assign) NSTimeInterval placeholderFadeDuration;
+@property (atomic) NSTimeInterval placeholderFadeDuration;
 
 /**
  * @abstract Determines drawing priority of the node. Nodes with higher priority will be drawn earlier.
@@ -472,7 +472,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @discussion Defaults to ASDefaultDrawingPriority. There may be multiple drawing threads, and some of them may
  * decide to perform operations in queued order (regardless of drawingPriority)
  */
-@property (atomic, assign) NSInteger drawingPriority;
+@property (atomic) NSInteger drawingPriority;
 
 /** @name Hit Testing */
 
@@ -486,7 +486,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * This affects the default implementation of -hitTest and -pointInside, so subclasses should call super if you override 
  * it and want hitTestSlop applied.
  */
-@property (nonatomic, assign) UIEdgeInsets hitTestSlop;
+@property (atomic) UIEdgeInsets hitTestSlop;
 
 /** 
  * @abstract Returns a Boolean value indicating whether the receiver contains the specified point.
@@ -549,21 +549,21 @@ extern NSInteger const ASDefaultDrawingPriority;
 /**
  * Whether or not the node would support having .layerBacked = YES.
  */
-@property (nonatomic, readonly) BOOL supportsLayerBacking;
+@property (atomic, readonly) BOOL supportsLayerBacking;
 
 /**
  * Whether or not the node layout should be automatically updated when it receives safeAreaInsetsDidChange.
  *
  * Defaults to NO.
  */
-@property (nonatomic, assign) BOOL automaticallyRelayoutOnSafeAreaChanges;
+@property (atomic) BOOL automaticallyRelayoutOnSafeAreaChanges;
 
 /**
  * Whether or not the node layout should be automatically updated when it receives layoutMarginsDidChange.
  *
  * Defaults to NO.
  */
-@property (nonatomic, assign) BOOL automaticallyRelayoutOnLayoutMarginsChanges;
+@property (atomic) BOOL automaticallyRelayoutOnLayoutMarginsChanges;
 
 @end
 
@@ -594,7 +594,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 + (BOOL)shouldStoreUnflattenedLayouts;
 
-@property (nonatomic, strong, readonly, nullable) ASLayout *unflattenedCalculatedLayout;
+@property (atomic, readonly, nullable) ASLayout *unflattenedCalculatedLayout;
 
 /**
  * @abstract Return a description of the node hierarchy.
@@ -645,10 +645,10 @@ extern NSInteger const ASDefaultDrawingPriority;
  */
 - (void)layoutIfNeeded;
 
-@property (nonatomic, assign)           CGRect frame;                          // default=CGRectZero
-@property (nonatomic, assign)           CGRect bounds;                         // default=CGRectZero
-@property (nonatomic, assign)           CGPoint position;                      // default=CGPointZero
-@property (nonatomic, assign)           CGFloat alpha;                         // default=1.0f
+@property (atomic)           CGRect frame;                          // default=CGRectZero
+@property (atomic)           CGRect bounds;                         // default=CGRectZero
+@property (atomic)           CGPoint position;                      // default=CGPointZero
+@property (atomic)           CGFloat alpha;                         // default=1.0f
 
 /* @abstract Sets the corner rounding method to use on the ASDisplayNode.
  * There are three types of corner rounding provided by Texture: CALayer, Precomposited, and Clipping.
@@ -672,33 +672,33 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @default ASCornerRoundingTypeDefaultSlowCALayer
  */
-@property (nonatomic, assign)           ASCornerRoundingType cornerRoundingType;  // default=Slow CALayer .cornerRadius (offscreen rendering)
+@property (atomic)           ASCornerRoundingType cornerRoundingType;  // default=Slow CALayer .cornerRadius (offscreen rendering)
 
 /** @abstract The radius to use when rounding corners of the ASDisplayNode.
  *
  * @discussion This property is thread-safe and should always be preferred over CALayer's cornerRadius property,
  * even if corner rounding type is ASCornerRoundingTypeDefaultSlowCALayer.
  */
-@property (nonatomic, assign)           CGFloat cornerRadius;                     // default=0.0
+@property (atomic)           CGFloat cornerRadius;                     // default=0.0
 
-@property (nonatomic, assign)           BOOL clipsToBounds;                    // default==NO
-@property (nonatomic, getter=isHidden)  BOOL hidden;                           // default==NO
-@property (nonatomic, getter=isOpaque)  BOOL opaque;                           // default==YES
+@property (atomic)           BOOL clipsToBounds;                    // default==NO
+@property (atomic, getter=isHidden)  BOOL hidden;                           // default==NO
+@property (atomic, getter=isOpaque)  BOOL opaque;                           // default==YES
 
-@property (nonatomic, strong, nullable) id contents;                           // default=nil
-@property (nonatomic, assign)           CGRect contentsRect;                   // default={0,0,1,1}. @see CALayer.h for details.
-@property (nonatomic, assign)           CGRect contentsCenter;                 // default={0,0,1,1}. @see CALayer.h for details.
-@property (nonatomic, assign)           CGFloat contentsScale;                 // default=1.0f. See @contentsScaleForDisplay for details.
-@property (nonatomic, assign)           CGFloat rasterizationScale;            // default=1.0f.
+@property (nullable, atomic) id contents;                           // default=nil
+@property (atomic)           CGRect contentsRect;                   // default={0,0,1,1}. @see CALayer.h for details.
+@property (atomic)           CGRect contentsCenter;                 // default={0,0,1,1}. @see CALayer.h for details.
+@property (atomic)           CGFloat contentsScale;                 // default=1.0f. See @contentsScaleForDisplay for details.
+@property (atomic)           CGFloat rasterizationScale;            // default=1.0f.
 
-@property (nonatomic, assign)           CGPoint anchorPoint;                   // default={0.5, 0.5}
-@property (nonatomic, assign)           CGFloat zPosition;                     // default=0.0
-@property (nonatomic, assign)           CATransform3D transform;               // default=CATransform3DIdentity
-@property (nonatomic, assign)           CATransform3D subnodeTransform;        // default=CATransform3DIdentity
+@property (atomic)           CGPoint anchorPoint;                   // default={0.5, 0.5}
+@property (atomic)           CGFloat zPosition;                     // default=0.0
+@property (atomic)           CATransform3D transform;               // default=CATransform3DIdentity
+@property (atomic)           CATransform3D subnodeTransform;        // default=CATransform3DIdentity
 
-@property (nonatomic, assign, getter=isUserInteractionEnabled) BOOL userInteractionEnabled; // default=YES (NO for layer-backed nodes)
+@property (atomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled; // default=YES (NO for layer-backed nodes)
 #if TARGET_OS_IOS
-@property (nonatomic, assign, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
+@property (atomic, getter=isExclusiveTouch) BOOL exclusiveTouch;    // default=NO
 #endif
 
 /**
@@ -707,9 +707,9 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @discussion In contrast to UIView, setting a transparent color will not set opaque = NO.
  * This only affects nodes that implement +drawRect like ASTextNode.
 */
-@property (nonatomic, strong, nullable) UIColor *backgroundColor;              // default=nil
+@property (nullable, atomic, copy) UIColor *backgroundColor;              // default=nil
 
-@property (nonatomic, strong, null_resettable) UIColor *tintColor;             // default=Blue
+@property (null_resettable, atomic, copy) UIColor *tintColor;             // default=Blue
 - (void)tintColorDidChange;                                                    // Notifies the node when the tintColor has changed.
 
 /**
@@ -720,24 +720,24 @@ extern NSInteger const ASDefaultDrawingPriority;
  * Thus, UIViewContentModeRedraw is not allowed; use needsDisplayOnBoundsChange = YES instead, and pick an appropriate 
  * contentMode for your content while it's being re-rendered.
  */
-@property (nonatomic, assign)           UIViewContentMode contentMode;         // default=UIViewContentModeScaleToFill
-@property (nonatomic, copy)             NSString *contentsGravity;             // Use .contentMode in preference when possible.
-@property (nonatomic, assign)           UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0)); // default=Unspecified
+@property (atomic)           UIViewContentMode contentMode;         // default=UIViewContentModeScaleToFill
+@property (atomic, copy)             NSString *contentsGravity;             // Use .contentMode in preference when possible.
+@property (atomic)           UISemanticContentAttribute semanticContentAttribute;
 
-@property (nonatomic, nullable)         CGColorRef shadowColor;                // default=opaque rgb black
-@property (nonatomic, assign)           CGFloat shadowOpacity;                 // default=0.0
-@property (nonatomic, assign)           CGSize shadowOffset;                   // default=(0, -3)
-@property (nonatomic, assign)           CGFloat shadowRadius;                  // default=3
-@property (nonatomic, assign)           CGFloat borderWidth;                   // default=0
-@property (nonatomic, nullable)         CGColorRef borderColor;                // default=opaque rgb black
+@property (nullable, atomic)         CGColorRef shadowColor;                // default=opaque rgb black
+@property (atomic)           CGFloat shadowOpacity;                 // default=0.0
+@property (atomic)           CGSize shadowOffset;                   // default=(0, -3)
+@property (atomic)           CGFloat shadowRadius;                  // default=3
+@property (atomic)           CGFloat borderWidth;                   // default=0
+@property (nullable, atomic)         CGColorRef borderColor;                // default=opaque rgb black
 
-@property (nonatomic, assign)           BOOL allowsGroupOpacity;
-@property (nonatomic, assign)           BOOL allowsEdgeAntialiasing;
-@property (nonatomic, assign)           unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
+@property (atomic)           BOOL allowsGroupOpacity;
+@property (atomic)           BOOL allowsEdgeAntialiasing;
+@property (atomic)           unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
 
-@property (nonatomic, assign)           BOOL needsDisplayOnBoundsChange;       // default==NO
-@property (nonatomic, assign)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
-@property (nonatomic, assign)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone (undefined for layer-backed nodes)
+@property (atomic)           BOOL needsDisplayOnBoundsChange;       // default==NO
+@property (atomic)           BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)
+@property (atomic)           UIViewAutoresizing autoresizingMask;   // default==UIViewAutoresizingNone (undefined for layer-backed nodes)
 
 /**
  * @abstract Content margins
@@ -748,8 +748,8 @@ extern NSInteger const ASDefaultDrawingPriority;
  * that the layout gets automatically updated when the value of this property changes. Or you can override layoutMarginsDidChange
  * and make all the necessary updates manually.
  */
-@property (nonatomic, assign)           UIEdgeInsets layoutMargins;
-@property (nonatomic, assign)           BOOL preservesSuperviewLayoutMargins;  // default is NO - set to enable pass-through or cascading behavior of margins from this view’s parent to its children
+@property (atomic)           UIEdgeInsets layoutMargins;
+@property (atomic)           BOOL preservesSuperviewLayoutMargins;  // default is NO - set to enable pass-through or cascading behavior of margins from this view’s parent to its children
 - (void)layoutMarginsDidChange;
 
 /**
@@ -761,8 +761,8 @@ extern NSInteger const ASDefaultDrawingPriority;
  * that the layout gets automatically updated when the value of this property changes. Or you can override safeAreaInsetsDidChange
  * and make all the necessary updates manually.
  */
-@property (nonatomic, readonly)         UIEdgeInsets safeAreaInsets;
-@property (nonatomic, assign)           BOOL insetsLayoutMarginsFromSafeArea;  // Default: YES
+@property (atomic, readonly)         UIEdgeInsets safeAreaInsets;
+@property (atomic)           BOOL insetsLayoutMarginsFromSafeArea;  // Default: YES
 - (void)safeAreaInsetsDidChange;
 
 
@@ -790,28 +790,28 @@ extern NSInteger const ASDefaultDrawingPriority;
 @interface ASDisplayNode (UIViewBridgeAccessibility)
 
 // Accessibility support
-@property (nonatomic, assign)           BOOL isAccessibilityElement;
-@property (nonatomic, copy, nullable)   NSString *accessibilityLabel;
-@property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedLabel API_AVAILABLE(ios(11.0),tvos(11.0));
-@property (nonatomic, copy, nullable)   NSString *accessibilityHint;
-@property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedHint API_AVAILABLE(ios(11.0),tvos(11.0));
-@property (nonatomic, copy, nullable)   NSString *accessibilityValue;
-@property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
-@property (nonatomic, assign)           UIAccessibilityTraits accessibilityTraits;
-@property (nonatomic, assign)           CGRect accessibilityFrame;
-@property (nonatomic, copy, nullable)   UIBezierPath *accessibilityPath;
-@property (nonatomic, assign)           CGPoint accessibilityActivationPoint;
-@property (nonatomic, copy, nullable)   NSString *accessibilityLanguage;
-@property (nonatomic, assign)           BOOL accessibilityElementsHidden;
-@property (nonatomic, assign)           BOOL accessibilityViewIsModal;
-@property (nonatomic, assign)           BOOL shouldGroupAccessibilityChildren;
-@property (nonatomic, assign)           UIAccessibilityNavigationStyle accessibilityNavigationStyle;
+@property (atomic)           BOOL isAccessibilityElement;
+@property (nullable, atomic, copy)   NSString *accessibilityLabel;
+@property (nullable, atomic, copy)   NSAttributedString *accessibilityAttributedLabel API_AVAILABLE(ios(11.0),tvos(11.0));
+@property (nullable, atomic, copy)   NSString *accessibilityHint;
+@property (nullable, atomic, copy)   NSAttributedString *accessibilityAttributedHint API_AVAILABLE(ios(11.0),tvos(11.0));
+@property (nullable, atomic, copy)   NSString *accessibilityValue;
+@property (nullable, atomic, copy)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
+@property (atomic)           UIAccessibilityTraits accessibilityTraits;
+@property (atomic)           CGRect accessibilityFrame;
+@property (nullable, atomic, copy)   UIBezierPath *accessibilityPath;
+@property (atomic)           CGPoint accessibilityActivationPoint;
+@property (nullable, atomic, copy)   NSString *accessibilityLanguage;
+@property (atomic)           BOOL accessibilityElementsHidden;
+@property (atomic)           BOOL accessibilityViewIsModal;
+@property (atomic)           BOOL shouldGroupAccessibilityChildren;
+@property (atomic)           UIAccessibilityNavigationStyle accessibilityNavigationStyle;
 #if TARGET_OS_TV
-@property(nonatomic, copy, nullable) 	NSArray *accessibilityHeaderElements;
+@property(nullable, atomic, copy) 	NSArray *accessibilityHeaderElements;
 #endif
 
 // Accessibility identification support
-@property (nonatomic, copy, nullable)   NSString *accessibilityIdentifier;
+@property (nullable, atomic, copy)   NSString *accessibilityIdentifier;
 
 @end
 
@@ -858,7 +858,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
  */
-@property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
+@property (nullable, atomic, copy) ASLayoutSpecBlock layoutSpecBlock;
 
 /** 
  * @abstract Return the calculated size.
@@ -870,14 +870,14 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @warning Subclasses must not override this; it returns the last cached measurement and is never expensive.
  */
-@property (nonatomic, readonly, assign) CGSize calculatedSize;
+@property (atomic, readonly) CGSize calculatedSize;
 
 /** 
  * @abstract Return the constrained size range used for calculating layout.
  *
  * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
  */
-@property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout;
+@property (atomic, readonly) ASSizeRange constrainedSizeForCalculatedLayout;
 
 
 @end
@@ -887,19 +887,19 @@ extern NSInteger const ASDefaultDrawingPriority;
 /**
  * @abstract The amount of time it takes to complete the default transition animation. Default is 0.2.
  */
-@property (nonatomic, assign) NSTimeInterval defaultLayoutTransitionDuration;
+@property (atomic) NSTimeInterval defaultLayoutTransitionDuration;
 
 /**
  * @abstract The amount of time (measured in seconds) to wait before beginning the default transition animation.
  *           Default is 0.0.
  */
-@property (nonatomic, assign) NSTimeInterval defaultLayoutTransitionDelay;
+@property (atomic) NSTimeInterval defaultLayoutTransitionDelay;
 
 /**
  * @abstract A mask of options indicating how you want to perform the default transition animations.
  *           For a list of valid constants, see UIViewAnimationOptions.
  */
-@property (nonatomic, assign) UIViewAnimationOptions defaultLayoutTransitionOptions;
+@property (atomic) UIViewAnimationOptions defaultLayoutTransitionOptions;
 
 /**
  * @discussion A place to perform your animation. New nodes have been inserted here. You can also use this time to re-order the hierarchy.
@@ -965,7 +965,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @discussion If flag is YES the node no longer require addSubnode: or removeFromSupernode method calls. The presence
  * or absence of subnodes is completely determined in its layoutSpecThatFits: method.
  */
-@property (nonatomic, assign) BOOL automaticallyManagesSubnodes;
+@property (atomic) BOOL automaticallyManagesSubnodes;
 
 @end
 
