@@ -34,18 +34,16 @@ void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l)
   // the lock, because we reset it to NULL before we unlock. So (thread == self) is
   // invariant.
   
+  const pthread_t s = pthread_self();
   if (os_unfair_lock_trylock(&l->_lock)) {
     // Owned by nobody. We now have the lock. Assign self.
-    rul_set_thread(l, pthread_self());
+    rul_set_thread(l, s);
+  } else if (rul_get_thread(l) == s) {
+    // Owned by self (recursive lock). nop.
   } else {
-    const pthread_t s = pthread_self();
-    if (rul_get_thread(l) == s) {
-      // Owned by self (recursive lock). nop.
-    } else {
-      // Owned by other thread. Block and then set thread to self.
-      os_unfair_lock_lock(&l->_lock);
-      rul_set_thread(l, s);
-    }
+    // Owned by other thread. Block and then set thread to self.
+    os_unfair_lock_lock(&l->_lock);
+    rul_set_thread(l, s);
   }
   
   l->_count++;
@@ -55,17 +53,15 @@ BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l)
 {
   // Same as Lock above. See comments there.
   
+  const pthread_t s = pthread_self();
   if (os_unfair_lock_trylock(&l->_lock)) {
     // Owned by nobody. We now have the lock. Assign self.
-    rul_set_thread(l, pthread_self());
+    rul_set_thread(l, s);
+  } else if (rul_get_thread(l) == s) {
+    // Owned by self (recursive lock). nop.
   } else {
-    const pthread_t s = pthread_self();
-    if (rul_get_thread(l) == s) {
-      // Owned by self (recursive lock). nop.
-    } else {
-      // Owned by other thread. Fail.
-      return NO;
-    }
+    // Owned by other thread. Fail.
+    return NO;
   }
   
   l->_count++;
