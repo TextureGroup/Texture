@@ -14,8 +14,6 @@ Pod::Spec.new do |spec|
   spec.ios.weak_frameworks = 'AssetsLibrary'
   spec.weak_frameworks = 'Photos','MapKit'
 
-  spec.requires_arc = true
-
   spec.ios.deployment_target = '9.0'
   spec.tvos.deployment_target = '9.0'
 
@@ -41,7 +39,6 @@ Pod::Spec.new do |spec|
         # See https://github.com/facebook/AsyncDisplayKit/issues/1153
         'Source/TextKit/*.h',
     ]
-    core.xcconfig = { 'GCC_PRECOMPILE_PREFIX_HEADER' => 'YES' }
   end
   
   spec.subspec 'PINRemoteImage' do |pin|
@@ -66,9 +63,4 @@ Pod::Spec.new do |spec|
 
   spec.social_media_url = 'https://twitter.com/TextureiOS'
   spec.library = 'c++'
-  spec.pod_target_xcconfig = {
-       'CLANG_CXX_LANGUAGE_STANDARD' => 'c++11',
-       'CLANG_CXX_LIBRARY' => 'libc++'
-  }
-
 end
