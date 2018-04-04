@@ -62,4 +62,5 @@ Pod::Spec.new do |spec|
   spec.default_subspec = 'PINRemoteImage'
 
   spec.social_media_url = 'https://twitter.com/TextureiOS'
+  spec.library = 'c++'
 end
