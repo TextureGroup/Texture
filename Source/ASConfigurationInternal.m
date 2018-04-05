@@ -37,8 +37,8 @@
 + (ASConfiguration *)defaultConfiguration NS_RETURNS_RETAINED
 {
   ASConfiguration *config = [[ASConfiguration alloc] init];
-  // On by default for now, pending fix for https://github.com/TextureGroup/Texture/issues/853
-  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  // TODO(wsdwsd0829): Fix #788 before enabling it.
+  // config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
   return config;
 }
 

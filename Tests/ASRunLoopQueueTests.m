@@ -188,6 +188,10 @@ static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run
 
 - (void)testASCATransactionQueueProcess
 {
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
+  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+
   ASCATransactionQueue *queue = [[ASCATransactionQueue alloc] init];
   QueueObject *object = [[QueueObject alloc] init];
   [queue enqueue:object];

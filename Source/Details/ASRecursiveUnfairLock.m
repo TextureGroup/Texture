@@ -28,33 +28,42 @@
 
 void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l)
 {
-  // Just a cache for pthread_self so that we never call it twice.
-  pthread_t s = NULL;
-  
   // Try to lock without blocking. If we fail, check what thread owns it.
   // Note that the owning thread CAN CHANGE freely, but it can't become `self`
   // because only we are `self`. And if it's already `self` then we already have
   // the lock, because we reset it to NULL before we unlock. So (thread == self) is
   // invariant.
   
-  if (!os_unfair_lock_trylock(&l->_lock) && (rul_get_thread(l) != (s = pthread_self()))) {
-    // Owned by other thread. Possibly other threads are waiting too. Block.
+  const pthread_t s = pthread_self();
+  if (os_unfair_lock_trylock(&l->_lock)) {
+    // Owned by nobody. We now have the lock. Assign self.
+    rul_set_thread(l, s);
+  } else if (rul_get_thread(l) == s) {
+    // Owned by self (recursive lock). nop.
+  } else {
+    // Owned by other thread. Block and then set thread to self.
     os_unfair_lock_lock(&l->_lock);
+    rul_set_thread(l, s);
   }
-  // Now we've got the lock. Update the thread pointer and count.
-  rul_set_thread(l, s ?: pthread_self());
+  
   l->_count++;
 }
 
 BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l)
 {
-  // Same logic as `Lock` function, see comments there.
-  pthread_t s = NULL;
+  // Same as Lock above. See comments there.
   
-  if (!os_unfair_lock_trylock(&l->_lock) && (rul_get_thread(l) != (s = pthread_self()))) {
+  const pthread_t s = pthread_self();
+  if (os_unfair_lock_trylock(&l->_lock)) {
+    // Owned by nobody. We now have the lock. Assign self.
+    rul_set_thread(l, s);
+  } else if (rul_get_thread(l) == s) {
+    // Owned by self (recursive lock). nop.
+  } else {
+    // Owned by other thread. Fail.
     return NO;
   }
-  rul_set_thread(l, s ?: pthread_self());
+  
   l->_count++;
   return YES;
 }
