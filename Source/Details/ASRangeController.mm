@@ -353,7 +353,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       // instant we come onscreen.  So, preload and display all of those things, but don't waste resources preloading yet.
       // We handle this as a separate case to minimize set operations for offscreen preloading, including containsObject:.
       
-      if ([allCurrentIndexPaths containsObject:indexPath]) {
+      if ([visibleIndexPaths containsObject:indexPath]) {  //Propose changes
         // DO NOT set Visible: even though these elements are in the visible range / "viewport",
         // our overall container object is itself not visible yet.  The moment it becomes visible, we will run the condition above
         
@@ -367,6 +367,9 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
           interfaceState |= ASInterfaceStateDisplay;
         }
       }
+      else if ([displayIndexPaths containsObject:indexPath]) {  //Propose changes
+        interfaceState |= ASInterfaceStatePreload;
+      }
     }
 
     ASCellNode *node = [map elementForItemAtIndexPath:indexPath].nodeIfAllocated;
@@ -376,7 +379,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
         [newVisibleNodes addObject:node];
       }
       // Skip the many method calls of the recursive operation if the top level cell node already has the right interfaceState.
-      if (node.interfaceState != interfaceState) {
+      if (node.pendingInterfaceState != interfaceState) {
 #if ASRangeControllerLoggingEnabled
         [modifiedIndexPaths addObject:indexPath];
 #endif

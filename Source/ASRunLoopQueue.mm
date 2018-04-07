@@ -237,14 +237,17 @@ typedef enum {
     }
     preLayoutHandler = ^{
       ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
+      NSLog(@"@@@@ preLayout");
     };
     preCommitHandler = ^{
       int state = [CATransaction currentState];
       ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
       ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
+      NSLog(@"@@@@ preCommit");
     };
     postCommitHandler = ^{
       ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
+      NSLog(@"@@@@ postCommit");
       // Can't add new observers inside an observer. rdar://problem/31253952
       dispatch_async(dispatch_get_main_queue(), ^{
         [self registerCATransactionObservers];
@@ -546,11 +549,25 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
     __unsafe_unretained __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-      [weakSelf processQueue];
+      NSLog(@"!!! preCommit");
+      while (true) {
+        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
+          if (!window.hidden) {
+            [window layoutIfNeeded];
+            NSLog(@"^^^^ windowLayoutIfNeeded");
+          }
+        }
+        if (_internalQueue.count > 0) {
+          [weakSelf processQueue];
+        } else {
+          break;
+        }
+      }
     };
     void (^postHandlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       ASDN::MutexLocker l(_internalQueueLock);
       _CATransactionCommitInProgress = NO;
+      NSLog(@"!!! postCommit");
     };
     _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, handlerBlock);
     _postTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueuePostOrder, postHandlerBlock);
@@ -613,7 +630,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     // Mark the queue will end coalescing shortly until after CATransactionCommit.
     // This will give the queue a chance to apply any further interfaceState changes/enqueue
     // immediately within current runloop instead of pushing the work to next runloop cycle.
-    _CATransactionCommitInProgress = YES;
+//    _CATransactionCommitInProgress = YES;
 
     NSInteger internalQueueCount = _internalQueue.count;
     // Early-exit if the queue is empty.
