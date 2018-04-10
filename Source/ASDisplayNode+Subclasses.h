@@ -363,6 +363,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didExitHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
 
 /**
+ * Called just after the view is added to a window.
+ * Note: this may be called multiple times during view controller transitions. To overcome this: use didEnterVisibleState or it's equavalents.
+ */
+- (void)didEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+
+/**
  * @abstract Whether the view or layer of this display node is currently in a window
  */
 @property (nonatomic, readonly, assign, getter=isInHierarchy) BOOL inHierarchy;
