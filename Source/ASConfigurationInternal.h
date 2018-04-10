@@ -30,6 +30,7 @@ BOOL ASActivateExperimentalFeature(ASExperimentalFeatures option);
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfigurationManager : NSObject
 
+
 /**
  * No API for now.
  * Just use ASActivateExperimentalFeature to access this efficiently.

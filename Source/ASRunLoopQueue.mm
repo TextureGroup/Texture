@@ -237,14 +237,17 @@ typedef enum {
     }
     preLayoutHandler = ^{
       ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
+      NSLog(@"@@@@ preLayout");
     };
     preCommitHandler = ^{
       int state = [CATransaction currentState];
       ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
       ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
+      NSLog(@"@@@@ preCommit");
     };
     postCommitHandler = ^{
       ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
+      NSLog(@"@@@@ postCommit");
       // Can't add new observers inside an observer. rdar://problem/31253952
       dispatch_async(dispatch_get_main_queue(), ^{
         [self registerCATransactionObservers];
@@ -546,11 +549,25 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
     __unsafe_unretained __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-      [weakSelf processQueue];
+      NSLog(@"!!! preCommit");
+//      [weakSelf processQueue];
+      while (true) {
+        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+        if (!window.hidden) {
+          NSLog(@"^^^^ windowLayoutIfNeeded");
+          [window layoutIfNeeded];
+        }
+        if (_internalQueue.count > 0) {
+          [weakSelf processQueue];
+        } else {
+          break;
+        }
+      }
     };
     void (^postHandlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       ASDN::MutexLocker l(_internalQueueLock);
       _CATransactionCommitInProgress = NO;
+      NSLog(@"!!! postCommit");
     };
     _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, handlerBlock);
     _postTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueuePostOrder, postHandlerBlock);
@@ -689,6 +706,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   }
 
   if (!foundObject) {
+    NSLog(@"^^^^ Adding object to queue: %@", object);
     [_internalQueue addPointer:(__bridge void *)object];
 
     CFRunLoopSourceSignal(_runLoopSource);

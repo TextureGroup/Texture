@@ -2273,13 +2273,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   BOOL visible = (self.window != nil);
   ASDisplayNode *node = self.collectionNode;
+  BOOL rangeCoontrollerUpdated = NO;
   if (!visible && node.inHierarchy) {
+    // Exit CellNodes first before Collection to match UIKit behaviors
+    if (![node supportsRangeManagedInterfaceState]) {
+      rangeCoontrollerUpdated = YES;
+      [_rangeController setNeedsUpdate];
+      [_rangeController updateIfNeeded];
+    }
     [node __exitHierarchy];
   }
 
   // Updating the visible node index paths only for not range managed nodes. Range managed nodes will get their
   // their update in the layout pass
-  if (![node supportsRangeManagedInterfaceState]) {
+  if (![node supportsRangeManagedInterfaceState] && !rangeCoontrollerUpdated) {
     [_rangeController setNeedsUpdate];
     [_rangeController updateIfNeeded];
   }
