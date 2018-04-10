@@ -19,6 +19,7 @@
 
 #import "ViewController.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 
 @interface ASConfigurationManager (Testing)
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration;
@@ -29,6 +30,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [ASDisplayNode setShouldShowRangeDebugOverlay:YES];
+
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
   config.experimentalFeatures |= ASExperimentalInterfaceStateCoalescing;
   [ASConfigurationManager test_resetWithConfiguration:config];

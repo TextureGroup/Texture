@@ -368,10 +368,15 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
         }
       } else if ([displayIndexPaths containsObject:indexPath]) {  //Propose changes
         interfaceState |= ASInterfaceStatePreload;
-      }
-      else {
+      } else {
         interfaceState = ASInterfaceStateNone;
       }
+
+//      else {
+//        interfaceState |= ASInterfaceStatePreload;
+//      }
+      // we may not want this because preserve presload state can avoid loading data with thrash 
+
     }
 
     ASCellNode *node = [map elementForItemAtIndexPath:indexPath].nodeIfAllocated;

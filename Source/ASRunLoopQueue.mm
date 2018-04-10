@@ -550,19 +550,19 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     __unsafe_unretained __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       NSLog(@"!!! preCommit");
-      [weakSelf processQueue];
-//      while (true) {
-//        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-//        if (!window.hidden) {
-//          NSLog(@"^^^^ windowLayoutIfNeeded");
-//          [window layoutIfNeeded];
-//        }
-//        if (_internalQueue.count > 0) {
-//          [weakSelf processQueue];
-//        } else {
-//          break;
-//        }
-//      }
+//      [weakSelf processQueue];
+      while (true) {
+        UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+        if (!window.hidden) {
+          NSLog(@"^^^^ windowLayoutIfNeeded");
+          [window layoutIfNeeded];
+        }
+        if (_internalQueue.count > 0) {
+          [weakSelf processQueue];
+        } else {
+          break;
+        }
+      }
     };
     void (^postHandlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       ASDN::MutexLocker l(_internalQueueLock);
