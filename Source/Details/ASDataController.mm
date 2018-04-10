@@ -297,7 +297,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   ASDisplayNodeAssertMainThread();
 
   NSUInteger sectionCount = [self itemCountsFromDataSource].size();
-  BOOL canDelegate = self.layoutDelegate;
+  BOOL canDelegate = (self.layoutDelegate != nil);
   if (sectionCount > 0) {
     NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
     ASSizeRange newSizeRange;
