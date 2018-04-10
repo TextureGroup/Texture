@@ -3104,6 +3104,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   } else {
     ASDN::MutexLocker l(__instanceLock__);
     if (_pendingInterfaceState != newState) {
+      NSLog(@"pendingInterfaceState: %lu, interfaceState: %lu node: %@", newState, self.interfaceState, self);
       _pendingInterfaceState = newState;
       [[ASCATransactionQueue sharedQueue] enqueue:self];
     }

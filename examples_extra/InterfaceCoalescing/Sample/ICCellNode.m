@@ -15,13 +15,14 @@
 
 - (instancetype)initWithColor:(UIColor *)color colorName:(NSString *)colorName {
   if (self = [super init]) {
-    self.automaticallyManagesSubnodes = NO;
+//    self.automaticallyManagesSubnodes = NO;
     _color = color;
     _colorName = colorName;
-    self.backgroundColor = _color;
 
     _didEnterVisibleCount = 0;
     _didExitVisibleCount = 0;
+
+    self.backgroundColor = _color;
   }
   return self;
 }
@@ -29,6 +30,10 @@
 - (void)layout {
   [super layout];
   NSLog(@"^^^^ Layout");
+}
+
+- (void)didLoad {
+  [super didLoad];
 }
 
 - (void)didEnterVisibleState {

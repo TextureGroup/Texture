@@ -10,6 +10,14 @@
 
 @implementation ICDisplayNode
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    self.backgroundColor = [UIColor whiteColor];
+  }
+  return self;
+}
 - (void)didEnterVisibleState {
   [super didEnterVisibleState];
   NSLog(@"^^^^ didEnterVisibleState %@", self);

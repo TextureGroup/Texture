@@ -366,9 +366,11 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
           // In that case we'll just set it back to MeasureLayout.  Only set Display | Preload if in allCurrentIndexPaths.
           interfaceState |= ASInterfaceStateDisplay;
         }
-      }
-      else if ([displayIndexPaths containsObject:indexPath]) {  //Propose changes
+      } else if ([displayIndexPaths containsObject:indexPath]) {  //Propose changes
         interfaceState |= ASInterfaceStatePreload;
+      }
+      else {
+        interfaceState = ASInterfaceStateNone;
       }
     }
 
