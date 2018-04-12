@@ -30,11 +30,17 @@ static BOOL defaultAllowsEdgeAntialiasing = NO;
 
 void ASInitializeFrameworkMainThread(void)
 {
-  ASDisplayNodeThreadIsMain();
+  ASDisplayNodeAssertMainThread();
   // Ensure these values are cached on the main thread before needed in the background.
-  CALayer *layer = [[[UIView alloc] init] layer];
-  defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
-  defaultAllowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
+  if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
+    defaultAllowsGroupOpacity = YES; // Always linked against iOS >= 7.
+    NSNumber *infoDictValue = [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
+    defaultAllowsEdgeAntialiasing = infoDictValue ? infoDictValue.boolValue : NO;
+  } else {
+    CALayer *layer = [[[UIView alloc] init] layer];
+    defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
+    defaultAllowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
+  }
 }
 
 BOOL ASDefaultAllowsGroupOpacity(void)
