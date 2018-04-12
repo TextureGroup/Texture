@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
-ASDISPLAYNODE_INLINE BOOL ASDisplayNodeThreadIsMain()
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 {
   return 0 != pthread_main_np();
 }
