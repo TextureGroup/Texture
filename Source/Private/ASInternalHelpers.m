@@ -33,9 +33,15 @@ void ASInitializeFrameworkMainThread(void)
   ASDisplayNodeAssertMainThread();
   // Ensure these values are cached on the main thread before needed in the background.
   if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
-    defaultAllowsGroupOpacity = YES; // Always linked against iOS >= 7.
-    NSNumber *infoDictValue = [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
-    defaultAllowsEdgeAntialiasing = infoDictValue ? infoDictValue.boolValue : NO;
+    NSBundle *mainBundle = NSBundle.mainBundle;
+    
+    // If unspecified, group opacity is YES since we always link against >= iOS 7
+    NSNumber *infoDictGroupOpacity = [mainBundle objectForInfoDictionaryKey:@"UIViewGroupOpacity"];
+    defaultAllowsGroupOpacity = infoDictGroupOpacity ? infoDictGroupOpacity.boolValue : YES;
+    
+    // If unspecified, edge antialiasing is NO.
+    NSNumber *infoDictAntialiasing = [mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
+    defaultAllowsEdgeAntialiasing = infoDictAntialiasing ? infoDictAntialiasing.boolValue : NO;
   } else {
     CALayer *layer = [[[UIView alloc] init] layer];
     defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
