@@ -25,38 +25,42 @@
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 
-static BOOL defaultAllowsGroupOpacity = YES;
-static BOOL defaultAllowsEdgeAntialiasing = NO;
+static NSNumber *allowsGroupOpacityFromUIKitOrNil;
+static NSNumber *allowsEdgeAntialiasingFromUIKitOrNil;
+
+BOOL ASDefaultAllowsGroupOpacity()
+{
+  static BOOL groupOpacity;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSNumber *groupOpacityObj = allowsGroupOpacityFromUIKitOrNil ?: [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewGroupOpacity"];
+    groupOpacity = groupOpacityObj ? groupOpacityObj.boolValue : YES;
+  });
+  return groupOpacity;
+}
+
+BOOL ASDefaultAllowsEdgeAntialiasing()
+{
+  static BOOL edgeAntialiasing;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSNumber *antialiasingObj = allowsEdgeAntialiasingFromUIKitOrNil ?: [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
+    edgeAntialiasing = antialiasingObj ? antialiasingObj.boolValue : NO;
+  });
+  return edgeAntialiasing;
+}
 
 void ASInitializeFrameworkMainThread(void)
 {
-  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeCAssertMainThread();
   // Ensure these values are cached on the main thread before needed in the background.
   if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
-    NSBundle *mainBundle = NSBundle.mainBundle;
-    
-    // If unspecified, group opacity is YES since we always link against >= iOS 7
-    NSNumber *infoDictGroupOpacity = [mainBundle objectForInfoDictionaryKey:@"UIViewGroupOpacity"];
-    defaultAllowsGroupOpacity = infoDictGroupOpacity ? infoDictGroupOpacity.boolValue : YES;
-    
-    // If unspecified, edge antialiasing is NO.
-    NSNumber *infoDictAntialiasing = [mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
-    defaultAllowsEdgeAntialiasing = infoDictAntialiasing ? infoDictAntialiasing.boolValue : NO;
+    // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
   } else {
     CALayer *layer = [[[UIView alloc] init] layer];
-    defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
-    defaultAllowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
+    allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
+    allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
   }
-}
-
-BOOL ASDefaultAllowsGroupOpacity(void)
-{
-  return defaultAllowsGroupOpacity;
-}
-
-BOOL ASDefaultAllowsEdgeAntialiasing(void)
-{
-  return defaultAllowsEdgeAntialiasing;
 }
 
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)
