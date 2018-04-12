@@ -24,6 +24,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalTextNode = 1 << 1,                          // exp_text_node
   ASExperimentalInterfaceStateCoalescing = 1 << 2,          // exp_interface_state_coalesce
   ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
+  ASExperimentalLayerDefaults = 1 << 4,                     // exp_infer_layer_defaults
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
