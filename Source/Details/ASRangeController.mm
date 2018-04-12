@@ -154,10 +154,14 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 - (void)updateIfNeeded
 {
   if (_needsRangeUpdate) {
-    _needsRangeUpdate = NO;
-      
-    [self _updateVisibleNodeIndexPaths];
+    [self updateRanges];
   }
+}
+
+- (void)updateRanges
+{
+  _needsRangeUpdate = NO;
+  [self _updateVisibleNodeIndexPaths];
 }
 
 - (void)updateCurrentRangeWithMode:(ASLayoutRangeMode)rangeMode

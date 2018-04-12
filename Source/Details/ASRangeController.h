@@ -65,6 +65,11 @@ AS_SUBCLASSING_RESTRICTED
 - (void)updateIfNeeded;
 
 /**
+ * Force update the ranges immediately.
+ */
+- (void)updateRanges;
+
+/**
  * Add the sized node for `indexPath` as a subview of `contentView`.
  *
  * @param contentView UIView to add a (sized) node's view to.
