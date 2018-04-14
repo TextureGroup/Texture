@@ -101,7 +101,7 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 
 @implementation _ASAnimatedTransitionContext
 
-+ (instancetype)contextForNode:(ASDisplayNode *)node alpha:(CGFloat)alpha
++ (instancetype)contextForNode:(ASDisplayNode *)node alpha:(CGFloat)alpha NS_RETURNS_RETAINED
 {
   _ASAnimatedTransitionContext *context = [[_ASAnimatedTransitionContext alloc] init];
   context.node = node;

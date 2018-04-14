@@ -58,6 +58,7 @@
 
   // Use UITableViewCell defaults
   _selectionStyle = UITableViewCellSelectionStyleDefault;
+  _focusStyle = UITableViewCellFocusStyleDefault;
   self.clipsToBounds = YES;
 
   return self;
@@ -349,6 +350,25 @@
 - (BOOL)supportsLayerBacking
 {
   return NO;
+}
+
+- (BOOL)shouldUseUIKitCell
+{
+  return NO;
+}
+
+@end
+
+
+#pragma mark -
+#pragma mark ASWrapperCellNode
+
+// TODO: Consider if other calls, such as willDisplayCell, should be bridged to this class.
+@implementation ASWrapperCellNode : ASCellNode
+
+- (BOOL)shouldUseUIKitCell
+{
+  return YES;
 }
 
 @end

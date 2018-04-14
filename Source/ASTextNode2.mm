@@ -17,7 +17,8 @@
 #import <deque>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
@@ -30,6 +31,7 @@
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 @interface ASTextCacheValue : NSObject {
   @package
@@ -232,7 +234,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self _ensureTruncationText];
   
   NSMutableAttributedString *mutableText = [attributedText mutableCopy];
-  [self prepareAttributedStringForDrawing:mutableText];
+  [self prepareAttributedString:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
   
   [self setNeedsDisplay];
@@ -259,7 +261,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSAttributedString *)attributedText
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _attributedText;
 }
 
@@ -272,7 +274,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   // Don't hold textLock for too long.
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     if (ASObjectIsEqual(attributedText, _attributedText)) {
       return;
     }
@@ -319,9 +321,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedStringForDrawing:(NSMutableAttributedString *)attributedString
+- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString
 {
-  ASDN::MutexLocker lock(__instanceLock__);
+  ASLockScopeSelf();
  
   // Apply paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
@@ -333,12 +335,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     paragraphStyle.lineBreakMode = _truncationMode;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
-  
-  // Apply background color if needed
-  UIColor *backgroundColor = self.backgroundColor;
-  if (CGColorGetAlpha(backgroundColor.CGColor) > 0) {
-    [attributedString addAttribute:NSBackgroundColorAttributeName value:backgroundColor range:NSMakeRange(0, attributedString.length)];
-  }
   
   // Apply shadow if needed
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
@@ -362,18 +358,23 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASTextContainer *copiedContainer = [_textContainer copy];
   copiedContainer.size = self.bounds.size;
   NSMutableAttributedString *mutableText = [self.attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
-  [self prepareAttributedStringForDrawing:mutableText];
+  
+  [self prepareAttributedString:mutableText];
+  
   return @{
-           @"container": copiedContainer,
-           @"text": mutableText
-           };
+    @"container": copiedContainer,
+    @"text": mutableText,
+    @"bgColor": self.backgroundColor ?: [NSNull null]
+  };
 }
 
 /**
  * If it can't find a compatible layout, this method creates one.
+ *
+ * NOTE: Be careful to copy `text` if needed.
  */
 + (ASTextLayout *)compatibleLayoutWithContainer:(ASTextContainer *)container
-                                           text:(NSAttributedString *)text
+                                           text:(NSAttributedString *)text NS_RETURNS_RETAINED
 
 {
   // Allocate layoutCacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
@@ -389,7 +390,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     cacheValue = [textLayoutCache objectForKey:text];
     if (cacheValue == nil) {
       cacheValue = [[ASTextCacheValue alloc] init];
-      [textLayoutCache setObject:cacheValue forKey:text];
+      [textLayoutCache setObject:cacheValue forKey:[text copy]];
     }
     cacheValue;
   });
@@ -456,15 +457,29 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing;
++ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextContainer *container = layoutDict[@"container"];
   NSAttributedString *text = layoutDict[@"text"];
+  UIColor *bgColor = layoutDict[@"bgColor"];
   ASTextLayout *layout = [self compatibleLayoutWithContainer:container text:text];
   
   if (isCancelledBlock()) {
     return;
   }
+  
+  // Fill background color.
+  if (bgColor == (id)[NSNull null]) {
+    bgColor = nil;
+  }
+
+  // They may have already drawn into this context in the pre-context block
+  // so unfortunately we have to use the normal blend mode, not copy.
+  if (bgColor && CGColorGetAlpha(bgColor.CGColor) > 0) {
+    [bgColor setFill];
+    UIRectFillUsingBlendMode(bounds, kCGBlendModeNormal);
+  }
+  
   CGContextRef context = UIGraphicsGetCurrentContext();
   ASDisplayNodeAssert(context, @"This is no good without a context.");
   
@@ -490,7 +505,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
    inAdditionalTruncationMessage:(out BOOL *)inAdditionalTruncationMessageOut
                  forHighlighting:(BOOL)highlighting
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   // TODO: The copy and application of size shouldn't be required, but it is currently.
   // See discussion in https://github.com/TextureGroup/Texture/pull/396
@@ -576,14 +591,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (ASTextNodeHighlightStyle)highlightStyle
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _highlightStyle;
 }
 
 - (void)setHighlightStyle:(ASTextNodeHighlightStyle)highlightStyle
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   _highlightStyle = highlightStyle;
 }
@@ -666,7 +681,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   _placeholderColor = placeholderColor;
   
@@ -736,7 +751,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (inAdditionalTruncationMessage) {
     NSRange visibleRange = NSMakeRange(0, 0);
     {
-      ASDN::MutexLocker l(__instanceLock__);
+      ASLockScopeSelf();
       // TODO: The copy and application of size shouldn't be required, but it is currently.
       // See discussion in https://github.com/TextureGroup/Texture/pull/396
       ASTextContainer *containerCopy = [_textContainer copy];
@@ -822,14 +837,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (BOOL)_pendingLinkTap
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && _delegate != nil;
 }
 
 - (BOOL)_pendingTruncationTap
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
@@ -844,30 +859,30 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
  */
 - (CGColorRef)shadowColor
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowColor;
 }
 
 - (void)setShadowColor:(CGColorRef)shadowColor
 {
-  __instanceLock__.lock();
+  [self lock];
   
   if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
     CGColorRelease(_shadowColor);
     _shadowColor = CGColorRetain(shadowColor);
-    __instanceLock__.unlock();
+    [self unlock];
     
     [self setNeedsDisplay];
     return;
   }
   
-  __instanceLock__.unlock();
+  [self unlock];
 }
 
 - (CGSize)shadowOffset
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowOffset;
 }
@@ -875,7 +890,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) {
       return;
@@ -888,7 +903,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (CGFloat)shadowOpacity
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowOpacity;
 }
@@ -896,7 +911,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setShadowOpacity:(CGFloat)shadowOpacity
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_shadowOpacity == shadowOpacity) {
       return;
@@ -910,7 +925,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (CGFloat)shadowRadius
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return _shadowRadius;
 }
@@ -918,7 +933,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setShadowRadius:(CGFloat)shadowRadius
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     
     if (_shadowRadius == shadowRadius) {
       return;
@@ -939,11 +954,21 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
 {
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  _pointSizeScaleFactors = [scaleFactors copy];
+  {
+    ASLockScopeSelf();
+    if (ASObjectIsEqual(scaleFactors, _pointSizeScaleFactors)) {
+      return;
+    }
+    
+    _pointSizeScaleFactors = [scaleFactors copy];
+  }
+  
+  [self setNeedsLayout];
 }
 
 - (NSArray *)pointSizeScaleFactors
 {
+  ASLockScopeSelf();
   return _pointSizeScaleFactors;
 }
 
@@ -962,67 +987,47 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)_ensureTruncationText
 {
   if (_textContainer.truncationToken == nil) {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     _textContainer.truncationToken = [self _locked_composedTruncationText];
   }
 }
 
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    
-    if (ASObjectIsEqual(_truncationAttributedText, truncationAttributedText)) {
-      return;
-    }
-    
-    _truncationAttributedText = [truncationAttributedText copy];
+  if (ASLockedSelfCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
+    [self _invalidateTruncationText];
   }
-  
-  [self _invalidateTruncationText];
 }
 
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    
-    if (ASObjectIsEqual(_additionalTruncationMessage, additionalTruncationMessage)) {
-      return;
-    }
-    
-    _additionalTruncationMessage = [additionalTruncationMessage copy];
+  if (ASLockedSelfCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
+    [self _invalidateTruncationText];
   }
-  
-  [self _invalidateTruncationText];
 }
 
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
-  ASDN::MutexLocker lock(__instanceLock__);
-  if (_truncationMode == truncationMode) {
-    return;
+  if (ASLockedSelfCompareAssign(_truncationMode, truncationMode)) {
+    ASTextTruncationType truncationType;
+    switch (truncationMode) {
+      case NSLineBreakByTruncatingHead:
+        truncationType = ASTextTruncationTypeStart;
+        break;
+      case NSLineBreakByTruncatingTail:
+        truncationType = ASTextTruncationTypeEnd;
+        break;
+      case NSLineBreakByTruncatingMiddle:
+        truncationType = ASTextTruncationTypeMiddle;
+        break;
+      default:
+        truncationType = ASTextTruncationTypeNone;
+    }
+    
+    _textContainer.truncationType = truncationType;
+    
+    [self setNeedsDisplay];
   }
-  _truncationMode = truncationMode;
-  
-  ASTextTruncationType truncationType;
-  switch (truncationMode) {
-    case NSLineBreakByTruncatingHead:
-      truncationType = ASTextTruncationTypeStart;
-      break;
-    case NSLineBreakByTruncatingTail:
-      truncationType = ASTextTruncationTypeEnd;
-      break;
-    case NSLineBreakByTruncatingMiddle:
-      truncationType = ASTextTruncationTypeMiddle;
-      break;
-    default:
-      truncationType = ASTextTruncationTypeNone;
-  }
-		
-  _textContainer.truncationType = truncationType;
-  
-  [self setNeedsDisplay];
 }
 
 - (BOOL)isTruncated
@@ -1048,7 +1053,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSUInteger)lineCount
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
   return 0;
 }
@@ -1067,7 +1072,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSRange)_additionalTruncationMessageRangeWithVisibleRange:(NSRange)visibleRange
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   // Check if we even have an additional truncation message.
   if (!_additionalTruncationMessage) {

@@ -190,6 +190,12 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  */
 @property (nonatomic) UITableViewCellSelectionStyle selectionStyle;
 
+/* @abstract The focus style when a cell is focused
+ * @default UITableViewCellFocusStyleDefault
+ * ASTableView uses these properties when configuring UITableViewCells that host ASCellNodes.
+ */
+@property (nonatomic) UITableViewCellFocusStyle focusStyle;
+
 /* @abstract The view used as the background of the cell when it is selected.
  * ASTableView uses these properties when configuring UITableViewCells that host ASCellNodes.
  * ASCollectionView uses these properties when configuring UICollectionViewCells that host ASCellNodes.
@@ -215,7 +221,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 
 - (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
 
-- (void)setLayerBacked:(BOOL)layerBacked AS_UNAVAILABLE("ASCellNode does not support layer-backing");
+- (void)setLayerBacked:(BOOL)layerBacked AS_UNAVAILABLE("ASCellNode does not support layer-backing, although subnodes may be layer-backed.");
 
 @end
 

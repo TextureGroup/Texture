@@ -211,15 +211,6 @@
 #define AS_SUBCLASSING_RESTRICTED
 #endif
 
-#define ASPthreadStaticKey(dtor) ({ \
-  static dispatch_once_t onceToken; \
-  static pthread_key_t key; \
-  dispatch_once(&onceToken, ^{ \
-    pthread_key_create(&key, dtor); \
-  }); \
-  key; \
-})
-
 #define ASCreateOnce(expr) ({ \
   static dispatch_once_t onceToken; \
   static __typeof__(expr) staticVar; \
@@ -239,6 +230,29 @@
 #define ASDynamicCastStrict(x, c) ({ \
   id __val = x;\
   ((c *) ([__val class] == [c class] ? __val : nil));\
+})
+
+// Compare two primitives, assign if different. Returns whether the assignment happened.
+#define ASCompareAssign(lvalue, newValue) ({  \
+  BOOL result = (lvalue != newValue);         \
+  if (result) { lvalue = newValue; }          \
+  result;                                     \
+})
+
+#define ASCompareAssignObjects(lvalue, newValue) \
+  ASCompareAssignCustom(lvalue, newValue, ASObjectIsEqual)
+
+// e.g. ASCompareAssignCustom(_myInsets, insets, UIEdgeInsetsEqualToEdgeInsets)
+#define ASCompareAssignCustom(lvalue, newValue, isequal) ({  \
+  BOOL result = !(isequal(lvalue, newValue));                \
+  if (result) { lvalue = newValue; }                         \
+  result;                                                    \
+})
+
+#define ASCompareAssignCopy(lvalue, newValue) ({           \
+  BOOL result = !ASObjectIsEqual(lvalue, newValue);        \
+  if (result) { lvalue = [newValue copyWithZone:NULL]; }   \
+  result;                                                  \
 })
 
 /**

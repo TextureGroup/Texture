@@ -20,6 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASNetworkImageNodeDelegate, ASImageCacheProtocol, ASImageDownloaderProtocol;
+@class ASNetworkImageLoadInfo;
 
 
 /**
@@ -119,13 +120,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readwrite) BOOL shouldRenderProgressImages;
 
 /**
- * The image quality of the current image. This is a number between 0 and 1 and can be used to track
+ * The image quality of the current image.
+ *
+ * If the URL is set, this is a number between 0 and 1 and can be used to track
  * progressive progress. Calculated by dividing number of bytes / expected number of total bytes.
+ * This is zero until the first progressive render or the final display.
+ *
+ * If the URL is unset, this is 1 if defaultImage or image is set to non-nil.
+ *
  */
 @property (nonatomic, assign, readonly) CGFloat currentImageQuality;
 
 /**
- * The image quality (value between 0 and 1) of the last image that completed displaying.
+ * The currentImageQuality (value between 0 and 1) of the last image that completed displaying.
  */
 @property (nonatomic, assign, readonly) CGFloat renderedImageQuality;
 
@@ -133,20 +140,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 #pragma mark -
-
-typedef NS_ENUM(NSInteger, ASNetworkImageSource) {
-  ASNetworkImageSourceUnspecified = 0,
-  ASNetworkImageSourceSynchronousCache,
-  ASNetworkImageSourceAsynchronousCache,
-  ASNetworkImageSourceFileURL,
-  ASNetworkImageSourceDownload,
-};
-
-/// A struct that carries details about ASNetworkImageNode's image loads.
-typedef struct {
-  /// The source from which the image was loaded.
-  ASNetworkImageSource imageSource;
-} ASNetworkImageNodeDidLoadInfo;
 
 /**
  * The methods declared by the ASNetworkImageNodeDelegate protocol allow the adopting delegate to respond to
@@ -161,11 +154,11 @@ typedef struct {
  *
  * @param imageNode The sender.
  * @param image The newly-loaded image.
- * @param info Misc information about the image load.
+ * @param info Additional information about the image load.
  *
  * @discussion Called on a background queue.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageNodeDidLoadInfo)info;
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
 
 /**
  * Notification that the image node finished downloading an image.

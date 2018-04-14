@@ -20,8 +20,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol ASCATransactionQueueObserving <NSObject>
+- (void)prepareForCATransactionCommit;
+@end
+
+@interface ASAbstractRunLoopQueue : NSObject
+@end
+
 AS_SUBCLASSING_RESTRICTED
-@interface ASRunLoopQueue<ObjectType> : NSObject <NSLocking>
+@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <NSLocking>
 
 /**
  * Create a new queue with the given run loop and handler.
@@ -41,7 +48,7 @@ AS_SUBCLASSING_RESTRICTED
 
 - (void)enqueue:(ObjectType)object;
 
-@property (nonatomic, readonly) BOOL isEmpty;
+@property (atomic, readonly) BOOL isEmpty;
 
 @property (nonatomic, assign) NSUInteger batchSize;           // Default == 1.
 @property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
@@ -49,9 +56,32 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 AS_SUBCLASSING_RESTRICTED
+@interface ASCATransactionQueue : ASAbstractRunLoopQueue
+
+@property (atomic, readonly) BOOL isEmpty;
+
+@property (atomic, readonly, getter=isEnabled) BOOL enabled;
+
+/**
+ * The queue to run on main run loop before CATransaction commit.
+ *
+ * @discussion this queue will run after ASRunLoopQueue and before CATransaction commit
+ * to get last chance of updating/coalesce info like interface state.
+ * Each node will only be called once per transaction commit to reflect interface change.
+ */
+@property (class, atomic, readonly) ASCATransactionQueue *sharedQueue;
++ (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
+
+- (void)enqueue:(id<ASCATransactionQueueObserving>)object;
+
+@end
+
+
+AS_SUBCLASSING_RESTRICTED
 @interface ASDeallocQueue : NSObject
 
 @property (class, atomic, readonly) ASDeallocQueue *sharedDeallocationQueue;
++ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
 
 - (void)test_drain;
 

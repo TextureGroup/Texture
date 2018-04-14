@@ -88,7 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      spacing:(CGFloat)spacing
                               justifyContent:(ASStackLayoutJustifyContent)justifyContent
                                   alignItems:(ASStackLayoutAlignItems)alignItems
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  @param direction The direction of the stack view (horizontal or vertical)
@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   alignItems:(ASStackLayoutAlignItems)alignItems
                                     flexWrap:(ASStackLayoutFlexWrap)flexWrap
                                 alignContent:(ASStackLayoutAlignContent)alignContent
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  @param direction The direction of the stack view (horizontal or vertical)
@@ -124,17 +124,17 @@ NS_ASSUME_NONNULL_BEGIN
                                     flexWrap:(ASStackLayoutFlexWrap)flexWrap
                                 alignContent:(ASStackLayoutAlignContent)alignContent
                                  lineSpacing:(CGFloat)lineSpacing
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * @return A stack layout spec with direction of ASStackLayoutDirectionVertical
  **/
-+ (instancetype)verticalStackLayoutSpec AS_WARN_UNUSED_RESULT;
++ (instancetype)verticalStackLayoutSpec NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * @return A stack layout spec with direction of ASStackLayoutDirectionHorizontal
  **/
-+ (instancetype)horizontalStackLayoutSpec AS_WARN_UNUSED_RESULT;
++ (instancetype)horizontalStackLayoutSpec NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 @end
 
