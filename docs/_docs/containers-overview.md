@@ -15,28 +15,28 @@ It is highly recommended that you use Texture's nodes within a node container. T
     <th>UIKit Equivalent</th> 
   </tr>
   <tr>
-    <td><a href = "containers-ascollectionnode.html">`ASCollectionNode`</a></td>
-    <td>in place of UIKit's `UICollectionView`</td>
+    <td><a href = "containers-ascollectionnode.html"><b>ASCollectionNode</b></a></td>
+    <td>in place of UIKit's </b>UICollectionView</b></td>
   </tr>
   <tr>
-    <td><a href = "containers-aspagernode.html">`ASPagerNode`</a></td>
-    <td>in place of UIKit's `UIPageViewController`</td>
+    <td><a href = "containers-aspagernode.html"><b>ASPagerNode</b></a></td>
+    <td>in place of UIKit's </b>UIPageViewController</b></td>
   </tr>
   <tr>
-    <td><a href = "containers-astablenode.html">`ASTableNode`</a></td>
-    <td>in place of UIKit's `UITableView`</td>
+    <td><a href = "containers-astablenode.html"><b>ASTableNode</b></a></td>
+    <td>in place of UIKit's </b>UITableView</b></td>
   </tr>
   <tr>
-    <td><a href = "containers-asviewcontroller.html">`ASViewController`</a></td>
-    <td>in place of UIKit's `UIViewController`</td>
+    <td><a href = "containers-asviewcontroller.html"><b>ASViewController</b></a></td>
+    <td>in place of UIKit's </b>UIViewController</b></td>
   </tr>
   <tr>
-    <td>`ASNavigationController`</td>
-    <td>in place of UIKit's `UINavigationController`. Implements the <a href = "asvisibility.html">`ASVisibility`</a> protocol.</td>
+    <td><b>ASNavigationController</b></td>
+    <td>in place of UIKit's </b>UINavigationController</b>< Implements the <a href = "asvisibility.html"><b>ASVisibility</b></a> protocol.</td>
   </tr>
   <tr>
-    <td>`ASTabBarController`</td>
-    <td>in place of UIKit's `UITabBarController`. Implements the <a href = "asvisibility.html">`ASVisibility`</a> protocol.</td>
+    <td><b>ASTabBarController</b></td>
+    <td>in place of UIKit's </b>UITabBarController</b>< Implements the <a href = "asvisibility.html"><b>ASVisibility</b></a> protocol.</td>
   </tr>
 </table>
 
