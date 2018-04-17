@@ -380,7 +380,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
         [newVisibleNodes addObject:node];
       }
       // Skip the many method calls of the recursive operation if the top level cell node already has the right interfaceState.
-      if (node.interfaceState != interfaceState) {
+      if (node.pendingInterfaceState != interfaceState) {
 #if ASRangeControllerLoggingEnabled
         [modifiedIndexPaths addObject:indexPath];
 #endif
