@@ -434,7 +434,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // reference to subnodes.
 
   for (ASDisplayNode *subnode in _subnodes)
-    [subnode _setSupernode:nil];
+    [subnode _setSupernode:nil forLayerAtIndex:0];
 
   // Trampoline any UIKit ivars' deallocation to main
   if (ASDisplayNodeThreadIsMain() == NO) {
@@ -442,7 +442,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
 
   // TODO: Remove this? If supernode isn't already nil, this method isn't dealloc-safe anyway.
-  [self _setSupernode:nil];
+  [self _setSupernode:nil forLayerAtIndex:0];
 }
 
 - (void)_scheduleIvarsForMainDeallocation
@@ -2177,7 +2177,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _supernode;
 }
 
-- (void)_setSupernode:(ASDisplayNode *)newSupernode
+/**
+ * @parem newSupernode  The Supernode to set self node to.
+ * @param layerIndex    The index among subnodes of newSupernode to create view/layer. If newSupernode is nil, layerIndex will not be used.
+ */
+- (void)_setSupernode:(ASDisplayNode *)newSupernode forLayerAtIndex:(NSInteger)layerIndex
 {
   BOOL supernodeDidChange = NO;
   ASDisplayNode *oldSupernode = nil;
@@ -2204,8 +2208,21 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       stateToEnterOrExit |= ASHierarchyStateRasterized;
     }
     if (newSupernode) {
+      // If this subnode will be rasterized, enter hierarchy if needed
+      BOOL isRasterized = subtreeIsRasterized(newSupernode);
+      if (!isRasterized && newSupernode.nodeLoaded) {
+        // If not rasterizing, and node is loaded insert the subview/sublayer now.
+        // Load node before interface state triggered.
+        [newSupernode _insertSubnodeSubviewOrSublayer:self atIndex:layerIndex];
+      } // Otherwise we will insert subview/sublayer when we get loaded
+
       [self enterHierarchyState:stateToEnterOrExit];
-      
+
+      if (isRasterized) {
+        if (newSupernode.inHierarchy) {
+          [self __enterHierarchy];
+        }
+      }
       // If a node was added to a supernode, the supernode could be in a layout pending state. All of the hierarchy state
       // properties related to the transition need to be copied over as well as propagated down the subtree.
       // This is especially important as with automatic subnode management, adding subnodes can happen while a transition
@@ -2323,27 +2340,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     _cachedSubnodes = nil;
   __instanceLock__.unlock();
 
-  if (!isRasterized && self.nodeLoaded) {
-    // Trigger the subnode to load its layer, which will create its view if it needs one.
-    // By doing this prior to downward propagation of .interfaceState in _setSupernode:,
-    // we can guarantee that -didEnterVisibleState is only called with .isNodeLoaded = YES.
-    [subnode layer];
-  }
-
   // This call will apply our .hierarchyState to the new subnode.
   // If we are a managed hierarchy, as in ASCellNode trees, it will also apply our .interfaceState.
-  [subnode _setSupernode:self];
-
-  // If this subnode will be rasterized, enter hierarchy if needed
-  // TODO: Move this into _setSupernode: ?
-  if (isRasterized) {
-    if (self.inHierarchy) {
-      [subnode __enterHierarchy];
-    }
-  } else if (self.nodeLoaded) {
-    // If not rasterizing, and node is loaded insert the subview/sublayer now.
-    [self _insertSubnodeSubviewOrSublayer:subnode atIndex:sublayerIndex];
-  } // Otherwise we will insert subview/sublayer when we get loaded
+  [subnode _setSupernode:self forLayerAtIndex:sublayerIndex];
 
   ASDisplayNodeAssert(disableNotifications == shouldDisableNotificationsForMovingBetweenParents(oldParent, self), @"Invariant violated");
   if (disableNotifications) {
@@ -2661,7 +2660,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     _cachedSubnodes = nil;
   __instanceLock__.unlock();
 
-  [subnode _setSupernode:nil];
+  [subnode _setSupernode:nil forLayerAtIndex:0];
 }
 
 - (void)removeFromSupernode
