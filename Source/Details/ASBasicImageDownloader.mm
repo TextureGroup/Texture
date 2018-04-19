@@ -58,7 +58,11 @@ static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
   ASBasicImageDownloaderContext *context = currentRequests[URL];
   if (!context) {
     context = [[ASBasicImageDownloaderContext alloc] initWithURL:URL];
-    currentRequests[URL] = context;
+    if (URL.absoluteString.length == 0) {
+      return context;
+    } else {
+      currentRequests[URL] = context;
+    }
   }
   return context;
 }
