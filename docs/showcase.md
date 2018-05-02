@@ -34,7 +34,8 @@ permalink: /showcase.html
 		<br>
 		<b>Buffer</b>
 		<br>
-		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a>
+		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a><br/><br/>
+		<a href="https://www.youtube.com/watch?v=Tzuz9usUpco">Texture: What, Why and How</a>
 		</td>
 		
 		</tr>
