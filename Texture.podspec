@@ -63,4 +63,9 @@ Pod::Spec.new do |spec|
 
   spec.social_media_url = 'https://twitter.com/TextureiOS'
   spec.library = 'c++'
+  spec.pod_target_xcconfig = {
+    'CLANG_CXX_LANGUAGE_STANDARD' => 'c++11',
+    'CLANG_CXX_LIBRARY' => 'libc++'
+   }
+   
 end
