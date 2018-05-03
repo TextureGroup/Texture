@@ -58,7 +58,6 @@
 
 @property (nonatomic, readwrite, strong) ASTextNode *textNode;
 @property (nonatomic, readwrite, copy) NSAttributedString *attributedText;
-@property (nonatomic, readwrite, strong) NSMutableArray *textNodeBucket;
 
 @end
 
@@ -68,7 +67,6 @@
 {
   [super setUp];
   _textNode = [[ASTextNode alloc] init];
-  _textNodeBucket = [[NSMutableArray alloc] init];
   UIFontDescriptor *desc =
   [UIFontDescriptor fontDescriptorWithName:@"Didot" size:18];
   NSArray *arr =
@@ -258,28 +256,28 @@
 
 - (void)testTextNodeSwitchWorksInMultiThreadEnvironment
 {
-  ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalTextNode;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-  XCTestExpectation *exp = [self expectationWithDescription:@"wait for full bucket"];
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTextNode;
+    [ASConfigurationManager test_resetWithConfiguration:config];
 
-  dispatch_queue_t queue = dispatch_queue_create("com.texture.AsyncDisplayKit.ASTextNodeTestsQueue", DISPATCH_QUEUE_CONCURRENT);
-  dispatch_group_t g = dispatch_group_create();
-  for (int i = 0; i < 20; i++) {
-    dispatch_group_async(g, queue, ^{
-      ASTextNode *textNode = [[ASTextNodeSecondSubclass alloc] init];
-      XCTAssert([textNode isKindOfClass:[ASTextNode2 class]]);
-      @synchronized(self.textNodeBucket) {
-        [self.textNodeBucket addObject:textNode];
-        if (self.textNodeBucket.count == 20) {
-          [exp fulfill];
+    XCTestExpectation *exp = [self expectationWithDescription:@"wait for full bucket"];
+    NSMutableArray *textNodeBucket = [[NSMutableArray alloc] init];
+    dispatch_queue_t queue = dispatch_queue_create("com.texture.AsyncDisplayKit.ASTextNodeTestsQueue", DISPATCH_QUEUE_CONCURRENT);
+    for (int i = 0; i < 20; i++) {
+      dispatch_async(queue, ^{
+        ASTextNode *textNode = [[ASTextNodeSecondSubclass alloc] init];
+        XCTAssert([textNode isKindOfClass:[ASTextNode2 class]]);
+        @synchronized(textNodeBucket) {
+          [textNodeBucket addObject:textNode];
+          if (textNodeBucket.count == 20) {
+            [exp fulfill];
+          }
         }
-      }
-    });
-  }
-  [self waitForExpectations:@[exp] timeout:3];
-  exp = nil;
-  [self.textNodeBucket removeAllObjects];
+      });
+    }
+    [self waitForExpectations:@[exp] timeout:3];
+    exp = nil;
+    [textNodeBucket removeAllObjects];
 }
 
 @end
