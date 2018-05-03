@@ -45,6 +45,8 @@
 - Use `NS_RETURNS_RETAINED` macro to make our methods a tiny bit faster. [Adlai Holler](https://github.com/Adlai-Holler) [#843](https://github.com/TextureGroup/Texture/pull/843/)
 - `ASDisplayNode, ASLayoutSpec, and ASLayoutElementStyle` now conform to `NSLocking`. They act as recursive locks. Useful locking macros have been added as `ASThread.h`. Subclasses / client code can lock these objects but should be careful as usual when dealing with locks. [Adlai Holler](https://github.com/Adlai-Holler)
 - Introduces `ASRecursiveUnfairLock` as an experiment to improve locking performance. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds an experiment to shorten init time. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds a check that Texture is compiled with stdc++11 as specified by the podfile. gnu++11 can cause subtle issues that are currently being investigated. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

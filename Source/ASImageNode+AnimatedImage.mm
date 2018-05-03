@@ -50,7 +50,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)_locked_setAnimatedImage:(id <ASAnimatedImageProtocol>)animatedImage
 {
-  if (ASObjectIsEqual(_animatedImage, animatedImage)) {
+  if (ASObjectIsEqual(_animatedImage, animatedImage) && animatedImage.playbackReady) {
     return;
   }
   
