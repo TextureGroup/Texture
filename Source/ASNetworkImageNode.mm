@@ -124,6 +124,20 @@
   [self _cancelImageDownloadWithResumePossibility:NO];
 }
 
+- (dispatch_queue_t)callbackQueue
+{
+    static dispatch_once_t onceToken;
+    static dispatch_queue_t callbackQueue;
+    dispatch_once(&onceToken, ^{
+        if (ASActivateExperimentalFeature(ASExperimentalNetworkImageQueue)) {
+            callbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        } else {
+            callbackQueue = dispatch_get_main_queue();
+        }
+    });
+    return callbackQueue;
+}
+
 #pragma mark - Public methods -- must lock
 
 /// Setter for public image property. It has the side effect of setting an internal _imageWasSetExternally that prevents setting an image internally. Setting an image internally should happen with the _setImage: method
@@ -455,7 +469,7 @@
   // Unbind from the previous download.
   if (oldDownloadIDForProgressBlock != nil) {
     as_log_verbose(ASImageLoadingLog(), "Disabled progress images for %@ id: %@", self, oldDownloadIDForProgressBlock);
-    [_downloader setProgressImageBlock:nil callbackQueue:dispatch_get_main_queue() withDownloadIdentifier:oldDownloadIDForProgressBlock];
+    [_downloader setProgressImageBlock:nil callbackQueue:[self callbackQueue] withDownloadIdentifier:oldDownloadIDForProgressBlock];
   }
 
   // Bind to the current download.
@@ -464,7 +478,7 @@
     as_log_verbose(ASImageLoadingLog(), "Enabled progress images for %@ id: %@", self, newDownloadIDForProgressBlock);
     [_downloader setProgressImageBlock:^(UIImage * _Nonnull progressImage, CGFloat progress, id  _Nullable downloadIdentifier) {
       [weakSelf handleProgressImage:progressImage progress:progress downloadIdentifier:downloadIdentifier];
-    } callbackQueue:dispatch_get_main_queue() withDownloadIdentifier:newDownloadIDForProgressBlock];
+    } callbackQueue:[self callbackQueue] withDownloadIdentifier:newDownloadIDForProgressBlock];
   }
 
   // Update state local state with lock held.
@@ -484,7 +498,7 @@
     // In this case another thread changed the _downloadIdentifierForProgressBlock before we finished registering
     // the new progress block for newDownloadIDForProgressBlock ID. Let's clear it now and reattempt to register
     if (newDownloadIDForProgressBlock) {
-      [_downloader setProgressImageBlock:nil callbackQueue:dispatch_get_main_queue() withDownloadIdentifier:newDownloadIDForProgressBlock];
+      [_downloader setProgressImageBlock:nil callbackQueue:[self callbackQueue] withDownloadIdentifier:newDownloadIDForProgressBlock];
     }
     [self _updateProgressImageBlockOnDownloaderIfNeeded];
   }
@@ -556,7 +570,7 @@
 
 
     downloadIdentifier = [_downloader downloadImageWithURL:url
-                                             callbackQueue:dispatch_get_main_queue()
+                                             callbackQueue:[self callbackQueue]
                                           downloadProgress:NULL
                                                 completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier, id _Nullable userInfo) {
                                                   if (finished != NULL) {
@@ -757,7 +771,7 @@
           }
         };
         [_cache cachedImageWithURL:URL
-                     callbackQueue:dispatch_get_main_queue()
+                     callbackQueue:[self callbackQueue]
                         completion:completion];
       } else {
         [self _downloadImageWithCompletion:^(id<ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
