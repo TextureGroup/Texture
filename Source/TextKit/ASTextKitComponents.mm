@@ -21,6 +21,7 @@
 #import <tgmath.h>
 
 @interface ASTextKitComponentsTextView () {
+  // Prevent UITextView from updating contentOffset while deallocating: https://github.com/TextureGroup/Texture/issues/860
   BOOL _deallocating;
 }
 @property (atomic, assign) CGRect threadSafeBounds;
