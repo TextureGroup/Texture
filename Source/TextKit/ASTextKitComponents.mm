@@ -20,7 +20,9 @@
 
 #import <tgmath.h>
 
-@interface ASTextKitComponentsTextView ()
+@interface ASTextKitComponentsTextView () {
+  BOOL _deallocating;
+}
 @property (atomic, assign) CGRect threadSafeBounds;
 @end
 
@@ -31,8 +33,14 @@
   self = [super initWithFrame:frame textContainer:textContainer];
   if (self) {
     _threadSafeBounds = self.bounds;
+    _deallocating = NO;
   }
   return self;
+}
+
+- (void)dealloc
+{
+  _deallocating = YES;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -48,6 +56,16 @@
   [super setBounds:bounds];
   self.threadSafeBounds = bounds;
 }
+
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+  if (_deallocating) {
+    return;
+  }
+  
+  [super setContentOffset:contentOffset];
+}
+
 
 @end
 
