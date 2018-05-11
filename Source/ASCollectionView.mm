@@ -1724,11 +1724,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)layoutSubviews
 {
   if (_cellsForLayoutUpdates.count > 0) {
-    NSMutableArray<ASCellNode *> *nodesSizesChanged = [NSMutableArray array];
-    [_dataController relayoutNodes:_cellsForLayoutUpdates nodesSizeChanged:nodesSizesChanged];
-    [self nodesDidRelayout:nodesSizesChanged];
+    NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
+    [_cellsForLayoutUpdates removeAllObjects];
+
+    NSMutableArray<ASCellNode *> *nodesSizeChanged = [NSMutableArray array];
+
+    [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
+    [self nodesDidRelayout:nodesSizeChanged];
   }
-  [_cellsForLayoutUpdates removeAllObjects];
 
   // Flush any pending invalidation action if needed.
   ASCollectionViewInvalidationStyle invalidationStyle = _nextLayoutInvalidationStyle;
