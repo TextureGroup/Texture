@@ -3016,7 +3016,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     return;
   }
 #endif
-  if (ASInterfaceStateIncludesVisible(_pendingInterfaceState)) {
+  if (ASInterfaceStateIncludesVisible(self.pendingInterfaceState)) {
     void(^exitVisibleInterfaceState)(void) = ^{
       // This block intentionally retains self.
       __instanceLock__.lock();
