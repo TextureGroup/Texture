@@ -21,7 +21,6 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASPendingStateController.h>
 
 /**
@@ -861,6 +860,103 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 #endif
 }
 
+- (UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  UIEdgeInsets margins = _getFromViewOnly(layoutMargins);
+
+  if (!AS_AT_LEAST_IOS11 && self.insetsLayoutMarginsFromSafeArea) {
+    UIEdgeInsets safeArea = self.safeAreaInsets;
+    margins = ASConcatInsets(margins, safeArea);
+  }
+
+  return margins;
+}
+
+- (void)setLayoutMargins:(UIEdgeInsets)layoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(layoutMargins, layoutMargins);
+}
+
+- (BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_read;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  return _getFromViewOnly(preservesSuperviewLayoutMargins);
+}
+
+- (void)setPreservesSuperviewLayoutMargins:(BOOL)preservesSuperviewLayoutMargins
+{
+  _bridge_prologue_write;
+  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
+  _setToViewOnly(preservesSuperviewLayoutMargins, preservesSuperviewLayoutMargins);
+}
+
+- (void)layoutMarginsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (self.automaticallyRelayoutOnLayoutMarginsChanges) {
+    [self setNeedsLayout];
+  }
+}
+
+- (UIEdgeInsets)safeAreaInsets
+{
+  _bridge_prologue_read;
+
+  if (AS_AVAILABLE_IOS(11.0)) {
+    if (!_flags.layerBacked && __loaded(self)) {
+      return self.view.safeAreaInsets;
+    }
+  }
+  return _fallbackSafeAreaInsets;
+}
+
+- (BOOL)insetsLayoutMarginsFromSafeArea
+{
+  _bridge_prologue_read;
+
+  return [self _locked_insetsLayoutMarginsFromSafeArea];
+}
+
+- (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)insetsLayoutMarginsFromSafeArea
+{
+  ASDisplayNodeAssertThreadAffinity(self);
+  BOOL shouldNotifyAboutUpdate;
+  {
+    _bridge_prologue_write;
+
+    _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+
+    if (AS_AVAILABLE_IOS(11.0)) {
+      if (!_flags.layerBacked) {
+        _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
+      }
+    }
+
+    shouldNotifyAboutUpdate = __loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
+  }
+
+  if (shouldNotifyAboutUpdate) {
+    [self layoutMarginsDidChange];
+  }
+}
+
+- (void)safeAreaInsetsDidChange
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (self.automaticallyRelayoutOnSafeAreaChanges) {
+    [self setNeedsLayout];
+  }
+
+  [self _fallbackUpdateSafeAreaOnChildren];
+}
+
 @end
 
 @implementation ASDisplayNode (InternalPropertyBridge)
@@ -875,6 +971,16 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_write;
   _setToLayer(cornerRadius, newLayerCornerRadius);
+}
+
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea
+{
+  if (AS_AVAILABLE_IOS(11.0)) {
+    if (!_flags.layerBacked) {
+      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
+    }
+  }
+  return _fallbackInsetsLayoutMarginsFromSafeArea;
 }
 
 @end

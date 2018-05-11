@@ -82,12 +82,12 @@ typedef ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> AS
 /**
  * Creates a new page table with (NSMapTableStrongMemory | NSMapTableObjectPointerPersonality) for values.
  */
-+ (ASPageTable *)pageTableForStrongObjectPointers;
++ (ASPageTable *)pageTableForStrongObjectPointers NS_RETURNS_RETAINED;
 
 /**
  * Creates a new page table with (NSMapTableWeakMemory | NSMapTableObjectPointerPersonality) for values.
  */
-+ (ASPageTable *)pageTableForWeakObjectPointers;
++ (ASPageTable *)pageTableForWeakObjectPointers NS_RETURNS_RETAINED;
 
 /**
  * Builds a new page to layout attributes from the given layout attributes.
@@ -98,7 +98,7 @@ typedef ASPageTable<id, NSMutableArray<UICollectionViewLayoutAttributes *> *> AS
  *
  * @param pageSize The size of each page.
  */
-+ (ASPageToLayoutAttributesTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize;
++ (ASPageToLayoutAttributesTable *)pageTableWithLayoutAttributes:(id<NSFastEnumeration>)layoutAttributesEnumerator contentSize:(CGSize)contentSize pageSize:(CGSize)pageSize NS_RETURNS_RETAINED;
 
 /**
  * Retrieves the object for a given page, or nil if the page is not found.
