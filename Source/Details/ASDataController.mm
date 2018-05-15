@@ -779,8 +779,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 #pragma mark - Relayout
 
-- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray *)nodesSizesChanged
+- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray<ASCellNode *> *)nodesSizesChanged
 {
+  NSParameterAssert(nodes);
   NSParameterAssert(nodesSizesChanged);
   
   ASDisplayNodeAssertMainThread();
