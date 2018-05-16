@@ -1051,7 +1051,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   
   // Respond to long-press when it begins, not when it ends.
   if (longPressRecognizer.state == UIGestureRecognizerStateBegan) {
-    if ([_delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
+    if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
       CGPoint touchPoint = [_longPressGestureRecognizer locationInView:self.view];
       [_delegate textNode:self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
     }
@@ -1324,8 +1324,9 @@ static NSAttributedString *DefaultTruncationAttributedString()
   // We are descended from ASTextNode. We need to change the superclass for the
   // ASTextNode subclass to ASTextNode2.
   // Walk up the class hierarchy until we find ASTextNode.
+  // Note: This may be called on multiple threads simultaneously.
   Class s;
-  for (Class c = self; c != [ASTextNode class]; c = s) {
+  for (Class c = self; c != Nil && c != [ASTextNode class]; c = s) {
     s = class_getSuperclass(c);
     if (s == [ASTextNode class]) {
 #pragma clang diagnostic push

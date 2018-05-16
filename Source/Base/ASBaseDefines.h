@@ -23,9 +23,6 @@
 // wrap constants, only C functions. See StackOverflow for more details:
 // http://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c
 #ifdef __cplusplus
-# ifndef __STRICT_ANSI__
-  #warning "Texture must be compiled with std=c++11. gnu++ is not supported and may cause issues."
-# endif
 # define ASDISPLAYNODE_EXTERN_C_BEGIN extern "C" {
 # define ASDISPLAYNODE_EXTERN_C_END   }
 #else

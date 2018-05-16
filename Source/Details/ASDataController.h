@@ -255,7 +255,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * @discussion Used to respond to setNeedsLayout calls in ASCellNode
  */
-- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray * _Nonnull)nodesSizesChanged;
+- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray<ASCellNode *> *)nodesSizesChanged;
 
 /**
  * See ASCollectionNode.h for full documentation of these methods.

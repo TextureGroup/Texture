@@ -235,6 +235,12 @@ permalink: /showcase.html
 		<br /> 
 		<b>MensXP</b>
 		</td>
+		
+ 		<td align="center" valign="top">
+ 		<a href="https://itunes.apple.com/us/app/idiva-beauty-wedding-tips/id1359022878?ls=1&mt=8"><img class="roundrect" src="https://is2-ssl.mzstatic.com/image/thumb/Purple128/v4/aa/52/a7/aa52a7aa-b978-126b-94d9-85cabb22aa85/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-4.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+ 		<br /> 
+ 		<b>iDiva</b>
+ 		</td>
 
 		</tr>
 		

@@ -47,6 +47,10 @@
 - Introduces `ASRecursiveUnfairLock` as an experiment to improve locking performance. [Adlai Holler](https://github.com/Adlai-Holler)
 - Adds an experiment to shorten init time. [Adlai Holler](https://github.com/Adlai-Holler)
 - Adds a check that Texture is compiled with stdc++11 as specified by the podfile. gnu++11 can cause subtle issues that are currently being investigated. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds an experiment to call ASNetworkImageNode callbacks off main. [Garrett Moon](https://github.com/garrettmoon)
+- Prevent UITextView from updating contentOffset while deallocating [Michael Schneider](https://github.com/maicki)
+- [ASCollectionNode/ASTableNode] Fix a crash occurs while remeasuring cell nodes. [Huy Nguyen](https://github.com/nguyenhuy) [#917](https://github.com/TextureGroup/Texture/pull/917)
+- Fix an issue where ASConfigurationDelegate would not call out for "control" users. If set, it now receives events whenever an experimental feature decision point occurs, whether it's enabled or not. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

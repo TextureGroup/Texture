@@ -63,10 +63,11 @@
   
   NSAssert(__builtin_popcount(requested) == 1, @"Cannot activate multiple features at once with this method.");
   
-  // If they're disabled, ignore them.
+  // We need to call out, whether it's enabled or not.
+  // A/B testing requires even "control" users to be activated.
   ASExperimentalFeatures enabled = requested & _config.experimentalFeatures;
-  ASExperimentalFeatures prevTriggered = atomic_fetch_or(&_activatedExperiments, enabled);
-  ASExperimentalFeatures newlyTriggered = enabled & ~prevTriggered;
+  ASExperimentalFeatures prevTriggered = atomic_fetch_or(&_activatedExperiments, requested);
+  ASExperimentalFeatures newlyTriggered = requested & ~prevTriggered;
   
   // Notify delegate if needed.
   if (newlyTriggered != 0) {
