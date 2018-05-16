@@ -1053,6 +1053,17 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   if (longPressRecognizer.state == UIGestureRecognizerStateBegan) {
     if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
       CGPoint touchPoint = [_longPressGestureRecognizer locationInView:self.view];
+      
+      // Fixes delegate method textNode:longPressedLinkAttribute:value:atPoint:textRange crash when nil values provided
+      
+      if (_highlightedLinkAttributeName == nil) {
+        _highlightedLinkAttributeName = @"";
+      }
+        
+      if (_highlightedLinkAttributeValue == nil) {
+        _highlightedLinkAttributeValue = @"";
+      }
+      
       [_delegate textNode:self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
     }
   }
