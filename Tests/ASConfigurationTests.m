@@ -33,14 +33,11 @@
   [ASConfigurationManager test_resetWithConfiguration:config];
   
   // Set an expectation for a callback, and assert we only get one.
-  XCTestExpectation *e = [self expectationWithDescription:@"Callback 1 done."];
+  XCTestExpectation *e = [self expectationWithDescription:@"Callbacks done."];
+  e.expectedFulfillmentCount = 2;
+  e.assertForOverFulfill = YES;
   onActivate = ^(ASConfigurationTests *self, ASExperimentalFeatures feature) {
-    XCTAssertEqual(feature, ASExperimentalGraphicsContexts);
     [e fulfill];
-    // Next time it's a fail.
-    self->onActivate = ^(ASConfigurationTests *self, ASExperimentalFeatures feature) {
-      XCTFail(@"Too many callbacks.");
-    };
   };
   
   // Now activate the graphics experiment and expect it works.
@@ -48,6 +45,7 @@
   // We should get a callback here
   // Now activate text node and expect it fails.
   XCTAssertFalse(ASActivateExperimentalFeature(ASExperimentalTextNode));
+  // But we should get another callback.
   [self waitForExpectationsWithTimeout:3 handler:nil];
 }
 
