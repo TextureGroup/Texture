@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
 - [ASTextNode2] Upgrade lock safety by protecting all ivars (including rarely-changed ones).
 - User FLT_EPSILON in ASCeilPixelValue and ASFloorPixelValue to help with floating point precision errors when computing layouts for 3x devices. [Ricky Cancro](https://github.com/rcancro) [#838](https://github.com/TextureGroup/Texture/pull/864)
 - Disable interface colescing and match to pre-colescing interface update behavior [Max Wang](https://github.com/wsdwsd0829) [#862](https://github.com/TextureGroup/Texture/pull/862) 
