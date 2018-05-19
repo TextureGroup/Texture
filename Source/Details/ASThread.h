@@ -129,8 +129,10 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  */
 #if CHECK_LOCKING_SAFETY
 #define ASDisplayNodeAssertLockUnownedByCurrentThread(lock) ASDisplayNodeAssertFalse(lock.ownedByCurrentThread())
+#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock) ASDisplayNodeAssert(lock.ownedByCurrentThread())
 #else
 #define ASDisplayNodeAssertLockUnownedByCurrentThread(lock)
+#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock)
 #endif
 
 namespace ASDN {
