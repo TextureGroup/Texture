@@ -213,17 +213,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
 {
   ASLockScopeSelf();
-  BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(_textContainer.insets, textContainerInset);
-  _textContainer.insets = textContainerInset;
-  
-  if (needsUpdate) {
+  if (ASCompareAssignCustom(_textContainer.insets, textContainerInset, UIEdgeInsetsEqualToEdgeInsets)) {
     [self setNeedsLayout];
   }
 }
 
 - (UIEdgeInsets)textContainerInset
 {
-  ASLockScopeSelf();
+  // textContainer is invariant and has an atomic accessor.
   return _textContainer.insets;
 }
 
@@ -281,10 +278,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Holding it for the duration of the method is more efficient in this case.
   ASLockScopeSelf();
 
-  if (ASObjectIsEqual(attributedText, _attributedText)) {
+  if (!ASCompareAssignCopy(_attributedText, attributedText)) {
     return;
   }
-  _attributedText = attributedText;
 
   // Since truncation text matches style of attributedText, invalidate it now.
   [self _invalidateTruncationText];
@@ -844,12 +840,12 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)_handleLongPress:(UILongPressGestureRecognizer *)longPressRecognizer
 {
   ASDisplayNodeAssertMainThread();
-  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
   
   // Respond to long-press when it begins, not when it ends.
   if (longPressRecognizer.state == UIGestureRecognizerStateBegan) {
     id<ASTextNodeDelegate> delegate = self.delegate;
     if ([delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
+      ASLockScopeSelf(); // Protect usage of _highlight* ivars.
       CGPoint touchPoint = [_longPressGestureRecognizer locationInView:self.view];
       [delegate textNode:(ASTextNode *)self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
     }
@@ -865,9 +861,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (BOOL)_pendingTruncationTap
 {
-  ASLockScopeSelf();
-  
-  return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
+  return [ASLockedSelf(_highlightedLinkAttributeName) isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
 #pragma mark - Shadow Properties
@@ -880,82 +874,57 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
  */
 - (CGColorRef)shadowColor
 {
-  ASLockScopeSelf();
-  
-  return _shadowColor;
+  return ASLockedSelf(_shadowColor);
 }
 
 - (void)setShadowColor:(CGColorRef)shadowColor
 {
   ASLockScopeSelf();
-
   if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
     CGColorRelease(_shadowColor);
     _shadowColor = CGColorRetain(shadowColor);
-    [self unlock];
-    
     [self setNeedsDisplay];
-    return;
   }
 }
 
 - (CGSize)shadowOffset
 {
-  ASLockScopeSelf();
-  
-  return _shadowOffset;
+  return ASLockedSelf(_shadowOffset);
 }
 
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
   ASLockScopeSelf();
-
-  if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) {
-    return;
+  BOOL changed = ASCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize);
+  if (changed) {
+    [self setNeedsDisplay];
   }
-  _shadowOffset = shadowOffset;
-
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowOpacity
 {
-  ASLockScopeSelf();
-  
-  return _shadowOpacity;
+  return ASLockedSelf(_shadowOpacity);
 }
 
 - (void)setShadowOpacity:(CGFloat)shadowOpacity
 {
   ASLockScopeSelf();
-
-  if (_shadowOpacity == shadowOpacity) {
-    return;
+  if (ASCompareAssign(_shadowOpacity, shadowOpacity)) {
+    [self setNeedsDisplay];
   }
-
-  _shadowOpacity = shadowOpacity;
-
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowRadius
 {
-  ASLockScopeSelf();
-  
-  return _shadowRadius;
+  return ASLockedSelf(_shadowRadius);
 }
 
 - (void)setShadowRadius:(CGFloat)shadowRadius
 {
   ASLockScopeSelf();
-
-  if (_shadowRadius == shadowRadius) {
-    return;
+  if (ASCompareAssign(_shadowRadius, shadowRadius)) {
+    [self setNeedsDisplay];
   }
-
-  _shadowRadius = shadowRadius;
-
-  [self setNeedsDisplay];
 }
 
 - (UIEdgeInsets)shadowPadding
@@ -967,20 +936,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
 {
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-
   ASLockScopeSelf();
-  if (ASObjectIsEqual(scaleFactors, _pointSizeScaleFactors)) {
-    return;
+  if (ASCompareAssignCopy(_pointSizeScaleFactors, scaleFactors)) {
+    [self setNeedsLayout];
   }
-
-  _pointSizeScaleFactors = [scaleFactors copy];
-
-  [self setNeedsLayout];
 }
 
 - (NSArray *)pointSizeScaleFactors
 {
-  ASLockScopeSelf();
   return _pointSizeScaleFactors;
 }
 
@@ -1007,8 +970,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
   ASLockScopeSelf();
-  if (!ASObjectIsEqual(_truncationAttributedText, truncationAttributedText)) {
-    _truncationAttributedText = [truncationAttributedText copy];
+  if (ASCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
     [self _invalidateTruncationText];
   }
 }
@@ -1016,8 +978,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
   ASLockScopeSelf();
-  if (!ASObjectIsEqual(_additionalTruncationMessage, additionalTruncationMessage)) {
-    _additionalTruncationMessage = [additionalTruncationMessage copy];
+  if (ASCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
     [self _invalidateTruncationText];
   }
 }
@@ -1025,9 +986,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
   ASLockScopeSelf();
-  if (_truncationMode != truncationMode) {
-    _truncationMode = truncationMode;
-
+  if (ASCompareAssign(_truncationMode, truncationMode)) {
     ASTextTruncationType truncationType;
     switch (truncationMode) {
       case NSLineBreakByTruncatingHead:
@@ -1057,19 +1016,16 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSUInteger)maximumNumberOfLines
 {
-  ASLockScopeSelf();
+  // _textContainer is invariant and this is just atomic access.
   return _textContainer.maximumNumberOfRows;
 }
 
 - (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
 {
   ASLockScopeSelf();
-  if (_textContainer.maximumNumberOfRows == maximumNumberOfLines) {
-    return;
+  if (ASCompareAssign(_textContainer.maximumNumberOfRows, maximumNumberOfLines)) {
+    [self setNeedsDisplay];
   }
-  _textContainer.maximumNumberOfRows = maximumNumberOfLines;
-  
-  [self setNeedsDisplay];
 }
 
 - (NSUInteger)lineCount
