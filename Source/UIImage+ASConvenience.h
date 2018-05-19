@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param imageName The name of the image to load
  *  @return The loaded image or nil
  */
-+ (UIImage *)as_imageNamed:(NSString *)imageName NS_RETURNS_RETAINED;
++ (nullable UIImage *)as_imageNamed:(NSString *)imageName NS_RETURNS_RETAINED;
 
 /**
  *  A version of imageNamed that caches results because loading an image is expensive.
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
  *  @param traitCollection The traits associated with the intended environment for the image.
  *  @return The loaded image or nil
  */
-+ (UIImage *)as_imageNamed:(NSString *)imageName compatibleWithTraitCollection:(nullable UITraitCollection *)traitCollection NS_RETURNS_RETAINED;
++ (nullable UIImage *)as_imageNamed:(NSString *)imageName compatibleWithTraitCollection:(nullable UITraitCollection *)traitCollection NS_RETURNS_RETAINED;
 
 @end
 

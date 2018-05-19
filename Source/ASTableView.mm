@@ -199,7 +199,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // CountedSet because UIKit may display the same element in multiple cells e.g. during animations.
   NSCountedSet<ASCollectionElement *> *_visibleElements;
   
-  BOOL _remeasuringCellNodes;
   NSHashTable<ASCellNode *> *_cellsForLayoutUpdates;
 
   // See documentation on same property in ASCollectionView
@@ -745,26 +744,27 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)layoutSubviews
 {
   // Remeasure all rows if our row width has changed.
-  _remeasuringCellNodes = YES;
   UIEdgeInsets contentInset = self.contentInset;
   CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth] - contentInset.left - contentInset.right;
   if (constrainedWidth > 0 && _nodesConstrainedWidth != constrainedWidth) {
     _nodesConstrainedWidth = constrainedWidth;
+    [_cellsForLayoutUpdates removeAllObjects];
 
     [self beginUpdates];
     [_dataController relayoutAllNodesWithInvalidationBlock:nil];
     [self endUpdatesAnimated:(ASDisplayNodeLayerHasAnimations(self.layer) == NO) completion:nil];
   } else {
     if (_cellsForLayoutUpdates.count > 0) {
-      NSMutableArray *nodesSizesChanged = [NSMutableArray array];
-      [_dataController relayoutNodes:_cellsForLayoutUpdates nodesSizeChanged:nodesSizesChanged];
-      if (nodesSizesChanged.count > 0) {
+      NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
+      [_cellsForLayoutUpdates removeAllObjects];
+
+      NSMutableArray<ASCellNode *> *nodesSizeChanged = [NSMutableArray array];
+      [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
+      if (nodesSizeChanged.count > 0) {
         [self requeryNodeHeights];
       }
     }
   }
-  [_cellsForLayoutUpdates removeAllObjects];
-  _remeasuringCellNodes = NO;
 
   // To ensure _nodesConstrainedWidth is up-to-date for every usage, this call to super must be done last
   [super layoutSubviews];

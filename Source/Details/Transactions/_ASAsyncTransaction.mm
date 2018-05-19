@@ -26,6 +26,10 @@
 #import <map>
 #import <mutex>
 
+#ifndef __STRICT_ANSI__
+  #warning "Texture must be compiled with std=c++11 to prevent layout issues. gnu++ is not supported. This is hopefully temporary."
+#endif
+
 #define ASAsyncTransactionAssertMainThread() NSAssert(0 != pthread_main_np(), @"This method must be called on the main thread");
 
 NSInteger const ASDefaultTransactionPriority = 0;

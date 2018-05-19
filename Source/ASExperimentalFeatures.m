@@ -16,7 +16,10 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
 {
   NSArray *allNames = ASCreateOnce((@[@"exp_graphics_contexts",
                                       @"exp_text_node",
-                                      @"exp_interface_state_coalesce"]));
+                                      @"exp_interface_state_coalesce",
+                                      @"exp_unfair_lock",
+                                      @"exp_infer_layer_defaults",
+                                      @"exp_network_image_queue"]));
   
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
