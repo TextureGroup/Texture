@@ -19,7 +19,11 @@
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASHashing.h>
+
+#import <pthread/pthread.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -90,7 +94,7 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
 @implementation ASTextContainer {
   @package
   BOOL _readonly; ///< used only in ASTextLayout.implementation
-  dispatch_semaphore_t _lock;
+  pthread_mutex_t _lock;
   
   CGSize _size;
   UIEdgeInsets _insets;
@@ -125,26 +129,31 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
 - (instancetype)init {
   self = [super init];
   if (!self) return nil;
-  _lock = dispatch_semaphore_create(1);
+  pthread_mutex_init(&_lock, NULL);
   _pathFillEvenOdd = YES;
   return self;
 }
 
+- (void)dealloc
+{
+  pthread_mutex_destroy(&_lock);
+}
+
 - (id)copyWithZone:(NSZone *)zone {
   ASTextContainer *one = [self.class new];
-  dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+  pthread_mutex_lock(&_lock);
   one->_size = _size;
   one->_insets = _insets;
   one->_path = _path;
-  one->_exclusionPaths = _exclusionPaths.copy;
+  one->_exclusionPaths = [_exclusionPaths copy];
   one->_pathFillEvenOdd = _pathFillEvenOdd;
   one->_pathLineWidth = _pathLineWidth;
   one->_verticalForm = _verticalForm;
   one->_maximumNumberOfRows = _maximumNumberOfRows;
   one->_truncationType = _truncationType;
-  one->_truncationToken = _truncationToken.copy;
+  one->_truncationToken = [_truncationToken copy];
   one->_linePositionModifier = [(NSObject *)_linePositionModifier copy];
-  dispatch_semaphore_signal(_lock);
+  pthread_mutex_unlock(&_lock);
   return one;
 }
 
@@ -186,9 +195,9 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
 }
 
 #define Getter(...) \
-dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+pthread_mutex_lock(&_lock); \
 __VA_ARGS__; \
-dispatch_semaphore_signal(_lock);
+pthread_mutex_unlock(&_lock);
 
 #define Setter(...) \
 if (_readonly) { \
@@ -196,9 +205,9 @@ if (_readonly) { \
 reason:@"Cannot change the property of the 'container' in 'ASTextLayout'." userInfo:nil]; \
 return; \
 } \
-dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+pthread_mutex_lock(&_lock); \
 __VA_ARGS__; \
-dispatch_semaphore_signal(_lock);
+pthread_mutex_unlock(&_lock);
 
 - (CGSize)size {
   Getter(CGSize size = _size) return size;
@@ -228,7 +237,7 @@ dispatch_semaphore_signal(_lock);
 
 - (void)setPath:(UIBezierPath *)path {
   Setter(
-         _path = path.copy;
+         _path = [path copy];
          if (_path) {
            CGRect bounds = _path.bounds;
            CGSize size = bounds.size;
@@ -248,7 +257,7 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (void)setExclusionPaths:(NSArray *)exclusionPaths {
-  Setter(_exclusionPaths = exclusionPaths.copy);
+  Setter(_exclusionPaths = [exclusionPaths copy]);
 }
 
 - (BOOL)isPathFillEvenOdd {
@@ -296,7 +305,7 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (void)setTruncationToken:(NSAttributedString *)truncationToken {
-  Setter(_truncationToken = truncationToken.copy);
+  Setter(_truncationToken = [truncationToken copy]);
 }
 
 - (void)setLinePositionModifier:(id<ASTextLinePositionModifier>)linePositionModifier {
@@ -305,6 +314,46 @@ dispatch_semaphore_signal(_lock);
 
 - (id<ASTextLinePositionModifier>)linePositionModifier {
   Getter(id<ASTextLinePositionModifier> m = _linePositionModifier) return m;
+}
+
+- (NSUInteger)hash
+{
+  return [self hashIncludingSize:YES];
+}
+
+- (NSUInteger)hashIncludingSize:(BOOL)includeSize
+{
+  pthread_mutex_lock(&_lock);
+#pragma clang diagnostic push
+#pragma clang diagnostic warning "-Wpadded"
+  struct {
+    CGSize size;
+    ASTextTruncationType truncationType;
+    NSUInteger truncationTokenHash;
+    NSUInteger maximumNumberOfRows;
+    NSUInteger verticalForm;
+    CGFloat pathLineWidth;
+    NSUInteger pathFillEvenOdd;
+    NSUInteger exclusionPathsHash;
+    NSUInteger pathHash;
+    UIEdgeInsets insets;
+    NSUInteger linePositionModifierHash;
+#pragma clang diagnostic pop
+  } data = {
+    includeSize ? _size : CGSizeZero,
+    _truncationType,
+    _truncationToken.hash,
+    _maximumNumberOfRows,
+    (NSUInteger)_verticalForm,
+    _pathLineWidth,
+    (NSUInteger)_pathFillEvenOdd,
+    _exclusionPaths.hash,
+    _path.hash,
+    _insets,
+    _linePositionModifier.hash
+  };
+  pthread_mutex_unlock(&_lock);
+  return ASHashBytes(&data, sizeof(data));
 }
 
 #undef Getter
@@ -360,16 +409,16 @@ dispatch_semaphore_signal(_lock);
   return self;
 }
 
-+ (ASTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
++ (ASTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text NS_RETURNS_RETAINED {
   ASTextContainer *container = [ASTextContainer containerWithSize:size];
   return [self layoutWithContainer:container text:text];
 }
 
-+ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text {
++ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text NS_RETURNS_RETAINED {
   return [self layoutWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
-+ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
++ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range NS_RETURNS_RETAINED {
   ASTextLayout *layout = NULL;
   CGPathRef cgPath = nil;
   CGRect cgPathBox = {0};
@@ -404,8 +453,8 @@ dispatch_semaphore_signal(_lock);
   if (lineRowsIndex) free(lineRowsIndex); \
   return nil; }
   
-  text = text.mutableCopy;
-  container = container.copy;
+  text = [text copy];
+  container = [container copy];
   if (!text || !container) return nil;
   if (range.location + range.length > text.length) return nil;
   container->_readonly = YES;
@@ -689,7 +738,7 @@ dispatch_semaphore_signal(_lock);
         if (runCount > 0) {
           CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, runCount - 1);
           attrs = (id)CTRunGetAttributes(run);
-          attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+          attrs = attrs ? [attrs mutableCopy] : [NSMutableArray new];
           [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
           CTFontRef font = (__bridge CTFontRef)attrs[(id)kCTFontAttributeName];
           CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
@@ -721,7 +770,7 @@ dispatch_semaphore_signal(_lock);
         } else if (container.truncationType == ASTextTruncationTypeMiddle) {
           type = kCTLineTruncationMiddle;
         }
-        NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+        NSMutableAttributedString *lastLineText = [[text attributedSubstringFromRange:lastLine.range] mutableCopy];
         [lastLineText appendAttributedString:truncationToken];
         CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef)lastLineText);
         if (ctLastLineExtend) {
@@ -2111,7 +2160,7 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (NSArray *)selectionRectsWithoutStartAndEndForRange:(ASTextRange *)range {
-  NSMutableArray *rects = [self selectionRectsForRange:range].mutableCopy;
+  NSMutableArray *rects = [[self selectionRectsForRange:range] mutableCopy];
   for (NSInteger i = 0, max = rects.count; i < max; i++) {
     ASTextSelectionRect *rect = rects[i];
     if (rect.containsStart || rect.containsEnd) {
@@ -2124,7 +2173,7 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (NSArray *)selectionRectsWithOnlyStartAndEndForRange:(ASTextRange *)range {
-  NSMutableArray *rects = [self selectionRectsForRange:range].mutableCopy;
+  NSMutableArray *rects = [[self selectionRectsForRange:range] mutableCopy];
   for (NSInteger i = 0, max = rects.count; i < max; i++) {
     ASTextSelectionRect *rect = rects[i];
     if (!rect.containsStart && !rect.containsEnd) {
@@ -3354,6 +3403,52 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
                  size:(CGSize)size
                 debug:(ASTextDebugOption *)debug {
   [self drawInContext:context size:size point:CGPointZero view:nil layer:nil debug:debug cancel:nil];
+}
+
+- (BOOL)isCompatibleWithContainer:(ASTextContainer *)otherContainer text:(NSAttributedString *)otherText
+{
+  // Text must be the same.
+  if (![_text isEqualToAttributedString:otherText]) {
+    return NO;
+  }
+  
+  CGRect containerBounds = (CGRect){ .size = _container.size };
+  CGSize layoutSize = self.textBoundingSize;
+  // 1. CoreText can return frames that are narrower than the constrained width, for obvious reasons.
+  // 2. CoreText can return frames that are slightly wider than the constrained width, for some reason.
+  //    We have to trust that somehow it's OK to try and draw within our size constraint, despite the return value.
+  // 3. Thus, those two values (constrained width & returned width) form a range, where
+  //    intermediate values in that range will be snapped. Thus, we can use a given layout as long as our
+  //    width is in that range, between the min and max of those two values.
+  CGRect minRect = CGRectMake(0, 0, MIN(layoutSize.width, containerBounds.size.width), MIN(layoutSize.height, containerBounds.size.height));
+  if (!CGRectContainsRect(containerBounds, minRect)) {
+    return NO;
+  }
+  CGRect maxRect = CGRectMake(0, 0, MAX(layoutSize.width, containerBounds.size.width), MAX(layoutSize.height, containerBounds.size.height));
+  if (!CGRectContainsRect(maxRect, containerBounds)) {
+    return NO;
+  }
+  
+  // Now check container params.
+  if (!UIEdgeInsetsEqualToEdgeInsets(_container.insets, otherContainer.insets)) {
+    return NO;
+  }
+  if (!ASObjectIsEqual(_container.exclusionPaths, otherContainer.exclusionPaths)) {
+    return NO;
+  }
+  if (!ASObjectIsEqual(_container.path, otherContainer.path)) {
+    return NO;
+  }
+  if (_container.maximumNumberOfRows != otherContainer.maximumNumberOfRows) {
+    return NO;
+  }
+  if (_container.truncationType != otherContainer.truncationType) {
+    return NO;
+  }
+  if (!ASObjectIsEqual(_container.truncationToken, otherContainer.truncationToken)) {
+    return NO;
+  }
+  return YES;
 }
 
 @end

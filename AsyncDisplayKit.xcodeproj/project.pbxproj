@@ -329,6 +329,8 @@
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */; };
 		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC224E962066CA6D00BBA57F /* configuration.json in Resources */ = {isa = PBXBuildFile; fileRef = CC224E952066CA6D00BBA57F /* configuration.json */; };
+		CC23AE4C20B089A700B1CE50 /* ASTextCacheKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CC23AE4A20B089A700B1CE50 /* ASTextCacheKey.h */; };
+		CC23AE4D20B089A700B1CE50 /* ASTextCacheKey.m in Sources */ = {isa = PBXBuildFile; fileRef = CC23AE4B20B089A700B1CE50 /* ASTextCacheKey.m */; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
 		CC2F65EF1E5FFB1600DA57C9 /* ASMutableElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */; };
 		CC3B20841C3F76D600798563 /* ASPendingStateController.h in Headers */ = {isa = PBXBuildFile; fileRef = CC3B20811C3F76D600798563 /* ASPendingStateController.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -384,6 +386,8 @@
 		CCA282CD1E9EB73E0037E8B7 /* ASTipNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CB1E9EB73E0037E8B7 /* ASTipNode.m */; };
 		CCA282D01E9EBF6C0037E8B7 /* ASTipsWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */; };
 		CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */; };
+		CCA49B8F2057259A0047CF5A /* ASCache.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA49B8D2057259A0047CF5A /* ASCache.h */; };
+		CCA49B902057259A0047CF5A /* ASCache.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA49B8E2057259A0047CF5A /* ASCache.m */; };
 		CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62D1EECC2A80060C137 /* ASAssert.m */; };
 		CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */ = {isa = PBXBuildFile; fileRef = CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCAA0B80206ADBF30057B336 /* ASRecursiveUnfairLock.m in Sources */ = {isa = PBXBuildFile; fileRef = CCAA0B7E206ADBF30057B336 /* ASRecursiveUnfairLock.m */; };
@@ -831,6 +835,8 @@
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageNodeTests.m; sourceTree = "<group>"; };
 		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
 		CC224E952066CA6D00BBA57F /* configuration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = configuration.json; sourceTree = "<group>"; };
+		CC23AE4A20B089A700B1CE50 /* ASTextCacheKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ASTextCacheKey.h; path = Component/ASTextCacheKey.h; sourceTree = "<group>"; };
+		CC23AE4B20B089A700B1CE50 /* ASTextCacheKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ASTextCacheKey.m; path = Component/ASTextCacheKey.m; sourceTree = "<group>"; };
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMutableElementMap.h; sourceTree = "<group>"; };
 		CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMutableElementMap.m; sourceTree = "<group>"; };
@@ -894,6 +900,8 @@
 		CCA282CB1E9EB73E0037E8B7 /* ASTipNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTipNode.m; sourceTree = "<group>"; };
 		CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTipsWindow.h; sourceTree = "<group>"; };
 		CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTipsWindow.m; sourceTree = "<group>"; };
+		CCA49B8D2057259A0047CF5A /* ASCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASCache.h; sourceTree = "<group>"; };
+		CCA49B8E2057259A0047CF5A /* ASCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASCache.m; sourceTree = "<group>"; };
 		CCA5F62D1EECC2A80060C137 /* ASAssert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASAssert.m; sourceTree = "<group>"; };
 		CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASRecursiveUnfairLock.h; sourceTree = "<group>"; };
 		CCAA0B7E206ADBF30057B336 /* ASRecursiveUnfairLock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASRecursiveUnfairLock.m; sourceTree = "<group>"; };
@@ -1512,6 +1520,8 @@
 				1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */,
 				0516FA3B1A15563400B4EBED /* ASLog.h */,
 				CCB1F9591EFB60A5009C7475 /* ASLog.m */,
+				CCA49B8D2057259A0047CF5A /* ASCache.h */,
+				CCA49B8E2057259A0047CF5A /* ASCache.m */,
 				CCB1F95B1EFB6316009C7475 /* ASSignpost.h */,
 			);
 			path = Base;
@@ -1668,6 +1678,8 @@
 		CCCCCCC11EC3EF060087FE10 /* TextExperiment */ = {
 			isa = PBXGroup;
 			children = (
+				CC23AE4A20B089A700B1CE50 /* ASTextCacheKey.h */,
+				CC23AE4B20B089A700B1CE50 /* ASTextCacheKey.m */,
 				CCCCCCC21EC3EF060087FE10 /* Component */,
 				CCCCCCCB1EC3EF060087FE10 /* String */,
 				CCCCCCD01EC3EF060087FE10 /* Utility */,
@@ -1811,6 +1823,7 @@
 			files = (
 				1A6C000D1FAB4E2100D05926 /* ASCornerLayoutSpec.h in Headers */,
 				E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */,
+				CCA49B8F2057259A0047CF5A /* ASCache.h in Headers */,
 				E5B225281F1790D6001E1431 /* ASHashing.h in Headers */,
 				CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */,
 				693A1DCA1ECC944E00D0C9D2 /* IGListAdapter+AsyncDisplayKit.h in Headers */,
@@ -1964,6 +1977,7 @@
 				698DFF441E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h in Headers */,
 				CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */,
 				83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */,
+				CC23AE4C20B089A700B1CE50 /* ASTextCacheKey.h in Headers */,
 				E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */,
 				9019FBBD1ED8061D00C45F72 /* ASYogaLayoutSpec.h in Headers */,
 				6947B0BE1E36B4E30007C478 /* ASStackUnpositionedLayout.h in Headers */,
@@ -2308,6 +2322,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC23AE4D20B089A700B1CE50 /* ASTextCacheKey.m in Sources */,
 				E5B225291F1790EE001E1431 /* ASHashing.m in Sources */,
 				DEB8ED7C1DD003D300DBDE55 /* ASLayoutTransition.mm in Sources */,
 				CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */,
@@ -2428,6 +2443,7 @@
 				CCA282B51E9EA7310037E8B7 /* ASTipsController.m in Sources */,
 				B35062271B010EFD0018CF92 /* ASRangeController.mm in Sources */,
 				0442850A1BAA63FE00D16268 /* ASBatchFetching.m in Sources */,
+				CCA49B902057259A0047CF5A /* ASCache.m in Sources */,
 				68FC85E61CE29B9400EDD713 /* ASNavigationController.m in Sources */,
 				CC4C2A791D88E3BF0039ACAB /* ASTraceEvent.m in Sources */,
 				34EFC76F1B701CF700AD841F /* ASRatioLayoutSpec.mm in Sources */,
