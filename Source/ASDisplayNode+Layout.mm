@@ -170,7 +170,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (CGSize)calculatedSize
 {
   ASDN::MutexLocker l(__instanceLock__);
-  if (_pendingDisplayNodeLayout != nullptr) {
+  if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout->layout.size;
   }
   return _calculatedDisplayNodeLayout->layout.size;
@@ -184,7 +184,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
 {
-  if (_pendingDisplayNodeLayout != nullptr) {
+  if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout->constrainedSize;
   }
   return _calculatedDisplayNodeLayout->constrainedSize;
@@ -304,24 +304,22 @@ ASLayoutElementStyleExtensibilityForwarding
   }
   
   CGSize boundsSizeForLayout = ASCeilSizeValues(bounds.size);
-  NSUInteger calculatedVersion = _calculatedDisplayNodeLayout->version;
 
   // Prefer a newer and not yet applied _pendingDisplayNodeLayout over _calculatedDisplayNodeLayout
   // If there is no such _pending, check if _calculated is valid to reuse (avoiding recalculation below).
   BOOL pendingLayoutIsPreferred = NO;
-  if (_pendingDisplayNodeLayout != nullptr) {
+  if (_pendingDisplayNodeLayout != nullptr && _pendingDisplayNodeLayout->isValid(_layoutVersion)) {
+    NSUInteger calculatedVersion = _calculatedDisplayNodeLayout->version;
     NSUInteger pendingVersion = _pendingDisplayNodeLayout->version;
-    if (pendingVersion >= _layoutVersion) {
-      if (pendingVersion > calculatedVersion) {
-        pendingLayoutIsPreferred = YES; // Newer _pending
-      } else if (pendingVersion == calculatedVersion
-                 && !ASSizeRangeEqualToSizeRange(_pendingDisplayNodeLayout->constrainedSize,
-                                                 _calculatedDisplayNodeLayout->constrainedSize)) {
-                   pendingLayoutIsPreferred = YES; // _pending with a different constrained size
-                 }
-    }
+    if (pendingVersion > calculatedVersion) {
+      pendingLayoutIsPreferred = YES; // Newer _pending
+    } else if (pendingVersion == calculatedVersion
+               && !ASSizeRangeEqualToSizeRange(_pendingDisplayNodeLayout->constrainedSize,
+                                               _calculatedDisplayNodeLayout->constrainedSize)) {
+                 pendingLayoutIsPreferred = YES; // _pending with a different constrained size
+               }
   }
-  BOOL calculatedLayoutIsReusable = (calculatedVersion >= _layoutVersion
+  BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->isValid(_layoutVersion)
                                      && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
                                          || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout)));
   if (!pendingLayoutIsPreferred && calculatedLayoutIsReusable) {

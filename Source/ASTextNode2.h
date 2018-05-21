@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
  textNode:longPressedLinkAttribute:value:atPoint:textRange: in order for
  the long press gesture recognizer to be installed.
  */
-@property (nonatomic, weak) id<ASTextNodeDelegate> delegate;
+@property (atomic, weak) id<ASTextNodeDelegate> delegate;
 
 /**
  @abstract If YES and a long press is recognized, touches are cancelled. Default is NO
