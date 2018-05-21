@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Set this block to customize the ASDisplayTraits returned when the VC transitions to the given window size.
  */
-@property (nonatomic, copy) ASDisplayTraitsForTraitWindowSizeBlock overrideDisplayTraitsWithWindowSize;
+@property (nonatomic, copy) ASDisplayTraitsForTraitWindowSizeBlock overrideDisplayTraitsWithWindowSize ASDISPLAYNODE_DEPRECATED_MSG("This property is actually never accessed inside the framework");
 
 /**
  * @abstract Passthrough property to the the .interfaceState of the node.
@@ -77,6 +77,11 @@ NS_ASSUME_NONNULL_BEGIN
 // blocking as a view controller becomes visible to ensure no placeholders flash onscreen.
 // Refer to examples/SynchronousConcurrency, AsyncViewController.m
 @property (nonatomic, assign) BOOL neverShowPlaceholders;
+
+/* Custom container UIViewController subclasses can use this property to add to the overlay
+ that UIViewController calculates for the safeAreaInsets for contained view controllers.
+ */
+@property(nonatomic) UIEdgeInsets additionalSafeAreaInsets;
 
 @end
 

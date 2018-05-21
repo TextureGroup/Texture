@@ -33,11 +33,13 @@
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
+#import <AsyncDisplayKit/ASStackLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASViewController.h>
 
 // Conveniences for making nodes named a certain way
 #define DeclareNodeNamed(n) ASDisplayNode *n = [[ASDisplayNode alloc] init]; n.debugName = @#n
@@ -130,7 +132,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 - (void)setInterfaceState:(ASInterfaceState)state
 {
   [super setInterfaceState:state];
-  ASCATransactionQueueWait();
+  ASCATransactionQueueWait(nil);
 }
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
@@ -259,6 +261,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return NO;
 }
 
+@end
+
+@interface ASTestViewController: ASViewController<ASDisplayNode *>
+@end
+@implementation ASTestViewController
+- (BOOL)prefersStatusBarHidden { return YES; }
 @end
 
 @interface UIResponderNodeTestDisplayViewCallingSuper : _ASDisplayView
@@ -476,6 +484,10 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     XCTAssertEqual(NO, node.exclusiveTouch, @"default exclusiveTouch broken %@", hasLoadedView);
     XCTAssertEqual(YES, node.autoresizesSubviews, @"default autoresizesSubviews broken %@", hasLoadedView);
     XCTAssertEqual(UIViewAutoresizingNone, node.autoresizingMask, @"default autoresizingMask broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsMake(8, 8, 8, 8), node.layoutMargins), @"default layoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(NO, node.preservesSuperviewLayoutMargins, @"default preservesSuperviewLayoutMargins broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, node.safeAreaInsets), @"default safeAreaInsets broken %@", hasLoadedView);
+    XCTAssertEqual(YES, node.insetsLayoutMarginsFromSafeArea, @"default insetsLayoutMarginsFromSafeArea broken %@", hasLoadedView);
   } else {
     XCTAssertEqual(NO, node.userInteractionEnabled, @"layer-backed nodes do not support userInteractionEnabled %@", hasLoadedView);
     XCTAssertEqual(NO, node.exclusiveTouch, @"layer-backed nodes do not support exclusiveTouch %@", hasLoadedView);
@@ -583,6 +595,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   if (!isLayerBacked) {
     XCTAssertEqual(UIViewAutoresizingFlexibleLeftMargin, node.autoresizingMask, @"autoresizingMask %@", hasLoadedView);
     XCTAssertEqual(NO, node.autoresizesSubviews, @"autoresizesSubviews broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsMake(3, 5, 8, 11), node.layoutMargins), @"layoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(YES, node.preservesSuperviewLayoutMargins, @"preservesSuperviewLayoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(NO, node.insetsLayoutMarginsFromSafeArea, @"insetsLayoutMarginsFromSafeArea broken %@", hasLoadedView);
   }
 }
 
@@ -651,6 +666,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
       node.exclusiveTouch = YES;
       node.autoresizesSubviews = NO;
       node.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+      node.insetsLayoutMarginsFromSafeArea = NO;
+      node.layoutMargins = UIEdgeInsetsMake(3, 5, 8, 11);
+      node.preservesSuperviewLayoutMargins = YES;
     }
   }];
 
@@ -2374,6 +2392,46 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASSizeRangeMake(CGSizeMake(100, 100))], NSException, NSInternalInconsistencyException);
 }
 
+- (void)testThatStackSpecOrdersSubnodesCorrectly
+{
+  // This test ensures that the z-order of nodes matches the stack spec, including after relayout / transition.
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+
+  DeclareNodeNamed(a);
+  DeclareNodeNamed(b);
+  DeclareNodeNamed(c);
+  DeclareNodeNamed(d);
+
+  NSArray *nodesForwardOrder = @[a, b, c, d];
+  NSArray *nodesReverseOrder = @[d, c, b, a];
+  __block BOOL flipItemOrder = NO;
+
+  node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange size) {
+    ASStackLayoutSpec *stack = [ASStackLayoutSpec verticalStackLayoutSpec];
+    stack.children = flipItemOrder ? nodesReverseOrder : nodesForwardOrder;
+    return stack;
+  };
+
+  ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
+  [node.view layoutIfNeeded];
+
+  // Because automaticallyManagesSubnodes is used, the subnodes array is constructed from the layout spec's children.
+  XCTAssert([node.subnodes isEqualToArray:nodesForwardOrder], @"subnodes: %@, array: %@", node.subnodes, nodesForwardOrder);
+  XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+                                           @"a,b,c,d", @"Forward order");
+
+  flipItemOrder = YES;
+  [node invalidateCalculatedLayout];
+  [node.view layoutIfNeeded];
+
+  // In this case, it's critical that the items are in the new order so that event handling and apparent z-position are correct.
+  // FIXME: The reversal case is not currently passing.
+  // XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
+  // XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+  //                                          @"d,c,b,a", @"Reverse order");
+}
+
 - (void)testThatOverlaySpecOrdersSubnodesCorrectly
 {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
@@ -2452,6 +2510,50 @@ static bool stringContainsPointer(NSString *description, id p) {
   // Have to split into two lines because XCTAssert macro can't handle the stringWithFormat:.
   BOOL hasVC = [debugDescription containsString:[NSString stringWithFormat:@"%p", vc]];
   XCTAssert(hasVC);
+}
+
+- (void)testThatSubnodeSafeAreaInsetsAreCalculatedCorrectly
+{
+  ASDisplayNode *rootNode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+
+  rootNode.automaticallyManagesSubnodes = YES;
+  rootNode.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(1, 2, 3, 4) child:subnode];
+  };
+
+  ASTestViewController *viewController = [[ASTestViewController alloc] initWithNode:rootNode];
+  viewController.additionalSafeAreaInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+
+  // It looks like iOS 11 suppresses safeAreaInsets calculation for the views that are not on screen.
+  UIWindow *window = [[UIWindow alloc] init];
+  window.rootViewController = viewController;
+  [window setHidden:NO];
+  [window layoutIfNeeded];
+
+  UIEdgeInsets expectedRootNodeSafeArea = UIEdgeInsetsMake(10, 10, 10, 10);
+  UIEdgeInsets expectedSubnodeSafeArea = UIEdgeInsetsMake(9, 8, 7, 6);
+
+  UIEdgeInsets windowSafeArea = UIEdgeInsetsZero;
+  if (AS_AVAILABLE_IOS(11.0)) {
+    windowSafeArea = window.safeAreaInsets;
+  }
+
+  expectedRootNodeSafeArea = ASConcatInsets(expectedRootNodeSafeArea, windowSafeArea);
+  expectedSubnodeSafeArea = ASConcatInsets(expectedSubnodeSafeArea, windowSafeArea);
+
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(expectedRootNodeSafeArea, rootNode.safeAreaInsets),
+                @"expected rootNode.safeAreaInsets to be %@ but got %@ (window.safeAreaInsets %@)",
+                NSStringFromUIEdgeInsets(expectedRootNodeSafeArea),
+                NSStringFromUIEdgeInsets(rootNode.safeAreaInsets),
+                NSStringFromUIEdgeInsets(windowSafeArea));
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(expectedSubnodeSafeArea, subnode.safeAreaInsets),
+                @"expected subnode.safeAreaInsets to be %@ but got %@ (window.safeAreaInsets %@)",
+                NSStringFromUIEdgeInsets(expectedSubnodeSafeArea),
+                NSStringFromUIEdgeInsets(subnode.safeAreaInsets),
+                NSStringFromUIEdgeInsets(windowSafeArea));
+
+  [window setHidden:YES];
 }
 
 - (void)testScreenScale

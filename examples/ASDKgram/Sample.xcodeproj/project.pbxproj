@@ -36,6 +36,7 @@
 		CC5532171E15CC1E0011C01F /* ASCollectionSectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5532161E15CC1E0011C01F /* ASCollectionSectionController.m */; };
 		CC6350BB1E1C482D002BC613 /* TailLoadingNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6350BA1E1C482D002BC613 /* TailLoadingNode.m */; };
 		CC85250F1E36B392008EABE6 /* FeedHeaderNode.m in Sources */ = {isa = PBXBuildFile; fileRef = CC85250E1E36B392008EABE6 /* FeedHeaderNode.m */; };
+		CCEDDDD7200C4C0E00FFCD0A /* TextureConfigDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */; };
 		E5F128F01E09625400B4335F /* PhotoFeedBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F128EF1E09625400B4335F /* PhotoFeedBaseController.m */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +99,7 @@
 		CC6350BA1E1C482D002BC613 /* TailLoadingNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TailLoadingNode.m; sourceTree = "<group>"; };
 		CC85250D1E36B392008EABE6 /* FeedHeaderNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedHeaderNode.h; sourceTree = "<group>"; };
 		CC85250E1E36B392008EABE6 /* FeedHeaderNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedHeaderNode.m; sourceTree = "<group>"; };
+		CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TextureConfigDelegate.m; sourceTree = "<group>"; };
 		D09B5DF0BFB37583DE8F3142 /* Pods-Sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample.release.xcconfig"; path = "Pods/Target Support Files/Pods-Sample/Pods-Sample.release.xcconfig"; sourceTree = "<group>"; };
 		E5F128EE1E09612700B4335F /* PhotoFeedBaseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoFeedBaseController.h; sourceTree = "<group>"; };
 		E5F128EF1E09625400B4335F /* PhotoFeedBaseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoFeedBaseController.m; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 			children = (
 				768843511CAA37EF00D8629E /* AppDelegate.h */,
 				768843681CAA37EF00D8629E /* AppDelegate.m */,
+				CCEDDDD6200C4C0E00FFCD0A /* TextureConfigDelegate.m */,
 				76229A761CBB79E000B62CEF /* WindowWithStatusBarUnderlay.h */,
 				76229A771CBB79E000B62CEF /* WindowWithStatusBarUnderlay.m */,
 				767A5F141CAA3D8A004CDA8D /* Controller */,
@@ -427,6 +430,7 @@
 				CC5532171E15CC1E0011C01F /* ASCollectionSectionController.m in Sources */,
 				768843801CAA37EF00D8629E /* AppDelegate.m in Sources */,
 				768843811CAA37EF00D8629E /* CommentFeedModel.m in Sources */,
+				CCEDDDD7200C4C0E00FFCD0A /* TextureConfigDelegate.m in Sources */,
 				7688438E1CAA37EF00D8629E /* PhotoFeedNodeController.m in Sources */,
 				CC6350BB1E1C482D002BC613 /* TailLoadingNode.m in Sources */,
 				CC85250F1E36B392008EABE6 /* FeedHeaderNode.m in Sources */,

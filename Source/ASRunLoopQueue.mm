@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
@@ -45,7 +46,7 @@ static void runLoopSourceCallback(void *info) {
   ASDN::RecursiveMutex _queueLock;
 }
 
-+ (ASDeallocQueue *)sharedDeallocationQueue
++ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
@@ -494,7 +495,6 @@ typedef enum {
   CFRunLoopObserverRef _postTransactionObserver;
   NSPointerArray *_internalQueue;
   ASDN::RecursiveMutex _internalQueueLock;
-  BOOL _disableInterfaceStateCoalesce;
   BOOL _CATransactionCommitInProgress;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
@@ -516,7 +516,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
 // and kASASCATransactionQueuePostOrder will apply interface change immediately.
 static int const kASASCATransactionQueuePostOrder = 3000000;
 
-+ (ASCATransactionQueue *)sharedQueue
++ (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED
 {
   static dispatch_once_t onceToken;
   static ASCATransactionQueue *sharedQueue;
@@ -671,7 +671,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     return;
   }
 
-  if (_disableInterfaceStateCoalesce || _CATransactionCommitInProgress) {
+  if (!self.enabled || _CATransactionCommitInProgress) {
     [object prepareForCATransactionCommit];
     return;
   }
@@ -702,14 +702,9 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   return _internalQueue.count == 0;
 }
 
-- (void)disable
+- (BOOL)isEnabled
 {
-  _disableInterfaceStateCoalesce = YES;
-}
-
-- (BOOL)disabled
-{
-  return _disableInterfaceStateCoalesce;
+  return ASActivateExperimentalFeature(ASExperimentalInterfaceStateCoalescing);
 }
 
 @end

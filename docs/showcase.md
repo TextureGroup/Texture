@@ -34,7 +34,8 @@ permalink: /showcase.html
 		<br>
 		<b>Buffer</b>
 		<br>
-		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a>
+		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a><br/><br/>
+		<a href="https://www.youtube.com/watch?v=Tzuz9usUpco">Texture: What, Why and How</a>
 		</td>
 		
 		</tr>
@@ -213,10 +214,12 @@ permalink: /showcase.html
 
 		<td align="center" valign="top">
 		<a href="https://itunes.apple.com/us/app/vingle-very-community/id637534820?mt=8"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple128/v4/09/21/52/09215288-4bab-6f97-240c-6e3a26218af2/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
-		<br /> 
+		<br> 
 		<b>Vingle</b>
+		<br>
+		<a href="https://medium.com/vingle-tech-blog/improvement-feed-performance-with-texture-asyncdisplaykit-2ef2ee11f06e">Improvement feed performance with Texture</a>
 		</td>
-
+		
 		</tr>
 		
 		<tr>
@@ -227,15 +230,17 @@ permalink: /showcase.html
 		<b>Blendle</b>
 		</td>
 
-		</tr>
-		
-		<tr>
-		
 		<td align="center" valign="top">
 		<a href="https://itunes.apple.com/in/app/mensxp-fashion-grooming-tips/id1253494246?mt=8"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple118/v4/04/78/65/04786577-67dc-ea87-2063-b97a89492e18/source/175x175bb.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>MensXP</b>
 		</td>
+		
+ 		<td align="center" valign="top">
+ 		<a href="https://itunes.apple.com/us/app/idiva-beauty-wedding-tips/id1359022878?ls=1&mt=8"><img class="roundrect" src="https://is2-ssl.mzstatic.com/image/thumb/Purple128/v4/aa/52/a7/aa52a7aa-b978-126b-94d9-85cabb22aa85/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-4.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+ 		<br /> 
+ 		<b>iDiva</b>
+ 		</td>
 
 		</tr>
 		

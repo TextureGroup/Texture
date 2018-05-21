@@ -15,8 +15,6 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <pthread.h>
-
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
@@ -102,6 +100,13 @@ NS_ASSUME_NONNULL_BEGIN
  * @note This method is guaranteed to be called on main.
  */
 - (void)nodeDidLayout;
+
+/**
+ * @abstract Called when the node loads.
+ * @discussion Can be used for operations that are performed after the node's view is available.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)nodeDidLoad;
 
 @end
 
@@ -356,6 +361,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Called after the view is removed from the window.
  */
 - (void)didExitHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+
+/**
+ * Called just after the view is added to a window.
+ * Note: this may be called multiple times during view controller transitions. To overcome this: use didEnterVisibleState or its equavalents.
+ */
+- (void)didEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
 
 /**
  * @abstract Whether the view or layer of this display node is currently in a window

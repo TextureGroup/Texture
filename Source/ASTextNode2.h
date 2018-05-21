@@ -11,28 +11,7 @@
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
-
-#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
-// Import this to get ASTextNodeHighlightStyle
-#import <AsyncDisplayKit/ASTextNode.h>
-#else
-@protocol ASTextNodeDelegate;
-
-/**
- * Highlight styles.
- */
-typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
-  /**
-   * Highlight style for text on a light background.
-   */
-  ASTextNodeHighlightStyleLight,
-
-  /**
-   * Highlight style for text on a dark background.
-   */
-  ASTextNodeHighlightStyleDark
-};
-#endif
+#import <AsyncDisplayKit/ASTextNodeCommon.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -218,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
  textNode:longPressedLinkAttribute:value:atPoint:textRange: in order for
  the long press gesture recognizer to be installed.
  */
-@property (nonatomic, weak) id<ASTextNodeDelegate> delegate;
+@property (atomic, weak) id<ASTextNodeDelegate> delegate;
 
 /**
  @abstract If YES and a long press is recognized, touches are cancelled. Default is NO
