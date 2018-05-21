@@ -401,28 +401,34 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   layoutCacheLock.unlock();
 
   CGRect containerBounds = (CGRect){ .size = container.size };
+  NSRange textRange = NSMakeRange(0, text.string.length);
   {
     for (auto &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
 
-      CGSize layoutSize = layout.textBoundingSize;
-      // 1. CoreText can return frames that are narrower than the constrained width, for obvious reasons.
-      // 2. CoreText can return frames that are slightly wider than the constrained width, for some reason.
-      //    We have to trust that somehow it's OK to try and draw within our size constraint, despite the return value.
-      // 3. Thus, those two values (constrained width & returned width) form a range, where
-      //    intermediate values in that range will be snapped. Thus, we can use a given layout as long as our
-      //    width is in that range, between the min and max of those two values.
-      CGRect minRect = CGRectMake(0, 0, MIN(layoutSize.width, constrainedSize.width), MIN(layoutSize.height, constrainedSize.height));
-      if (!CGRectContainsRect(containerBounds, minRect)) {
-        continue;
-      }
-      CGRect maxRect = CGRectMake(0, 0, MAX(layoutSize.width, constrainedSize.width), MAX(layoutSize.height, constrainedSize.height));
-      if (!CGRectContainsRect(maxRect, containerBounds)) {
-        continue;
-      }
-      if (!CGSizeEqualToSize(container.size, constrainedSize)) {
-        continue;
+      BOOL wrapped = (layout.rowCount >= 2);
+      BOOL truncated = !NSEqualRanges(layout.visibleRange, textRange);
+      BOOL wrappingDimensionsMatch = (layout.container.verticalForm ? constrainedSize.height == containerBounds.size.height : constrainedSize.width == containerBounds.size.width);
+      BOOL nonWrappingDimensionIsGreater = (layout.container.verticalForm ? containerBounds.size.width >= constrainedSize.width : containerBounds.size.height >= constrainedSize.height);
+      
+      if (!wrapped && !truncated) {
+        // Not wrapped, not truncated, can reuse if our bounds are bigger.
+        if (!CGRectContainsRect(containerBounds, layout.textBoundingRect)) {
+          continue;
+        }
+      } else if (!truncated) {
+        // Wrapped, but not truncated. Can reuse layout if wrapping dimensions match
+        // and if the new constrained non-wrapping dimension is greater.
+        if (!wrappingDimensionsMatch || !nonWrappingDimensionIsGreater) {
+          continue;
+        }
+      } else {
+        // Truncated. For now require that the sizes match. There may be other
+        // false negative cases in the future.
+        if (!CGSizeEqualToSize(containerBounds.size, constrainedSize)) {
+          continue;
+        }
       }
 
       // Now check container params.
@@ -440,6 +446,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
         continue;
       }
       if (!ASObjectIsEqual(container.truncationToken, otherContainer.truncationToken)) {
+        continue;
+      }
+      if (container.verticalForm != otherContainer.verticalForm) {
         continue;
       }
       // TODO: When we get a cache hit, move this entry to the front (LRU).
