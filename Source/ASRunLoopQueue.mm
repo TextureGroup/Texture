@@ -201,7 +201,7 @@ static void runLoopSourceCallback(void *info) {
 @end
 
 @implementation ASDeallocQueueV2 {
-  std::vector<id> _queue;
+  std::vector<CFTypeRef> _queue;
   ASDN::Mutex _lock;
 }
 
@@ -222,11 +222,8 @@ static void runLoopSourceCallback(void *info) {
   
   _lock.lock();
   auto isFirstEntry = _queue.empty();
-  // Transfer the +1 into our queue. Emits no retain/release.
-  _queue.push_back((__bridge_transfer id)*cfPtr);
-  // Clear their pointer since we just took it out of ARC. As far as they're concerned, it's gone.
-  // Have to do this with the lock or another thread could release the object before we nil it and they
-  // would have a dangling pointer.
+  // Push the pointer into our queue and clear their strong ref.
+  _queue.push_back(*cfPtr);
   *cfPtr = NULL;
   _lock.unlock();
   
@@ -241,11 +238,12 @@ static void runLoopSourceCallback(void *info) {
 {
   @autoreleasepool {
     _lock.lock();
-    // Use move to avoid extra retain/release pairs.
+    // Use move since copying CFTypeRefs = dangerous memory management.
     auto q = std::move(_queue);
     _lock.unlock();
-    // Explicit clear is probably overkill but makes behavior explicit.
-    q.clear();
+    for (auto ref : q) {
+      CFRelease(ref);
+    }
   }
 }
 
