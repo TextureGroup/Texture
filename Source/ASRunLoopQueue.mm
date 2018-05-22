@@ -222,7 +222,9 @@ static void runLoopSourceCallback(void *info) {
   
   _lock.lock();
   auto isFirstEntry = _queue.empty();
-  // Push the pointer into our queue and clear their strong ref.
+  // Push the pointer into our queue and clear their pointer.
+  // This "steals" the +1 from ARC and nils their pointer so they can't
+  // access or release the object.
   _queue.push_back(*cfPtr);
   *cfPtr = NULL;
   _lock.unlock();
@@ -238,10 +240,10 @@ static void runLoopSourceCallback(void *info) {
 {
   @autoreleasepool {
     _lock.lock();
-    // Use move since copying CFTypeRefs = dangerous memory management.
     auto q = std::move(_queue);
     _lock.unlock();
     for (auto ref : q) {
+      // NOTE: Could check that retain count is 1 and retry later if not.
       CFRelease(ref);
     }
   }

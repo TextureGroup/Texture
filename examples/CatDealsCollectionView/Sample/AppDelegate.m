@@ -55,3 +55,14 @@
 }
 
 @end
+
+@implementation ASConfiguration (UserProvided)
+
++ (ASConfiguration *)textureConfiguration
+{
+  ASConfiguration *cfg = [[ASConfiguration alloc] init];
+  cfg.experimentalFeatures = ASExperimentalDeallocQueue;
+  return cfg;
+}
+
+@end
