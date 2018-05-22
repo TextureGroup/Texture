@@ -202,19 +202,7 @@ static void runLoopSourceCallback(void *info) {
 
 @implementation ASDeallocQueueV2 {
   std::vector<id> _queue;
-  NSCondition *_condition;
-  NSThread *_thread;
-}
-
-- (instancetype)init
-{
-  if (self = [super init]) {
-    _condition = [[NSCondition alloc] init];
-    _thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil];
-    _thread.name = @"ASDeallocQueue";
-    [_thread start];
-  }
-  return self;
+  ASDN::Mutex _lock;
 }
 
 - (void)dealloc
@@ -222,42 +210,40 @@ static void runLoopSourceCallback(void *info) {
   ASDisplayNodeFailAssert(@"Singleton should not dealloc.");
 }
 
-- (void)threadMain
-{
-  auto thread = NSThread.currentThread;
-  while (!thread.cancelled) {
-    // Wait for first object.
-    [_condition lock];
-    while (_queue.empty()) {
-      [_condition wait];
-    }
-    [_condition unlock];
-    
-    // Wait 100ms.
-    [NSThread sleepForTimeInterval:0.100];
-    
-    // Drain.
-    [self drain];
-  }
-}
-
 - (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
 {
-  ASLockScopeUnowned(_condition);
-  _queue.push_back(*objectPtr);
-  *objectPtr = nil;
-  if (_queue.size() == 1) {
-    [_condition signal];
+  NSParameterAssert(objectPtr != NULL);
+  
+  // Cast to CFType so we can manipulate retain count manually.
+  auto cfPtr = (void *)objectPtr;
+  if (!cfPtr || !*cfPtr) {
+    return;
+  }
+  
+  _lock.lock();
+  auto firstEntry = _queue.empty();
+  // Transfer the +1 into our queue. Emits no retain/release.
+  _queue.push_back((__bridge_transfer id)*cfPtr);
+  // Clear their pointer since we just took it out of ARC. As far as they're concerned, it's gone.
+  // Have to do this with the lock or another thread could release the object before we nil it and they
+  // would have a dangling pointer.
+  *cfPtr = NULL;
+  _lock.unlock();
+  
+  if (firstEntry) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.100 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+      [self drain];
+    });
   }
 }
 
 - (void)drain
 {
   @autoreleasepool {
-    [_condition lock];
+    _lock.lock();
     // Use move to avoid extra retain/release pairs.
     auto q = std::move(_queue);
-    [_condition unlock];
+    _lock.unlock();
     // Explicit clear is probably overkill but makes behavior explicit.
     q.clear();
   }
