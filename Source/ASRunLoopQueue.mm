@@ -39,21 +39,39 @@ static void runLoopSourceCallback(void *info) {
 
 #pragma mark - ASDeallocQueue
 
-@implementation ASDeallocQueue {
-  NSThread *_thread;
-  NSCondition *_condition;
-  std::deque<id> _queue;
-  ASDN::RecursiveMutex _queueLock;
-}
+@interface ASDeallocQueueV1 : ASDeallocQueue
+@end
+@interface ASDeallocQueueV2 : ASDeallocQueue
+@end
+
+@implementation ASDeallocQueue
 
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    deallocQueue = [[ASDeallocQueue alloc] init];
+    if (ASActivateExperimentalFeature(ASExperimentalDeallocQueue)) {
+      deallocQueue = [[ASDeallocQueueV2 alloc] init];
+    } else {
+      deallocQueue = [[ASDeallocQueueV1 alloc] init];
+    }
   });
   return deallocQueue;
+}
+
+- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
+{
+  ASDisplayNodeFailAssert(@"Abstract method.");
+}
+
+@end
+
+@implementation ASDeallocQueueV1 {
+  NSThread *_thread;
+  NSCondition *_condition;
+  std::deque<id> _queue;
+  ASDN::RecursiveMutex _queueLock;
 }
 
 - (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
@@ -147,29 +165,6 @@ static void runLoopSourceCallback(void *info) {
   _thread = nil;
 }
 
-- (void)test_drain
-{
-  [self performSelector:@selector(_test_drain) onThread:_thread withObject:nil waitUntilDone:YES];
-}
-
-- (void)_test_drain
-{
-  while (true) {
-    @autoreleasepool {
-      _queueLock.lock();
-      std::deque<id> currentQueue = _queue;
-      _queue = std::deque<id>();
-      _queueLock.unlock();
-
-      if (currentQueue.empty()) {
-        return;
-      } else {
-        currentQueue.clear();
-      }
-    }
-  }
-}
-
 - (void)_stop
 {
   CFRunLoopStop(CFRunLoopGetCurrent());
@@ -178,6 +173,65 @@ static void runLoopSourceCallback(void *info) {
 - (void)dealloc
 {
   [self stop];
+}
+
+@end
+
+@implementation ASDeallocQueueV2 {
+  std::vector<id> _queue;
+  NSCondition *_condition;
+  NSThread *_thread;
+}
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _condition = [[NSCondition alloc] init];
+    _thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil];
+    [_thread start];
+  }
+  return self;
+}
+
+- (void)dealloc
+{
+  ASDisplayNodeFailAssert(@"Singleton should not dealloc.");
+}
+
+- (void)threadMain
+{
+  auto thread = NSThread.currentThread;
+  while (!thread.cancelled) {
+    // Wait for first object.
+    [_condition lock];
+    while (_queue.empty()) {
+      [_condition wait];
+    }
+    [_condition unlock];
+    
+    // Wait 100ms.
+    [NSThread sleepForTimeInterval:0.100];
+    
+    // Drain.
+    @autoreleasepool {
+      [_condition lock];
+      // Use move to avoid extra retain/release pairs.
+      auto q = std::move(_queue);
+      [_condition unlock];
+      // Explicit clear is probably overkill but makes behavior explicit.
+      q.clear();
+    }
+  }
+}
+
+- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
+{
+  ASLockScopeUnowned(_condition);
+  _queue.push_back(*objectPtr);
+  *objectPtr = nil;
+  if (_queue.size() == 1) {
+    [_condition signal];
+  }
 }
 
 @end
