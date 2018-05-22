@@ -38,25 +38,26 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary
+- (instancetype)initWithUnsplashPhoto:(NSDictionary *)photoDictionary
 {
   self = [super init];
   
   if (self) {
     _dictionaryRepresentation = photoDictionary;
     _uploadDateRaw            = [photoDictionary objectForKey:@"created_at"];
-    _photoID                  = [[photoDictionary objectForKey:@"id"] description];
-    _title                    = [photoDictionary objectForKey:@"title"];
-    _descriptionText          = [photoDictionary valueForKeyPath:@"name"];
-    _commentsCount            = [[photoDictionary objectForKey:@"comments_count"] integerValue];
-    _likesCount               = [[photoDictionary objectForKey:@"positive_votes_count"] integerValue];
+    _photoID                  = [photoDictionary objectForKey:@"id"];
+    _descriptionText          = [photoDictionary valueForKeyPath:@"description"];
+    _likesCount               = [[photoDictionary objectForKey:@"likes"] integerValue];
+    _location                 = [photoDictionary objectForKey:@"location"];
     
-    NSString *urlString       = [[photoDictionary objectForKey:@"image_url"] firstObject];
+    NSString *urlString       = [photoDictionary objectForKey:@"urls"][@"regular"];
     _URL                      = urlString ? [NSURL URLWithString:urlString] : nil;
     
-    _location                 = [[LocationModel alloc] initWith500pxPhoto:photoDictionary];
-    _ownerUserProfile         = [[UserModel alloc] initWith500pxPhoto:photoDictionary];
+    _ownerUserProfile         = [[UserModel alloc] initWithUnsplashPhoto:photoDictionary];
     _uploadDateString         = [NSString elapsedTimeStringSinceDate:_uploadDateRaw];
+    
+    _height = [[photoDictionary objectForKey:@"height"] integerValue];
+    _width = [[photoDictionary objectForKey:@"width"] integerValue];
   }
   
   return self;
@@ -88,7 +89,7 @@
 
 - (NSAttributedString *)locationAttributedStringWithFontSize:(CGFloat)size
 {
-  return [NSAttributedString attributedStringWithString:self.location.locationString fontSize:size color:[UIColor lightBlueColor] firstWordColor:nil];
+  return [NSAttributedString attributedStringWithString:self.location fontSize:size color:[UIColor lightBlueColor] firstWordColor:nil];
 }
 
 - (NSString *)description

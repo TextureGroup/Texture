@@ -29,7 +29,7 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWith500pxPhoto:(NSDictionary *)dictionary
+- (instancetype)initWithUnsplashPhoto:(NSDictionary *)dictionary
 {
   self = [super init];
   
@@ -110,7 +110,7 @@
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
   
     // fetch JSON data from server
-    NSString *urlString     = [NSString stringWithFormat:@"https://api.500px.com/v1/users/show?id=%lu&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC", (unsigned long)_userID];
+    NSString *urlString     = [NSString stringWithFormat:@"https://api.500px.com/v1/users/show?id=%@&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC", _userID];
     
     NSURL *url              = [NSURL URLWithString:urlString];
     NSURLSession *session   = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
@@ -148,30 +148,23 @@
     return;
   }
 
-  _userID                   = [[self guardJSONElement:[userDictionary objectForKey:@"id"]] integerValue];
+  _userID                   = [self guardJSONElement:[userDictionary objectForKey:@"id"]];
   _username                 = [[self guardJSONElement:[userDictionary objectForKey:@"username"]] lowercaseString];
   
-  if ([_username isKindOfClass:[NSNumber class]]) {
+  if (_username == nil) {
     _username               = @"Anonymous";
   }
   
-  _firstName                = [self guardJSONElement:[userDictionary objectForKey:@"firstname"]];
-  _lastName                 = [self guardJSONElement:[userDictionary objectForKey:@"lastname"]];
-  _fullName                 = [self guardJSONElement:[userDictionary objectForKey:@"fullname"]];
-  _city                     = [self guardJSONElement:[userDictionary objectForKey:@"city"]];
-  _state                    = [self guardJSONElement:[userDictionary objectForKey:@"state"]];
-  _country                  = [self guardJSONElement:[userDictionary objectForKey:@"country"]];
-  _about                    = [self guardJSONElement:[userDictionary objectForKey:@"about"]];
-  _domain                   = [self guardJSONElement:[userDictionary objectForKey:@"domain"]];
-  _photoCount               = [[self guardJSONElement:[userDictionary objectForKey:@"photos_count"]] integerValue];
-  _galleriesCount           = [[self guardJSONElement:[userDictionary objectForKey:@"galleries_count"]] integerValue];
-  _affection                = [[self guardJSONElement:[userDictionary objectForKey:@"affection"]] integerValue];
-  _friendsCount             = [[self guardJSONElement:[userDictionary objectForKey:@"friends_count"]] integerValue];
-  _followersCount           = [[self guardJSONElement:[userDictionary objectForKey:@"followers_count"]] integerValue];
-  _following                = [[self guardJSONElement:[userDictionary objectForKey:@"following"]] boolValue];
+  _firstName                = [self guardJSONElement:[userDictionary objectForKey:@"first_name"]];
+  _lastName                 = [self guardJSONElement:[userDictionary objectForKey:@"last_name"]];
+  _fullName                 = [self guardJSONElement:[userDictionary objectForKey:@"name"]];
+  _location                 = [self guardJSONElement:[userDictionary objectForKey:@"location"]];
+  _about                    = [self guardJSONElement:[userDictionary objectForKey:@"bio"]];
+  _photoCount               = [[self guardJSONElement:[userDictionary objectForKey:@"total_photos"]] integerValue];
+  _galleriesCount           = [[self guardJSONElement:[userDictionary objectForKey:@"total_collections"]] integerValue];
   _dictionaryRepresentation = userDictionary;
   
-  NSString *urlString       = [self guardJSONElement:[userDictionary objectForKey:@"userpic_url"]];
+  NSString *urlString       = [self guardJSONElement:[userDictionary objectForKey:@"profile_image"][@"medium"]];
   _userPicURL               = urlString ? [NSURL URLWithString:urlString] : nil;
 
 }

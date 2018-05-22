@@ -82,6 +82,7 @@
     _photoCommentsView                   = [[CommentView alloc] init];
     _userAvatarImageView                 = [[UIImageView alloc] init];
     _photoImageView                      = [[UIImageView alloc] init];
+    _photoImageView.contentMode          = UIViewContentModeScaleAspectFill;
     _userNameLabel                       = [[UILabel alloc] init];
     _photoLocationLabel                  = [[UILabel alloc] init];
     _photoTimeIntervalSincePostLabel     = [[UILabel alloc] init];
@@ -454,7 +455,15 @@
   
   [self downloadAndProcessUserAvatarForPhoto:photo];
   [self loadCommentsForPhoto:photo];
-  [self reverseGeocodeLocationForPhoto:photo];
+  
+  //update location
+  _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
+  [_photoLocationLabel sizeToFit];
+  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self updateConstraints];
+    [self setNeedsLayout];
+  });
 }
 
 - (void)loadCommentsForPhoto:(PhotoModel *)photo
@@ -479,25 +488,6 @@
   [UIImage downloadImageForURL:photo.URL completion:^(UIImage *image) {
     CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
     _userAvatarImageView.image = [image makeCircularImageWithSize:profileImageSize];
-  }];
-}
-
-- (void)reverseGeocodeLocationForPhoto:(PhotoModel *)photo
-{
-  [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
-    
-    // check and make sure this is still relevant for this cell (and not an old cell)
-    // make sure to use _photoModel instance variable as photo may change when cell is reused,
-    // where as local variable will never change
-    if (locationModel == _photoModel.location) {
-      _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
-      [_photoLocationLabel sizeToFit];
-      
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateConstraints];
-        [self setNeedsLayout];
-      });
-    }
   }];
 }
 

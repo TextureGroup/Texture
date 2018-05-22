@@ -22,11 +22,8 @@
 
 #define NUM_COMMENTS_TO_SHOW 3
 
-#define fiveHundredPX_ENDPOINT_HOST      @"https://api.500px.com/v1/"
-#define fiveHundredPX_ENDPOINT_COMMENTS  @"photos/4928401/comments"
-#define fiveHundredPX_ENDPOINT_SEARCH    @"photos/search?geo="    //latitude,longitude,radius<units>
-#define fiveHundredPX_ENDPOINT_USER      @"photos?user_id="
-#define fiveHundredPX_CONSUMER_KEY_PARAM @"&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"
+#define unsplash_ENDPOINT_HOST      @"https://api.500px.com/v1/"
+#define unsplash_CONSUMER_KEY_PARAM @"&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"
 
 @implementation CommentFeedModel
 {

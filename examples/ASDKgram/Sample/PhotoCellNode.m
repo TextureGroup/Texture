@@ -89,16 +89,7 @@
     
     _photoLocationLabel      = [[ASTextNode alloc] init];
     _photoLocationLabel.maximumNumberOfLines = 1;
-    [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
-      
-      // check and make sure this is still relevant for this cell (and not an old cell)
-      // make sure to use _photoModel instance variable as photo may change when cell is reused,
-      // where as local variable will never change
-      if (locationModel == _photoModel.location) {
-        _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
-        [self setNeedsLayout];
-      }
-    }];
+    _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
     
     _photoTimeIntervalSincePostLabel = [self createLayerBackedTextNodeWithString:[photo uploadDateAttributedStringWithFontSize:FONT_SIZE]];
     _photoLikesLabel                 = [self createLayerBackedTextNodeWithString:[photo likesAttributedStringWithFontSize:FONT_SIZE]];

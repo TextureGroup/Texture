@@ -38,7 +38,6 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 - (PhotoModel *)objectAtIndex:(NSUInteger)index;
 - (NSInteger)indexOfPhotoModel:(PhotoModel *)photoModel;
 
-- (void)updatePhotoFeedModelTypeLocationCoordinates:(CLLocationCoordinate2D)coordinate radiusInMiles:(NSUInteger)radius;
 - (void)updatePhotoFeedModelTypeUserId:(NSUInteger)userID;
 
 - (void)clearFeed;
