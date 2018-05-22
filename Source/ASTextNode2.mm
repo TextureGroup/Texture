@@ -895,8 +895,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
   ASLockScopeSelf();
-  BOOL changed = ASCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize);
-  if (changed) {
+  if (ASCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize)) {
     [self setNeedsDisplay];
   }
 }
@@ -944,7 +943,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSArray *)pointSizeScaleFactors
 {
-  return _pointSizeScaleFactors;
+  return ASLockedSelf(_pointSizeScaleFactors);
 }
 
 #pragma mark - Truncation Message
