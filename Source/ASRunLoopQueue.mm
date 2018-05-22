@@ -165,6 +165,29 @@ static void runLoopSourceCallback(void *info) {
   _thread = nil;
 }
 
+- (void)drain
+{
+  [self performSelector:@selector(_test_drain) onThread:_thread withObject:nil waitUntilDone:YES];
+}
+
+- (void)_drain
+{
+  while (true) {
+    @autoreleasepool {
+      _queueLock.lock();
+      std::deque<id> currentQueue = _queue;
+      _queue = std::deque<id>();
+      _queueLock.unlock();
+
+      if (currentQueue.empty()) {
+        return;
+      } else {
+        currentQueue.clear();
+      }
+    }
+  }
+}
+
 - (void)_stop
 {
   CFRunLoopStop(CFRunLoopGetCurrent());
@@ -188,6 +211,7 @@ static void runLoopSourceCallback(void *info) {
   if (self = [super init]) {
     _condition = [[NSCondition alloc] init];
     _thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil];
+    _thread.name = @"ASDeallocQueue";
     [_thread start];
   }
   return self;
@@ -213,14 +237,7 @@ static void runLoopSourceCallback(void *info) {
     [NSThread sleepForTimeInterval:0.100];
     
     // Drain.
-    @autoreleasepool {
-      [_condition lock];
-      // Use move to avoid extra retain/release pairs.
-      auto q = std::move(_queue);
-      [_condition unlock];
-      // Explicit clear is probably overkill but makes behavior explicit.
-      q.clear();
-    }
+    [self drain];
   }
 }
 
@@ -231,6 +248,18 @@ static void runLoopSourceCallback(void *info) {
   *objectPtr = nil;
   if (_queue.size() == 1) {
     [_condition signal];
+  }
+}
+
+- (void)drain
+{
+  @autoreleasepool {
+    [_condition lock];
+    // Use move to avoid extra retain/release pairs.
+    auto q = std::move(_queue);
+    [_condition unlock];
+    // Explicit clear is probably overkill but makes behavior explicit.
+    q.clear();
   }
 }
 
