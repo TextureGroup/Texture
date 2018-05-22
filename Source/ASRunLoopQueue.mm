@@ -167,7 +167,7 @@ static void runLoopSourceCallback(void *info) {
 
 - (void)drain
 {
-  [self performSelector:@selector(_test_drain) onThread:_thread withObject:nil waitUntilDone:YES];
+  [self performSelector:@selector(_drain) onThread:_thread withObject:nil waitUntilDone:YES];
 }
 
 - (void)_drain
