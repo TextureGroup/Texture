@@ -221,7 +221,7 @@ static void runLoopSourceCallback(void *info) {
   }
   
   _lock.lock();
-  auto firstEntry = _queue.empty();
+  auto isFirstEntry = _queue.empty();
   // Transfer the +1 into our queue. Emits no retain/release.
   _queue.push_back((__bridge_transfer id)*cfPtr);
   // Clear their pointer since we just took it out of ARC. As far as they're concerned, it's gone.
@@ -230,7 +230,7 @@ static void runLoopSourceCallback(void *info) {
   *cfPtr = NULL;
   _lock.unlock();
   
-  if (firstEntry) {
+  if (isFirstEntry) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.100 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
       [self drain];
     });
