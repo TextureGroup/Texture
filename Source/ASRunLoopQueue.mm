@@ -215,7 +215,7 @@ static void runLoopSourceCallback(void *info) {
   NSParameterAssert(objectPtr != NULL);
   
   // Cast to CFType so we can manipulate retain count manually.
-  auto cfPtr = (void *)objectPtr;
+  auto cfPtr = (CFTypeRef *)(void *)objectPtr;
   if (!cfPtr || !*cfPtr) {
     return;
   }
