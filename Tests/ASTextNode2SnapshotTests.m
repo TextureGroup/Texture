@@ -31,7 +31,7 @@
   config.experimentalFeatures = ASExperimentalTextNode;
   [ASConfigurationManager test_resetWithConfiguration:config];
 
-  self.recordMode = YES;
+  self.recordMode = NO;
 }
 
 - (void)testTextContainerInset
