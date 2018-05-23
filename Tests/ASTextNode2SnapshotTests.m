@@ -25,7 +25,7 @@
 {
   [super setUp];
 
-  // This will use ASTextNode2 for snapshot tests
+  // This will use ASTextNode2 for snapshot tests.
   // All tests are duplicated from ASTextNodeSnapshotTests.
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
   config.experimentalFeatures = ASExperimentalTextNode;
