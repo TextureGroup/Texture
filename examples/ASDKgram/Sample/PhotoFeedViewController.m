@@ -21,7 +21,6 @@
 #import "Utilities.h"
 #import "PhotoTableViewCell.h"
 #import "PhotoFeedModel.h"
-#import "CommentView.h"
 
 #define AUTO_TAIL_LOADING_NUM_SCREENFULS  2.5
 
@@ -73,33 +72,7 @@
 {
   [self.photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
     [self insertNewRows:newPhotos];
-    [self requestCommentsForPhotos:newPhotos];
   } numResultsToReturn:20];
-}
-
-- (void)requestCommentsForPhotos:(NSArray *)newPhotos
-{
-  for (PhotoModel *photo in newPhotos) {
-    [photo.commentFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
-      
-      NSInteger rowNum         = [self.photoFeed indexOfPhotoModel:photo];
-      NSIndexPath *cellPath    = [NSIndexPath indexPathForRow:rowNum inSection:0];
-      PhotoTableViewCell *cell = [_tableView cellForRowAtIndexPath:cellPath];
-      
-      if (cell) {
-        [cell loadCommentsForPhoto:photo];
-        [_tableView beginUpdates];
-        [_tableView endUpdates];
-        
-        // adjust scrollView contentOffset if inserting above visible cells
-        NSIndexPath *visibleCellPath = [_tableView indexPathForCell:_tableView.visibleCells.firstObject];
-        if (cellPath.row < visibleCellPath.row) {
-          CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:self.view.bounds.size.width];
-          _tableView.contentOffset = CGPointMake(_tableView.contentOffset.x, _tableView.contentOffset.y + commentViewHeight);
-        }
-      }
-    }];
-  }
 }
 
 #pragma mark - UITableViewDataSource methods

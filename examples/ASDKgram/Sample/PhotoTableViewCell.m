@@ -21,7 +21,6 @@
 #import "Utilities.h"
 #import "PINImageView+PINRemoteImage.h"
 #import "PINButton+PINRemoteImage.h"
-#import "CommentView.h"
 
 #define DEBUG_PHOTOCELL_LAYOUT  0
 #define USE_UIKIT_AUTOLAYOUT    1
@@ -36,7 +35,6 @@
 @implementation PhotoTableViewCell
 {
   PhotoModel   *_photoModel;
-  CommentView  *_photoCommentsView;
   
   UIImageView  *_userAvatarImageView;
   UIImageView  *_photoImageView;
@@ -66,9 +64,7 @@
                                                                                   options:NSStringDrawingUsesLineFragmentOrigin
                                                                                   context:nil].size.height;
   
-  CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:availableWidth];
-  
-  return HEADER_HEIGHT + photoHeight + likesHeight + descriptionHeight + commentViewHeight + (4 * VERTICAL_BUFFER);
+  return HEADER_HEIGHT + photoHeight + likesHeight + descriptionHeight + (4 * VERTICAL_BUFFER);
 }
 
 #pragma mark - Lifecycle
@@ -78,8 +74,6 @@
   self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
   
   if (self) {
-    
-    _photoCommentsView                   = [[CommentView alloc] init];
     _userAvatarImageView                 = [[UIImageView alloc] init];
     _photoImageView                      = [[UIImageView alloc] init];
     _photoImageView.contentMode          = UIViewContentModeScaleAspectFill;
@@ -90,7 +84,6 @@
     _photoDescriptionLabel               = [[UILabel alloc] init];
     _photoDescriptionLabel.numberOfLines = 3;
 
-    [self addSubview:_photoCommentsView];
     [self addSubview:_userAvatarImageView];
     [self addSubview:_photoImageView];
     [self addSubview:_userNameLabel];
@@ -100,7 +93,6 @@
     [self addSubview:_photoDescriptionLabel];
 
 #if USE_UIKIT_AUTOLAYOUT
-    [_photoCommentsView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_userAvatarImageView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_photoImageView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_userNameLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -108,7 +100,6 @@
     [_photoTimeIntervalSincePostLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_photoLikesLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [_photoDescriptionLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [_photoCommentsView setTranslatesAutoresizingMaskIntoConstraints:NO];
     
     [self setupConstraints];
     [self updateConstraints];
@@ -119,7 +110,6 @@
     _userNameLabel.backgroundColor                    = [UIColor greenColor];
     _photoLocationLabel.backgroundColor               = [UIColor greenColor];
     _photoTimeIntervalSincePostLabel.backgroundColor  = [UIColor greenColor];
-    _photoCommentsView.backgroundColor                = [UIColor greenColor];
     _photoDescriptionLabel.backgroundColor            = [UIColor greenColor];
     _photoLikesLabel.backgroundColor                  = [UIColor greenColor];
 #endif
@@ -314,31 +304,6 @@
                                                    attribute:NSLayoutAttributeWidth
                                                   multiplier:1.0
                                                     constant:-HORIZONTAL_BUFFER]];
-  
-  // _photoCommentsView
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_photoCommentsView
-                                                   attribute:NSLayoutAttributeTop
-                                                   relatedBy:NSLayoutRelationEqual
-                                                      toItem:_photoDescriptionLabel
-                                                   attribute:NSLayoutAttributeBottom
-                                                  multiplier:1.0
-                                                    constant:VERTICAL_BUFFER]];
-  
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_photoCommentsView
-                                                   attribute:NSLayoutAttributeLeft
-                                                   relatedBy:NSLayoutRelationEqual
-                                                      toItem:_photoCommentsView.superview
-                                                   attribute:NSLayoutAttributeLeft
-                                                  multiplier:1.0
-                                                    constant:HORIZONTAL_BUFFER]];
-  
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_photoCommentsView
-                                                   attribute:NSLayoutAttributeWidth
-                                                   relatedBy:NSLayoutRelationEqual
-                                                      toItem:_photoCommentsView.superview
-                                                   attribute:NSLayoutAttributeWidth
-                                                  multiplier:1.0
-                                                    constant:-HORIZONTAL_BUFFER]];
 }
 
 - (void)updateConstraints
@@ -405,20 +370,12 @@
   rect.size.width = MIN(boundsSize.width - HORIZONTAL_BUFFER * 2, rect.size.width);
   rect.origin.y = CGRectGetMaxY(_photoLikesLabel.frame) + VERTICAL_BUFFER;
   _photoDescriptionLabel.frame = rect;
-
-  rect.size = _photoCommentsView.bounds.size;
-  rect.size.width = boundsSize.width - HORIZONTAL_BUFFER * 2;
-  rect.origin.y = CGRectGetMaxY(_photoDescriptionLabel.frame) + VERTICAL_BUFFER;
-  _photoCommentsView.frame = rect;
 #endif
 }
 
 - (void)prepareForReuse
 {
   [super prepareForReuse];
-  
-  _photoCommentsView.frame                        = CGRectZero;   // next cell might not have a _photoCommentsView
-  [_photoCommentsView updateWithCommentFeedModel:nil];
   
   _userAvatarImageView.image                      = nil;
   _photoImageView.image                           = nil;
@@ -454,7 +411,6 @@
   }];
   
   [self downloadAndProcessUserAvatarForPhoto:photo];
-  [self loadCommentsForPhoto:photo];
   
   //update location
   _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
@@ -464,21 +420,6 @@
     [self updateConstraints];
     [self setNeedsLayout];
   });
-}
-
-- (void)loadCommentsForPhoto:(PhotoModel *)photo
-{
-  if (photo.commentFeed.numberOfItemsInFeed > 0) {
-    [_photoCommentsView updateWithCommentFeedModel:photo.commentFeed];
-    
-    CGRect frame             = _photoCommentsView.frame;
-    CGFloat availableWidth   = (self.bounds.size.width - HORIZONTAL_BUFFER * 2);
-    frame.size.width         = availableWidth;
-    frame.size.height        = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:availableWidth];
-    _photoCommentsView.frame = frame;
-    
-    [self setNeedsLayout];
-  }
 }
 
 #pragma mark - Helper Methods

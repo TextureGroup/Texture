@@ -34,6 +34,5 @@
 #pragma mark - Subclasses must override these methods
 
 - (void)loadPage;
-- (void)requestCommentsForPhotos:(NSArray *)newPhotos;
 
 @end

@@ -18,7 +18,6 @@
 //
 
 #import "UserModel.h"
-#import "CommentFeedModel.h"
 #import <IGListKit/IGListKit.h>
 
 @interface PhotoModel : NSObject <IGListDiffable>
@@ -30,7 +29,6 @@
 @property (nonatomic, assign, readonly) NSUInteger             likesCount;
 @property (nonatomic, strong, readonly) NSString               *location;
 @property (nonatomic, strong, readonly) UserModel              *ownerUserProfile;
-@property (nonatomic, strong, readonly) CommentFeedModel       *commentFeed;
 @property (nonatomic, assign, readonly) NSUInteger             width;
 @property (nonatomic, assign, readonly) NSUInteger             height;
 

@@ -23,7 +23,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 
 #import "Utilities.h"
-#import "CommentsNode.h"
 #import "PINImageView+PINRemoteImage.h"
 #import "PINButton+PINRemoteImage.h"
 
@@ -50,7 +49,6 @@
 @implementation PhotoCellNode
 {
   PhotoModel          *_photoModel;
-  CommentsNode        *_photoCommentsNode;
   ASNetworkImageNode  *_userAvatarImageNode;
   ASNetworkImageNode  *_photoImageNode;
   ASTextNode          *_userNameLabel;
@@ -95,10 +93,6 @@
     _photoLikesLabel                 = [self createLayerBackedTextNodeWithString:[photo likesAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel           = [self createLayerBackedTextNodeWithString:[photo descriptionAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel.maximumNumberOfLines = 3;
-    
-    _photoCommentsNode = [[CommentsNode alloc] init];
-    
-    _photoCommentsNode.layerBacked = YES;
     
     // instead of adding everything addSubnode:
     self.automaticallyManagesSubnodes = YES;
@@ -166,7 +160,7 @@
     // Create the last stack before assembling everything: the Footer Stack contains the description and comments.
     ASStackLayoutSpec *footerStack = [ASStackLayoutSpec verticalStackLayoutSpec];
     footerStack.spacing = VERTICAL_BUFFER;
-    footerStack.children = @[_photoLikesLabel, _photoDescriptionLabel, _photoCommentsNode];
+    footerStack.children = @[_photoLikesLabel, _photoDescriptionLabel];
 
     // Main Vertical Stack: contains header, large main photo with fixed aspect ratio, and footer.
     ASStackLayoutSpec *verticalStack = [ASStackLayoutSpec verticalStackLayoutSpec];
@@ -259,8 +253,7 @@
                   alignItems:ASStackLayoutAlignItemsStretch
                   children:@[
                              _photoLikesLabel,
-                             _photoDescriptionLabel,
-                             _photoCommentsNode
+                             _photoDescriptionLabel
                              ]]
                  ]
             ]];
@@ -273,10 +266,6 @@
 - (void)didEnterPreloadState
 {
   [super didEnterPreloadState];
-  
-  [_photoModel.commentFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
-    [self loadCommentsForPhoto:_photoModel];
-  }];
 }
 
 #pragma mark - Network Image Delegate
@@ -300,15 +289,6 @@
   textNode.layerBacked      = YES;
   textNode.attributedText = attributedString;
   return textNode;
-}
-
-- (void)loadCommentsForPhoto:(PhotoModel *)photo
-{
-  if (photo.commentFeed.numberOfItemsInFeed > 0) {
-    [_photoCommentsNode updateWithCommentFeedModel:photo.commentFeed];
-    
-    [self setNeedsLayout];
-  }
 }
 
 - (void)setupYogaLayoutIfNeeded

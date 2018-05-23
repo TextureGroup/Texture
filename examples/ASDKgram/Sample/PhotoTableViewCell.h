@@ -17,7 +17,6 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <CoreLocation/CLLocation.h>
 #import "PhotoModel.h"
 
 @interface PhotoTableViewCell : UITableViewCell
@@ -25,6 +24,5 @@
 + (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width;
 
 - (void)updateCellWithPhotoObject:(PhotoModel *)photo;
-- (void)loadCommentsForPhoto:(PhotoModel *)photo;
 
 @end

@@ -60,7 +60,6 @@
     [_activityIndicatorView stopAnimating];
     
     [self.tableView reloadData];
-    [self requestCommentsForPhotos:newPhotos];
     
     // immediately start second larger fetch
     [self loadPage];
@@ -112,11 +111,6 @@
 }
 
 - (void)loadPage
-{
-  NSAssert(NO, @"Subclasses must override this method");
-}
-
-- (void)requestCommentsForPhotos:(NSArray *)newPhotos
 {
   NSAssert(NO, @"Subclasses must override this method");
 }

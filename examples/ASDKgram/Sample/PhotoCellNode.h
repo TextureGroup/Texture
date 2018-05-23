@@ -17,7 +17,6 @@
 //  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import <CoreLocation/CLLocation.h>
 #import "PhotoModel.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import "PhotoTableViewCell.h"   // PhotoTableViewCellProtocol

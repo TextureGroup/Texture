@@ -22,18 +22,6 @@
 {
   NSDictionary     *_dictionaryRepresentation;
   NSString         *_uploadDateRaw;
-  CommentFeedModel *_commentFeed;
-}
-
-#pragma mark - Properties
-
-- (CommentFeedModel *)commentFeed
-{
-  if (!_commentFeed) {
-    _commentFeed = [[CommentFeedModel alloc] initWithPhotoID:_photoID];
-  }
-  
-  return _commentFeed;
 }
 
 #pragma mark - Lifecycle
