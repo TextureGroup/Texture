@@ -311,6 +311,9 @@
 		B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943121A1575630030A7D0 /* AssetsLibrary.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.m */; };
 		BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.m */; };
+		C50B382820B68669004C1D6B /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C52B15B020B68083004AA8E6 /* PINCache.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C50B382920B68669004C1D6B /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C52B15AE20B68083004AA8E6 /* PINOperation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C50B382A20B68669004C1D6B /* PINRemoteImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C52B15AF20B68083004AA8E6 /* PINRemoteImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C78F7E2B1BF7809800CDEAFC /* ASTableNode.h in Headers */ = {isa = PBXBuildFile; fileRef = B0F880581BEAEC7500D17647 /* ASTableNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A091E60BEB400626263 /* ASDisplayNode+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */; };
@@ -816,6 +819,10 @@
 		BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASNavigationControllerTests.m; sourceTree = "<group>"; };
 		BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTabBarControllerTests.m; sourceTree = "<group>"; };
 		BDC2D162BD55A807C1475DA5 /* Pods-AsyncDisplayKitTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.profile.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.profile.xcconfig"; sourceTree = "<group>"; };
+		C52B15AD20B68068004AA8E6 /* AsyncDisplayKit copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "AsyncDisplayKit copy2-Info.plist"; path = "/Users/svpcadmin/Projects/com/github/fumito-ito/Texture/AsyncDisplayKit copy2-Info.plist"; sourceTree = "<absolute>"; };
+		C52B15AE20B68083004AA8E6 /* PINOperation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINOperation.framework; path = Carthage/Build/iOS/PINOperation.framework; sourceTree = "<group>"; };
+		C52B15AF20B68083004AA8E6 /* PINRemoteImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINRemoteImage.framework; path = Carthage/Build/iOS/PINRemoteImage.framework; sourceTree = "<group>"; };
+		C52B15B020B68083004AA8E6 /* PINCache.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINCache.framework; path = Carthage/Build/iOS/PINCache.framework; sourceTree = "<group>"; };
 		CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Convenience.h"; sourceTree = "<group>"; };
 		CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ASDisplayNode+Convenience.m"; sourceTree = "<group>"; };
 		CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AsyncDisplayKit+IGListKitMethods.h"; sourceTree = "<group>"; };
@@ -1035,6 +1042,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C50B382820B68669004C1D6B /* PINCache.framework in Frameworks */,
+				C50B382920B68669004C1D6B /* PINOperation.framework in Frameworks */,
+				C50B382A20B68669004C1D6B /* PINRemoteImage.framework in Frameworks */,
 				92DD2FE61BF4D05E0074C9DD /* MapKit.framework in Frameworks */,
 				B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */,
 				B350625D1B0111740018CF92 /* Photos.framework in Frameworks */,
@@ -1074,6 +1084,7 @@
 				058D09AE195D04C000B7D73C /* Frameworks */,
 				058D09AD195D04C000B7D73C /* Products */,
 				FD40E2760492F0CAAEAD552D /* Pods */,
+				C52B15AD20B68068004AA8E6 /* AsyncDisplayKit copy2-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -1093,6 +1104,9 @@
 		058D09AE195D04C000B7D73C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C52B15B020B68083004AA8E6 /* PINCache.framework */,
+				C52B15AE20B68083004AA8E6 /* PINOperation.framework */,
+				C52B15AF20B68083004AA8E6 /* PINRemoteImage.framework */,
 				92DD2FE51BF4D05E0074C9DD /* MapKit.framework */,
 				051943141A1575670030A7D0 /* Photos.framework */,
 				051943121A1575630030A7D0 /* AssetsLibrary.framework */,
@@ -2695,12 +2709,16 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks $(FRAMEWORK_SEARCH_PATHS)";
 				MODULEMAP_FILE = Source/AsyncDisplayKit.modulemap;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-Wundef";
@@ -2725,11 +2743,15 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks $(FRAMEWORK_SEARCH_PATHS)";
 				MODULEMAP_FILE = Source/AsyncDisplayKit.modulemap;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-Wundef";
@@ -2838,12 +2860,16 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "PROFILE=1";
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks $(FRAMEWORK_SEARCH_PATHS)";
 				MODULEMAP_FILE = Source/AsyncDisplayKit.modulemap;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-Wundef";
