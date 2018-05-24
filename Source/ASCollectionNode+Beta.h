@@ -29,16 +29,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @default [ASCollectionView class] is used whenever this property is unset or nil.
  */
-@property (nonatomic, nullable) Class collectionViewClass;
+@property (nullable, nonatomic) Class collectionViewClass;
 
 /**
  * The elements that are currently displayed. The "UIKit index space". Must be accessed on main thread.
  */
 @property (nonatomic, readonly) ASElementMap *visibleElements;
 
-@property (atomic, readonly, nullable) id<ASCollectionLayoutDelegate> layoutDelegate;
+@property (nullable, readonly) id<ASCollectionLayoutDelegate> layoutDelegate;
 
-@property (nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
+@property (nullable, nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
 
 /**
  * When this mode is enabled, ASCollectionView matches the timing of UICollectionView as closely as possible, 

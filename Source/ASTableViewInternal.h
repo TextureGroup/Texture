@@ -25,7 +25,7 @@
 @interface ASTableView (Internal)
 
 @property (nonatomic, readonly) ASDataController *dataController;
-@property (nonatomic, weak, readwrite) ASTableNode *tableNode;
+@property (nonatomic, weak) ASTableNode *tableNode;
 @property (nonatomic, readonly) ASRangeController *rangeController;
 
 /**

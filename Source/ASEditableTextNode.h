@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
              placeholderTextKitComponents:(ASTextKitComponents *)placeholderTextKitComponents;
 
 //! @abstract The text node's delegate, which must conform to the <ASEditableTextNodeDelegate> protocol.
-@property (nullable, atomic, weak) id <ASEditableTextNodeDelegate> delegate;
+@property (nullable, weak) id <ASEditableTextNodeDelegate> delegate;
 
 #pragma mark - Configuration
 
@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, id> *typingAttributes;
 
 //! @abstract The range of text currently selected. If length is zero, the range is the cursor location.
-@property (atomic) NSRange selectedRange;
+@property NSRange selectedRange;
 
 #pragma mark - Placeholder
 /**

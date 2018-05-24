@@ -36,7 +36,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * Note: You cannot mutate this.
  */
-@property (class, atomic, readonly) ASIntegerMap *identityMap;
+@property (class, readonly) ASIntegerMap *identityMap;
 + (ASIntegerMap *)identityMap NS_RETURNS_RETAINED;
 
 /**
@@ -44,7 +44,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * Note: You cannot mutate this.
  */
-@property (class, atomic, readonly) ASIntegerMap *emptyMap;
+@property (class, readonly) ASIntegerMap *emptyMap;
 + (ASIntegerMap *)emptyMap NS_RETURNS_RETAINED;
 
 /**

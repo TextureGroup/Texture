@@ -57,11 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
  *   that it's always safe simply to retain it, and copy if needed. Since @c UICollectionViewLayoutAttributes
  *   is always mutable, @c copy is never "free" like it is for e.g. NSString.
  */
-@property (nonatomic, strong, nullable) UICollectionViewLayoutAttributes *layoutAttributes;
+@property (nullable, nonatomic) UICollectionViewLayoutAttributes *layoutAttributes;
 
-@property (atomic, weak, nullable) ASCollectionElement *collectionElement;
+@property (weak, nullable) ASCollectionElement *collectionElement;
 
-@property (atomic, weak, nullable) id<ASRangeManagingNode> owningNode;
+@property (weak, nullable) id<ASRangeManagingNode> owningNode;
 
 @property (nonatomic, readonly) BOOL shouldUseUIKitCell;
 
@@ -75,9 +75,9 @@ typedef UICollectionReusableView * _Nonnull(^ASViewForSupplementaryBlock)(ASWrap
 
 @interface ASWrapperCellNode : ASCellNode
 
-@property (nonatomic, copy, readonly) ASSizeForItemBlock sizeForItemBlock;
-@property (nonatomic, copy, readonly) ASCellForItemBlock cellForItemBlock;
-@property (nonatomic, copy, readonly) ASViewForSupplementaryBlock viewForSupplementaryBlock;
+@property (nonatomic, readonly) ASSizeForItemBlock sizeForItemBlock;
+@property (nonatomic, readonly) ASCellForItemBlock cellForItemBlock;
+@property (nonatomic, readonly) ASViewForSupplementaryBlock viewForSupplementaryBlock;
 
 @end
 

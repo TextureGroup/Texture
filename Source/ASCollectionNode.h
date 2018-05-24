@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return view The corresponding ASCollectionView.
  */
-@property (atomic, readonly) ASCollectionView *view;
+@property (readonly) ASCollectionView *view;
 
 /**
  * The object that acts as the asynchronous delegate of the collection view
@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The delegate object is responsible for providing size constraints for nodes and indicating whether batch fetching should begin.
  * @note This is a convenience method which sets the asyncDelegate on the collection node's collection view.
  */
-@property (nullable, atomic, weak) id <ASCollectionDelegate>   delegate;
+@property (nullable, weak) id <ASCollectionDelegate>   delegate;
 
 /**
  * The object that acts as the asynchronous data source of the collection view
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The datasource object is responsible for providing nodes or node creation blocks to the collection view.
  * @note This is a convenience method which sets the asyncDatasource on the collection node's collection view.
  */
-@property (nullable, atomic, weak) id <ASCollectionDataSource> dataSource;
+@property (nullable, weak) id <ASCollectionDataSource> dataSource;
 
 /**
  * The number of screens left to scroll before the delegate -collectionNode:beginBatchFetchingWithContext: is called.
@@ -428,7 +428,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The index paths of the selected items, or @c nil if no items are selected.
  */
-@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedItems;
+@property (nullable, nonatomic, copy, readonly) NSArray<NSIndexPath *> *indexPathsForSelectedItems;
 
 /**
  * Selects the item at the specified index path and optionally scrolls it into view.

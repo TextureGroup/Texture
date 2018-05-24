@@ -39,11 +39,11 @@
 }
 
 
-@property (atomic, readwrite) ASInterfaceState interfaceState;
-@property (atomic, readonly) ASDisplayNode *spinner;
-@property (atomic, readwrite) ASDisplayNode *playerNode;
-@property (atomic, readwrite) AVPlayer *player;
-@property (atomic, readwrite) BOOL shouldBePlaying;
+@property ASInterfaceState interfaceState;
+@property (readonly) ASDisplayNode *spinner;
+@property ASDisplayNode *playerNode;
+@property AVPlayer *player;
+@property BOOL shouldBePlaying;
 
 - (void)setVideoPlaceholderImage:(UIImage *)image;
 - (void)prepareToPlayAsset:(AVAsset *)asset withKeys:(NSArray *)requestedKeys;

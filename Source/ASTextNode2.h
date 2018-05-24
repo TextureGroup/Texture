@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion Defaults to nil, no text is shown.
  For inline image attachments, add an attribute of key NSAttachmentAttributeName, with a value of an NSTextAttachment.
  */
-@property (nullable, atomic, copy) NSAttributedString *attributedText;
+@property (nullable, copy) NSAttributedString *attributedText;
 
 #pragma mark - Truncation
 
@@ -34,37 +34,37 @@ NS_ASSUME_NONNULL_BEGIN
  @abstract The attributedText to use when the text must be truncated.
  @discussion Defaults to a localized ellipsis character.
  */
-@property (nullable, atomic, copy) NSAttributedString *truncationAttributedText;
+@property (nullable, copy) NSAttributedString *truncationAttributedText;
 
 /**
  @summary The second attributed string appended for truncation.
  @discussion This string will be highlighted on touches.
  @default nil
  */
-@property (nullable, atomic, copy) NSAttributedString *additionalTruncationMessage;
+@property (nullable, copy) NSAttributedString *additionalTruncationMessage;
 
 /**
  @abstract Determines how the text is truncated to fit within the receiver's maximum size.
  @discussion Defaults to NSLineBreakByWordWrapping.
  @note Setting a truncationMode in attributedString will override the truncation mode set here.
  */
-@property (atomic) NSLineBreakMode truncationMode;
+@property NSLineBreakMode truncationMode;
 
 /**
  @abstract If the text node is truncated. Text must have been sized first.
  */
-@property (atomic, readonly, getter=isTruncated) BOOL truncated;
+@property (readonly, getter=isTruncated) BOOL truncated;
 
 /**
  @abstract The maximum number of lines to render of the text before truncation.
  @default 0 (No limit)
  */
-@property (atomic) NSUInteger maximumNumberOfLines;
+@property NSUInteger maximumNumberOfLines;
 
 /**
  @abstract The number of lines in the text. Text must have been sized first.
  */
-@property (atomic, readonly) NSUInteger lineCount;
+@property (readonly) NSUInteger lineCount;
 
 /**
  * An array of path objects representing the regions where text should not be displayed.
@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the text node's bounds. You can use this property to have text wrap around images,
  * shapes or other text like a fancy magazine.
  */
-@property (nullable, atomic, copy) NSArray<UIBezierPath *> *exclusionPaths;
+@property (nullable, copy) NSArray<UIBezierPath *> *exclusionPaths;
 
 #pragma mark - Placeholders
 
@@ -85,17 +85,17 @@ NS_ASSUME_NONNULL_BEGIN
  * following the true shape of the text's wrapping.  This visually mirrors the overall
  * shape and weight of paragraphs, making the appearance of the finished text less jarring.
  */
-@property (atomic) BOOL placeholderEnabled;
+@property BOOL placeholderEnabled;
 
 /**
  @abstract The placeholder color.
  */
-@property (nullable, atomic, copy) UIColor *placeholderColor;
+@property (nullable, copy) UIColor *placeholderColor;
 
 /**
  @abstract Inset each line of the placeholder.
  */
-@property (atomic) UIEdgeInsets placeholderInsets;
+@property UIEdgeInsets placeholderInsets;
 
 #pragma mark - Shadow
 
@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
  textNode:longPressedLinkAttribute:value:atPoint:textRange: in order for
  the long press gesture recognizer to be installed.
  */
-@property (atomic, weak) id<ASTextNodeDelegate> delegate;
+@property (weak) id<ASTextNodeDelegate> delegate;
 
 /**
  @abstract If YES and a long press is recognized, touches are cancelled. Default is NO

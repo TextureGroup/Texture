@@ -242,9 +242,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UICollectionViewScrollPosition)scrollPosition ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
 
-@property (nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
+@property (nonatomic, copy, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
 
-@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
+@property (nullable, nonatomic, copy, readonly) NSArray<NSIndexPath *> *indexPathsForSelectedItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
 
 /**
  *  Perform a batch of updates asynchronously, optionally disabling all animations in the batch. This method must be called from the main thread.

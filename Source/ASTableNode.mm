@@ -79,7 +79,7 @@
   id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 
-@property (nonatomic, strong) _ASTablePendingState *pendingState;
+@property (nonatomic) _ASTablePendingState *pendingState;
 @end
 
 @implementation ASTableNode

@@ -83,7 +83,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 @interface _ASTableViewCell : UITableViewCell
 @property (nonatomic, weak) id<_ASTableViewCellDelegate> delegate;
 @property (nonatomic, readonly) ASCellNode *node;
-@property (nonatomic, strong) ASCollectionElement *element;
+@property (nonatomic) ASCollectionElement *element;
 @end
 
 @implementation _ASTableViewCell
@@ -279,7 +279,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } _asyncDataSourceFlags;
 }
 
-@property (nonatomic, readwrite) ASDataController *dataController;
+@property (nonatomic) ASDataController *dataController;
 
 @property (nonatomic, weak)   ASTableNode *tableNode;
 

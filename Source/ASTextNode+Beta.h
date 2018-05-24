@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Returns YES if this node is using the experimental implementation. NO otherwise. Will not change.
  */
-@property (atomic, readonly) BOOL usingExperiment;
+@property (readonly) BOOL usingExperiment;
 
 @end
 

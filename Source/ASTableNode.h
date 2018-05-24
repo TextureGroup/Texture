@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init; // UITableViewStylePlain
 - (instancetype)initWithStyle:(UITableViewStyle)style NS_DESIGNATED_INITIALIZER;
 
-@property (atomic, readonly) ASTableView *view;
+@property (readonly) ASTableView *view;
 
 // These properties can be set without triggering the view to be created, so it's fine to set them in -init.
 @property (nullable, weak, nonatomic) id <ASTableDelegate>   delegate;
@@ -444,7 +444,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion This method must be called from the main thread.
  */
-@property (nonatomic, readonly, nullable) NSIndexPath *indexPathForSelectedRow;
+@property (nullable, nonatomic, copy, readonly) NSIndexPath *indexPathForSelectedRow;
 
 @property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedRows;
 

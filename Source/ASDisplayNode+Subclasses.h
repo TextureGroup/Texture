@@ -134,7 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @warning Subclasses must not override this; it returns the last cached layout and is never expensive.
  */
-@property (nullable, atomic, readonly) ASLayout *calculatedLayout;
+@property (nullable, readonly) ASLayout *calculatedLayout;
 
 #pragma mark - View Lifecycle
 /** @name View Lifecycle */
@@ -371,7 +371,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract Whether the view or layer of this display node is currently in a window
  */
-@property (atomic, readonly, getter=isInHierarchy) BOOL inHierarchy;
+@property (readonly, getter=isInHierarchy) BOOL inHierarchy;
 
 /**
  * Provides an opportunity to clear backing store and other memory-intensive intermediates, such as text layout managers
@@ -440,7 +440,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @see setNeedsDisplayAtScale:
  */
-@property (atomic, readonly) CGFloat contentsScaleForDisplay;
+@property (readonly) CGFloat contentsScaleForDisplay;
 
 
 #pragma mark - Touch handling

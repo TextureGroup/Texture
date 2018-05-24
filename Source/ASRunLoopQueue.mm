@@ -349,7 +349,7 @@ typedef enum {
 #endif
 }
 
-@property (nonatomic, copy) void (^queueConsumer)(id dequeuedItem, BOOL isQueueDrained);
+@property (nonatomic) void (^queueConsumer)(id dequeuedItem, BOOL isQueueDrained);
 
 @end
 

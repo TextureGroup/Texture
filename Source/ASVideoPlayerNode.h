@@ -49,20 +49,20 @@ NS_ASSUME_NONNULL_BEGIN
  * When shouldAutoplay is set to true, a video node will play when it has both loaded and entered the "visible" interfaceState.
  * If it leaves the visible interfaceState it will pause but will resume once it has returned.
  */
-@property (nonatomic, readwrite) BOOL shouldAutoPlay;
-@property (nonatomic, readwrite) BOOL shouldAutoRepeat;
-@property (nonatomic, readwrite) BOOL muted;
+@property (nonatomic) BOOL shouldAutoPlay;
+@property (nonatomic) BOOL shouldAutoRepeat;
+@property (nonatomic) BOOL muted;
 @property (nonatomic, readonly) ASVideoNodePlayerState playerState;
-@property (nonatomic, readwrite) BOOL shouldAggressivelyRecoverFromStall;
-@property (nullable, nonatomic, readwrite) NSURL *placeholderImageURL;
+@property (nonatomic) BOOL shouldAggressivelyRecoverFromStall;
+@property (nullable, nonatomic) NSURL *placeholderImageURL;
 
-@property (nullable, nonatomic, readwrite) AVAsset *asset;
+@property (nullable, nonatomic) AVAsset *asset;
 /**
  ** @abstract The URL with which the asset was initialized.
  ** @discussion Setting the URL will override the current asset with a newly created AVURLAsset created from the given URL, and AVAsset *asset will point to that newly created AVURLAsset.  Please don't set both assetURL and asset.
  ** @return Current URL the asset was initialized or nil if no URL was given.
  **/
-@property (nullable, nonatomic, readwrite) NSURL *assetURL;
+@property (nullable, nonatomic) NSURL *assetURL;
 
 /// You should never set any value on the backing video node. Use exclusivively the video player node to set properties
 @property (nonatomic, readonly) ASVideoNode *videoNode;

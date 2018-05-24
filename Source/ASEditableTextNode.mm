@@ -31,14 +31,14 @@
 **/
 @interface _ASTextInputTraitsPendingState : NSObject
 
-@property (atomic) UITextAutocapitalizationType autocapitalizationType;
-@property (atomic) UITextAutocorrectionType autocorrectionType;
-@property (atomic) UITextSpellCheckingType spellCheckingType;
-@property (atomic) UIKeyboardAppearance keyboardAppearance;
-@property (atomic) UIKeyboardType keyboardType;
-@property (atomic) UIReturnKeyType returnKeyType;
-@property (atomic) BOOL enablesReturnKeyAutomatically;
-@property (atomic, getter=isSecureTextEntry) BOOL secureTextEntry;
+@property UITextAutocapitalizationType autocapitalizationType;
+@property UITextAutocorrectionType autocorrectionType;
+@property UITextSpellCheckingType spellCheckingType;
+@property UIKeyboardAppearance keyboardAppearance;
+@property UIKeyboardType keyboardType;
+@property UIReturnKeyType returnKeyType;
+@property BOOL enablesReturnKeyAutomatically;
+@property (getter=isSecureTextEntry) BOOL secureTextEntry;
 
 @end
 

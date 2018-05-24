@@ -26,7 +26,7 @@
 /**
  Simple state identifier to allow control of current spec inside of the layoutSpecBlock
  */
-@property (strong, nonatomic) NSNumber *layoutState;
+@property (nonatomic) NSNumber *layoutState;
 
 @end
 

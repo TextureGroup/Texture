@@ -96,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The underlying ASCollectionView object.
  */
-@property (atomic, readonly) ASCollectionView *view;
+@property (readonly) ASCollectionView *view;
 
 /**
  * Returns the current page index. Main thread only.

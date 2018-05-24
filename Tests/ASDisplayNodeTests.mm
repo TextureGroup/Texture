@@ -104,8 +104,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 
 @interface ASTestDisplayNode : ASDisplayNode
-@property (nonatomic, copy) void (^willDeallocBlock)(__unsafe_unretained ASTestDisplayNode *node);
-@property (nonatomic, copy) CGSize(^calculateSizeBlock)(ASTestDisplayNode *node, CGSize size);
+@property (nonatomic) void (^willDeallocBlock)(__unsafe_unretained ASTestDisplayNode *node);
+@property (nonatomic) CGSize(^calculateSizeBlock)(ASTestDisplayNode *node, CGSize size);
 
 @property (nonatomic, nullable) UIGestureRecognizer *gestureRecognizer;
 @property (nonatomic, nullable) id idGestureRecognizer;
@@ -119,8 +119,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
 
-@property (nonatomic, assign) NSUInteger displayWillStartCount;
-@property (nonatomic, assign) NSUInteger didDisplayCount;
+@property (nonatomic) NSUInteger displayWillStartCount;
+@property (nonatomic) NSUInteger didDisplayCount;
 
 @end
 

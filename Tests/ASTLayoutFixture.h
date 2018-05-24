@@ -21,14 +21,14 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASTLayoutFixture : NSObject
 
 /// The correct layout. The root should be unpositioned (same as -calculatedLayout).
-@property (nonatomic, strong, nullable) ASLayout *layout;
+@property (nonatomic, nullable) ASLayout *layout;
 
 /// The layoutSpecBlocks for non-leaf nodes.
-@property (nonatomic, strong, readonly) NSMapTable<ASDisplayNode *, ASLayoutSpecBlock> *layoutSpecBlocks;
+@property (nonatomic, readonly) NSMapTable<ASDisplayNode *, ASLayoutSpecBlock> *layoutSpecBlocks;
 
-@property (nonatomic, strong, readonly) ASLayoutTestNode *rootNode;
+@property (nonatomic, readonly) ASLayoutTestNode *rootNode;
 
-@property (nonatomic, strong, readonly) NSSet<ASLayoutTestNode *> *allNodes;
+@property (nonatomic, readonly) NSSet<ASLayoutTestNode *> *allNodes;
 
 /// Get the (correct) layout for the specified node.
 - (ASLayout *)layoutForNode:(ASLayoutTestNode *)node;

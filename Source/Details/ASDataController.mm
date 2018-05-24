@@ -87,8 +87,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   } _dataSourceFlags;
 }
 
-@property (atomic, copy, readwrite) ASElementMap *pendingMap;
-@property (atomic, copy, readwrite) ASElementMap *visibleMap;
+@property (copy) ASElementMap *pendingMap;
+@property (copy) ASElementMap *visibleMap;
 @end
 
 @implementation ASDataController

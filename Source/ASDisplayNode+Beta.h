@@ -75,22 +75,22 @@ typedef struct {
  * restoring context if necessary. Restoring can be done in contextDidDisplayNodeContent
  * This block can be called from *any* thread and it is unsafe to access any UIKit main thread properties from it.
  */
-@property (nullable, atomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
+@property (nullable) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
 
 /**
  * @abstract allow modification of a context after the node's content is drawn
  */
-@property (nullable, atomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
+@property (nullable) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 
 /**
  * @abstract A bitmask representing which actions (layout spec, layout generation) should be measured.
  */
-@property (atomic) ASDisplayNodePerformanceMeasurementOptions measurementOptions;
+@property ASDisplayNodePerformanceMeasurementOptions measurementOptions;
 
 /**
  * @abstract A simple struct representing performance measurements collected.
  */
-@property (atomic, readonly) ASDisplayNodePerformanceMeasurements performanceMeasurements;
+@property (readonly) ASDisplayNodePerformanceMeasurements performanceMeasurements;
 
 #if ASEVENTLOG_ENABLE
 /*
@@ -104,7 +104,7 @@ typedef struct {
  * an aggregation of all child nodes' accessibility labels. Nodes in this node's subtree that are also accessibility containers will
  * not be included in this aggregation, and will be exposed as separate accessibility elements to UIKit.
  */
-@property (atomic) BOOL isAccessibilityContainer;
+@property BOOL isAccessibilityContainer;
 
 /**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
@@ -180,7 +180,7 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
-@property (atomic) BOOL yogaLayoutInProgress;
+@property BOOL yogaLayoutInProgress;
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
 
 // These methods are intended to be used internally to Texture, and should not be called directly.
@@ -195,19 +195,19 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 - (YGNodeRef)yogaNodeCreateIfNeeded;
 - (void)destroyYogaNode;
 
-@property (atomic, readonly) YGNodeRef yogaNode;
+@property (readonly) YGNodeRef yogaNode;
 
-@property (atomic) ASStackLayoutDirection flexDirection;
-@property (atomic) YGDirection direction;
-@property (atomic) ASStackLayoutJustifyContent justifyContent;
-@property (atomic) ASStackLayoutAlignItems alignItems;
-@property (atomic) YGPositionType positionType;
-@property (atomic) ASEdgeInsets position;
-@property (atomic) ASEdgeInsets margin;
-@property (atomic) ASEdgeInsets padding;
-@property (atomic) ASEdgeInsets border;
-@property (atomic) CGFloat aspectRatio;
-@property (atomic) YGWrap flexWrap;
+@property ASStackLayoutDirection flexDirection;
+@property YGDirection direction;
+@property ASStackLayoutJustifyContent justifyContent;
+@property ASStackLayoutAlignItems alignItems;
+@property YGPositionType positionType;
+@property ASEdgeInsets position;
+@property ASEdgeInsets margin;
+@property ASEdgeInsets padding;
+@property ASEdgeInsets border;
+@property CGFloat aspectRatio;
+@property YGWrap flexWrap;
 
 @end
 

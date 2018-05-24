@@ -702,7 +702,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
-  if (ASLockedSelfCompareAssignCopy(_placeholderColor, placeholderColor)) {
+  ASLockScopeSelf();
+  if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
     self.placeholderEnabled = CGColorGetAlpha(placeholderColor.CGColor) > 0;
   }
 }
