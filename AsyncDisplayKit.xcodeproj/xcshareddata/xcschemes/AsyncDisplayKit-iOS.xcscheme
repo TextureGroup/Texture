@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-               BuildableName = "AsyncDisplayKit.framework"
-               BlueprintName = "AsyncDisplayKit"
+               BlueprintIdentifier = "C52B141620B68067004AA8E6"
+               BuildableName = "AsyncDisplayKit-iOS.framework"
+               BlueprintName = "AsyncDisplayKit-iOS"
                ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -66,15 +66,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
-            BlueprintName = "AsyncDisplayKit"
-            ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "FB_REFERENCE_IMAGE_DIR"
@@ -91,15 +82,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
-            BlueprintName = "AsyncDisplayKit"
-            ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
