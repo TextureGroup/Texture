@@ -55,6 +55,7 @@
 - Fix an issue where ASConfigurationDelegate would not call out for "control" users. If set, it now receives events whenever an experimental feature decision point occurs, whether it's enabled or not. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASDisplayNode] Fix an issue that causes a node to sometimes return an outdated calculated size or size range. [Huy Nguyen](https://github.com/nguyenhuy) [#808](https://github.com/TextureGroup/Texture/pull/808)
 - Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
+- Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
