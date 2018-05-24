@@ -78,6 +78,7 @@
 
 - (ASTextNode *)titleNode
 {
+  ASLockScopeSelf();
   if (!_titleNode) {
     _titleNode = [[ASTextNode alloc] init];
 #if TARGET_OS_IOS 
@@ -92,6 +93,7 @@
 
 - (ASImageNode *)imageNode
 {
+  ASLockScopeSelf();
   if (!_imageNode) {
     _imageNode = [[ASImageNode alloc] init];
     [_imageNode setLayerBacked:YES];
@@ -101,6 +103,7 @@
 
 - (ASImageNode *)backgroundImageNode
 {
+  ASLockScopeSelf();
   if (!_backgroundImageNode) {
     _backgroundImageNode = [[ASImageNode alloc] init];
     [_backgroundImageNode setLayerBacked:YES];
@@ -162,7 +165,7 @@
 - (void)updateImage
 {
   [self lock];
-
+  
   UIImage *newImage;
   if (self.enabled == NO && _disabledImage) {
     newImage = _disabledImage;
@@ -253,16 +256,9 @@
 
 - (void)setContentSpacing:(CGFloat)contentSpacing
 {
-  {
-    ASLockScopeSelf();
-    if (contentSpacing == _contentSpacing) {
-      return;
-    }
-    
-    _contentSpacing = contentSpacing;
+  if (ASLockedSelfCompareAssign(_contentSpacing, contentSpacing)) {
+    [self setNeedsLayout];
   }
-
-  [self setNeedsLayout];
 }
 
 - (BOOL)laysOutHorizontally
@@ -273,16 +269,9 @@
 
 - (void)setLaysOutHorizontally:(BOOL)laysOutHorizontally
 {
-  {
-    ASLockScopeSelf();
-    if (laysOutHorizontally == _laysOutHorizontally) {
-      return;
-    }
-  
-    _laysOutHorizontally = laysOutHorizontally;
+  if (ASLockedSelfCompareAssign(_laysOutHorizontally, laysOutHorizontally)) {
+    [self setNeedsLayout];
   }
-
-  [self setNeedsLayout];
 }
 
 - (ASVerticalAlignment)contentVerticalAlignment

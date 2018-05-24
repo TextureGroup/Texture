@@ -209,11 +209,11 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @interface ASTextShadow : NSObject <NSCoding, NSCopying>
 + (instancetype)shadowWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius NS_RETURNS_RETAINED;
 
-@property (nullable, nonatomic, strong) UIColor *color; ///< shadow color
+@property (nullable, nonatomic) UIColor *color; ///< shadow color
 @property (nonatomic) CGSize offset;                    ///< shadow offset
 @property (nonatomic) CGFloat radius;                   ///< shadow blur radius
 @property (nonatomic) CGBlendMode blendMode;            ///< shadow blend mode
-@property (nullable, nonatomic, strong) ASTextShadow *subShadow;  ///< a sub shadow which will be added above the parent shadow
+@property (nullable, nonatomic) ASTextShadow *subShadow;  ///< a sub shadow which will be added above the parent shadow
 
 + (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow NS_RETURNS_RETAINED; ///< convert NSShadow to ASTextShadow
 - (NSShadow *)nsShadow; ///< convert ASTextShadow to NSShadow
@@ -232,9 +232,9 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
 + (instancetype)decorationWithStyle:(ASTextLineStyle)style NS_RETURNS_RETAINED;
 + (instancetype)decorationWithStyle:(ASTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color NS_RETURNS_RETAINED;
 @property (nonatomic) ASTextLineStyle style;                   ///< line style
-@property (nullable, nonatomic, strong) NSNumber *width;       ///< line width (nil means automatic width)
-@property (nullable, nonatomic, strong) UIColor *color;        ///< line color (nil means automatic color)
-@property (nullable, nonatomic, strong) ASTextShadow *shadow;  ///< line shadow
+@property (nullable, nonatomic) NSNumber *width;       ///< line width (nil means automatic width)
+@property (nullable, nonatomic) UIColor *color;        ///< line color (nil means automatic color)
+@property (nullable, nonatomic) ASTextShadow *shadow;  ///< line shadow
 @end
 
 
@@ -256,12 +256,12 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
 + (instancetype)borderWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius NS_RETURNS_RETAINED;
 @property (nonatomic) ASTextLineStyle lineStyle;              ///< border line style
 @property (nonatomic) CGFloat strokeWidth;                    ///< border line width
-@property (nullable, nonatomic, strong) UIColor *strokeColor; ///< border line color
+@property (nullable, nonatomic) UIColor *strokeColor; ///< border line color
 @property (nonatomic) CGLineJoin lineJoin;                    ///< border line join
 @property (nonatomic) UIEdgeInsets insets;                    ///< border insets for text bounds
 @property (nonatomic) CGFloat cornerRadius;                   ///< border corder radius
-@property (nullable, nonatomic, strong) ASTextShadow *shadow; ///< border shadow
-@property (nullable, nonatomic, strong) UIColor *fillColor;   ///< inner fill color
+@property (nullable, nonatomic) ASTextShadow *shadow; ///< border shadow
+@property (nullable, nonatomic) UIColor *fillColor;   ///< inner fill color
 @end
 
 
@@ -277,10 +277,10 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  */
 @interface ASTextAttachment : NSObject<NSCoding, NSCopying>
 + (instancetype)attachmentWithContent:(nullable id)content NS_RETURNS_RETAINED;
-@property (nullable, nonatomic, strong) id content;             ///< Supported type: UIImage, UIView, CALayer
+@property (nullable, nonatomic) id content;             ///< Supported type: UIImage, UIView, CALayer
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.
 @property (nonatomic) UIEdgeInsets contentInsets;               ///< The insets when drawing content.
-@property (nullable, nonatomic, strong) NSDictionary *userInfo; ///< The user information dictionary.
+@property (nullable, nonatomic) NSDictionary *userInfo; ///< The user information dictionary.
 @end
 
 
@@ -340,13 +340,13 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  Tap action when user tap the highlight, default is nil.
  If the value is nil, ASTextView or ASLabel will ask it's delegate to handle the tap action.
  */
-@property (nullable, nonatomic, copy) ASTextAction tapAction;
+@property (nullable, nonatomic) ASTextAction tapAction;
 
 /**
  Long press action when user long press the highlight, default is nil.
  If the value is nil, ASTextView or ASLabel will ask it's delegate to handle the long press action.
  */
-@property (nullable, nonatomic, copy) ASTextAction longPressAction;
+@property (nullable, nonatomic) ASTextAction longPressAction;
 
 @end
 

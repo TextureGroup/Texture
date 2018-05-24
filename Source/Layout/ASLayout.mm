@@ -79,14 +79,14 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsFlattened(ASLayout *la
 /*
  * Caches all sublayouts if set to YES or destroys the sublayout cache if set to NO. Defaults to NO
  */
-@property (nonatomic, assign) BOOL retainSublayoutLayoutElements;
+@property (nonatomic) BOOL retainSublayoutLayoutElements;
 
 /**
  * Array for explicitly retain sublayout layout elements in case they are created and references in layoutSpecThatFits: and no one else will hold a strong reference on it
  */
-@property (nonatomic, strong) NSMutableArray<id<ASLayoutElement>> *sublayoutLayoutElements;
+@property (nonatomic) NSMutableArray<id<ASLayoutElement>> *sublayoutLayoutElements;
 
-@property (nonatomic, strong, readonly) ASRectMap *elementToRectMap;
+@property (nonatomic, readonly) ASRectMap *elementToRectMap;
 
 @end
 

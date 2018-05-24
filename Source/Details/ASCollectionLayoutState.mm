@@ -37,6 +37,8 @@
 
 @implementation ASCollectionLayoutState {
   ASDN::Mutex __instanceLock__;
+  CGSize _contentSize;
+  ASCollectionLayoutContext *_context;
   NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
   ASPageToLayoutAttributesTable *_pageToLayoutAttributesTable;
   ASPageToLayoutAttributesTable *_unmeasuredPageToLayoutAttributesTable;
@@ -113,6 +115,16 @@ elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
     _unmeasuredPageToLayoutAttributesTable = [ASCollectionLayoutState _unmeasuredLayoutAttributesTableFromTable:table contentSize:contentSize pageSize:pageSize];
   }
   return self;
+}
+
+- (ASCollectionLayoutContext *)context
+{
+  return _context;
+}
+
+- (CGSize)contentSize
+{
+  return _contentSize;
 }
 
 - (NSArray<UICollectionViewLayoutAttributes *> *)allLayoutAttributes

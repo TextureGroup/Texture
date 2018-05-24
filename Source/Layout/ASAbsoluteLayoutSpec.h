@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  How much space will the spec taken up
  */
-@property (nonatomic, assign) ASAbsoluteLayoutSpecSizing sizing;
+@property (nonatomic) ASAbsoluteLayoutSpecSizing sizing;
 
 /**
  @param sizing How much space the spec will take up

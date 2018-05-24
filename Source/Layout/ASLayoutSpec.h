@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * layout spec can be created and mutated. Once it is passed back to ASDK, the isMutable flag will be
  * set to NO and any further mutations will cause an assert.
  */
-@property (nonatomic, assign) BOOL isMutable;
+@property (nonatomic) BOOL isMutable;
 
 /**
  * First child within the children's array.
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  * setChild:atIndex: internally. For example, ASBackgroundLayoutSpec exposes a "background"
  * property that behind the scenes is calling setChild:atIndex:.
  */
-@property (nullable, strong, nonatomic) id<ASLayoutElement> child;
+@property (nullable, nonatomic) id<ASLayoutElement> child;
 
 /**
  * An array of ASLayoutElement children
@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
  * For good measure, in these layout specs it probably makes sense to define
  * setChild: and setChild:forIdentifier: methods to do something appropriate or to assert.
  */
-@property (nullable, strong, nonatomic) NSArray<id<ASLayoutElement>> *children;
+@property (nullable, nonatomic) NSArray<id<ASLayoutElement>> *children;
 
 @end
 
@@ -91,7 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Init not available for ASWrapperLayoutSpec
  */
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

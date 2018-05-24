@@ -168,21 +168,21 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * NOTE: Soon we will drop support for using ASTableView/ASCollectionView without the node, so this will be non-null.
  */
-@property (nonatomic, nullable, weak, readonly) id<ASRangeManagingNode> node;
+@property (nullable, nonatomic, weak, readonly) id<ASRangeManagingNode> node;
 
 /**
  * The map that is currently displayed. The "UIKit index space."
  *
  * This property will only be changed on the main thread.
  */
-@property (atomic, copy, readonly) ASElementMap *visibleMap;
+@property (copy, readonly) ASElementMap *visibleMap;
 
 /**
  * The latest map fetched from the data source. May be more recent than @c visibleMap.
  *
  * This property will only be changed on the main thread.
  */
-@property (atomic, copy, readonly) ASElementMap *pendingMap;
+@property (copy, readonly) ASElementMap *pendingMap;
 
 /**
  Data source for fetching data info.
@@ -227,13 +227,13 @@ extern NSString * const ASCollectionInvalidUpdateException;
 /*
  * @abstract The primitive event tracing object. You shouldn't directly use it to log event. Use the ASDataControllerLogEvent macro instead.
  */
-@property (nonatomic, strong, readonly) ASEventLog *eventLog;
+@property (nonatomic, readonly) ASEventLog *eventLog;
 #endif
 
 /**
  * @see ASCollectionNode+Beta.h for full documentation.
  */
-@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
+@property (nonatomic) BOOL usesSynchronousDataLoading;
 
 /** @name Data Updating */
 

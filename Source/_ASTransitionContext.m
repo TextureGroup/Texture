@@ -95,8 +95,8 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 
 
 @interface _ASAnimatedTransitionContext ()
-@property (nonatomic, strong, readwrite) ASDisplayNode *node;
-@property (nonatomic, assign, readwrite) CGFloat alpha;
+@property (nonatomic) ASDisplayNode *node;
+@property (nonatomic) CGFloat alpha;
 @end
 
 @implementation _ASAnimatedTransitionContext
