@@ -919,8 +919,13 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNode *node = [_dataController.visibleMap elementForItemAtIndexPath:indexPath].node;
-  CGFloat height = node.calculatedSize.height;
+  CGFloat height = 0.0;
+
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  ASCellNode *node = element.node;
+  if (element != nil && node != nil) {
+    height = [node layoutThatFits:element.constrainedSize].size.height;
+  }
   
 #if TARGET_OS_IOS
   /**
