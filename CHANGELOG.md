@@ -56,6 +56,7 @@
 - [ASDisplayNode] Fix an issue that causes a node to sometimes return an outdated calculated size or size range. [Huy Nguyen](https://github.com/nguyenhuy) [#808](https://github.com/TextureGroup/Texture/pull/808)
 - Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
 - Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
+- [ASTableView] Fix an issue that causes table view to use invalid layout of a cell node during height query. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
