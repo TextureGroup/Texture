@@ -664,10 +664,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (CGSize)sizeForElement:(ASCollectionElement *)element
 {
   ASDisplayNodeAssertMainThread();
-  ASCellNode *node = element.node;
-  if (element == nil || node == nil) {
+  if (element == nil) {
     return CGSizeZero;
   }
+
+  ASCellNode *node = element.node;
+  ASDisplayNodeAssertNotNil(node, @"Node must not be nil!");
 
   BOOL useUIKitCell = node.shouldUseUIKitCell;
   if (useUIKitCell) {

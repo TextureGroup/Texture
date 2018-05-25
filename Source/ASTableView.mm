@@ -922,8 +922,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   CGFloat height = 0.0;
 
   ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
-  ASCellNode *node = element.node;
-  if (element != nil && node != nil) {
+  if (element != nil) {
+    ASCellNode *node = element.node;
+    ASDisplayNodeAssertNotNil(node, @"Node must not be nil!");
     height = [node layoutThatFits:element.constrainedSize].size.height;
   }
   
