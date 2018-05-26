@@ -82,11 +82,11 @@ typedef NS_ENUM(NSInteger, ASTextAffinity) {
  */
 @interface ASTextSelectionRect : UITextSelectionRect <NSCopying>
 
-@property (nonatomic, readwrite) CGRect rect;
-@property (nonatomic, readwrite) UITextWritingDirection writingDirection;
-@property (nonatomic, readwrite) BOOL containsStart;
-@property (nonatomic, readwrite) BOOL containsEnd;
-@property (nonatomic, readwrite) BOOL isVertical;
+@property (nonatomic) CGRect rect;
+@property (nonatomic) UITextWritingDirection writingDirection;
+@property (nonatomic) BOOL containsStart;
+@property (nonatomic) BOOL containsEnd;
+@property (nonatomic) BOOL isVertical;
 
 @end
 

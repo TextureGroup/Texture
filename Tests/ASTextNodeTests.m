@@ -31,7 +31,7 @@
 @interface ASTextNodeTestDelegate : NSObject <ASTextNodeDelegate>
 
 @property (nonatomic, copy, readonly) NSString *tappedLinkAttribute;
-@property (nonatomic, assign, readonly) id tappedLinkValue;
+@property (nonatomic, readonly) id tappedLinkValue;
 
 @end
 @interface ASTextNodeSubclass : ASTextNode
@@ -56,8 +56,8 @@
 
 @interface ASTextNodeTests : XCTestCase
 
-@property (nonatomic, readwrite, strong) ASTextNode *textNode;
-@property (nonatomic, readwrite, copy) NSAttributedString *attributedText;
+@property (nonatomic) ASTextNode *textNode;
+@property (nonatomic, copy) NSAttributedString *attributedText;
 
 @end
 

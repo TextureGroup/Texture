@@ -618,6 +618,14 @@ static NSString * const kRate = @"rate";
 - (void)setGravity:(NSString *)gravity
 {
   ASLockScopeSelf();
+  if (!gravity) {
+    gravity = AVLayerVideoGravityResizeAspect;
+  }
+  
+  if (!ASCompareAssignObjects(_gravity, gravity)) {
+    return;
+  }
+  
   if (_playerNode.isNodeLoaded) {
     ((AVPlayerLayer *)_playerNode.layer).videoGravity = gravity;
   }

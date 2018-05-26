@@ -59,8 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ASCenterLayoutSpec : ASRelativeLayoutSpec
 
-@property (nonatomic, assign) ASCenterLayoutSpecCenteringOptions centeringOptions;
-@property (nonatomic, assign) ASCenterLayoutSpecSizingOptions sizingOptions;
+@property (nonatomic) ASCenterLayoutSpecCenteringOptions centeringOptions;
+@property (nonatomic) ASCenterLayoutSpecSizingOptions sizingOptions;
 
 /**
  * Initializer.

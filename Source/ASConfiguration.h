@@ -35,7 +35,7 @@ AS_SUBCLASSING_RESTRICTED
  * The delegate for configuration-related events.
  * Delegate methods are called from a serial queue.
  */
-@property (nonatomic, strong, nullable) id<ASConfigurationDelegate> delegate;
+@property (nonatomic, nullable) id<ASConfigurationDelegate> delegate;
 
 /**
  * The experimental features to enable in Texture.

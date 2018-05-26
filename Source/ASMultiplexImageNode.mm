@@ -98,10 +98,10 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 }
 
 //! @abstract Read-write redeclaration of property declared in ASMultiplexImageNode.h.
-@property (nonatomic, readwrite, copy) id loadedImageIdentifier;
+@property (nonatomic, copy) id loadedImageIdentifier;
 
 //! @abstract The image identifier that's being loaded by _loadNextImageWithCompletion:.
-@property (nonatomic, readwrite, copy) id loadingImageIdentifier;
+@property (nonatomic, copy) id loadingImageIdentifier;
 
 /**
   @abstract Returns the next image identifier that should be downloaded.

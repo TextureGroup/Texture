@@ -100,6 +100,15 @@ ASDISPLAYNODE_INLINE void ASBoundsAndPositionForFrame(CGRect rect, CGPoint origi
                           rect.origin.y + rect.size.height * anchorPoint.y);
 }
 
+ASDISPLAYNODE_INLINE UIEdgeInsets ASConcatInsets(UIEdgeInsets insetsA, UIEdgeInsets insetsB)
+{
+  insetsA.top += insetsB.top;
+  insetsA.left += insetsB.left;
+  insetsA.bottom += insetsB.bottom;
+  insetsA.right += insetsB.right;
+  return insetsA;
+}
+
 @interface NSIndexPath (ASInverseComparison)
 - (NSComparisonResult)asdk_inverseCompare:(NSIndexPath *)otherIndexPath;
 @end

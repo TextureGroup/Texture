@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 AS_SUBCLASSING_RESTRICTED
 @interface ASCGImageBuffer : NSObject
 
+/// Init a zero-filled buffer with the given length.
 - (instancetype)initWithLength:(NSUInteger)length;
 
 @property (readonly) void *mutableBytes NS_RETURNS_INNER_POINTER;

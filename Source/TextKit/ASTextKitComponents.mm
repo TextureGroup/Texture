@@ -20,8 +20,11 @@
 
 #import <tgmath.h>
 
-@interface ASTextKitComponentsTextView ()
-@property (atomic, assign) CGRect threadSafeBounds;
+@interface ASTextKitComponentsTextView () {
+  // Prevent UITextView from updating contentOffset while deallocating: https://github.com/TextureGroup/Texture/issues/860
+  BOOL _deallocating;
+}
+@property CGRect threadSafeBounds;
 @end
 
 @implementation ASTextKitComponentsTextView
@@ -31,8 +34,14 @@
   self = [super initWithFrame:frame textContainer:textContainer];
   if (self) {
     _threadSafeBounds = self.bounds;
+    _deallocating = NO;
   }
   return self;
+}
+
+- (void)dealloc
+{
+  _deallocating = YES;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -49,14 +58,24 @@
   self.threadSafeBounds = bounds;
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+  if (_deallocating) {
+    return;
+  }
+  
+  [super setContentOffset:contentOffset];
+}
+
+
 @end
 
 @interface ASTextKitComponents ()
 
 // read-write redeclarations
-@property (nonatomic, strong, readwrite) NSTextStorage *textStorage;
-@property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
-@property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
+@property (nonatomic) NSTextStorage *textStorage;
+@property (nonatomic) NSTextContainer *textContainer;
+@property (nonatomic) NSLayoutManager *layoutManager;
 
 @end
 

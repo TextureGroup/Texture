@@ -88,8 +88,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   } _dataSourceFlags;
 }
 
-@property (atomic, copy, readwrite) ASElementMap *pendingMap;
-@property (atomic, copy, readwrite) ASElementMap *visibleMap;
+@property (copy) ASElementMap *pendingMap;
+@property (copy) ASElementMap *visibleMap;
 @end
 
 @implementation ASDataController
@@ -503,14 +503,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (BOOL)isProcessingUpdates
 {
   ASDisplayNodeAssertMainThread();
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED
-  // Using dispatch_group_wait is much more expensive than our manually managed count, but it's crucial they always match.
-  BOOL editingTransactionQueueBusy = dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_NOW) != 0;
-  ASDisplayNodeAssert(editingTransactionQueueBusy == (_editingTransactionGroupCount > 0),
-                      @"editingTransactionQueueBusy = %@, but _editingTransactionGroupCount = %d !",
-                      editingTransactionQueueBusy ? @"YES" : @"NO", (int)_editingTransactionGroupCount);
-#endif
-
   return _mainSerialQueue.numberOfScheduledBlocks > 0 || _editingTransactionGroupCount > 0;
 }
 
@@ -830,8 +822,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 #pragma mark - Relayout
 
-- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray *)nodesSizesChanged
+- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray<ASCellNode *> *)nodesSizesChanged
 {
+  NSParameterAssert(nodes);
   NSParameterAssert(nodesSizesChanged);
   
   ASDisplayNodeAssertMainThread();

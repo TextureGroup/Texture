@@ -28,8 +28,8 @@
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode
 
-@property (nonatomic, assign) NSUInteger setSelectedCounter;
-@property (nonatomic, assign) NSUInteger applyLayoutAttributesCount;
+@property (nonatomic) NSUInteger setSelectedCounter;
+@property (nonatomic) NSUInteger applyLayoutAttributesCount;
 
 @end
 
@@ -50,8 +50,8 @@
 
 @interface ASTestSectionContext : NSObject <ASSectionContext>
 
-@property (nonatomic, assign) NSInteger sectionIndex;
-@property (nonatomic, assign) NSInteger sectionGeneration;
+@property (nonatomic) NSInteger sectionIndex;
+@property (nonatomic) NSInteger sectionGeneration;
 
 @end
 
@@ -63,8 +63,8 @@
 
 @interface ASCollectionViewTestDelegate : NSObject <ASCollectionDataSource, ASCollectionDelegate, UICollectionViewDelegateFlowLayout>
 
-@property (nonatomic, assign) NSInteger sectionGeneration;
-@property (nonatomic, copy) void(^willBeginBatchFetch)(ASBatchContext *);
+@property (nonatomic) NSInteger sectionGeneration;
+@property (nonatomic) void(^willBeginBatchFetch)(ASBatchContext *);
 
 @end
 
@@ -139,9 +139,9 @@
 
 @interface ASCollectionViewTestController: UIViewController
 
-@property (nonatomic, strong) ASCollectionViewTestDelegate *asyncDelegate;
-@property (nonatomic, strong) ASCollectionView *collectionView;
-@property (nonatomic, strong) ASCollectionNode *collectionNode;
+@property (nonatomic) ASCollectionViewTestDelegate *asyncDelegate;
+@property (nonatomic) ASCollectionView *collectionView;
+@property (nonatomic) ASCollectionNode *collectionNode;
 
 @end
 

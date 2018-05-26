@@ -204,6 +204,15 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   UIBezierPath *_accessibilityPath;
   BOOL _isAccessibilityContainer;
 
+  // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
+  UIEdgeInsets _fallbackSafeAreaInsets;
+  BOOL _fallbackInsetsLayoutMarginsFromSafeArea;
+
+  BOOL _automaticallyRelayoutOnSafeAreaChanges;
+  BOOL _automaticallyRelayoutOnLayoutMarginsChanges;
+
+  BOOL _isViewControllerRoot;
+
   // performance measurement
   ASDisplayNodePerformanceMeasurementOptions _measurementOptions;
   NSTimeInterval _layoutSpecTotalTime;
@@ -237,10 +246,10 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;
 
 /// The _ASDisplayLayer backing the node, if any.
-@property (nullable, nonatomic, readonly, strong) _ASDisplayLayer *asyncLayer;
+@property (nullable, nonatomic, readonly) _ASDisplayLayer *asyncLayer;
 
 /// Bitmask to check which methods an object overrides.
-@property (nonatomic, assign, readonly) ASDisplayNodeMethodOverrides methodOverrides;
+@property (nonatomic, readonly) ASDisplayNodeMethodOverrides methodOverrides;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view
@@ -299,7 +308,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 /// Alternative initialiser for backing with a custom layer class.  Supports asynchronous display with _ASDisplayLayer subclasses.
 - (instancetype)initWithLayerClass:(Class)layerClass;
 
-@property (nonatomic, assign) CGFloat contentsScaleForDisplay;
+@property (nonatomic) CGFloat contentsScaleForDisplay;
 
 - (void)applyPendingViewState;
 
@@ -315,7 +324,7 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
  *
  * @see ASInterfaceState
  */
-@property (nonatomic, assign) BOOL interfaceStateSuspended;
+@property (nonatomic) BOOL interfaceStateSuspended;
 
 /**
  * This method has proven helpful in a few rare scenarios, similar to a category extension on UIView,
@@ -328,18 +337,23 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
 /**
  * Whether this node rasterizes its descendants. See -enableSubtreeRasterization.
  */
-@property (atomic, readonly) BOOL rasterizesSubtree;
+@property (readonly) BOOL rasterizesSubtree;
 
 /**
  * Called if a gesture recognizer was attached to an _ASDisplayView
  */
 - (void)nodeViewDidAddGestureRecognizer;
 
+// Recalculates fallbackSafeAreaInsets for the subnodes
+- (void)_fallbackUpdateSafeAreaOnChildren;
+
 @end
 
 @interface ASDisplayNode (InternalPropertyBridge)
 
-@property (nonatomic, assign) CGFloat layerCornerRadius;
+@property (nonatomic) CGFloat layerCornerRadius;
+
+- (BOOL)_locked_insetsLayoutMarginsFromSafeArea;
 
 @end
 

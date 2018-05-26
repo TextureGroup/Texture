@@ -47,7 +47,7 @@
     
     // Check the VM flag again because we may have failed above.
     if (!_isVM) {
-      _mutableBytes = malloc(length);
+      _mutableBytes = calloc(1, length);
     }
   }
   return self;
