@@ -1825,6 +1825,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     const CGSize calculatedSize = [node layoutThatFits:constrainedSize].size;
     node.frame = { .size = calculatedSize };
 
+    // Now that the node has been re-measured with a new constrained size, set the size to the backing colleciton element.
+    node.collectionElement.constrainedSize = constrainedSize;
+
     // If the node height changed, trigger a height requery.
     if (oldSize.height != calculatedSize.height) {
       [self beginUpdates];
