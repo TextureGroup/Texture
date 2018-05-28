@@ -65,6 +65,11 @@ static void runLoopSourceCallback(void *info) {
   ASDisplayNodeFailAssert(@"Abstract method.");
 }
 
+- (void)drain
+{
+  ASDisplayNodeFailAssert(@"Abstract method.");
+}
+
 @end
 
 @implementation ASDeallocQueueV1 {
@@ -541,17 +546,7 @@ typedef enum {
   return _internalQueue.count == 0;
 }
 
-#pragma mark - NSLocking
-
-- (void)lock
-{
-  _internalQueueLock.lock();
-}
-
-- (void)unlock
-{
-  _internalQueueLock.unlock();
-}
+ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 
 @end
 

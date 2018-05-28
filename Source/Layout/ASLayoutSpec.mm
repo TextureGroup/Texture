@@ -259,17 +259,7 @@ ASLayoutElementStyleExtensibilityForwarding
   return result;
 }
 
-#pragma mark - NSLocking
-
-- (void)lock
-{
-  __instanceLock__.lock();
-}
-
-- (void)unlock
-{
-  __instanceLock__.unlock();
-}
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 @end
 

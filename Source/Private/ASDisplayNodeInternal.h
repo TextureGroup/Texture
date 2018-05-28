@@ -31,6 +31,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class ASDisplayTree;
 @protocol _ASDisplayLayerDelegate;
 @class _ASDisplayLayer;
 @class _ASPendingState;
@@ -121,10 +122,17 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
     unsigned isDeallocating:1;
   } _flags;
   
-@protected
+  /*
+   * In the tree experiment, these properties are
+   * guarded by the tree's lock whereas in
+   * control, they are guarded by __instanceLock__.
+   */
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
+  
+  ASDisplayTree * _tree; // nil unless root, nil until has first subnode.
 
+@protected
   // Set this to nil whenever you modify _subnodes
   NSArray<ASDisplayNode *> *_cachedSubnodes;
 

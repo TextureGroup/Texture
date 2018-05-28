@@ -37,6 +37,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayTree.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -373,15 +374,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return self;
 }
 
-- (void)lock
-{
-  __instanceLock__.lock();
-}
-
-- (void)unlock
-{
-  __instanceLock__.unlock();
-}
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)setViewBlock:(ASDisplayNodeViewBlock)viewBlock
 {
@@ -2260,6 +2253,15 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _cachedSubnodes ?: @[];
 }
 
+- (ASDisplayTree *)_getOrCreateDisplayTreeIfNeeded
+{
+  ASLockScopeSelf();
+  if (_tree == nil && ASActivateExperimentalFeature(ASExperimentalDisplayTree)) {
+    _tree = [[ASDisplayTree alloc] init];
+  }
+  return _tree;
+}
+
 /*
  * Central private helper method that should eventually be called if submethods add, insert or replace subnodes
  * This method is called with thread affinity.
@@ -2381,6 +2383,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)_addSubnode:(ASDisplayNode *)subnode
 {
+  if (ASActivateExperimentalFeature(ASExperimentalDisplayTree)) {
+    
+    return;
+  }
   ASDisplayNodeAssertThreadAffinity(self);
   
   ASDisplayNodeAssert(subnode, @"Cannot insert a nil subnode");
@@ -2480,6 +2486,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below
 {
   ASDisplayNodeAssertThreadAffinity(self);
+  auto tree = [self _getOrCreateDisplayTreeIfNeeded];
+  if (tree) {
+    [tree insert:subnode at:ASTreeInsertBelow relativeTo:self with:NSNotFound];
+    return;
+  }
 
   if (subnode == nil) {
     ASDisplayNodeFailAssert(@"Cannot insert a nil subnode");

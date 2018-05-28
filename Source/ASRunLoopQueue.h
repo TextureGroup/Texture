@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASLocking.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 AS_SUBCLASSING_RESTRICTED
-@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <NSLocking>
+@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <ASLocking>
 
 /**
  * Create a new queue with the given run loop and handler.
