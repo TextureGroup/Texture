@@ -919,8 +919,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNode *node = [_dataController.visibleMap elementForItemAtIndexPath:indexPath].node;
-  CGFloat height = node.calculatedSize.height;
+  CGFloat height = 0.0;
+
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  if (element != nil) {
+    ASCellNode *node = element.node;
+    ASDisplayNodeAssertNotNil(node, @"Node must not be nil!");
+    height = [node layoutThatFits:element.constrainedSize].size.height;
+  }
   
 #if TARGET_OS_IOS
   /**
@@ -1818,6 +1824,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     CGSize oldSize = node.bounds.size;
     const CGSize calculatedSize = [node layoutThatFits:constrainedSize].size;
     node.frame = { .size = calculatedSize };
+
+    // After the re-measurement, set the new constrained size to the node's backing colleciton element.
+    node.collectionElement.constrainedSize = constrainedSize;
 
     // If the node height changed, trigger a height requery.
     if (oldSize.height != calculatedSize.height) {
