@@ -300,7 +300,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   BOOL canDelegate = (self.layoutDelegate != nil);
   if (sectionCount > 0) {
     NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
-    ASSizeRange newSizeRange;
+    ASSizeRange newSizeRange = ASSizeRangeZero;
     for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
       NSArray<NSIndexPath *> *indexPaths = [self _allIndexPathsForItemsOfKind:kind inSections:sectionIndexes];
       NSMutableArray<NSIndexPath *> *indexPathsToDeleteForKind = [[NSMutableArray alloc] init];
