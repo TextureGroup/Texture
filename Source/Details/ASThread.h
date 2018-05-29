@@ -27,6 +27,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
@@ -94,17 +95,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #ifdef __cplusplus
 
 #define TIME_LOCKER 0
-/**
- * Enable this flag to collect information on the owning thread and ownership level of a mutex.
- * These properties are useful to determine if a mutext has been acquired and in case of a recursive mutex, how many times that happened.
- * 
- * This flag also enable locking assertions (e.g ASDisplayNodeAssertLockUnownedByCurrentThread(node)).
- * The assertions are useful when you want to indicate and enforce the locking policy/expectation of methods.
- * To determine when and which methods acquired a (recursive) mutex (to debug deadlocks, for example),
- * put breakpoints at some assertions. When the breakpoints hit, walk through stack trace frames 
- * and check ownership count of the mutex.
- */
-#define CHECK_LOCKING_SAFETY 0
 
 #if TIME_LOCKER
 #import <QuartzCore/QuartzCore.h>
@@ -127,13 +117,8 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * put breakpoints at some of these assertions. When the breakpoints hit, walk through stack trace frames
  * and check ownership count of the mutex.
  */
-#if CHECK_LOCKING_SAFETY
-#define ASDisplayNodeAssertLockUnownedByCurrentThread(lock) ASDisplayNodeAssertFalse(lock.ownedByCurrentThread())
-#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock) ASDisplayNodeAssert(lock.ownedByCurrentThread())
-#else
-#define ASDisplayNodeAssertLockUnownedByCurrentThread(lock)
-#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock)
-#endif
+#define ASDisplayNodeAssertLockUnownedByCurrentThread(lock) ASDisplayNodeAssertFalse(0 != lock.ownershipCountInCurrentThread())
+#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock) ASDisplayNodeAssertTrue(0 == lock.ownershipCountInCurrentThread())
 
 namespace ASDN {
   
@@ -256,10 +241,6 @@ namespace ASDN {
       } else {
         AS_POSIX_ASSERT_NOERR(pthread_mutex_destroy (&_m));
       }
-#if CHECK_LOCKING_SAFETY
-      _owner = 0;
-      _count = 0;
-#endif
     }
 
     Mutex (const Mutex&) = delete;
@@ -275,11 +256,11 @@ namespace ASDN {
       } else {
         AS_POSIX_ASSERT_NOERR(pthread_mutex_lock(&_m));
       }
-#if CHECK_LOCKING_SAFETY
-      mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+      auto thread_id = pthread_self();
       if (thread_id != _owner) {
         // New owner. Since this mutex can't be acquired by another thread if there is an existing owner, _owner and _count must be 0.
-        ASDisplayNodeCAssertTrue(0 == _owner);
+        ASDisplayNodeCAssertNotNil(_owner, nil);
         ASDisplayNodeCAssertTrue(0 == _count);
         _owner = thread_id;
       } else {
@@ -291,8 +272,8 @@ namespace ASDN {
     }
 
     void unlock () {
-#if CHECK_LOCKING_SAFETY
-      mach_port_t thread_id = pthread_mach_thread_np(pthread_self());
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+      auto thread_id = pthread_self();
       // Unlocking a mutex on an unowning thread causes undefined behaviour. Assert and fail early.
       ASDisplayNodeCAssertTrue(thread_id == _owner);
       // Current thread owns this mutex. _count must be positive.
@@ -316,9 +297,16 @@ namespace ASDN {
 
     pthread_mutex_t *mutex () { return &_m; }
 
-#if CHECK_LOCKING_SAFETY
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
     bool ownedByCurrentThread() {
-      return _count > 0 && pthread_mach_thread_np(pthread_self()) == _owner;
+      // These vars are unsynchronized but this read
+      // is safe because we are only interested
+      // in whether owner is self. We are always the
+      // thread that changes whether owner is self or not
+      // so there's no risk of us being wrong about that,
+      // even if we can't see the latest modifications
+      // from other threads.
+      return pthread_self() == _owner && _count > 0;
     }
 #endif
     
@@ -355,8 +343,8 @@ namespace ASDN {
           AS_POSIX_ASSERT_NOERR(pthread_mutex_init(&_m, &attr));
         }
       }
-#if CHECK_LOCKING_SAFETY
-      _owner = 0;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+      _owner = NULL;
       _count = 0;
 #endif
     }
@@ -368,8 +356,8 @@ namespace ASDN {
       ASRecursiveUnfairLock _runfair;
       pthread_mutex_t _m;
     };
-#if CHECK_LOCKING_SAFETY
-    mach_port_t _owner;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+    pthread_t _owner;
     uint32_t _count;
 #endif
   };

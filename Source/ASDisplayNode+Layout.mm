@@ -218,18 +218,16 @@ ASLayoutElementStyleExtensibilityForwarding
  */
 - (void)_u_setNeedsLayoutFromAbove
 {
-  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock);
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   as_activity_create_for_scope("Set needs layout from above");
   ASDisplayNodeAssertThreadAffinity(self);
 
   // Mark the node for layout in the next layout pass
   [self setNeedsLayout];
   
-  __instanceLock__.lock();
   // Escalate to the root; entire tree must allow adjustments so the layout fits the new child.
   // Much of the layout will be re-used as cached (e.g. other items in an unconstrained stack)
-  ASDisplayNode *supernode = _supernode;
-  __instanceLock__.unlock();
+  auto supernode = ASLockedSelf(_supernode);
   
   if (supernode) {
     // Threading model requires that we unlock before calling a method on our parent.
@@ -295,7 +293,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
-  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock);
+  ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDN::MutexLocker l(__instanceLock__);
   // Check if we are a subnode in a layout transition.
   // In this case no measurement is needed as it's part of the layout transition
@@ -848,9 +846,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
 
-  __instanceLock__.lock();
-  ASLayoutTransition *pendingLayoutTransition = _pendingLayoutTransition;
-  __instanceLock__.unlock();
+  auto pendingLayoutTransition = ASLockedSelf(_pendingLayoutTransition);
 
   [pendingLayoutTransition applySubnodeRemovals];
 }
@@ -860,9 +856,7 @@ ASLayoutElementStyleExtensibilityForwarding
  */
 - (void)_completePendingLayoutTransition
 {
-  __instanceLock__.lock();
-  ASLayoutTransition *pendingLayoutTransition = _pendingLayoutTransition;
-  __instanceLock__.unlock();
+  auto pendingLayoutTransition = ASLockedSelf(_pendingLayoutTransition);
 
   if (pendingLayoutTransition != nil) {
     [self _setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];

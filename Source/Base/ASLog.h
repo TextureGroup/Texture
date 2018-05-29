@@ -76,6 +76,10 @@ os_log_t ASImageLoadingLog(void);
 #define ASMainThreadDeallocationLogEnabled 0
 os_log_t ASMainThreadDeallocationLog(void);
 
+/// Very very chatty log about lock/unlocks. Only turn on for targeted debugging.
+#define ASThreadingLogEnabled 0
+os_log_t ASThreadingLog(void);
+
 ASDISPLAYNODE_EXTERN_C_END
 
 /**
