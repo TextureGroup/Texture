@@ -310,11 +310,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       for (NSIndexPath *indexPath in indexPaths) {
         ASCollectionElement *previousElement = [previousMap supplementaryElementOfKind:kind atIndexPath:indexPath];
         if (canDelegate) {
-          ASCollectionLayoutContext *context = [self.layoutDelegate layoutContextWithElements:previousMap];
-          Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
-          ASCollectionLayoutState *layoutState = [layoutDelegateClass calculateLayoutWithContext:context];
-          UICollectionViewLayoutAttributes *attrs = [layoutState layoutAttributesForSupplementaryElementOfKind:kind atIndexPath:indexPath];
-          newSizeRange = attrs ? ASSizeRangeMake(attrs.size, attrs.size) : ASSizeRangeMake(CGSizeZero, CGSizeZero);
+          // TODO: https://github.com/TextureGroup/Texture/issues/948
         } else {
           newSizeRange = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
         }

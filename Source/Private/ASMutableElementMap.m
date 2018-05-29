@@ -70,13 +70,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 
 - (void)removeSupplementaryElementsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths kind:(NSString *)kind
 {
-  NSMutableDictionary *supplementariesForKind = _supplementaryElements[kind];
-  if (supplementariesForKind == nil) {
-    return;
-  }
-  for (NSIndexPath *indexPath in indexPaths) {
-    supplementariesForKind[indexPath] = nil;
-  }
+  [_supplementaryElements[kind] removeObjectsForKeys:indexPaths];
 }
 
 - (void)removeAllElements
