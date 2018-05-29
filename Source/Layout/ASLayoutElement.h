@@ -68,12 +68,12 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 /**
  * @abstract Returns type of layoutElement
  */
-@property (nonatomic, assign, readonly) ASLayoutElementType layoutElementType;
+@property (nonatomic, readonly) ASLayoutElementType layoutElementType;
 
 /**
  * @abstract A size constraint that should apply to this ASLayoutElement.
  */
-@property (nonatomic, strong, readonly) ASLayoutElementStyle *style;
+@property (nonatomic, readonly) ASLayoutElementStyle *style;
 
 /**
  * @abstract Returns all children of an object which class conforms to the ASLayoutElement protocol
@@ -196,14 +196,14 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * The minWidth and maxWidth properties override width.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension width;
+@property (nonatomic) ASDimension width;
 
 /**
  * @abstract The height property specifies the height of the content area of an ASLayoutElement
  * The minHeight and maxHeight properties override height.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension height;
+@property (nonatomic) ASDimension height;
 
 /**
  * @abstract The minHeight property is used to set the minimum height of a given element. It prevents the used value
@@ -211,7 +211,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * The value of minHeight overrides both maxHeight and height.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension minHeight;
+@property (nonatomic) ASDimension minHeight;
 
 /**
  * @abstract The maxHeight property is used to set the maximum height of an element. It prevents the used value of the
@@ -219,7 +219,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * The value of maxHeight overrides height, but minHeight overrides maxHeight.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension maxHeight;
+@property (nonatomic) ASDimension maxHeight;
 
 /**
  * @abstract The minWidth property is used to set the minimum width of a given element. It prevents the used value of
@@ -227,7 +227,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * The value of minWidth overrides both maxWidth and width.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension minWidth;
+@property (nonatomic) ASDimension minWidth;
 
 /**
  * @abstract The maxWidth property is used to set the maximum width of a given element. It prevents the used value of
@@ -235,7 +235,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * The value of maxWidth overrides width, but minWidth overrides maxWidth.
  * Defaults to ASDimensionAuto
  */
-@property (nonatomic, assign, readwrite) ASDimension maxWidth;
+@property (nonatomic) ASDimension maxWidth;
 
 #pragma mark - ASLayoutElementStyleSizeHelpers
 
@@ -251,7 +251,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  *
  * @warning Calling the getter when the size's width or height are relative will cause an assert.
  */
-@property (nonatomic, assign) CGSize preferredSize;
+@property (nonatomic) CGSize preferredSize;
 
  /**
  * @abstract An optional property that provides a minimum size bound for a layout element. If provided, this restriction will 
@@ -262,7 +262,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * element in a full screen container, this would result in a width of 160 points on an iPhone screen. However, 
  * since 160 pts is lower than the minimum width of 200 pts, the minimum width would be used.
  */
-@property (nonatomic, assign) CGSize minSize;
+@property (nonatomic) CGSize minSize;
 - (CGSize)minSize UNAVAILABLE_ATTRIBUTE;
 
 /**
@@ -274,7 +274,7 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * element in a full screen container, this would result in a width of 160 points on an iPhone screen. However, 
  * since 160 pts is higher than the maximum width of 120 pts, the maximum width would be used.
  */
-@property (nonatomic, assign) CGSize maxSize;
+@property (nonatomic) CGSize maxSize;
 - (CGSize)maxSize UNAVAILABLE_ATTRIBUTE;
 
 /**
@@ -284,21 +284,21 @@ extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * will be enforced. If this optional value is not provided, the layout element’s size will default to its intrinsic content size 
  * provided calculateSizeThatFits:
  */
-@property (nonatomic, assign, readwrite) ASLayoutSize preferredLayoutSize;
+@property (nonatomic) ASLayoutSize preferredLayoutSize;
 
 /**
  * @abstract An optional property that provides a minimum RELATIVE size bound for a layout element. If provided, this
  * restriction will always be enforced. If a parent layout element’s minimum relative size is smaller than its child’s minimum
  * relative size, the child’s minimum relative size will be enforced and its size will extend out of the layout spec’s.
  */
-@property (nonatomic, assign, readwrite) ASLayoutSize minLayoutSize;
+@property (nonatomic) ASLayoutSize minLayoutSize;
 
 /**
  * @abstract An optional property that provides a maximum RELATIVE size bound for a layout element. If provided, this
  * restriction will always be enforced. If a parent layout element’s maximum relative size is smaller than its child’s maximum
  * relative size, the child’s maximum relative size will be enforced and its size will extend out of the layout spec’s.
  */
-@property (nonatomic, assign, readwrite) ASLayoutSize maxLayoutSize;
+@property (nonatomic) ASLayoutSize maxLayoutSize;
 
 @end
 

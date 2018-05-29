@@ -13,7 +13,7 @@
 #import "ASIntegerMap.h"
 #import <AsyncDisplayKit/ASAssert.h>
 #import <unordered_map>
-#import <NSIndexSet+ASHelpers.h>
+#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 /**

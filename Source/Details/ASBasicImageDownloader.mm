@@ -39,7 +39,7 @@ NSString * const kASBasicImageDownloaderContextCompletionBlock = @"kASBasicImage
   ASDN::RecursiveMutex __instanceLock__;
 }
 
-@property (nonatomic, strong) NSMutableArray *callbackDatas;
+@property (nonatomic) NSMutableArray *callbackDatas;
 
 @end
 
@@ -179,7 +179,7 @@ static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
  * NSURLSessionDownloadTask lacks a `userInfo` property, so add this association ourselves.
  */
 @interface NSURLRequest (ASBasicImageDownloader)
-@property (nonatomic, strong) ASBasicImageDownloaderContext *asyncdisplaykit_context;
+@property (nonatomic) ASBasicImageDownloaderContext *asyncdisplaykit_context;
 @end
 
 @implementation NSURLRequest (ASBasicImageDownloader)

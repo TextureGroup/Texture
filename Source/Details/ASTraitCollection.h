@@ -176,22 +176,22 @@ ASDISPLAYNODE_EXTERN_C_END
 AS_SUBCLASSING_RESTRICTED
 @interface ASTraitCollection : NSObject
 
-@property (nonatomic, assign, readonly) UIUserInterfaceSizeClass horizontalSizeClass;
-@property (nonatomic, assign, readonly) UIUserInterfaceSizeClass verticalSizeClass;
+@property (nonatomic, readonly) UIUserInterfaceSizeClass horizontalSizeClass;
+@property (nonatomic, readonly) UIUserInterfaceSizeClass verticalSizeClass;
 
-@property (nonatomic, assign, readonly) CGFloat displayScale;
-@property (nonatomic, assign, readonly) UIDisplayGamut displayGamut;
+@property (nonatomic, readonly) CGFloat displayScale;
+@property (nonatomic, readonly) UIDisplayGamut displayGamut;
 
-@property (nonatomic, assign, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
-@property (nonatomic, assign, readonly) UIForceTouchCapability forceTouchCapability;
-@property (nonatomic, assign, readonly) UITraitEnvironmentLayoutDirection layoutDirection;
+@property (nonatomic, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
+@property (nonatomic, readonly) UIForceTouchCapability forceTouchCapability;
+@property (nonatomic, readonly) UITraitEnvironmentLayoutDirection layoutDirection;
 #if TARGET_OS_TV
-@property (nonatomic, assign, readonly) UIUserInterfaceStyle userInterfaceStyle;
+@property (nonatomic, readonly) UIUserInterfaceStyle userInterfaceStyle;
 #endif
 
-@property (nonatomic, assign, readonly) UIContentSizeCategory preferredContentSizeCategory;
+@property (nonatomic, readonly) UIContentSizeCategory preferredContentSizeCategory;
 
-@property (nonatomic, assign, readonly) CGSize containerSize;
+@property (nonatomic, readonly) CGSize containerSize;
 
 + (ASTraitCollection *)traitCollectionWithUITraitCollection:(UITraitCollection *)traitCollection
                                               containerSize:(CGSize)windowSize NS_RETURNS_RETAINED;

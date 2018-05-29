@@ -177,10 +177,17 @@
   self.options = options;
 }
 
+- (id<MKMapViewDelegate>)mapDelegate
+{
+  return ASLockedSelf(_mapDelegate);
+}
+
 - (void)setMapDelegate:(id<MKMapViewDelegate>)mapDelegate {
+  ASLockScopeSelf();
   _mapDelegate = mapDelegate;
   
   if (_mapView) {
+    ASDisplayNodeAssertMainThread();
     _mapView.delegate = mapDelegate;
   }
 }

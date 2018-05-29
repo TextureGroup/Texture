@@ -94,26 +94,26 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 @interface _ASHierarchyChangeSet ()
 
 // array index is old section index, map goes oldItem -> newItem
-@property (nonatomic, strong, readonly) NSMutableArray<ASIntegerMap *> *itemMappings;
+@property (nonatomic, readonly) NSMutableArray<ASIntegerMap *> *itemMappings;
 
 // array index is new section index, map goes newItem -> oldItem
-@property (nonatomic, strong, readonly) NSMutableArray<ASIntegerMap *> *reverseItemMappings;
+@property (nonatomic, readonly) NSMutableArray<ASIntegerMap *> *reverseItemMappings;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *insertItemChanges;
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalInsertItemChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchyItemChange *> *insertItemChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalInsertItemChanges;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *deleteItemChanges;
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalDeleteItemChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchyItemChange *> *deleteItemChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchyItemChange *> *originalDeleteItemChanges;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchyItemChange *> *reloadItemChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchyItemChange *> *reloadItemChanges;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchySectionChange *> *insertSectionChanges;
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchySectionChange *> *originalInsertSectionChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchySectionChange *> *insertSectionChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchySectionChange *> *originalInsertSectionChanges;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchySectionChange *> *deleteSectionChanges;
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchySectionChange *> *originalDeleteSectionChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchySectionChange *> *deleteSectionChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchySectionChange *> *originalDeleteSectionChanges;
 
-@property (nonatomic, strong, readonly) NSMutableArray<_ASHierarchySectionChange *> *reloadSectionChanges;
+@property (nonatomic, readonly) NSMutableArray<_ASHierarchySectionChange *> *reloadSectionChanges;
 
 @end
 

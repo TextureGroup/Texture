@@ -47,33 +47,33 @@ NS_ASSUME_NONNULL_BEGIN
  Specifies the direction children are stacked in. If horizontalAlignment and verticalAlignment were set, 
  they will be resolved again, causing justifyContent and alignItems to be updated accordingly
  */
-@property (nonatomic, assign) ASStackLayoutDirection direction;
+@property (nonatomic) ASStackLayoutDirection direction;
 /** The amount of space between each child. */
-@property (nonatomic, assign) CGFloat spacing;
+@property (nonatomic) CGFloat spacing;
 /** 
  Specifies how children are aligned horizontally. Depends on the stack direction, setting the alignment causes either
  justifyContent or alignItems to be updated. The alignment will remain valid after future direction changes.
  Thus, it is preferred to those properties
  */
-@property (nonatomic, assign) ASHorizontalAlignment horizontalAlignment;
+@property (nonatomic) ASHorizontalAlignment horizontalAlignment;
 /** 
  Specifies how children are aligned vertically. Depends on the stack direction, setting the alignment causes either
  justifyContent or alignItems to be updated. The alignment will remain valid after future direction changes.
  Thus, it is preferred to those properties
  */
-@property (nonatomic, assign) ASVerticalAlignment verticalAlignment;
+@property (nonatomic) ASVerticalAlignment verticalAlignment;
 /** The amount of space between each child. Defaults to ASStackLayoutJustifyContentStart */
-@property (nonatomic, assign) ASStackLayoutJustifyContent justifyContent;
+@property (nonatomic) ASStackLayoutJustifyContent justifyContent;
 /** Orientation of children along cross axis. Defaults to ASStackLayoutAlignItemsStretch */
-@property (nonatomic, assign) ASStackLayoutAlignItems alignItems;
+@property (nonatomic) ASStackLayoutAlignItems alignItems;
 /** Whether children are stacked into a single or multiple lines. Defaults to single line (ASStackLayoutFlexWrapNoWrap) */
-@property (nonatomic, assign) ASStackLayoutFlexWrap flexWrap;
+@property (nonatomic) ASStackLayoutFlexWrap flexWrap;
 /** Orientation of lines along cross axis if there are multiple lines. Defaults to ASStackLayoutAlignContentStart */
-@property (nonatomic, assign) ASStackLayoutAlignContent alignContent;
+@property (nonatomic) ASStackLayoutAlignContent alignContent;
 /** If the stack spreads on multiple lines using flexWrap, the amount of space between lines. */
-@property (nonatomic, assign) CGFloat lineSpacing;
+@property (nonatomic) CGFloat lineSpacing;
 /** Whether this stack can dispatch to other threads, regardless of which thread it's running on */
-@property (nonatomic, assign, getter=isConcurrent) BOOL concurrent;
+@property (nonatomic, getter=isConcurrent) BOOL concurrent;
 
 - (instancetype)init;
 

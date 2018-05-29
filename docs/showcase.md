@@ -34,7 +34,8 @@ permalink: /showcase.html
 		<br>
 		<b>Buffer</b>
 		<br>
-		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a>
+		<a href="https://overflow.buffer.com/2016/10/04/implementing-asyncdisplaykit-within-buffer-ios/">Smooth Scrolling in Buffer for iOS: How (and Why) We Implemented AsyncDisplayKit</a><br/><br/>
+		<a href="https://www.youtube.com/watch?v=Tzuz9usUpco">Texture: What, Why and How</a>
 		</td>
 		
 		</tr>
@@ -200,7 +201,7 @@ permalink: /showcase.html
 		<tr>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/tw/app/pairs%E6%B4%BE%E6%84%9B%E6%97%8F-%E6%89%BE%E5%88%B0%E7%90%86%E6%83%B3%E5%B0%8D%E8%B1%A1%E7%9A%84%E4%BA%A4%E5%8F%8Bapp/id825433065?mt=8"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple118/v4/5b/a0/e3/5ba0e32f-5e6c-e0cb-fca9-ccb6b8bb02a4/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<a href="https://itunes.apple.com/tw/app/pairs%E6%B4%BE%E6%84%9B%E6%97%8F-%E6%89%BE%E5%88%B0%E7%90%86%E6%83%B3%E5%B0%8D%E8%B1%A1%E7%9A%84%E4%BA%A4%E5%8F%8Bapp/id825433065?mt=8"><img class="roundrect" src="https://is1-ssl.mzstatic.com/image/thumb/Purple125/v4/2d/97/9a/2d979a6b-bda9-b493-e8f9-0defc69f62ed/AppIcon-1x_U007emarketing-85-220-0-4.png/492x0w.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>Pairs</b>
 		</td>
@@ -234,6 +235,12 @@ permalink: /showcase.html
 		<br /> 
 		<b>MensXP</b>
 		</td>
+		
+ 		<td align="center" valign="top">
+ 		<a href="https://itunes.apple.com/us/app/idiva-beauty-wedding-tips/id1359022878?ls=1&mt=8"><img class="roundrect" src="https://is2-ssl.mzstatic.com/image/thumb/Purple128/v4/aa/52/a7/aa52a7aa-b978-126b-94d9-85cabb22aa85/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-4.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+ 		<br /> 
+ 		<b>iDiva</b>
+ 		</td>
 
 		</tr>
 		

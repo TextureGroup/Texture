@@ -52,8 +52,8 @@
 }
 
 // Read-write overrides.
-@property (nonatomic, readwrite, assign, getter=isTracking) BOOL tracking;
-@property (nonatomic, readwrite, assign, getter=isTouchInside) BOOL touchInside;
+@property (getter=isTracking) BOOL tracking;
+@property (getter=isTouchInside) BOOL touchInside;
 
 /**
   @abstract Returns a key to be used in _controlEventDispatchTable that identifies the control event.

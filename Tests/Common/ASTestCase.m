@@ -95,7 +95,7 @@ static __weak ASTestCase *currentTestCase;
   }
 
   // Now that the autorelease pool is drained, drain the dealloc queue also.
-  [[ASDeallocQueue sharedDeallocationQueue] test_drain];
+  [[ASDeallocQueue sharedDeallocationQueue] drain];
 }
 
 + (ASTestCase *)currentTestCase

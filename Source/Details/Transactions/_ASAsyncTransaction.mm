@@ -26,14 +26,18 @@
 #import <map>
 #import <mutex>
 
+#ifndef __STRICT_ANSI__
+  #warning "Texture must be compiled with std=c++11 to prevent layout issues. gnu++ is not supported. This is hopefully temporary."
+#endif
+
 #define ASAsyncTransactionAssertMainThread() NSAssert(0 != pthread_main_np(), @"This method must be called on the main thread");
 
 NSInteger const ASDefaultTransactionPriority = 0;
 
 @interface ASAsyncTransactionOperation : NSObject
 - (instancetype)initWithOperationCompletionBlock:(asyncdisplaykit_async_transaction_operation_completion_block_t)operationCompletionBlock;
-@property (nonatomic, copy) asyncdisplaykit_async_transaction_operation_completion_block_t operationCompletionBlock;
-@property (atomic, strong) id value; // set on bg queue by the operation block
+@property (nonatomic) asyncdisplaykit_async_transaction_operation_completion_block_t operationCompletionBlock;
+@property id value; // set on bg queue by the operation block
 @end
 
 @implementation ASAsyncTransactionOperation
@@ -326,7 +330,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 }
 
 @interface _ASAsyncTransaction ()
-@property (atomic) ASAsyncTransactionState state;
+@property ASAsyncTransactionState state;
 @end
 
 

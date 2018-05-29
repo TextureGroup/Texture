@@ -37,8 +37,8 @@
 + (ASConfiguration *)defaultConfiguration NS_RETURNS_RETAINED
 {
   ASConfiguration *config = [[ASConfiguration alloc] init];
-  // On by default for now, pending fix for https://github.com/TextureGroup/Texture/issues/853
-  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  // TODO(wsdwsd0829): Fix #788 before enabling it.
+  // config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
   return config;
 }
 
@@ -63,10 +63,11 @@
   
   NSAssert(__builtin_popcount(requested) == 1, @"Cannot activate multiple features at once with this method.");
   
-  // If they're disabled, ignore them.
+  // We need to call out, whether it's enabled or not.
+  // A/B testing requires even "control" users to be activated.
   ASExperimentalFeatures enabled = requested & _config.experimentalFeatures;
-  ASExperimentalFeatures prevTriggered = atomic_fetch_or(&_activatedExperiments, enabled);
-  ASExperimentalFeatures newlyTriggered = enabled & ~prevTriggered;
+  ASExperimentalFeatures prevTriggered = atomic_fetch_or(&_activatedExperiments, requested);
+  ASExperimentalFeatures newlyTriggered = requested & ~prevTriggered;
   
   // Notify delegate if needed.
   if (newlyTriggered != 0) {
@@ -79,14 +80,13 @@
   return (enabled != 0);
 }
 
-#if DEBUG
+// Define this even when !DEBUG, since we may run our tests in release mode.
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration
 {
   ASConfigurationManager *inst = ASGetSharedConfigMgr();
   inst->_config = configuration ?: [self defaultConfiguration];
   atomic_store(&inst->_activatedExperiments, 0);
 }
-#endif
 
 @end
 

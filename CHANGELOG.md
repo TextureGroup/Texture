@@ -1,6 +1,11 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)
+- Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
+- [ASTextNode2] Upgrade lock safety by protecting all ivars (including rarely-changed ones).
+- User FLT_EPSILON in ASCeilPixelValue and ASFloorPixelValue to help with floating point precision errors when computing layouts for 3x devices. [Ricky Cancro](https://github.com/rcancro) [#838](https://github.com/TextureGroup/Texture/pull/864)
+- Disable interface colescing and match to pre-colescing interface update behavior [Max Wang](https://github.com/wsdwsd0829) [#862](https://github.com/TextureGroup/Texture/pull/862) 
+- [ASDisplayNode] Add safeAreaInsets, layoutMargins and related properties to ASDisplayNode, with full support for older OS versions [Yevgen Pogribnyi](https://github.com/ypogribnyi) [#685](https://github.com/TextureGroup/Texture/pull/685)
 - [ASPINRemoteImageDownloader] Allow cache to provide animated image. [Max Wang](https://github.com/wsdwsd0829) [#850](https://github.com/TextureGroup/Texture/pull/850)
 - [tvOS] Fixes errors when building against tvOS SDK [Alex Hill](https://github.com/alexhillc) [#728](https://github.com/TextureGroup/Texture/pull/728)
 - [ASDisplayNode] Add unit tests for layout z-order changes (with an open issue to fix).
@@ -42,6 +47,17 @@
 - [NoCopyRendering] Improved performance & fixed image memory not being tagged in Instruments. [Adlai Holler](https://github.com/Adlai-Holler) [#833](https://github.com/TextureGroup/Texture/pull/833/)
 - Use `NS_RETURNS_RETAINED` macro to make our methods a tiny bit faster. [Adlai Holler](https://github.com/Adlai-Holler) [#843](https://github.com/TextureGroup/Texture/pull/843/)
 - `ASDisplayNode, ASLayoutSpec, and ASLayoutElementStyle` now conform to `NSLocking`. They act as recursive locks. Useful locking macros have been added as `ASThread.h`. Subclasses / client code can lock these objects but should be careful as usual when dealing with locks. [Adlai Holler](https://github.com/Adlai-Holler)
+- Introduces `ASRecursiveUnfairLock` as an experiment to improve locking performance. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds an experiment to shorten init time. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds a check that Texture is compiled with stdc++11 as specified by the podfile. gnu++11 can cause subtle issues that are currently being investigated. [Adlai Holler](https://github.com/Adlai-Holler)
+- Adds an experiment to call ASNetworkImageNode callbacks off main. [Garrett Moon](https://github.com/garrettmoon)
+- Prevent UITextView from updating contentOffset while deallocating [Michael Schneider](https://github.com/maicki)
+- [ASCollectionNode/ASTableNode] Fix a crash occurs while remeasuring cell nodes. [Huy Nguyen](https://github.com/nguyenhuy) [#917](https://github.com/TextureGroup/Texture/pull/917)
+- Fix an issue where ASConfigurationDelegate would not call out for "control" users. If set, it now receives events whenever an experimental feature decision point occurs, whether it's enabled or not. [Adlai Holler](https://github.com/Adlai-Holler)
+- [ASDisplayNode] Fix an issue that causes a node to sometimes return an outdated calculated size or size range. [Huy Nguyen](https://github.com/nguyenhuy) [#808](https://github.com/TextureGroup/Texture/pull/808)
+- Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
+- Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
+- [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

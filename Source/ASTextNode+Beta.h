@@ -36,12 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
  This property can be useful for handling text which does not fit within the view by default. An example: like UILabel,
  ASTextNode will clip the left and right of the string "judar" if it's rendered in an italicised font.
  */
-@property (nonatomic, assign) UIEdgeInsets textContainerInset;
+@property (nonatomic) UIEdgeInsets textContainerInset;
 
 /**
  * Returns YES if this node is using the experimental implementation. NO otherwise. Will not change.
  */
-@property (atomic, readonly) BOOL usingExperiment;
+@property (readonly) BOOL usingExperiment;
 
 @end
 
