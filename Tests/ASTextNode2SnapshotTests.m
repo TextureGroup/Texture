@@ -34,7 +34,7 @@
   self.recordMode = NO;
 }
 
-- (void)testTextContainerInset
+- (void)testTextContainerInset_ASTextNode2
 {
   // trivial test case to ensure ASSnapshotTestCase works
   ASTextNode *textNode = [[ASTextNode alloc] init];
@@ -46,7 +46,7 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
-- (void)testTextContainerInsetIsIncludedWithSmallerConstrainedSize
+- (void)testTextContainerInsetIsIncludedWithSmallerConstrainedSize_ASTextNode2
 {
   UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
   backgroundView.layer.as_allowsHighlightDrawing = YES;
@@ -69,7 +69,7 @@
   ASSnapshotVerifyLayer(backgroundView.layer, nil);
 }
 
-- (void)testTextContainerInsetHighlight
+- (void)testTextContainerInsetHighlight_ASTextNode2
 {
   UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
   backgroundView.layer.as_allowsHighlightDrawing = YES;
@@ -92,7 +92,7 @@
 }
 
 // This test is disabled because the fast-path is disabled.
-- (void)DISABLED_testThatFastPathTruncationWorks
+- (void)DISABLED_testThatFastPathTruncationWorks_ASTextNode2
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
@@ -100,7 +100,7 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
-- (void)testThatSlowPathTruncationWorks
+- (void)testThatSlowPathTruncationWorks_ASTextNode2
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
@@ -110,7 +110,7 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
-- (void)testShadowing
+- (void)testShadowing_ASTextNode2
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important"];
@@ -125,7 +125,7 @@
 /**
  * https://github.com/TextureGroup/Texture/issues/822
  */
-- (void)DISABLED_testThatTruncationTokenAttributesPrecedeThoseInheritedFromTextWhenTruncateTailMode
+- (void)DISABLED_testThatTruncationTokenAttributesPrecedeThoseInheritedFromTextWhenTruncateTailMode_ASTextNode2
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.style.maxSize = CGSizeMake(20, 80);
