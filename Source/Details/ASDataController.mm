@@ -295,9 +295,11 @@ typedef void (^ASDataControllerSynchronizationBlock)();
                              previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
-
+  if (self.layoutDelegate != nil) {
+    // TODO: https://github.com/TextureGroup/Texture/issues/948
+    return;
+  }
   NSUInteger sectionCount = [self itemCountsFromDataSource].size();
-  BOOL canDelegate = (self.layoutDelegate != nil);
   if (sectionCount > 0) {
     NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
     ASSizeRange newSizeRange = ASSizeRangeZero;
@@ -309,11 +311,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       // If supplementary node doesn't exist and size is now non-zero, insert one.
       for (NSIndexPath *indexPath in indexPaths) {
         ASCollectionElement *previousElement = [previousMap supplementaryElementOfKind:kind atIndexPath:indexPath];
-        if (canDelegate) {
-          // TODO: https://github.com/TextureGroup/Texture/issues/948
-        } else {
-          newSizeRange = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
-        }
+        newSizeRange = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
         BOOL sizeRangeIsZero = ASSizeRangeEqualToSizeRange(ASSizeRangeZero, newSizeRange);
         if (previousElement != nil && sizeRangeIsZero) {
           [indexPathsToDeleteForKind addObject:indexPath];
