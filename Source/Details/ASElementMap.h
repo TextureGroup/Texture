@@ -114,7 +114,7 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * A very terse description e.g. { itemCounts = [ <S0: 1> <S1: 16> ] }
  */
-@property (atomic, readonly) NSString *smallDescription;
+@property (readonly) NSString *smallDescription;
 
 #pragma mark - Initialization -- Only Useful to ASDataController
 

@@ -126,7 +126,7 @@ extern const CGSize ASTextContainerMaxSize;
  to a specified value, lets each line of height be the same.
  */
 @interface ASTextLinePositionSimpleModifier : NSObject <ASTextLinePositionModifier>
-@property (assign) CGFloat fixedLineHeight; ///< The fixed line height (distance between two baseline).
+@property CGFloat fixedLineHeight; ///< The fixed line height (distance between two baseline).
 @end
 
 
@@ -220,9 +220,9 @@ extern const CGSize ASTextContainerMaxSize;
 ///=============================================================================
 
 ///< The text container
-@property (nonatomic, strong, readonly) ASTextContainer *container;
+@property (nonatomic, readonly) ASTextContainer *container;
 ///< The full text
-@property (nonatomic, strong, readonly) NSAttributedString *text;
+@property (nonatomic, readonly) NSAttributedString *text;
 ///< The text range in full text
 @property (nonatomic, readonly) NSRange range;
 ///< CTFrameSetter
@@ -230,17 +230,17 @@ extern const CGSize ASTextContainerMaxSize;
 ///< CTFrame
 @property (nonatomic, readonly) CTFrameRef frame;
 ///< Array of `ASTextLine`, no truncated
-@property (nonatomic, strong, readonly) NSArray<ASTextLine *> *lines;
+@property (nonatomic, readonly) NSArray<ASTextLine *> *lines;
 ///< ASTextLine with truncated token, or nil
-@property (nullable, nonatomic, strong, readonly) ASTextLine *truncatedLine;
+@property (nullable, nonatomic, readonly) ASTextLine *truncatedLine;
 ///< Array of `ASTextAttachment`
-@property (nullable, nonatomic, strong, readonly) NSArray<ASTextAttachment *> *attachments;
+@property (nullable, nonatomic, readonly) NSArray<ASTextAttachment *> *attachments;
 ///< Array of NSRange(wrapped by NSValue) in text
-@property (nullable, nonatomic, strong, readonly) NSArray<NSValue *> *attachmentRanges;
+@property (nullable, nonatomic, readonly) NSArray<NSValue *> *attachmentRanges;
 ///< Array of CGRect(wrapped by NSValue) in container
-@property (nullable, nonatomic, strong, readonly) NSArray<NSValue *> *attachmentRects;
+@property (nullable, nonatomic, readonly) NSArray<NSValue *> *attachmentRects;
 ///< Set of Attachment (UIImage/UIView/CALayer)
-@property (nullable, nonatomic, strong, readonly) NSSet *attachmentContentsSet;
+@property (nullable, nonatomic, readonly) NSSet *attachmentContentsSet;
 ///< Number of rows
 @property (nonatomic, readonly) NSUInteger rowCount;
 ///< Visible text range

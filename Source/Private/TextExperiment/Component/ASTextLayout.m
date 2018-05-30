@@ -316,36 +316,36 @@ dispatch_semaphore_signal(_lock);
 
 @interface ASTextLayout ()
 
-@property (nonatomic, readwrite) ASTextContainer *container;
-@property (nonatomic, readwrite) NSAttributedString *text;
-@property (nonatomic, readwrite) NSRange range;
+@property (nonatomic) ASTextContainer *container;
+@property (nonatomic) NSAttributedString *text;
+@property (nonatomic) NSRange range;
 
-@property (nonatomic, readwrite) CTFramesetterRef frameSetter;
-@property (nonatomic, readwrite) CTFrameRef frame;
-@property (nonatomic, readwrite) NSArray *lines;
-@property (nonatomic, readwrite) ASTextLine *truncatedLine;
-@property (nonatomic, readwrite) NSArray *attachments;
-@property (nonatomic, readwrite) NSArray *attachmentRanges;
-@property (nonatomic, readwrite) NSArray *attachmentRects;
-@property (nonatomic, readwrite) NSSet *attachmentContentsSet;
-@property (nonatomic, readwrite) NSUInteger rowCount;
-@property (nonatomic, readwrite) NSRange visibleRange;
-@property (nonatomic, readwrite) CGRect textBoundingRect;
-@property (nonatomic, readwrite) CGSize textBoundingSize;
+@property (nonatomic) CTFramesetterRef frameSetter;
+@property (nonatomic) CTFrameRef frame;
+@property (nonatomic) NSArray *lines;
+@property (nonatomic) ASTextLine *truncatedLine;
+@property (nonatomic) NSArray *attachments;
+@property (nonatomic) NSArray *attachmentRanges;
+@property (nonatomic) NSArray *attachmentRects;
+@property (nonatomic) NSSet *attachmentContentsSet;
+@property (nonatomic) NSUInteger rowCount;
+@property (nonatomic) NSRange visibleRange;
+@property (nonatomic) CGRect textBoundingRect;
+@property (nonatomic) CGSize textBoundingSize;
 
-@property (nonatomic, readwrite) BOOL containsHighlight;
-@property (nonatomic, readwrite) BOOL needDrawBlockBorder;
-@property (nonatomic, readwrite) BOOL needDrawBackgroundBorder;
-@property (nonatomic, readwrite) BOOL needDrawShadow;
-@property (nonatomic, readwrite) BOOL needDrawUnderline;
-@property (nonatomic, readwrite) BOOL needDrawText;
-@property (nonatomic, readwrite) BOOL needDrawAttachment;
-@property (nonatomic, readwrite) BOOL needDrawInnerShadow;
-@property (nonatomic, readwrite) BOOL needDrawStrikethrough;
-@property (nonatomic, readwrite) BOOL needDrawBorder;
+@property (nonatomic) BOOL containsHighlight;
+@property (nonatomic) BOOL needDrawBlockBorder;
+@property (nonatomic) BOOL needDrawBackgroundBorder;
+@property (nonatomic) BOOL needDrawShadow;
+@property (nonatomic) BOOL needDrawUnderline;
+@property (nonatomic) BOOL needDrawText;
+@property (nonatomic) BOOL needDrawAttachment;
+@property (nonatomic) BOOL needDrawInnerShadow;
+@property (nonatomic) BOOL needDrawStrikethrough;
+@property (nonatomic) BOOL needDrawBorder;
 
-@property (nonatomic, assign) NSUInteger *lineRowsIndex;
-@property (nonatomic, assign) ASRowEdge *lineRowsEdge; ///< top-left origin
+@property (nonatomic) NSUInteger *lineRowsIndex;
+@property (nonatomic) ASRowEdge *lineRowsEdge; ///< top-left origin
 
 @end
 

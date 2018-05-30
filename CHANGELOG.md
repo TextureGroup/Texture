@@ -1,6 +1,9 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+
 - Add snapshot test for astextnode2. [Max Wang](https://github.com/wsdwsd0829) [#935](https://github.com/TextureGroup/Texture/pull/935)
+
+## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
 - [ASTextNode2] Upgrade lock safety by protecting all ivars (including rarely-changed ones).
 - User FLT_EPSILON in ASCeilPixelValue and ASFloorPixelValue to help with floating point precision errors when computing layouts for 3x devices. [Ricky Cancro](https://github.com/rcancro) [#838](https://github.com/TextureGroup/Texture/pull/864)
@@ -55,6 +58,9 @@
 - [ASCollectionNode/ASTableNode] Fix a crash occurs while remeasuring cell nodes. [Huy Nguyen](https://github.com/nguyenhuy) [#917](https://github.com/TextureGroup/Texture/pull/917)
 - Fix an issue where ASConfigurationDelegate would not call out for "control" users. If set, it now receives events whenever an experimental feature decision point occurs, whether it's enabled or not. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASDisplayNode] Fix an issue that causes a node to sometimes return an outdated calculated size or size range. [Huy Nguyen](https://github.com/nguyenhuy) [#808](https://github.com/TextureGroup/Texture/pull/808)
+- Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
+- Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
+- [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

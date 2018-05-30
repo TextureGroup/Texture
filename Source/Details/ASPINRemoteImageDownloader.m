@@ -76,7 +76,7 @@
 @end
 
 @protocol ASPINDiskCache
-@property (assign) NSUInteger byteLimit;
+@property NSUInteger byteLimit;
 @end
 
 @interface ASPINRemoteImageManager : PINRemoteImageManager

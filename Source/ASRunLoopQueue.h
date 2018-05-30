@@ -48,19 +48,19 @@ AS_SUBCLASSING_RESTRICTED
 
 - (void)enqueue:(ObjectType)object;
 
-@property (atomic, readonly) BOOL isEmpty;
+@property (readonly) BOOL isEmpty;
 
-@property (nonatomic, assign) NSUInteger batchSize;           // Default == 1.
-@property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
+@property (nonatomic) NSUInteger batchSize;           // Default == 1.
+@property (nonatomic) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
 
 @end
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
-@property (atomic, readonly) BOOL isEmpty;
+@property (readonly) BOOL isEmpty;
 
-@property (atomic, readonly, getter=isEnabled) BOOL enabled;
+@property (readonly, getter=isEnabled) BOOL enabled;
 
 /**
  * The queue to run on main run loop before CATransaction commit.
@@ -69,21 +69,19 @@ AS_SUBCLASSING_RESTRICTED
  * to get last chance of updating/coalesce info like interface state.
  * Each node will only be called once per transaction commit to reflect interface change.
  */
-@property (class, atomic, readonly) ASCATransactionQueue *sharedQueue;
+@property (class, readonly) ASCATransactionQueue *sharedQueue;
 + (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
 
 @end
 
-
-AS_SUBCLASSING_RESTRICTED
 @interface ASDeallocQueue : NSObject
 
-@property (class, atomic, readonly) ASDeallocQueue *sharedDeallocationQueue;
+@property (class, readonly) ASDeallocQueue *sharedDeallocationQueue;
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
 
-- (void)test_drain;
+- (void)drain;
 
 - (void)releaseObjectInBackground:(id __strong _Nullable * _Nonnull)objectPtr;
 

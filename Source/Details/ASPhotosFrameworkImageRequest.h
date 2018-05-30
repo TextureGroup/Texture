@@ -59,7 +59,7 @@ API_AVAILABLE(ios(8.0), tvos(10.0))
  @discussion Some properties of this object are ignored when converting this request into a URL.
  As of iOS SDK 9.0, these properties are `progressHandler` and `synchronous`.
  */
-@property (nonatomic, strong) PHImageRequestOptions *options;
+@property (nonatomic) PHImageRequestOptions *options;
 
 /**
  @return A new URL converted from this request.

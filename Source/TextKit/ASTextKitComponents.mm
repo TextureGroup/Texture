@@ -24,7 +24,7 @@
   // Prevent UITextView from updating contentOffset while deallocating: https://github.com/TextureGroup/Texture/issues/860
   BOOL _deallocating;
 }
-@property (atomic, assign) CGRect threadSafeBounds;
+@property CGRect threadSafeBounds;
 @end
 
 @implementation ASTextKitComponentsTextView
@@ -73,9 +73,9 @@
 @interface ASTextKitComponents ()
 
 // read-write redeclarations
-@property (nonatomic, strong, readwrite) NSTextStorage *textStorage;
-@property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
-@property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
+@property (nonatomic) NSTextStorage *textStorage;
+@property (nonatomic) NSTextContainer *textContainer;
+@property (nonatomic) NSLayoutManager *layoutManager;
 
 @end
 

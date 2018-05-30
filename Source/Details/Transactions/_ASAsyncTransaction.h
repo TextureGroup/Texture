@@ -76,13 +76,13 @@ extern NSInteger const ASDefaultTransactionPriority;
 /**
  A block that is called when the transaction is completed.
  */
-@property (nonatomic, readonly, copy, nullable) asyncdisplaykit_async_transaction_completion_block_t completionBlock;
+@property (nullable, nonatomic, readonly) asyncdisplaykit_async_transaction_completion_block_t completionBlock;
 
 /**
  The state of the transaction.
  @see ASAsyncTransactionState
  */
-@property (readonly, assign) ASAsyncTransactionState state;
+@property (readonly) ASAsyncTransactionState state;
 
 /**
  @summary Adds a synchronous operation to the transaction.  The execution block will be executed immediately.

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCollectionLayoutContext (Private)
 
-@property (nonatomic, strong, readonly) Class<ASCollectionLayoutDelegate> layoutDelegateClass;
+@property (nonatomic, readonly) Class<ASCollectionLayoutDelegate> layoutDelegateClass;
 @property (nonatomic, weak, readonly) ASCollectionLayoutCache *layoutCache;
 
 - (instancetype)initWithViewportSize:(CGSize)viewportSize

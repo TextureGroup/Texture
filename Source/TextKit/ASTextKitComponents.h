@@ -61,10 +61,10 @@ AS_SUBCLASSING_RESTRICTED
 - (CGSize)sizeForConstrainedWidth:(CGFloat)constrainedWidth
               forMaxNumberOfLines:(NSInteger)numberOfLines;
 
-@property (nonatomic, strong, readonly) NSTextStorage *textStorage;
-@property (nonatomic, strong, readonly) NSTextContainer *textContainer;
-@property (nonatomic, strong, readonly) NSLayoutManager *layoutManager;
-@property (nonatomic, strong, nullable) ASTextKitComponentsTextView *textView;
+@property (nonatomic, readonly) NSTextStorage *textStorage;
+@property (nonatomic, readonly) NSTextContainer *textContainer;
+@property (nonatomic, readonly) NSLayoutManager *layoutManager;
+@property (nonatomic, nullable) ASTextKitComponentsTextView *textView;
 
 @end
 
