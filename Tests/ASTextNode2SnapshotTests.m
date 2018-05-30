@@ -34,6 +34,14 @@
   self.recordMode = NO;
 }
 
+- (void)tearDown
+{
+  [super tearDown];
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
+  config.experimentalFeatures = kNilOptions;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+}
+
 - (void)testTextContainerInset_ASTextNode2
 {
   // trivial test case to ensure ASSnapshotTestCase works
