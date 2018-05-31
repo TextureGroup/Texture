@@ -34,6 +34,10 @@
   #define ASSetDebugNames(...)
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
+ASDISPLAYNODE_EXTERN_C_BEGIN
+
 /// For deallocation of objects on the main thread across multiple run loops.
 extern void ASPerformMainThreadDeallocation(id _Nullable __strong * _Nonnull objectPtr);
 
@@ -59,7 +63,7 @@ ASDISPLAYNODE_INLINE BOOL ASInterfaceStateIncludesMeasureLayout(ASInterfaceState
   return ((interfaceState & ASInterfaceStateMeasureLayout) == ASInterfaceStateMeasureLayout);
 }
 
-__unused static NSString * _Nonnull NSStringFromASInterfaceState(ASInterfaceState interfaceState)
+__unused static NSString * NSStringFromASInterfaceState(ASInterfaceState interfaceState)
 {
   NSMutableArray *states = [NSMutableArray array];
   if (interfaceState == ASInterfaceStateNone) {
@@ -88,7 +92,7 @@ __unused static NSString * _Nonnull NSStringFromASInterfaceState(ASInterfaceStat
 
 /// e.g. { +Visible, -Preload } (although that should never actually happen.)
 /// NOTE: Changes to MeasureLayout state don't really mean anything so we omit them for now.
-__unused static NSString * _Nonnull NSStringFromASInterfaceStateChange(ASInterfaceState oldState, ASInterfaceState newState)
+__unused static NSString *NSStringFromASInterfaceStateChange(ASInterfaceState oldState, ASInterfaceState newState)
 {
   if (oldState == newState) {
     return @"{ }";
@@ -103,10 +107,6 @@ __unused static NSString * _Nonnull NSStringFromASInterfaceStateChange(ASInterfa
 }
 
 #undef INTERFACE_STATE_DELTA
-
-NS_ASSUME_NONNULL_BEGIN
-
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  Returns the appropriate interface state for a given ASDisplayNode and window
@@ -218,7 +218,7 @@ extern void ASDisplayNodeDisableHierarchyNotifications(ASDisplayNode *node);
 extern void ASDisplayNodeEnableHierarchyNotifications(ASDisplayNode *node);
 
 // Not to be called directly.
-extern void _ASSetDebugNames(Class _Nonnull owningClass, NSString * _Nonnull names, ASDisplayNode * _Nullable object, ...);
+extern void _ASSetDebugNames(Class owningClass, NSString *names, ASDisplayNode *object, ...);
 
 ASDISPLAYNODE_EXTERN_C_END
 
