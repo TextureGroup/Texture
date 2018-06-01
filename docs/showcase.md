@@ -243,7 +243,15 @@ permalink: /showcase.html
  		</td>
 
 		</tr>
+		<tr>
 		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/waplog-dating-app-chat-meet/id557997762?mt=8"><img class="roundrect" src="https://is5-ssl.mzstatic.com/image/thumb/Purple125/v4/13/82/95/1382952c-c9de-8b97-44b2-4b4275b692e9/AppIcon-1x_U007emarketing-85-220-0-6.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Waplog</b>
+		</td>
+
+		</tr>
 		</table>
 		
 		<br />
