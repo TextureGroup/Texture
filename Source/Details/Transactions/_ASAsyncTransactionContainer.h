@@ -64,15 +64,23 @@ typedef NS_ENUM(NSUInteger, ASAsyncTransactionContainerState) {
 /**
  @summary Returns the current async transaction for this layer. A new transaction is created if one
  did not already exist. This method will always return an open, uncommitted transaction.
- @desc asyncdisplaykit_isAsyncTransactionContainer does not need to be YES for this to return a transaction.
+ @desc asyncdisplaykit_asyncTransactionContainer does not need to be YES for this to return a transaction.
+ Defaults to nil.
  */
 @property (nullable, nonatomic, readonly) _ASAsyncTransaction *asyncdisplaykit_asyncTransaction;
 
 /**
- @summary Goes up the superlayer chain until it finds the first layer with asyncdisplaykit_isAsyncTransactionContainer=YES (including the receiver) and returns it.
+ @summary Goes up the superlayer chain until it finds the first layer with asyncdisplaykit_asyncTransactionContainer=YES (including the receiver) and returns it.
  Returns nil if no parent container is found.
  */
 @property (nullable, nonatomic, readonly) CALayer *asyncdisplaykit_parentTransactionContainer;
+
+/**
+ @summary Whether or not this layer should serve as a transaction container.
+ Defaults to NO.
+ */
+@property (nonatomic, getter=asyncdisplaykit_isAsyncTransactionContainer, setter = asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;
+
 @end
 
 @interface UIView (ASAsyncTransactionContainer) <ASAsyncTransactionContainer>
