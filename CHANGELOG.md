@@ -2,6 +2,8 @@
 * Add your own contributions to the next release on the line below this with your name.
 - Make `ASPerformMainThreadDeallocation` visible in C. [Adlai Holler](https://github.com/Adlai-Holler)
 
+- Add snapshot test for astextnode2. [Max Wang](https://github.com/wsdwsd0829) [#935](https://github.com/TextureGroup/Texture/pull/935)
+
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
 - [ASTextNode2] Upgrade lock safety by protecting all ivars (including rarely-changed ones).
