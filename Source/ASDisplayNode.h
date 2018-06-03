@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
+#import <AsyncDisplayKit/ASLocking.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -127,7 +128,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : NSObject <NSLocking>
+@interface ASDisplayNode : NSObject <ASLocking>
 
 /** @name Initializing a node object */
 
