@@ -26,8 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void(^asyncdisplaykit_async_transaction_completion_block_t)(_ASAsyncTransaction *completedTransaction, BOOL canceled);
 typedef id<NSObject> _Nullable(^asyncdisplaykit_async_transaction_operation_block_t)(void);
 typedef void(^asyncdisplaykit_async_transaction_operation_completion_block_t)(id _Nullable value, BOOL canceled);
-typedef void(^asyncdisplaykit_async_transaction_complete_async_operation_block_t)(id _Nullable value);
-typedef void(^asyncdisplaykit_async_transaction_async_operation_block_t)(asyncdisplaykit_async_transaction_complete_async_operation_block_t completeOperationBlock);
 
 /**
  State is initially ASAsyncTransactionStateOpen.
@@ -76,29 +74,13 @@ extern NSInteger const ASDefaultTransactionPriority;
 /**
  A block that is called when the transaction is completed.
  */
-@property (nullable, nonatomic, readonly) asyncdisplaykit_async_transaction_completion_block_t completionBlock;
+@property (nullable, readonly) asyncdisplaykit_async_transaction_completion_block_t completionBlock;
 
 /**
  The state of the transaction.
  @see ASAsyncTransactionState
  */
 @property (readonly) ASAsyncTransactionState state;
-
-/**
- @summary Adds a synchronous operation to the transaction.  The execution block will be executed immediately.
-
- @desc The block will be executed on the specified queue and is expected to complete synchronously.  The async
- transaction will wait for all operations to execute on their appropriate queues, so the blocks may still be executing
- async if they are running on a concurrent queue, even though the work for this block is synchronous.
-
- @param block The execution block that will be executed on a background queue.  This is where the expensive work goes.
- @param queue The dispatch queue on which to execute the block.
- @param completion The completion block that will be executed with the output of the execution block when all of the
- operations in the transaction are completed. Executed and released on callbackQueue.
- */
-- (void)addOperationWithBlock:(asyncdisplaykit_async_transaction_operation_block_t)block
-                        queue:(dispatch_queue_t)queue
-                   completion:(nullable asyncdisplaykit_async_transaction_operation_completion_block_t)completion;
 
 /**
  @summary Adds a synchronous operation to the transaction.  The execution block will be executed immediately.
@@ -117,56 +99,6 @@ extern NSInteger const ASDefaultTransactionPriority;
                      priority:(NSInteger)priority
                         queue:(dispatch_queue_t)queue
                    completion:(nullable asyncdisplaykit_async_transaction_operation_completion_block_t)completion;
-
-
-/**
- @summary Adds an async operation to the transaction.  The execution block will be executed immediately.
-
- @desc The block will be executed on the specified queue and is expected to complete asynchronously.  The block will be
- supplied with a completion block that can be executed once its async operation is completed.  This is useful for
- network downloads and other operations that have an async API.
-
- WARNING: Consumers MUST call the completeOperationBlock passed into the work block, or objects will be leaked!
-
- @param block The execution block that will be executed on a background queue.  This is where the expensive work goes.
- @param queue The dispatch queue on which to execute the block.
- @param completion The completion block that will be executed with the output of the execution block when all of the
- operations in the transaction are completed. Executed and released on callbackQueue.
- */
-- (void)addAsyncOperationWithBlock:(asyncdisplaykit_async_transaction_async_operation_block_t)block
-                             queue:(dispatch_queue_t)queue
-                        completion:(nullable asyncdisplaykit_async_transaction_operation_completion_block_t)completion;
-
-/**
- @summary Adds an async operation to the transaction.  The execution block will be executed immediately.
- 
- @desc The block will be executed on the specified queue and is expected to complete asynchronously.  The block will be
- supplied with a completion block that can be executed once its async operation is completed.  This is useful for
- network downloads and other operations that have an async API.
- 
- WARNING: Consumers MUST call the completeOperationBlock passed into the work block, or objects will be leaked!
- 
- @param block The execution block that will be executed on a background queue.  This is where the expensive work goes.
- @param priority Execution priority; Tasks with higher priority will be executed sooner
- @param queue The dispatch queue on which to execute the block.
- @param completion The completion block that will be executed with the output of the execution block when all of the
- operations in the transaction are completed. Executed and released on callbackQueue.
- */
-- (void)addAsyncOperationWithBlock:(asyncdisplaykit_async_transaction_async_operation_block_t)block
-                          priority:(NSInteger)priority
-                             queue:(dispatch_queue_t)queue
-                        completion:(nullable asyncdisplaykit_async_transaction_operation_completion_block_t)completion;
-
-
-
-/**
- @summary Adds a block to run on the completion of the async transaction.
-
- @param completion The completion block that will be executed with the output of the execution block when all of the
- operations in the transaction are completed. Executed and released on callbackQueue.
- */
-
-- (void)addCompletionBlock:(asyncdisplaykit_async_transaction_completion_block_t)completion;
 
 /**
  @summary Cancels all operations in the transaction.
