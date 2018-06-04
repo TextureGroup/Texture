@@ -15,6 +15,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * An extension of NSLocking that supports -tryLock.
+ */
 @protocol ASLocking <NSLocking>
 
 /// Try to take lock without blocking. Returns whether the lock was taken.
@@ -23,60 +26,111 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Take multiple locks "simultaneously," avoiding deadlocks
- * caused by lock ordering.
- *
- * We use an explicit count argument to handle nil locks.
- * If you pass a nil lock, obviously we ignore it.
- *
- * TODO: Implement a scoped version. The scope variable would be
- * a struct containing the lock count and the locks to unlock.
+ * A set of locks acquired during ASLockSequence.
  */
-NS_INLINE void ASLockMany(unsigned count, id<ASLocking> _Nullable arg0, ...) {
-  if (count == 0) {
-    return;
-  }
-  
-  BOOL done = NO;
-  while (!done) {
-    // Don't retain/release locks. Arguments are retained by caller.
-    __unsafe_unretained id<ASLocking> ownedLocks[count];
-    va_list locks;
-    va_start(locks, arg0);
-    for (int i = 0; i < count; i++) {
-      __unsafe_unretained id<ASLocking> lock = va_arg(locks, id<ASLocking>);
-      
-      // Attempt to lock, or pass if nil.
-      BOOL locked = (lock ? [lock tryLock] : YES);
-      
-      if (!locked) {
-        // If we failed to lock, release what we have, yield, and start over.
-        for (int j = 0; j < i; j++) {
-          [ownedLocks[j] unlock];
-        }
-        sched_yield();
-        break;
-      } else if (i == count - 1) {
-        // If we suceeded and this was the last, we're done.
-        done = YES;
-      } else {
-        // Otherwise note that we have this lock and keep going.
-        ownedLocks[i] = lock;
-      }
-    }
-    va_end(locks);
+typedef struct {
+  unsigned count;
+  CFTypeRef _Nullable locks[32];
+} ASLockSet;
+
+/**
+ * Declare a lock set that is automatically unlocked at the end of scope.
+ *
+ * We use this instead of a scope-locking macro because we want to be able
+ * to step through the lock sequence block in the debugger.
+ */
+#define ASScopedLockSet __unused ASLockSet __attribute__((cleanup(ASUnlockSet)))
+
+/**
+ * A block that attempts to add a lock to a lock sequence.
+ * Such a block is provided to the caller of ASLockSequence.
+ *
+ * Returns whether the lock was added. You should return
+ * NO from your lock sequence body if it returns NO.
+ *
+ * For instance, you might write `return addLock(l1) && addLock(l2)`.
+ *
+ * @param lock The lock to attempt to add.
+ * @return YES if the lock was added, NO otherwise.
+ */
+typedef BOOL(^ASAddLockBlock)(id<ASLocking> lock);
+
+/**
+ * A block that attempts to lock multiple locks in sequence.
+ * Such a block is provided by the caller of ASLockSequence.
+ *
+ * The block may be run multiple times, if not all locks are immediately
+ * available. Therefore the block should be idempotent.
+ *
+ * The block should attempt to invoke addLock multiple times with
+ * different locks. It should return NO as soon as any addLock
+ * operation fails.
+ *
+ * For instance, you might write `return addLock(l1) && addLock(l2)`.
+ *
+ * @param addLock A block you can call to attempt to add a lock.
+ * @return YES if all locks were added, NO otherwise.
+ */
+typedef BOOL(^ASLockSequenceBlock)(NS_NOESCAPE ASAddLockBlock addLock);
+
+/**
+ * Unlock and release all of the locks in this lock set.
+ */
+NS_INLINE void ASUnlockSet(ASLockSet *lockSet) {
+  for (unsigned i = 0; i < lockSet->count; i++) {
+    CFTypeRef lock = lockSet->locks[i];
+    [(__bridge id<ASLocking>)lock unlock];
+    CFRelease(lock);
   }
 }
 
-NS_INLINE void ASUnlockMany(unsigned count, id<NSLocking> arg0, ...)
+/**
+ * Take multiple locks "simultaneously," avoiding deadlocks
+ * caused by lock ordering.
+ *
+ * The block you provide should attempt to take a series of locks,
+ * using the provided `addLock` block. As soon as any addLock fails,
+ * you should return NO.
+ *
+ * For example:
+ * ASLockSequence(^(ASAddLockBlock addLock) ^{
+ *   return addLock(l0) && addLock(l1);
+ * });
+ *
+ * Note: This function doesn't protect from lock ordering deadlocks if
+ * one of the locks is already locked (recursive.) Only locks taken
+ * inside this function are guaranteed not to cause a deadlock.
+ */
+NS_INLINE ASLockSet ASLockSequence(NS_NOESCAPE ASLockSequenceBlock body)
 {
-  va_list locks;
-  va_start(locks, arg0);
-  for (int i = 0; i < count; i++) {
-    __unsafe_unretained id<ASLocking> lock = va_arg(locks, id<ASLocking>);
-    [lock unlock];
+  __block ASLockSet locks = (ASLockSet){0};
+  BOOL (^addLock)(id<ASLocking>) = ^(id<ASLocking> obj) {
+    if (!obj) {
+      return YES;
+    }
+    
+    if ([obj tryLock]) {
+      locks.locks[locks.count++] = (__bridge_retained CFTypeRef)obj;
+      return YES;
+    }
+    return NO;
+  };
+  
+  /**
+   * Repeatedly try running their block, passing in our `addLock`
+   * until it succeeds. If it fails, unlock all and yield the thread
+   * to reduce spinning.
+   */
+  while (true) {
+    if (body(addLock)) {
+      // Success
+      return locks;
+    } else {
+      ASUnlockSet(&locks);
+      locks.count = 0;
+      sched_yield();
+    }
   }
-  va_end(locks);
 }
 
 /**
