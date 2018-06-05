@@ -87,6 +87,16 @@ ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unre
   id<NSLocking> __lockToken __attribute__((cleanup(_ASUnlockScopeCleanup))) NS_VALID_UNTIL_END_OF_SCOPE = nsLocking; \
   [__lockToken unlock];
 
+#define ASSynthesizeLockingMethodsWithMutex(mutex) \
+- (void)lock { mutex.lock(); } \
+- (void)unlock { mutex.unlock(); } \
+- (BOOL)tryLock { return mutex.tryLock(); }
+
+#define ASSynthesizeLockingMethodsWithObject(object) \
+- (void)lock { [object lock]; } \
+- (void)unlock { [object unlock]; } \
+- (BOOL)tryLock { return [object tryLock]; }
+
 ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
   [*lockPtr lock];
 }
@@ -265,6 +275,25 @@ namespace ASDN {
     Mutex (const Mutex&) = delete;
     Mutex &operator=(const Mutex&) = delete;
 
+    bool tryLock() {
+      if (gMutex_unfair) {
+        if (_recursive) {
+          return ASRecursiveUnfairLockTryLock(&_runfair);
+        } else {
+          return os_unfair_lock_trylock(&_unfair);
+        }
+      } else {
+        auto result = pthread_mutex_trylock(&_m);
+        if (result == 0) {
+          return true;
+        } else if (result == EBUSY) {
+          return false;
+        } else {
+          ASDisplayNodeCFailAssert(@"Locking error: %s", strerror(result));
+          return true; // if we return false we may enter an infinite loop.
+        }
+      }
+    }
     void lock() {
       if (gMutex_unfair) {
         if (_recursive) {
