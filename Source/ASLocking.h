@@ -13,7 +13,11 @@
 #import <Foundation/Foundation.h>
 #import <pthread/sched.h>
 
+#import <AsyncDisplayKit/ASAssert.h>
+
 NS_ASSUME_NONNULL_BEGIN
+
+#define kLockSetCapacity 32
 
 /**
  * An extension of NSLocking that supports -tryLock.
@@ -30,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef struct {
   unsigned count;
-  CFTypeRef _Nullable locks[32];
+  CFTypeRef _Nullable locks[kLockSetCapacity];
 } ASLockSet;
 
 /**
@@ -105,7 +109,16 @@ NS_INLINE ASLockSet ASLockSequence(NS_NOESCAPE ASLockSequenceBlock body)
 {
   __block ASLockSet locks = (ASLockSet){0};
   BOOL (^addLock)(id<ASLocking>) = ^(id<ASLocking> obj) {
+    
+    // nil lock = ignore.
     if (!obj) {
+      return YES;
+    }
+    
+    // If they go over capacity, assert and return YES.
+    // If we return NO, they will enter an infinite loop.
+    if (locks.count == kLockSetCapacity) {
+      ASDisplayNodeCFailAssert(@"Locking more than %d locks at once is not supported.", kLockSetCapacity);
       return YES;
     }
     
