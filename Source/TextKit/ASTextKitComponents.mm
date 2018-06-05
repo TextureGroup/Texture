@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 
 #import <tgmath.h>
 
@@ -109,6 +110,11 @@
   [components.layoutManager addTextContainer:components.textContainer];
 
   return components;
+}
+
++ (BOOL)needsMainThreadDeallocation
+{
+  return YES;
 }
 
 #pragma mark - Lifecycle
