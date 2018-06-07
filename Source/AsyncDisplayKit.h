@@ -110,6 +110,7 @@
 #import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
+#import <AsyncDisplayKit/ASLocking.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 #import <AsyncDisplayKit/ASMutableAttributedStringBuilder.h>

@@ -374,15 +374,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return self;
 }
 
-- (void)lock
-{
-  __instanceLock__.lock();
-}
-
-- (void)unlock
-{
-  __instanceLock__.unlock();
-}
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)setViewBlock:(ASDisplayNodeViewBlock)viewBlock
 {
