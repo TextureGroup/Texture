@@ -393,6 +393,8 @@
 		CCB1F95C1EFB6350009C7475 /* ASSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CCB1F95B1EFB6316009C7475 /* ASSignpost.h */; };
 		CCB2F34D1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB2F34C1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m */; };
 		CCBBBF5D1EB161760069AA91 /* ASRangeManagingNode.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBBBF5C1EB161760069AA91 /* ASRangeManagingNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBDDD0520C62A2D00CBA922 /* ASMainThreadDeallocation.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBDDD0620C62A2D00CBA922 /* ASMainThreadDeallocation.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */; };
 		CCCCCCD51EC3EF060087FE10 /* ASTextDebugOption.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCC31EC3EF060087FE10 /* ASTextDebugOption.h */; };
 		CCCCCCD61EC3EF060087FE10 /* ASTextDebugOption.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCC41EC3EF060087FE10 /* ASTextDebugOption.m */; };
 		CCCCCCD71EC3EF060087FE10 /* ASTextInput.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCC51EC3EF060087FE10 /* ASTextInput.h */; };
@@ -907,6 +909,8 @@
 		CCBBBF5C1EB161760069AA91 /* ASRangeManagingNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASRangeManagingNode.h; sourceTree = "<group>"; };
 		CCBD05DE1E4147B000D18509 /* ASIGListAdapterBasedDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIGListAdapterBasedDataSource.m; sourceTree = "<group>"; };
 		CCBD05DF1E4147B000D18509 /* ASIGListAdapterBasedDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIGListAdapterBasedDataSource.h; sourceTree = "<group>"; };
+		CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASMainThreadDeallocation.h; sourceTree = "<group>"; };
+		CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMainThreadDeallocation.mm; sourceTree = "<group>"; };
 		CCCCCCC31EC3EF060087FE10 /* ASTextDebugOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextDebugOption.h; sourceTree = "<group>"; };
 		CCCCCCC41EC3EF060087FE10 /* ASTextDebugOption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTextDebugOption.m; sourceTree = "<group>"; };
 		CCCCCCC51EC3EF060087FE10 /* ASTextInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextInput.h; sourceTree = "<group>"; };
@@ -1165,6 +1169,8 @@
 				058D09DE195D050800B7D73C /* ASImageNode.mm */,
 				68355B2E1CB5799E001D4E68 /* ASImageNode+AnimatedImage.mm */,
 				CCF1FF5D20C4785000AAD8FC /* ASLocking.h */,
+				CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */,
+				CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */,
 				92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */,
 				92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */,
 				0516FA3E1A1563D200B4EBED /* ASMultiplexImageNode.h */,
@@ -1822,6 +1828,7 @@
 				693A1DCA1ECC944E00D0C9D2 /* IGListAdapter+AsyncDisplayKit.h in Headers */,
 				E5E2D72E1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
+				CCBDDD0520C62A2D00CBA922 /* ASMainThreadDeallocation.h in Headers */,
 				CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
@@ -2377,6 +2384,7 @@
 				B35061F91B010EFD0018CF92 /* ASControlNode.mm in Sources */,
 				8021EC1F1D2B00B100799119 /* UIImage+ASConvenience.m in Sources */,
 				CCAA0B80206ADBF30057B336 /* ASRecursiveUnfairLock.m in Sources */,
+				CCBDDD0620C62A2D00CBA922 /* ASMainThreadDeallocation.mm in Sources */,
 				B35062181B010EFD0018CF92 /* ASDataController.mm in Sources */,
 				CCB1F95A1EFB60A5009C7475 /* ASLog.m in Sources */,
 				767E7F8E1C90191D0066C000 /* AsyncDisplayKit+Debug.m in Sources */,

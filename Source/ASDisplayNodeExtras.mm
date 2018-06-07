@@ -36,6 +36,9 @@ extern void ASPerformMainThreadDeallocation(id _Nullable __strong * _Nonnull obj
   });
 
   if (objectPtr != NULL && *objectPtr != nil) {
+    // TODO: If ASRunLoopQueue supported an "unsafe_unretained" mode, we could
+    // transfer the caller's +1 into it and save the retain/release pair.
+    
     // Lock queue while enqueuing and releasing, so that there's no risk
     // that the queue will release before we get a chance to release.
     [queue lock];

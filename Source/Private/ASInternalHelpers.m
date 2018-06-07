@@ -127,33 +127,6 @@ void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object)
   [[ASDeallocQueue sharedDeallocationQueue] releaseObjectInBackground:object];
 }
 
-BOOL ASClassRequiresMainThreadDeallocation(Class c)
-{
-  // Specific classes
-  if (c == [UIImage class] || c == [UIColor class]) {
-    return NO;
-  }
-  
-  if ([c isSubclassOfClass:[UIResponder class]]
-      || [c isSubclassOfClass:[CALayer class]]
-      || [c isSubclassOfClass:[UIGestureRecognizer class]]) {
-    return YES;
-  }
-
-  // Apple classes with prefix
-  const char *name = class_getName(c);
-  if (strncmp(name, "UI", 2) == 0 || strncmp(name, "AV", 2) == 0 || strncmp(name, "CA", 2) == 0) {
-    return YES;
-  }
-  
-  // Specific Texture classes
-  if (strncmp(name, "ASTextKitComponents", 19) == 0) {
-    return YES;
-  }
-
-  return NO;
-}
-
 Class _Nullable ASGetClassFromType(const char  * _Nullable type)
 {
   // Class types all start with @"
