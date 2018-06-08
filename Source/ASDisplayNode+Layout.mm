@@ -493,10 +493,10 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return [self _locked_isLayoutTransitionValid];
+  return [self _locked_isLayoutTransitionInValid];
 }
 
-- (BOOL)_locked_isLayoutTransitionValid
+- (BOOL)_locked_isLayoutTransitionInValid
 {
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
