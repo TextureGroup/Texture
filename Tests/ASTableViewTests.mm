@@ -53,7 +53,7 @@
 @end
 
 @interface ASTestTableView : ASTableView
-@property (nonatomic, copy) void (^willDeallocBlock)(ASTableView *tableView);
+@property (nonatomic) void (^willDeallocBlock)(ASTableView *tableView);
 @end
 
 @implementation ASTestTableView
@@ -79,7 +79,7 @@
 @end
 
 @interface ASTableViewTestDelegate : NSObject <ASTableDataSource, ASTableDelegate>
-@property (nonatomic, copy) void (^willDeallocBlock)(ASTableViewTestDelegate *delegate);
+@property (nonatomic) void (^willDeallocBlock)(ASTableViewTestDelegate *delegate);
 @property (nonatomic) CGFloat headerHeight;
 @property (nonatomic) CGFloat footerHeight;
 @end
@@ -141,7 +141,7 @@
 @property (nonatomic) BOOL usesSectionIndex;
 @property (nonatomic) NSInteger numberOfSections;
 @property (nonatomic) NSInteger rowsPerSection;
-@property (nonatomic, nullable, copy) ASCellNodeBlock(^nodeBlockForItem)(NSIndexPath *);
+@property (nonatomic, nullable) ASCellNodeBlock(^nodeBlockForItem)(NSIndexPath *);
 @end
 
 @implementation ASTableViewFilledDataSource

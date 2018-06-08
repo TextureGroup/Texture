@@ -311,6 +311,7 @@
 		B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943121A1575630030A7D0 /* AssetsLibrary.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.m */; };
 		BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.m */; };
+		C057D9BD20B5453D00FC9112 /* ASTextNode2SnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.m */; };
 		C78F7E2B1BF7809800CDEAFC /* ASTableNode.h in Headers */ = {isa = PBXBuildFile; fileRef = B0F880581BEAEC7500D17647 /* ASTableNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A091E60BEB400626263 /* ASDisplayNode+Convenience.h in Headers */ = {isa = PBXBuildFile; fileRef = CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC034A0A1E60BEB400626263 /* ASDisplayNode+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */; };
@@ -392,6 +393,8 @@
 		CCB1F95C1EFB6350009C7475 /* ASSignpost.h in Headers */ = {isa = PBXBuildFile; fileRef = CCB1F95B1EFB6316009C7475 /* ASSignpost.h */; };
 		CCB2F34D1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCB2F34C1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.m */; };
 		CCBBBF5D1EB161760069AA91 /* ASRangeManagingNode.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBBBF5C1EB161760069AA91 /* ASRangeManagingNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBDDD0520C62A2D00CBA922 /* ASMainThreadDeallocation.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBDDD0620C62A2D00CBA922 /* ASMainThreadDeallocation.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */; };
 		CCCCCCD51EC3EF060087FE10 /* ASTextDebugOption.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCC31EC3EF060087FE10 /* ASTextDebugOption.h */; };
 		CCCCCCD61EC3EF060087FE10 /* ASTextDebugOption.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCC41EC3EF060087FE10 /* ASTextDebugOption.m */; };
 		CCCCCCD71EC3EF060087FE10 /* ASTextInput.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCC51EC3EF060087FE10 /* ASTextInput.h */; };
@@ -427,6 +430,7 @@
 		CCEDDDD1200C488000FFCD0A /* ASConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD0200C488000FFCD0A /* ASConfiguration.m */; };
 		CCEDDDD9200C518800FFCD0A /* ASConfigurationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */; };
 		CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		CCF1FF5E20C4785000AAD8FC /* ASLocking.h in Headers */ = {isa = PBXBuildFile; fileRef = CCF1FF5D20C4785000AAD8FC /* ASLocking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */; };
 		DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DB55C2601C6408D6004EDCF5 /* _ASTransitionContext.m */; };
@@ -816,6 +820,7 @@
 		BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASNavigationControllerTests.m; sourceTree = "<group>"; };
 		BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTabBarControllerTests.m; sourceTree = "<group>"; };
 		BDC2D162BD55A807C1475DA5 /* Pods-AsyncDisplayKitTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.profile.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.profile.xcconfig"; sourceTree = "<group>"; };
+		C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTextNode2SnapshotTests.m; sourceTree = "<group>"; };
 		CC034A071E60BEB400626263 /* ASDisplayNode+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Convenience.h"; sourceTree = "<group>"; };
 		CC034A081E60BEB400626263 /* ASDisplayNode+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ASDisplayNode+Convenience.m"; sourceTree = "<group>"; };
 		CC034A111E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AsyncDisplayKit+IGListKitMethods.h"; sourceTree = "<group>"; };
@@ -904,6 +909,8 @@
 		CCBBBF5C1EB161760069AA91 /* ASRangeManagingNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASRangeManagingNode.h; sourceTree = "<group>"; };
 		CCBD05DE1E4147B000D18509 /* ASIGListAdapterBasedDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIGListAdapterBasedDataSource.m; sourceTree = "<group>"; };
 		CCBD05DF1E4147B000D18509 /* ASIGListAdapterBasedDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIGListAdapterBasedDataSource.h; sourceTree = "<group>"; };
+		CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASMainThreadDeallocation.h; sourceTree = "<group>"; };
+		CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMainThreadDeallocation.mm; sourceTree = "<group>"; };
 		CCCCCCC31EC3EF060087FE10 /* ASTextDebugOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextDebugOption.h; sourceTree = "<group>"; };
 		CCCCCCC41EC3EF060087FE10 /* ASTextDebugOption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASTextDebugOption.m; sourceTree = "<group>"; };
 		CCCCCCC51EC3EF060087FE10 /* ASTextInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTextInput.h; sourceTree = "<group>"; };
@@ -945,6 +952,7 @@
 		CCEDDDCE200C42A200FFCD0A /* ASConfigurationDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASConfigurationDelegate.h; sourceTree = "<group>"; };
 		CCEDDDD0200C488000FFCD0A /* ASConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASConfiguration.m; sourceTree = "<group>"; };
 		CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASConfigurationTests.m; sourceTree = "<group>"; };
+		CCF1FF5D20C4785000AAD8FC /* ASLocking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASLocking.h; sourceTree = "<group>"; };
 		D3779BCFF841AD3EB56537ED /* Pods-AsyncDisplayKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		D785F6601A74327E00291744 /* ASScrollNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASScrollNode.h; sourceTree = "<group>"; };
 		D785F6611A74327E00291744 /* ASScrollNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASScrollNode.mm; sourceTree = "<group>"; };
@@ -1160,6 +1168,9 @@
 				058D09DD195D050800B7D73C /* ASImageNode.h */,
 				058D09DE195D050800B7D73C /* ASImageNode.mm */,
 				68355B2E1CB5799E001D4E68 /* ASImageNode+AnimatedImage.mm */,
+				CCF1FF5D20C4785000AAD8FC /* ASLocking.h */,
+				CCBDDD0320C62A2D00CBA922 /* ASMainThreadDeallocation.h */,
+				CCBDDD0420C62A2D00CBA922 /* ASMainThreadDeallocation.mm */,
 				92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */,
 				92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */,
 				0516FA3E1A1563D200B4EBED /* ASMultiplexImageNode.h */,
@@ -1298,6 +1309,7 @@
 				4496D0721FA9EA6B001CC8D5 /* ASTraitCollectionTests.m */,
 				CC0AEEA31D66316E005D1C78 /* ASUICollectionViewTests.m */,
 				AEEC47E31C21D3D200EC1693 /* ASVideoNodeTests.m */,
+				C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.m */,
 				CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */,
 				83A7D95D1D446A6E00BF333E /* ASWeakMapTests.m */,
 				CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.m */,
@@ -1816,6 +1828,7 @@
 				693A1DCA1ECC944E00D0C9D2 /* IGListAdapter+AsyncDisplayKit.h in Headers */,
 				E5E2D72E1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
+				CCBDDD0520C62A2D00CBA922 /* ASMainThreadDeallocation.h in Headers */,
 				CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
@@ -1868,6 +1881,7 @@
 				CC56013B1F06E9A700DC4FBE /* ASIntegerMap.h in Headers */,
 				B35061FA1B010EFD0018CF92 /* ASControlNode+Subclasses.h in Headers */,
 				E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */,
+				CCF1FF5E20C4785000AAD8FC /* ASLocking.h in Headers */,
 				B35061F81B010EFD0018CF92 /* ASControlNode.h in Headers */,
 				B35062171B010EFD0018CF92 /* ASDataController.h in Headers */,
 				34EFC75B1B701BAF00AD841F /* ASDimension.h in Headers */,
@@ -2279,6 +2293,7 @@
 				CC0AEEA41D66316E005D1C78 /* ASUICollectionViewTests.m in Sources */,
 				CCE4F9B51F0DA4F300062E4E /* ASLayoutEngineTests.mm in Sources */,
 				69B225671D72535E00B25B22 /* ASDisplayNodeLayoutTests.mm in Sources */,
+				C057D9BD20B5453D00FC9112 /* ASTextNode2SnapshotTests.m in Sources */,
 				ACF6ED621B178DC700DA7C62 /* ASRatioLayoutSpecSnapshotTests.mm in Sources */,
 				7AB338691C55B97B0055FDE8 /* ASRelativeLayoutSpecSnapshotTests.mm in Sources */,
 				CCDD148B1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m in Sources */,
@@ -2369,6 +2384,7 @@
 				B35061F91B010EFD0018CF92 /* ASControlNode.mm in Sources */,
 				8021EC1F1D2B00B100799119 /* UIImage+ASConvenience.m in Sources */,
 				CCAA0B80206ADBF30057B336 /* ASRecursiveUnfairLock.m in Sources */,
+				CCBDDD0620C62A2D00CBA922 /* ASMainThreadDeallocation.mm in Sources */,
 				B35062181B010EFD0018CF92 /* ASDataController.mm in Sources */,
 				CCB1F95A1EFB60A5009C7475 /* ASLog.m in Sources */,
 				767E7F8E1C90191D0066C000 /* AsyncDisplayKit+Debug.m in Sources */,

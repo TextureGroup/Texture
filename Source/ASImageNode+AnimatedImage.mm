@@ -50,7 +50,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 - (void)_locked_setAnimatedImage:(id <ASAnimatedImageProtocol>)animatedImage
 {
-  if (ASObjectIsEqual(_animatedImage, animatedImage) && animatedImage.playbackReady) {
+  if (ASObjectIsEqual(_animatedImage, animatedImage) && (animatedImage == nil || animatedImage.playbackReady)) {
     return;
   }
   
@@ -171,7 +171,7 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
     [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
   }
-  _animatedImageRunLoopMode = runLoopMode;
+  _animatedImageRunLoopMode = [runLoopMode copy];
 }
 
 - (void)setShouldAnimate:(BOOL)shouldAnimate

@@ -201,7 +201,7 @@ permalink: /showcase.html
 		<tr>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/tw/app/pairs%E6%B4%BE%E6%84%9B%E6%97%8F-%E6%89%BE%E5%88%B0%E7%90%86%E6%83%B3%E5%B0%8D%E8%B1%A1%E7%9A%84%E4%BA%A4%E5%8F%8Bapp/id825433065?mt=8"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple118/v4/5b/a0/e3/5ba0e32f-5e6c-e0cb-fca9-ccb6b8bb02a4/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<a href="https://itunes.apple.com/tw/app/pairs%E6%B4%BE%E6%84%9B%E6%97%8F-%E6%89%BE%E5%88%B0%E7%90%86%E6%83%B3%E5%B0%8D%E8%B1%A1%E7%9A%84%E4%BA%A4%E5%8F%8Bapp/id825433065?mt=8"><img class="roundrect" src="https://is1-ssl.mzstatic.com/image/thumb/Purple125/v4/2d/97/9a/2d979a6b-bda9-b493-e8f9-0defc69f62ed/AppIcon-1x_U007emarketing-85-220-0-4.png/492x0w.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>Pairs</b>
 		</td>
@@ -243,7 +243,15 @@ permalink: /showcase.html
  		</td>
 
 		</tr>
+		<tr>
 		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/waplog-dating-app-chat-meet/id557997762?mt=8"><img class="roundrect" src="https://is5-ssl.mzstatic.com/image/thumb/Purple125/v4/13/82/95/1382952c-c9de-8b97-44b2-4b4275b692e9/AppIcon-1x_U007emarketing-85-220-0-6.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Waplog</b>
+		</td>
+
+		</tr>
 		</table>
 		
 		<br />

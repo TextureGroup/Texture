@@ -15,10 +15,10 @@
 @interface ASTLayoutFixture ()
 
 /// The size ranges against which nodes are expected to be measured.
-@property (nonatomic, strong, readonly) NSMapTable<ASDisplayNode *, NSMutableArray<NSValue *> *> *sizeRanges;
+@property (nonatomic, readonly) NSMapTable<ASDisplayNode *, NSMutableArray<NSValue *> *> *sizeRanges;
 
 /// The overridden returned sizes for nodes where you want to trigger multipass layout.
-@property (nonatomic, strong, readonly) NSMapTable<ASDisplayNode *, NSValue *> *returnedSizes;
+@property (nonatomic, readonly) NSMapTable<ASDisplayNode *, NSValue *> *returnedSizes;
 
 @end
 

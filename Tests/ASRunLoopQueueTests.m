@@ -18,7 +18,7 @@
 static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run for one millisecond each time.
 
 @interface QueueObject : NSObject <ASCATransactionQueueObserving>
-@property (nonatomic, assign) BOOL queueObjectProcessed;
+@property (nonatomic) BOOL queueObjectProcessed;
 @end
 
 @implementation QueueObject

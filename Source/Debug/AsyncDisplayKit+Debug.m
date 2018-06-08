@@ -230,8 +230,8 @@ static BOOL __enableHitTestDebug = NO;
 @interface _ASRangeDebugBarView : UIView
 
 @property (nonatomic, weak) ASRangeController *rangeController;
-@property (nonatomic, assign) BOOL destroyOnLayout;
-@property (nonatomic, strong) NSString *debugString;
+@property (nonatomic) BOOL destroyOnLayout;
+@property (nonatomic) NSString *debugString;
 
 - (instancetype)initWithRangeController:(ASRangeController *)rangeController;
 

@@ -26,6 +26,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
   ASExperimentalLayerDefaults = 1 << 4,                     // exp_infer_layer_defaults
   ASExperimentalNetworkImageQueue = 1 << 5,                 // exp_network_image_queue
+  ASExperimentalDeallocQueue = 1 << 6,                      // exp_dealloc_queue_v2
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

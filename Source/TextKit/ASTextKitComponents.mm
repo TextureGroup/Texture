@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 
 #import <tgmath.h>
 
@@ -24,7 +25,7 @@
   // Prevent UITextView from updating contentOffset while deallocating: https://github.com/TextureGroup/Texture/issues/860
   BOOL _deallocating;
 }
-@property (atomic, assign) CGRect threadSafeBounds;
+@property CGRect threadSafeBounds;
 @end
 
 @implementation ASTextKitComponentsTextView
@@ -73,9 +74,9 @@
 @interface ASTextKitComponents ()
 
 // read-write redeclarations
-@property (nonatomic, strong, readwrite) NSTextStorage *textStorage;
-@property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
-@property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
+@property (nonatomic) NSTextStorage *textStorage;
+@property (nonatomic) NSTextContainer *textContainer;
+@property (nonatomic) NSLayoutManager *layoutManager;
 
 @end
 
@@ -109,6 +110,11 @@
   [components.layoutManager addTextContainer:components.textContainer];
 
   return components;
+}
+
++ (BOOL)needsMainThreadDeallocation
+{
+  return YES;
 }
 
 #pragma mark - Lifecycle

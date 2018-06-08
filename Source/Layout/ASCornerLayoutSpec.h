@@ -54,25 +54,25 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A layoutElement object that is laid out to a corner on the child.
  */
-@property (nonatomic, strong) id <ASLayoutElement> corner;
+@property (nonatomic) id <ASLayoutElement> corner;
 
 /**
  The corner position option.
  */
-@property (nonatomic, assign) ASCornerLayoutLocation cornerLocation;
+@property (nonatomic) ASCornerLayoutLocation cornerLocation;
 
 /**
  The point which offsets from the corner location. Use this property to make delta
  distance from the default corner location. Default is CGPointZero.
  */
-@property (nonatomic, assign) CGPoint offset;
+@property (nonatomic) CGPoint offset;
 
 /**
  Whether should include corner element into layout size calculation. If included,
  the layout size will be the union size of both child and corner; If not included,
  the layout size will be only child's size. Default is NO.
  */
-@property (nonatomic, assign) BOOL wrapsCorner;
+@property (nonatomic) BOOL wrapsCorner;
 
 @end
 

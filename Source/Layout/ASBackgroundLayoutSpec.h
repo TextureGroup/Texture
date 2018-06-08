@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Background layoutElement for this layout spec
  */
-@property (nonatomic, strong) id<ASLayoutElement> background;
+@property (nonatomic) id<ASLayoutElement> background;
 
 /**
  * Creates and returns an ASBackgroundLayoutSpec object

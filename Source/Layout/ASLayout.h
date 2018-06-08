@@ -58,19 +58,19 @@ ASDISPLAYNODE_EXTERN_C_END
 /**
  * The type of ASLayoutElement that created this layout
  */
-@property (nonatomic, assign, readonly) ASLayoutElementType type;
+@property (nonatomic, readonly) ASLayoutElementType type;
 
 /**
  * Size of the current layout
  */
-@property (nonatomic, assign, readonly) CGSize size;
+@property (nonatomic, readonly) CGSize size;
 
 /**
  * Position in parent. Default to ASPointNull.
  * 
  * @discussion When being used as a sublayout, this property must not equal ASPointNull.
  */
-@property (nonatomic, assign, readonly) CGPoint position;
+@property (nonatomic, readonly) CGPoint position;
 
 /**
  * Array of ASLayouts. Each must have a valid non-null position.
@@ -87,7 +87,7 @@ ASDISPLAYNODE_EXTERN_C_END
  * @abstract Returns a valid frame for the current layout computed with the size and position.
  * @discussion Clamps the layout's origin or position to 0 if any of the calculated values are infinite.
  */
-@property (nonatomic, assign, readonly) CGRect frame;
+@property (nonatomic, readonly) CGRect frame;
 
 /**
  * Designated initializer
@@ -143,7 +143,7 @@ ASDISPLAYNODE_EXTERN_C_END
 
 @interface ASLayout (Unavailable)
 
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 
