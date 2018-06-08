@@ -565,7 +565,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
     // Check if we are a subnode in a layout transition.
     // In this case no measurement is needed as we're part of the layout transition.
-    if ([self _locked_isLayoutTransitionValid]) {
+    if ([self _locked_isLayoutTransitionInValid]) {
       return;
     }
 
