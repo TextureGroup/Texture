@@ -493,10 +493,10 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return [self _locked_isLayoutTransitionInValid];
+  return [self _locked_isLayoutTransitionInvalid];
 }
 
-- (BOOL)_locked_isLayoutTransitionInValid
+- (BOOL)_locked_isLayoutTransitionInvalid
 {
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
@@ -565,7 +565,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
     // Check if we are a subnode in a layout transition.
     // In this case no measurement is needed as we're part of the layout transition.
-    if ([self _locked_isLayoutTransitionInValid]) {
+    if ([self _locked_isLayoutTransitionInvalid]) {
       return;
     }
 
