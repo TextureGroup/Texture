@@ -316,8 +316,8 @@ ASLayoutElementStyleExtensibilityForwarding
     } else if (pendingVersion == calculatedVersion
                && !ASSizeRangeEqualToSizeRange(_pendingDisplayNodeLayout->constrainedSize,
                                                _calculatedDisplayNodeLayout->constrainedSize)) {
-                 pendingLayoutIsPreferred = YES; // _pending with a different constrained size
-               }
+      pendingLayoutIsPreferred = YES; // _pending with a different constrained size
+    }
   }
   BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->isValid(_layoutVersion)
                                      && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
