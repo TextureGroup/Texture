@@ -50,7 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
  * class need to be deallocated on the main thread.
  * You do not access this property yourself.
  *
- * The NSProxy implementation returns NO.
+ * The NSProxy implementation returns NO because
+ * proxies almost always hold weak references.
  */
 @property (class, readonly) BOOL needsMainThreadDeallocation;
 
