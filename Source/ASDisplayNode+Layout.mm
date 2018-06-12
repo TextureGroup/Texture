@@ -316,8 +316,8 @@ ASLayoutElementStyleExtensibilityForwarding
     } else if (pendingVersion == calculatedVersion
                && !ASSizeRangeEqualToSizeRange(_pendingDisplayNodeLayout->constrainedSize,
                                                _calculatedDisplayNodeLayout->constrainedSize)) {
-                 pendingLayoutIsPreferred = YES; // _pending with a different constrained size
-               }
+      pendingLayoutIsPreferred = YES; // _pending with a different constrained size
+    }
   }
   BOOL calculatedLayoutIsReusable = (_calculatedDisplayNodeLayout->isValid(_layoutVersion)
                                      && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
@@ -493,10 +493,10 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)_isLayoutTransitionInvalid
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return [self _locked_isLayoutTransitionValid];
+  return [self _locked_isLayoutTransitionInvalid];
 }
 
-- (BOOL)_locked_isLayoutTransitionValid
+- (BOOL)_locked_isLayoutTransitionInvalid
 {
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
@@ -565,7 +565,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
     // Check if we are a subnode in a layout transition.
     // In this case no measurement is needed as we're part of the layout transition.
-    if ([self _locked_isLayoutTransitionValid]) {
+    if ([self _locked_isLayoutTransitionInvalid]) {
       return;
     }
 
