@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  * class need to be deallocated on the main thread.
  * You do not access this property yourself.
  *
- * The NSObject implementation returns NO if the class name has
+ * The NSObject implementation returns YES if the class name has
  * a prefix UI, AV, or CA. This property is also overridden to
  * return fixed values for other common classes, such as UIImage,
  * UIGestureRecognizer, and UIResponder.
@@ -43,5 +43,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSProxy (ASNeedsMainThreadDeallocation)
+
+/**
+ * Override this property to indicate that instances of this
+ * class need to be deallocated on the main thread.
+ * You do not access this property yourself.
+ *
+ * The NSProxy implementation returns NO.
+ */
+@property (class, readonly) BOOL needsMainThreadDeallocation;
+
+@end
 
 NS_ASSUME_NONNULL_END

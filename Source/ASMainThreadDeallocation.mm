@@ -199,3 +199,12 @@
 }
 
 @end
+
+@implementation NSProxy (ASNeedsMainThreadDeallocation)
+
++ (BOOL)needsMainThreadDeallocation
+{
+  return NO;
+}
+
+@end
