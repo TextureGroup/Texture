@@ -250,6 +250,12 @@ permalink: /showcase.html
 		<br /> 
 		<b>Waplog</b>
 		</td>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/app/id979274575"><img class="roundrect" src="https://is4-ssl.mzstatic.com/image/thumb/Purple115/v4/4f/70/f5/4f70f548-1874-21a0-be38-3291458a658c/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-6.png/230x0w.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Apollo for Reddit</b>
+		</td>
 
 		</tr>
 		</table>
