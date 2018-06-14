@@ -6,6 +6,7 @@
 - Internal housekeeping on the async transaction (rendering) system. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add new protocol `ASLocking` that extends `NSLocking` with `tryLock`, and allows taking multiple locks safely. [Adlai Holler](https://github.com/Adlai-Holler)
 - Make the main thread ivar deallocation system available to other classes. Plus a little optimization. See `ASMainThreadDeallocation.h`. [Adlai Holler](https://github.com/Adlai-Holler) [#959](https://github.com/TextureGroup/Texture/pull/959)
+- Reduce usage of autorelease pools. [Adlai Holler](https://github.com/Adlai-Holler) [#968](https://github.com/TextureGroup/Texture/pull/968)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
