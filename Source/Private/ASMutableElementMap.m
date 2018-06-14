@@ -87,7 +87,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 - (void)insertEmptySectionsOfItemsAtIndexes:(NSIndexSet *)sections
 {
   [sections enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-    [_sectionsOfItems insertObject:[NSMutableArray array] atIndex:idx];
+    [_sectionsOfItems insertObject:[[NSMutableArray alloc] init]  atIndex:idx];
   }];
 }
 
@@ -99,7 +99,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   } else {
     NSMutableDictionary *supplementariesForKind = _supplementaryElements[kind];
     if (supplementariesForKind == nil) {
-      supplementariesForKind = [NSMutableDictionary dictionary];
+      supplementariesForKind = [[NSMutableDictionary alloc] init];
       _supplementaryElements[kind] = supplementariesForKind;
     }
     supplementariesForKind[indexPath] = element;
@@ -120,7 +120,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
     // Note: it's tempting to update the dictionary in-place but because of the likely collision between old and new index paths,
     // subtle bugs are possible. Note that this process is rare (only on section-level updates),
     // that this work is done off-main, and that the typical supplementary element use case is just 1-per-section (header).
-    NSMutableDictionary *newSupps = [NSMutableDictionary dictionary];
+    NSMutableDictionary *newSupps = [[NSMutableDictionary alloc] init];
     [supps enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
       NSInteger oldSection = oldIndexPath.section;
       NSInteger newSection = [mapping integerForKey:oldSection];

@@ -178,7 +178,7 @@ static void _ASCollectDisplayNodes(NSMutableArray *array, CALayer *layer)
 
 extern NSArray<ASDisplayNode *> *ASCollectDisplayNodes(ASDisplayNode *node)
 {
-  NSMutableArray *list = [NSMutableArray array];
+  NSMutableArray *list = [[NSMutableArray alloc] init];
   for (CALayer *sublayer in node.layer.sublayers) {
     _ASCollectDisplayNodes(list, sublayer);
   }
@@ -203,7 +203,7 @@ static void _ASDisplayNodeFindAllSubnodes(NSMutableArray *array, ASDisplayNode *
 
 extern NSArray<ASDisplayNode *> *ASDisplayNodeFindAllSubnodes(ASDisplayNode *start, BOOL (^block)(ASDisplayNode *node))
 {
-  NSMutableArray *list = [NSMutableArray array];
+  NSMutableArray *list = [[NSMutableArray alloc] init];
   _ASDisplayNodeFindAllSubnodes(list, start, block);
   return list;
 }
