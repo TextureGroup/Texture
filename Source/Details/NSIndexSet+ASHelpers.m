@@ -24,7 +24,7 @@
 
 - (NSIndexSet *)as_indexesByMapping:(NSUInteger (^)(NSUInteger))block
 {
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
+  NSMutableIndexSet *result = [[NSMutableIndexSet alloc] init];
   [self enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
     for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
       NSUInteger newIndex = block(i);
@@ -38,7 +38,7 @@
 
 - (NSIndexSet *)as_intersectionWithIndexes:(NSIndexSet *)indexes
 {
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
+  NSMutableIndexSet *result = [[NSMutableIndexSet alloc] init];
   [self enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
     [indexes enumerateRangesInRange:range options:kNilOptions usingBlock:^(NSRange range, BOOL * _Nonnull stop) {
       [result addIndexesInRange:range];
@@ -49,7 +49,7 @@
 
 + (NSIndexSet *)as_indexSetFromIndexPaths:(NSArray<NSIndexPath *> *)indexPaths inSection:(NSUInteger)section
 {
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
+  NSMutableIndexSet *result = [[NSMutableIndexSet alloc] init];
   for (NSIndexPath *indexPath in indexPaths) {
     if (indexPath.section == section) {
       [result addIndex:indexPath.item];
@@ -89,7 +89,7 @@
 
 + (NSIndexSet *)as_sectionsFromIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
 {
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
+  NSMutableIndexSet *result = [[NSMutableIndexSet alloc] init];
   for (NSIndexPath *indexPath in indexPaths) {
     [result addIndex:indexPath.section];
   }

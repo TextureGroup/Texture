@@ -237,7 +237,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 - (NSIndexSet *)indexesForItemChangesOfType:(_ASHierarchyChangeType)changeType inSection:(NSUInteger)section
 {
   [self _ensureCompleted];
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
+  auto result = [[NSMutableIndexSet alloc] init];
   for (_ASHierarchyItemChange *change in [self itemChangesOfType:changeType]) {
     [result addIndexes:[NSIndexSet as_indexSetFromIndexPaths:change.indexPaths inSection:section]];
   }
@@ -751,7 +751,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   NSMutableArray *result = [[NSMutableArray alloc] init];
   
   __block ASDataControllerAnimationOptions currentOptions = 0;
-  NSMutableIndexSet *currentIndexes = [NSMutableIndexSet indexSet];
+  auto currentIndexes = [[NSMutableIndexSet alloc] init];
 
   BOOL reverse = type == _ASHierarchyChangeTypeDelete || type == _ASHierarchyChangeTypeOriginalDelete;
   NSEnumerationOptions options = reverse ? NSEnumerationReverse : kNilOptions;
@@ -790,7 +790,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 + (NSMutableIndexSet *)allIndexesInSectionChanges:(NSArray<_ASHierarchySectionChange *> *)changes
 {
-  NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
+  auto indexes = [[NSMutableIndexSet alloc] init];
   for (_ASHierarchySectionChange *change in changes) {
     [indexes addIndexes:change.indexSet];
   }
