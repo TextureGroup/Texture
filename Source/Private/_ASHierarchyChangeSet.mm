@@ -739,11 +739,9 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   for (_ASHierarchySectionChange *change in changes) {
     ASDataControllerAnimationOptions options = change.animationOptions;
     NSIndexSet *indexes = change.indexSet;
-    [indexes enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
-      for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
-        animationOptions[i] = options;
-      }
-    }];
+    AS_FOR_INDEXSET(indexes, i) {
+      animationOptions[i] = options;
+    }
     [allIndexes addIndexes:indexes];
   }
   
@@ -973,9 +971,9 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 {
   NSDictionary *map = [self sectionToIndexSetMapFromChanges:changes];
   NSMutableString *str = [NSMutableString stringWithString:@"{ "];
-  [map enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull section, NSIndexSet * _Nonnull indexSet, BOOL * _Nonnull stop) {
+  AS_FOR_DICT(map, NSNumber *, section, NSIndexSet *, indexSet) {
     [str appendFormat:@"@%lu : %@ ", (long)section.integerValue, [indexSet as_smallDescription]];
-  }];
+  }
   [str appendString:@"}"];
   return str;
 }

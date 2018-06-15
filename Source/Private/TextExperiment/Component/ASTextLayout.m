@@ -458,9 +458,9 @@ dispatch_semaphore_signal(_lock);
       }
     }
     if (path) {
-      [layout.container.exclusionPaths enumerateObjectsUsingBlock: ^(UIBezierPath *onePath, NSUInteger idx, BOOL *stop) {
+      for (UIBezierPath *onePath in layout.container.exclusionPaths) {
         CGPathAddPath(path, NULL, onePath.CGPath);
-      }];
+      }
       
       cgPathBox = CGPathGetPathBoundingBox(path);
       CGAffineTransform trans = CGAffineTransformMakeScale(1, -1);

@@ -86,9 +86,9 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 
 - (void)insertEmptySectionsOfItemsAtIndexes:(NSIndexSet *)sections
 {
-  [sections enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-    [_sectionsOfItems insertObject:[NSMutableArray array] atIndex:idx];
-  }];
+  AS_FOR_INDEXSET(sections, idx) {
+    [_sectionsOfItems insertObject:[[NSMutableArray alloc] init]  atIndex:idx];
+  }
 }
 
 - (void)insertElement:(ASCollectionElement *)element atIndexPath:(NSIndexPath *)indexPath
@@ -114,14 +114,13 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   }
 
   // For each element kind,
-  [_supplementaryElements enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSMutableDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull supps, BOOL * _Nonnull stop) {
-    
+  AS_FOR_DICT(_supplementaryElements, NSString *, key, NSMutableDictionary *, supps) {
     // For each index path of that kind, move entries into a new dictionary.
     // Note: it's tempting to update the dictionary in-place but because of the likely collision between old and new index paths,
     // subtle bugs are possible. Note that this process is rare (only on section-level updates),
     // that this work is done off-main, and that the typical supplementary element use case is just 1-per-section (header).
-    NSMutableDictionary *newSupps = [NSMutableDictionary dictionary];
-    [supps enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull oldIndexPath, ASCollectionElement * _Nonnull obj, BOOL * _Nonnull stop) {
+    NSMutableDictionary *newSupps = [[NSMutableDictionary alloc] init];
+    AS_FOR_DICT(supps, NSIndexPath *, oldIndexPath, ASCollectionElement *, obj) {
       NSInteger oldSection = oldIndexPath.section;
       NSInteger newSection = [mapping integerForKey:oldSection];
       
@@ -133,9 +132,9 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
         NSIndexPath *newIndexPath = [NSIndexPath indexPathForItem:oldIndexPath.item inSection:newSection];
         newSupps[newIndexPath] = obj;
       }
-    }];
+    }
     [supps setDictionary:newSupps];
-  }];
+  }
 }
 
 #pragma mark - Helpers

@@ -49,7 +49,7 @@ NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *co
 {
   NSMutableDictionary *cleanAttributes = [[NSMutableDictionary alloc] initWithCapacity:coreTextAttributes.count];
 
-  [coreTextAttributes enumerateKeysAndObjectsUsingBlock:^(NSString *coreTextKey, id coreTextValue, BOOL *stop) {
+  AS_FOR_DICT(coreTextAttributes, NSString *, coreTextKey, id, coreTextValue) {
     // The following attributes are not supported on NSAttributedString. Should they become available, we should add them.
     /*
      kCTForegroundColorFromContextAttributeName
@@ -127,7 +127,7 @@ NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *co
     else if (!ASAttributeWithNameIsUnsupportedCoreTextAttribute(coreTextKey)){
       cleanAttributes[coreTextKey] = coreTextValue;
     }
-  }];
+  }
 
   return cleanAttributes;
 }
@@ -142,12 +142,12 @@ NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedSt
   [dirtyAttributedString enumerateAttributesInRange:NSMakeRange(0, dirtyAttributedString.length)
                                             options:0
                                          usingBlock:^(NSDictionary *dirtyAttributes, NSRange range, BOOL *stop) {
-                                           [dirtyAttributes enumerateKeysAndObjectsUsingBlock:^(NSString *coreTextKey, id coreTextValue, BOOL *innerStop) {
+                                           AS_FOR_DICT(dirtyAttributes, NSString *, coreTextKey, id, coreTextValue) {
                                              if (ASAttributeWithNameIsUnsupportedCoreTextAttribute(coreTextKey)) {
                                                containsCoreTextAttributes = YES;
-                                               *innerStop = YES;
+                                               break;
                                              }
-                                           }];
+                                           }
                                            *stop = containsCoreTextAttributes;
                                          }];
   if (containsCoreTextAttributes) {

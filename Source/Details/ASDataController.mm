@@ -217,24 +217,20 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
     std::vector<NSInteger> counts = [self itemCountsFromDataSource];
-    [sections enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
-      for (NSUInteger sectionIndex = range.location; sectionIndex < NSMaxRange(range); sectionIndex++) {
-        NSUInteger itemCount = counts[sectionIndex];
-        for (NSUInteger i = 0; i < itemCount; i++) {
-          [indexPaths addObject:[NSIndexPath indexPathForItem:i inSection:sectionIndex]];
-        }
+    AS_FOR_INDEXSET(sections, sectionIndex) {
+      NSUInteger itemCount = counts[sectionIndex];
+      for (NSUInteger i = 0; i < itemCount; i++) {
+        [indexPaths addObject:[NSIndexPath indexPathForItem:i inSection:sectionIndex]];
       }
-    }];
+    }
   } else if (_dataSourceFlags.supplementaryNodesOfKindInSection) {
     id<ASDataControllerSource> dataSource = _dataSource;
-    [sections enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
-      for (NSUInteger sectionIndex = range.location; sectionIndex < NSMaxRange(range); sectionIndex++) {
-        NSUInteger itemCount = [dataSource dataController:self supplementaryNodesOfKind:kind inSection:sectionIndex];
-        for (NSUInteger i = 0; i < itemCount; i++) {
-          [indexPaths addObject:[NSIndexPath indexPathForItem:i inSection:sectionIndex]];
-        }
+    AS_FOR_INDEXSET(sections, sectionIndex) {
+      NSUInteger itemCount = [dataSource dataController:self supplementaryNodesOfKind:kind inSection:sectionIndex];
+      for (NSUInteger i = 0; i < itemCount; i++) {
+        [indexPaths addObject:[NSIndexPath indexPathForItem:i inSection:sectionIndex]];
       }
-    }];
+    }
   }
   
   return indexPaths;
@@ -721,7 +717,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 {
   ASDisplayNodeAssertMainThread();
 
-  [sectionIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+  AS_FOR_INDEXSET(sectionIndexes, idx) {
     id<ASSectionContext> context;
     if (_dataSourceFlags.contextForSection) {
       context = [_dataSource dataController:self contextForSection:idx];
@@ -729,7 +725,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     ASSection *section = [[ASSection alloc] initWithSectionID:_nextSectionID context:context];
     [map insertSection:section atIndex:idx];
     _nextSectionID++;
-  }];
+  }
 }
 
 /**

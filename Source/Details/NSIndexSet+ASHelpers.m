@@ -18,21 +18,20 @@
 // UIKit indexPath helpers
 #import <UIKit/UIKit.h>
 
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 
 @implementation NSIndexSet (ASHelpers)
 
 - (NSIndexSet *)as_indexesByMapping:(NSUInteger (^)(NSUInteger))block
 {
-  NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
-  [self enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
-    for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
-      NSUInteger newIndex = block(i);
-      if (newIndex != NSNotFound) {
-        [result addIndex:newIndex];
-      }
+  NSMutableIndexSet *result = [[NSMutableIndexSet alloc] init];
+  AS_FOR_INDEXSET(self, i) {
+    NSUInteger newIndex = block(i);
+    if (newIndex != NSNotFound) {
+      [result addIndex:newIndex];
     }
-  }];
+  }
   return result;
 }
 
@@ -60,16 +59,14 @@
 
 - (NSUInteger)as_indexChangeByInsertingItemsBelowIndex:(NSUInteger)index
 {
-  __block NSUInteger newIndex = index;
-  [self enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
-    for (NSUInteger i = range.location; i < NSMaxRange(range); i++) {
-      if (i <= newIndex) {
-        newIndex += 1;
-      } else {
-        *stop = YES;
-      }
+  NSUInteger newIndex = index;
+  AS_FOR_INDEXSET(self, i) {
+    if (i <= newIndex) {
+      newIndex += 1;
+    } else {
+      break;
     }
-  }];
+  }
   return newIndex - index;
 }
 

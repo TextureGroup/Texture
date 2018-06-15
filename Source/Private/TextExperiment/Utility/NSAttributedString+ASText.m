@@ -654,9 +654,9 @@ return style. _attr_;
 - (void)setAs_attributes:(NSDictionary *)attributes {
   if (attributes == (id)[NSNull null]) attributes = nil;
   [self setAttributes:@{} range:NSMakeRange(0, self.length)];
-  [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+  AS_FOR_DICT(attributes, id, key, id, obj) {
     [self as_setAttribute:key value:obj];
-  }];
+  }
 }
 
 - (void)as_setAttribute:(NSString *)name value:(id)value {

@@ -93,12 +93,12 @@
   CFArrayRef tabStops;
   if (CTParagraphStyleGetValueForSpecifier(CTStyle, kCTParagraphStyleSpecifierTabStops, sizeof(CFArrayRef), &tabStops)) {
     NSMutableArray *tabs = [NSMutableArray new];
-    [((__bridge NSArray *)(tabStops))enumerateObjectsUsingBlock : ^(id obj, NSUInteger idx, BOOL *stop) {
+    for (id obj in (__bridge NSArray *)tabStops) {
       CTTextTabRef ctTab = (__bridge CTTextTabRef)obj;
       
       NSTextTab *tab = [[NSTextTab alloc] initWithTextAlignment:NSTextAlignmentFromCTTextAlignment(CTTextTabGetAlignment(ctTab)) location:CTTextTabGetLocation(ctTab) options:(__bridge id)CTTextTabGetOptions(ctTab)];
       [tabs addObject:tab];
-    }];
+    }
     if (tabs.count) {
       style.tabStops = tabs;
     }

@@ -67,9 +67,9 @@
       s++;
     }
     for (NSDictionary *supplementariesForKind in [_supplementaryElements objectEnumerator]) {
-      [supplementariesForKind enumerateKeysAndObjectsUsingBlock:^(NSIndexPath *_Nonnull indexPath, ASCollectionElement * _Nonnull element, BOOL * _Nonnull stop) {
+      AS_FOR_DICT(supplementariesForKind, NSIndexPath *, indexPath, ASCollectionElement *, element) {
         [_elementToIndexPathMap setObject:indexPath forKey:element];
-      }];
+      }
     }
   }
   return self;

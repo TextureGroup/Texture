@@ -2007,10 +2007,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (_asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection) {
     NSMutableSet *kinds = [NSMutableSet set];
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, @[]);
-    [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {
+    AS_FOR_INDEXSET(sections, section) {
       NSArray<NSString *> *kindsForSection = [_asyncDataSource collectionNode:collectionNode supplementaryElementKindsInSection:section];
       [kinds addObjectsFromArray:kindsForSection];
-    }];
+    }
     return [kinds allObjects];
   } else {
     // TODO: Lock this

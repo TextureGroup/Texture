@@ -58,7 +58,7 @@ NSString *_ASObjectDescriptionMakePropertyList(NSArray<NSDictionary *> * _Nullab
 {
   NSMutableArray *components = [NSMutableArray array];
   for (NSDictionary *properties in propertyGroups) {
-    [properties enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+    AS_FOR_DICT(properties, id, key, id, obj) {
       NSString *str;
       if (key == (id)kCFNull) {
         str = ASGetDescriptionValueString(obj);
@@ -66,7 +66,7 @@ NSString *_ASObjectDescriptionMakePropertyList(NSArray<NSDictionary *> * _Nullab
         str = [NSString stringWithFormat:@"%@ = %@", key, ASGetDescriptionValueString(obj)];
       }
       [components addObject:str];
-    }];
+    }
   }
   return [components componentsJoinedByString:@"; "];
 }

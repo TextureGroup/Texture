@@ -296,3 +296,39 @@
   } \
   a; \
 })
+
+/**
+ * A fast enumeration for a dictionary. It evaluates to a declaration for a
+ * for loop that provides each key-value pair using the name and type you give.
+ *
+ * Usage:
+ * AS_FOR_DICT(myDict, NSString *, name, NSNumber *, age) {
+ *   NSLog(@"Name: %@, age: %@", name, age);
+ * }
+ *
+ * In implementation terms:
+ * - We namespace all temporary variables by the key name
+ *   so that multiple declarations don't interfere.
+ * - We are careful not to encompass the body inside the macro or
+ *   we'll make debugging tough.
+ * - We make the stack arrays one extra long, so that we can advance the key & val
+ *   pointers in the "increment" portion of the loop decl without going
+ *   out-of-bounds. The loop will exit before the user uses the garbage values there.
+ */
+#define AS_FOR_DICT(dict, keyType, key, valType, val) \
+  NSUInteger c_##key = dict.count; \
+  __unsafe_unretained keyType karr_##key[c_##key+1]; \
+  __unsafe_unretained valType varr_##key[c_##key+1]; \
+  [dict getObjects:varr_##key andKeys:karr_##key count:c_##key]; \
+  int i_##key = 0; \
+  __unsafe_unretained keyType key = c_##key ? karr_##key[0] : nil; \
+  __unsafe_unretained valType val = c_##key ? varr_##key[0] : nil; \
+  for (; i_##key < c_##key; i_##key++, key = karr_##key[i_##key], val = varr_##key[i_##key])
+
+#define AS_FOR_INDEXSET(indexSet, val) \
+  NSUInteger c = indexSet.count; \
+  NSUInteger buf[c + 1]; \
+  [indexSet getIndexes:buf maxCount:c inIndexRange:NULL]; \
+  NSUInteger i = 0; \
+  NSUInteger val = c ? buf[0] : NSNotFound; \
+  for (; i < c; val = buf[i++])

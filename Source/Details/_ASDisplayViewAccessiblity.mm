@@ -182,12 +182,14 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
     NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
-    [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSUInteger idx = 0;
+    for (NSAttributedString *obj in attributedLabels) {
       if (idx != 0) {
         [attributedLabel appendAttributedString:[[NSAttributedString alloc] initWithString:@", "]];
       }
-      [attributedLabel appendAttributedString:(NSAttributedString *)obj];
-    }];
+      [attributedLabel appendAttributedString:obj];
+      idx++;
+    }
     accessiblityElement.accessibilityAttributedLabel = attributedLabel;
   } else
 #endif
