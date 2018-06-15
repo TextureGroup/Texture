@@ -473,7 +473,7 @@ dispatch_semaphore_signal(_lock);
   if (!cgPath) FAIL_AND_RETURN
   
   // frame setter config
-  frameAttrs = [NSMutableDictionary dictionary];
+  frameAttrs = [[NSMutableDictionary alloc] init];
   if (container.isPathFillEvenOdd == NO) {
     frameAttrs[(id)kCTFramePathFillRuleAttributeName] = @(kCTFramePathFillWindingNumber);
   }
@@ -886,7 +886,7 @@ dispatch_semaphore_signal(_lock);
 + (NSArray *)layoutWithContainers:(NSArray *)containers text:(NSAttributedString *)text range:(NSRange)range {
   if (!containers || !text) return nil;
   if (range.location + range.length > text.length) return nil;
-  NSMutableArray *layouts = [NSMutableArray array];
+  NSMutableArray *layouts = [[NSMutableArray alloc] init];
   for (NSUInteger i = 0, max = containers.count; i < max; i++) {
     ASTextContainer *container = containers[i];
     ASTextLayout *layout = [self layoutWithContainer:container text:text range:range];
@@ -1959,7 +1959,7 @@ dispatch_semaphore_signal(_lock);
   range = [self _correctedRangeWithEdge:range];
   
   BOOL isVertical = _container.verticalForm;
-  NSMutableArray *rects = [NSMutableArray array];
+  NSMutableArray *rects = [[NSMutableArray<NSValue *> alloc] init];
   if (!range) return rects;
   
   NSUInteger startLineIndex = [self lineIndexForPosition:range.start];

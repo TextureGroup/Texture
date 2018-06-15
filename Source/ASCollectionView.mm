@@ -303,7 +303,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   _proxyDataSource = [[ASCollectionViewProxy alloc] initWithTarget:nil interceptor:self];
   super.dataSource = (id<UICollectionViewDataSource>)_proxyDataSource;
   
-  _registeredSupplementaryKinds = [NSMutableSet set];
+  _registeredSupplementaryKinds = [[NSMutableSet alloc] init];
   _visibleElements = [[NSCountedSet alloc] init];
   
   _cellsForVisibilityUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
@@ -1729,7 +1729,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
     [_cellsForLayoutUpdates removeAllObjects];
 
-    NSMutableArray<ASCellNode *> *nodesSizeChanged = [NSMutableArray array];
+    NSMutableArray<ASCellNode *> *nodesSizeChanged = [[NSMutableArray alloc] init];
 
     [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
     [self nodesDidRelayout:nodesSizeChanged];
@@ -2005,7 +2005,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
 {
   if (_asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection) {
-    NSMutableSet *kinds = [NSMutableSet set];
+    auto kinds = [[NSMutableSet<NSString *> alloc] init];
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, @[]);
     [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {
       NSArray<NSString *> *kindsForSection = [_asyncDataSource collectionNode:collectionNode supplementaryElementKindsInSection:section];

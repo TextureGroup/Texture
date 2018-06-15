@@ -767,10 +767,10 @@ ASLayoutElementStyleExtensibilityForwarding
   
   NSArray<ASDisplayNode *> *removedSubnodes = [context removedSubnodes];
   NSMutableArray<ASDisplayNode *> *insertedSubnodes = [[context insertedSubnodes] mutableCopy];
-  NSMutableArray<ASDisplayNode *> *movedSubnodes = [NSMutableArray array];
+  auto movedSubnodes = [[NSMutableArray<ASDisplayNode *> alloc] init];
   
-  NSMutableArray<_ASAnimatedTransitionContext *> *insertedSubnodeContexts = [NSMutableArray array];
-  NSMutableArray<_ASAnimatedTransitionContext *> *removedSubnodeContexts = [NSMutableArray array];
+  auto insertedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
+  auto removedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
   
   for (ASDisplayNode *subnode in [context subnodesForKey:ASTransitionContextToLayoutKey]) {
     if ([insertedSubnodes containsObject:subnode] == NO) {

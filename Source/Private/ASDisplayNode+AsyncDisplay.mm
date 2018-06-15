@@ -208,7 +208,7 @@
 
   if (shouldBeginRasterizing) {
     // Collect displayBlocks for all descendants.
-    NSMutableArray *displayBlocks = [NSMutableArray array];
+    NSMutableArray *displayBlocks = [[NSMutableArray alloc] init];
     [self _recursivelyRasterizeSelfAndSublayersWithIsCancelledBlock:isCancelledBlock displayBlocks:displayBlocks];
     CHECK_CANCELLED_AND_RETURN_NIL();
     

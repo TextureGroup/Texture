@@ -80,7 +80,7 @@
     return;
   }
   if (_yogaChildren == nil) {
-    _yogaChildren = [NSMutableArray array];
+    _yogaChildren = [[NSMutableArray alloc] init];
   }
 
   // Clean up state in case this child had another parent.

@@ -259,7 +259,7 @@
  * Create a new set by mapping `collection` over `work`, ignoring nil.
  */
 #define ASSetByFlatMapping(collection, decl, work) ({ \
-  NSMutableSet *s = [NSMutableSet set]; \
+  NSMutableSet *s = [[NSMutableSet alloc] init]; \
   for (decl in collection) {\
     id result = work; \
     if (result != nil) { \
@@ -271,9 +271,11 @@
 
 /**
  * Create a new ObjectPointerPersonality NSHashTable by mapping `collection` over `work`, ignoring nil.
+ *
+ * capacity: 0 is taken from +hashTableWithOptions.
  */
 #define ASPointerTableByFlatMapping(collection, decl, work) ({ \
-  NSHashTable *t = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality]; \
+  NSHashTable *t = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality capacity:0]; \
   for (decl in collection) {\
     id result = work; \
     if (result != nil) { \
@@ -287,7 +289,7 @@
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
 #define ASArrayByFlatMapping(collection, decl, work) ({ \
-  NSMutableArray *a = [NSMutableArray array]; \
+  NSMutableArray *a = [[NSMutableArray alloc] init]; \
   for (decl in collection) {\
     id result = work; \
     if (result != nil) { \

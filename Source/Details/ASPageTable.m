@@ -121,7 +121,7 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
       ASPageCoordinate page = (ASPageCoordinate)pagePtr;
       NSMutableArray<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
       if (attrsInPage == nil) {
-        attrsInPage = [NSMutableArray array];
+        attrsInPage = [[NSMutableArray alloc] init];
         [result setObject:attrsInPage forPage:page];
       }
       [attrsInPage addObject:attrs];

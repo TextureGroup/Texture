@@ -236,10 +236,10 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     queue.push_back({sublayout, sublayout.position});
   }
   
-  NSMutableArray *flattenedSublayouts = [NSMutableArray array];
+  NSMutableArray *flattenedSublayouts = [[NSMutableArray alloc] init];
   
   while (!queue.empty()) {
-    const Context context = queue.front();
+    const Context context = std::move(queue.front());
     queue.pop_front();
     
     ASLayout *layout = context.layout;

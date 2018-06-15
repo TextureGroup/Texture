@@ -854,7 +854,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   ASLockScopeSelf();
   
   NSArray *rects = [[self _locked_renderer] rectsForTextRange:textRange measureOption:measureOption];
-  NSMutableArray *adjustedRects = [NSMutableArray array];
+  auto adjustedRects = [[NSMutableArray<NSValue *> alloc] init];
 
   for (NSValue *rectValue in rects) {
     CGRect rect = [rectValue CGRectValue];
