@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
   * @deprecated This API has been removed for now due to the increased complexity to the class that it brought.
   * Please use .URL instead.
   */
-@property (nullable, copy) NSArray <NSURL *> *URLs ASDISPLAYNODE_DEPRECATED_MSG("Please use URL instead.");
+@property (nullable, copy) NSArray <NSURL *> *URLs AS_DEPRECATED_MSG("Please use URL instead.");
 
 /**
  * Download and display a new image.

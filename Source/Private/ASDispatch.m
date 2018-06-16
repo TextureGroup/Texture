@@ -19,7 +19,7 @@
  * Note: The actual number of threads may be lower than threadCount, if libdispatch
  * decides the system can't handle it. In reality this rarely happens.
  */
-void ASDispatchApply(size_t iterationCount, dispatch_queue_t queue, NSUInteger threadCount, NS_NOESCAPE void(^work)(size_t i)) {
+void ASDispatchApply(size_t iterationCount, dispatch_queue_t queue, NSUInteger threadCount, void(NS_NOESCAPE ^work)(size_t i)) {
   if (threadCount == 0) {
     threadCount = NSProcessInfo.processInfo.activeProcessorCount * 2;
   }
@@ -42,7 +42,7 @@ void ASDispatchApply(size_t iterationCount, dispatch_queue_t queue, NSUInteger t
  * Note: The actual number of threads may be lower than threadCount, if libdispatch
  * decides the system can't handle it. In reality this rarely happens.
  */
-void ASDispatchAsync(size_t iterationCount, dispatch_queue_t queue, NSUInteger threadCount, NS_NOESCAPE void(^work)(size_t i)) {
+void ASDispatchAsync(size_t iterationCount, dispatch_queue_t queue, NSUInteger threadCount, void(NS_NOESCAPE ^work)(size_t i)) {
   if (threadCount == 0) {
     threadCount = NSProcessInfo.processInfo.activeProcessorCount * 2;
   }

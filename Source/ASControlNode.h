@@ -58,11 +58,11 @@ typedef NS_OPTIONS(NSUInteger, ASControlNodeEvent)
  * Apple's UIControlState enum gets special treatment here, and
  * UIControlStateNormal is available in Swift.
  */
-typedef UIControlState ASControlState ASDISPLAYNODE_DEPRECATED_MSG("Use UIControlState.");
-static UIControlState const ASControlStateNormal ASDISPLAYNODE_DEPRECATED_MSG("Use UIControlStateNormal.") = UIControlStateNormal;
-static UIControlState const ASControlStateDisabled ASDISPLAYNODE_DEPRECATED_MSG("Use UIControlStateDisabled.") = UIControlStateDisabled;
-static UIControlState const ASControlStateHighlighted ASDISPLAYNODE_DEPRECATED_MSG("Use UIControlStateHighlighted.") = UIControlStateHighlighted;
-static UIControlState const ASControlStateSelected ASDISPLAYNODE_DEPRECATED_MSG("Use UIControlStateSelected.") = UIControlStateSelected;
+typedef UIControlState ASControlState AS_DEPRECATED_MSG("Use UIControlState.");
+static UIControlState const ASControlStateNormal AS_DEPRECATED_MSG("Use UIControlStateNormal.") = UIControlStateNormal;
+static UIControlState const ASControlStateDisabled AS_DEPRECATED_MSG("Use UIControlStateDisabled.") = UIControlStateDisabled;
+static UIControlState const ASControlStateHighlighted AS_DEPRECATED_MSG("Use UIControlStateHighlighted.") = UIControlStateHighlighted;
+static UIControlState const ASControlStateSelected AS_DEPRECATED_MSG("Use UIControlStateSelected.") = UIControlStateSelected;
 
 /**
   @abstract ASControlNode is the base class for control nodes (such as buttons), or nodes that track touches to invoke targets with action messages.

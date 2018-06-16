@@ -148,10 +148,10 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  * ASCellNode must forward touch events in order for UITableView and UICollectionView tap handling to work. Overriding
  * these methods (e.g. for highlighting) requires the super method be called.
  */
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
+- (void)touchesCancelled:(nullable NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event NS_REQUIRES_SUPER;
 
 /** 
  * Called by the system when ASCellNode is used with an ASCollectionNode.  It will not be called by ASTableNode.
@@ -221,7 +221,7 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 
 - (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
-- (void)setLayerBacked:(BOOL)layerBacked AS_UNAVAILABLE("ASCellNode does not support layer-backing, although subnodes may be layer-backed.");
+- (void)setLayerBacked:(BOOL)layerBacked AS_UNAVAILABLE_MSG("ASCellNode does not support layer-backing, although subnodes may be layer-backed.");
 
 @end
 

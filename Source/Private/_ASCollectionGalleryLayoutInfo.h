@@ -12,6 +12,8 @@
 
 #import <UIKit/UIKit.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface _ASCollectionGalleryLayoutInfo : NSObject
 
 // Read-only properties
@@ -28,3 +30,5 @@
 - (instancetype)init NS_UNAVAILABLE;
 
 @end
+
+NS_ASSUME_NONNULL_END

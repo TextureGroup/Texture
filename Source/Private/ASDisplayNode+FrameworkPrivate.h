@@ -58,22 +58,22 @@ typedef NS_OPTIONS(NSUInteger, ASHierarchyState)
   ASHierarchyStateLayoutPending           = 1 << 3,
 };
 
-ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesLayoutPending(ASHierarchyState hierarchyState)
+AS_INLINE BOOL ASHierarchyStateIncludesLayoutPending(ASHierarchyState hierarchyState)
 {
   return ((hierarchyState & ASHierarchyStateLayoutPending) == ASHierarchyStateLayoutPending);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesRangeManaged(ASHierarchyState hierarchyState)
+AS_INLINE BOOL ASHierarchyStateIncludesRangeManaged(ASHierarchyState hierarchyState)
 {
   return ((hierarchyState & ASHierarchyStateRangeManaged) == ASHierarchyStateRangeManaged);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesRasterized(ASHierarchyState hierarchyState)
+AS_INLINE BOOL ASHierarchyStateIncludesRasterized(ASHierarchyState hierarchyState)
 {
 	return ((hierarchyState & ASHierarchyStateRasterized) == ASHierarchyStateRasterized);
 }
 
-ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesTransitioningSupernodes(ASHierarchyState hierarchyState)
+AS_INLINE BOOL ASHierarchyStateIncludesTransitioningSupernodes(ASHierarchyState hierarchyState)
 {
 	return ((hierarchyState & ASHierarchyStateTransitioningSupernodes) == ASHierarchyStateTransitioningSupernodes);
 }

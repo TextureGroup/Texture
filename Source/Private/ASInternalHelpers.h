@@ -23,47 +23,43 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+AS_EXTERN void ASInitializeFrameworkMainThread(void);
 
-void ASInitializeFrameworkMainThread(void);
+AS_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);
+AS_EXTERN BOOL ASDefaultAllowsEdgeAntialiasing(void);
 
-BOOL ASDefaultAllowsGroupOpacity(void);
-BOOL ASDefaultAllowsEdgeAntialiasing(void);
-
-BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector);
-BOOL ASSubclassOverridesClassSelector(Class superclass, Class subclass, SEL selector);
+AS_EXTERN BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector);
+AS_EXTERN BOOL ASSubclassOverridesClassSelector(Class superclass, Class subclass, SEL selector);
 
 /// Replace a method from the given class with a block and returns the original method IMP
-IMP ASReplaceMethodWithBlock(Class c, SEL origSEL, id block);
+AS_EXTERN IMP ASReplaceMethodWithBlock(Class c, SEL origSEL, id block);
 
 /// Dispatches the given block to the main queue if not already running on the main thread
-void ASPerformBlockOnMainThread(void (^block)(void));
+AS_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
 
 /// Dispatches the given block to a background queue with priority of DISPATCH_QUEUE_PRIORITY_DEFAULT if not already run on a background queue
-void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
+AS_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
 /// For deallocation of objects on a background thread without GCD overhead / thread explosion
-void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
+AS_EXTERN void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
 
-CGFloat ASScreenScale(void);
+AS_EXTERN CGFloat ASScreenScale(void);
 
-CGSize ASFloorSizeValues(CGSize s);
+AS_EXTERN CGSize ASFloorSizeValues(CGSize s);
 
-CGFloat ASFloorPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASFloorPixelValue(CGFloat f);
 
-CGPoint ASCeilPointValues(CGPoint p);
+AS_EXTERN CGPoint ASCeilPointValues(CGPoint p);
 
-CGSize ASCeilSizeValues(CGSize s);
+AS_EXTERN CGSize ASCeilSizeValues(CGSize s);
 
-CGFloat ASCeilPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASCeilPixelValue(CGFloat f);
 
-CGFloat ASRoundPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASRoundPixelValue(CGFloat f);
 
-Class _Nullable ASGetClassFromType(const char * _Nullable type);
+AS_EXTERN Class _Nullable ASGetClassFromType(const char * _Nullable type);
 
-ASDISPLAYNODE_EXTERN_C_END
-
-ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
+AS_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
   switch (info) {
     case kCGImageAlphaNone:
     case kCGImageAlphaNoneSkipLast:
@@ -83,7 +79,7 @@ ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
  @param withoutAnimation Set to `YES` to perform given block without animation
  @param block Perform UIView geometry changes within the passed block
  */
-ASDISPLAYNODE_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)(void)) {
+AS_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, void (^block)(void)) {
   if (withoutAnimation) {
     [UIView performWithoutAnimation:block];
   } else {
@@ -91,14 +87,14 @@ ASDISPLAYNODE_INLINE void ASPerformBlockWithoutAnimation(BOOL withoutAnimation, 
   }
 }
 
-ASDISPLAYNODE_INLINE void ASBoundsAndPositionForFrame(CGRect rect, CGPoint origin, CGPoint anchorPoint, CGRect *bounds, CGPoint *position)
+AS_INLINE void ASBoundsAndPositionForFrame(CGRect rect, CGPoint origin, CGPoint anchorPoint, CGRect *bounds, CGPoint *position)
 {
   *bounds   = (CGRect){ origin, rect.size };
   *position = CGPointMake(rect.origin.x + rect.size.width * anchorPoint.x,
                           rect.origin.y + rect.size.height * anchorPoint.y);
 }
 
-ASDISPLAYNODE_INLINE UIEdgeInsets ASConcatInsets(UIEdgeInsets insetsA, UIEdgeInsets insetsB)
+AS_INLINE UIEdgeInsets ASConcatInsets(UIEdgeInsets insetsA, UIEdgeInsets insetsB)
 {
   insetsA.top += insetsB.top;
   insetsA.left += insetsB.left;

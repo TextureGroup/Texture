@@ -26,7 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 #pragma mark - ASPrimitiveContentSizeCategory
 
@@ -54,7 +53,7 @@ typedef __unsafe_unretained UIContentSizeCategory ASPrimitiveContentSizeCategory
  *
  * @return a pointer to one of the UIContentSizeCategory constants.
  */
-extern ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory sizeCategory);
+AS_EXTERN ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeCategory sizeCategory);
 
 #pragma mark - ASPrimitiveTraitCollection
 
@@ -88,31 +87,28 @@ typedef struct ASPrimitiveTraitCollection {
 /**
  * Creates ASPrimitiveTraitCollection with default values.
  */
-extern ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault(void);
+AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault(void);
 
 /**
  * Creates a ASPrimitiveTraitCollection from a given UITraitCollection.
  */
-extern ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
-
+AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
 
 /**
  * Compares two ASPrimitiveTraitCollection to determine if they are the same.
  */
-extern BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs);
+AS_EXTERN BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs);
 
 /**
  * Returns a string representation of a ASPrimitiveTraitCollection.
  */
-extern NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits);
+AS_EXTERN NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits);
 
 /**
  * This function will walk the layout element hierarchy and updates the layout element trait collection for every
  * layout element within the hierarchy.
  */
-extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
-
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
 
 /**
  * Abstraction on top of UITraitCollection for propagation within AsyncDisplayKit-Layout
@@ -240,7 +236,7 @@ AS_SUBCLASSING_RESTRICTED
 
 @interface ASTraitCollection (Deprecated)
 
-- (instancetype)init ASDISPLAYNODE_DEPRECATED_MSG("The default constructor of this class is going to become unavailable. Use other constructors instead.");
+- (instancetype)init AS_DEPRECATED_MSG("The default constructor of this class is going to become unavailable. Use other constructors instead.");
 
 + (ASTraitCollection *)traitCollectionWithDisplayScale:(CGFloat)displayScale
                                     userInterfaceIdiom:(UIUserInterfaceIdiom)userInterfaceIdiom
@@ -248,7 +244,7 @@ AS_SUBCLASSING_RESTRICTED
                                      verticalSizeClass:(UIUserInterfaceSizeClass)verticalSizeClass
                                   forceTouchCapability:(UIForceTouchCapability)forceTouchCapability
                                          containerSize:(CGSize)windowSize
-  NS_RETURNS_RETAINED ASDISPLAYNODE_DEPRECATED_MSG("Use full version of this method instead.");
+  NS_RETURNS_RETAINED AS_DEPRECATED_MSG("Use full version of this method instead.");
 
 @end
 

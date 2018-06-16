@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
+AS_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 {
   return 0 != pthread_main_np();
 }
@@ -52,11 +52,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
   __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
   [__lockToken lock];
 
-ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
+AS_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
   [*lockPtr unlock];
 }
 
-ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
+AS_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
   [*lockPtr unlock];
 }
 
@@ -97,7 +97,7 @@ ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unre
 - (void)unlock { [object unlock]; } \
 - (BOOL)tryLock { return [object tryLock]; }
 
-ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
+AS_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr) {
   [*lockPtr lock];
 }
 
@@ -160,7 +160,7 @@ namespace ASDN {
   public:
 #if !TIME_LOCKER
 
-    Locker (T &l) ASDISPLAYNODE_NOTHROW : _l (l) {
+    Locker (T &l) noexcept : _l (l) {
       _l.lock ();
     }
 
@@ -174,7 +174,7 @@ namespace ASDN {
 
 #else
 
-    Locker (T &l, const char *name = NULL) ASDISPLAYNODE_NOTHROW : _l (l), _name(name) {
+    Locker (T &l, const char *name = NULL) noexcept : _l (l), _name(name) {
       _ti = CACurrentMediaTime();
       _l.lock ();
     }
@@ -204,7 +204,7 @@ namespace ASDN {
   public:
 #if !TIME_LOCKER
     
-    SharedLocker (std::shared_ptr<T> const& l) ASDISPLAYNODE_NOTHROW : _l (l) {
+    SharedLocker (std::shared_ptr<T> const& l) noexcept : _l (l) {
       ASDisplayNodeCAssertTrue(_l != nullptr);
       _l->lock ();
     }
@@ -219,7 +219,7 @@ namespace ASDN {
     
 #else
     
-    SharedLocker (std::shared_ptr<T> const& l, const char *name = NULL) ASDISPLAYNODE_NOTHROW : _l (l), _name(name) {
+    SharedLocker (std::shared_ptr<T> const& l, const char *name = NULL) noexcept : _l (l), _name(name) {
       _ti = CACurrentMediaTime();
       _l->lock ();
     }
@@ -241,7 +241,7 @@ namespace ASDN {
   {
     T &_l;
   public:
-    Unlocker (T &l) ASDISPLAYNODE_NOTHROW : _l (l) { _l.unlock (); }
+    Unlocker (T &l) noexcept : _l (l) { _l.unlock (); }
     ~Unlocker () {_l.lock ();}
     Unlocker(Unlocker<T>&) = delete;
     Unlocker &operator=(Unlocker<T>&) = delete;

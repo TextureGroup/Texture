@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Set this block to customize the ASDisplayTraits returned when the VC transitions to the given window size.
  */
-@property (nonatomic, copy) ASDisplayTraitsForTraitWindowSizeBlock overrideDisplayTraitsWithWindowSize ASDISPLAYNODE_DEPRECATED_MSG("This property is actually never accessed inside the framework");
+@property (nonatomic, copy) ASDisplayTraitsForTraitWindowSizeBlock overrideDisplayTraitsWithWindowSize AS_DEPRECATED_MSG("This property is actually never accessed inside the framework");
 
 /**
  * @abstract Passthrough property to the the .interfaceState of the node.

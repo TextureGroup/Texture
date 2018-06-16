@@ -23,7 +23,7 @@
  @param otherObj The second object in the comparison. Can be nil.
  @result YES if the objects are equal, including cases where both object are nil.
  */
-ASDISPLAYNODE_INLINE BOOL ASObjectIsEqual(id<NSObject> obj, id<NSObject> otherObj)
+AS_INLINE BOOL ASObjectIsEqual(id<NSObject> obj, id<NSObject> otherObj)
 {
   return obj == otherObj || [obj isEqual:otherObj];
 }

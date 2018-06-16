@@ -236,7 +236,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see attributedText
  */
-@property (nullable, copy) NSAttributedString *attributedString ASDISPLAYNODE_DEPRECATED_MSG("Use .attributedText instead.");
+@property (nullable, copy) NSAttributedString *attributedString AS_DEPRECATED_MSG("Use .attributedText instead.");
 
 
 /**
@@ -245,7 +245,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @see truncationAttributedText
  */
-@property (nullable, copy) NSAttributedString *truncationAttributedString ASDISPLAYNODE_DEPRECATED_MSG("Use .truncationAttributedText instead.");
+@property (nullable, copy) NSAttributedString *truncationAttributedString AS_DEPRECATED_MSG("Use .truncationAttributedText instead.");
 
 @end
 

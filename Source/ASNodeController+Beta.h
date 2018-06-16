@@ -31,20 +31,20 @@
 - (void)loadNode;
 
 // for descriptions see <ASInterfaceState> definition
-- (void)nodeDidLoad ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)nodeDidLayout ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)nodeDidLoad NS_REQUIRES_SUPER;
+- (void)nodeDidLayout NS_REQUIRES_SUPER;
 
-- (void)didEnterVisibleState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitVisibleState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterVisibleState NS_REQUIRES_SUPER;
+- (void)didExitVisibleState  NS_REQUIRES_SUPER;
 
-- (void)didEnterDisplayState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitDisplayState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterDisplayState NS_REQUIRES_SUPER;
+- (void)didExitDisplayState  NS_REQUIRES_SUPER;
 
-- (void)didEnterPreloadState ASDISPLAYNODE_REQUIRES_SUPER;
-- (void)didExitPreloadState  ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)didEnterPreloadState NS_REQUIRES_SUPER;
+- (void)didExitPreloadState  NS_REQUIRES_SUPER;
 
 - (void)interfaceStateDidChange:(ASInterfaceState)newState
-                      fromState:(ASInterfaceState)oldState ASDISPLAYNODE_REQUIRES_SUPER;
+                      fromState:(ASInterfaceState)oldState NS_REQUIRES_SUPER;
 
 @end
 

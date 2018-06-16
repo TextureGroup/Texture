@@ -189,13 +189,12 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 
 @interface ASImageNode (Unavailable)
 
-- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock AS_UNAVAILABLE();
+- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock AS_UNAVAILABLE_MSG();
 
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock AS_UNAVAILABLE();
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock AS_UNAVAILABLE_MSG();
 
 @end
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  * @abstract Image modification block that rounds (and optionally adds a border to) an image.
@@ -207,7 +206,7 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  *
  * @return An ASImageNode image modification block.
  */
-asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor * _Nullable borderColor);
+AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor * _Nullable borderColor);
 
 /**
  * @abstract Image modification block that applies a tint color à la UIImage configured with
@@ -219,7 +218,6 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
  *
  * @return An ASImageNode image modification block.
  */
-asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
+AS_EXTERN asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
 
-ASDISPLAYNODE_EXTERN_C_END
 NS_ASSUME_NONNULL_END

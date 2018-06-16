@@ -27,7 +27,7 @@
 
 NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array)
 {
-  NSMutableArray *newArray = [NSMutableArray arrayWithCapacity:array.count];
+  NSMutableArray *newArray = [[NSMutableArray alloc] initWithCapacity:array.count];
   NSInteger i = 0;
   for (NSArray *subarray in array) {
     ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");

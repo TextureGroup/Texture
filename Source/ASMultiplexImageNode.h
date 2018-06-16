@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef id<NSCopying, NSObject> ASImageIdentifier;
 
-extern NSString *const ASMultiplexImageNodeErrorDomain;
+AS_EXTERN NSString *const ASMultiplexImageNodeErrorDomain;
 
 /**
  * ASMultiplexImageNode error codes.

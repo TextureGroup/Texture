@@ -36,7 +36,7 @@ AS_SUBCLASSING_RESTRICTED
 
 - (instancetype)initWithTip:(ASTip *)tip NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)init AS_UNAVAILABLE_MSG;
 
 @property (nonatomic, readonly) ASTip *tip;
 

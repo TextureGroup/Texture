@@ -16,6 +16,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,7 +31,7 @@ typedef NS_OPTIONS(NSInteger, ASTextAttributeType) {
 };
 
 /// Get the attribute type from an attribute name.
-extern ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
+AS_EXTERN ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
 
 /**
  Line style in ASText (similar to NSUnderlineStyle).
@@ -94,66 +95,66 @@ typedef NS_ENUM (NSUInteger, ASTextTruncationType) {
 
 /// The value of this attribute is a `ASTextBackedString` object.
 /// Use this attribute to store the original plain text if it is replaced by something else (such as attachment).
-UIKIT_EXTERN NSString *const ASTextBackedStringAttributeName;
+AS_EXTERN NSString *const ASTextBackedStringAttributeName;
 
 /// The value of this attribute is a `ASTextBinding` object.
 /// Use this attribute to bind a range of text together, as if it was a single charactor.
-UIKIT_EXTERN NSString *const ASTextBindingAttributeName;
+AS_EXTERN NSString *const ASTextBindingAttributeName;
 
 /// The value of this attribute is a `ASTextShadow` object.
 /// Use this attribute to add shadow to a range of text.
 /// Shadow will be drawn below text glyphs. Use ASTextShadow.subShadow to add multi-shadow.
-UIKIT_EXTERN NSString *const ASTextShadowAttributeName;
+AS_EXTERN NSString *const ASTextShadowAttributeName;
 
 /// The value of this attribute is a `ASTextShadow` object.
 /// Use this attribute to add inner shadow to a range of text.
 /// Inner shadow will be drawn above text glyphs. Use ASTextShadow.subShadow to add multi-shadow.
-UIKIT_EXTERN NSString *const ASTextInnerShadowAttributeName;
+AS_EXTERN NSString *const ASTextInnerShadowAttributeName;
 
 /// The value of this attribute is a `ASTextDecoration` object.
 /// Use this attribute to add underline to a range of text.
 /// The underline will be drawn below text glyphs.
-UIKIT_EXTERN NSString *const ASTextUnderlineAttributeName;
+AS_EXTERN NSString *const ASTextUnderlineAttributeName;
 
 /// The value of this attribute is a `ASTextDecoration` object.
 /// Use this attribute to add strikethrough (delete line) to a range of text.
 /// The strikethrough will be drawn above text glyphs.
-UIKIT_EXTERN NSString *const ASTextStrikethroughAttributeName;
+AS_EXTERN NSString *const ASTextStrikethroughAttributeName;
 
 /// The value of this attribute is a `ASTextBorder` object.
 /// Use this attribute to add cover border or cover color to a range of text.
 /// The border will be drawn above the text glyphs.
-UIKIT_EXTERN NSString *const ASTextBorderAttributeName;
+AS_EXTERN NSString *const ASTextBorderAttributeName;
 
 /// The value of this attribute is a `ASTextBorder` object.
 /// Use this attribute to add background border or background color to a range of text.
 /// The border will be drawn below the text glyphs.
-UIKIT_EXTERN NSString *const ASTextBackgroundBorderAttributeName;
+AS_EXTERN NSString *const ASTextBackgroundBorderAttributeName;
 
 /// The value of this attribute is a `ASTextBorder` object.
 /// Use this attribute to add a code block border to one or more line of text.
 /// The border will be drawn below the text glyphs.
-UIKIT_EXTERN NSString *const ASTextBlockBorderAttributeName;
+AS_EXTERN NSString *const ASTextBlockBorderAttributeName;
 
 /// The value of this attribute is a `ASTextAttachment` object.
 /// Use this attribute to add attachment to text.
 /// It should be used in conjunction with a CTRunDelegate.
-UIKIT_EXTERN NSString *const ASTextAttachmentAttributeName;
+AS_EXTERN NSString *const ASTextAttachmentAttributeName;
 
 /// The value of this attribute is a `ASTextHighlight` object.
 /// Use this attribute to add a touchable highlight state to a range of text.
-UIKIT_EXTERN NSString *const ASTextHighlightAttributeName;
+AS_EXTERN NSString *const ASTextHighlightAttributeName;
 
 /// The value of this attribute is a `NSValue` object stores CGAffineTransform.
 /// Use this attribute to add transform to each glyph in a range of text.
-UIKIT_EXTERN NSString *const ASTextGlyphTransformAttributeName;
+AS_EXTERN NSString *const ASTextGlyphTransformAttributeName;
 
 
 
 #pragma mark - String Token Define
 
-UIKIT_EXTERN NSString *const ASTextAttachmentToken; ///< Object replacement character (U+FFFC), used for text attachment.
-UIKIT_EXTERN NSString *const ASTextTruncationToken; ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
+AS_EXTERN NSString *const ASTextAttachmentToken; ///< Object replacement character (U+FFFC), used for text attachment.
+AS_EXTERN NSString *const ASTextTruncationToken; ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
 
 
 

@@ -28,7 +28,7 @@ NSString *NSStringFromASLayoutElementSize(ASLayoutElementSize size)
           NSStringFromASLayoutSize(ASLayoutSizeMake(size.maxWidth, size.maxHeight))];
 }
 
-ASDISPLAYNODE_INLINE void ASLayoutElementSizeConstrain(CGFloat minVal, CGFloat exactVal, CGFloat maxVal, CGFloat *outMin, CGFloat *outMax)
+AS_INLINE void ASLayoutElementSizeConstrain(CGFloat minVal, CGFloat exactVal, CGFloat maxVal, CGFloat *outMin, CGFloat *outMax)
 {
     NSCAssert(!isnan(minVal), @"minVal must not be NaN");
     NSCAssert(!isnan(maxVal), @"maxVal must not be NaN");

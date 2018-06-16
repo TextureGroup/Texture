@@ -74,11 +74,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLayoutDelegate:(id<ASCollectionLayoutDelegate>)layoutDelegate layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 
-- (void)beginUpdates ASDISPLAYNODE_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
+- (void)beginUpdates AS_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
 
-- (void)endUpdatesAnimated:(BOOL)animated ASDISPLAYNODE_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
+- (void)endUpdatesAnimated:(BOOL)animated AS_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
 
-- (void)endUpdatesAnimated:(BOOL)animated completion:(nullable void (^)(BOOL))completion ASDISPLAYNODE_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
+- (void)endUpdatesAnimated:(BOOL)animated completion:(nullable void (^)(BOOL))completion AS_DEPRECATED_MSG("Use -performBatchUpdates:completion: instead.");
 
 - (void)invalidateFlowLayoutDelegateMetrics;
 

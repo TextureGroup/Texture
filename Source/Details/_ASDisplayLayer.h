@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)drawRect:(CGRect)bounds
   withParameters:(nullable id)parameters
-     isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock
+     isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock
    isRasterizing:(BOOL)isRasterizing;
 
 /**
@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A UIImage with contents that are ready to display on the main thread. Make sure that the image is already decoded before returning it here.
  */
 + (UIImage *)displayWithParameters:(nullable id<NSObject>)parameters
-                       isCancelled:(AS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock;
+                       isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock;
 
 // Called on the main thread only
 

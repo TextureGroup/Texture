@@ -26,7 +26,7 @@
 
 #import <queue>
 
-NS_INLINE UIAccessibilityTraits InteractiveAccessibilityTraitsMask() {
+AS_INLINE UIAccessibilityTraits InteractiveAccessibilityTraitsMask() {
   return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
 }
 

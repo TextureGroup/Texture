@@ -30,7 +30,7 @@
 
 CGPoint const ASPointNull = {NAN, NAN};
 
-extern BOOL ASPointIsNull(CGPoint point)
+AS_EXTERN BOOL ASPointIsNull(CGPoint point)
 {
   return isnan(point.x) && isnan(point.y);
 }
@@ -38,7 +38,7 @@ extern BOOL ASPointIsNull(CGPoint point)
 /**
  * Creates an defined number of "    |" indent blocks for the recursive description.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString * descriptionIndents(NSUInteger indents)
+AS_INLINE AS_WARN_UNUSED_RESULT NSString * descriptionIndents(NSUInteger indents)
 {
   NSMutableString *description = [NSMutableString string];
   for (NSUInteger i = 0; i < indents; i++) {
@@ -50,12 +50,12 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString * descriptionIndents(NSUInte
   return description;
 }
 
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsDisplayNodeType(ASLayout *layout)
+AS_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsDisplayNodeType(ASLayout *layout)
 {
   return layout.type == ASLayoutElementTypeDisplayNode;
 }
 
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsFlattened(ASLayout *layout)
+AS_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsFlattened(ASLayout *layout)
 {
   // A layout is flattened if its position is null, and all of its sublayouts are of type displaynode with no sublayouts.
   if (! ASPointIsNull(layout.position)) {
