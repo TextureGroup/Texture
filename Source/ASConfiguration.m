@@ -25,7 +25,7 @@
   if (self = [super init]) {
     autotype featureStrings = ASDynamicCast(dictionary[@"experimental_features"], NSArray);
     autotype version = ASDynamicCast(dictionary[@"version"], NSNumber).integerValue;
-    if (version != ASConfigurationSchemaCurrentVersion) {
+    if (dictionary != nil && version != ASConfigurationSchemaCurrentVersion) {
       NSLog(@"Texture warning: configuration schema is old version (%zd vs %zd)", version, ASConfigurationSchemaCurrentVersion);
     }
     self.experimentalFeatures = ASExperimentalFeaturesFromArray(featureStrings);
