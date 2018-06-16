@@ -14,7 +14,6 @@
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  * A bit mask of features. Make sure to update configuration.json when you add entries.
@@ -31,10 +30,9 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
 };
 
 /// Convert flags -> name array.
-NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
+AS_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
 
 /// Convert name array -> flags.
-ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
+AS_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
 
-ASDISPLAYNODE_EXTERN_C_END
 NS_ASSUME_NONNULL_END

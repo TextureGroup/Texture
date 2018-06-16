@@ -22,18 +22,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+AS_EXTERN CGPoint const ASPointNull; // {NAN, NAN}
 
-extern CGPoint const ASPointNull; // {NAN, NAN}
-
-extern BOOL ASPointIsNull(CGPoint point);
+AS_EXTERN BOOL ASPointIsNull(CGPoint point);
 
 /**
  * Safely calculates the layout of the given root layoutElement by guarding against nil nodes.
  * @param rootLayoutElement The root node to calculate the layout for.
  * @param sizeRange The size range to calculate the root layout within.
  */
-extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange);
+AS_EXTERN ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange);
 
 /**
  * Safely computes the layout of the given node by guarding against nil nodes.
@@ -41,9 +39,7 @@ extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, co
  * @param sizeRange The size range to calculate the node layout within.
  * @param parentSize The parent size of the node to calculate the layout for.
  */
-extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
-
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
 
 /**
  * A node in the layout tree that represents the size and position of the object that created it (ASLayoutElement).

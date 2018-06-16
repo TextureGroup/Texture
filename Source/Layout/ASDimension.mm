@@ -121,7 +121,7 @@ NSString *NSStringFromASSizeRange(ASSizeRange sizeRange)
 #pragma mark - Yoga - ASEdgeInsets
 ASEdgeInsets const ASEdgeInsetsZero = {};
 
-extern ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets)
+AS_EXTERN ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets)
 {
   ASEdgeInsets asEdgeInsets = ASEdgeInsetsZero;
   asEdgeInsets.top = ASDimensionMake(edgeInsets.top);

@@ -17,7 +17,6 @@
 #import <AsyncDisplayKit/ASConfiguration.h>
 
 NS_ASSUME_NONNULL_BEGIN
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  * Quickly check if an experiment is enabled and notify the delegate
@@ -25,7 +24,7 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
  *
  * The delegate will be notified asynchronously.
  */
-BOOL ASActivateExperimentalFeature(ASExperimentalFeatures option);
+AS_EXTERN BOOL ASActivateExperimentalFeature(ASExperimentalFeatures option);
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfigurationManager : NSObject
@@ -38,4 +37,3 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 NS_ASSUME_NONNULL_END
-ASDISPLAYNODE_EXTERN_C_END

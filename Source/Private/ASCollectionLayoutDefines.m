@@ -12,7 +12,7 @@
 
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 
-extern ASSizeRange ASSizeRangeForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections)
+AS_EXTERN ASSizeRange ASSizeRangeForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections)
 {
   ASSizeRange sizeRange = ASSizeRangeUnconstrained;
   if (ASScrollDirectionContainsVerticalDirection(scrollableDirections) == NO) {

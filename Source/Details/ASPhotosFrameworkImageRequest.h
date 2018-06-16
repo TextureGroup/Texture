@@ -17,10 +17,11 @@
 
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const ASPhotosURLScheme;
+AS_EXTERN NSString *const ASPhotosURLScheme;
 
 /**
  @abstract Use ASPhotosFrameworkImageRequest to encapsulate all the information needed to request an image from
