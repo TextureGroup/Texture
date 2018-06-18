@@ -15,20 +15,9 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-// The C++ compiler mangles C function names. extern "C" { /* your C functions */ } prevents this.
-// You should wrap all C function prototypes declared in headers with ASDISPLAYNODE_EXTERN_C_BEGIN/END, even if
-// they are included only from .m (Objective-C) files. It's common for .m files to start using C++
-// features and become .mm (Objective-C++) files. Always wrapping the prototypes with
-// ASDISPLAYNODE_EXTERN_C_BEGIN/END will save someone a headache once they need to do this. You do not need to
-// wrap constants, only C functions. See StackOverflow for more details:
-// http://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c
-#ifdef __cplusplus
-# define ASDISPLAYNODE_EXTERN_C_BEGIN extern "C" {
-# define ASDISPLAYNODE_EXTERN_C_END   }
-#else
-# define ASDISPLAYNODE_EXTERN_C_BEGIN
-# define ASDISPLAYNODE_EXTERN_C_END
-#endif
+#import <Foundation/NSObjCRuntime.h>
+
+#define AS_EXTERN FOUNDATION_EXTERN
 
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \

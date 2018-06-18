@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The max text container size in layout.
  */
-extern const CGSize ASTextContainerMaxSize;
+AS_EXTERN const CGSize ASTextContainerMaxSize;
 
 /**
  The ASTextContainer class defines a region in which text is laid out.

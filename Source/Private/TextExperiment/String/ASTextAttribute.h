@@ -15,6 +15,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,7 +31,7 @@ typedef NS_OPTIONS(NSInteger, ASTextAttributeType) {
 };
 
 /// Get the attribute type from an attribute name.
-extern ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
+AS_EXTERN ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
 
 /**
  Line style in ASText (similar to NSUnderlineStyle).

@@ -19,12 +19,12 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
-extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image)
+void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image)
 {
   ASDisplayNodeSetResizableContents(layer, image);
 }
 
-extern void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
+void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
 {
   if (image) {
     ASDisplayNodeCAssert(image.resizingMode == UIImageResizingModeStretch || UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero),
