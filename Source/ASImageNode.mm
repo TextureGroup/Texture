@@ -732,7 +732,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
 #pragma mark - Extras
 
-AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
+asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
   return ^(UIImage *originalImage) {
     ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
@@ -755,7 +755,7 @@ AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlo
   };
 }
 
-AS_EXTERN asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
+asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
   return ^(UIImage *originalImage) {
     ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);

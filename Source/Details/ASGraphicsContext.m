@@ -41,7 +41,7 @@ static UInt8 __contextDataAssociationKey;
 
 #pragma mark - Graphics Contexts
 
-AS_EXTERN void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
+void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
@@ -106,7 +106,7 @@ AS_EXTERN void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, 
   CGContextRelease(context);
 }
 
-AS_EXTERN UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
+UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -160,7 +160,7 @@ AS_EXTERN UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURN
   return result;
 }
 
-AS_EXTERN void ASGraphicsEndImageContext()
+void ASGraphicsEndImageContext()
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsEndImageContext();

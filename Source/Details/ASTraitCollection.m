@@ -80,7 +80,7 @@ ASPrimitiveContentSizeCategory ASPrimitiveContentSizeCategoryMake(UIContentSizeC
 
 #pragma mark - ASPrimitiveTraitCollection
 
-AS_EXTERN void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
+void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
   if (element) {
     element.primitiveTraitCollection = traitCollection;
   }

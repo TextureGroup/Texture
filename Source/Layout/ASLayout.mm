@@ -30,7 +30,7 @@
 
 CGPoint const ASPointNull = {NAN, NAN};
 
-AS_EXTERN BOOL ASPointIsNull(CGPoint point)
+BOOL ASPointIsNull(CGPoint point)
 {
   return isnan(point.x) && isnan(point.y);
 }

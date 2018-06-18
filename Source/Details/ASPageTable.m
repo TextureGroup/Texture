@@ -12,7 +12,7 @@
 
 #import <AsyncDisplayKit/ASPageTable.h>
 
-AS_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
+ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
 {
   // Add 1 to the end result because 0 is not accepted by NSArray and NSMapTable.
   // To avoid overflow after adding, x and y can't be UINT16_MAX (0xFFFF) **at the same time**.
@@ -22,29 +22,29 @@ AS_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
   return (x << 16) + y + 1;
 }
 
-AS_EXTERN ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize)
+ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize)
 {
   return ASPageCoordinateMake((MAX(0.0, point.x) / pageSize.width), (MAX(0.0, point.y) / pageSize.height));
 }
 
-AS_EXTERN uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate)
+uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate)
 {
   return (pageCoordinate - 1) >> 16;
 }
 
-AS_EXTERN uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate)
+uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate)
 {
   return (pageCoordinate - 1) & ~(0xFFFF<<16);
 }
 
-AS_EXTERN CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize)
+CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize)
 {
   CGFloat pageWidth = pageSize.width;
   CGFloat pageHeight = pageSize.height;
   return CGRectMake(ASPageCoordinateGetX(pageCoordinate) * pageWidth, ASPageCoordinateGetY(pageCoordinate) * pageHeight, pageWidth, pageHeight);
 }
 
-AS_EXTERN NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize)
+NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize)
 {
   CGRect contentRect = CGRectMake(0.0, 0.0, contentSize.width, contentSize.height);
   // Make sure the specified rect is within contentRect
