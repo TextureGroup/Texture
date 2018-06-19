@@ -930,8 +930,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   ASDisplayNodeAssertMainThread();
   if (_initialReloadDataHasBeenCalled) {
     [self waitUntilAllUpdatesAreProcessed];
-    auto vis = self.visibleMap;
-    auto pending = self.pendingMap;
     self.visibleMap = self.pendingMap = [[ASElementMap alloc] init];
   }
 }
