@@ -324,8 +324,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   // Sometimes the UIKit classes can call back to their delegate even during deallocation, due to animation completion blocks etc.
   _isDeallocating = YES;
-  [self setAsyncDelegate:nil];
-  [self setAsyncDataSource:nil];
+  if (!ASActivateExperimentalFeature(ASExperimentalCollectionTeardown)) {
+    [self setAsyncDelegate:nil];
+    [self setAsyncDataSource:nil];
+  }
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main.
   ASPerformBackgroundDeallocation(&_dataController);
