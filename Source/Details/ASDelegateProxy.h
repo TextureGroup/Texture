@@ -34,7 +34,7 @@
 
 @interface ASDelegateProxy : NSProxy
 
-- (instancetype)initWithTarget:(id <NSObject>)target interceptor:(id <ASDelegateProxyInterceptor>)interceptor;
+- (instancetype)initWithTarget:(id)target interceptor:(id <ASDelegateProxyInterceptor>)interceptor;
 
 // This method must be overridden by a subclass.
 - (BOOL)interceptsSelector:(SEL)selector;
