@@ -529,8 +529,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   // For now, assume that a tap inside this text, but outside the text range is a tap on the
   // truncation token.
-  if (inAdditionalTruncationMessageOut != NULL && ![layout textRangeAtPoint:point]) {
-    *inAdditionalTruncationMessageOut = YES;
+  if (![layout textRangeAtPoint:point]) {
+    if (inAdditionalTruncationMessageOut != NULL) {
+      *inAdditionalTruncationMessageOut = YES;
+    }
     return nil;
   }
 
