@@ -47,6 +47,11 @@
   return self;
 }
 
+- (void)dealloc
+{
+    [_weakNode removeInterfaceStateDelegate:self];
+}
+
 - (void)loadNode
 {
   self.node = [[ASDisplayNode alloc] init];
@@ -74,7 +79,7 @@
     _weakNode = nil;
   }
 
-  node.interfaceStateDelegate = self;
+  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setNode:(ASDisplayNode *)node

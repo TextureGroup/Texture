@@ -36,6 +36,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -71,7 +72,6 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 @protocol CALayerDelegate;
 
 @interface ASDisplayNode () <UIGestureRecognizerDelegate, CALayerDelegate, _ASDisplayLayerDelegate, ASCATransactionQueueObserving>
-
 /**
  * See ASDisplayNodeInternal.h for ivars
  */
@@ -543,8 +543,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   for (ASDisplayNodeDidLoadBlock block in onDidLoadBlocks) {
     block(self);
   }
-
-  [_interfaceStateDelegate nodeDidLoad];
+  
+  [_interfaceStateDelegateManager nodeDidLoad];
 }
 
 - (void)didLoad
@@ -1225,7 +1225,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
-  [_interfaceStateDelegate nodeDidLayout];
+  [_interfaceStateDelegateManager nodeDidLayout];
 }
 
 #pragma mark Layout Transition
@@ -3142,7 +3142,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // Subclass hook
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate interfaceStateDidChange:newState fromState:oldState];
+  [_interfaceStateDelegateManager interfaceStateDidChange:newState fromState:oldState];
 }
 
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState
@@ -3150,6 +3150,24 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   BOOL willDisplay = ASInterfaceStateIncludesDisplay(newInterfaceState);
   BOOL nowDisplay = ASInterfaceStateIncludesDisplay(self.interfaceState);
   return willDisplay && (willDisplay != nowDisplay);
+}
+
+- (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
+{
+  ASDisplayNodeAssertMainThread();
+
+  // Not a fan of lazy loading, but this method won't get called very often and avoiding
+  // the overhead of creating this is probably worth it.
+  if (_interfaceStateDelegateManager == nil) {
+    [[ASDisplayNodeInterfaceDelegateManager alloc] init];
+  }
+  [_interfaceStateDelegateManager addDelegate:interfaceStateDelegate];
+}
+
+- (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
+{
+  ASDisplayNodeAssertMainThread();
+  [_interfaceStateDelegateManager removeDelegate:interfaceStateDelegate];
 }
 
 - (BOOL)isVisible
@@ -3163,7 +3181,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didEnterVisibleState];
+  [_interfaceStateDelegateManager didEnterVisibleState];
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
@@ -3174,7 +3192,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitVisibleState];
+  [_interfaceStateDelegateManager didExitVisibleState];
 }
 
 - (BOOL)isInDisplayState
@@ -3188,7 +3206,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didEnterDisplayState];
+  [_interfaceStateDelegateManager didEnterDisplayState];
 }
 
 - (void)didExitDisplayState
@@ -3196,7 +3214,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitDisplayState];
+  [_interfaceStateDelegateManager didExitDisplayState];
 }
 
 - (BOOL)isInPreloadState
@@ -3247,14 +3265,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [self layoutIfNeeded];
   }
 
-  [_interfaceStateDelegate didEnterPreloadState];
+  [_interfaceStateDelegateManager didEnterPreloadState];
 }
 
 - (void)didExitPreloadState
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitPreloadState];
+  [_interfaceStateDelegateManager didExitPreloadState];
 }
 
 - (void)clearContents
