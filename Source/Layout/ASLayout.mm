@@ -203,7 +203,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 - (BOOL)isFlattened
 {
   // A layout is flattened if its position is null, and all of its sublayouts are of type displaynode with no sublayouts.
-  if (! ASPointIsNull(_position)) {
+  if (!ASPointIsNull(_position)) {
     return NO;
   }
   
