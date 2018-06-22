@@ -243,6 +243,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     queue.pop_front();
     
     unowned ASLayout *layout = context.layout;
+    // Direct ivar access to avoid retain/release, use existing +1.
     const NSUInteger sublayoutsCount = layout->_sublayouts.count;
     const CGPoint absolutePosition = context.absolutePosition;
     
