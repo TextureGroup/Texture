@@ -18,6 +18,7 @@
 #import <Foundation/NSObjCRuntime.h>
 
 #define AS_EXTERN FOUNDATION_EXTERN
+#define unowned __unsafe_unretained
 
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
