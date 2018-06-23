@@ -82,8 +82,6 @@ AS_SUBCLASSING_RESTRICTED
 @property (class, readonly) ASDeallocQueue *sharedDeallocationQueue;
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
 
-- (void)drain;
-
 - (void)releaseObjectInBackground:(id __strong _Nullable * _Nonnull)objectPtr;
 
 @end

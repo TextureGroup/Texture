@@ -216,6 +216,6 @@ AS_EXTERN void ASDisplayNodeDisableHierarchyNotifications(ASDisplayNode *node);
 AS_EXTERN void ASDisplayNodeEnableHierarchyNotifications(ASDisplayNode *node);
 
 // Not to be called directly.
-AS_EXTERN void _ASSetDebugNames(Class owningClass, NSString *names, ASDisplayNode *object, ...);
+AS_EXTERN void _ASSetDebugNames(Class owningClass, NSString *names, ASDisplayNode * _Nullable object, ...);
 
 NS_ASSUME_NONNULL_END
