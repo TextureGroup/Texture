@@ -169,7 +169,9 @@
   layer.shadowColor = [UIColor blackColor].CGColor;
   layer.shadowRadius = 12.0;
   layer.shadowOpacity = 0.45;
-  layer.shadowPath = [UIBezierPath bezierPathWithRect:self.layer.bounds].CGPath;
+  CGPathRef shadowPath = CGPathCreateWithRect(self.layer.bounds, NULL);
+  layer.shadowPath = shadowPath;
+  CGPathRelease(shadowPath);
   view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.25, 1.25);
 }
 

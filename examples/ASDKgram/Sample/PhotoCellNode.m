@@ -79,8 +79,8 @@
     _photoImageNode.delegate = self;
     _photoImageNode.URL      = photo.URL;
     _photoImageNode.layerBacked = YES;
-    
-    _userNameLabel                  = [[ASTextNode alloc] init];
+
+    _userNameLabel                = [[ASTextNode alloc] init];
     _userNameLabel.attributedText = [photo.ownerUserProfile usernameAttributedStringWithFontSize:FONT_SIZE];
     
     _photoLocationLabel      = [[ASTextNode alloc] init];
