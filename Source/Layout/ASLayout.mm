@@ -19,6 +19,7 @@
 
 #import <queue>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
@@ -236,7 +237,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     queue.push_back({sublayout, sublayout.position});
   }
   
-  auto flattenedSublayouts = [[NSMutableArray<ASLayout *> alloc] init];
+  std::vector<ASLayout *> flattenedSublayouts;
   
   while (!queue.empty()) {
     const Context context = std::move(queue.front());
@@ -254,9 +255,9 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
                                                       size:layout.size
                                                   position:absolutePosition
                                                 sublayouts:@[]];
-        [flattenedSublayouts addObject:newLayout];
+        flattenedSublayouts.push_back(newLayout);
       } else {
-        [flattenedSublayouts addObject:layout];
+        flattenedSublayouts.push_back(layout);
       }
     } else if (sublayoutsCount > 0) {
       // Fast-reverse-enumerate the sublayouts array by copying it into a C-array and push_front'ing each into the queue.
@@ -268,7 +269,10 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     }
   }
   
-  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:flattenedSublayouts];
+  NSArray *array = [NSArray arrayByTransferring:flattenedSublayouts.data() count:flattenedSublayouts.size()];
+  // flattenedSublayouts is now all nils.
+  
+  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:array];
   // All flattened layouts must have this flag enabled
   // to ensure sublayout elements are retained until the layouts are applied.
   layout.retainSublayoutLayoutElements = YES;

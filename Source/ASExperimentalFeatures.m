@@ -12,6 +12,8 @@
 
 #import <AsyncDisplayKit/ASExperimentalFeatures.h>
 
+#import <AsyncDisplayKit/ASCollections.h>
+
 NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags)
 {
   NSArray *allNames = ASCreateOnce((@[@"exp_graphics_contexts",
