@@ -65,6 +65,11 @@ static void runLoopSourceCallback(void *info) {
   ASDisplayNodeFailAssert(@"Abstract method.");
 }
 
+- (void)drain
+{
+  ASDisplayNodeFailAssert(@"Abstract method.");
+}
+
 @end
 
 @implementation ASDeallocQueueV1 {

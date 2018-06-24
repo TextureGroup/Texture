@@ -191,7 +191,12 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
 
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
+  NSAttributedString *_additionalTruncationMessage;
   NSAttributedString *_composedTruncationText;
+  NSArray<NSNumber *> *_pointSizeScaleFactors;
+  NSLineBreakMode _truncationMode;
+  
+  NSUInteger _maximumNumberOfLines;
 
   NSString *_highlightedLinkAttributeName;
   id _highlightedLinkAttributeValue;
@@ -1175,6 +1180,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
 }
 
+- (NSAttributedString *)additionalTruncationMessage
+{
+  return ASLockedSelf(_additionalTruncationMessage);
+}
+
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
   if (ASLockedSelfCompareAssign(_truncationMode, truncationMode)) {
@@ -1182,16 +1192,26 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
 }
 
+- (NSLineBreakMode)truncationMode
+{
+  return ASLockedSelf(_truncationMode);
+}
+
 - (BOOL)isTruncated
 {
   return ASLockedSelf([[self _locked_renderer] isTruncated]);
 }
 
-- (void)setPointSizeScaleFactors:(NSArray *)pointSizeScaleFactors
+- (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)pointSizeScaleFactors
 {
   if (ASLockedSelfCompareAssignCopy(_pointSizeScaleFactors, pointSizeScaleFactors)) {
     [self setNeedsDisplay];
   }
+}
+
+- (NSArray<NSNumber *> *)pointSizeScaleFactors
+{
+  return ASLockedSelf(_pointSizeScaleFactors);
 }
 
 - (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
@@ -1199,6 +1219,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
   if (ASLockedSelfCompareAssign(_maximumNumberOfLines, maximumNumberOfLines)) {
     [self setNeedsDisplay];
   }
+}
+
+- (NSUInteger)maximumNumberOfLines
+{
+   return ASLockedSelf(_maximumNumberOfLines);
 }
 
 - (NSUInteger)lineCount
