@@ -2,35 +2,33 @@
 //  Constants
 //  ASDKgram-Swift
 //
-//  Created by Calum Harris on 07/01/2017.
-//
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
+//  grant of patent rights can be found in the PATENTS file in the same directory.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
+//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // swiftlint:disable nesting
 
 import UIKit
 
 struct Constants {
-
-	struct PX500 {
-		struct URLS {
-			static let Host = "https://api.500px.com/v1/"
-			static let PopularEndpoint = "photos?feature=popular&exclude=Nude,People,Fashion&sort=rating&image_size=3&include_store=store_download&include_states=voted"
-			static let SearchEndpoint = "photos/search?geo="    //latitude,longitude,radius<units>
-			static let UserEndpoint = "photos?user_id="
-			static let ConsumerKey = "&consumer_key=Fi13GVb8g53sGvHICzlram7QkKOlSDmAmp9s9aqC"
-		}
-	}
+    struct Unsplash {
+        struct URLS {
+            static let Host = "https://api.unsplash.com/"
+            static let PopularEndpoint = "photos?order_by=popular"
+            static let SearchEndpoint = "photos/search?geo="    //latitude,longitude,radius<units>
+            static let UserEndpoint = "photos?user_id="
+            static let ConsumerKey = "&client_id=3b99a69cee09770a4a0bbb870b437dbda53efb22f6f6de63714b71c4df7c9642"
+            static let ImagesPerPage = 30
+        }
+    }
 
 	struct CellLayout {
 		static let FontSize: CGFloat = 14
