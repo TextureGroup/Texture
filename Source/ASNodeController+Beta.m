@@ -48,13 +48,6 @@
   return self;
 }
 
-- (void)dealloc
-{
-  ASPerformBlockOnMainThread(^{
-    [_weakNode removeInterfaceStateDelegate:self];
-  });
-}
-
 - (void)loadNode
 {
   self.node = [[ASDisplayNode alloc] init];
