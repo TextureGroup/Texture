@@ -433,9 +433,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
   // TODO: Remove this? If supernode isn't already nil, this method isn't dealloc-safe anyway.
   [self _setSupernode:nil];
-  
-  ASPerformMainThreadDeallocation(&_interfaceStateDelegates);
-  _interfaceStateDelegates = nil;
 }
 
 #pragma mark - Loading
