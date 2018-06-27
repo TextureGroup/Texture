@@ -241,8 +241,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   NSTimeInterval _debugTimeToAddSubnodeViews;
   NSTimeInterval _debugTimeForDidLoad;
 #endif
-    
-  ASDisplayNodeInterfaceDelegateManager *_interfaceStateDelegateManager;
+  
+  NSHashTable <id <ASInterfaceStateDelegate>> *_interfaceStateDelegates;
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;

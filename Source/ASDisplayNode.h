@@ -263,7 +263,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property (readonly) ASInterfaceState interfaceState;
 
 /**
- * @abstract Adds a delegate to recieve notifications on interfaceState changes.
+ * @abstract Adds a delegate to receive notifications on interfaceState changes.
  *
  * @warning This must be called from the main thread.
  *
@@ -272,7 +272,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate;
 
 /**
- * @abstract Removes a delegate from recieving notifications on interfaceState changes.
+ * @abstract Removes a delegate from receiving notifications on interfaceState changes.
  *
  * @warning This must be called from the main thread.
  *
