@@ -36,6 +36,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -71,7 +72,6 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 @protocol CALayerDelegate;
 
 @interface ASDisplayNode () <UIGestureRecognizerDelegate, CALayerDelegate, _ASDisplayLayerDelegate, ASCATransactionQueueObserving>
-
 /**
  * See ASDisplayNodeInternal.h for ivars
  */
@@ -544,7 +544,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     block(self);
   }
 
-  [_interfaceStateDelegate nodeDidLoad];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(nodeDidLoad)]) {
+      [delegate nodeDidLoad];
+    }
+  }
 }
 
 - (void)didLoad
@@ -1225,7 +1229,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
-  [_interfaceStateDelegate nodeDidLayout];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(nodeDidLayout)]) {
+      [delegate nodeDidLayout];
+    }
+  }
 }
 
 #pragma mark Layout Transition
@@ -1447,6 +1455,13 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   if (_pendingDisplayNodes.isEmpty) {
     
     [self hierarchyDisplayDidFinish];
+    
+    for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+      if ([delegate respondsToSelector:@selector(hierarchyDisplayDidFinish)]) {
+        [delegate hierarchyDisplayDidFinish];
+      }
+    }
+      
     BOOL placeholderShouldPersist = [self placeholderShouldPersist];
 
     __instanceLock__.lock();
@@ -3142,7 +3157,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // Subclass hook
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate interfaceStateDidChange:newState fromState:oldState];
+  ASDisplayNodeAssertMainThread();
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(interfaceStateDidChange:fromState:)]) {
+      [delegate interfaceStateDidChange:newState fromState:oldState];
+    }
+  }
 }
 
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState
@@ -3150,6 +3170,24 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   BOOL willDisplay = ASInterfaceStateIncludesDisplay(newInterfaceState);
   BOOL nowDisplay = ASInterfaceStateIncludesDisplay(self.interfaceState);
   return willDisplay && (willDisplay != nowDisplay);
+}
+
+- (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
+{
+  ASDisplayNodeAssertMainThread();
+
+  // Not a fan of lazy loading, but this method won't get called very often and avoiding
+  // the overhead of creating this is probably worth it.
+  if (_interfaceStateDelegates == nil) {
+    _interfaceStateDelegates = [NSHashTable weakObjectsHashTable];
+  }
+  [_interfaceStateDelegates addObject:interfaceStateDelegate];
+}
+
+- (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
+{
+  ASDisplayNodeAssertMainThread();
+  [_interfaceStateDelegates removeObject:interfaceStateDelegate];
 }
 
 - (BOOL)isVisible
@@ -3163,7 +3201,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didEnterVisibleState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didEnterVisibleState)]) {
+      [delegate didEnterVisibleState];
+    }
+  }
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
@@ -3174,7 +3216,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitVisibleState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didExitVisibleState)]) {
+      [delegate didExitVisibleState];
+    }
+  }
 }
 
 - (BOOL)isInDisplayState
@@ -3188,7 +3234,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didEnterDisplayState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didEnterDisplayState)]) {
+      [delegate didEnterDisplayState];
+    }
+  }
 }
 
 - (void)didExitDisplayState
@@ -3196,7 +3246,11 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitDisplayState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didExitDisplayState)]) {
+      [delegate didExitDisplayState];
+    }
+  }
 }
 
 - (BOOL)isInPreloadState
@@ -3247,14 +3301,22 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [self layoutIfNeeded];
   }
 
-  [_interfaceStateDelegate didEnterPreloadState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didEnterPreloadState)]) {
+      [delegate didEnterPreloadState];
+    }
+  }
 }
 
 - (void)didExitPreloadState
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssertLockUnownedByCurrentThread(__instanceLock__);
-  [_interfaceStateDelegate didExitPreloadState];
+  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+    if ([delegate respondsToSelector:@selector(didExitPreloadState)]) {
+      [delegate didExitPreloadState];
+    }
+  }
 }
 
 - (void)clearContents

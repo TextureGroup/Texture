@@ -138,9 +138,6 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 // Returns the bounds of the node without reaching the view or layer
 - (CGRect)_locked_threadSafeBounds;
 
-// delegate to inform of ASInterfaceState changes (used by ASNodeController)
-@property (nonatomic, weak) id<ASInterfaceStateDelegate> interfaceStateDelegate;
-
 // The -pendingInterfaceState holds the value that will be applied to -interfaceState by the
 // ASCATransactionQueue. If already applied, it matches -interfaceState. Thread-safe access.
 @property (nonatomic, readonly) ASInterfaceState pendingInterfaceState;

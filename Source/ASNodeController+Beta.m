@@ -15,9 +15,10 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASWeakProxy.h>
-#import <AsyncDisplayKit/ASNodeController+Beta.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASNodeController+Beta.h>
+#import <AsyncDisplayKit/ASWeakProxy.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
@@ -74,7 +75,7 @@
     _weakNode = nil;
   }
 
-  node.interfaceStateDelegate = self;
+  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setNode:(ASDisplayNode *)node
