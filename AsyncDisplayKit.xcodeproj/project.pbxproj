@@ -115,7 +115,7 @@
 		68355B3E1CB57A60001D4E68 /* ASPINRemoteImageDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 68355B361CB57A5A001D4E68 /* ASPINRemoteImageDownloader.m */; };
 		68355B401CB57A69001D4E68 /* ASImageContainerProtocolCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = 68355B381CB57A5A001D4E68 /* ASImageContainerProtocolCategories.m */; };
 		68355B411CB57A6C001D4E68 /* ASImageContainerProtocolCategories.h in Headers */ = {isa = PBXBuildFile; fileRef = 68355B371CB57A5A001D4E68 /* ASImageContainerProtocolCategories.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		683F563720E409D700CEB7A3 /* ASDisplayNode+InterfaceState.h in Headers */ = {isa = PBXBuildFile; fileRef = 683F563620E409D600CEB7A3 /* ASDisplayNode+InterfaceState.h */; };
+		683F563720E409D700CEB7A3 /* ASDisplayNode+InterfaceState.h in Headers */ = {isa = PBXBuildFile; fileRef = 683F563620E409D600CEB7A3 /* ASDisplayNode+InterfaceState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68AF37DB1CBEF4D80077BF76 /* ASImageNode+AnimatedImagePrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		68B0277B1C1A79D60041016B /* ASDisplayNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B027791C1A79CC0041016B /* ASDisplayNode+Beta.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68B8A4E21CBDB958007E4543 /* ASWeakProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 68B8A4DF1CBDB958007E4543 /* ASWeakProxy.h */; settings = {ATTRIBUTES = (Private, ); }; };
