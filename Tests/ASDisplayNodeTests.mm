@@ -263,6 +263,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
+@interface ASTestResponderNodeWithOverride : ASDisplayNode
+@end
+@implementation ASTestResponderNodeWithOverride
+- (BOOL)canBecomeFirstResponder {
+  return YES;
+}
+@end
+
 @interface ASTestViewController: ASViewController<ASDisplayNode *>
 @end
 @implementation ASTestViewController
@@ -351,6 +359,21 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   // If the textNode resigns it's first responder the view should not be the first responder
   XCTAssertTrue([window firstResponder] == nil);
   XCTAssertFalse([textNode.view isFirstResponder]);
+}
+
+- (void)testResponderOverrrideCanBecomeFirstResponder
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASTestResponderNodeWithOverride *node = [[ASTestResponderNodeWithOverride alloc] init];
+  
+  // We have to add the text node to a window otherwise the responder methods responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+  XCTAssertTrue([window firstResponder] == node.view);
 }
 
 - (void)testUnsupportedResponderSetupWillThrow

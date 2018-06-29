@@ -29,6 +29,20 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASViewController.h>
 
+#pragma mark - ASDisplayNode
+
+/**
+ * Open access to the method overrides struct for ASDisplayView
+ */
+@implementation ASDisplayNode (ASDisplayNodeMethodOverrides_ASDisplayView)
+
+- (ASDisplayNodeMethodOverrides)methodOverrides
+{
+  return _methodOverrides;
+}
+
+@end
+
 #pragma mark - _ASDisplayViewMethodOverrides
 
 typedef NS_OPTIONS(NSUInteger, _ASDisplayViewMethodOverrides)
@@ -452,25 +466,24 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 
 #pragma mark UIResponder Handling
 
-#define IMPLEMENT_RESPONDER_METHOD(__sel, __methodOverride) \
+#define IMPLEMENT_RESPONDER_METHOD(__sel, __nodeMethodOverride, __viewMethodOverride) \
 - (BOOL)__sel\
 {\
   ASDisplayNode *node = _asyncdisplaykit_node; /* Create strong reference to weak ivar. */ \
-  SEL sel = @selector(__sel); \
-  /* Prevent an infinite loop in here if [super canBecomeFirstResponder] was called on a
-  / _ASDisplayView subclass */ \
-  if (self->_methodOverrides & __methodOverride) { \
-    /* Check if we can call through to ASDisplayNode subclass directly */ \
-    if (ASDisplayNodeSubclassOverridesSelector([node class], sel)) { \
-      return [node __sel]; \
-    } else { \
-    /* Call through to views superclass as we expect super was called from the
-      _ASDisplayView subclass and a node subclass does not overwrite canBecomeFirstResponder */ \
-      return [self __##__sel]; \
-    } \
+  /* Check if we can call through to ASDisplayNode subclass directly */ \
+  if (node.methodOverrides & __nodeMethodOverride) { \
+    return [node __sel]; \
   } else { \
-    /* Call through to internal node __canBecomeFirstResponder that will consider the view in responding */ \
-    return [node __##__sel]; \
+    /* Prevent an infinite loop in here if [super __sel] was called on a \
+     / _ASDisplayView subclass */ \
+    if (self->_methodOverrides & __viewMethodOverride) { \
+      /* Call through to views superclass as we expect super was called from the
+        _ASDisplayView subclass and a node subclass does not overwrite __sel */ \
+      return [self __##__sel]; \
+    } else { \
+      /* Call through to internal node __sel method that will consider the view in responding */ \
+      return [node __##__sel]; \
+    } \
   } \
 }\
 /* All __ prefixed methods are called from ASDisplayNode to let the view decide in what UIResponder state they \
@@ -480,11 +493,21 @@ are not overridden by a ASDisplayNode subclass */ \
   return [super __sel]; \
 } \
 
-IMPLEMENT_RESPONDER_METHOD(canBecomeFirstResponder, _ASDisplayViewMethodOverrideCanBecomeFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(becomeFirstResponder, _ASDisplayViewMethodOverrideBecomeFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(canResignFirstResponder, _ASDisplayViewMethodOverrideCanResignFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(resignFirstResponder, _ASDisplayViewMethodOverrideResignFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(isFirstResponder, _ASDisplayViewMethodOverrideIsFirstResponder);
+IMPLEMENT_RESPONDER_METHOD(canBecomeFirstResponder,
+                             ASDisplayNodeMethodOverrideCanBecomeFirstResponder,
+                             _ASDisplayViewMethodOverrideCanBecomeFirstResponder);
+IMPLEMENT_RESPONDER_METHOD(becomeFirstResponder,
+                             ASDisplayNodeMethodOverrideBecomeFirstResponder,
+                             _ASDisplayViewMethodOverrideBecomeFirstResponder);
+IMPLEMENT_RESPONDER_METHOD(canResignFirstResponder,
+                             ASDisplayNodeMethodOverrideCanResignFirstResponder,
+                             _ASDisplayViewMethodOverrideCanResignFirstResponder);
+IMPLEMENT_RESPONDER_METHOD(resignFirstResponder,
+                             ASDisplayNodeMethodOverrideResignFirstResponder,
+                             _ASDisplayViewMethodOverrideResignFirstResponder);
+IMPLEMENT_RESPONDER_METHOD(isFirstResponder,
+                             ASDisplayNodeMethodOverrideIsFirstResponder,
+                             _ASDisplayViewMethodOverrideIsFirstResponder);
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {

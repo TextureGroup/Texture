@@ -154,6 +154,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeCAssertNotNil(c, @"class is required");
   
   ASDisplayNodeMethodOverrides overrides = ASDisplayNodeMethodOverrideNone;
+  
+  // Handling touches
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesBegan:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesBegan;
   }
@@ -166,13 +168,32 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
+  
+  // Responder chain
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideCanBecomeFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(becomeFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideBecomeFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canResignFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideCanResignFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(resignFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideResignFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(isFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideIsFirstResponder;
+  }
+  
+  // Layout related methods
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
   }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:)) ||
       ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:
-                                                                 restrictedToSize:
-                                                             relativeToParentSize:))) {
+                                                          restrictedToSize:
+                                                          relativeToParentSize:))) {
     overrides |= ASDisplayNodeMethodOverrideCalcLayoutThatFits;
   }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
