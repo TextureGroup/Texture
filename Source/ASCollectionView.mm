@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASCollectionInternal.h>
 #import <AsyncDisplayKit/ASCollectionLayout.h>
 #import <AsyncDisplayKit/ASCollectionNode+Beta.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
@@ -751,19 +752,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToCollectionNode:(NSArray<NSIndexPath *> *)indexPaths
 {
-  if (indexPaths == nil) {
-    return nil;
-  }
-
-  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
-
-  for (NSIndexPath *indexPathInView in indexPaths) {
-    NSIndexPath *indexPath = [self convertIndexPathToCollectionNode:indexPathInView];
-    if (indexPath != nil) {
-      [indexPathsArray addObject:indexPath];
-    }
-  }
-  return indexPathsArray;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *viewIndexPath, [self convertIndexPathToCollectionNode:viewIndexPath]);
 }
 
 - (ASCellNode *)supplementaryNodeForElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
@@ -2225,13 +2214,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
 
-  NSMutableArray<NSIndexPath *> *uikitIndexPaths = [NSMutableArray arrayWithCapacity:nodes.count];
-  for (ASCellNode *node in nodes) {
-    NSIndexPath *uikitIndexPath = [self indexPathForNode:node];
-    if (uikitIndexPath != nil) {
-      [uikitIndexPaths addObject:uikitIndexPath];
-    }
-  }
+  auto uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
   
   [_layoutFacilitator collectionViewWillEditCellsAtIndexPaths:uikitIndexPaths batched:NO];
   

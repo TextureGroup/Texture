@@ -214,13 +214,18 @@
 /**
  * Create a new array by mapping `collection` over `work`, ignoring nil.
  */
-#define ASArrayByFlatMapping(collection, decl, work) ({ \
-  NSMutableArray *a = [[NSMutableArray alloc] init]; \
-  for (decl in collection) {\
-    id result = work; \
-    if (result != nil) { \
-      [a addObject:result]; \
+#define ASArrayByFlatMapping(collectionArg, decl, work) ({ \
+  id __collection = collectionArg; \
+  NSArray *__result; \
+  if (__collection) { \
+    id __buf[[__collection count]]; \
+    NSUInteger __i = 0; \
+    for (decl in __collection) {\
+      if ((__buf[__i] = work)) { \
+        __i++; \
+      } \
     } \
+    __result = [NSArray arrayByTransferring:__buf count:__i]; \
   } \
-  a; \
+  __result; \
 })

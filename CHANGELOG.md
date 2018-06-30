@@ -12,6 +12,7 @@
 - Clean up C-function `extern` decorators. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add an experiment to reduce work involved in collection teardown. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimize layout flattening, particularly reducing retain/release operations. [Adlai Holler](https://github.com/Adlai-Holler)
+- Create a method to transfer strong C-arrays into immutable NSArrays, reducing retain/release traffic. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
