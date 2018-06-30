@@ -20,7 +20,6 @@
 #if YOGA /* YOGA */
 
 #import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
-#import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
