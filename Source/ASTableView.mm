@@ -24,6 +24,8 @@
 #import <AsyncDisplayKit/ASBatchFetching.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollections.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -371,8 +373,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   // Sometimes the UIKit classes can call back to their delegate even during deallocation.
   _isDeallocating = YES;
-  [self setAsyncDelegate:nil];
-  [self setAsyncDataSource:nil];
+  if (!ASActivateExperimentalFeature(ASExperimentalCollectionTeardown)) {
+    [self setAsyncDelegate:nil];
+    [self setAsyncDataSource:nil];
+  }
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
   ASPerformBackgroundDeallocation(&_dataController);
@@ -758,7 +762,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
       [_cellsForLayoutUpdates removeAllObjects];
 
-      NSMutableArray<ASCellNode *> *nodesSizeChanged = [NSMutableArray array];
+      auto nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
       [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
       if (nodesSizeChanged.count > 0) {
         [self requeryNodeHeights];

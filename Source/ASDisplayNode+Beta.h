@@ -27,10 +27,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-void ASPerformBlockOnMainThread(void (^block)(void));
-void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
+AS_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
 #if ASEVENTLOG_ENABLE
   #define ASDisplayNodeLogEvent(node, ...) [node.eventLog logEventWithBacktrace:(AS_SAVE_EVENT_BACKTRACES ? [NSThread callStackSymbols] : nil) format:__VA_ARGS__]
@@ -167,7 +165,7 @@ typedef struct {
 
 #if YOGA
 
-extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
+AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
 
 @interface ASDisplayNode (Yoga)
 

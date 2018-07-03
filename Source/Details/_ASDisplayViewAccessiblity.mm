@@ -142,8 +142,8 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
 static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _ASDisplayView *view, NSMutableArray *elements) {
   UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:container containerNode:container];
 
-  NSMutableArray<ASAccessibilityElement *> *labeledNodes = [NSMutableArray array];
-  NSMutableArray<ASAccessibilityCustomAction *> *actions = [NSMutableArray array];
+  NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
+  NSMutableArray<ASAccessibilityCustomAction *> *actions = [[NSMutableArray alloc] init];
   std::queue<ASDisplayNode *> queue;
   queue.push(container);
 
@@ -268,7 +268,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
     return _accessibleElements;
   }
   
-  NSMutableArray *accessibleElements = [NSMutableArray array];
+  NSMutableArray *accessibleElements = [[NSMutableArray alloc] init];
   CollectAccessibilityElementsForView(self, accessibleElements);
   SortAccessibilityElements(accessibleElements);
   _accessibleElements = accessibleElements;

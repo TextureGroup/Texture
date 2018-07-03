@@ -19,6 +19,7 @@
 
 #import <queue>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
@@ -30,7 +31,7 @@
 
 CGPoint const ASPointNull = {NAN, NAN};
 
-extern BOOL ASPointIsNull(CGPoint point)
+BOOL ASPointIsNull(CGPoint point)
 {
   return isnan(point.x) && isnan(point.y);
 }
@@ -53,22 +54,6 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString * descriptionIndents(NSUInte
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsDisplayNodeType(ASLayout *layout)
 {
   return layout.type == ASLayoutElementTypeDisplayNode;
-}
-
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsFlattened(ASLayout *layout)
-{
-  // A layout is flattened if its position is null, and all of its sublayouts are of type displaynode with no sublayouts.
-  if (! ASPointIsNull(layout.position)) {
-    return NO;
-  }
-  
-  for (ASLayout *sublayout in layout.sublayouts) {
-    if (ASLayoutIsDisplayNodeType(sublayout) == NO || sublayout.sublayouts.count > 0) {
-      return NO;
-    }
-  }
-  
-  return YES;
 }
 
 @interface ASLayout () <ASDescriptionProvider>
@@ -216,9 +201,25 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 #pragma mark - Layout Flattening
 
+- (BOOL)isFlattened
+{
+  // A layout is flattened if its position is null, and all of its sublayouts are of type displaynode with no sublayouts.
+  if (!ASPointIsNull(_position)) {
+    return NO;
+  }
+  
+  for (ASLayout *sublayout in _sublayouts) {
+    if (ASLayoutIsDisplayNodeType(sublayout) == NO || sublayout->_sublayouts.count > 0) {
+      return NO;
+    }
+  }
+  
+  return YES;
+}
+
 - (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED
 {
-  if (ASLayoutIsFlattened(self)) {
+  if ([self isFlattened]) {
     // All flattened layouts must have this flag enabled
     // to ensure sublayout elements are retained until the layouts are applied.
     self.retainSublayoutLayoutElements = YES;
@@ -226,46 +227,52 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   }
   
   struct Context {
-    ASLayout *layout;
+    unowned ASLayout *layout;
     CGPoint absolutePosition;
   };
   
   // Queue used to keep track of sublayouts while traversing this layout in a DFS fashion.
   std::deque<Context> queue;
-  for (ASLayout *sublayout in self.sublayouts) {
+  for (ASLayout *sublayout in _sublayouts) {
     queue.push_back({sublayout, sublayout.position});
   }
   
-  NSMutableArray *flattenedSublayouts = [NSMutableArray array];
+  std::vector<ASLayout *> flattenedSublayouts;
   
   while (!queue.empty()) {
-    const Context context = queue.front();
+    const Context context = std::move(queue.front());
     queue.pop_front();
     
-    ASLayout *layout = context.layout;
-    const NSArray<ASLayout *> *sublayouts = layout.sublayouts;
-    const NSUInteger sublayoutsCount = sublayouts.count;
+    unowned ASLayout *layout = context.layout;
+    // Direct ivar access to avoid retain/release, use existing +1.
+    const NSUInteger sublayoutsCount = layout->_sublayouts.count;
     const CGPoint absolutePosition = context.absolutePosition;
     
     if (ASLayoutIsDisplayNodeType(layout)) {
       if (sublayoutsCount > 0 || CGPointEqualToPoint(ASCeilPointValues(absolutePosition), layout.position) == NO) {
         // Only create a new layout if the existing one can't be reused, which means it has either some sublayouts or an invalid absolute position.
-        layout = [ASLayout layoutWithLayoutElement:layout.layoutElement
-                                              size:layout.size
-                                          position:absolutePosition
-                                        sublayouts:@[]];
+        auto newLayout = [ASLayout layoutWithLayoutElement:layout->_layoutElement
+                                                      size:layout.size
+                                                  position:absolutePosition
+                                                sublayouts:@[]];
+        flattenedSublayouts.push_back(newLayout);
+      } else {
+        flattenedSublayouts.push_back(layout);
       }
-      [flattenedSublayouts addObject:layout];
-    } else if (sublayoutsCount > 0){
-      std::vector<Context> sublayoutContexts;
-      for (ASLayout *sublayout in sublayouts) {
-        sublayoutContexts.push_back({sublayout, absolutePosition + sublayout.position});
+    } else if (sublayoutsCount > 0) {
+      // Fast-reverse-enumerate the sublayouts array by copying it into a C-array and push_front'ing each into the queue.
+      unowned ASLayout *rawSublayouts[sublayoutsCount];
+      [layout->_sublayouts getObjects:rawSublayouts range:NSMakeRange(0, sublayoutsCount)];
+      for (NSInteger i = sublayoutsCount - 1; i >= 0; i--) {
+        queue.push_front({rawSublayouts[i], absolutePosition + rawSublayouts[i].position});
       }
-      queue.insert(queue.cbegin(), sublayoutContexts.begin(), sublayoutContexts.end());
     }
   }
   
-  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:flattenedSublayouts];
+  NSArray *array = [NSArray arrayByTransferring:flattenedSublayouts.data() count:flattenedSublayouts.size()];
+  // flattenedSublayouts is now all nils.
+  
+  ASLayout *layout = [ASLayout layoutWithLayoutElement:_layoutElement size:_size sublayouts:array];
   // All flattened layouts must have this flag enabled
   // to ensure sublayout elements are retained until the layouts are applied.
   layout.retainSublayoutLayoutElements = YES;

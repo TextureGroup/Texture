@@ -123,7 +123,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _mainSerialQueue = [[ASMainSerialQueue alloc] init];
 
   _synchronized = YES;
-  _onDidFinishSynchronizingBlocks = [NSMutableSet set];
+  _onDidFinishSynchronizingBlocks = [[NSMutableSet alloc] init];
   
   const char *queueName = [[NSString stringWithFormat:@"org.AsyncDisplayKit.ASDataController.editingTransactionQueue:%p", self] cStringUsingEncoding:NSASCIIStringEncoding];
   _editingTransactionQueue = dispatch_queue_create(queueName, DISPATCH_QUEUE_SERIAL);
@@ -214,7 +214,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     return @[];
   }
   
-  NSMutableArray<NSIndexPath *> *indexPaths = [NSMutableArray array];
+  auto indexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
     std::vector<NSInteger> counts = [self itemCountsFromDataSource];
     [sections enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
@@ -671,7 +671,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
       completion();
     } else {
-      NSMutableArray<ASCollectionElement *> *elementsToProcess = [NSMutableArray array];
+      auto elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
       for (ASCollectionElement *element in newMap) {
         ASCellNode *nodeIfAllocated = element.nodeIfAllocated;
         if (nodeIfAllocated.shouldUseUIKitCell) {

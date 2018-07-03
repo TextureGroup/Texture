@@ -81,13 +81,11 @@
  */
 #pragma mark - Main Thread Assertions Disabling
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-BOOL ASMainThreadAssertionsAreDisabled(void);
+AS_EXTERN BOOL ASMainThreadAssertionsAreDisabled(void);
 
-void ASPushMainThreadAssertionsDisabled(void);
+AS_EXTERN void ASPushMainThreadAssertionsDisabled(void);
 
-void ASPopMainThreadAssertionsDisabled(void);
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN void ASPopMainThreadAssertionsDisabled(void);
 
 #pragma mark - Non-Fatal Assertions
 

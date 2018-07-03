@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
@@ -70,37 +71,6 @@ typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode *node
  */
 typedef void (^ASDisplayNodeNonFatalErrorBlock)(NSError *error);
 
-/**
- * Interface state is available on ASDisplayNode and ASViewController, and
- * allows checking whether a node is in an interface situation where it is prudent to trigger certain
- * actions: measurement, data loading, display, and visibility (the latter for animations or other onscreen-only effects).
- * 
- * The defualt state, ASInterfaceStateNone, means that the element is not predicted to be onscreen soon and
- * preloading should not be performed. Swift: use [] for the default behavior.
- */
-typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
-{
-  /** The element is not predicted to be onscreen soon and preloading should not be performed */
-  ASInterfaceStateNone          = 0,
-  /** The element may be added to a view soon that could become visible.  Measure the layout, including size calculation. */
-  ASInterfaceStateMeasureLayout = 1 << 0,
-  /** The element is likely enough to come onscreen that disk and/or network data required for display should be fetched. */
-  ASInterfaceStatePreload       = 1 << 1,
-  /** The element is very likely to become visible, and concurrent rendering should be executed for any -setNeedsDisplay. */
-  ASInterfaceStateDisplay       = 1 << 2,
-  /** The element is physically onscreen by at least 1 pixel.
-   In practice, all other bit fields should also be set when this flag is set. */
-  ASInterfaceStateVisible       = 1 << 3,
-
-  /**
-   * The node is not contained in a cell but it is in a window.
-   *
-   * Currently we only set `interfaceState` to other values for
-   * nodes contained in table views or collection views.
-   */
-  ASInterfaceStateInHierarchy   = ASInterfaceStateMeasureLayout | ASInterfaceStatePreload | ASInterfaceStateDisplay | ASInterfaceStateVisible,
-};
-
 typedef NS_ENUM(NSInteger, ASCornerRoundingType) {
   ASCornerRoundingTypeDefaultSlowCALayer,
   ASCornerRoundingTypePrecomposited,
@@ -110,7 +80,7 @@ typedef NS_ENUM(NSInteger, ASCornerRoundingType) {
 /**
  * Default drawing priority for display node
  */
-extern NSInteger const ASDefaultDrawingPriority;
+AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 /**
  * An `ASDisplayNode` is an abstraction over `UIView` and `CALayer` that allows you to perform calculations about a view
@@ -291,6 +261,24 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @see ASInterfaceState
  */
 @property (readonly) ASInterfaceState interfaceState;
+
+/**
+ * @abstract Adds a delegate to receive notifications on interfaceState changes.
+ *
+ * @warning This must be called from the main thread.
+ *
+ * @see ASInterfaceState
+ */
+- (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate;
+
+/**
+ * @abstract Removes a delegate from receiving notifications on interfaceState changes.
+ *
+ * @warning This must be called from the main thread.
+ *
+ * @see ASInterfaceState
+ */
+- (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate;
 
 /**
  * @abstract Class property that allows to set a block that can be called on non-fatal errors. This

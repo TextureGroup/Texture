@@ -65,8 +65,8 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
                               : _atomicFlags.fetch_and(~flag)) & flag) != 0)
 
-FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
-FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
+AS_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
+AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
 
 // Allow 2^n increments of begin disabling hierarchy notifications
 #define VISIBILITY_NOTIFICATIONS_DISABLED_BITS 4
@@ -241,6 +241,8 @@ FOUNDATION_EXPORT NSString * const ASRenderingEngineDidDisplayNodesScheduledBefo
   NSTimeInterval _debugTimeToAddSubnodeViews;
   NSTimeInterval _debugTimeForDidLoad;
 #endif
+  
+  NSHashTable <id <ASInterfaceStateDelegate>> *_interfaceStateDelegates;
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;

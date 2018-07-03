@@ -33,10 +33,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** A constant that indicates that the parent's size is not yet determined in a given dimension. */
-extern CGFloat const ASLayoutElementParentDimensionUndefined;
+AS_EXTERN CGFloat const ASLayoutElementParentDimensionUndefined;
 
 /** A constant that indicates that the parent's size is not yet determined in either dimension. */
-extern CGSize const ASLayoutElementParentSizeUndefined;
+AS_EXTERN CGSize const ASLayoutElementParentSizeUndefined;
 
 /** Type of ASLayoutElement  */
 typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
@@ -152,24 +152,24 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 #pragma mark - ASLayoutElementStyle
 
-extern NSString * const ASLayoutElementStyleWidthProperty;
-extern NSString * const ASLayoutElementStyleMinWidthProperty;
-extern NSString * const ASLayoutElementStyleMaxWidthProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleWidthProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleMinWidthProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleMaxWidthProperty;
 
-extern NSString * const ASLayoutElementStyleHeightProperty;
-extern NSString * const ASLayoutElementStyleMinHeightProperty;
-extern NSString * const ASLayoutElementStyleMaxHeightProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleHeightProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleMinHeightProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleMaxHeightProperty;
 
-extern NSString * const ASLayoutElementStyleSpacingBeforeProperty;
-extern NSString * const ASLayoutElementStyleSpacingAfterProperty;
-extern NSString * const ASLayoutElementStyleFlexGrowProperty;
-extern NSString * const ASLayoutElementStyleFlexShrinkProperty;
-extern NSString * const ASLayoutElementStyleFlexBasisProperty;
-extern NSString * const ASLayoutElementStyleAlignSelfProperty;
-extern NSString * const ASLayoutElementStyleAscenderProperty;
-extern NSString * const ASLayoutElementStyleDescenderProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleSpacingBeforeProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleSpacingAfterProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleFlexGrowProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleFlexShrinkProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleFlexBasisProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleAlignSelfProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleAscenderProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleDescenderProperty;
 
-extern NSString * const ASLayoutElementStyleLayoutPositionProperty;
+AS_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
 
 @protocol ASLayoutElementStyleDelegate <NSObject>
 - (void)style:(__kindof ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName;

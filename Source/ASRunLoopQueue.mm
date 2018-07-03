@@ -65,6 +65,11 @@ static void runLoopSourceCallback(void *info) {
   ASDisplayNodeFailAssert(@"Abstract method.");
 }
 
+- (void)drain
+{
+  ASDisplayNodeFailAssert(@"Abstract method.");
+}
+
 @end
 
 @implementation ASDeallocQueueV1 {
@@ -96,7 +101,7 @@ static void runLoopSourceCallback(void *info) {
         return;
       }
       // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
-      NSInteger count;
+      __unused NSInteger count; // Prevent static analyzer warning if release build
       @autoreleasepool {
 #if ASRunLoopQueueLoggingEnabled
         NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
@@ -238,14 +243,12 @@ static void runLoopSourceCallback(void *info) {
 
 - (void)drain
 {
-  @autoreleasepool {
-    _lock.lock();
-    auto q = std::move(_queue);
-    _lock.unlock();
-    for (auto ref : q) {
-      // NOTE: Could check that retain count is 1 and retry later if not.
-      CFRelease(ref);
-    }
+  _lock.lock();
+  auto q = std::move(_queue);
+  _lock.unlock();
+  for (auto ref : q) {
+    // NOTE: Could check that retain count is 1 and retry later if not.
+    CFRelease(ref);
   }
 }
 
@@ -278,7 +281,8 @@ typedef enum {
 
 - (instancetype)init
 {
-  if (self != [super init]) {
+  self = [super init];
+  if (self == nil) {
     return nil;
   }
   ASDisplayNodeAssert(self.class != [ASAbstractRunLoopQueue class], @"Should never create instances of abstract class ASAbstractRunLoopQueue.");

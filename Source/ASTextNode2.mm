@@ -346,7 +346,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
     NSShadow *shadow = [[NSShadow alloc] init];
     if (_shadowOpacity != 1) {
-      shadow.shadowColor = [UIColor colorWithCGColor:CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor))];
+      CGColorRef shadowColorRef = CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor));
+      shadow.shadowColor = [UIColor colorWithCGColor:shadowColorRef];
+      CGColorRelease(shadowColorRef);
     } else {
       shadow.shadowColor = [UIColor colorWithCGColor:_shadowColor];
     }
@@ -530,7 +532,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // For now, assume that a tap inside this text, but outside the text range is a tap on the
   // truncation token.
   if (![layout textRangeAtPoint:point]) {
-    *inAdditionalTruncationMessageOut = YES;
+    if (inAdditionalTruncationMessageOut != NULL) {
+      *inAdditionalTruncationMessageOut = YES;
+    }
     return nil;
   }
 
@@ -948,7 +952,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 }
 
-- (NSArray *)pointSizeScaleFactors
+- (NSArray<NSNumber *> *)pointSizeScaleFactors
 {
   return ASLockedSelf(_pointSizeScaleFactors);
 }

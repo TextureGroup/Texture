@@ -33,8 +33,8 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 @implementation _ASTransitionContext
 
 - (instancetype)initWithAnimation:(BOOL)animated
-                     layoutDelegate:(id<_ASTransitionContextLayoutDelegate>)layoutDelegate
-                 completionDelegate:(id<_ASTransitionContextCompletionDelegate>)completionDelegate
+                   layoutDelegate:(id<_ASTransitionContextLayoutDelegate>)layoutDelegate
+               completionDelegate:(id<_ASTransitionContextCompletionDelegate>)completionDelegate
 {
   self = [super init];
   if (self) {
@@ -69,7 +69,7 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 
 - (NSArray<ASDisplayNode *> *)subnodesForKey:(NSString *)key
 {
-  NSMutableArray<ASDisplayNode *> *subnodes = [NSMutableArray array];
+  NSMutableArray<ASDisplayNode *> *subnodes = [[NSMutableArray alloc] init];
   for (ASLayout *sublayout in [self layoutForKey:key].sublayouts) {
     [subnodes addObject:(ASDisplayNode *)sublayout.layoutElement];
   }

@@ -1,11 +1,19 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
 - [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)
 - Make `ASPerformMainThreadDeallocation` visible in C. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add snapshot test for astextnode2. [Max Wang](https://github.com/wsdwsd0829) [#935](https://github.com/TextureGroup/Texture/pull/935)
 - Internal housekeeping on the async transaction (rendering) system. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add new protocol `ASLocking` that extends `NSLocking` with `tryLock`, and allows taking multiple locks safely. [Adlai Holler](https://github.com/Adlai-Holler)
 - Make the main thread ivar deallocation system available to other classes. Plus a little optimization. See `ASMainThreadDeallocation.h`. [Adlai Holler](https://github.com/Adlai-Holler) [#959](https://github.com/TextureGroup/Texture/pull/959)
+- Reduce usage of autorelease pools. [Adlai Holler](https://github.com/Adlai-Holler) [#968](https://github.com/TextureGroup/Texture/pull/968)
+- Clean up unused/unneeded header macros. [Adlai Holler](https://github.com/Adlai-Holler)
+- Clean up C-function `extern` decorators. [Adlai Holler](https://github.com/Adlai-Holler)
+- Add an experiment to reduce work involved in collection teardown. [Adlai Holler](https://github.com/Adlai-Holler)
+- Optimize layout flattening, particularly reducing retain/release operations. [Adlai Holler](https://github.com/Adlai-Holler)
+- Create a method to transfer strong C-arrays into immutable NSArrays, reducing retain/release traffic. [Adlai Holler](https://github.com/Adlai-Holler)
+- Remove yoga layout spec, which has been superseded by tighter Yoga integration (`ASDisplayNode+Yoga.h`)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)

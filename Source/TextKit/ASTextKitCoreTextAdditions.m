@@ -172,7 +172,7 @@ NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedSt
 #pragma mark -
 @implementation NSParagraphStyle (ASTextKitCoreTextAdditions)
 
-+ (instancetype)paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextParagraphStyle NS_RETURNS_RETAINED
++ (NSParagraphStyle *)paragraphStyleWithCTParagraphStyle:(CTParagraphStyleRef)coreTextParagraphStyle NS_RETURNS_RETAINED
 {
   NSMutableParagraphStyle *newParagraphStyle = [[NSMutableParagraphStyle alloc] init];
 

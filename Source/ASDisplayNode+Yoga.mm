@@ -20,7 +20,6 @@
 #if YOGA /* YOGA */
 
 #import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
-#import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -80,7 +79,7 @@
     return;
   }
   if (_yogaChildren == nil) {
-    _yogaChildren = [NSMutableArray array];
+    _yogaChildren = [[NSMutableArray alloc] init];
   }
 
   // Clean up state in case this child had another parent.

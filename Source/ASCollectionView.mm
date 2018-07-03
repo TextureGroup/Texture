@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASCollectionInternal.h>
 #import <AsyncDisplayKit/ASCollectionLayout.h>
 #import <AsyncDisplayKit/ASCollectionNode+Beta.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
@@ -303,7 +304,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   _proxyDataSource = [[ASCollectionViewProxy alloc] initWithTarget:nil interceptor:self];
   super.dataSource = (id<UICollectionViewDataSource>)_proxyDataSource;
   
-  _registeredSupplementaryKinds = [NSMutableSet set];
+  _registeredSupplementaryKinds = [[NSMutableSet alloc] init];
   _visibleElements = [[NSCountedSet alloc] init];
   
   _cellsForVisibilityUpdates = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
@@ -324,8 +325,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   // Sometimes the UIKit classes can call back to their delegate even during deallocation, due to animation completion blocks etc.
   _isDeallocating = YES;
-  [self setAsyncDelegate:nil];
-  [self setAsyncDataSource:nil];
+  if (!ASActivateExperimentalFeature(ASExperimentalCollectionTeardown)) {
+    [self setAsyncDelegate:nil];
+    [self setAsyncDataSource:nil];
+  }
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main.
   ASPerformBackgroundDeallocation(&_dataController);
@@ -749,19 +752,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToCollectionNode:(NSArray<NSIndexPath *> *)indexPaths
 {
-  if (indexPaths == nil) {
-    return nil;
-  }
-
-  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
-
-  for (NSIndexPath *indexPathInView in indexPaths) {
-    NSIndexPath *indexPath = [self convertIndexPathToCollectionNode:indexPathInView];
-    if (indexPath != nil) {
-      [indexPathsArray addObject:indexPath];
-    }
-  }
-  return indexPathsArray;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *viewIndexPath, [self convertIndexPathToCollectionNode:viewIndexPath]);
 }
 
 - (ASCellNode *)supplementaryNodeForElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
@@ -1729,7 +1720,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
     [_cellsForLayoutUpdates removeAllObjects];
 
-    NSMutableArray<ASCellNode *> *nodesSizeChanged = [NSMutableArray array];
+    NSMutableArray<ASCellNode *> *nodesSizeChanged = [[NSMutableArray alloc] init];
 
     [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
     [self nodesDidRelayout:nodesSizeChanged];
@@ -2005,7 +1996,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
 {
   if (_asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection) {
-    NSMutableSet *kinds = [NSMutableSet set];
+    auto kinds = [[NSMutableSet<NSString *> alloc] init];
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, @[]);
     [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {
       NSArray<NSString *> *kindsForSection = [_asyncDataSource collectionNode:collectionNode supplementaryElementKindsInSection:section];
@@ -2223,13 +2214,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
 
-  NSMutableArray<NSIndexPath *> *uikitIndexPaths = [NSMutableArray arrayWithCapacity:nodes.count];
-  for (ASCellNode *node in nodes) {
-    NSIndexPath *uikitIndexPath = [self indexPathForNode:node];
-    if (uikitIndexPath != nil) {
-      [uikitIndexPaths addObject:uikitIndexPath];
-    }
-  }
+  auto uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
   
   [_layoutFacilitator collectionViewWillEditCellsAtIndexPaths:uikitIndexPaths batched:NO];
   
