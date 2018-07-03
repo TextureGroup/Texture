@@ -48,6 +48,8 @@ AS_SUBCLASSING_RESTRICTED
 
 - (void)removeSectionsOfItems:(NSIndexSet *)itemSections;
 
+- (void)removeSupplementaryElementsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths kind:(NSString *)kind;
+
 - (void)insertEmptySectionsOfItemsAtIndexes:(NSIndexSet *)sections;
 
 - (void)insertElement:(ASCollectionElement *)element atIndexPath:(NSIndexPath *)indexPath;

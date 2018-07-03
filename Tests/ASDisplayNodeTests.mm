@@ -29,14 +29,17 @@
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
+#import <AsyncDisplayKit/ASEditableTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
+#import <AsyncDisplayKit/ASStackLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASViewController.h>
 
 // Conveniences for making nodes named a certain way
 #define DeclareNodeNamed(n) ASDisplayNode *n = [[ASDisplayNode alloc] init]; n.debugName = @#n
@@ -87,18 +90,22 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertFalse(n.nodeLoaded, @"%@ should not be loaded", n.debugName);\
 }
 
+@interface UIWindow (Testing)
+// UIWindow has this handy method that is not public but great for testing
+- (UIResponder *)firstResponder;
+@end
 
 @interface ASDisplayNode (HackForTests)
 - (id)initWithViewClass:(Class)viewClass;
 - (id)initWithLayerClass:(Class)layerClass;
-
+- (void)setInterfaceState:(ASInterfaceState)state;
 // FIXME: Importing ASDisplayNodeInternal.h causes a heap of problems.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
 @end
 
 @interface ASTestDisplayNode : ASDisplayNode
-@property (nonatomic, copy) void (^willDeallocBlock)(__unsafe_unretained ASTestDisplayNode *node);
-@property (nonatomic, copy) CGSize(^calculateSizeBlock)(ASTestDisplayNode *node, CGSize size);
+@property (nonatomic) void (^willDeallocBlock)(__unsafe_unretained ASTestDisplayNode *node);
+@property (nonatomic) CGSize(^calculateSizeBlock)(ASTestDisplayNode *node, CGSize size);
 
 @property (nonatomic, nullable) UIGestureRecognizer *gestureRecognizer;
 @property (nonatomic, nullable) id idGestureRecognizer;
@@ -112,8 +119,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @property (nonatomic) BOOL preloadStateChangedToYES;
 @property (nonatomic) BOOL preloadStateChangedToNO;
 
-@property (nonatomic, assign) NSUInteger displayWillStartCount;
-@property (nonatomic, assign) NSUInteger didDisplayCount;
+@property (nonatomic) NSUInteger displayWillStartCount;
+@property (nonatomic) NSUInteger didDisplayCount;
 
 @end
 
@@ -121,6 +128,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 @end
 
 @implementation ASTestDisplayNode
+
+- (void)setInterfaceState:(ASInterfaceState)state
+{
+  [super setInterfaceState:state];
+  ASCATransactionQueueWait(nil);
+}
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
@@ -169,6 +182,28 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 {
   [super displayWillStartAsynchronously:asynchronously];
   _displayWillStartCount++;
+}
+
+@end
+
+@interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaViewClass
+
++ (Class)viewClass {
+  return [UIView class];
+}
+
+@end
+
+@interface ASSynchronousTestDisplayNodeViaLayerClass : ASDisplayNode
+@end
+
+@implementation ASSynchronousTestDisplayNodeViaLayerClass
+
++ (Class)layerClass {
+  return [CALayer class];
 }
 
 @end
@@ -228,6 +263,26 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
 @end
 
+@interface ASTestViewController: ASViewController<ASDisplayNode *>
+@end
+@implementation ASTestViewController
+- (BOOL)prefersStatusBarHidden { return YES; }
+@end
+
+@interface UIResponderNodeTestDisplayViewCallingSuper : _ASDisplayView
+@end
+@implementation UIResponderNodeTestDisplayViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
+@end
+
+@interface UIResponderNodeTestViewCallingSuper : UIView
+@end
+@implementation UIResponderNodeTestViewCallingSuper
+- (BOOL)canBecomeFirstResponder { return YES; }
+- (BOOL)becomeFirstResponder { return [super becomeFirstResponder]; }
+@end
+
 @interface ASDisplayNodeTests : XCTestCase
 @end
 
@@ -236,16 +291,75 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   dispatch_queue_t queue;
 }
 
-- (void)testOverriddenFirstResponderBehavior {
+- (void)testOverriddenNodeFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestResponderNode alloc] init];
   XCTAssertTrue([node canBecomeFirstResponder]);
   XCTAssertTrue([node becomeFirstResponder]);
 }
 
-- (void)testDefaultFirstResponderBehavior {
+- (void)testOverriddenDisplayViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestDisplayViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testOverriddenViewFirstResponderBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:[UIResponderNodeTestViewCallingSuper class]];
+  
+  // We have to add the node to a window otherwise the super responder methods call responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([node canBecomeFirstResponder]);
+  XCTAssertTrue([node becomeFirstResponder]);
+}
+
+- (void)testDefaultFirstResponderBehavior
+{
   ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
   XCTAssertFalse([node canBecomeFirstResponder]);
   XCTAssertFalse([node becomeFirstResponder]);
+}
+
+- (void)testResponderMethodsBehavior
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  ASEditableTextNode *textNode = [[ASEditableTextNode alloc] init];
+  
+  // We have to add the text node to a window otherwise the responder methods responses are undefined
+  // This will also create the backing view of the node
+  [window addSubnode:textNode];
+  [window makeKeyAndVisible];
+  
+  XCTAssertTrue([textNode canBecomeFirstResponder]);
+  XCTAssertTrue([textNode becomeFirstResponder]);
+  XCTAssertTrue([window firstResponder] == textNode.textView);
+  XCTAssertTrue([textNode resignFirstResponder]);
+  
+  // If the textNode resigns it's first responder the view should not be the first responder
+  XCTAssertTrue([window firstResponder] == nil);
+  XCTAssertFalse([textNode.view isFirstResponder]);
+}
+
+- (void)testUnsupportedResponderSetupWillThrow
+{
+  ASTestResponderNode *node = [[ASTestResponderNode alloc] init];
+  [node setViewBlock:^UIView * _Nonnull{
+    return [[UIView alloc] init];
+  }];
+  XCTAssertThrows([node view], @"Externally provided views should be synchronous");
 }
 
 - (void)setUp
@@ -370,6 +484,10 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     XCTAssertEqual(NO, node.exclusiveTouch, @"default exclusiveTouch broken %@", hasLoadedView);
     XCTAssertEqual(YES, node.autoresizesSubviews, @"default autoresizesSubviews broken %@", hasLoadedView);
     XCTAssertEqual(UIViewAutoresizingNone, node.autoresizingMask, @"default autoresizingMask broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsMake(8, 8, 8, 8), node.layoutMargins), @"default layoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(NO, node.preservesSuperviewLayoutMargins, @"default preservesSuperviewLayoutMargins broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, node.safeAreaInsets), @"default safeAreaInsets broken %@", hasLoadedView);
+    XCTAssertEqual(YES, node.insetsLayoutMarginsFromSafeArea, @"default insetsLayoutMarginsFromSafeArea broken %@", hasLoadedView);
   } else {
     XCTAssertEqual(NO, node.userInteractionEnabled, @"layer-backed nodes do not support userInteractionEnabled %@", hasLoadedView);
     XCTAssertEqual(NO, node.exclusiveTouch, @"layer-backed nodes do not support exclusiveTouch %@", hasLoadedView);
@@ -477,6 +595,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   if (!isLayerBacked) {
     XCTAssertEqual(UIViewAutoresizingFlexibleLeftMargin, node.autoresizingMask, @"autoresizingMask %@", hasLoadedView);
     XCTAssertEqual(NO, node.autoresizesSubviews, @"autoresizesSubviews broken %@", hasLoadedView);
+    XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsMake(3, 5, 8, 11), node.layoutMargins), @"layoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(YES, node.preservesSuperviewLayoutMargins, @"preservesSuperviewLayoutMargins broken %@", hasLoadedView);
+    XCTAssertEqual(NO, node.insetsLayoutMarginsFromSafeArea, @"insetsLayoutMarginsFromSafeArea broken %@", hasLoadedView);
   }
 }
 
@@ -545,6 +666,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
       node.exclusiveTouch = YES;
       node.autoresizesSubviews = NO;
       node.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+      node.insetsLayoutMarginsFromSafeArea = NO;
+      node.layoutMargins = UIEdgeInsetsMake(3, 5, 8, 11);
+      node.preservesSuperviewLayoutMargins = YES;
     }
   }];
 
@@ -711,46 +835,54 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(105, 105), correctPoint = CGPointMake(95, 95);
+  originalPoint = CGPointMake(105, 105);
+  correctPoint = CGPointMake(95, 95);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(15, 15);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(15, 15);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
   node.frame = CGRectMake(100, 100, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(95, 95), correctPoint = CGPointMake(105, 105);
+  originalPoint = CGPointMake(95, 95);
+  correctPoint = CGPointMake(105, 105);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
   node.frame = CGRectMake(0, 0, 100, 100);
   innerNode.frame = CGRectMake(10, 10, 20, 20);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(-5, -5);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(-5, -5);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }
@@ -764,7 +896,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
@@ -773,12 +906,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(20, 20, 100, 100);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(42, 42), correctPoint = CGPointMake(36, 36);
+  originalPoint = CGPointMake(42, 42);
+  correctPoint = CGPointMake(36, 36);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
@@ -787,12 +922,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(-1000, -1000, 1337, 1337);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(5, 5), correctPoint = CGPointMake(11, 11);
+  originalPoint = CGPointMake(5, 5);
+  correctPoint = CGPointMake(11, 11);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
@@ -801,12 +938,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(20, 20, 100, 100);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(36, 36), correctPoint = CGPointMake(42, 42);
+  originalPoint = CGPointMake(36, 36);
+  correctPoint = CGPointMake(42, 42);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
@@ -815,7 +954,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   node.bounds = CGRectMake(-1000, -1000, 1337, 1337);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(11, 11), correctPoint = CGPointMake(5, 5);
+  originalPoint = CGPointMake(11, 11);
+  correctPoint = CGPointMake(5, 5);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(CGPointEqualToPoint(convertedPoint, correctPoint), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }
@@ -828,7 +968,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Setup
   CGPoint originalPoint = CGPointZero, convertedPoint = CGPointZero, correctPoint = CGPointZero;
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* outer node's coordinate space to inner node's coordinate space
@@ -836,12 +977,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.75, 1);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(42, 42), correctPoint = CGPointMake(51, 56);
+  originalPoint = CGPointMake(42, 42);
+  correctPoint = CGPointMake(51, 56);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:node selfNode:innerNode];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point *FROM* inner node's coordinate space to outer node's coordinate space
@@ -849,12 +992,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.3, 0.3);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(55, 55), correctPoint = CGPointMake(1, 1);
+  originalPoint = CGPointMake(55, 55);
+  correctPoint = CGPointMake(1, 1);
   convertedPoint = [self checkConvertPoint:originalPoint fromNode:innerNode selfNode:node];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in inner node's coordinate space *TO* outer node's coordinate space
@@ -862,12 +1007,14 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.75, 1);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 20, 20);
-  originalPoint = CGPointMake(51, 56), correctPoint = CGPointMake(42, 42);
+  originalPoint = CGPointMake(51, 56);
+  correctPoint = CGPointMake(42, 42);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:node selfNode:innerNode];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 
   // Setup
-  node = [[ASDisplayNode alloc] init], innerNode = [[ASDisplayNode alloc] init];
+  node = [[ASDisplayNode alloc] init];
+  innerNode = [[ASDisplayNode alloc] init];
   [node addSubnode:innerNode];
 
   // Convert point in outer node's coordinate space *TO* inner node's coordinate space
@@ -875,7 +1022,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   innerNode.anchorPoint = CGPointMake(0.3, 0.3);
   innerNode.position = CGPointMake(23, 23);
   innerNode.bounds = CGRectMake(17, 17, 200, 200);
-  originalPoint = CGPointMake(1, 1), correctPoint = CGPointMake(55, 55);
+  originalPoint = CGPointMake(1, 1);
+  correctPoint = CGPointMake(55, 55);
   convertedPoint = [self checkConvertPoint:originalPoint toNode:innerNode selfNode:node];
   XCTAssertTrue(_CGPointEqualToPointWithEpsilon(convertedPoint, correctPoint, 0.001), @"Unexpected point conversion result. Point: %@ Expected conversion: %@ Actual conversion: %@", NSStringFromCGPoint(originalPoint), NSStringFromCGPoint(correctPoint), NSStringFromCGPoint(convertedPoint));
 }
@@ -2012,9 +2160,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   [supernode addSubnode:subnode];
@@ -2030,9 +2178,9 @@ static bool stringContainsPointer(NSString *description, id p) {
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenAddedToContainerThatIsInHierarchy
 {
-  ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
   [supernode enableSubtreeRasterization];
-  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASTestDisplayNode alloc] init];
   ASSetDebugNames(supernode, subnode);
 
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -2146,8 +2294,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   [node view]; // Node needs to be loaded
   
   [node enterInterfaceState:ASInterfaceStatePreload];
-  
-  
+
   XCTAssertTrue((node.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue((subnode.interfaceState & ASInterfaceStatePreload) == ASInterfaceStatePreload);
   XCTAssertTrue(node.hasPreloaded);
@@ -2245,6 +2392,46 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASSizeRangeMake(CGSizeMake(100, 100))], NSException, NSInternalInconsistencyException);
 }
 
+- (void)testThatStackSpecOrdersSubnodesCorrectly
+{
+  // This test ensures that the z-order of nodes matches the stack spec, including after relayout / transition.
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+
+  DeclareNodeNamed(a);
+  DeclareNodeNamed(b);
+  DeclareNodeNamed(c);
+  DeclareNodeNamed(d);
+
+  NSArray *nodesForwardOrder = @[a, b, c, d];
+  NSArray *nodesReverseOrder = @[d, c, b, a];
+  __block BOOL flipItemOrder = NO;
+
+  node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange size) {
+    ASStackLayoutSpec *stack = [ASStackLayoutSpec verticalStackLayoutSpec];
+    stack.children = flipItemOrder ? nodesReverseOrder : nodesForwardOrder;
+    return stack;
+  };
+
+  ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
+  [node.view layoutIfNeeded];
+
+  // Because automaticallyManagesSubnodes is used, the subnodes array is constructed from the layout spec's children.
+  XCTAssert([node.subnodes isEqualToArray:nodesForwardOrder], @"subnodes: %@, array: %@", node.subnodes, nodesForwardOrder);
+  XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+                                           @"a,b,c,d", @"Forward order");
+
+  flipItemOrder = YES;
+  [node invalidateCalculatedLayout];
+  [node.view layoutIfNeeded];
+
+  // In this case, it's critical that the items are in the new order so that event handling and apparent z-position are correct.
+  // FIXME: The reversal case is not currently passing.
+  // XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
+  // XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+  //                                          @"d,c,b,a", @"Reverse order");
+}
+
 - (void)testThatOverlaySpecOrdersSubnodesCorrectly
 {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
@@ -2323,6 +2510,67 @@ static bool stringContainsPointer(NSString *description, id p) {
   // Have to split into two lines because XCTAssert macro can't handle the stringWithFormat:.
   BOOL hasVC = [debugDescription containsString:[NSString stringWithFormat:@"%p", vc]];
   XCTAssert(hasVC);
+}
+
+- (void)testThatSubnodeSafeAreaInsetsAreCalculatedCorrectly
+{
+  ASDisplayNode *rootNode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *subnode = [[ASDisplayNode alloc] init];
+
+  rootNode.automaticallyManagesSubnodes = YES;
+  rootNode.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+    return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(1, 2, 3, 4) child:subnode];
+  };
+
+  ASTestViewController *viewController = [[ASTestViewController alloc] initWithNode:rootNode];
+  viewController.additionalSafeAreaInsets = UIEdgeInsetsMake(10, 10, 10, 10);
+
+  // It looks like iOS 11 suppresses safeAreaInsets calculation for the views that are not on screen.
+  UIWindow *window = [[UIWindow alloc] init];
+  window.rootViewController = viewController;
+  [window setHidden:NO];
+  [window layoutIfNeeded];
+
+  UIEdgeInsets expectedRootNodeSafeArea = UIEdgeInsetsMake(10, 10, 10, 10);
+  UIEdgeInsets expectedSubnodeSafeArea = UIEdgeInsetsMake(9, 8, 7, 6);
+
+  UIEdgeInsets windowSafeArea = UIEdgeInsetsZero;
+  if (AS_AVAILABLE_IOS(11.0)) {
+    windowSafeArea = window.safeAreaInsets;
+  }
+
+  expectedRootNodeSafeArea = ASConcatInsets(expectedRootNodeSafeArea, windowSafeArea);
+  expectedSubnodeSafeArea = ASConcatInsets(expectedSubnodeSafeArea, windowSafeArea);
+
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(expectedRootNodeSafeArea, rootNode.safeAreaInsets),
+                @"expected rootNode.safeAreaInsets to be %@ but got %@ (window.safeAreaInsets %@)",
+                NSStringFromUIEdgeInsets(expectedRootNodeSafeArea),
+                NSStringFromUIEdgeInsets(rootNode.safeAreaInsets),
+                NSStringFromUIEdgeInsets(windowSafeArea));
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(expectedSubnodeSafeArea, subnode.safeAreaInsets),
+                @"expected subnode.safeAreaInsets to be %@ but got %@ (window.safeAreaInsets %@)",
+                NSStringFromUIEdgeInsets(expectedSubnodeSafeArea),
+                NSStringFromUIEdgeInsets(subnode.safeAreaInsets),
+                NSStringFromUIEdgeInsets(windowSafeArea));
+
+  [window setHidden:YES];
+}
+
+- (void)testScreenScale
+{
+  XCTAssertEqual(ASScreenScale(), UIScreen.mainScreen.scale);
+}
+
+- (void)testThatIfViewClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaViewClass *node = [[ASSynchronousTestDisplayNodeViaViewClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
+}
+
+- (void)testThatIfLayerClassIsOverwrittenItsSynchronous
+{
+  ASSynchronousTestDisplayNodeViaLayerClass *node = [[ASSynchronousTestDisplayNodeViaLayerClass alloc] init];
+  XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
 }
 
 @end

@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASThread.h>
 
-extern NSString *const ASAnimatedImageDefaultRunLoopMode;
+AS_EXTERN NSString *const ASAnimatedImageDefaultRunLoopMode;
 
 @interface ASImageNode ()
 {
@@ -33,7 +33,7 @@ extern NSString *const ASAnimatedImageDefaultRunLoopMode;
   NSUInteger _playedLoops;
 }
 
-@property (nonatomic, assign) CFTimeInterval lastDisplayLinkFire;
+@property (nonatomic) CFTimeInterval lastDisplayLinkFire;
 
 @end
 

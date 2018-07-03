@@ -47,8 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSUInteger ASDataControllerAnimationOptions;
 
-extern NSString * const ASDataControllerRowNodeKind;
-extern NSString * const ASCollectionInvalidUpdateException;
+AS_EXTERN NSString * const ASDataControllerRowNodeKind;
+AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
 
 /**
  Data source for data controller
@@ -91,7 +91,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
 
 - (NSUInteger)dataController:(ASDataController *)dataController supplementaryNodesOfKind:(NSString *)kind inSection:(NSUInteger)section;
 
-- (ASCellNodeBlock)dataController:(ASDataController *)dataController supplementaryNodeBlockOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+- (ASCellNodeBlock)dataController:(ASDataController *)dataController supplementaryNodeBlockOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath shouldAsyncLayout:(BOOL *)shouldAsyncLayout;
 
 /**
  The constrained size range for layout. Called only if no data controller layout delegate is provided.
@@ -168,21 +168,21 @@ extern NSString * const ASCollectionInvalidUpdateException;
  *
  * NOTE: Soon we will drop support for using ASTableView/ASCollectionView without the node, so this will be non-null.
  */
-@property (nonatomic, nullable, weak, readonly) id<ASRangeManagingNode> node;
+@property (nullable, nonatomic, weak, readonly) id<ASRangeManagingNode> node;
 
 /**
  * The map that is currently displayed. The "UIKit index space."
  *
  * This property will only be changed on the main thread.
  */
-@property (atomic, copy, readonly) ASElementMap *visibleMap;
+@property (copy, readonly) ASElementMap *visibleMap;
 
 /**
  * The latest map fetched from the data source. May be more recent than @c visibleMap.
  *
  * This property will only be changed on the main thread.
  */
-@property (atomic, copy, readonly) ASElementMap *pendingMap;
+@property (copy, readonly) ASElementMap *pendingMap;
 
 /**
  Data source for fetching data info.
@@ -227,13 +227,13 @@ extern NSString * const ASCollectionInvalidUpdateException;
 /*
  * @abstract The primitive event tracing object. You shouldn't directly use it to log event. Use the ASDataControllerLogEvent macro instead.
  */
-@property (nonatomic, strong, readonly) ASEventLog *eventLog;
+@property (nonatomic, readonly) ASEventLog *eventLog;
 #endif
 
 /**
  * @see ASCollectionNode+Beta.h for full documentation.
  */
-@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
+@property (nonatomic) BOOL usesSynchronousDataLoading;
 
 /** @name Data Updating */
 
@@ -248,21 +248,27 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * The invalidationBlock is called after flushing the ASMainSerialQueue, which ensures that any in-progress
  * layout calculations have been applied. The block will not be called if data hasn't been loaded.
  */
-- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)())invalidationBlock;
+- (void)relayoutAllNodesWithInvalidationBlock:(nullable void (^)(void))invalidationBlock;
 
 /**
  * Re-measures given nodes in the backing store.
  *
  * @discussion Used to respond to setNeedsLayout calls in ASCellNode
  */
-- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray * _Nonnull)nodesSizesChanged;
+- (void)relayoutNodes:(id<NSFastEnumeration>)nodes nodesSizeChanged:(NSMutableArray<ASCellNode *> *)nodesSizesChanged;
 
 /**
  * See ASCollectionNode.h for full documentation of these methods.
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreProcessed;
+
+/**
+ * See ASCollectionNode.h for full documentation of these methods.
+ */
+@property (nonatomic, readonly, getter=isSynchronized) BOOL synchronized;
+- (void)onDidFinishSynchronizing:(void (^)(void))completion;
 
 /**
  * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information
@@ -273,6 +279,11 @@ extern NSString * const ASCollectionInvalidUpdateException;
  * @discussion This method can be called on any threads.
  */
 - (void)environmentDidChange;
+
+/**
+ * Reset visibleMap and pendingMap when asyncDataSource and asyncDelegate of collection view become nil.
+ */
+- (void)clearData;
 
 @end
 

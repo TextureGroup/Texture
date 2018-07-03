@@ -32,6 +32,11 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASElementMap : NSObject <NSCopying, NSFastEnumeration>
 
 /**
+ * The total number of elements in this map.
+ */
+@property (readonly) NSUInteger count;
+
+/**
  * The number of sections (of items) in this map.
  */
 @property (readonly) NSInteger numberOfSections;
@@ -109,7 +114,7 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * A very terse description e.g. { itemCounts = [ <S0: 1> <S1: 16> ] }
  */
-@property (atomic, readonly) NSString *smallDescription;
+@property (readonly) NSString *smallDescription;
 
 #pragma mark - Initialization -- Only Useful to ASDataController
 

@@ -15,8 +15,6 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <pthread.h>
-
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
@@ -44,67 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
  * variables.
  */
 
-@protocol ASInterfaceStateDelegate <NSObject>
-@required
-
-/**
- * @abstract Called whenever any bit in the ASInterfaceState bitfield is changed.
- * @discussion Subclasses may use this to monitor when they become visible, should free cached data, and much more.
- * @see ASInterfaceState
- */
-- (void)interfaceStateDidChange:(ASInterfaceState)newState fromState:(ASInterfaceState)oldState;
-
-/**
- * @abstract Called whenever the node becomes visible.
- * @discussion Subclasses may use this to monitor when they become visible.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didEnterVisibleState;
-
-/**
- * @abstract Called whenever the node is no longer visible.
- * @discussion Subclasses may use this to monitor when they are no longer visible.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didExitVisibleState;
-
-/**
- * @abstract Called whenever the the node has entered the display state.
- * @discussion Subclasses may use this to monitor when a node should be rendering its content.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didEnterDisplayState;
-
-/**
- * @abstract Called whenever the the node has exited the display state.
- * @discussion Subclasses may use this to monitor when a node should no longer be rendering its content.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didExitDisplayState;
-
-/**
- * @abstract Called whenever the the node has entered the preload state.
- * @discussion Subclasses may use this to monitor data for a node should be preloaded, either from a local or remote source.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didEnterPreloadState;
-
-/**
- * @abstract Called whenever the the node has exited the preload state.
- * @discussion Subclasses may use this to monitor whether preloading data for a node should be canceled.
- * @note This method is guaranteed to be called on main.
- */
-- (void)didExitPreloadState;
-
-/**
- * @abstract Called when the node has completed applying the layout.
- * @discussion Can be used for operations that are performed after layout has completed.
- * @note This method is guaranteed to be called on main.
- */
-- (void)nodeDidLayout;
-
-@end
-
 @interface ASDisplayNode (Subclassing) <ASInterfaceStateDelegate>
 
 #pragma mark - Properties
@@ -129,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @warning Subclasses must not override this; it returns the last cached layout and is never expensive.
  */
-@property (nullable, nonatomic, readonly, strong) ASLayout *calculatedLayout;
+@property (nullable, readonly) ASLayout *calculatedLayout;
 
 #pragma mark - View Lifecycle
 /** @name View Lifecycle */
@@ -358,9 +295,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didExitHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
 
 /**
+ * Called just after the view is added to a window.
+ * Note: this may be called multiple times during view controller transitions. To overcome this: use didEnterVisibleState or its equavalents.
+ */
+- (void)didEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+
+/**
  * @abstract Whether the view or layer of this display node is currently in a window
  */
-@property (nonatomic, readonly, assign, getter=isInHierarchy) BOOL inHierarchy;
+@property (readonly, getter=isInHierarchy) BOOL inHierarchy;
 
 /**
  * Provides an opportunity to clear backing store and other memory-intensive intermediates, such as text layout managers
@@ -429,7 +372,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @see setNeedsDisplayAtScale:
  */
-@property (nonatomic, assign, readonly) CGFloat contentsScaleForDisplay;
+@property (readonly) CGFloat contentsScaleForDisplay;
 
 
 #pragma mark - Touch handling
