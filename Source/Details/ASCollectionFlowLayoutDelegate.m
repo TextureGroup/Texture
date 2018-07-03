@@ -60,7 +60,7 @@
 + (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
-  NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
+  NSArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }

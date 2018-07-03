@@ -25,7 +25,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (readonly) void *mutableBytes NS_RETURNS_INNER_POINTER;
 
 /// Don't do any drawing or call any methods after calling this.
-- (CGDataProviderRef)createDataProviderAndInvalidate;
+- (CGDataProviderRef)createDataProviderAndInvalidate CF_RETURNS_RETAINED;
 
 @end
 
