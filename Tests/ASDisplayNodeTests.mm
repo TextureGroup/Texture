@@ -2402,14 +2402,26 @@ static bool stringContainsPointer(NSString *description, id p) {
   DeclareNodeNamed(b);
   DeclareNodeNamed(c);
   DeclareNodeNamed(d);
+  DeclareNodeNamed(e);
 
   NSArray *nodesForwardOrder = @[a, b, c, d];
   NSArray *nodesReverseOrder = @[d, c, b, a];
+  NSArray *addAndMoveOrder = @[a, b, e, d, c];
   __block BOOL flipItemOrder = NO;
 
+  __block NSUInteger testCount = 0;
   node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange size) {
     ASStackLayoutSpec *stack = [ASStackLayoutSpec verticalStackLayoutSpec];
-    stack.children = flipItemOrder ? nodesReverseOrder : nodesForwardOrder;
+    switch(testCount) {
+      case 0:
+        stack.children = nodesForwardOrder; break;
+      case 1:
+        stack.children = nodesReverseOrder; break;
+      case 2:
+      default:
+        stack.children = addAndMoveOrder; break;
+    }
+    testCount++;
     return stack;
   };
 
@@ -2423,13 +2435,22 @@ static bool stringContainsPointer(NSString *description, id p) {
 
   flipItemOrder = YES;
   [node invalidateCalculatedLayout];
+  [node.view setNeedsLayout];
   [node.view layoutIfNeeded];
 
   // In this case, it's critical that the items are in the new order so that event handling and apparent z-position are correct.
   // FIXME: The reversal case is not currently passing.
-  // XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
-  // XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
-  //                                          @"d,c,b,a", @"Reverse order");
+   XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
+   XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+                                            @"d,c,b,a", @"Reverse order");
+
+  [node invalidateCalculatedLayout];
+  [node.view setNeedsLayout];
+  [node.view layoutIfNeeded];
+  XCTAssert([node.subnodes isEqualToArray:addAndMoveOrder], @"subnodes: %@, array: %@", node.subnodes, addAndMoveOrder);
+  XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+          @"a,b,e,d,c", @"AddAndMove order");
+
 }
 
 - (void)testThatOverlaySpecOrdersSubnodesCorrectly

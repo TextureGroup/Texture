@@ -20,50 +20,106 @@
 
 @implementation NSArray (Diffing)
 
+typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
+
 - (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
 {
-  [self asdk_diffWithArray:array insertions:insertions deletions:deletions compareBlock:^BOOL(id lhs, id rhs) {
-    return [lhs isEqual:rhs];
-  }];
+  [self asdk_diffWithArray:array insertions:insertions deletions:deletions moves:nil compareBlock:[NSArray defaultCompareBlock]];
 }
 
-- (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions compareBlock:(BOOL (^)(id lhs, id rhs))comparison
+- (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
+              compareBlock:(compareBlock)comparison
+{
+  [self asdk_diffWithArray:array insertions:insertions deletions:deletions moves:nil compareBlock:comparison];
+}
+
+- (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
+                     moves:(NSArray<NSIndexPath *> **)moves
+{
+  [self asdk_diffWithArray:array insertions:insertions deletions:deletions moves:moves
+              compareBlock:[NSArray defaultCompareBlock]];
+}
+
+- (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
+                     moves:(NSArray<NSIndexPath *> **)moves compareBlock:(compareBlock)comparison
 {
   NSAssert(comparison != nil, @"Comparison block is required");
-  NSIndexSet *commonIndexes = [self _asdk_commonIndexesWithArray:array compareBlock:comparison];
-  
-  if (insertions) {
-    NSArray *commonObjects = [self objectsAtIndexes:commonIndexes];
-    NSMutableIndexSet *insertionIndexes = [[NSMutableIndexSet alloc] init];
-    for (NSInteger i = 0, j = 0; i < commonObjects.count || j < array.count;) {
-      if (i < commonObjects.count && j < array.count && comparison(commonObjects[i], array[j])) {
-        i++; j++;
-      } else {
-        [insertionIndexes addIndex:j];
-        j++;
-      }
-    }
-    *insertions = insertionIndexes;
+  NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");
+  NSMutableDictionary<NSNumber *, NSMutableArray<id> *> *potentialMoves = nil;
+  NSMutableArray<NSIndexPath *> *moveIndexPaths = nil;
+  NSMutableIndexSet *insertionIndexes = nil, *deletionIndexes = nil;
+  if (moves) {
+    potentialMoves = [NSMutableDictionary new];
+    moveIndexPaths = [NSMutableArray new];
   }
-  
-  if (deletions) {
-    NSMutableIndexSet *deletionIndexes = [[NSMutableIndexSet alloc] init];
-    for (NSInteger i = 0; i < self.count; i++) {
+  NSMutableIndexSet *commonIndexes = [[self _asdk_commonIndexesWithArray:array compareBlock:comparison] mutableCopy];
+
+  if (deletions || moves) {
+    deletionIndexes = [NSMutableIndexSet indexSet];
+    for (NSUInteger i = 0; i < self.count; i++) {
       if (![commonIndexes containsIndex:i]) {
         [deletionIndexes addIndex:i];
       }
+      NSNumber *hash = @([self[i] hash]);
+      if (!potentialMoves[hash]) {
+        potentialMoves[hash] = [@[@(i)] mutableCopy];
+      } else {
+        [potentialMoves[hash] addObject:@(i)];
+      }
     }
-    *deletions = deletionIndexes;
   }
+
+  if (insertions || moves) {
+    insertionIndexes = [NSMutableIndexSet indexSet];
+    NSArray *commonObjects = [self objectsAtIndexes:commonIndexes];
+    BOOL moveFound;
+    NSUInteger movedFrom = NSNotFound;
+    for (NSUInteger i = 0, j = 0; j < array.count; j++) {
+      NSNumber *hash = @([array[j] hash]);
+      moveFound = (potentialMoves[hash] != nil);
+      if (moveFound) {
+        movedFrom = [[potentialMoves[hash] firstObject] unsignedIntegerValue];
+        [potentialMoves[hash] removeObjectAtIndex:0];
+        if (![potentialMoves[hash] count]) {
+          potentialMoves[hash] = nil;
+        }
+        if (movedFrom != j) {
+          NSUInteger indexes[] = {movedFrom, j};
+          [moveIndexPaths addObject:[NSIndexPath indexPathWithIndexes:indexes length:2]];
+        }
+      }
+        if (i < commonObjects.count && j < array.count && comparison(commonObjects[i], array[j])) {
+        i++;
+      } else {
+        if (moveFound) {
+          // moves will coalesce a delete / insert - the insert is just not done, and here we remove the delete:
+          [deletionIndexes removeIndex:movedFrom];
+          // OR a move will have come from the LCS:
+          if ([commonIndexes containsIndex:movedFrom]) {
+            [commonIndexes removeIndex:movedFrom];
+            commonObjects = [self objectsAtIndexes:commonIndexes];
+          }
+        } else {
+          [insertionIndexes addIndex:j];
+        }
+      }
+    }
+  }
+
+  if (moves) {*moves = moveIndexPaths;}
+  if (deletions) {*deletions = deletionIndexes;}
+  if (insertions) {*insertions = insertionIndexes;}
 }
 
+// https://github.com/raywenderlich/swift-algorithm-club/tree/master/Longest%20Common%20Subsequence is not exactly this code (obviously), but
+// is a good commentary on the algorithm.
 - (NSIndexSet *)_asdk_commonIndexesWithArray:(NSArray *)array compareBlock:(BOOL (^)(id lhs, id rhs))comparison
 {
   NSAssert(comparison != nil, @"Comparison block is required");
-  
+
   NSInteger selfCount = self.count;
   NSInteger arrayCount = array.count;
-  
+
   // Allocate the diff map in the heap so we don't blow the stack for large arrays.
   NSInteger **lengths = NULL;
   lengths = (NSInteger **)malloc(sizeof(NSInteger*) * (selfCount+1));
@@ -71,7 +127,7 @@
     ASDisplayNodeFailAssert(@"Failed to allocate memory for diffing");
     return nil;
   }
-  
+  // Fill in a LCS length matrix:
   for (NSInteger i = 0; i <= selfCount; i++) {
     lengths[i] = (NSInteger *)malloc(sizeof(NSInteger) * (arrayCount+1));
     if (lengths[i] == NULL) {
@@ -89,8 +145,8 @@
       }
     }
   }
-  
-  NSMutableIndexSet *common = [[NSMutableIndexSet alloc] init];
+  // Backtrack to fill in indices based on length matrix:
+  NSMutableIndexSet *common = [NSMutableIndexSet indexSet];
   NSInteger i = selfCount, j = arrayCount;
   while(i > 0 && j > 0) {
     if (comparison(self[i-1], array[j-1])) {
@@ -108,6 +164,21 @@
   }
   free(lengths);
   return common;
+}
+
+static compareBlock defaultCompare = nil;
+
++ (compareBlock)defaultCompareBlock
+{
+  static dispatch_once_t onceToken;
+
+  dispatch_once(&onceToken, ^{
+    defaultCompare = [^BOOL(id lhs, id rhs) {
+      return [lhs isEqual:rhs];
+    } copy];
+  });
+
+  return defaultCompare;
 }
 
 @end

@@ -35,4 +35,12 @@
  */
 - (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions compareBlock:(BOOL (^)(id lhs, id rhs))comparison;
 
+/**
+ * @abstract Compares two arrays, providing the insertion, deletion, and move indexes needed to transform into the target array.
+ * @discussion This compares the equality of each object with `isEqual:`.
+ * This diffing algorithm uses a bottom-up memoized longest common subsequence solution to identify differences.
+ * It runs in O(mn) complexity.
+ * The moves are returned in ascending order of their destination index.
+ */
+- (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions moves:(NSArray<NSIndexPath *> **)moves;
 @end

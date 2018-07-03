@@ -150,7 +150,11 @@
   ASDisplayNode *node1 = [[ASDisplayNode alloc] init];
   ASDisplayNode *node2 = [[ASDisplayNode alloc] init];
   ASDisplayNode *node3 = [[ASDisplayNode alloc] init];
-  
+
+  node1.debugName = @"a";
+  node2.debugName = @"b";
+  node3.debugName = @"c";
+
   // As we will involve a stack spec we have to give the nodes an intrinsic content size
   node1.style.preferredSize = kSize;
   node2.style.preferredSize = kSize;
