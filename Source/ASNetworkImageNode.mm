@@ -61,6 +61,9 @@
     unsigned int delegateDidFinishDecoding:1;
     unsigned int delegateDidLoadImage:1;
     unsigned int delegateDidLoadImageWithInfo:1;
+    unsigned int delegateDidFailFetchingWithError:1;
+    unsigned int delegateDidFetchImage:1;
+    unsigned int delegateDidFetchImageWithInfo:1;
   } _delegateFlags;
 
   
@@ -304,6 +307,9 @@
   _delegateFlags.delegateDidFinishDecoding = [delegate respondsToSelector:@selector(imageNodeDidFinishDecoding:)];
   _delegateFlags.delegateDidLoadImage = [delegate respondsToSelector:@selector(imageNode:didLoadImage:)];
   _delegateFlags.delegateDidLoadImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImage:info:)];
+  _delegateFlags.delegateDidFailFetchingWithError = [delegate respondsToSelector:@selector(imageNode:didFailFetchingWithError:)];
+  _delegateFlags.delegateDidFetchImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didFetchImage:info:)];
+  _delegateFlags.delegateDidFetchImage = [delegate respondsToSelector:@selector(imageNode:didFetchImage:)];
 }
 
 - (id<ASNetworkImageNodeDelegate>)delegate
@@ -352,10 +358,26 @@
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
           [_delegate imageNode:self didLoadImage:result info:info];
+#pragma clang diagnostic pop
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
           [_delegate imageNode:self didLoadImage:result];
+#pragma clang diagnostic pop
+        }
+
+        // Call out to the delegate.
+        if (_delegateFlags.delegateDidFetchImageWithInfo) {
+          ASUnlockScope(self);
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          [_delegate imageNode:self didFetchImage:result info:info];
+        } else if (_delegateFlags.delegateDidFetchImage) {
+          ASUnlockScope(self);
+          [_delegate imageNode:self didFetchImage:result];
         }
       }
     }
@@ -666,10 +688,26 @@
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
-          [delegate imageNode:self didLoadImage:self.image info:info];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+          [_delegate imageNode:self didLoadImage:self.image info:info];
+#pragma clang diagnostic pop
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
-          [delegate imageNode:self didLoadImage:self.image];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+          [_delegate imageNode:self didLoadImage:self.image];
+#pragma clang diagnostic pop
+        }
+
+        // Call out to the delegate.
+        if (_delegateFlags.delegateDidFetchImageWithInfo) {
+          ASUnlockScope(self);
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          [_delegate imageNode:self didFetchImage:self.image info:info];
+        } else if (_delegateFlags.delegateDidFetchImage) {
+          ASUnlockScope(self);
+          [_delegate imageNode:self didFetchImage:self.image];
         }
       });
     } else {
@@ -716,24 +754,53 @@
           strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
-          
+          void (^backgroundCalloutBlock)(ASNetworkImageNode *inst);
+
           if (newImage) {
             if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
+#pragma clang diagnostic pop
               };
             } else if (_delegateFlags.delegateDidLoadImage) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 [delegate imageNode:strongSelf didLoadImage:newImage];
+#pragma clang diagnostic pop
               };
             }
           } else if (error && _delegateFlags.delegateDidFailWithError) {
             calloutBlock = ^(ASNetworkImageNode *strongSelf) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
               [delegate imageNode:strongSelf didFailWithError:error];
+#pragma clang diagnostic pop
             };
           }
-          
+
+          if (_delegateFlags.delegateDidLoadImageWithInfo) {
+            backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+              [delegate imageNode:strongSelf didFetchImage:newImage info:info];
+            };
+          } else if (_delegateFlags.delegateDidFetchImage) {
+            backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              [delegate imageNode:strongSelf didFetchImage:newImage];
+            };
+          } else if (error && _delegateFlags.delegateDidFailFetchingWithError) {
+            backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              [delegate imageNode:strongSelf didFailFetchingWithError:error];
+            };
+          }
+
+          if (backgroundCalloutBlock) {
+            backgroundCalloutBlock(self);
+          }
+
           if (calloutBlock) {
             ASPerformBlockOnMainThread(^{
               if (auto strongSelf = weakSelf) {
