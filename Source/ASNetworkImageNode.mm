@@ -690,13 +690,13 @@
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-          [_delegate imageNode:self didLoadImage:self.image info:info];
+          [delegate imageNode:self didLoadImage:self.image info:info];
 #pragma clang diagnostic pop
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-          [_delegate imageNode:self didLoadImage:self.image];
+          [delegate imageNode:self didLoadImage:self.image];
 #pragma clang diagnostic pop
         }
 
@@ -782,7 +782,7 @@
             };
           }
 
-          if (_delegateFlags.delegateDidLoadImageWithInfo) {
+          if (_delegateFlags.delegateDidFetchImageWithInfo) {
             backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
               auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
               [delegate imageNode:strongSelf didFetchImage:newImage info:info];
