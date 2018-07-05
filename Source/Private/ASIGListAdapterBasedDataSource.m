@@ -92,6 +92,21 @@ typedef struct {
   [self.delegate collectionView:collectionNode.view didSelectItemAtIndexPath:indexPath];
 }
 
+- (void)collectionNode:(ASCollectionNode *)collectionNode didDeselectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didDeselectItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didHighlightItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didHighlightItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didUnhighlightItemAtIndexPath:indexPath];
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   [self.delegate scrollViewDidScroll:scrollView];
