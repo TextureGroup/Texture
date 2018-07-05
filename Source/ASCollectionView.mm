@@ -179,7 +179,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionViewWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForCollectionView:1;
     unsigned int collectionNodeWillDisplayItem:1;
+    unsigned int collectionNodeWillDisplayItemDeprecated:1;
     unsigned int collectionNodeDidEndDisplayingItem:1;
+    unsigned int collectionNodeDidEndDisplayingItemDeprecated:1;
     unsigned int collectionNodeShouldSelectItem:1;
     unsigned int collectionNodeDidSelectItem:1;
     unsigned int collectionNodeShouldDeselectItem:1;
@@ -538,8 +540,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionViewShouldShowMenuForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:shouldShowMenuForItemAtIndexPath:)];
     _asyncDelegateFlags.collectionViewCanPerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:canPerformAction:forItemAtIndexPath:withSender:)];
     _asyncDelegateFlags.collectionViewPerformActionForItem = [_asyncDelegate respondsToSelector:@selector(collectionView:performAction:forItemAtIndexPath:withSender:)];
-    _asyncDelegateFlags.collectionNodeWillDisplayItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:willDisplayItemWithNode:)];
-    _asyncDelegateFlags.collectionNodeDidEndDisplayingItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingItemWithNode:)];
+    _asyncDelegateFlags.collectionNodeWillDisplayItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:willDisplayNode:forItemAtIndexPath:)];
+    _asyncDelegateFlags.collectionNodeWillDisplayItemDeprecated = [_asyncDelegate respondsToSelector:@selector(collectionNode:willDisplayItemWithNode:)];
+    _asyncDelegateFlags.collectionNodeDidEndDisplayingItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingNode:forItemAtIndexPath:)];
+      _asyncDelegateFlags.collectionNodeDidEndDisplayingItemDeprecated = [_asyncDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingItemWithNode:)];
     _asyncDelegateFlags.collectionNodeWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(collectionNode:willBeginBatchFetchWithContext:)];
     _asyncDelegateFlags.shouldBatchFetchForCollectionNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForCollectionNode:)];
     _asyncDelegateFlags.collectionNodeShouldSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldSelectItemAtIndexPath:)];
@@ -1230,10 +1234,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASDisplayNodeAssertNotNil(cellNode, @"Expected node associated with cell that will be displayed not to be nil. indexPath: %@", indexPath);
 
   if (_asyncDelegateFlags.collectionNodeWillDisplayItem && self.collectionNode != nil) {
-    [_asyncDelegate collectionNode:self.collectionNode willDisplayItemWithNode:cellNode];
-  } else if (_asyncDelegateFlags.collectionViewWillDisplayNodeForItem) {
+    [_asyncDelegate collectionNode:self.collectionNode willDisplayNode:cellNode forItemAtIndexPath:indexPath];
+  } else if (_asyncDelegateFlags.collectionNodeWillDisplayItem && self.collectionNode != nil) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [_asyncDelegate collectionNode:self.collectionNode willDisplayItemWithNode:cellNode];
+  } else if (_asyncDelegateFlags.collectionViewWillDisplayNodeForItem) {
     [_asyncDelegate collectionView:self willDisplayNode:cellNode forItemAtIndexPath:indexPath];
   } else if (_asyncDelegateFlags.collectionViewWillDisplayNodeForItemDeprecated) {
     [_asyncDelegate collectionView:self willDisplayNodeForItemAtIndexPath:indexPath];
@@ -1275,7 +1281,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   if (_asyncDelegateFlags.collectionNodeDidEndDisplayingItem) {
     if (ASCollectionNode *collectionNode = self.collectionNode) {
-    	[_asyncDelegate collectionNode:collectionNode didEndDisplayingItemWithNode:cellNode];
+      [_asyncDelegate collectionNode:collectionNode didEndDisplayingNode:cellNode forItemAtIndexPath:indexPath];
+    }
+  } else if (_asyncDelegateFlags.collectionNodeDidEndDisplayingItemDeprecated) {
+    if (ASCollectionNode *collectionNode = self.collectionNode) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+      [_asyncDelegate collectionNode:collectionNode didEndDisplayingItemWithNode:cellNode];
+#pragma clang diagnostic pop
     }
   } else if (_asyncDelegateFlags.collectionViewDidEndDisplayingNodeForItem) {
 #pragma clang diagnostic push
