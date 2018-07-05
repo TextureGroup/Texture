@@ -154,6 +154,16 @@ typedef struct {
   [ctrl beginBatchFetchWithContext:context];
 }
 
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view willDisplayCell:node.view forItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didEndDisplayingCell:node.view forItemAtIndexPath:indexPath];
+}
+
 /**
  * Note: It is not documented that ASCollectionNode will forward these UIKit delegate calls if they are implemented.
  * It is not considered harmful to do so, and adding them to documentation will confuse most users, who should
