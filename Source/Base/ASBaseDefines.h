@@ -20,6 +20,14 @@
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
+#if defined(__cplusplus)
+# define var auto
+# define let auto const
+#else
+# define var __auto_type
+# define let const __auto_type
+#endif
+
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
 (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))

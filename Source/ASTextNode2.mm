@@ -408,7 +408,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
-    for (auto &t : cacheValue->_layouts) {
+    for (let &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
 
@@ -1135,7 +1135,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
     NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
     [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
      ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [NSMutableDictionary dictionaryWithDictionary:originalStringAttributes];
+       NSMutableDictionary *futureTruncationAttributes = [[NSMutableDictionary alloc] initWithDictionary:originalStringAttributes];
        [futureTruncationAttributes addEntriesFromDictionary:attributes];
        [truncationMutableString setAttributes:futureTruncationAttributes range:range];
      }];

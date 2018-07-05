@@ -166,10 +166,10 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription
 {
-  auto result = [NSMutableArray<NSDictionary *> array];
+  let result = [NSMutableArray<NSDictionary *> array];
   if (NSArray *children = self.children) {
     // Use tiny descriptions because these trees can get nested very deep.
-    auto tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
+    let tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
     [result addObject:@{ @"children": tinyDescriptions }];
   }
   return result;

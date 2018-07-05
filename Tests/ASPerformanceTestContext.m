@@ -24,7 +24,7 @@
 {
   self = [super init];
   if (self != nil) {
-    _userInfo = [NSMutableDictionary dictionary];
+    _userInfo = [[NSMutableDictionary alloc] init];
   }
   return self;
 }

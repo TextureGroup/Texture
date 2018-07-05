@@ -676,7 +676,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray<ASCellNode *> *)visibleNodes
 {
-  auto elements = [self visibleElementsForRangeController:_rangeController];
+  let elements = [self visibleElementsForRangeController:_rangeController];
   return ASArrayByFlatMapping(elements, ASCollectionElement *e, e.node);
 }
 
@@ -762,7 +762,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
       [_cellsForLayoutUpdates removeAllObjects];
 
-      auto nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
+      let nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
       [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
       if (nodesSizeChanged.count > 0) {
         [self requeryNodeHeights];

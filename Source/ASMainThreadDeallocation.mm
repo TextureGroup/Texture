@@ -146,7 +146,7 @@
 
 + (BOOL)needsMainThreadDeallocation
 {
-  auto name = class_getName(self);
+  let name = class_getName(self);
   if (0 == strncmp(name, "AV", 2) || 0 == strncmp(name, "UI", 2) || 0 == strncmp(name, "CA", 2)) {
     return YES;
   }

@@ -283,7 +283,7 @@ namespace ASDN {
           return os_unfair_lock_trylock(&_unfair);
         }
       } else {
-        auto result = pthread_mutex_trylock(&_m);
+        let result = pthread_mutex_trylock(&_m);
         if (result == 0) {
           return true;
         } else if (result == EBUSY) {

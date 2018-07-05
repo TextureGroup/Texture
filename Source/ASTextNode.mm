@@ -859,7 +859,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   ASLockScopeSelf();
   
   NSArray *rects = [[self _locked_renderer] rectsForTextRange:textRange measureOption:measureOption];
-  auto adjustedRects = [[NSMutableArray<NSValue *> alloc] init];
+  let adjustedRects = [[NSMutableArray<NSValue *> alloc] init];
 
   for (NSValue *rectValue in rects) {
     CGRect rect = [rectValue CGRectValue];
@@ -1308,7 +1308,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
     NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
     [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
      ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [NSMutableDictionary dictionaryWithDictionary:originalStringAttributes];
+       NSMutableDictionary *futureTruncationAttributes = [[NSMutableDictionary alloc] initWithDictionary:originalStringAttributes];
        [futureTruncationAttributes addEntriesFromDictionary:attributes];
        [truncationMutableString setAttributes:futureTruncationAttributes range:range];
      }];
