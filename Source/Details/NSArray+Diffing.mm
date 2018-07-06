@@ -16,6 +16,8 @@
 //
 
 #import <AsyncDisplayKit/NSArray+Diffing.h>
+#import <unordered_map>
+#import <queue>
 #import <AsyncDisplayKit/ASAssert.h>
 
 @implementation NSArray (Diffing)
@@ -43,13 +45,14 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
 - (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
                      moves:(NSArray<NSIndexPath *> **)moves compareBlock:(compareBlock)comparison
 {
+  typedef std::unordered_map<NSUInteger, std::queue<NSUInteger>> move_map;
   NSAssert(comparison != nil, @"Comparison block is required");
-  NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");
-  NSMutableDictionary<NSNumber *, NSMutableArray<id> *> *potentialMoves = nil;
+    NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");
+  std::unique_ptr<move_map> potentialMoves(nullptr);
   NSMutableArray<NSIndexPath *> *moveIndexPaths = nil;
   NSMutableIndexSet *insertionIndexes = nil, *deletionIndexes = nil;
   if (moves) {
-    potentialMoves = [NSMutableDictionary new];
+    potentialMoves = std::unique_ptr<move_map>(new move_map());
     moveIndexPaths = [NSMutableArray new];
   }
   NSMutableIndexSet *commonIndexes = [[self _asdk_commonIndexesWithArray:array compareBlock:comparison] mutableCopy];
@@ -60,12 +63,11 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
       if (![commonIndexes containsIndex:i]) {
         [deletionIndexes addIndex:i];
       }
-      NSNumber *hash = @([self[i] hash]);
-      if (!potentialMoves[hash]) {
-        potentialMoves[hash] = [@[@(i)] mutableCopy];
-      } else {
-        [potentialMoves[hash] addObject:@(i)];
+      NSUInteger hash = [self[i] hash];
+      if (potentialMoves) {
+        (*potentialMoves)[hash].push(i);
       }
+
     }
   }
 
@@ -75,13 +77,13 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
     BOOL moveFound;
     NSUInteger movedFrom = NSNotFound;
     for (NSUInteger i = 0, j = 0; j < array.count; j++) {
-      NSNumber *hash = @([array[j] hash]);
-      moveFound = (potentialMoves[hash] != nil);
+      NSUInteger hash = [array[j] hash];
+      moveFound = (potentialMoves && potentialMoves->count(hash));
       if (moveFound) {
-        movedFrom = [[potentialMoves[hash] firstObject] unsignedIntegerValue];
-        [potentialMoves[hash] removeObjectAtIndex:0];
-        if (![potentialMoves[hash] count]) {
-          potentialMoves[hash] = nil;
+        movedFrom = (*potentialMoves)[hash].front();
+        (*potentialMoves)[hash].pop();
+        if ((*potentialMoves)[hash].empty()) {
+          potentialMoves->erase(hash);
         }
         if (movedFrom != j) {
           NSUInteger indexes[] = {movedFrom, j};
