@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [IGListKit] Extended IGListKit support for displaying delegates. [Heberti Almeida](https://github.com/hebertialmeida) [#1011](https://github.com/TextureGroup/Texture/pull/1011)
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
 - [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)
 - Make `ASPerformMainThreadDeallocation` visible in C. [Adlai Holler](https://github.com/Adlai-Holler)
