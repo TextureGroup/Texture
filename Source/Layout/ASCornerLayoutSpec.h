@@ -49,50 +49,30 @@ NS_ASSUME_NONNULL_BEGIN
  @param location The corner position option.
  @return An ASCornerLayoutSpec object with a given child and an layoutElement that act as corner.
  */
-<<<<<<< HEAD
-+ (instancetype)cornerLayoutSpecWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location AS_WARN_UNUSED_RESULT;
-=======
 + (instancetype)cornerLayoutSpecWithChild:(id <ASLayoutElement>)child corner:(id <ASLayoutElement>)corner location:(ASCornerLayoutLocation)location NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
->>>>>>> upstream/master
 
 /**
  A layoutElement object that is laid out to a corner on the child.
  */
-<<<<<<< HEAD
-@property (nonatomic, strong) id <ASLayoutElement> corner;
-=======
 @property (nonatomic) id <ASLayoutElement> corner;
->>>>>>> upstream/master
 
 /**
  The corner position option.
  */
-<<<<<<< HEAD
-@property (nonatomic, assign) ASCornerLayoutLocation cornerLocation;
-=======
 @property (nonatomic) ASCornerLayoutLocation cornerLocation;
->>>>>>> upstream/master
 
 /**
  The point which offsets from the corner location. Use this property to make delta
  distance from the default corner location. Default is CGPointZero.
  */
-<<<<<<< HEAD
-@property (nonatomic, assign) CGPoint offset;
-=======
 @property (nonatomic) CGPoint offset;
->>>>>>> upstream/master
 
 /**
  Whether should include corner element into layout size calculation. If included,
  the layout size will be the union size of both child and corner; If not included,
  the layout size will be only child's size. Default is NO.
  */
-<<<<<<< HEAD
-@property (nonatomic, assign) BOOL wrapsCorner;
-=======
 @property (nonatomic) BOOL wrapsCorner;
->>>>>>> upstream/master
 
 @end
 
