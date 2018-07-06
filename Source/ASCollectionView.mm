@@ -1288,11 +1288,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
       [_asyncDelegate collectionNode:collectionNode didEndDisplayingItemWithNode:cellNode];
-#pragma clang diagnostic pop
     }
   } else if (_asyncDelegateFlags.collectionViewDidEndDisplayingNodeForItem) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [_asyncDelegate collectionView:self didEndDisplayingNode:cellNode forItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
   }
