@@ -14,6 +14,7 @@
 - Optimize layout flattening, particularly reducing retain/release operations. [Adlai Holler](https://github.com/Adlai-Holler)
 - Create a method to transfer strong C-arrays into immutable NSArrays, reducing retain/release traffic. [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove yoga layout spec, which has been superseded by tighter Yoga integration (`ASDisplayNode+Yoga.h`)
+- Properly consider node for responder methods [Michael Schneider](https://github.com/maicki) 
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
