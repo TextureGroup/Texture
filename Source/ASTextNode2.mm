@@ -346,9 +346,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
     NSShadow *shadow = [[NSShadow alloc] init];
     if (_shadowOpacity != 1) {
-      CGColorRef shadowColorRef = CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor));
-      shadow.shadowColor = [UIColor colorWithCGColor:shadowColorRef];
-      CGColorRelease(shadowColorRef);
+      shadow.shadowColor = [UIColor colorWithCGColor:CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor))];
     } else {
       shadow.shadowColor = [UIColor colorWithCGColor:_shadowColor];
     }
