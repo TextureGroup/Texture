@@ -1959,7 +1959,7 @@ dispatch_semaphore_signal(_lock);
   range = [self _correctedRangeWithEdge:range];
   
   BOOL isVertical = _container.verticalForm;
-  NSMutableArray *rects = [[NSMutableArray<NSValue *> alloc] init];
+  NSMutableArray *rects = [[NSMutableArray<ASTextSelectionRect *> alloc] init];
   if (!range) return rects;
   
   NSUInteger startLineIndex = [self lineIndexForPosition:range.start];
