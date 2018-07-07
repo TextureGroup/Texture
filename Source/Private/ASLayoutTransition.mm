@@ -33,7 +33,7 @@
 
 #if AS_IG_LIST_KIT
 #import <IGListKit/IGListKit.h>
-#import <ASyncDisplayKit/ASLayout+IGListKit.h>
+#import <AsyncDisplayKit/ASLayout+IGListKit.h>
 #endif
 
 /**
