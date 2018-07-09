@@ -199,14 +199,16 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
-    self.pendingState               = nil;
-    view.asyncDelegate              = pendingState.delegate;
-    view.asyncDataSource            = pendingState.dataSource;
-    view.inverted                   = pendingState.inverted;
-    view.allowsSelection            = pendingState.allowsSelection;
-    view.allowsMultipleSelection    = pendingState.allowsMultipleSelection;
-    view.usesSynchronousDataLoading = pendingState.usesSynchronousDataLoading;
-    view.layoutInspector            = pendingState.layoutInspector;
+    self.pendingState                   = nil;
+    view.asyncDelegate                  = pendingState.delegate;
+    view.asyncDataSource                = pendingState.dataSource;
+    view.inverted                       = pendingState.inverted;
+    view.allowsSelection                = pendingState.allowsSelection;
+    view.allowsMultipleSelection        = pendingState.allowsMultipleSelection;
+    view.usesSynchronousDataLoading     = pendingState.usesSynchronousDataLoading;
+    view.layoutInspector                = pendingState.layoutInspector;
+    view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
+    view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
 
     // Only apply these flags if they're enabled; the view might come with them turned on.
     if (pendingState.alwaysBounceVertical) {
