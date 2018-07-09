@@ -123,8 +123,9 @@
   }
 
   let result = [[ASIntegerMap alloc] init];
-  for (var it = _map.begin(); it != _map.end(); it++) {
-    result->_map[it->second] = it->first;
+  
+  for (let &e : _map) {
+    result->_map[e.second] = e.first;
   }
   return result;
 }
@@ -155,8 +156,8 @@
   } else {
     // { 1->2 3->4 5->6 }
     NSMutableString *str = [NSMutableString string];
-    for (var it = _map.begin(); it != _map.end(); it++) {
-      [str appendFormat:@" %zd->%zd", it->first, it->second];
+    for (let &e : _map) {
+      [str appendFormat:@" %zd->%zd", e.first, e.second];
     }
     // Remove leading space
     if (str.length > 0) {

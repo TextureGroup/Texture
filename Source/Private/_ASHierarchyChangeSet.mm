@@ -918,10 +918,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   ASDisplayNodeAssert(ASHierarchyChangeTypeIsFinal(type), @"Attempt to sort and coalesce item changes of intermediary type %@. Why?", NSStringFromASHierarchyChangeType(type));
     
   // Lookup table [NSIndexPath: AnimationOptions]
-  NSMutableDictionary *animationOptions = [[NSMutableDictionary alloc] init];
+  let animationOptions = [[NSMutableDictionary<NSIndexPath *, NSNumber *> alloc] init];
   
   // All changed index paths, sorted
-  NSMutableArray *allIndexPaths = [[NSMutableArray alloc] init];
+  let allIndexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
   
   for (_ASHierarchyItemChange *change in changes) {
     for (NSIndexPath *indexPath in change.indexPaths) {

@@ -1308,7 +1308,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
     NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
     [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
      ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [[NSMutableDictionary alloc] initWithDictionary:originalStringAttributes];
+       NSMutableDictionary *futureTruncationAttributes = [originalStringAttributes mutableCopy];
        [futureTruncationAttributes addEntriesFromDictionary:attributes];
        [truncationMutableString setAttributes:futureTruncationAttributes range:range];
      }];

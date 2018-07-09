@@ -62,8 +62,8 @@
 
   // { ptr1->rect1 ptr2->rect2 ptr3->rect3 }
   NSMutableString *str = [NSMutableString string];
-  for (var it = _map.begin(); it != _map.end(); it++) {
-    [str appendFormat:@" %@->%@", it->first, NSStringFromCGRect(it->second)];
+  for (let &e : _map) {
+    [str appendFormat:@" %@->%@", e.first, NSStringFromCGRect(e.second)];
   }
   [result addObject:@{ @"ASRectMap": str }];
 
