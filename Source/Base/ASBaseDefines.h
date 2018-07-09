@@ -22,7 +22,7 @@
 
 #if defined(__cplusplus)
 # define var auto
-# define let auto const
+# define let const auto
 #else
 # define var __auto_type
 # define let const __auto_type
