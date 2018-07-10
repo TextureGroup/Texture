@@ -220,13 +220,13 @@ static void runLoopSourceCallback(void *info) {
   NSParameterAssert(objectPtr != NULL);
   
   // Cast to CFType so we can manipulate retain count manually.
-  auto cfPtr = (CFTypeRef *)(void *)objectPtr;
+  let cfPtr = (CFTypeRef *)(void *)objectPtr;
   if (!cfPtr || !*cfPtr) {
     return;
   }
   
   _lock.lock();
-  auto isFirstEntry = _queue.empty();
+  let isFirstEntry = _queue.empty();
   // Push the pointer into our queue and clear their pointer.
   // This "steals" the +1 from ARC and nils their pointer so they can't
   // access or release the object.
@@ -244,9 +244,9 @@ static void runLoopSourceCallback(void *info) {
 - (void)drain
 {
   _lock.lock();
-  auto q = std::move(_queue);
+  let q = std::move(_queue);
   _lock.unlock();
-  for (auto ref : q) {
+  for (let ref : q) {
     // NOTE: Could check that retain count is 1 and retry later if not.
     CFRelease(ref);
   }
@@ -488,11 +488,11 @@ typedef enum {
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  auto count = itemsToProcess.size();
+  let count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    auto itemsEnd = itemsToProcess.cend();
-    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    let itemsEnd = itemsToProcess.cend();
+    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
@@ -711,11 +711,11 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  auto count = itemsToProcess.size();
+  let count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    auto itemsEnd = itemsToProcess.cend();
-    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    let itemsEnd = itemsToProcess.cend();
+    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       [value prepareForCATransactionCommit];
       as_log_verbose(ASDisplayLog(), "processed %@", value);

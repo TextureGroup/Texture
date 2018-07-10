@@ -98,7 +98,7 @@ static const struct _UIContentModeStringLUTEntry UIContentModeDescriptionLUT[] =
 
 NSString *ASDisplayNodeNSStringFromUIContentMode(UIViewContentMode contentMode)
 {
-  for (auto &e : UIContentModeDescriptionLUT) {
+  for (let &e : UIContentModeDescriptionLUT) {
     if (e.contentMode == contentMode) {
       return e.string;
     }
@@ -108,7 +108,7 @@ NSString *ASDisplayNodeNSStringFromUIContentMode(UIViewContentMode contentMode)
 
 UIViewContentMode ASDisplayNodeUIContentModeFromNSString(NSString *string)
 {
-  for (auto &e : UIContentModeDescriptionLUT) {
+  for (let &e : UIContentModeDescriptionLUT) {
     if (ASObjectIsEqual(e.string, string)) {
       return e.contentMode;
     }
@@ -118,7 +118,7 @@ UIViewContentMode ASDisplayNodeUIContentModeFromNSString(NSString *string)
 
 NSString *const ASDisplayNodeCAContentsGravityFromUIContentMode(UIViewContentMode contentMode)
 {
-  for (auto &e : UIContentModeCAGravityLUT) {
+  for (let &e : UIContentModeCAGravityLUT) {
     if (e.contentMode == contentMode) {
       return e.string;
     }
@@ -140,7 +140,7 @@ UIViewContentMode ASDisplayNodeUIContentModeFromCAContentsGravity(NSString *cons
     return cachedModes[foundCacheIndex];
   }
   
-  for (auto &e : UIContentModeCAGravityLUT) {
+  for (let &e : UIContentModeCAGravityLUT) {
     if (ASObjectIsEqual(e.string, contentsGravity)) {
       UIViewContentMode foundContentMode = e.contentMode;
       

@@ -160,7 +160,7 @@
     self.style.descender = stackChildren.back().style.descender;
   }
   
-  auto sublayouts = [[NSMutableArray<ASLayout *> alloc] init];
+  const auto sublayouts = [[NSMutableArray<ASLayout *> alloc] init];
   for (const auto &item : positionedLayout.items) {
     [sublayouts addObject:item.layout];
   }

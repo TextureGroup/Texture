@@ -251,10 +251,10 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     if (ASLayoutIsDisplayNodeType(layout)) {
       if (sublayoutsCount > 0 || CGPointEqualToPoint(ASCeilPointValues(absolutePosition), layout.position) == NO) {
         // Only create a new layout if the existing one can't be reused, which means it has either some sublayouts or an invalid absolute position.
-        auto newLayout = [ASLayout layoutWithLayoutElement:layout->_layoutElement
-                                                      size:layout.size
-                                                  position:absolutePosition
-                                                sublayouts:@[]];
+        let newLayout = [ASLayout layoutWithLayoutElement:layout->_layoutElement
+                                                     size:layout.size
+                                                 position:absolutePosition
+                                               sublayouts:@[]];
         flattenedSublayouts.push_back(newLayout);
       } else {
         flattenedSublayouts.push_back(layout);
@@ -348,11 +348,11 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   NSMutableArray *result = [NSMutableArray array];
   [result addObject:@{ @"size" : [NSValue valueWithCGSize:self.size] }];
 
-  if (auto layoutElement = self.layoutElement) {
+  if (let layoutElement = self.layoutElement) {
     [result addObject:@{ @"layoutElement" : layoutElement }];
   }
 
-  auto pos = self.position;
+  let pos = self.position;
   if (!ASPointIsNull(pos)) {
     [result addObject:@{ @"position" : [NSValue valueWithCGPoint:pos] }];
   }

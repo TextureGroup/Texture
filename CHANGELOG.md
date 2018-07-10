@@ -74,6 +74,7 @@
 - Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
 - Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
+- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
