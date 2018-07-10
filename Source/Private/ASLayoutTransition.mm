@@ -285,7 +285,7 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNode
   for (ASLayout *sublayout in layout.sublayouts) {
     if (idx > lastIndex) { break; }
     if (idx >= firstIndex && [indexes containsIndex:idx]) {
-      ASDisplayNode *node = (ASDisplayNode *) sublayout.layoutElement;
+      ASDisplayNode *node = ASDynamicCast(sublayout.layoutElement, ASDisplayNode);
       ASDisplayNodeCAssert(node, @"ASDisplayNode was deallocated before it was added to a subnode. It's likely the case that you use automatically manages subnodes and allocate a ASDisplayNode in layoutSpecThatFits: and don't have any strong reference to it.");
       // Ignore the odd case in which a non-node sublayout is accessed and the type cast fails
       if (node != nil) {
