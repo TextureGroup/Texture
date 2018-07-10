@@ -16,9 +16,9 @@
 //
 
 #import <AsyncDisplayKit/NSArray+Diffing.h>
-#import <unordered_map>
-#import <queue>
+#import <UIKit/NSIndexPath+UIKitAdditions.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <unordered_map>
 
 @implementation NSArray (Diffing)
 
@@ -45,55 +45,54 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
 - (void)asdk_diffWithArray:(NSArray *)array insertions:(NSIndexSet **)insertions deletions:(NSIndexSet **)deletions
                      moves:(NSArray<NSIndexPath *> **)moves compareBlock:(compareBlock)comparison
 {
-  typedef std::unordered_map<NSUInteger, std::queue<NSUInteger>> move_map;
+  struct NSObjectHash
+  {
+    std::size_t operator()(id <NSObject> k) const { return (std::size_t) [k hash]; };
+  };
+  struct NSObjectCompare
+  {
+    bool operator()(id <NSObject> lhs, id <NSObject> rhs) const { return (bool) [lhs isEqual:rhs]; };
+  };
+  std::unordered_multimap<id, NSUInteger, NSObjectHash, NSObjectCompare> potentialMoves;
+
   NSAssert(comparison != nil, @"Comparison block is required");
-    NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");
-  std::unique_ptr<move_map> potentialMoves(nullptr);
+  NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");
   NSMutableArray<NSIndexPath *> *moveIndexPaths = nil;
   NSMutableIndexSet *insertionIndexes = nil, *deletionIndexes = nil;
   if (moves) {
-    potentialMoves = std::unique_ptr<move_map>(new move_map());
     moveIndexPaths = [NSMutableArray new];
   }
-  NSMutableIndexSet *commonIndexes = [[self _asdk_commonIndexesWithArray:array compareBlock:comparison] mutableCopy];
+  NSMutableIndexSet *commonIndexes = [self _asdk_commonIndexesWithArray:array compareBlock:comparison];
 
   if (deletions || moves) {
     deletionIndexes = [NSMutableIndexSet indexSet];
-    for (NSUInteger i = 0; i < self.count; i++) {
+    NSUInteger i = 0;
+    for (id element in self) {
       if (![commonIndexes containsIndex:i]) {
         [deletionIndexes addIndex:i];
       }
-      NSUInteger hash = [self[i] hash];
-      if (potentialMoves) {
-        (*potentialMoves)[hash].push(i);
+      if (moves) {
+        potentialMoves.insert(std::pair<id, NSUInteger>(element, i));
       }
-
+      ++i;
     }
   }
 
   if (insertions || moves) {
     insertionIndexes = [NSMutableIndexSet indexSet];
     NSArray *commonObjects = [self objectsAtIndexes:commonIndexes];
-    BOOL moveFound;
-    NSUInteger movedFrom = NSNotFound;
     for (NSUInteger i = 0, j = 0; j < array.count; j++) {
-      NSUInteger hash = [array[j] hash];
-      moveFound = (potentialMoves && potentialMoves->count(hash));
-      if (moveFound) {
-        movedFrom = (*potentialMoves)[hash].front();
-        (*potentialMoves)[hash].pop();
-        if ((*potentialMoves)[hash].empty()) {
-          potentialMoves->erase(hash);
-        }
-        if (movedFrom != j) {
-          NSUInteger indexes[] = {movedFrom, j};
-          [moveIndexPaths addObject:[NSIndexPath indexPathWithIndexes:indexes length:2]];
-        }
+      auto moveFound = potentialMoves.find(array[j]);
+      NSUInteger movedFrom = NSNotFound;
+      if (moveFound != potentialMoves.end() && moveFound->second != j) {
+        movedFrom = moveFound->second;
+        potentialMoves.erase(moveFound);
+        [moveIndexPaths addObject:[NSIndexPath indexPathForItem:j inSection:movedFrom]];
       }
-        if (i < commonObjects.count && j < array.count && comparison(commonObjects[i], array[j])) {
+      if (i < commonObjects.count && j < array.count && comparison(commonObjects[i], array[j])) {
         i++;
       } else {
-        if (moveFound) {
+        if (movedFrom != NSNotFound) {
           // moves will coalesce a delete / insert - the insert is just not done, and here we remove the delete:
           [deletionIndexes removeIndex:movedFrom];
           // OR a move will have come from the LCS:
@@ -115,7 +114,7 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
 
 // https://github.com/raywenderlich/swift-algorithm-club/tree/master/Longest%20Common%20Subsequence is not exactly this code (obviously), but
 // is a good commentary on the algorithm.
-- (NSIndexSet *)_asdk_commonIndexesWithArray:(NSArray *)array compareBlock:(BOOL (^)(id lhs, id rhs))comparison
+- (NSMutableIndexSet *)_asdk_commonIndexesWithArray:(NSArray *)array compareBlock:(BOOL (^)(id lhs, id rhs))comparison
 {
   NSAssert(comparison != nil, @"Comparison block is required");
 
@@ -175,9 +174,9 @@ static compareBlock defaultCompare = nil;
   static dispatch_once_t onceToken;
 
   dispatch_once(&onceToken, ^{
-    defaultCompare = [^BOOL(id lhs, id rhs) {
+    defaultCompare = ^BOOL(id lhs, id rhs) {
       return [lhs isEqual:rhs];
-    } copy];
+    };
   });
 
   return defaultCompare;

@@ -273,15 +273,15 @@
     }
     // Some sequences that presented issues in the past:
     if (testNumber == 0) {
-      original = [@[@20, @11, @14, @2, @14, @5, @4, @18, @0] mutableCopy];
+      original = @[@20, @11, @14, @2, @14, @5, @4, @18, @0];
       pending = @[@9, @18, @18, @19, @20, @18, @22, @10, @3];
     }
     if (testNumber == 1) {
-      original = [@[@5, @9, @21, @11, @5, @9, @8] mutableCopy];
+      original = @[@5, @9, @21, @11, @5, @9, @8];
       pending = @[@2, @12, @17, @19, @9, @1, @8, @5, @21];
     }
     if (testNumber == 2) {
-      original = [@[@14, @14, @12, @8, @20, @4, @0, @10] mutableCopy];
+      original = @[@14, @14, @12, @8, @20, @4, @0, @10];
       pending = @[@14];
     }
 
@@ -295,7 +295,6 @@
     [insertions enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
       [insertionsList addObject:@(idx)];
     }];
-    NSMutableArray *movesList = [moves mutableCopy];
 
     NSUInteger i = 0;
     NSUInteger j = 0;
@@ -304,16 +303,17 @@
       if (i < [insertionsList count] && [insertionsList[i] unsignedIntegerValue] == count) {
         [test addObject:pending[[insertionsList[i] unsignedIntegerValue]]];
         i++;
-      } else if (j < [movesList count] && [movesList[j] indexAtPosition:1] == count) {
-        [test addObject:original[[movesList[j] indexAtPosition:0]]];
+      } else if (j < [moves count] && [moves[j] indexAtPosition:1] == count) {
+        [test addObject:original[[moves[j] indexAtPosition:0]]];
         j++;
       } else {
         [test addObject:original[count]];
       }
     }
 
-    XCTAssert([test isEqualToArray:pending], @"Did not mutate to expected new array: %@, insertions: %@, moves: %@, deletions: %@",
-            [test componentsJoinedByString:@","], insertionsList, movesList, deletionsList);
+    XCTAssert([test isEqualToArray:pending], @"Did not mutate to expected new array:\n [%@] -> [%@], actual: [%@]\ninsertions: %@\nmoves: %@\ndeletions: %@",
+            [original componentsJoinedByString:@","], [pending componentsJoinedByString:@","], [test componentsJoinedByString:@","],
+            insertions, moves, deletions);
     original = @[];
     pending = @[];
   }
