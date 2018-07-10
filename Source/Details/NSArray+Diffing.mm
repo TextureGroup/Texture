@@ -53,7 +53,7 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
   {
     bool operator()(id <NSObject> lhs, id <NSObject> rhs) const { return (bool) [lhs isEqual:rhs]; };
   };
-  std::unordered_multimap<id, NSUInteger, NSObjectHash, NSObjectCompare> potentialMoves;
+  std::unordered_multimap<unowned id, NSUInteger, NSObjectHash, NSObjectCompare> potentialMoves;
 
   NSAssert(comparison != nil, @"Comparison block is required");
   NSAssert(moves == nil || comparison == [NSArray defaultCompareBlock], @"move detection requires isEqual: and hash (no custom compare)");

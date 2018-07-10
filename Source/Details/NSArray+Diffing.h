@@ -17,6 +17,60 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * These changes can be used to transform `self` to `array` by applying them in (any) order, *without shifting* the
+ * other elements.  This can be done (in an NSMutableArray) by calling `setObject:atIndexedSubscript:` (or just use
+ * [subscripting] directly) for insertions from `array` into `self` (not the seemingly more apt `insertObject:atIndex`!),
+ * and using the same method for deletions from `self` (*set* a `[NSNull null]` as opposed to `removeObject:atIndex:`).
+ * After all inserts/deletes have been applied, there will be no nulls left (except possibly at the end of the array if
+ * `[array count] < [self count]`)
+
+ * Some examples:
+ * in:   ab c
+ * out:  abdc
+ * diff: ..+.
+ *
+ * in:   abcd
+ * out:     dcba
+ * dif:  ---.+++
+ *
+ * in:   abcd
+ * out:  ab d
+ * diff: ..-.
+ *
+ * in:   a bcd
+ * out:  adbc
+ * diff: .+..-
+ *
+ * If `moves` pointer is passed in, instances where one element moves to another location are detected and reported,
+ * possibly replacing pairs of delete/insert. The process for transforming an array remains the same, however now it is
+ * important to apply the moves in order and not overwrite an element that needs to be moved somewhere else.
+ *
+ * the same examples, with moves:
+ * in:   ab c
+ * out:  abdc
+ * diff: ..+.
+ *
+ * in:   abcd
+ * out:  dcba
+ * diff: 321.
+ *
+ * in:   abcd
+ * out:  ab d
+ * diff: ..-.
+ *
+ * in:   abcd
+ * out:  adbc
+ * diff: .312
+ *
+ * Other notes:
+ *
+ * No index will be both moved from and deleted.
+ * Each index 0...[self count] will be either moved from or deleted. If it is moved to the same location, we omit it.
+ * Each index 0...[array count] will be the destination of ONE move or ONE insert.
+ * Knowing these things means any two of the three (delete, move, insert) implies the third.
+ */
+
 @interface NSArray (Diffing)
 
 /**
