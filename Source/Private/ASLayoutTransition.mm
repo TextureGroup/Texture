@@ -73,7 +73,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   NSArray<ASDisplayNode *> *_removedSubnodes;
   std::vector<NSUInteger> _insertedSubnodePositions;
   std::vector<NSUInteger> _removedSubnodePositions;
-  std::vector<std::pair<id, NSUInteger>> _subnodeMoves;
+  std::vector<std::pair<ASDisplayNode *, NSUInteger>> _subnodeMoves;
 }
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
@@ -123,8 +123,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   ASDisplayNodeLogEvent(_node, @"insertSubnodes: %@", _insertedSubnodes);
   NSUInteger i = 0;
   NSUInteger j = 0;
-  for (j = 0; j < _subnodeMoves.size(); ++j) {
-    [_subnodeMoves[j].first _removeFromSupernodeIfEqualTo:_node];
+  for (auto const &move : _subnodeMoves) {
+    [move.first _removeFromSupernodeIfEqualTo:_node];
   }
   j = 0;
   while (i < _insertedSubnodePositions.size() && j < _subnodeMoves.size()) {
@@ -186,13 +186,13 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
     _removedSubnodePositions = findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
     for (IGListMoveIndex *move in result.moves) {
-      id subnode = previousLayout.sublayouts[static_cast<NSUInteger>(move.from)].layoutElement;
-      _subnodeMoves.push_back(std::pair<id, NSUInteger>(subnode, move.to));
+      unowned ASDisplayNode *subnode = previousLayout.sublayouts[move.from].layoutElement;
+      _subnodeMoves.push_back(std::pair<ASDisplayNode *, NSUInteger>(subnode, move.to));
     }
 
     // Sort by ascending order of move destinations, this will allow easy loop of `insertSubnode:AtIndex` later.
-    std::sort(_subnodeMoves.begin(), _subnodeMoves.end(), [](std::pair<id, NSUInteger> a,
-            std::pair<id, NSUInteger> b) {
+    std::sort(_subnodeMoves.begin(), _subnodeMoves.end(), [](std::pair<id<ASLayoutElement>, NSUInteger> a,
+            std::pair<ASDisplayNode *, NSUInteger> b) {
       return a.second < b.second;
     });
 #else
@@ -210,7 +210,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
                                                                            &_removedSubnodes);
     // These should arrive sorted in ascending order of move destinations.
     for (NSIndexPath *move in moves) {
-      id subnode = previousLayout.sublayouts[static_cast<NSUInteger>([move indexAtPosition:0])].layoutElement;
+      unowned ASDisplayNode *subnode = previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement;
       _subnodeMoves.push_back(std::pair<id, NSUInteger>(subnode, [move indexAtPosition:1]));
     }
 #endif
@@ -300,7 +300,7 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNode
   for (ASLayout *sublayout in layout.sublayouts) {
     if (idx > lastIndex) { break; }
     if (idx >= firstIndex && [indexes containsIndex:idx]) {
-      ASDisplayNode *node = ASDynamicCast(sublayout.layoutElement, ASDisplayNode);
+      ASDisplayNode *node = (ASDisplayNode *) sublayout.layoutElement;
       ASDisplayNodeCAssert(node, @"ASDisplayNode was deallocated before it was added to a subnode. It's likely the case that you use automatically manages subnodes and allocate a ASDisplayNode in layoutSpecThatFits: and don't have any strong reference to it.");
       // Ignore the odd case in which a non-node sublayout is accessed and the type cast fails
       if (node != nil) {
