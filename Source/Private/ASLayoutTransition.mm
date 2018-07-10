@@ -20,16 +20,9 @@
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
-#import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _insertSubnode... / _removeFromSupernode.
-#import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
-#import <memory>
-#import <algorithm>
-
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
 
 #if AS_IG_LIST_KIT
 #import <IGListKit/IGListKit.h>
@@ -186,8 +179,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
     _removedSubnodePositions = findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
     for (IGListMoveIndex *move in result.moves) {
-      unowned ASDisplayNode *subnode = previousLayout.sublayouts[move.from].layoutElement;
-      _subnodeMoves.push_back(std::pair<ASDisplayNode *, NSUInteger>(subnode, move.to));
+      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[move.from].layoutElement, move.to));
     }
 
     // Sort by ascending order of move destinations, this will allow easy loop of `insertSubnode:AtIndex` later.
@@ -210,8 +202,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
                                                                            &_removedSubnodes);
     // These should arrive sorted in ascending order of move destinations.
     for (NSIndexPath *move in moves) {
-      unowned ASDisplayNode *subnode = previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement;
-      _subnodeMoves.push_back(std::pair<id, NSUInteger>(subnode, [move indexAtPosition:1]));
+      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
+              [move indexAtPosition:1]));
     }
 #endif
   } else {

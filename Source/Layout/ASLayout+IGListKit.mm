@@ -12,24 +12,28 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #if AS_IG_LIST_KIT
 #import "ASLayout+IGListKit.h"
-#import <AsyncDisplayKit/ASLayout.h>
-#import <IGListKit/IGListKit.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
+
+@interface ASLayout() {
+@public
+  id<ASLayoutElement> _layoutElement;
+}
+@end
 
 @implementation ASLayout(IGListKit)
-- (nonnull id <NSObject>)diffIdentifier
+
+- (id <NSObject>)diffIdentifier
 {
-  return @([self.layoutElement hash]);
+  return [NSValue valueWithPointer: (__bridge void*) self->_layoutElement];
 }
 
-- (BOOL)isEqualToDiffableObject:(nullable id <IGListDiffable>)other
+- (BOOL)isEqualToDiffableObject:(id <IGListDiffable>)other
 {
   if (other == self) return YES;
 
   ASLayout *otherLayout = ASDynamicCast(other, ASLayout);
   if (!otherLayout) return NO;
 
-  return [otherLayout.layoutElement isEqual:self.layoutElement];
+  return (otherLayout->_layoutElement == self->_layoutElement);
 }
 @end
 #endif // AS_IG_LIST_KIT
