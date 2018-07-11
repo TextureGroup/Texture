@@ -561,7 +561,12 @@
     // it and try again.
     {
       ASLockScopeSelf();
-      url = _URL;
+      if (_URL) {
+        url = _URL;
+      } else {
+        [self _locked_cancelDownloadAndClearImageWithResumePossibility:NO];
+        return;
+      }
     }
 
 
