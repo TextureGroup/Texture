@@ -160,7 +160,7 @@ typedef struct {
   UIView *contentView = node.view.superview;
   UICollectionViewCell *cell = contentView.superview;
 
-  if (cell == nil) {
+  if (cell == nil || indexPath == nil) {
     return;
   }
 
@@ -173,7 +173,7 @@ typedef struct {
   UIView *contentView = node.view.superview;
   UICollectionViewCell *cell = contentView.superview;
 
-  if (cell == nil) {
+  if (cell == nil || indexPath == nil) {
     return;
   }
 
