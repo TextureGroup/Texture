@@ -23,17 +23,12 @@
 
 - (id <NSObject>)diffIdentifier
 {
-  return [NSValue valueWithPointer: (__bridge void*) self->_layoutElement];
+  return self->_layoutElement;
 }
 
 - (BOOL)isEqualToDiffableObject:(id <IGListDiffable>)other
 {
-  if (other == self) return YES;
-
-  ASLayout *otherLayout = ASDynamicCast(other, ASLayout);
-  if (!otherLayout) return NO;
-
-  return (otherLayout->_layoutElement == self->_layoutElement);
+  return [self isEqual:other];
 }
 @end
 #endif // AS_IG_LIST_KIT
