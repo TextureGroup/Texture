@@ -157,13 +157,27 @@ typedef struct {
 - (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node
 {
   NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
-  [self.delegate collectionView:collectionNode.view willDisplayCell:node.view forItemAtIndexPath:indexPath];
+  UIView *contentView = node.view.superview;
+  UICollectionViewCell *cell = contentView.superview;
+
+  if (cell == nil) {
+    return;
+  }
+
+  [self.delegate collectionView:collectionNode.view willDisplayCell:cell forItemAtIndexPath:indexPath];
 }
 
 - (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node
 {
   NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
-  [self.delegate collectionView:collectionNode.view didEndDisplayingCell:node.view forItemAtIndexPath:indexPath];
+  UIView *contentView = node.view.superview;
+  UICollectionViewCell *cell = contentView.superview;
+
+  if (cell == nil) {
+    return;
+  }
+
+  [self.delegate collectionView:collectionNode.view didEndDisplayingCell:cell forItemAtIndexPath:indexPath];
 }
 
 /**
