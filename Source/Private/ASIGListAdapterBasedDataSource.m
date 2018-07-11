@@ -154,13 +154,15 @@ typedef struct {
   [ctrl beginBatchFetchWithContext:context];
 }
 
-- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node
 {
+  NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
   [self.delegate collectionView:collectionNode.view willDisplayCell:node.view forItemAtIndexPath:indexPath];
 }
 
-- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node
 {
+  NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
   [self.delegate collectionView:collectionNode.view didEndDisplayingCell:node.view forItemAtIndexPath:indexPath];
 }
 

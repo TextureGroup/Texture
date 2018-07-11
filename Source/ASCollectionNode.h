@@ -756,11 +756,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 
-- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath;
-- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -collectionNode:willDisplayNode:forItemAtIndexPath:");
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node;
 
-- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingNode:(ASCellNode *)node forItemAtIndexPath:(NSIndexPath *)indexPath;
-- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -collectionNode:didEndDisplayingNode:forItemAtIndexPath:");
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node;
 
 - (void)collectionNode:(ASCollectionNode *)collectionNode willDisplaySupplementaryElementWithNode:(ASCellNode *)node NS_AVAILABLE_IOS(8_0);
 - (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingSupplementaryElementWithNode:(ASCellNode *)node;
