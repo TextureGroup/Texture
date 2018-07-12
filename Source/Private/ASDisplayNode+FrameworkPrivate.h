@@ -298,6 +298,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (BOOL)_isLayoutTransitionInvalid;
 
 /**
+ * Same as @c -_isLayoutTransitionInvalid but must be called with the node's instance lock held.
+ */
+- (BOOL)_locked_isLayoutTransitionInvalid;
+
+/**
  * Internal method that can be overriden by subclasses to add specific behavior after the measurement of a layout
  * transition did finish.
  */
