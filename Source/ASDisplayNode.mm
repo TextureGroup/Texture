@@ -590,7 +590,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   if (ASDisplayNodeThreadIsMain()) {
     // Because the view and layer can only be created and destroyed on Main, that is also the only thread
     // where the state of this property can change. As an optimization, we can avoid locking.
-    return [self _isNodeLoaded];
+    return [self _unsafe_unlocked_isNodeLoaded];
   } else {
     ASDN::MutexLocker l(__instanceLock__);
     return [self _locked_isNodeLoaded];
@@ -603,7 +603,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   return (_view != nil || (_layer != nil && _flags.layerBacked));
 }
 
-- (BOOL)_isNodeLoaded
+/// Called without the lock. Client is responsible for locking safety.
+- (BOOL)_unsafe_unlocked_isNodeLoaded
 {
   return (_view != nil || (_layer != nil && _flags.layerBacked));
 }
