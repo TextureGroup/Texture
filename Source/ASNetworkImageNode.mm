@@ -87,6 +87,8 @@
 
 @implementation ASNetworkImageNode
 
+static BOOL _delegateCallbacksOnMainThread = YES;
+
 @dynamic image;
 
 - (instancetype)initWithCache:(id<ASImageCacheProtocol>)cache downloader:(id<ASImageDownloaderProtocol>)downloader
@@ -446,6 +448,14 @@
   
   // Image was set externally no need to load an image
   [self _lazilyLoadImageIfNecessary];
+}
+
++ (void)setDelegateCallbacksOnMainThread:(BOOL)delegateCallbacksOnMainThread {
+  _delegateCallbacksOnMainThread = delegateCallbacksOnMainThread;
+}
+
++ (BOOL)delegateCallbacksOnMainThread {
+  return _delegateCallbacksOnMainThread;
 }
 
 #pragma mark - Progress
