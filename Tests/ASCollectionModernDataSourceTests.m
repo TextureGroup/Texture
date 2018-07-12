@@ -308,8 +308,7 @@
     [self expectDataSourceCountMethods];
     
     // Combine reloads + inserts and expect them to load content for all of them, in ascending order.
-    NSMutableDictionary<NSIndexPath *, id> *insertsPlusReloads = [NSMutableDictionary dictionary];
-    [insertsPlusReloads addEntriesFromDictionary:insertedItems];
+    NSMutableDictionary<NSIndexPath *, id> *insertsPlusReloads = [[NSMutableDictionary alloc] initWithDictionary:insertedItems];
 
     // Go through reloaded sections and add all their items into `insertsPlusReloads`
     [reloadedSectionIndexes enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {

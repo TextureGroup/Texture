@@ -44,14 +44,19 @@ _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
 
 typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
 {
-  ASDisplayNodeMethodOverrideNone               = 0,
-  ASDisplayNodeMethodOverrideTouchesBegan       = 1 << 0,
-  ASDisplayNodeMethodOverrideTouchesCancelled   = 1 << 1,
-  ASDisplayNodeMethodOverrideTouchesEnded       = 1 << 2,
-  ASDisplayNodeMethodOverrideTouchesMoved       = 1 << 3,
-  ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
-  ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
-  ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
+  ASDisplayNodeMethodOverrideNone                   = 0,
+  ASDisplayNodeMethodOverrideTouchesBegan           = 1 << 0,
+  ASDisplayNodeMethodOverrideTouchesCancelled       = 1 << 1,
+  ASDisplayNodeMethodOverrideTouchesEnded           = 1 << 2,
+  ASDisplayNodeMethodOverrideTouchesMoved           = 1 << 3,
+  ASDisplayNodeMethodOverrideLayoutSpecThatFits     = 1 << 4,
+  ASDisplayNodeMethodOverrideCalcLayoutThatFits     = 1 << 5,
+  ASDisplayNodeMethodOverrideCalcSizeThatFits       = 1 << 6,
+  ASDisplayNodeMethodOverrideCanBecomeFirstResponder= 1 << 7,
+  ASDisplayNodeMethodOverrideBecomeFirstResponder   = 1 << 8,
+  ASDisplayNodeMethodOverrideCanResignFirstResponder= 1 << 9,
+  ASDisplayNodeMethodOverrideResignFirstResponder   = 1 << 10,
+  ASDisplayNodeMethodOverrideIsFirstResponder       = 1 << 11,
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)

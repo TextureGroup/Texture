@@ -245,7 +245,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
   // cause significant performance issues.
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // associate metadata with it
-    NSMutableDictionary *callbackData = [[NSMutableDictionary alloc] init];
+    let callbackData = [[NSMutableDictionary alloc] init];
     callbackData[kASBasicImageDownloaderContextCallbackQueue] = callbackQueue ? : dispatch_get_main_queue();
 
     if (downloadProgress) {
@@ -256,7 +256,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
       callbackData[kASBasicImageDownloaderContextCompletionBlock] = [completion copy];
     }
 
-    [context addCallbackData:[NSDictionary dictionaryWithDictionary:callbackData]];
+    [context addCallbackData:[[NSDictionary alloc] initWithDictionary:callbackData]];
 
     // Create new task if necessary
     NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [_session downloadTaskWithURL:URL];}];

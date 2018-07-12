@@ -1,5 +1,5 @@
 //
-//  PopularPageModel.swift
+//  ParseResponse.swift
 //  ASDKgram-Swift
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -17,16 +17,15 @@
 
 import Foundation
 
-struct PopularPageModel {
-    let page: Int
-    let totalPages: Int
-    let totalNumberOfItems: Int
-    let photos: [PhotoModel]
-    
-    init(metaData: ResponseMetadata, photos:[PhotoModel]) {
-        self.page = metaData.currentPage
-        self.totalPages = metaData.pagesTotal
-        self.totalNumberOfItems = metaData.itemsTotal
-        self.photos = photos
-    }
+func parsePopularPage(withURL: URL, page: Int) -> Resource<PopularPageModel> {
+    let parse = Resource<PopularPageModel>(url: withURL, page: page) { metaData, jsonData in
+        do {
+            let photos = try JSONDecoder().decode([PhotoModel].self, from: jsonData)
+            return .success(PopularPageModel(metaData: metaData, photos: photos))
+        } catch {
+            return .failure(.errorParsingJSON)
+        }
+	}
+
+	return parse
 }

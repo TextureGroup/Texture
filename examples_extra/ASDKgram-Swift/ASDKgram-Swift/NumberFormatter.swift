@@ -1,5 +1,5 @@
 //
-//  PopularPageModel.swift
+//  NumberFormatter.swift
 //  ASDKgram-Swift
 //
 //  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
@@ -17,16 +17,10 @@
 
 import Foundation
 
-struct PopularPageModel {
-    let page: Int
-    let totalPages: Int
-    let totalNumberOfItems: Int
-    let photos: [PhotoModel]
-    
-    init(metaData: ResponseMetadata, photos:[PhotoModel]) {
-        self.page = metaData.currentPage
-        self.totalPages = metaData.pagesTotal
-        self.totalNumberOfItems = metaData.itemsTotal
-        self.photos = photos
-    }
+extension NumberFormatter {
+    static let decimalNumberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }()
 }

@@ -154,6 +154,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   ASDisplayNodeCAssertNotNil(c, @"class is required");
   
   ASDisplayNodeMethodOverrides overrides = ASDisplayNodeMethodOverrideNone;
+  
+  // Handling touches
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesBegan:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesBegan;
   }
@@ -166,13 +168,32 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
+  
+  // Responder chain
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideCanBecomeFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(becomeFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideBecomeFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canResignFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideCanResignFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(resignFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideResignFirstResponder;
+  }
+  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(isFirstResponder))) {
+    overrides |= ASDisplayNodeMethodOverrideIsFirstResponder;
+  }
+  
+  // Layout related methods
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
   }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:)) ||
       ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateLayoutThatFits:
-                                                                 restrictedToSize:
-                                                             relativeToParentSize:))) {
+                                                          restrictedToSize:
+                                                          relativeToParentSize:))) {
     overrides |= ASDisplayNodeMethodOverrideCalcLayoutThatFits;
   }
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(calculateSizeThatFits:))) {
@@ -1019,10 +1040,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
-    __instanceLock__.unlock();
-    [self _u_measureNodeWithBoundsIfNecessary:bounds];
-    __instanceLock__.lock();
-
+    {
+      ASDN::MutexUnlocker u(__instanceLock__);
+      [self _u_measureNodeWithBoundsIfNecessary:bounds];
+    }
+    
     [self _locked_layoutPlaceholderIfNecessary];
   }
   
@@ -3653,7 +3675,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (NSString *)debugDescription
 {
   ASPushMainThreadAssertionsDisabled();
-  auto result = ASObjectDescriptionMake(self, [self propertiesForDebugDescription]);
+  let result = ASObjectDescriptionMake(self, [self propertiesForDebugDescription]);
   ASPopMainThreadAssertionsDisabled();
   return result;
 }
@@ -3725,7 +3747,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASPushMainThreadAssertionsDisabled();
   ASDN::MutexLocker l(__instanceLock__);
-  auto props = [NSMutableArray<NSDictionary *> array];
+  let props = [[NSMutableArray<NSDictionary *> alloc] init];
 
   [props addObject:@{ @"layoutVersion": @(_layoutVersion.load()) }];
   [props addObject:@{ @"bounds": [NSValue valueWithCGRect:self.bounds] }];

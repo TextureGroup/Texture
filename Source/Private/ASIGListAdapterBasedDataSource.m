@@ -115,6 +115,11 @@ typedef struct {
   [self.delegate scrollViewDidEndDragging:scrollView willDecelerate:decelerate];
 }
 
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+  [self.delegate scrollViewDidEndDecelerating:scrollView];
+}
+
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode
 {
   NSInteger sectionCount = [self numberOfSectionsInCollectionNode:collectionNode];
