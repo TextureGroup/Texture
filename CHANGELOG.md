@@ -16,6 +16,7 @@
 - Remove yoga layout spec, which has been superseded by tighter Yoga integration (`ASDisplayNode+Yoga.h`)
 - Properly consider node for responder methods [Michael Schneider](https://github.com/maicki) 
 - [IGListKit] Adds missing UIScrollViewDelegate method to DataSource proxy [Sergey Pronin](https://github.com/wannabehero) 
+- Fix misleading/scary stack trace shown when an assertion occurs during node measurement [Huy Nguyen](https://github.com/nguyenhuy) [#1022](https://github.com/TextureGroup/Texture/pull/1022)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
