@@ -108,7 +108,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * Enable this flag to collect information on the owning thread and ownership level of a mutex.
  * These properties are useful to determine if a mutext has been acquired and in case of a recursive mutex, how many times that happened.
  * 
- * This flag also enable locking assertions (e.g ASDisplayNodeAssertLockNotHeld(node)).
+ * This flag also enable locking assertions (e.g ASAssertUnlocked(node)).
  * The assertions are useful when you want to indicate and enforce the locking policy/expectation of methods.
  * To determine when and which methods acquired a (recursive) mutex (to debug deadlocks, for example),
  * put breakpoints at some assertions. When the breakpoints hit, walk through stack trace frames 
@@ -138,11 +138,11 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * and check ownership count of the mutex.
  */
 #if CHECK_LOCKING_SAFETY
-#define ASDisplayNodeAssertLockNotHeld(lock) ASDisplayNodeAssertFalse(lock.locked())
-#define ASDisplayNodeAssertLockHeld(lock) ASDisplayNodeAssert(lock.locked(), @"Lock must be held by current thread")
+#define ASAssertUnlocked(lock) ASDisplayNodeAssertFalse(lock.locked())
+#define ASAssertLocked(lock) ASDisplayNodeAssert(lock.locked(), @"Lock must be held by current thread")
 #else
-#define ASDisplayNodeAssertLockNotHeld(lock)
-#define ASDisplayNodeAssertLockHeld(lock)
+#define ASAssertUnlocked(lock)
+#define ASAssertLocked(lock)
 #endif
 
 namespace ASDN {

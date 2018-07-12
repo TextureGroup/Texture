@@ -150,7 +150,7 @@
 
 - (void)_locked_setImage:(UIImage *)image
 {
-  ASDisplayNodeAssertLockHeld(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   
   BOOL imageWasSetExternally = (image != nil);
   BOOL shouldCancelAndClear = imageWasSetExternally && (imageWasSetExternally != _imageWasSetExternally);
@@ -178,7 +178,7 @@
 
 - (void)_locked__setImage:(UIImage *)image
 {
-  ASDisplayNodeAssertLockHeld(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   [super _locked_setImage:image];
 }
 
@@ -512,7 +512,7 @@
 
 - (void)_locked_cancelDownloadAndClearImageWithResumePossibility:(BOOL)storeResume
 {
-  ASDisplayNodeAssertLockHeld(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   
   [self _locked_cancelImageDownloadWithResumePossibility:storeResume];
   
@@ -538,7 +538,7 @@
 
 - (void)_locked_cancelImageDownloadWithResumePossibility:(BOOL)storeResume
 {
-  ASDisplayNodeAssertLockHeld(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   
   if (!_downloadIdentifier) {
     return;
