@@ -67,7 +67,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   NSArray<ASDisplayNode *> *_insertedSubnodes;
   NSArray<ASDisplayNode *> *_removedSubnodes;
   std::vector<NSUInteger> _insertedSubnodePositions;
-  std::vector<NSUInteger> _removedSubnodePositions;
   std::vector<std::pair<ASDisplayNode *, NSUInteger>> _subnodeMoves;
 }
 
@@ -179,7 +178,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     // IGListDiff completes in linear time O(m+n), so use it if we have it:
     IGListIndexSetResult *result = IGListDiff(previousLayout.sublayouts, pendingLayout.sublayouts, IGListDiffEquality);
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
-    _removedSubnodePositions = findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
+    findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
     for (IGListMoveIndex *move in result.moves) {
       _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[move.from].layoutElement, move.to));
     }
@@ -192,16 +191,15 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 #else
     NSIndexSet *insertions, *deletions;
     NSArray<NSIndexPath *> *moves;
-    [previousLayout.sublayouts asdk_diffWithArray:pendingLayout.sublayouts
+    NSArray<ASDisplayNode *> *previousNodes = [previousLayout.sublayouts valueForKey:@"layoutElement"];
+    NSArray<ASDisplayNode *> *pendingNodes = [pendingLayout.sublayouts valueForKey:@"layoutElement"];
+    [previousNodes asdk_diffWithArray:pendingNodes
                                        insertions:&insertions
                                         deletions:&deletions
                                             moves:&moves];
 
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, insertions, &_insertedSubnodes);
-    _removedSubnodePositions = findNodesInLayoutAtIndexesWithFilteredNodes(previousLayout,
-                                                                           deletions,
-                                                                           _insertedSubnodes,
-                                                                           &_removedSubnodes);
+    _removedSubnodes = [previousNodes objectsAtIndexes:deletions];
     // These should arrive sorted in ascending order of move destinations.
     for (NSIndexPath *move in moves) {
       _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
@@ -212,7 +210,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [pendingLayout.sublayouts count])];
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, indexes, &_insertedSubnodes);
     _removedSubnodes = nil;
-    _removedSubnodePositions.clear();
   }
   _calculatedSubnodeOperations = YES;
 }
