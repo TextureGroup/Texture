@@ -109,7 +109,10 @@
   _shouldRenderProgressImages = YES;
   self.shouldBypassEnsureDisplay = YES;
 
-  ASNetworkImageNode.delegateCallbacksOnMainThread = YES;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    [self class].delegateCallbacksOnMainThread = YES;
+  });
 
   return self;
 }
@@ -749,7 +752,7 @@
           strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
-          void (^backgroundCalloutBlock)(ASNetworkImageNode *inst);
+
           if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
             if (newImage) {
               if (_delegateFlags.delegateDidLoadImageWithInfo) {
@@ -778,27 +781,27 @@
             }
           } else { // !ASNetworkImageNode.delegateCallbacksOnMainThread
             if (newImage && _delegateFlags.delegateDidFetchImageWithInfo) {
-              backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didFetchImage:newImage info:info];
               };
             } else if (error && _delegateFlags.delegateDidFailFetchingWithError) {
-              backgroundCalloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 [delegate imageNode:strongSelf didFailFetchingWithError:error];
               };
             }
           }
 
-          if (backgroundCalloutBlock) {
-            backgroundCalloutBlock(self);
-          }
-
           if (calloutBlock) {
-            ASPerformBlockOnMainThread(^{
-              if (auto strongSelf = weakSelf) {
-                calloutBlock(strongSelf);
-              }
-            });
+            if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
+              ASPerformBlockOnMainThread(^{
+                if (auto strongSelf = weakSelf) {
+                  calloutBlock(strongSelf);
+                }
+              });
+            } else {
+              calloutBlock(self);
+            }
           }
         });
       };

@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on a main queue.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage:info: instead.");;
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage:info: instead.");
 
 /**
  * Notification that the image node finished downloading an image.
@@ -173,7 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on a main thread.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage: instead.");
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage:info: instead.");
 
 /**
  * Notification that the image node started to load
