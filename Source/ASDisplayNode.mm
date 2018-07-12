@@ -1076,22 +1076,29 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  // We only want one calculateLayout signpost interval per thread.
-  static _Thread_local NSInteger tls_callDepth;
   as_activity_scope_verbose(as_activity_create("Calculate node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   as_log_verbose(ASLayoutLog(), "Calculating layout for %@ sizeRange %@", self, NSStringFromASSizeRange(constrainedSize));
+
+#if AS_KDEBUG_ENABLE
+  // We only want one calculateLayout signpost interval per thread.
+  // Currently there is no fallback for profiling i386, since it's not useful.
+  static _Thread_local NSInteger tls_callDepth;
   if (tls_callDepth++ == 0) {
     ASSignpostStart(ASSignpostCalculateLayout);
   }
+#endif
 
   ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
   const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
   ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
   as_log_verbose(ASLayoutLog(), "Calculated layout %@", result);
 
+#if AS_KDEBUG_ENABLE
   if (--tls_callDepth == 0) {
     ASSignpostEnd(ASSignpostCalculateLayout);
   }
+#endif
+  
   return result;
 }
 

@@ -19,6 +19,12 @@
 
 #pragma once
 
+#ifdef __i386__
+  #define AS_TLS_AVAILABLE 0
+#else
+  #define AS_TLS_AVAILABLE 1
+#endif
+
 #ifndef kCFCoreFoundationVersionNumber_iOS_10_0
   #define kCFCoreFoundationVersionNumber_iOS_10_0 1348.00
 #endif
