@@ -101,7 +101,7 @@ static void runLoopSourceCallback(void *info) {
         return;
       }
       // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
-      __unused NSInteger count; // Prevent static analyzer warning if release build
+      NSInteger count;
       @autoreleasepool {
 #if ASRunLoopQueueLoggingEnabled
         NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
@@ -281,8 +281,7 @@ typedef enum {
 
 - (instancetype)init
 {
-  self = [super init];
-  if (self == nil) {
+  if (self != [super init]) {
     return nil;
   }
   ASDisplayNodeAssert(self.class != [ASAbstractRunLoopQueue class], @"Should never create instances of abstract class ASAbstractRunLoopQueue.");
