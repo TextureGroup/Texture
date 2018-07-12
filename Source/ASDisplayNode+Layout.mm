@@ -437,19 +437,19 @@ ASLayoutElementStyleExtensibilityForwarding
   ASAssertLocked(__instanceLock__);
 
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.threadSafeBounds.size);
-  std::shared_ptr<ASDisplayNodeLayout> pendingLayout = _pendingDisplayNodeLayout;
-  std::shared_ptr<ASDisplayNodeLayout> calculatedLayout = _calculatedDisplayNodeLayout;
-  
+
   // Checkout if constrained size of pending or calculated display node layout can be used
-  if (pendingLayout != nullptr
-      && (pendingLayout->requestedLayoutFromAbove || CGSizeEqualToSize(pendingLayout->layout.size, boundsSizeForLayout))) {
+  if (_pendingDisplayNodeLayout != nullptr
+      && (_pendingDisplayNodeLayout->requestedLayoutFromAbove
+          || CGSizeEqualToSize(_pendingDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
     // We assume the size from the last returned layoutThatFits: layout was applied so use the pending display node
     // layout constrained size
-    return pendingLayout->constrainedSize;
-  } else if (calculatedLayout->layout != nil
-             && (calculatedLayout->requestedLayoutFromAbove || CGSizeEqualToSize(calculatedLayout->layout.size, boundsSizeForLayout))) {
+    return _pendingDisplayNodeLayout->constrainedSize;
+  } else if (_calculatedDisplayNodeLayout->layout != nil
+             && (_calculatedDisplayNodeLayout->requestedLayoutFromAbove
+                 || CGSizeEqualToSize(_calculatedDisplayNodeLayout->layout.size, boundsSizeForLayout))) {
     // We assume the  _calculatedDisplayNodeLayout is still valid and the frame is not different
-    return calculatedLayout->constrainedSize;
+    return _calculatedDisplayNodeLayout->constrainedSize;
   } else {
     // In this case neither the _pendingDisplayNodeLayout or the _calculatedDisplayNodeLayout constrained size can
     // be reused, so the current bounds is used. This is usual the case if a frame was set manually that differs to
@@ -663,9 +663,9 @@ ASLayoutElementStyleExtensibilityForwarding
         // Update calculated layout
         let previousLayout = _calculatedDisplayNodeLayout;
         let pendingLayout = std::make_shared<ASDisplayNodeLayout>(newLayout,
-                                                                   constrainedSize,
-                                                                   constrainedSize.max,
-                                                                   newLayoutVersion);
+                                                                  constrainedSize,
+                                                                  constrainedSize.max,
+                                                                  newLayoutVersion);
         [self _locked_setCalculatedDisplayNodeLayout:pendingLayout];
         
         // Setup pending layout transition for animation
