@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -59,7 +60,7 @@
 + (ASCollectionLayoutState *)calculateLayoutWithContext:(ASCollectionLayoutContext *)context
 {
   ASElementMap *elements = context.elements;
-  NSMutableArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
+  NSArray<ASCellNode *> *children = ASArrayByFlatMapping(elements.itemElements, ASCollectionElement *element, element.node);
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }

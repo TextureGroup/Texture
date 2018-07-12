@@ -24,6 +24,8 @@
 #import <AsyncDisplayKit/ASBatchFetching.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollections.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -82,8 +84,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 @interface _ASTableViewCell : UITableViewCell
 @property (nonatomic, weak) id<_ASTableViewCellDelegate> delegate;
-@property (nonatomic, strong, readonly) ASCellNode *node;
-@property (nonatomic, strong) ASCollectionElement *element;
+@property (nonatomic, readonly) ASCellNode *node;
+@property (nonatomic) ASCollectionElement *element;
 @end
 
 @implementation _ASTableViewCell
@@ -114,11 +116,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   if (node) {
     self.backgroundColor = node.backgroundColor;
-    self.selectionStyle = node.selectionStyle;
     self.selectedBackgroundView = node.selectedBackgroundView;
+#if TARGET_OS_IOS
     self.separatorInset = node.separatorInset;
-    self.selectionStyle = node.selectionStyle;
+#endif
+    self.selectionStyle = node.selectionStyle; 
+    self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
+    self.tintColor = node.tintColor;
     
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
     // This is actually a workaround for a bug we are seeing in some rare cases (selected background view
@@ -128,6 +133,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
+}
+
+- (BOOL)consumesCellNodeVisibilityEvents
+{
+  ASCellNode *node = self.node;
+  if (node == nil) {
+    return NO;
+  }
+  return ASSubclassOverridesSelector([ASCellNode class], [node class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -178,15 +192,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   BOOL _automaticallyAdjustsContentOffset;
   
   CGPoint _deceleratingVelocity;
-  
-  /**
-   * Our layer, retained. Under iOS < 9, when table views are removed from the hierarchy,
-   * their layers may be deallocated and become dangling pointers. This puts the table view
-   * into a very dangerous state where pretty much any call will crash it. So we manually retain our layer.
-   *
-   * You should never access this, and it will be nil under iOS >= 9.
-   */
-  CALayer *_retainedLayer;
 
   CGFloat _nodesConstrainedWidth;
   BOOL _queuedNodeHeightUpdate;
@@ -196,7 +201,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // CountedSet because UIKit may display the same element in multiple cells e.g. during animations.
   NSCountedSet<ASCollectionElement *> *_visibleElements;
   
-  BOOL _remeasuringCellNodes;
   NSHashTable<ASCellNode *> *_cellsForLayoutUpdates;
 
   // See documentation on same property in ASCollectionView
@@ -215,7 +219,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
    * Counter used to keep track of nested batch updates.
    */
   NSInteger _batchUpdateCount;
-  
+
+  /**
+   * Keep a strong reference to node till view is ready to release.
+   */
+  ASTableNode *_keepalive_node;
+
   struct {
     unsigned int scrollViewDidScroll:1;
     unsigned int scrollViewWillBeginDragging:1;
@@ -272,7 +281,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } _asyncDataSourceFlags;
 }
 
-@property (nonatomic, strong, readwrite) ASDataController *dataController;
+@property (nonatomic) ASDataController *dataController;
 
 @property (nonatomic, weak)   ASTableNode *tableNode;
 
@@ -341,10 +350,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   [self registerClass:_ASTableViewCell.class forCellReuseIdentifier:kCellReuseIdentifier];
   
-  if (!AS_AT_LEAST_IOS9) {
-    _retainedLayer = self.layer;
-  }
-  
   // iOS 11 automatically uses estimated heights, so disable those (see PR #485)
   if (AS_AT_LEAST_IOS11) {
     super.estimatedRowHeight = 0.0;
@@ -368,8 +373,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   // Sometimes the UIKit classes can call back to their delegate even during deallocation.
   _isDeallocating = YES;
-  [self setAsyncDelegate:nil];
-  [self setAsyncDataSource:nil];
+  if (!ASActivateExperimentalFeature(ASExperimentalCollectionTeardown)) {
+    [self setAsyncDelegate:nil];
+    [self setAsyncDataSource:nil];
+  }
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
   ASPerformBackgroundDeallocation(&_dataController);
@@ -669,7 +676,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray<ASCellNode *> *)visibleNodes
 {
-  auto elements = [self visibleElementsForRangeController:_rangeController];
+  let elements = [self visibleElementsForRangeController:_rangeController];
   return ASArrayByFlatMapping(elements, ASCollectionElement *e, e.node);
 }
 
@@ -721,7 +728,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return [_dataController isProcessingUpdates];
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
   [_dataController onDidFinishProcessingUpdates:completion];
 }
@@ -741,26 +748,27 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)layoutSubviews
 {
   // Remeasure all rows if our row width has changed.
-  _remeasuringCellNodes = YES;
   UIEdgeInsets contentInset = self.contentInset;
   CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth] - contentInset.left - contentInset.right;
   if (constrainedWidth > 0 && _nodesConstrainedWidth != constrainedWidth) {
     _nodesConstrainedWidth = constrainedWidth;
+    [_cellsForLayoutUpdates removeAllObjects];
 
     [self beginUpdates];
     [_dataController relayoutAllNodesWithInvalidationBlock:nil];
     [self endUpdatesAnimated:(ASDisplayNodeLayerHasAnimations(self.layer) == NO) completion:nil];
   } else {
     if (_cellsForLayoutUpdates.count > 0) {
-      NSMutableArray *nodesSizesChanged = [NSMutableArray array];
-      [_dataController relayoutNodes:_cellsForLayoutUpdates nodesSizeChanged:nodesSizesChanged];
-      if (nodesSizesChanged.count > 0) {
+      NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
+      [_cellsForLayoutUpdates removeAllObjects];
+
+      let nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
+      [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
+      if (nodesSizeChanged.count > 0) {
         [self requeryNodeHeights];
       }
     }
   }
-  [_cellsForLayoutUpdates removeAllObjects];
-  _remeasuringCellNodes = NO;
 
   // To ensure _nodesConstrainedWidth is up-to-date for every usage, this call to super must be done last
   [super layoutSubviews];
@@ -915,9 +923,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASCellNode *node = [_dataController.visibleMap elementForItemAtIndexPath:indexPath].node;
-  CGFloat height = node.calculatedSize.height;
+  CGFloat height = 0.0;
+
+  ASCollectionElement *element = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
+  if (element != nil) {
+    ASCellNode *node = element.node;
+    ASDisplayNodeAssertNotNil(node, @"Node must not be nil!");
+    height = [node layoutThatFits:element.constrainedSize].size.height;
+  }
   
+#if TARGET_OS_IOS
   /**
    * Weirdly enough, Apple expects the return value here to _include_ the height
    * of the separator, if there is one! So if our node wants to be 43.5, we need
@@ -927,6 +942,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (tableView.separatorStyle != UITableViewCellSeparatorStyleNone) {
     height += 1.0 / ASScreenScale();
   }
+#endif
+  
   return height;
 }
 
@@ -971,7 +988,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView willDisplayCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
   ASCollectionElement *element = cell.element;
-  [_visibleElements addObject:element];
+  if (element) {
+    ASDisplayNodeAssertTrue([_dataController.visibleMap elementForItemAtIndexPath:indexPath] == element);
+    [_visibleElements addObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for willDisplayCell: %@, %@, %@", cell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
   cellNode.scrollView = tableView;
 
@@ -991,15 +1015,22 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   
   [_rangeController setNeedsUpdate];
   
-  if (ASSubclassOverridesSelector([ASCellNode class], [cellNode class], @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:))) {
+  if ([cell consumesCellNodeVisibilityEvents]) {
     [_cellsForVisibilityUpdates addObject:cell];
   }
 }
 
 - (void)tableView:(UITableView *)tableView didEndDisplayingCell:(_ASTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  // Retrieve the element from cell instead of visible map because at this point visible map could have been updated and no longer holds the element.
   ASCollectionElement *element = cell.element;
-  [_visibleElements removeObject:element];
+  if (element) {
+    [_visibleElements removeObject:element];
+  } else {
+    ASDisplayNodeAssert(NO, @"Unexpected nil element for didEndDisplayingCell: %@, %@, %@", cell, self, indexPath);
+    return;
+  }
+
   ASCellNode *cellNode = element.node;
 
   [_rangeController setNeedsUpdate];
@@ -1203,13 +1234,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewDidScroll:scrollView];
     return;
   }
-  // If a scroll happenes the current range mode needs to go to full
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
-    [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
     [self _checkForBatchFetching];
-  }
-  
+  }  
   for (_ASTableViewCell *tableCell in _cellsForVisibilityUpdates) {
     [[tableCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
                                  inScrollView:scrollView
@@ -1261,6 +1289,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewWillBeginDragging:scrollView];
     return;
   }
+  // If a scroll happens the current range mode needs to go to full
+  _rangeController.contentHasBeenScrolled = YES;
+  [_rangeController updateCurrentRangeWithMode:ASLayoutRangeModeFull];
+
   for (_ASTableViewCell *tableViewCell in _cellsForVisibilityUpdates) {
     [[tableViewCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventWillBeginDragging
                                           inScrollView:scrollView
@@ -1754,6 +1786,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
   CGRect rect = [self rectForRowAtIndexPath:indexPath];
   
+#if TARGET_OS_IOS
   /**
    * Weirdly enough, Apple expects the return value in tableView:heightForRowAtIndexPath: to _include_ the height
    * of the separator, if there is one! So if rectForRow would return 44.0 we need to use 43.5.
@@ -1761,6 +1794,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (self.separatorStyle != UITableViewCellSeparatorStyleNone) {
     rect.size.height -= 1.0 / ASScreenScale();
   }
+#endif
 
   return (fabs(rect.size.height - size.height) < FLT_EPSILON);
 }
@@ -1794,6 +1828,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     CGSize oldSize = node.bounds.size;
     const CGSize calculatedSize = [node layoutThatFits:constrainedSize].size;
     node.frame = { .size = calculatedSize };
+
+    // After the re-measurement, set the new constrained size to the node's backing colleciton element.
+    node.collectionElement.constrainedSize = constrainedSize;
 
     // If the node height changed, trigger a height requery.
     if (oldSize.height != calculatedSize.height) {
@@ -1883,21 +1920,43 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   BOOL visible = (self.window != nil);
   ASDisplayNode *node = self.tableNode;
+  BOOL rangeControllerNeedsUpdate = ![node supportsRangeManagedInterfaceState];;
+
   if (!visible && node.inHierarchy) {
+    if (rangeControllerNeedsUpdate) {
+      rangeControllerNeedsUpdate = NO;
+      // Exit CellNodes first before Table to match UIKit behaviors (tear down bottom up).
+      // Although we have not yet cleared the interfaceState's Visible bit (this  happens in __exitHierarchy),
+      // the ASRangeController will get the correct value from -interfaceStateForRangeController:.
+      [_rangeController updateRanges];
+    }
     [node __exitHierarchy];
   }
 
   // Updating the visible node index paths only for not range managed nodes. Range managed nodes will get their
   // their update in the layout pass
-  if (![node supportsRangeManagedInterfaceState]) {
-    [_rangeController setNeedsUpdate];
-    [_rangeController updateIfNeeded];
+  if (rangeControllerNeedsUpdate) {
+    [_rangeController updateRanges];
   }
 
   // When we aren't visible, we will only fetch up to the visible area. Now that we are visible,
   // we will fetch visible area + leading screens, so we need to check.
   if (visible) {
     [self _checkForBatchFetching];
+  }
+}
+
+- (void)willMoveToSuperview:(UIView *)newSuperview
+{
+  if (self.superview == nil && newSuperview != nil) {
+    _keepalive_node = self.tableNode;
+  }
+}
+
+- (void)didMoveToSuperview
+{
+  if (self.superview == nil) {
+    _keepalive_node = nil;
   }
 }
 

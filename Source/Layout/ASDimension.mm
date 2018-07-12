@@ -97,8 +97,8 @@ struct _Range {
 
 ASSizeRange ASSizeRangeIntersect(ASSizeRange sizeRange, ASSizeRange otherSizeRange)
 {
-  auto w = _Range({sizeRange.min.width, sizeRange.max.width}).intersect({otherSizeRange.min.width, otherSizeRange.max.width});
-  auto h = _Range({sizeRange.min.height, sizeRange.max.height}).intersect({otherSizeRange.min.height, otherSizeRange.max.height});
+  let w = _Range({sizeRange.min.width, sizeRange.max.width}).intersect({otherSizeRange.min.width, otherSizeRange.max.width});
+  let h = _Range({sizeRange.min.height, sizeRange.max.height}).intersect({otherSizeRange.min.height, otherSizeRange.max.height});
   return {{w.min, h.min}, {w.max, h.max}};
 }
 
@@ -121,7 +121,7 @@ NSString *NSStringFromASSizeRange(ASSizeRange sizeRange)
 #pragma mark - Yoga - ASEdgeInsets
 ASEdgeInsets const ASEdgeInsetsZero = {};
 
-extern ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets)
+ASEdgeInsets ASEdgeInsetsMake(UIEdgeInsets edgeInsets)
 {
   ASEdgeInsets asEdgeInsets = ASEdgeInsetsZero;
   asEdgeInsets.top = ASDimensionMake(edgeInsets.top);

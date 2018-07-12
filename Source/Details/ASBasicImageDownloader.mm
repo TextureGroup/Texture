@@ -39,7 +39,7 @@ NSString * const kASBasicImageDownloaderContextCompletionBlock = @"kASBasicImage
   ASDN::RecursiveMutex __instanceLock__;
 }
 
-@property (nonatomic, strong) NSMutableArray *callbackDatas;
+@property (nonatomic) NSMutableArray *callbackDatas;
 
 @end
 
@@ -130,7 +130,7 @@ static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
 
     if (completionBlock) {
       dispatch_async(callbackQueue, ^{
-        completionBlock(image, error, nil);
+        completionBlock(image, error, nil, nil);
       });
     }
   }
@@ -179,7 +179,7 @@ static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
  * NSURLSessionDownloadTask lacks a `userInfo` property, so add this association ourselves.
  */
 @interface NSURLRequest (ASBasicImageDownloader)
-@property (nonatomic, strong) ASBasicImageDownloaderContext *asyncdisplaykit_context;
+@property (nonatomic) ASBasicImageDownloaderContext *asyncdisplaykit_context;
 @end
 
 @implementation NSURLRequest (ASBasicImageDownloader)
@@ -206,7 +206,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 
 @implementation ASBasicImageDownloader
 
-+ (instancetype)sharedImageDownloader
++ (ASBasicImageDownloader *)sharedImageDownloader
 {
   static ASBasicImageDownloader *sharedImageDownloader = nil;
   static dispatch_once_t once = 0;
@@ -235,9 +235,9 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 #pragma mark ASImageDownloaderProtocol.
 
 - (id)downloadImageWithURL:(NSURL *)URL
-                      callbackQueue:(dispatch_queue_t)callbackQueue
-                   downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
-                         completion:(ASImageDownloaderCompletion)completion
+             callbackQueue:(dispatch_queue_t)callbackQueue
+          downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
+                completion:(ASImageDownloaderCompletion)completion
 {
   ASBasicImageDownloaderContext *context = [ASBasicImageDownloaderContext contextForURL:URL];
 
@@ -245,7 +245,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
   // cause significant performance issues.
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // associate metadata with it
-    NSMutableDictionary *callbackData = [NSMutableDictionary dictionary];
+    let callbackData = [[NSMutableDictionary alloc] init];
     callbackData[kASBasicImageDownloaderContextCallbackQueue] = callbackQueue ? : dispatch_get_main_queue();
 
     if (downloadProgress) {
@@ -256,7 +256,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
       callbackData[kASBasicImageDownloaderContextCompletionBlock] = [completion copy];
     }
 
-    [context addCallbackData:[NSDictionary dictionaryWithDictionary:callbackData]];
+    [context addCallbackData:[[NSDictionary alloc] initWithDictionary:callbackData]];
 
     // Create new task if necessary
     NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [_session downloadTaskWithURL:URL];}];

@@ -76,7 +76,7 @@
 @end
 
 @protocol ASPINDiskCache
-@property (assign) NSUInteger byteLimit;
+@property NSUInteger byteLimit;
 @end
 
 @interface ASPINRemoteImageManager : PINRemoteImageManager
@@ -114,7 +114,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
 @implementation ASPINRemoteImageDownloader
 
-+ (instancetype)sharedDownloader
++ (ASPINRemoteImageDownloader *)sharedDownloader NS_RETURNS_RETAINED
 {
 
   static dispatch_once_t onceToken = 0;
@@ -204,26 +204,17 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 {
   [[self sharedPINRemoteImageManager] imageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode completion:^(PINRemoteImageManagerResult * _Nonnull result) {
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
+#if PIN_ANIMATED_AVAILABLE
+      if (result.alternativeRepresentation) {
+        completion(result.alternativeRepresentation);
+      } else {
+        completion(result.image);
+      }
+#else
       completion(result.image);
+#endif
     }];
   }];
-}
-
-- (void)cachedImageWithURLs:(NSArray <NSURL *> *)URLs
-              callbackQueue:(dispatch_queue_t)callbackQueue
-                 completion:(ASImageCacherCompletion)completion
-{
-  [self cachedImageWithURL:[URLs lastObject]
-             callbackQueue:callbackQueue
-                completion:^(id<ASImageContainerProtocol>  _Nullable imageFromCache) {
-                  if (imageFromCache.asdk_image == nil && URLs.count > 1) {
-                    [self cachedImageWithURLs:[URLs subarrayWithRange:NSMakeRange(0, URLs.count - 1)]
-                                callbackQueue:callbackQueue
-                                   completion:completion];
-                  } else {
-                    completion(imageFromCache);
-                  }
-                }];
 }
 
 - (void)clearFetchedImageFromCacheWithURL:(NSURL *)URL
@@ -240,18 +231,6 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
                    downloadProgress:(ASImageDownloaderProgress)downloadProgress
                          completion:(ASImageDownloaderCompletion)completion;
 {
-    NSArray <NSURL *>*URLs = nil;
-    if (URL) {
-        URLs = @[URL];
-    }
-    return [self downloadImageWithURLs:URLs callbackQueue:callbackQueue downloadProgress:downloadProgress completion:completion];
-}
-
-- (nullable id)downloadImageWithURLs:(NSArray <NSURL *> *)URLs
-                       callbackQueue:(dispatch_queue_t)callbackQueue
-                    downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
-                          completion:(ASImageDownloaderCompletion)completion
-{
   PINRemoteImageManagerProgressDownload progressDownload = ^(int64_t completedBytes, int64_t totalBytes) {
     if (downloadProgress == nil) { return; }
 
@@ -264,12 +243,12 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
 #if PIN_ANIMATED_AVAILABLE
       if (result.alternativeRepresentation) {
-        completion(result.alternativeRepresentation, result.error, result.UUID);
+        completion(result.alternativeRepresentation, result.error, result.UUID, result);
       } else {
-        completion(result.image, result.error, result.UUID);
+        completion(result.image, result.error, result.UUID, result);
       }
 #else
-      completion(result.image, result.error, result.UUID);
+      completion(result.image, result.error, result.UUID, result);
 #endif
     }];
   };
@@ -279,11 +258,11 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
   // extra downloads isn't worth the effort of rechecking caches every single time. In order to provide
   // feedback to the consumer about whether images are cached, we can't simply make the cache a no-op and
   // check the cache as part of this download.
-  return [[self sharedPINRemoteImageManager] downloadImageWithURLs:URLs
-                                                           options:PINRemoteImageManagerDownloadOptionsSkipDecode | PINRemoteImageManagerDownloadOptionsIgnoreCache
-                                                     progressImage:nil
-                                                  progressDownload:progressDownload
-                                                        completion:imageCompletion];
+  return [[self sharedPINRemoteImageManager] downloadImageWithURL:URL
+                                                          options:PINRemoteImageManagerDownloadOptionsSkipDecode | PINRemoteImageManagerDownloadOptionsIgnoreCache
+                                                    progressImage:nil
+                                                 progressDownload:progressDownload
+                                                       completion:imageCompletion];
 }
 
 - (void)cancelImageDownloadForIdentifier:(id)downloadIdentifier
@@ -359,7 +338,7 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
  * If queue is nil, assert and perform now.
  * Otherwise, dispatch async to queue.
  */
-+ (void)_performWithCallbackQueue:(dispatch_queue_t)queue work:(void (^)())work
++ (void)_performWithCallbackQueue:(dispatch_queue_t)queue work:(void (^)(void))work
 {
   if (work == nil) {
     // No need to assert here, really. We aren't expecting any feedback from this method.

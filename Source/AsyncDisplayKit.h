@@ -16,10 +16,14 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNode+Convenience.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASConfiguration.h>
+#import <AsyncDisplayKit/ASConfigurationDelegate.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 #import <AsyncDisplayKit/ASControlNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
@@ -35,6 +39,7 @@
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
+#import <AsyncDisplayKit/ASNetworkImageLoadInfo.h>
 #import <AsyncDisplayKit/ASNetworkImageNode.h>
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 
@@ -91,6 +96,7 @@
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
@@ -105,7 +111,9 @@
 #import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
+#import <AsyncDisplayKit/ASLocking.h>
 #import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 #import <AsyncDisplayKit/ASMutableAttributedStringBuilder.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASTextKitComponents.h>
@@ -119,6 +127,7 @@
 #import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>

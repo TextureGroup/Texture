@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
@@ -102,9 +103,9 @@
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }
 
-  NSMutableArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
-                                                                          ASCollectionElement *element,
-                                                                          [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
+  NSArray<_ASGalleryLayoutItem *> *children = ASArrayByFlatMapping(elements.itemElements,
+                                                                   ASCollectionElement *element,
+                                                                   [[_ASGalleryLayoutItem alloc] initWithItemSize:itemSize collectionElement:element]);
   if (children.count == 0) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
   }

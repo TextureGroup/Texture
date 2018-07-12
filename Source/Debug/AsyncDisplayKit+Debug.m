@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
@@ -148,7 +149,7 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
       
-      UIGraphicsBeginImageContext(imgRect.size);
+      ASGraphicsBeginImageContextWithOptions(imgRect.size, NO, 1);
       
       [fillColor setFill];
       UIRectFill(imgRect);
@@ -156,8 +157,7 @@ static BOOL __enableHitTestDebug = NO;
       [self drawEdgeIfClippedWithEdges:clippedEdges color:clipsBorderColor borderWidth:borderWidth imgRect:imgRect];
       [self drawEdgeIfClippedWithEdges:clipsToBoundsClippedEdges color:borderColor borderWidth:borderWidth imgRect:imgRect];
       
-      UIImage *debugHighlightImage = UIGraphicsGetImageFromCurrentImageContext();
-      UIGraphicsEndImageContext();
+      UIImage *debugHighlightImage = ASGraphicsGetImageAndEndCurrentContext();
       
       UIEdgeInsets edgeInsets = UIEdgeInsetsMake(borderWidth, borderWidth, borderWidth, borderWidth);
       debugOverlay.image = [debugHighlightImage resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
@@ -213,7 +213,7 @@ static BOOL __enableHitTestDebug = NO;
 
 @interface _ASRangeDebugOverlayView : UIView
 
-+ (instancetype)sharedInstance;
++ (instancetype)sharedInstance NS_RETURNS_RETAINED;
 
 - (void)addRangeController:(ASRangeController *)rangeController;
 
@@ -230,8 +230,8 @@ static BOOL __enableHitTestDebug = NO;
 @interface _ASRangeDebugBarView : UIView
 
 @property (nonatomic, weak) ASRangeController *rangeController;
-@property (nonatomic, assign) BOOL destroyOnLayout;
-@property (nonatomic, strong) NSString *debugString;
+@property (nonatomic) BOOL destroyOnLayout;
+@property (nonatomic) NSString *debugString;
 
 - (instancetype)initWithRangeController:(ASRangeController *)rangeController;
 
@@ -311,7 +311,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   return [[NSClassFromString(@"UIApplication") sharedApplication] keyWindow];
 }
 
-+ (instancetype)sharedInstance
++ (_ASRangeDebugOverlayView *)sharedInstance NS_RETURNS_RETAINED
 {
   static _ASRangeDebugOverlayView *__rangeDebugOverlay = nil;
   
@@ -752,7 +752,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
     return rangeBarImageNode;
 }
 
-+ (NSAttributedString *)whiteAttributedStringFromString:(NSString *)string withSize:(CGFloat)size
++ (NSAttributedString *)whiteAttributedStringFromString:(NSString *)string withSize:(CGFloat)size NS_RETURNS_RETAINED
 {
   NSDictionary *attributes = @{NSForegroundColorAttributeName : [UIColor whiteColor],
                                NSFontAttributeName            : [UIFont systemFontOfSize:size]};

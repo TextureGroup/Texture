@@ -23,11 +23,13 @@
 #import <vector>
 #import <OCMock/OCMock.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import "ASDisplayNodeTestsHelper.h"
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode
 
-@property (nonatomic, assign) NSUInteger setSelectedCounter;
-@property (nonatomic, assign) NSUInteger applyLayoutAttributesCount;
+@property (nonatomic) NSUInteger setSelectedCounter;
+@property (nonatomic) NSUInteger applyLayoutAttributesCount;
 
 @end
 
@@ -48,8 +50,8 @@
 
 @interface ASTestSectionContext : NSObject <ASSectionContext>
 
-@property (nonatomic, assign) NSInteger sectionIndex;
-@property (nonatomic, assign) NSInteger sectionGeneration;
+@property (nonatomic) NSInteger sectionIndex;
+@property (nonatomic) NSInteger sectionGeneration;
 
 @end
 
@@ -61,8 +63,8 @@
 
 @interface ASCollectionViewTestDelegate : NSObject <ASCollectionDataSource, ASCollectionDelegate, UICollectionViewDelegateFlowLayout>
 
-@property (nonatomic, assign) NSInteger sectionGeneration;
-@property (nonatomic, copy) void(^willBeginBatchFetch)(ASBatchContext *);
+@property (nonatomic) NSInteger sectionGeneration;
+@property (nonatomic) void(^willBeginBatchFetch)(ASBatchContext *);
 
 @end
 
@@ -137,9 +139,9 @@
 
 @interface ASCollectionViewTestController: UIViewController
 
-@property (nonatomic, strong) ASCollectionViewTestDelegate *asyncDelegate;
-@property (nonatomic, strong) ASCollectionView *collectionView;
-@property (nonatomic, strong) ASCollectionNode *collectionNode;
+@property (nonatomic) ASCollectionViewTestDelegate *asyncDelegate;
+@property (nonatomic) ASCollectionView *collectionView;
+@property (nonatomic) ASCollectionNode *collectionNode;
 
 @end
 
@@ -860,6 +862,7 @@
   [cn waitUntilAllUpdatesAreProcessed];
   [cn.view layoutIfNeeded];
   ASCellNode *node = [cn nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  ASCATransactionQueueWait(nil);
   XCTAssertTrue(node.visible);
   testController.asyncDelegate->_itemCounts = {0};
   [cn deleteItemsAtIndexPaths: @[[NSIndexPath indexPathForItem:0 inSection:0]]];
@@ -1047,7 +1050,7 @@
   window.rootViewController = testController;
 
   [window makeKeyAndVisible];
-  // Trigger the initial reload to start
+  // Trigger the initial reload to start 
   [window layoutIfNeeded];
 
   // Test the APIs that monitor ASCollectionNode update handling
@@ -1071,6 +1074,7 @@
       for (NSInteger i = 0; i < c; i++) {
         NSIndexPath *ip = [NSIndexPath indexPathForItem:i inSection:s];
         ASCellNode *node = [cn nodeForItemAtIndexPath:ip];
+        ASCATransactionQueueWait(nil);
         if (node.inPreloadState) {
           CGRect frame = [cn.view layoutAttributesForItemAtIndexPath:ip].frame;
           r = CGRectUnion(r, frame);
@@ -1097,7 +1101,7 @@
   [window layoutIfNeeded];
   
   // The initial reload is async, changing the trait collection here should be "mid-update"
-  ASPrimitiveTraitCollection traitCollection;
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
   traitCollection.displayScale = cn.primitiveTraitCollection.displayScale + 1; // Just a dummy change
   traitCollection.containerSize = screenBounds.size;
   cn.primitiveTraitCollection = traitCollection;

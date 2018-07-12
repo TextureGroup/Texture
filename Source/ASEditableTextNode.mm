@@ -31,14 +31,14 @@
 **/
 @interface _ASTextInputTraitsPendingState : NSObject
 
-@property (nonatomic, readwrite, assign) UITextAutocapitalizationType autocapitalizationType;
-@property (nonatomic, readwrite, assign) UITextAutocorrectionType autocorrectionType;
-@property (nonatomic, readwrite, assign) UITextSpellCheckingType spellCheckingType;
-@property (nonatomic, readwrite, assign) UIKeyboardAppearance keyboardAppearance;
-@property (nonatomic, readwrite, assign) UIKeyboardType keyboardType;
-@property (nonatomic, readwrite, assign) UIReturnKeyType returnKeyType;
-@property (nonatomic, readwrite, assign) BOOL enablesReturnKeyAutomatically;
-@property (nonatomic, readwrite, assign, getter=isSecureTextEntry) BOOL secureTextEntry;
+@property UITextAutocapitalizationType autocapitalizationType;
+@property UITextAutocorrectionType autocorrectionType;
+@property UITextSpellCheckingType spellCheckingType;
+@property UIKeyboardAppearance keyboardAppearance;
+@property UIKeyboardType keyboardType;
+@property UIReturnKeyType returnKeyType;
+@property BOOL enablesReturnKeyAutomatically;
+@property (getter=isSecureTextEntry) BOOL secureTextEntry;
 
 @end
 
@@ -142,7 +142,7 @@
   NSRange _previousSelectedRange;
 }
 
-@property (nonatomic, strong, readonly) _ASTextInputTraitsPendingState *textInputTraits;
+@property (nonatomic, readonly) _ASTextInputTraitsPendingState *textInputTraits;
 
 @end
 

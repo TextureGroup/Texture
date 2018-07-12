@@ -20,6 +20,7 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
@@ -165,10 +166,10 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription
 {
-  auto result = [NSMutableArray<NSDictionary *> array];
+  let result = [NSMutableArray<NSDictionary *> array];
   if (NSArray *children = self.children) {
     // Use tiny descriptions because these trees can get nested very deep.
-    auto tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
+    let tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
     [result addObject:@{ @"children": tinyDescriptions }];
   }
   return result;
@@ -259,13 +260,15 @@ ASLayoutElementStyleExtensibilityForwarding
   return result;
 }
 
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
+
 @end
 
 #pragma mark - ASWrapperLayoutSpec
 
 @implementation ASWrapperLayoutSpec
 
-+ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement
++ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithLayoutElement:layoutElement];
 }
@@ -279,7 +282,7 @@ ASLayoutElementStyleExtensibilityForwarding
   return self;
 }
 
-+ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements
++ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements NS_RETURNS_RETAINED
 {
   return [[self alloc] initWithLayoutElements:layoutElements];
 }
