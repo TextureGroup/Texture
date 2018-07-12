@@ -1040,10 +1040,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
-    __instanceLock__.unlock();
-    [self _u_measureNodeWithBoundsIfNecessary:bounds];
-    __instanceLock__.lock();
-
+    {
+      ASDN::MutexUnlocker u(__instanceLock__);
+      [self _u_measureNodeWithBoundsIfNecessary:bounds];
+    }
+    
     [self _locked_layoutPlaceholderIfNecessary];
   }
   
