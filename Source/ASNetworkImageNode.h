@@ -57,6 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, weak) id<ASNetworkImageNodeDelegate> delegate;
 
 /**
+ * The delegate will receive callbacks on main thread. Default to YES.
+ */
+@property (class) BOOL delegateCallbacksOnMainThread;
+
+/**
  * The image to display.
  *
  * @discussion By setting an image to the image property the ASNetworkImageNode will act like a plain ASImageNode.
@@ -166,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param image The newly-loaded image.
  *
- * @discussion Called on a main queue.
+ * @discussion Called on a main thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage: instead.");
 
@@ -185,7 +190,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param error The error with details.
  *
- * @discussion Called on a main queue.
+ * @discussion Called on a main thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error ASDISPLAYNODE_DEPRECATED_MSG("Please use didFailFetchingWithError: instead.");
 
@@ -207,16 +212,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Called on a background queue.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didFetchImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
-
-/**
- * Notification that the image node finished downloading an image.
- *
- * @param imageNode The sender.
- * @param image The newly-loaded image.
- *
- * @discussion Called on a background queue.
- */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didFetchImage:(UIImage *)image;
 
 /**
  * Notification that the image node failed to download the image.
