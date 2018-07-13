@@ -111,11 +111,6 @@ static BOOL _delegateCallbacksOnMainThread = YES;
   _shouldRenderProgressImages = YES;
   self.shouldBypassEnsureDisplay = YES;
 
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    [self class].delegateCallbacksOnMainThread = YES;
-  });
-
   return self;
 }
 
@@ -313,8 +308,6 @@ static BOOL _delegateCallbacksOnMainThread = YES;
   _delegateFlags.delegateDidFinishDecoding = [delegate respondsToSelector:@selector(imageNodeDidFinishDecoding:)];
   _delegateFlags.delegateDidLoadImage = [delegate respondsToSelector:@selector(imageNode:didLoadImage:)];
   _delegateFlags.delegateDidLoadImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImage:info:)];
-  _delegateFlags.delegateDidFailFetchingWithError = [delegate respondsToSelector:@selector(imageNode:didFailFetchingWithError:)];
-  _delegateFlags.delegateDidFetchImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didFetchImage:info:)];
 }
 
 - (id<ASNetworkImageNodeDelegate>)delegate
@@ -360,26 +353,13 @@ static BOOL _delegateCallbacksOnMainThread = YES;
         _imageLoaded = YES;
         
         // Call out to the delegate.
-        if (ASNetworkImageNode.delegateCallbacksOnMainThread && _delegateFlags.delegateDidLoadImageWithInfo) {
+        if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
           [_delegate imageNode:self didLoadImage:result info:info];
-#pragma clang diagnostic pop
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
           [_delegate imageNode:self didLoadImage:result];
-#pragma clang diagnostic pop
-        }
-
-        // Call out to the delegate.
-        if (!ASNetworkImageNode.delegateCallbacksOnMainThread && _delegateFlags.delegateDidFetchImageWithInfo) {
-          ASUnlockScope(self);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
-          [_delegate imageNode:self didFetchImage:result info:info];
         }
       }
     }
@@ -694,28 +674,13 @@ static BOOL _delegateCallbacksOnMainThread = YES;
         _imageLoaded = YES;
 
         [self _setCurrentImageQuality:1.0];
-        if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
-          if (_delegateFlags.delegateDidLoadImageWithInfo) {
-            ASUnlockScope(self);
-            auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [delegate imageNode:self didLoadImage:self.image info:info];
-  #pragma clang diagnostic pop
-          } else if (_delegateFlags.delegateDidLoadImage) {
-            ASUnlockScope(self);
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            [delegate imageNode:self didLoadImage:self.image];
-  #pragma clang diagnostic pop
-          }
-        } else {
-          // Call out to the delegate.
-          if (_delegateFlags.delegateDidFetchImageWithInfo) {
-            ASUnlockScope(self);
-            auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
-            [_delegate imageNode:self didFetchImage:self.image info:info];
-          }
+        if (_delegateFlags.delegateDidLoadImageWithInfo) {
+          ASUnlockScope(self);
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          [delegate imageNode:self didLoadImage:self.image info:info];
+        } else if (_delegateFlags.delegateDidLoadImage) {
+          ASUnlockScope(self);
+          [delegate imageNode:self didLoadImage:self.image];
         }
       });
     } else {
@@ -763,43 +728,21 @@ static BOOL _delegateCallbacksOnMainThread = YES;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
 
-          if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
-            if (newImage) {
-              if (_delegateFlags.delegateDidLoadImageWithInfo) {
-                calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-                  auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                  [delegate imageNode:strongSelf didLoadImage:newImage info:info];
-  #pragma clang diagnostic pop
-                };
-              } else if (_delegateFlags.delegateDidLoadImage) {
-                calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                  [delegate imageNode:strongSelf didLoadImage:newImage];
-  #pragma clang diagnostic pop
-                };
-              }
-            } else if (error && _delegateFlags.delegateDidFailWithError) {
-              calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [delegate imageNode:strongSelf didFailWithError:error];
-  #pragma clang diagnostic pop
-              };
-            }
-          } else { // !ASNetworkImageNode.delegateCallbacksOnMainThread
-            if (newImage && _delegateFlags.delegateDidFetchImageWithInfo) {
+          if (newImage) {
+            if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
-                [delegate imageNode:strongSelf didFetchImage:newImage info:info];
+                [delegate imageNode:strongSelf didLoadImage:newImage info:info];
               };
-            } else if (error && _delegateFlags.delegateDidFailFetchingWithError) {
+            } else if (_delegateFlags.delegateDidLoadImage) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-                [delegate imageNode:strongSelf didFailFetchingWithError:error];
+                [delegate imageNode:strongSelf didLoadImage:newImage];
               };
             }
+          } else if (error && _delegateFlags.delegateDidFailWithError) {
+            calloutBlock = ^(ASNetworkImageNode *strongSelf) {
+              [delegate imageNode:strongSelf didFailWithError:error];
+            };
           }
 
           if (calloutBlock) {

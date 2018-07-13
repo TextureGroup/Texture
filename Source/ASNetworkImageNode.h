@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on a main queue.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage:info: instead.");
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
 
 /**
  * Notification that the image node finished downloading an image.
@@ -173,7 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on a main thread.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image ASDISPLAYNODE_DEPRECATED_MSG("Please use didFetchImage:info: instead.");
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image;
 
 /**
  * Notification that the image node started to load
@@ -192,7 +192,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on a main thread.
  */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error ASDISPLAYNODE_DEPRECATED_MSG("Please use didFailFetchingWithError: instead.");
+- (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error;
 
 /**
  * Notification that the image node finished decoding an image.
@@ -200,28 +200,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  */
 - (void)imageNodeDidFinishDecoding:(ASNetworkImageNode *)imageNode;
-
-/**
- * Notification that the image node finished downloading an image, with additional info.
- * If implemented, this method will be called instead of `imageNode:didFetchImage:`.
- *
- * @param imageNode The sender.
- * @param image The newly-loaded image.
- * @param info Additional information about the image load.
- *
- * @discussion Called on a background queue.
- */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didFetchImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
-
-/**
- * Notification that the image node failed to download the image.
- *
- * @param imageNode The sender.
- * @param error The error with details.
- *
- * @discussion Called on a background queue.
- */
-- (void)imageNode:(ASNetworkImageNode *)imageNode didFailFetchingWithError:(NSError *)error;
 
 @end
 
