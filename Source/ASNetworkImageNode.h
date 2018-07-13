@@ -161,7 +161,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param image The newly-loaded image.
  * @param info Additional information about the image load.
  *
- * @discussion Called on a main queue.
+ * @discussion Called on the main thread if delegateCallbacksOnMainThread=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
 
@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param image The newly-loaded image.
  *
- * @discussion Called on a main thread.
+ * @discussion Called on the main thread if delegateCallbacksOnMainThread=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image;
 

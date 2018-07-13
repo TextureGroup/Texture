@@ -61,8 +61,6 @@
     unsigned int delegateDidFinishDecoding:1;
     unsigned int delegateDidLoadImage:1;
     unsigned int delegateDidLoadImageWithInfo:1;
-    unsigned int delegateDidFailFetchingWithError:1;
-    unsigned int delegateDidFetchImageWithInfo:1;
   } _delegateFlags;
 
   
@@ -674,6 +672,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
         _imageLoaded = YES;
 
         [self _setCurrentImageQuality:1.0];
+
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
@@ -744,7 +743,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
               [delegate imageNode:strongSelf didFailWithError:error];
             };
           }
-
+          
           if (calloutBlock) {
             if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
               ASPerformBlockOnMainThread(^{
