@@ -66,7 +66,7 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 };
 
 // Can be called without the node's lock. Client is responsible for thread safety.
-#define _loaded(node) (node->_view != nil || (node->_layer != nil && node->_flags.layerBacked))
+#define _loaded(node) (node->_layer != nil)
 
 #define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
 // Returns the old value of the flag as a BOOL.
