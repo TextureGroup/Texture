@@ -16,6 +16,9 @@
 //
 
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
+
+#if AS_USE_PHOTOS
+
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 NSString *const ASPhotosURLScheme = @"ph";
@@ -160,3 +163,5 @@ static NSString *const _ASPhotosURLQueryKeyCropHeight = @"crop_h";
 }
 
 @end
+
+#endif // AS_USE_PHOTOS

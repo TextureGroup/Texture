@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASMultiplexImageNode.h>
 
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS && AS_USE_ASSETS_LIBRARY
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
 
@@ -25,11 +25,14 @@
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
+
+#if AS_USE_PHOTOS
+#import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
+#endif
 
 #if AS_PIN_REMOTE_IMAGE
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
@@ -39,7 +42,9 @@
 
 NSString *const ASMultiplexImageNodeErrorDomain = @"ASMultiplexImageNodeErrorDomain";
 
+#if AS_USE_ASSETS_LIBRARY
 static NSString *const kAssetsLibraryURLScheme = @"assets-library";
+#endif
 
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
@@ -133,7 +138,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
  */
 - (void)_fetchImageWithIdentifierFromCache:(id)imageIdentifier URL:(NSURL *)imageURL completion:(void (^)(UIImage *image))completionBlock;
 
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS && AS_USE_ASSETS_LIBRARY
 /**
   @abstract Loads the image corresponding to the given assetURL from the device's Assets Library.
   @param imageIdentifier The identifier for the image to be loaded. May not be nil.
@@ -143,6 +148,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)_loadALAssetWithIdentifier:(id)imageIdentifier URL:(NSURL *)assetURL completion:(void (^)(UIImage *image, NSError *error))completionBlock;
 #endif
 
+#if AS_USE_PHOTOS
 /**
   @abstract Loads the image corresponding to the given image request from the Photos framework.
   @param imageIdentifier The identifier for the image to be loaded. May not be nil.
@@ -150,6 +156,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   @param completionBlock The block to be performed when the image has been loaded, if possible. May not be nil.
  */
 - (void)_loadPHAssetWithRequest:(ASPhotosFrameworkImageRequest *)request identifier:(id)imageIdentifier completion:(void (^)(UIImage *image, NSError *error))completionBlock API_AVAILABLE(ios(8.0), tvos(10.0));
+#endif
 
 /**
  @abstract Downloads the image corresponding to the given imageIdentifier from the given URL.
@@ -620,7 +627,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     return;
   }
 
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS && AS_USE_ASSETS_LIBRARY
   // If it's an assets-library URL, we need to fetch it from the assets library.
   if ([[nextImageURL scheme] isEqualToString:kAssetsLibraryURLScheme]) {
     // Load the asset.
@@ -633,6 +640,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   }
 #endif
   
+#if AS_USE_PHOTOS
   if (AS_AVAILABLE_IOS_TVOS(9, 10)) {
     // Likewise, if it's a Photos asset, we need to fetch it accordingly.
     if (ASPhotosFrameworkImageRequest *request = [ASPhotosFrameworkImageRequest requestWithURL:nextImageURL]) {
@@ -644,6 +652,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
       return;
     }
   }
+#endif
   
   // Otherwise, it's a web URL that we can download.
   // First, check the cache.
@@ -677,7 +686,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     }];
   }];
 }
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS && AS_USE_ASSETS_LIBRARY
 - (void)_loadALAssetWithIdentifier:(id)imageIdentifier URL:(NSURL *)assetURL completion:(void (^)(UIImage *image, NSError *error))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
@@ -702,6 +711,8 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 #pragma clang diagnostic pop
 }
 #endif
+
+#if AS_USE_PHOTOS
 - (void)_loadPHAssetWithRequest:(ASPhotosFrameworkImageRequest *)request identifier:(id)imageIdentifier completion:(void (^)(UIImage *image, NSError *error))completionBlock
 {
   ASDisplayNodeAssertNotNil(imageIdentifier, @"imageIdentifier is required");
@@ -789,6 +800,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   _phImageRequestOperation = newImageRequestOp;
   [phImageRequestQueue addOperation:newImageRequestOp];
 }
+#endif
 
 - (void)_fetchImageWithIdentifierFromCache:(id)imageIdentifier URL:(NSURL *)imageURL completion:(void (^)(UIImage *image))completionBlock
 {
@@ -892,6 +904,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 @end
 
+#if AS_USE_PHOTOS
 @implementation NSURL (ASPhotosFrameworkURLs)
 
 + (NSURL *)URLWithAssetLocalIdentifier:(NSString *)assetLocalIdentifier targetSize:(CGSize)targetSize contentMode:(PHImageContentMode)contentMode options:(PHImageRequestOptions *)options NS_RETURNS_RETAINED
@@ -904,3 +917,4 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 }
 
 @end
+#endif
