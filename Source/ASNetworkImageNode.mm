@@ -353,7 +353,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
           [_delegate imageNode:self didLoadImage:result info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -675,7 +675,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
 
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:self.image info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -726,11 +726,11 @@ static BOOL _delegateCallbacksOnMainThread = YES;
           strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
-          
+
           if (newImage) {
             if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-                auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+                let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
               };
             } else if (_delegateFlags.delegateDidLoadImage) {
