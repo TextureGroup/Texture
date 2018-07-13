@@ -2415,6 +2415,77 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASSizeRangeMake(CGSizeMake(100, 100))], NSException, NSInternalInconsistencyException);
 }
 
+- (void)testThatStackSpecOrdersSubnodesCorrectlyRandomness
+{
+  // This test ensures that the z-order of nodes matches the stack spec, including after several random relayouts / transitions.
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+
+  DeclareNodeNamed(a);
+  DeclareNodeNamed(b);
+  DeclareNodeNamed(c);
+  DeclareNodeNamed(d);
+  DeclareNodeNamed(e);
+  DeclareNodeNamed(f);
+  DeclareNodeNamed(g);
+  DeclareNodeNamed(h);
+  DeclareNodeNamed(i);
+  DeclareNodeNamed(j);
+
+  NSMutableArray *allNodes = [@[a, b, c, d, e, f, g, h, i, j] mutableCopy];
+  NSArray *testPrevious = @[];
+  NSArray __block *testPending = @[];
+
+  int len1 = 1 + arc4random_uniform(9);
+  for (NSUInteger n = 0; n < len1; n++) { // shuffle and add
+    [allNodes exchangeObjectAtIndex:n withObjectAtIndex:n + arc4random_uniform(10 - (uint32_t) n)];
+    testPrevious = [testPrevious arrayByAddingObject:allNodes[n]];
+  }
+
+  __block NSUInteger testCount = 0;
+  node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange size) {
+    ASStackLayoutSpec *stack = [ASStackLayoutSpec verticalStackLayoutSpec];
+
+    if (testCount++ == 0) {
+      stack.children = testPrevious;
+    }
+    else {
+      testPending = @[];
+      int len2 = 1 + arc4random_uniform(9);
+      for (NSUInteger n = 0; n < len2; n++) { // shuffle and add
+        [allNodes exchangeObjectAtIndex:n withObjectAtIndex:n + arc4random_uniform(10 - (uint32_t) n)];
+        testPending = [testPending arrayByAddingObject:allNodes[n]];
+      }
+      stack.children = testPending;
+    }
+
+    return stack;
+  };
+
+  ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
+  [node.view layoutIfNeeded];
+
+  // Because automaticallyManagesSubnodes is used, the subnodes array is constructed from the layout spec's children.
+  NSString *expected = [[testPrevious valueForKey:@"debugName"] componentsJoinedByString:@","];
+  XCTAssert([node.subnodes isEqualToArray:testPrevious], @"subnodes: %@, array: %@", node.subnodes, testPrevious);
+  XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+          expected, @"Initial order");
+
+  for (NSUInteger n = 0; n < 25; n++) {
+    [node invalidateCalculatedLayout];
+    [node.view setNeedsLayout];
+    [node.view layoutIfNeeded];
+
+
+    XCTAssert([node.subnodes isEqualToArray:testPending], @"subnodes: %@, array: %@", node.subnodes, testPending);
+    expected = [[testPending valueForKey:@"debugName"] componentsJoinedByString:@","];
+
+    XCTAssertEqualObjects(orderStringFromSubnodes(node), expected, @"Incorrect node order for Random order #%ld", (unsigned long) n);
+    XCTAssertEqualObjects(orderStringFromSubviews(node.view), expected, @"Incorrect subviews for Random order #%ld", (unsigned long) n);
+    XCTAssertEqualObjects(orderStringFromSublayers(node.layer), expected, @"Incorrect sublayers for Random order #%ld", (unsigned long) n);
+  }
+}
+
 - (void)testThatStackSpecOrdersSubnodesCorrectly
 {
   // This test ensures that the z-order of nodes matches the stack spec, including after relayout / transition.
@@ -2425,14 +2496,26 @@ static bool stringContainsPointer(NSString *description, id p) {
   DeclareNodeNamed(b);
   DeclareNodeNamed(c);
   DeclareNodeNamed(d);
+  DeclareNodeNamed(e);
 
   NSArray *nodesForwardOrder = @[a, b, c, d];
   NSArray *nodesReverseOrder = @[d, c, b, a];
+  NSArray *addAndMoveOrder = @[a, b, e, d, c];
   __block BOOL flipItemOrder = NO;
 
+  __block NSUInteger testCount = 0;
   node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange size) {
     ASStackLayoutSpec *stack = [ASStackLayoutSpec verticalStackLayoutSpec];
-    stack.children = flipItemOrder ? nodesReverseOrder : nodesForwardOrder;
+    switch(testCount) {
+      case 0:
+        stack.children = nodesForwardOrder; break;
+      case 1:
+        stack.children = nodesReverseOrder; break;
+      case 2:
+      default:
+        stack.children = addAndMoveOrder; break;
+    }
+    testCount++;
     return stack;
   };
 
@@ -2446,13 +2529,22 @@ static bool stringContainsPointer(NSString *description, id p) {
 
   flipItemOrder = YES;
   [node invalidateCalculatedLayout];
+  [node.view setNeedsLayout];
   [node.view layoutIfNeeded];
 
   // In this case, it's critical that the items are in the new order so that event handling and apparent z-position are correct.
   // FIXME: The reversal case is not currently passing.
-  // XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
-  // XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
-  //                                          @"d,c,b,a", @"Reverse order");
+   XCTAssert([node.subnodes isEqualToArray:nodesReverseOrder], @"subnodes: %@, array: %@", node.subnodes, nodesReverseOrder);
+   XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+                                            @"d,c,b,a", @"Reverse order");
+
+  [node invalidateCalculatedLayout];
+  [node.view setNeedsLayout];
+  [node.view layoutIfNeeded];
+  XCTAssert([node.subnodes isEqualToArray:addAndMoveOrder], @"subnodes: %@, array: %@", node.subnodes, addAndMoveOrder);
+  XCTAssertNodeSubnodeSubviewSublayerOrder(node, YES /* isLoaded */, NO /* isLayerBacked */,
+          @"a,b,e,d,c", @"AddAndMove order");
+
 }
 
 - (void)testThatOverlaySpecOrdersSubnodesCorrectly
