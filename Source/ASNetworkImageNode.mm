@@ -85,7 +85,7 @@
 
 @implementation ASNetworkImageNode
 
-static BOOL _delegateCallbacksOnMainThread = YES;
+static BOOL _useMainThreadDelegateCallbacks = YES;
 
 @dynamic image;
 
@@ -428,12 +428,14 @@ static BOOL _delegateCallbacksOnMainThread = YES;
   [self _lazilyLoadImageIfNecessary];
 }
 
-+ (void)setDelegateCallbacksOnMainThread:(BOOL)delegateCallbacksOnMainThread {
-  _delegateCallbacksOnMainThread = delegateCallbacksOnMainThread;
++ (void)setUseMainThreadDelegateCallbacks:(BOOL)useMainThreadDelegateCallbacks
+{
+  _useMainThreadDelegateCallbacks = useMainThreadDelegateCallbacks;
 }
 
-+ (BOOL)delegateCallbacksOnMainThread {
-  return _delegateCallbacksOnMainThread;
++ (BOOL)useMainThreadDelegateCallbacks
+{
+  return _useMainThreadDelegateCallbacks;
 }
 
 #pragma mark - Progress
@@ -726,7 +728,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
           strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
-
+          
           if (newImage) {
             if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
@@ -745,7 +747,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
           }
           
           if (calloutBlock) {
-            if (ASNetworkImageNode.delegateCallbacksOnMainThread) {
+            if (ASNetworkImageNode.useMainThreadDelegateCallbacks) {
               ASPerformBlockOnMainThread(^{
                 if (auto strongSelf = weakSelf) {
                   calloutBlock(strongSelf);
