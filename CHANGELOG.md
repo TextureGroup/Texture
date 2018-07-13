@@ -1,6 +1,7 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread [Max Wang](https://github.com/wsdwsd0829) [#1007](https://github.com/TextureGroup/Texture/pull/1007)
+- [ASLayoutTransition] Add support for preserving order after node moves during transitions. (This order defines the z-order as well.) [Kevin Smith](https://github.com/wiseoldduck) [#1006]
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
 - [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)
 - Make `ASPerformMainThreadDeallocation` visible in C. [Adlai Holler](https://github.com/Adlai-Holler)
@@ -18,6 +19,7 @@
 - Properly consider node for responder methods [Michael Schneider](https://github.com/maicki) 
 - [IGListKit] Adds missing UIScrollViewDelegate method to DataSource proxy [Sergey Pronin](https://github.com/wannabehero) 
 - Fix misleading/scary stack trace shown when an assertion occurs during node measurement [Huy Nguyen](https://github.com/nguyenhuy) [#1022](https://github.com/TextureGroup/Texture/pull/1022)
+- Fix build on 32-bit simulator in Xcode 9.3 and later, caused by `Thread-local storage is not supported on this architecture.` [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)

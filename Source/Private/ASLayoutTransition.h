@@ -85,9 +85,10 @@ AS_SUBCLASSING_RESTRICTED
 - (void)commitTransition;
 
 /**
- * Insert all new subnodes that were added between the previous layout and the pending layout
+ * Insert all new subnodes that were added and move the subnodes that moved between the previous layout and
+ * the pending layout.
  */
-- (void)applySubnodeInsertions;
+- (void)applySubnodeInsertionsAndMoves;
 
 /**
  * Remove all subnodes that are removed between the previous layout and the pending layout

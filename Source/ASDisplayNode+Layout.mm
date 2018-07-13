@@ -685,7 +685,7 @@ ASLayoutElementStyleExtensibilityForwarding
       }
       
       // Apply the subnode insertion immediately to be able to animate the nodes
-      [pendingLayoutTransition applySubnodeInsertions];
+      [pendingLayoutTransition applySubnodeInsertionsAndMoves];
       
       // Kick off animating the layout transition
       {

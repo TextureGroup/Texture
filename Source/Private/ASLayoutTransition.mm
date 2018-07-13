@@ -25,10 +25,11 @@
 #import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
-#import <memory>
 
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
+#if AS_IG_LIST_KIT
+#import <IGListKit/IGListKit.h>
+#import <AsyncDisplayKit/ASLayout+IGListKit.h>
+#endif
 
 /**
  * Search the whole layout stack if at least one layout has a layoutElement object that can not be layed out asynchronous.
@@ -66,7 +67,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   NSArray<ASDisplayNode *> *_insertedSubnodes;
   NSArray<ASDisplayNode *> *_removedSubnodes;
   std::vector<NSUInteger> _insertedSubnodePositions;
-  std::vector<NSUInteger> _removedSubnodePositions;
+  std::vector<std::pair<ASDisplayNode *, NSUInteger>> _subnodeMoves;
 }
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
@@ -98,27 +99,44 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)commitTransition
 {
-  [self applySubnodeInsertions];
   [self applySubnodeRemovals];
+  [self applySubnodeInsertionsAndMoves];
 }
 
-- (void)applySubnodeInsertions
+- (void)applySubnodeInsertionsAndMoves
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   
   // Create an activity even if no subnodes affected.
-  as_activity_create_for_scope("Apply subnode insertions");
-  if (_insertedSubnodes.count == 0) {
+  as_activity_create_for_scope("Apply subnode insertions and moves");
+  if (_insertedSubnodePositions.size() == 0 && _subnodeMoves.size() == 0) {
     return;
   }
 
   ASDisplayNodeLogEvent(_node, @"insertSubnodes: %@", _insertedSubnodes);
   NSUInteger i = 0;
-  for (ASDisplayNode *node in _insertedSubnodes) {
+  NSUInteger j = 0;
+  for (auto const &move : _subnodeMoves) {
+    [move.first _removeFromSupernodeIfEqualTo:_node];
+  }
+  j = 0;
+  while (i < _insertedSubnodePositions.size() && j < _subnodeMoves.size()) {
     NSUInteger p = _insertedSubnodePositions[i];
-    [_node _insertSubnode:node atIndex:p];
-    i += 1;
+    NSUInteger q = _subnodeMoves[j].second;
+    if (p < q) {
+      [_node _insertSubnode:_insertedSubnodes[i] atIndex:p];
+      i++;
+    } else {
+      [_node _insertSubnode:_subnodeMoves[j].first atIndex:q];
+      j++;
+    }
+  }
+  for (; i < _insertedSubnodePositions.size(); ++i) {
+    [_node _insertSubnode:_insertedSubnodes[i] atIndex:_insertedSubnodePositions[i]];
+  }
+  for (; j < _subnodeMoves.size(); ++j) {
+    [_node _insertSubnode:_subnodeMoves[j].first atIndex:_subnodeMoves[j].second];
   }
 }
 
@@ -156,23 +174,42 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   ASLayout *pendingLayout = _pendingLayout->layout;
 
   if (previousLayout) {
+#if AS_IG_LIST_KIT
+    // IGListDiff completes in linear time O(m+n), so use it if we have it:
+    IGListIndexSetResult *result = IGListDiff(previousLayout.sublayouts, pendingLayout.sublayouts, IGListDiffEquality);
+    _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
+    findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
+    for (IGListMoveIndex *move in result.moves) {
+      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[move.from].layoutElement, move.to));
+    }
+
+    // Sort by ascending order of move destinations, this will allow easy loop of `insertSubnode:AtIndex` later.
+    std::sort(_subnodeMoves.begin(), _subnodeMoves.end(), [](std::pair<id<ASLayoutElement>, NSUInteger> a,
+            std::pair<ASDisplayNode *, NSUInteger> b) {
+      return a.second < b.second;
+    });
+#else
     NSIndexSet *insertions, *deletions;
-    [previousLayout.sublayouts asdk_diffWithArray:pendingLayout.sublayouts
+    NSArray<NSIndexPath *> *moves;
+    NSArray<ASDisplayNode *> *previousNodes = [previousLayout.sublayouts valueForKey:@"layoutElement"];
+    NSArray<ASDisplayNode *> *pendingNodes = [pendingLayout.sublayouts valueForKey:@"layoutElement"];
+    [previousNodes asdk_diffWithArray:pendingNodes
                                        insertions:&insertions
                                         deletions:&deletions
-                                     compareBlock:^BOOL(ASLayout *lhs, ASLayout *rhs) {
-                                       return ASObjectIsEqual(lhs.layoutElement, rhs.layoutElement);
-                                     }];
+                                            moves:&moves];
+
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, insertions, &_insertedSubnodes);
-    _removedSubnodePositions = findNodesInLayoutAtIndexesWithFilteredNodes(previousLayout,
-                                                                           deletions,
-                                                                           _insertedSubnodes,
-                                                                           &_removedSubnodes);
+    _removedSubnodes = [previousNodes objectsAtIndexes:deletions];
+    // These should arrive sorted in ascending order of move destinations.
+    for (NSIndexPath *move in moves) {
+      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
+              [move indexAtPosition:1]));
+    }
+#endif
   } else {
     NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [pendingLayout.sublayouts count])];
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, indexes, &_insertedSubnodes);
     _removedSubnodes = nil;
-    _removedSubnodePositions.clear();
   }
   _calculatedSubnodeOperations = YES;
 }
@@ -254,7 +291,7 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNode
   for (ASLayout *sublayout in layout.sublayouts) {
     if (idx > lastIndex) { break; }
     if (idx >= firstIndex && [indexes containsIndex:idx]) {
-      ASDisplayNode *node = (ASDisplayNode *)sublayout.layoutElement;
+      ASDisplayNode *node = (ASDisplayNode *) sublayout.layoutElement;
       ASDisplayNodeCAssert(node, @"ASDisplayNode was deallocated before it was added to a subnode. It's likely the case that you use automatically manages subnodes and allocate a ASDisplayNode in layoutSpecThatFits: and don't have any strong reference to it.");
       // Ignore the odd case in which a non-node sublayout is accessed and the type cast fails
       if (node != nil) {
