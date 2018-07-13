@@ -26,6 +26,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
 #import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
@@ -182,6 +183,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 {
   [super displayWillStartAsynchronously:asynchronously];
   _displayWillStartCount++;
+}
+
+- (CALayer *__strong (*)[NUM_CLIP_CORNER_LAYERS])clipCornerLayers
+{
+  return &self->_clipCornerLayers;
 }
 
 @end
@@ -2686,6 +2692,18 @@ static bool stringContainsPointer(NSString *description, id p) {
 {
   ASSynchronousTestDisplayNodeViaLayerClass *node = [[ASSynchronousTestDisplayNodeViaLayerClass alloc] init];
   XCTAssertTrue([node isSynchronous], @"Node should be synchronous if viewClass is ovewritten and not a subclass of _ASDisplayView");
+}
+
+- (void)testCornerRoundingTypeClippingRoundedCornersIsUsingASDisplayNodeCornerLayerDelegate
+{
+  ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
+  node.cornerRoundingType = ASCornerRoundingTypeClipping;
+  node.cornerRadius = 10.0;
+  auto l = node.clipCornerLayers;
+  for (int i = 0; i < NUM_CLIP_CORNER_LAYERS; i++) {
+    CALayer *cornerLayer = (*l)[i];
+    XCTAssertTrue([cornerLayer.delegate isKindOfClass:[ASDisplayNodeCornerLayerDelegate class]], @"");
+  }
 }
 
 @end
