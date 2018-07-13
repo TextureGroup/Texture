@@ -65,6 +65,9 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
   YogaLayoutInProgress = 1 << 1,
 };
 
+// Can be called without the node's lock. Client is responsible for thread safety.
+#define _loaded(node) (node->_layer != nil)
+
 #define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
 // Returns the old value of the flag as a BOOL.
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \

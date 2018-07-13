@@ -108,13 +108,13 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * Enable this flag to collect information on the owning thread and ownership level of a mutex.
  * These properties are useful to determine if a mutext has been acquired and in case of a recursive mutex, how many times that happened.
  * 
- * This flag also enable locking assertions (e.g ASDisplayNodeAssertLockUnownedByCurrentThread(node)).
+ * This flag also enable locking assertions (e.g ASAssertUnlocked(node)).
  * The assertions are useful when you want to indicate and enforce the locking policy/expectation of methods.
  * To determine when and which methods acquired a (recursive) mutex (to debug deadlocks, for example),
  * put breakpoints at some assertions. When the breakpoints hit, walk through stack trace frames 
  * and check ownership count of the mutex.
  */
-#define CHECK_LOCKING_SAFETY 0
+#define CHECK_LOCKING_SAFETY 1
 
 #if TIME_LOCKER
 #import <QuartzCore/QuartzCore.h>
@@ -138,11 +138,11 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * and check ownership count of the mutex.
  */
 #if CHECK_LOCKING_SAFETY
-#define ASDisplayNodeAssertLockUnownedByCurrentThread(lock) ASDisplayNodeAssertFalse(lock.ownedByCurrentThread())
-#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock) ASDisplayNodeAssert(lock.ownedByCurrentThread())
+#define ASAssertUnlocked(lock) ASDisplayNodeAssertFalse(lock.locked())
+#define ASAssertLocked(lock) ASDisplayNodeAssert(lock.locked(), @"Lock must be held by current thread")
 #else
-#define ASDisplayNodeAssertLockUnownedByCurrentThread(lock)
-#define ASDisplayNodeAssertLockOwnedByCurrentThread(lock)
+#define ASAssertUnlocked(lock)
+#define ASAssertLocked(lock)
 #endif
 
 namespace ASDN {
@@ -346,7 +346,7 @@ namespace ASDN {
     pthread_mutex_t *mutex () { return &_m; }
 
 #if CHECK_LOCKING_SAFETY
-    bool ownedByCurrentThread() {
+    bool locked() {
       return _count > 0 && pthread_mach_thread_np(pthread_self()) == _owner;
     }
 #endif

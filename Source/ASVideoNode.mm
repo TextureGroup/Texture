@@ -338,6 +338,7 @@ static NSString * const kRate = @"rate";
         if (self.playerState != ASVideoNodePlayerStatePlaying) {
           self.playerState = ASVideoNodePlayerStateReadyToPlay;
           if (_shouldBePlaying && ASInterfaceStateIncludesVisible(self.interfaceState)) {
+            ASUnlockScope(self);
             [self play];
           }
         }
@@ -360,6 +361,8 @@ static NSString * const kRate = @"rate";
         if (self.playerState == ASVideoNodePlayerStateLoading && _delegateFlags.delegateVideoNodeDidRecoverFromStall) {
           [self.delegate videoNodeDidRecoverFromStall:self];
         }
+        
+        ASUnlockScope(self);
         [self play]; // autoresume after buffer catches up
       }
     } else if ([keyPath isEqualToString:kplaybackBufferEmpty]) {

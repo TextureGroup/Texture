@@ -19,6 +19,7 @@
 - [IGListKit] Adds missing UIScrollViewDelegate method to DataSource proxy [Sergey Pronin](https://github.com/wannabehero) 
 - Fix misleading/scary stack trace shown when an assertion occurs during node measurement [Huy Nguyen](https://github.com/nguyenhuy) [#1022](https://github.com/TextureGroup/Texture/pull/1022)
 - Fix build on 32-bit simulator in Xcode 9.3 and later, caused by `Thread-local storage is not supported on this architecture.` [Adlai Holler](https://github.com/Adlai-Holler)
+- Enable locking assertions (and add some more) to improve and enforce locking safety within the framework [Huy Nguyen](https://github.com/nguyenhuy) [#1024](https://github.com/TextureGroup/Texture/pull/1024)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)

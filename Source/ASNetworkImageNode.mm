@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
@@ -149,6 +150,8 @@
 
 - (void)_locked_setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
+  
   BOOL imageWasSetExternally = (image != nil);
   BOOL shouldCancelAndClear = imageWasSetExternally && (imageWasSetExternally != _imageWasSetExternally);
   _imageWasSetExternally = imageWasSetExternally;
@@ -175,6 +178,7 @@
 
 - (void)_locked__setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
   [super _locked_setImage:image];
 }
 
@@ -508,6 +512,8 @@
 
 - (void)_locked_cancelDownloadAndClearImageWithResumePossibility:(BOOL)storeResume
 {
+  ASAssertLocked(__instanceLock__);
+  
   [self _locked_cancelImageDownloadWithResumePossibility:storeResume];
   
   [self _locked_setAnimatedImage:nil];
@@ -532,6 +538,8 @@
 
 - (void)_locked_cancelImageDownloadWithResumePossibility:(BOOL)storeResume
 {
+  ASAssertLocked(__instanceLock__);
+  
   if (!_downloadIdentifier) {
     return;
   }
