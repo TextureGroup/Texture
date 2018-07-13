@@ -190,7 +190,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param error The error with details.
  *
- * @discussion Called on a main thread.
+ * @discussion Called on the main thread if delegateCallbacksOnMainThread=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error;
 

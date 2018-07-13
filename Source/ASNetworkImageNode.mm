@@ -726,7 +726,7 @@ static BOOL _delegateCallbacksOnMainThread = YES;
           strongSelf->_cacheSentinel++;
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
-
+          
           if (newImage) {
             if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
