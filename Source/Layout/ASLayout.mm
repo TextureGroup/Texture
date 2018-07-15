@@ -376,7 +376,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, const ASSizeRange sizeRange, const CGSize parentSize)
 {
-  ASDisplayNodeCAssertNotNil(layoutElement, @"Not valid layoutElement passed in.");
+  NSCParameterAssert(layoutElement != nil);
   
   return [layoutElement layoutThatFits:sizeRange parentSize:parentSize];
 }
