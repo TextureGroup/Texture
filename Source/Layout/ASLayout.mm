@@ -107,7 +107,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     _layoutElementType = layoutElement.layoutElementType;
     
     if (!ASIsCGSizeValidForSize(size)) {
-      ASDisplayNodeAssert(NO, @"layoutSize is invalid and unsafe to provide to Core Animation! Release configurations will force to 0, 0.  Size = %@, node = %@", NSStringFromCGSize(size), layoutElement);
+      ASDisplayNodeFailAssert(@"layoutSize is invalid and unsafe to provide to Core Animation! Release configurations will force to 0, 0.  Size = %@, node = %@", NSStringFromCGSize(size), layoutElement);
       size = CGSizeZero;
     } else {
       size = CGSizeMake(ASCeilPixelValue(size.width), ASCeilPixelValue(size.height));
