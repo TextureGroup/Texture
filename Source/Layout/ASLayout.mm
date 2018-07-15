@@ -95,7 +95,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   
   self = [super init];
   if (self) {
-#if DEBUG
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
     for (ASLayout *sublayout in sublayouts) {
       ASDisplayNodeAssert(ASPointIsNull(sublayout.position) == NO, @"Invalid position is not allowed in sublayout.");
     }
