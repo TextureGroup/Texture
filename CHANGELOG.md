@@ -21,6 +21,7 @@
 - Fix build on 32-bit simulator in Xcode 9.3 and later, caused by `Thread-local storage is not supported on this architecture.` [Adlai Holler](https://github.com/Adlai-Holler)
 - Enable locking assertions (and add some more) to improve and enforce locking safety within the framework [Huy Nguyen](https://github.com/nguyenhuy) [#1024](https://github.com/TextureGroup/Texture/pull/1024)
 - Split MapKit, Photos, and AssetsLibrary dependent code into separate subspecs to improve binary size and start time when they're not needed. The default subspec includes all three for backwards compatibility, but this **will change in 3.0**. When using non-Cocoapods build environments, define `AS_USE_PHOTOS, AS_USE_MAPKIT, AS_USE_ASSETS_LIBRARY` to 1 respectively to signal their use. [Adlai Holler](https://github.com/Adlai-Holler)
+- Optimization: Removed an NSMutableArray in flattened layouts. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
