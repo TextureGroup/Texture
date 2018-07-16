@@ -21,7 +21,7 @@
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
-  return nil;
+  return (id)kCFNull;
 }
 
 @end
