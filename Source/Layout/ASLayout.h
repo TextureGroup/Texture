@@ -149,15 +149,9 @@ AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const AS
 
 /**
  * Set to YES to tell all ASLayout instances to retain their sublayout elements. Defaults to NO.
- * Can be overridden at instance level.
+ * See `-retainSublayoutElements` to control this per-instance.
  */
-+ (void)setShouldRetainSublayoutLayoutElements:(BOOL)shouldRetain;
-
-/**
- * Whether or not ASLayout instances should retain their sublayout elements.
- * Can be overridden at instance level.
- */
-+ (BOOL)shouldRetainSublayoutLayoutElements;
+@property (class) BOOL shouldRetainSublayoutElements;
 
 /**
  * Recrusively output the description of the layout tree.
