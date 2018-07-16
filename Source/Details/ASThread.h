@@ -106,7 +106,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #define TIME_LOCKER 0
 /**
  * Enable this flag to collect information on the owning thread and ownership level of a mutex.
- * These properties are useful to determine if a mutext has been acquired and in case of a recursive mutex, how many times that happened.
+ * These properties are useful to determine if a mutex has been acquired and in case of a recursive mutex, how many times that happened.
  * 
  * This flag also enable locking assertions (e.g ASAssertUnlocked(node)).
  * The assertions are useful when you want to indicate and enforce the locking policy/expectation of methods.
@@ -114,7 +114,11 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
  * put breakpoints at some assertions. When the breakpoints hit, walk through stack trace frames 
  * and check ownership count of the mutex.
  */
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
 #define CHECK_LOCKING_SAFETY 1
+#else
+#define CHECK_LOCKING_SAFETY 0
+#endif
 
 #if TIME_LOCKER
 #import <QuartzCore/QuartzCore.h>
