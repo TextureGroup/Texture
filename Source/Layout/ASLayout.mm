@@ -134,6 +134,12 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   return self;
 }
 
+- (instancetype)init
+{
+  ASDisplayNodeAssert(NO, @"Use the designated initializer");
+  return [self init];
+}
+
 #pragma mark - Class Constructors
 
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
