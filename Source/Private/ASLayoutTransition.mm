@@ -85,12 +85,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   return self;
 }
 
-- (instancetype)init
-{
-  ASDisplayNodeAssert(NO, @"Use the designated initializer");
-  return [self init];
-}
-
 - (BOOL)isSynchronous
 {
   ASDN::MutexSharedLocker l(__instanceLock__);

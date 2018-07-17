@@ -95,11 +95,8 @@ AS_SUBCLASSING_RESTRICTED
  */
 - (void)applySubnodeRemovals;
 
-@end
-
-@interface ASLayoutTransition (Unavailable)
-
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)new NS_UNAVAILABLE;
 
 @end
 
