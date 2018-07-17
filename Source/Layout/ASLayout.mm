@@ -172,7 +172,10 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 {
   if (_retainSublayoutElements.load()) {
     for (ASLayout *sublayout in _sublayouts) {
-      CFRelease((__bridge CFTypeRef)sublayout);
+      // We retained this, so there's no risk of it deallocating on us.
+      if (let cfElement = (__bridge CFTypeRef)sublayout->_layoutElement) {
+        CFRelease(cfElement);
+      }
     }
   }
 }
@@ -186,7 +189,8 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   }
   
   for (ASLayout *sublayout in _sublayouts) {
-    CFRetain((__bridge CFTypeRef)sublayout->_layoutElement);
+    // CFBridgingRetain atomically casts and retains. We need the atomicity.
+    CFBridgingRetain(sublayout->_layoutElement);
   }
 }
 
