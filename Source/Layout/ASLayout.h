@@ -130,16 +130,14 @@ AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const AS
  */
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
+
 /**
  * Traverses the existing layout tree and generates a new tree that represents only ASDisplayNode layouts
  */
 - (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
-@end
-
-@interface ASLayout (Unavailable)
-
 - (instancetype)init NS_UNAVAILABLE;
+- (instancetype)new NS_UNAVAILABLE;
 
 @end
 
@@ -149,15 +147,11 @@ AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const AS
 
 /**
  * Set to YES to tell all ASLayout instances to retain their sublayout elements. Defaults to NO.
- * Can be overridden at instance level.
+ * See `-retainSublayoutLayoutElements` to control this per-instance.
+ *
+ * Note: Weaver relies on this API.
  */
-+ (void)setShouldRetainSublayoutLayoutElements:(BOOL)shouldRetain;
-
-/**
- * Whether or not ASLayout instances should retain their sublayout elements.
- * Can be overridden at instance level.
- */
-+ (BOOL)shouldRetainSublayoutLayoutElements;
+@property (class) BOOL shouldRetainSublayoutLayoutElements;
 
 /**
  * Recrusively output the description of the layout tree.

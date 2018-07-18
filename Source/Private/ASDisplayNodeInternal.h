@@ -65,6 +65,9 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
   YogaLayoutInProgress = 1 << 1,
 };
 
+// Can be called without the node's lock. Client is responsible for thread safety.
+#define _loaded(node) (node->_layer != nil)
+
 #define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
 // Returns the old value of the flag as a BOOL.
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
@@ -77,6 +80,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 #define VISIBILITY_NOTIFICATIONS_DISABLED_BITS 4
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
+
+#define NUM_CLIP_CORNER_LAYERS 4
 
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
@@ -183,7 +188,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   
   CGFloat _cornerRadius;
   ASCornerRoundingType _cornerRoundingType;
-  CALayer *_clipCornerLayers[4];
+  CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;

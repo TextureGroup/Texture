@@ -41,8 +41,6 @@
 
 #define DISPLAYNODE_USE_LOCKS 1
 
-#define __loaded(node) (node->_view != nil || (node->_layer != nil && node->_flags.layerBacked))
-
 #if DISPLAYNODE_USE_LOCKS
 #define _bridge_prologue_read ASDN::MutexLocker l(__instanceLock__); ASDisplayNodeAssertThreadAffinity(self)
 #define _bridge_prologue_write ASDN::MutexLocker l(__instanceLock__)
@@ -59,7 +57,7 @@
 /// returns NO. Otherwise, the pending state can be scheduled and flushed *before* you get a chance
 /// to apply it.
 ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNode *node) {
-  BOOL loaded = __loaded(node);
+  BOOL loaded = _loaded(node);
   if (ASDisplayNodeThreadIsMain()) {
     return loaded;
   } else {
@@ -70,7 +68,7 @@ ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNo
   }
 };
 
-#define _getFromViewOrLayer(layerProperty, viewAndPendingViewStateProperty) __loaded(self) ? \
+#define _getFromViewOrLayer(layerProperty, viewAndPendingViewStateProperty) _loaded(self) ? \
   (_view ? _view.viewAndPendingViewStateProperty : _layer.layerProperty )\
  : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 
@@ -80,9 +78,9 @@ ASDISPLAYNODE_INLINE BOOL ASDisplayNodeShouldApplyBridgedWriteToView(ASDisplayNo
 #define _setToViewOnly(viewAndPendingViewStateProperty, viewAndPendingViewStateExpr) BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self); \
 if (shouldApply) { _view.viewAndPendingViewStateProperty = (viewAndPendingViewStateExpr); } else { ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty = (viewAndPendingViewStateExpr); }
 
-#define _getFromViewOnly(viewAndPendingViewStateProperty) __loaded(self) ? _view.viewAndPendingViewStateProperty : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
+#define _getFromViewOnly(viewAndPendingViewStateProperty) _loaded(self) ? _view.viewAndPendingViewStateProperty : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 
-#define _getFromLayer(layerProperty) __loaded(self) ? _layer.layerProperty : ASDisplayNodeGetPendingState(self).layerProperty
+#define _getFromLayer(layerProperty) _loaded(self) ? _layer.layerProperty : ASDisplayNodeGetPendingState(self).layerProperty
 
 #define _setToLayer(layerProperty, layerValueExpr) BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self); \
 if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNodeGetPendingState(self).layerProperty = (layerValueExpr); }
@@ -304,7 +302,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   struct ASDisplayNodeFlags flags = _flags;
   BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
 
-  BOOL nodeLoaded = __loaded(self);
+  BOOL nodeLoaded = _loaded(self);
   BOOL isMainThread = ASDisplayNodeThreadIsMain();
   if (!specialPropertiesHandling) {
     BOOL canReadProperties = isMainThread || !nodeLoaded;
@@ -416,7 +414,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-    loaded = __loaded(self);
+    loaded = _loaded(self);
     viewOrLayer = _view ?: _layer;
     if (shouldApply == NO && loaded) {
       // The node is loaded but we're not on main.
@@ -447,7 +445,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
     shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-    loaded = __loaded(self);
+    loaded = _loaded(self);
     viewOrLayer = _view ?: _layer;
     if (shouldApply == NO && loaded) {
       // The node is loaded but we're not on main.
@@ -658,7 +656,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIViewContentMode)contentMode
 {
   _bridge_prologue_read;
-  if (__loaded(self)) {
+  if (_loaded(self)) {
     if (_flags.layerBacked) {
       return ASDisplayNodeUIContentModeFromCAContentsGravity(_layer.contentsGravity);
     } else {
@@ -909,7 +907,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _bridge_prologue_read;
 
   if (AS_AVAILABLE_IOS(11.0)) {
-    if (!_flags.layerBacked && __loaded(self)) {
+    if (!_flags.layerBacked && _loaded(self)) {
       return self.view.safeAreaInsets;
     }
   }
@@ -938,7 +936,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       }
     }
 
-    shouldNotifyAboutUpdate = __loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
+    shouldNotifyAboutUpdate = _loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
   }
 
   if (shouldNotifyAboutUpdate) {
@@ -975,6 +973,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
+  ASAssertLocked(__instanceLock__);
   if (AS_AVAILABLE_IOS(11.0)) {
     if (!_flags.layerBacked) {
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
@@ -996,7 +995,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 // - In case the node is loaded
 //  - Check if the node has a view and get the value from the view if loaded or from the pending state
 //  - If view is not available, e.g. the node is layer backed return the property value
-#define _getAccessibilityFromViewOrProperty(nodeProperty, viewAndPendingViewStateProperty) __loaded(self) ? \
+#define _getAccessibilityFromViewOrProperty(nodeProperty, viewAndPendingViewStateProperty) _loaded(self) ? \
 (_view ? _view.viewAndPendingViewStateProperty : nodeProperty )\
 : ASDisplayNodeGetPendingState(self).viewAndPendingViewStateProperty
 

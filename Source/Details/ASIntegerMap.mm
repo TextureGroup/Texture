@@ -157,7 +157,7 @@
     // { 1->2 3->4 5->6 }
     NSMutableString *str = [NSMutableString string];
     for (let &e : _map) {
-      [str appendFormat:@" %zd->%zd", e.first, e.second];
+      [str appendFormat:@" %ld->%ld", (long)e.first, (long)e.second];
     }
     // Remove leading space
     if (str.length > 0) {

@@ -15,10 +15,9 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
-
-#if TARGET_OS_IOS
 #import <AsyncDisplayKit/ASMapNode.h>
+
+#if TARGET_OS_IOS && AS_USE_MAPKIT
 
 #import <tgmath.h>
 
@@ -448,4 +447,4 @@
 }
 
 @end
-#endif
+#endif // TARGET_OS_IOS && AS_USE_MAPKIT

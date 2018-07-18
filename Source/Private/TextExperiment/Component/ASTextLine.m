@@ -153,7 +153,7 @@
 - (NSString *)description {
   NSMutableString *desc = @"".mutableCopy;
   NSRange range = self.range;
-  [desc appendFormat:@"<ASTextLine: %p> row:%zd range:%tu,%tu",self, self.row, range.location, range.length];
+  [desc appendFormat:@"<ASTextLine: %p> row:%ld range:%tu,%tu", self, (long)self.row, range.location, range.length];
   [desc appendFormat:@" position:%@",NSStringFromCGPoint(self.position)];
   [desc appendFormat:@" bounds:%@",NSStringFromCGRect(self.bounds)];
   return desc;

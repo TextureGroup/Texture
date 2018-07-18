@@ -25,6 +25,18 @@
   #define AS_TLS_AVAILABLE 1
 #endif
 
+#ifndef AS_USE_PHOTOS
+# define AS_USE_PHOTOS 0
+#endif
+
+#ifndef AS_USE_MAPKIT
+# define AS_USE_MAPKIT 0
+#endif
+
+#ifndef AS_USE_ASSETS_LIBRARY
+# define AS_USE_ASSETS_LIBRARY 0
+#endif
+
 #ifndef kCFCoreFoundationVersionNumber_iOS_10_0
   #define kCFCoreFoundationVersionNumber_iOS_10_0 1348.00
 #endif

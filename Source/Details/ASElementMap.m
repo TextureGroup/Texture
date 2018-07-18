@@ -244,7 +244,7 @@
   NSInteger sectionCount = _sectionsOfItems.count;
   if (section >= sectionCount || section < 0) {
     if (assert) {
-      ASDisplayNodeFailAssert(@"Invalid section index %zd when there are only %zd sections!", section, sectionCount);
+      ASDisplayNodeFailAssert(@"Invalid section index %ld when there are only %ld sections!", (long)section, (long)sectionCount);
     }
     return NO;
   } else {
@@ -272,7 +272,7 @@
   NSInteger item = indexPath.item;
   if (item >= itemCount || item < 0) {
     if (assert) {
-      ASDisplayNodeFailAssert(@"Invalid item index %zd in section %zd which only has %zd items!", item, section, itemCount);
+      ASDisplayNodeFailAssert(@"Invalid item index %ld in section %ld which only has %ld items!", (long)item, (long)section, (long)itemCount);
     }
     return NO;
   }

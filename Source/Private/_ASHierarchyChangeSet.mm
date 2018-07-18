@@ -536,7 +536,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   NSInteger deletedSectionCount = _deletedSections.count;
   // Assert that the new section count is correct.
   if (newSectionCount != oldSectionCount + insertedSectionCount - deletedSectionCount) {
-    ASFailUpdateValidation(@"Invalid number of sections. The number of sections after the update (%zd) must be equal to the number of sections before the update (%zd) plus or minus the number of sections inserted or deleted (%tu inserted, %tu deleted)", newSectionCount, oldSectionCount, insertedSectionCount, deletedSectionCount);
+    ASFailUpdateValidation(@"Invalid number of sections. The number of sections after the update (%ld) must be equal to the number of sections before the update (%ld) plus or minus the number of sections inserted or deleted (%ld inserted, %ld deleted)", (long)newSectionCount, (long)oldSectionCount, (long)insertedSectionCount, (long)deletedSectionCount);
     return;
   }
   
@@ -548,7 +548,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     invalidSectionDelete = [_deletedSections indexGreaterThanIndex:oldSectionCount - 1];
   }
   if (invalidSectionDelete != NSNotFound) {
-    ASFailUpdateValidation(@"Attempt to delete section %zd but there are only %zd sections before the update.", invalidSectionDelete, oldSectionCount);
+    ASFailUpdateValidation(@"Attempt to delete section %ld but there are only %ld sections before the update.", (long)invalidSectionDelete, (long)oldSectionCount);
     return;
   }
   
@@ -558,14 +558,14 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
       NSInteger section = indexPath.section;
       NSInteger item = indexPath.item;
       if (section >= oldSectionCount) {
-        ASFailUpdateValidation(@"Attempt to delete item %zd from section %zd, but there are only %zd sections before the update.", item, section, oldSectionCount);
+        ASFailUpdateValidation(@"Attempt to delete item %ld from section %ld, but there are only %ld sections before the update.", (long)item, (long)section, (long)oldSectionCount);
         return;
       }
       
       // Assert that item delete happened to a valid item.
       NSInteger oldItemCount = _oldItemCounts[section];
       if (item >= oldItemCount) {
-        ASFailUpdateValidation(@"Attempt to delete item %zd from section %zd, which only contains %zd items before the update.", item, section, oldItemCount);
+        ASFailUpdateValidation(@"Attempt to delete item %ld from section %ld, which only contains %ld items before the update.", (long)item, (long)section, (long)oldItemCount);
         return;
       }
     }
@@ -577,14 +577,14 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
       NSInteger item = indexPath.item;
       // Assert that item insert happened in a valid section.
       if (section >= newSectionCount) {
-        ASFailUpdateValidation(@"Attempt to insert item %zd into section %zd, but there are only %zd sections after the update.", item, section, newSectionCount);
+        ASFailUpdateValidation(@"Attempt to insert item %ld into section %ld, but there are only %ld sections after the update.", (long)item, (long)section, (long)newSectionCount);
         return;
       }
       
       // Assert that item delete happened to a valid item.
       NSInteger newItemCount = _newItemCounts[section];
       if (item >= newItemCount) {
-        ASFailUpdateValidation(@"Attempt to insert item %zd into section %zd, which only contains %zd items after the update.", item, section, newItemCount);
+        ASFailUpdateValidation(@"Attempt to insert item %ld into section %ld, which only contains %ld items after the update.", (long)item, (long)section, (long)newItemCount);
         return;
       }
     }
@@ -598,7 +598,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     invalidSectionInsert = [_insertedSections indexGreaterThanIndex:newSectionCount - 1];
   }
   if (invalidSectionInsert != NSNotFound) {
-    ASFailUpdateValidation(@"Attempt to insert section %zd but there are only %zd sections after the update.", invalidSectionInsert, newSectionCount);
+    ASFailUpdateValidation(@"Attempt to insert section %ld but there are only %ld sections after the update.", (long)invalidSectionInsert, (long)newSectionCount);
     return;
   }
   
@@ -631,7 +631,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     NSInteger insertedItemCount = originalInsertedItems.count;
     NSInteger deletedItemCount = originalDeletedItems.count;
     if (newItemCount != oldItemCount + insertedItemCount - deletedItemCount) {
-      ASFailUpdateValidation(@"Invalid number of items in section %zd. The number of items after the update (%zd) must be equal to the number of items before the update (%zd) plus or minus the number of items inserted or deleted (%zd inserted, %zd deleted).", oldSection, newItemCount, oldItemCount, insertedItemCount, deletedItemCount);
+      ASFailUpdateValidation(@"Invalid number of items in section %ld. The number of items after the update (%ld) must be equal to the number of items before the update (%ld) plus or minus the number of items inserted or deleted (%ld inserted, %ld deleted).", (long)oldSection, (long)newItemCount, (long)oldItemCount, (long)insertedItemCount, (long)deletedItemCount);
       return;
     }
   }
