@@ -81,6 +81,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
 
+#define NUM_CLIP_CORNER_LAYERS 4
+
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
 @package
@@ -186,7 +188,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   
   CGFloat _cornerRadius;
   ASCornerRoundingType _cornerRoundingType;
-  CALayer *_clipCornerLayers[4];
+  CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;

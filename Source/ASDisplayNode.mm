@@ -35,6 +35,7 @@
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -1642,7 +1643,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   }
   
   CGSize boundsSize = self.bounds.size;
-  for (int idx = 0; idx < 4; idx++) {
+  for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
     BOOL isTop   = (idx == 0 || idx == 1);
     BOOL isRight = (idx == 1 || idx == 2);
     if (_clipCornerLayers[idx]) {
@@ -1656,7 +1657,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
 - (void)_updateClipCornerLayerContentsWithRadius:(CGFloat)radius backgroundColor:(UIColor *)backgroundColor
 {
   ASPerformBlockOnMainThread(^{
-    for (int idx = 0; idx < 4; idx++) {
+    for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
       // Layers are, in order: Top Left, Top Right, Bottom Right, Bottom Left.
       // anchorPoint is Bottom Left at 0,0 and Top Right at 1,1.
       BOOL isTop   = (idx == 0 || idx == 1);
@@ -1693,16 +1694,21 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   ASPerformBlockOnMainThread(^{
     ASDisplayNodeAssertMainThread();
     if (visible) {
-      for (int idx = 0; idx < 4; idx++) {
+      for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
         if (_clipCornerLayers[idx] == nil) {
+          static ASDisplayNodeCornerLayerDelegate *clipCornerLayers;
+          static dispatch_once_t onceToken;
+          dispatch_once(&onceToken, ^{
+            clipCornerLayers = [[ASDisplayNodeCornerLayerDelegate alloc] init];
+          });
           _clipCornerLayers[idx] = [[CALayer alloc] init];
           _clipCornerLayers[idx].zPosition = 99999;
-          _clipCornerLayers[idx].delegate = self;
+          _clipCornerLayers[idx].delegate = clipCornerLayers;
         }
       }
       [self _updateClipCornerLayerContentsWithRadius:_cornerRadius backgroundColor:self.backgroundColor];
     } else {
-      for (int idx = 0; idx < 4; idx++) {
+      for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
         [_clipCornerLayers[idx] removeFromSuperlayer];
         _clipCornerLayers[idx] = nil;
       }
