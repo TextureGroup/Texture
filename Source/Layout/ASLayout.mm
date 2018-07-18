@@ -63,9 +63,6 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsDisplayNodeType(ASLayo
   std::atomic_bool _retainSublayoutElements;
 }
 
-/// Call this to keep sublayout elements alive. Multiple calls have no effect.
-- (void)retainSublayoutElements;
-
 @property (nonatomic, readonly) ASRectMap *elementToRectMap;
 
 @end
