@@ -85,7 +85,7 @@
 
 @implementation ASNetworkImageNode
 
-static BOOL _useMainThreadDelegateCallbacks = YES;
+static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
 @dynamic image;
 
