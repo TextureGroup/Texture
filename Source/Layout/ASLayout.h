@@ -130,16 +130,14 @@ AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const AS
  */
 + (instancetype)layoutWithLayoutElement:(id<ASLayoutElement>)layoutElement
                                    size:(CGSize)size NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
+
 /**
  * Traverses the existing layout tree and generates a new tree that represents only ASDisplayNode layouts
  */
 - (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
-@end
-
-@interface ASLayout (Unavailable)
-
 - (instancetype)init NS_UNAVAILABLE;
+- (instancetype)new NS_UNAVAILABLE;
 
 @end
 
