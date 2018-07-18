@@ -150,6 +150,8 @@ AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const AS
 /**
  * Set to YES to tell all ASLayout instances to retain their sublayout elements. Defaults to NO.
  * See `-retainSublayoutLayoutElements` to control this per-instance.
+ *
+ * Note: Weaver relies on this API.
  */
 @property (class) BOOL shouldRetainSublayoutLayoutElements;
 
