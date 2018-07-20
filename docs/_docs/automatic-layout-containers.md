@@ -10,7 +10,7 @@ Texture includes a library of `layoutSpec` components that can be composed to de
 
 The **child(ren) of a layoutSpec may be a node, a layoutSpec or a combination of the two types.**  In the below image, an `ASStackLayoutSpec` (vertical) containing a text node and an image node, is wrapped in another `ASStackLayoutSpec` (horizontal) with another text node. 
 
-<img src="/static/images/layoutable-types.png">
+<img src="http://texturegroup.org/static/images/layoutable-types.png">
 
 Both nodes and layoutSpecs conform to the `<ASLayoutable>` protocol.  Any `ASLayoutable` object may be the child of a layoutSpec. <a href = "automatic-layout-containers.html#aslayoutable-properties">ASLayoutable properties</a> may be applied to `ASLayoutable` objects to create complex UI designs. 
 
@@ -184,7 +184,7 @@ An overlay spec requires the underlay object (object to which the overlay item w
 
 An inset spec requires its object to have an intrinsic size. It adds the inset padding to this size to calculate the final size of the inset spec. 
 
-<img src="/static/images/overlay-vs-inset-spec.png">
+<img src="http://texturegroup.org/static/images/overlay-vs-inset-spec.png">
 
 ### Best Practices
   - Texture layout is called on a background thread. Do not access the device screen bounds, or any other UIKit methods in `layoutSpecThatFits:`.
