@@ -321,22 +321,21 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 - (void)removeControls
 {
-  ASLockScope(self);
-  
-  // Grab the cached controls for removing it
-  NSMutableDictionary *cachedControls = [_cachedControls copy];
-
+  NSMutableDictionary *cachedControls = nil;
   {
-    ASUnlockScope(self);
-    for (ASDisplayNode *node in [cachedControls objectEnumerator]) {
-      [node removeFromSupernode];
-    }
+    ASLockScope(self);
+  
+    // Grab the cached controls for removing it
+    cachedControls = [_cachedControls copy];
+    [self _locked_cleanCachedControls];
   }
 
-  [self __locked_cleanCachedControls];
+  for (ASDisplayNode *node in [cachedControls objectEnumerator]) {
+    [node removeFromSupernode];
+  }
 }
 
-- (void)__locked_cleanCachedControls
+- (void)_locked_cleanCachedControls
 {
   [_cachedControls removeAllObjects];
 
@@ -669,11 +668,12 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
       
       return spinnnerView;
     }];
-    
     _spinnerNode.style.preferredSize = CGSizeMake(44.0, 44.0);
+    
+    let spinnerNode = _spinnerNode;
     {
       ASUnlockScope(self);
-      [self addSubnode:_spinnerNode];
+      [self addSubnode:spinnerNode];
       [self setNeedsLayout];
     }
   }
@@ -682,16 +682,18 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 - (void)removeSpinner
 {
-  ASLockScopeSelf();
-
-  if (!_spinnerNode) {
-    return;
-  }
+  ASDisplayNode *spinnerNode = nil;
   {
-    ASUnlockScope(self);
-    [_spinnerNode removeFromSupernode];
+    ASLockScopeSelf();
+    if (!_spinnerNode) {
+      return;
+    }
+    
+    spinnerNode = _spinnerNode;
+    _spinnerNode = nil;
   }
-  _spinnerNode = nil;
+
+  [spinnerNode removeFromSupernode];
 }
 
 - (void)didTapPlaybackButton:(ASControlNode*)node
