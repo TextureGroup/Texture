@@ -209,10 +209,8 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 - (void)didLoad
 {
   [super didLoad];
-  {
-    ASLockScopeSelf();
-    [self createControls];
-  }
+  
+  [self createControls];
 }
 
 - (void)didEnterPreloadState
@@ -284,14 +282,22 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
     if (_delegateFlags.delegateCustomControls && _delegateFlags.delegateLayoutSpecForControls) {
       NSDictionary *customControls = [_delegate videoPlayerNodeCustomControls:self];
+      std::vector<ASDisplayNode *> subnodes;
       for (id key in customControls) {
         id node = customControls[key];
         if (![node isKindOfClass:[ASDisplayNode class]]) {
           continue;
         }
 
-        [self addSubnode:node];
+        subnodes.push_back(node);
         [_cachedControls setObject:node forKey:key];
+      }
+      
+      {
+        ASUnlockScope(self);
+        for (var subnode : subnodes) {
+          [self addSubnode:subnode];
+        }
       }
     }
   }
@@ -315,14 +321,21 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 - (void)removeControls
 {
-  for (ASDisplayNode *node in [_cachedControls objectEnumerator]) {
-    [node removeFromSupernode];
+  NSMutableDictionary *cachedControls = nil;
+  {
+    ASLockScope(self);
+  
+    // Grab the cached controls for removing it
+    cachedControls = [_cachedControls copy];
+    [self _locked_cleanCachedControls];
   }
 
-  [self cleanCachedControls];
+  for (ASDisplayNode *node in [cachedControls objectEnumerator]) {
+    [node removeFromSupernode];
+  }
 }
 
-- (void)cleanCachedControls
+- (void)_locked_cleanCachedControls
 {
   [_cachedControls removeAllObjects];
 
@@ -355,7 +368,10 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     [_cachedControls setObject:_playbackButtonNode forKey:@(ASVideoPlayerNodeControlTypePlaybackButton)];
   }
 
-  [self addSubnode:_playbackButtonNode];
+  {
+    ASUnlockScope(self);
+    [self addSubnode:_playbackButtonNode];
+  }
 }
 
 - (void)_locked_createFullScreenButton
@@ -374,7 +390,10 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     [_cachedControls setObject:_fullScreenButtonNode forKey:@(ASVideoPlayerNodeControlTypeFullScreenButton)];
   }
   
-  [self addSubnode:_fullScreenButtonNode];
+  {
+    ASUnlockScope(self);
+    [self addSubnode:_fullScreenButtonNode];
+  }
 }
 
 - (void)_locked_createElapsedTextField
@@ -389,7 +408,10 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
     [_cachedControls setObject:_elapsedTextNode forKey:@(ASVideoPlayerNodeControlTypeElapsedText)];
   }
-  [self addSubnode:_elapsedTextNode];
+  {
+    ASUnlockScope(self);
+    [self addSubnode:_elapsedTextNode];
+  }
 }
 
 - (void)_locked_createDurationTextField
@@ -405,7 +427,10 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     [_cachedControls setObject:_durationTextNode forKey:@(ASVideoPlayerNodeControlTypeDurationText)];
   }
   [self updateDurationTimeLabel];
-  [self addSubnode:_durationTextNode];
+  {
+    ASUnlockScope(self);
+    [self addSubnode:_durationTextNode];
+  }
 }
 
 - (void)_locked_createScrubber
@@ -450,8 +475,10 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
     [_cachedControls setObject:_scrubberNode forKey:@(ASVideoPlayerNodeControlTypeScrubber)];
   }
-
-  [self addSubnode:_scrubberNode];
+  {
+    ASUnlockScope(self);
+    [self addSubnode:_scrubberNode];
+  }
 }
 
 - (void)_locked_createControlFlexGrowSpacer
@@ -623,7 +650,6 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
   ASLockScopeSelf();
 
   if (!_spinnerNode) {
-  
     __weak __typeof__(self) weakSelf = self;
     _spinnerNode = [[ASDisplayNode alloc] initWithViewBlock:^UIView *{
       __typeof__(self) strongSelf = weakSelf;
@@ -642,24 +668,32 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
       
       return spinnnerView;
     }];
-    
     _spinnerNode.style.preferredSize = CGSizeMake(44.0, 44.0);
-
-    [self addSubnode:_spinnerNode];
-    [self setNeedsLayout];
+    
+    let spinnerNode = _spinnerNode;
+    {
+      ASUnlockScope(self);
+      [self addSubnode:spinnerNode];
+      [self setNeedsLayout];
+    }
   }
   [(UIActivityIndicatorView *)_spinnerNode.view startAnimating];
 }
 
 - (void)removeSpinner
 {
-  ASLockScopeSelf();
-
-  if (!_spinnerNode) {
-    return;
+  ASDisplayNode *spinnerNode = nil;
+  {
+    ASLockScopeSelf();
+    if (!_spinnerNode) {
+      return;
+    }
+    
+    spinnerNode = _spinnerNode;
+    _spinnerNode = nil;
   }
-  [_spinnerNode removeFromSupernode];
-  _spinnerNode = nil;
+
+  [spinnerNode removeFromSupernode];
 }
 
 - (void)didTapPlaybackButton:(ASControlNode*)node
