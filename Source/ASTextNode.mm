@@ -657,7 +657,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
 
     // Ask our delegate if a long-press on an attribute is relevant
-    if ([_delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
+    if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
       return [_delegate textNode:self
         shouldLongPressLinkAttribute:_highlightedLinkAttributeName
                                value:_highlightedLinkAttributeValue
