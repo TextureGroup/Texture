@@ -110,7 +110,7 @@
 		509E68641B3AEDB7009B9150 /* ASCollectionViewLayoutController.m in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E1C1B373A2C007741D0 /* ASCollectionViewLayoutController.m */; };
 		509E68651B3AEDC5009B9150 /* CoreGraphics+ASConvenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 205F0E1F1B376416007741D0 /* CoreGraphics+ASConvenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		509E68661B3AEDD7009B9150 /* CoreGraphics+ASConvenience.mm in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E201B376416007741D0 /* CoreGraphics+ASConvenience.mm */; };
-        636EA1A41C7FF4EC00EE152F /* NSArray+Diffing.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBC452DA1C5BF64600B16017 /* NSArray+Diffing.mm */; };
+		636EA1A41C7FF4EC00EE152F /* NSArray+Diffing.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBC452DA1C5BF64600B16017 /* NSArray+Diffing.mm */; };
 		636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */ = {isa = PBXBuildFile; fileRef = AEB7B0191C5962EA00662EF4 /* ASDefaultPlayButton.m */; };
 		680346941CE4052A0009FEB4 /* ASNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FC85DC1CE29AB700EDD713 /* ASNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68355B341CB579B9001D4E68 /* ASImageNode+AnimatedImage.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68355B2E1CB5799E001D4E68 /* ASImageNode+AnimatedImage.mm */; };

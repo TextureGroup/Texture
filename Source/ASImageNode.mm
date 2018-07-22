@@ -775,7 +775,7 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
       
       CGPathRelease(path);
     }
-    
+
     return ASGraphicsGetImageAndEndCurrentContext();
   };
 }
