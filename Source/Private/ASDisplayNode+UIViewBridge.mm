@@ -296,69 +296,77 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (void)setFrame:(CGRect)rect
 {
-  _bridge_prologue_write;
-
-  // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
-  struct ASDisplayNodeFlags flags = _flags;
-  BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
-
-  BOOL nodeLoaded = _loaded(self);
+  BOOL setToView = NO;
+  BOOL setToLayer = NO;
+  CGRect newBounds = CGRectZero;
+  CGPoint newPosition = CGPointZero;
+  BOOL nodeLoaded = NO;
   BOOL isMainThread = ASDisplayNodeThreadIsMain();
-  if (!specialPropertiesHandling) {
-    BOOL canReadProperties = isMainThread || !nodeLoaded;
-    if (canReadProperties) {
-      // We don't have to set frame directly, and we can read current properties.
-      // Compute a new bounds and position and set them on self.
-      CALayer *layer = _layer;
-      BOOL useLayer = (layer != nil);
-      CGPoint origin = (useLayer ? layer.bounds.origin : self.bounds.origin);
-      CGPoint anchorPoint = (useLayer ? layer.anchorPoint : self.anchorPoint);
+  {
+    _bridge_prologue_write;
 
-      CGRect newBounds = CGRectZero;
-      CGPoint newPosition = CGPointZero;
-      ASBoundsAndPositionForFrame(rect, origin, anchorPoint, &newBounds, &newPosition);
+    // For classes like ASTableNode, ASCollectionNode, ASScrollNode and similar - make sure UIView gets setFrame:
+    struct ASDisplayNodeFlags flags = _flags;
+    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), flags.layerBacked);
 
-      if (ASIsCGRectValidForLayout(newBounds) == NO || ASIsCGPositionValidForLayout(newPosition) == NO) {
-        ASDisplayNodeAssertNonFatal(NO, @"-[ASDisplayNode setFrame:] - The new frame (%@) is invalid and unsafe to be set.", NSStringFromCGRect(rect));
-        return;
-      }
-      
-      if (useLayer) {
-        layer.bounds = newBounds;
-        layer.position = newPosition;
+    nodeLoaded = _loaded(self);
+    if (!specialPropertiesHandling) {
+      BOOL canReadProperties = isMainThread || !nodeLoaded;
+      if (canReadProperties) {
+        // We don't have to set frame directly, and we can read current properties.
+        // Compute a new bounds and position and set them on self.
+        CALayer *layer = _layer;
+        CGPoint origin = (nodeLoaded ? layer.bounds.origin : self.bounds.origin);
+        CGPoint anchorPoint = (nodeLoaded ? layer.anchorPoint : self.anchorPoint);
+
+        ASBoundsAndPositionForFrame(rect, origin, anchorPoint, &newBounds, &newPosition);
+
+        if (ASIsCGRectValidForLayout(newBounds) == NO || ASIsCGPositionValidForLayout(newPosition) == NO) {
+          ASDisplayNodeAssertNonFatal(NO, @"-[ASDisplayNode setFrame:] - The new frame (%@) is invalid and unsafe to be set.", NSStringFromCGRect(rect));
+          return;
+        }
+
+        if (nodeLoaded) {
+          setToLayer = YES;
+        } else {
+          self.bounds = newBounds;
+          self.position = newPosition;
+        }
       } else {
-        self.bounds = newBounds;
-        self.position = newPosition;
+        // We don't have to set frame directly, but we can't read properties.
+        // Store the frame in our pending state, and it'll get decomposed into
+        // bounds and position when the pending state is applied.
+        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        if (nodeLoaded && !pendingState.hasChanges) {
+          [[ASPendingStateController sharedInstance] registerNode:self];
+        }
+        pendingState.frame = rect;
       }
     } else {
-      // We don't have to set frame directly, but we can't read properties.
-      // Store the frame in our pending state, and it'll get decomposed into
-      // bounds and position when the pending state is applied.
-      _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
-      if (nodeLoaded && !pendingState.hasChanges) {
-        [[ASPendingStateController sharedInstance] registerNode:self];
+      if (nodeLoaded && isMainThread) {
+        // We do have to set frame directly, and we're on main thread with a loaded node.
+        // Just set the frame on the view.
+        // NOTE: Frame is only defined when transform is identity because we explicitly diverge from CALayer behavior and define frame without transform.
+        setToView = YES;
+      } else {
+        // We do have to set frame directly, but either the node isn't loaded or we're on a non-main thread.
+        // Set the frame on the pending state, and it'll call setFrame: when applied.
+        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        if (nodeLoaded && !pendingState.hasChanges) {
+          [[ASPendingStateController sharedInstance] registerNode:self];
+        }
+        pendingState.frame = rect;
       }
-      pendingState.frame = rect;
     }
-  } else {
-    if (nodeLoaded && isMainThread) {
-      // We do have to set frame directly, and we're on main thread with a loaded node.
-      // Just set the frame on the view.
-      // NOTE: Frame is only defined when transform is identity because we explicitly diverge from CALayer behavior and define frame without transform.
-//#if DEBUG
-//      // Checking if the transform is identity is expensive, so disable when unnecessary. We have assertions on in Release, so DEBUG is the only way I know of.
-//      ASDisplayNodeAssert(CATransform3DIsIdentity(self.transform), @"-[ASDisplayNode setFrame:] - self.transform must be identity in order to set the frame property.  (From Apple's UIView documentation: If the transform property is not the identity transform, the value of this property is undefined and therefore should be ignored.)");
-//#endif
-      _view.frame = rect;
-    } else {
-      // We do have to set frame directly, but either the node isn't loaded or we're on a non-main thread.
-      // Set the frame on the pending state, and it'll call setFrame: when applied.
-      _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
-      if (nodeLoaded && !pendingState.hasChanges) {
-        [[ASPendingStateController sharedInstance] registerNode:self];
-      }
-      pendingState.frame = rect;
-    }
+  }
+
+  if (setToView) {
+    ASDisplayNodeAssertTrue(nodeLoaded && isMainThread);
+    _view.frame = rect;
+  } else if (setToLayer) {
+    ASDisplayNodeAssertTrue(nodeLoaded && isMainThread);
+    _layer.bounds = newBounds;
+    _layer.position = newPosition;
   }
 }
 
