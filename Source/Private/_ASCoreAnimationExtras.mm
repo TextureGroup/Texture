@@ -26,6 +26,11 @@ void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *
 
 void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
 {
+  // FIXME (https://github.com/TextureGroup/Texture/issues/1046): This method does not currently handle UIImageResizingModeTile, which is the default.
+  // See also https://developer.apple.com/documentation/uikit/uiimage/1624157-resizingmode?language=objc
+  // I'm not sure of a way to use CALayer directly to perform such tiling on the GPU, though the stretch is handled by the GPU,
+  // and CALayer.h documents the fact that contentsCenter is used to stretch the pixels.
+
   if (image) {
     ASDisplayNodeCAssert(image.resizingMode == UIImageResizingModeStretch || UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero),
                          @"Image insets must be all-zero or resizingMode has to be UIImageResizingModeStretch. XCode assets default value is UIImageResizingModeTile which is not supported by Texture because of GPU-accelerated CALayer features.");
