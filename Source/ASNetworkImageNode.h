@@ -57,6 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, weak) id<ASNetworkImageNodeDelegate> delegate;
 
 /**
+ * The delegate will receive callbacks on main thread. Default to YES.
+ */
+@property (class) BOOL useMainThreadDelegateCallbacks;
+
+/**
  * The image to display.
  *
  * @discussion By setting an image to the image property the ASNetworkImageNode will act like a plain ASImageNode.
@@ -156,7 +161,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param image The newly-loaded image.
  * @param info Additional information about the image load.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
 
@@ -166,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param image The newly-loaded image.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image;
 
@@ -185,7 +190,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param error The error with details.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error;
 

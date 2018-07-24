@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
 - [ASLayoutTransition] Add support for preserving order after node moves during transitions. (This order defines the z-order as well.) [Kevin Smith](https://github.com/wiseoldduck) [#1006]
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
 - [ASDataController] Add capability to renew supplementary views (update map) when size change from zero to non-zero.[Max Wang](https://github.com/wsdwsd0829) [#842](https://github.com/TextureGroup/Texture/pull/842)

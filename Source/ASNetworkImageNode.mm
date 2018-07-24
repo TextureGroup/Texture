@@ -86,6 +86,8 @@
 
 @implementation ASNetworkImageNode
 
+static std::atomic_bool _useMainThreadDelegateCallbacks(true);
+
 @dynamic image;
 
 - (instancetype)initWithCache:(id<ASImageCacheProtocol>)cache downloader:(id<ASImageDownloaderProtocol>)downloader
@@ -430,6 +432,16 @@
   [self _lazilyLoadImageIfNecessary];
 }
 
++ (void)setUseMainThreadDelegateCallbacks:(BOOL)useMainThreadDelegateCallbacks
+{
+  _useMainThreadDelegateCallbacks = useMainThreadDelegateCallbacks;
+}
+
++ (BOOL)useMainThreadDelegateCallbacks
+{
+  return _useMainThreadDelegateCallbacks;
+}
+
 #pragma mark - Progress
 
 - (void)handleProgressImage:(UIImage *)progressImage progress:(CGFloat)progress downloadIdentifier:(nullable id)downloadIdentifier
@@ -743,11 +755,15 @@
           }
           
           if (calloutBlock) {
-            ASPerformBlockOnMainThread(^{
-              if (let strongSelf = weakSelf) {
-                calloutBlock(strongSelf);
-              }
-            });
+            if (ASNetworkImageNode.useMainThreadDelegateCallbacks) {
+              ASPerformBlockOnMainThread(^{
+                if (auto strongSelf = weakSelf) {
+                  calloutBlock(strongSelf);
+                }
+              });
+            } else {
+              calloutBlock(self);
+            }
           }
         });
       };
