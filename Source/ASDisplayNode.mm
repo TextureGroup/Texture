@@ -24,6 +24,7 @@
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 
 #import <objc/runtime.h>
+#import <unordered_map>
 
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
@@ -111,51 +112,37 @@ _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
 }
 
 /**
- *  Returns ASDisplayNodeFlags for the given class/instance. instance MAY BE NIL.
+ *  Fetch the ASDisplayNodeFlags and ASDisplayNodeMethodOverrides for the given class.
  *
- *  @param c        the class, required
- *  @param instance the instance, which may be nil. (If so, the class is inspected instead)
- *  @remarks        The instance value is used only if we suspect the class may be dynamic (because it overloads 
- *                  +respondsToSelector: or -respondsToSelector.) In that case we use our "slow path", calling this 
- *                  method on each -init and passing the instance value. While this may seem like an unlikely scenario,
- *                  it turns our our own internal tests use a dynamic class, so it's worth capturing this edge case.
- *
- *  @return ASDisplayNode flags.
+ *  @param c         the class, required
+ *  @param flags     a ref to a flags struct that we will initialize
+ *  @param overrides a ref to an overrides field that we will initialize
  */
-static struct ASDisplayNodeFlags GetASDisplayNodeFlags(Class c, ASDisplayNode *instance)
+static void GetASDisplayNodeFlags(Class c, struct ASDisplayNodeFlags &flags, ASDisplayNodeMethodOverrides &overrides)
 {
   ASDisplayNodeCAssertNotNil(c, @"class is required");
+  static ASDN::StaticMutex lock;
+  static std::unordered_map<Class, std::pair<struct ASDisplayNodeFlags, ASDisplayNodeMethodOverrides>> map;
 
-  struct ASDisplayNodeFlags flags = {0};
+  ASDN::StaticMutexLocker locker(lock);
+  auto it = map.find(c);
+  if (it != map.cend()) {
+    auto pair = it->second;
+    flags = pair.first;
+    overrides = pair.second;
+    return;
+  }
+
+  flags = {0};
 
   flags.isInHierarchy = NO;
   flags.displaysAsynchronously = YES;
   flags.shouldAnimateSizeChanges = YES;
   flags.implementsDrawRect = ([c respondsToSelector:@selector(drawRect:withParameters:isCancelled:isRasterizing:)] ? 1 : 0);
   flags.implementsImageDisplay = ([c respondsToSelector:@selector(displayWithParameters:isCancelled:)] ? 1 : 0);
-  if (instance) {
-    flags.implementsDrawParameters = ([instance respondsToSelector:@selector(drawParametersForAsyncLayer:)] ? 1 : 0);
-  } else {
-    flags.implementsDrawParameters = ([c instancesRespondToSelector:@selector(drawParametersForAsyncLayer:)] ? 1 : 0);
-  }
-  
-  
-  return flags;
-}
 
-/**
- *  Returns ASDisplayNodeMethodOverrides for the given class
- *
- *  @param c the class, required.
- *
- *  @return ASDisplayNodeMethodOverrides.
- */
-static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
-{
-  ASDisplayNodeCAssertNotNil(c, @"class is required");
-  
-  ASDisplayNodeMethodOverrides overrides = ASDisplayNodeMethodOverrideNone;
-  
+  overrides = ASDisplayNodeMethodOverrideNone;
+
   // Handling touches
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesBegan:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesBegan;
@@ -201,12 +188,12 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     overrides |= ASDisplayNodeMethodOverrideCalcSizeThatFits;
   }
 
-  return overrides;
+  map.insert({c, {flags, overrides}});
 }
 
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
 + (void)initialize
 {
-#if ASDISPLAYNODE_ASSERTIONS_ENABLED
   if (self != [ASDisplayNode class]) {
     
     // Subclasses should never override these. Use unused to prevent warnings
@@ -222,7 +209,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     // Check if subnodes where modified during the creation of the layout
 	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
 		  NSArray *oldSubnodes = _self.subnodes;
-		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
+		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *(*)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
 		  NSArray *subnodes = _self.subnodes;
 		  ASDisplayNodeAssert(oldSubnodes.count == subnodes.count, @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
 		  for (NSInteger i = 0; i < oldSubnodes.count; i++) {
@@ -231,29 +218,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 		  return layoutElement;
 	  });
   }
-#endif
-
-  // Below we are pre-calculating values per-class and dynamically adding a method (_staticInitialize) to populate these values
-  // when each instance is constructed. These values don't change for each class, so there is significant performance benefit
-  // in doing it here. +initialize is guaranteed to be called before any instance method so it is safe to add this method here.
-  // Note that we take care to detect if the class overrides +respondsToSelector: or -respondsToSelector and take the slow path
-  // (recalculating for each instance) to make sure we are always correct.
-
-  BOOL classOverridesRespondsToSelector = ASSubclassOverridesClassSelector([NSObject class], self, @selector(respondsToSelector:));
-  BOOL instancesOverrideRespondsToSelector = ASSubclassOverridesSelector([NSObject class], self, @selector(respondsToSelector:));
-  struct ASDisplayNodeFlags flags = GetASDisplayNodeFlags(self, nil);
-  ASDisplayNodeMethodOverrides methodOverrides = GetASDisplayNodeMethodOverrides(self);
-  
-  __unused Class initializeSelf = self;
-
-  IMP staticInitialize = imp_implementationWithBlock(^(ASDisplayNode *node) {
-    ASDisplayNodeAssert(node.class == initializeSelf, @"Node class %@ does not have a matching _staticInitialize method; check to ensure [super initialize] is called within any custom +initialize implementations!  Overridden methods will not be called unless they are also implemented by superclass %@", node.class, initializeSelf);
-    node->_flags = (classOverridesRespondsToSelector || instancesOverrideRespondsToSelector) ? GetASDisplayNodeFlags(node.class, node) : flags;
-    node->_methodOverrides = (classOverridesRespondsToSelector) ? GetASDisplayNodeMethodOverrides(node.class) : methodOverrides;
-  });
-
-  class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
 }
+#endif
 
 #if !AS_INITIALIZE_FRAMEWORK_MANUALLY
 + (void)load
@@ -274,14 +240,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark - Lifecycle
 
-- (void)_staticInitialize
-{
-  ASDisplayNodeAssert(NO, @"_staticInitialize must be overridden");
-}
-
 - (void)_initializeInstance
 {
-  [self _staticInitialize];
+  GetASDisplayNodeFlags(self.class, _flags, _methodOverrides);
 
 #if ASEVENTLOG_ENABLE
   _eventLog = [[ASEventLog alloc] initWithObject:self];
@@ -1866,6 +1827,11 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 {
   // Subclass hook.
   [self displayDidFinish];
+}
+
+- (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
+{
+  return nil;
 }
 
 - (void)displayWillStart {}

@@ -25,6 +25,7 @@
 - Reduced binary size by disabling exception support (which we don't use.) [Adlai Holler](https://github.com/Adlai-Holler)
 - Create and set delegate for clip corner layers within ASDisplayNode [Michael Schneider](https://github.com/maicki) [#1029](https://github.com/TextureGroup/Texture/pull/1029)
 - Improve locking situation in ASVideoPlayerNode [Michael Schneider](https://github.com/maicki) [#1042](https://github.com/TextureGroup/Texture/pull/1042)
+- Eliminate `+[ASDisplayNode initialize]` in production, and drastically reduce its work when debugging. [Adlai Holler](https://github.com/Adlai-Holler)
 
 
 ## 2.7

@@ -183,6 +183,11 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  // If the mode isn't set, pretend we don't implement this method.
+  if (!(_modes & _ASDisplayLayerTestDelegateModeDrawParameters)) {
+    return [super drawParametersForAsyncLayer:layer];
+  }
+
   _drawParametersCount++;
   return self;
 }
@@ -196,8 +201,6 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 {
   if (sel_isEqual(selector, @selector(didDisplayAsyncLayer:))) {
     return (_modes & _ASDisplayLayerTestDelegateModeDidDisplay);
-  } else if (sel_isEqual(selector, @selector(drawParametersForAsyncLayer:))) {
-    return (_modes & _ASDisplayLayerTestDelegateModeDrawParameters);
   } else if (sel_isEqual(selector, @selector(willDisplayAsyncLayer:))) {
     return (_modes & _ASDisplayLayerTestDelegateModeWillDisplay);
   } else {

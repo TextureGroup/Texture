@@ -121,7 +121,6 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
     unsigned implementsDrawRect:1;
     unsigned implementsImageDisplay:1;
-    unsigned implementsDrawParameters:1;
 
     // internal state
     unsigned isEnteringHierarchy:1;
@@ -366,6 +365,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 @property (nonatomic) CGFloat layerCornerRadius;
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea;
+
+- (_ASDisplayLayer *)_locked_asyncLayer;
 
 @end
 

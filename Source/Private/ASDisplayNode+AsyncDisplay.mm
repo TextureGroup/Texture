@@ -43,19 +43,6 @@
                                                                     return nil; \
                                                                   } \
 
-- (NSObject *)drawParameters
-{
-  __instanceLock__.lock();
-  BOOL implementsDrawParameters = _flags.implementsDrawParameters;
-  __instanceLock__.unlock();
-
-  if (implementsDrawParameters) {
-    return [self drawParametersForAsyncLayer:self.asyncLayer];
-  } else {
-    return nil;
-  }
-}
-
 - (void)_recursivelyRasterizeSelfAndSublayersWithIsCancelledBlock:(asdisplaynode_iscancelled_block_t)isCancelledBlock displayBlocks:(NSMutableArray *)displayBlocks
 {
   // Skip subtrees that are hidden or zero alpha.
@@ -191,11 +178,13 @@
   CGColorRef borderColor = self.borderColor;
   CGFloat borderWidth = self.borderWidth;
   CGFloat contentsScaleForDisplay = _contentsScaleForDisplay;
+  auto asyncLayer = [self _locked_asyncLayer];
+  ASDisplayNodeAssertNotNil(asyncLayer, @"Expected async layer to be non-nil since we're doing asynchronous drawing.");
     
   __instanceLock__.unlock();
 
   // Capture drawParameters from delegate on main thread, if this node is displaying itself rather than recursively rasterizing.
-  id drawParameters = (shouldBeginRasterizing == NO ? [self drawParameters] : nil);
+  id drawParameters = (shouldBeginRasterizing == NO ? [self drawParametersForAsyncLayer:asyncLayer] : nil);
   
   // Only the -display methods should be called if we can't size the graphics buffer to use.
   if (CGRectIsEmpty(bounds) && (shouldBeginRasterizing || shouldCreateGraphicsContext)) {
