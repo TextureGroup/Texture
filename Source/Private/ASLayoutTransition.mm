@@ -268,6 +268,7 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexes(ASLayout *layou
 
 /**
  * @abstract Stores the nodes at the given indexes in the `storedNodes` array, storing indexes in a `storedPositions` c++ vector.
+ * Call only with a flattened layout.
  * @discussion If the node exists in the `filteredNodes` array, the node is not added to `storedNodes`.
  */
 static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNodes(ASLayout *layout,
@@ -285,9 +286,9 @@ static inline std::vector<NSUInteger> findNodesInLayoutAtIndexesWithFilteredNode
   for (ASLayout *sublayout in layout.sublayouts) {
     if (idx > lastIndex) { break; }
     if (idx >= firstIndex && [indexes containsIndex:idx]) {
-      ASDisplayNode *node = (ASDisplayNode *) sublayout.layoutElement;
+      ASDisplayNode *node = (ASDisplayNode *)(sublayout.layoutElement);
       ASDisplayNodeCAssert(node, @"ASDisplayNode was deallocated before it was added to a subnode. It's likely the case that you use automatically manages subnodes and allocate a ASDisplayNode in layoutSpecThatFits: and don't have any strong reference to it.");
-      // Ignore the odd case in which a non-node sublayout is accessed and the type cast fails
+      ASDisplayNodeCAssert([node isKindOfClass:[ASDisplayNode class]], @"sublayout is an ASLayout, but not an ASDisplayNode - only call findNodesInLayoutAtIndexesWithFilteredNodes with a flattened layout (all sublayouts are ASDisplayNodes).");
       if (node != nil) {
         BOOL notFiltered = (filteredNodes == nil || [filteredNodes indexOfObjectIdenticalTo:node] == NSNotFound);
         if (notFiltered) {
