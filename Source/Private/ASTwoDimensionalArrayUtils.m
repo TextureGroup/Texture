@@ -55,14 +55,14 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
   for (NSIndexPath *indexPath in indexPaths) {
     NSInteger section = indexPath.section;
     if (section >= mutableArray.count) {
-      ASDisplayNodeCFailAssert(@"Invalid section index %zd – only %zd sections", section, mutableArray.count);
+      ASDisplayNodeCFailAssert(@"Invalid section index %ld – only %ld sections", (long)section, (long)mutableArray.count);
       continue;
     }
 
     NSMutableArray *subarray = mutableArray[section];
     NSInteger item = indexPath.item;
     if (item >= subarray.count) {
-      ASDisplayNodeCFailAssert(@"Invalid item index %zd – only %zd items in section %zd", item, subarray.count, section);
+      ASDisplayNodeCFailAssert(@"Invalid item index %ld – only %ld items in section %ld", (long)item, (long)subarray.count, (long)section);
       continue;
     }
     [subarray removeObjectAtIndex:item];

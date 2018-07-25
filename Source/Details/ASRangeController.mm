@@ -225,7 +225,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
   // TODO: Consider if we need to use this codepath, or can rely on something more similar to the data & display ranges
   // Example: ... = [_layoutController indexPathsForScrolling:scrollDirection rangeType:ASLayoutRangeTypeVisible];
-  auto visibleElements = [_dataSource visibleElementsForRangeController:self];
+  var visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
   ASSignpostStart(ASSignpostRangeControllerUpdate);

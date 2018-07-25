@@ -19,8 +19,9 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
 #import <AsyncDisplayKit/ASTextKitShadower.h>
@@ -408,7 +409,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
-    for (auto &t : cacheValue->_layouts) {
+    for (let &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
 
@@ -1098,7 +1099,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_composedTruncationText
 {
-  ASDisplayNodeAssertLockOwnedByCurrentThread(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   if (_composedTruncationText == nil) {
     if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
       NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
@@ -1124,7 +1125,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
 {
-  ASDisplayNodeAssertLockOwnedByCurrentThread(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
   // Grab the attributes from the full string
   if (_attributedText.length > 0) {
@@ -1135,7 +1136,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
     NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
     [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
      ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [NSMutableDictionary dictionaryWithDictionary:originalStringAttributes];
+       NSMutableDictionary *futureTruncationAttributes = [originalStringAttributes mutableCopy];
        [futureTruncationAttributes addEntriesFromDictionary:attributes];
        [truncationMutableString setAttributes:futureTruncationAttributes range:range];
      }];

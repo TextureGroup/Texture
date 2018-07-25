@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
@@ -85,6 +86,8 @@
 
 @implementation ASNetworkImageNode
 
+static std::atomic_bool _useMainThreadDelegateCallbacks(true);
+
 @dynamic image;
 
 - (instancetype)initWithCache:(id<ASImageCacheProtocol>)cache downloader:(id<ASImageDownloaderProtocol>)downloader
@@ -149,6 +152,8 @@
 
 - (void)_locked_setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
+  
   BOOL imageWasSetExternally = (image != nil);
   BOOL shouldCancelAndClear = imageWasSetExternally && (imageWasSetExternally != _imageWasSetExternally);
   _imageWasSetExternally = imageWasSetExternally;
@@ -175,6 +180,7 @@
 
 - (void)_locked__setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
   [super _locked_setImage:image];
 }
 
@@ -351,7 +357,7 @@
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
           [_delegate imageNode:self didLoadImage:result info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -424,6 +430,16 @@
   
   // Image was set externally no need to load an image
   [self _lazilyLoadImageIfNecessary];
+}
+
++ (void)setUseMainThreadDelegateCallbacks:(BOOL)useMainThreadDelegateCallbacks
+{
+  _useMainThreadDelegateCallbacks = useMainThreadDelegateCallbacks;
+}
+
++ (BOOL)useMainThreadDelegateCallbacks
+{
+  return _useMainThreadDelegateCallbacks;
 }
 
 #pragma mark - Progress
@@ -508,6 +524,8 @@
 
 - (void)_locked_cancelDownloadAndClearImageWithResumePossibility:(BOOL)storeResume
 {
+  ASAssertLocked(__instanceLock__);
+  
   [self _locked_cancelImageDownloadWithResumePossibility:storeResume];
   
   [self _locked_setAnimatedImage:nil];
@@ -532,6 +550,8 @@
 
 - (void)_locked_cancelImageDownloadWithResumePossibility:(BOOL)storeResume
 {
+  ASAssertLocked(__instanceLock__);
+  
   if (!_downloadIdentifier) {
     return;
   }
@@ -629,7 +649,7 @@
         } else {
           // First try to load the path directly, for efficiency assuming a developer who
           // doesn't want caching is trying to be as minimal as possible.
-          auto nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:URL.path];
+          var nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:URL.path];
           if (nonAnimatedImage == nil) {
             // If we couldn't find it, execute an -imageNamed:-like search so we can find resources even if the
             // extension is not provided in the path.  This allows the same path to work regardless of shouldCacheImage.
@@ -642,7 +662,7 @@
           // If the file may be an animated gif and then created an animated image.
           id<ASAnimatedImageProtocol> animatedImage = nil;
           if (_downloaderFlags.downloaderImplementsAnimatedImage) {
-            auto data = [[NSData alloc] initWithContentsOfURL:URL];
+            let data = [[NSData alloc] initWithContentsOfURL:URL];
             if (data != nil) {
               animatedImage = [_downloader animatedImageWithData:data];
 
@@ -665,7 +685,7 @@
 
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:self.image info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -674,7 +694,7 @@
       });
     } else {
       __weak __typeof__(self) weakSelf = self;
-      auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSourceType imageSource, id userInfo) {
+      let finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSourceType imageSource, id userInfo) {
         ASPerformBlockOnBackgroundThread(^{
           __typeof__(self) strongSelf = weakSelf;
           if (strongSelf == nil) {
@@ -720,7 +740,7 @@
           if (newImage) {
             if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-                auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+                let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
               };
             } else if (_delegateFlags.delegateDidLoadImage) {
@@ -735,11 +755,15 @@
           }
           
           if (calloutBlock) {
-            ASPerformBlockOnMainThread(^{
-              if (auto strongSelf = weakSelf) {
-                calloutBlock(strongSelf);
-              }
-            });
+            if (ASNetworkImageNode.useMainThreadDelegateCallbacks) {
+              ASPerformBlockOnMainThread(^{
+                if (auto strongSelf = weakSelf) {
+                  calloutBlock(strongSelf);
+                }
+              });
+            } else {
+              calloutBlock(self);
+            }
           }
         });
       };

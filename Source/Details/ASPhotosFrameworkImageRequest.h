@@ -15,6 +15,10 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_USE_PHOTOS
+
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
@@ -73,3 +77,5 @@ API_AVAILABLE(ios(8.0), tvos(10.0))
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif // AS_USE_PHOTOS

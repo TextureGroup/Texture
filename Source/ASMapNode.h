@@ -15,8 +15,11 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <Foundation/Foundation.h>
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if TARGET_OS_IOS && AS_USE_MAPKIT
 #import <AsyncDisplayKit/ASImageNode.h>
-#if TARGET_OS_IOS
 #import <MapKit/MapKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

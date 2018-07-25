@@ -225,7 +225,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  auto image = ASLockedSelf(_image);
+  let image = ASLockedSelf(_image);
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];
@@ -244,6 +244,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (void)_locked_setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
   if (ASObjectIsEqual(_image, image)) {
     return;
   }

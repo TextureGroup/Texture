@@ -44,14 +44,19 @@ _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
 
 typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
 {
-  ASDisplayNodeMethodOverrideNone               = 0,
-  ASDisplayNodeMethodOverrideTouchesBegan       = 1 << 0,
-  ASDisplayNodeMethodOverrideTouchesCancelled   = 1 << 1,
-  ASDisplayNodeMethodOverrideTouchesEnded       = 1 << 2,
-  ASDisplayNodeMethodOverrideTouchesMoved       = 1 << 3,
-  ASDisplayNodeMethodOverrideLayoutSpecThatFits = 1 << 4,
-  ASDisplayNodeMethodOverrideCalcLayoutThatFits = 1 << 5,
-  ASDisplayNodeMethodOverrideCalcSizeThatFits   = 1 << 6,
+  ASDisplayNodeMethodOverrideNone                   = 0,
+  ASDisplayNodeMethodOverrideTouchesBegan           = 1 << 0,
+  ASDisplayNodeMethodOverrideTouchesCancelled       = 1 << 1,
+  ASDisplayNodeMethodOverrideTouchesEnded           = 1 << 2,
+  ASDisplayNodeMethodOverrideTouchesMoved           = 1 << 3,
+  ASDisplayNodeMethodOverrideLayoutSpecThatFits     = 1 << 4,
+  ASDisplayNodeMethodOverrideCalcLayoutThatFits     = 1 << 5,
+  ASDisplayNodeMethodOverrideCalcSizeThatFits       = 1 << 6,
+  ASDisplayNodeMethodOverrideCanBecomeFirstResponder= 1 << 7,
+  ASDisplayNodeMethodOverrideBecomeFirstResponder   = 1 << 8,
+  ASDisplayNodeMethodOverrideCanResignFirstResponder= 1 << 9,
+  ASDisplayNodeMethodOverrideResignFirstResponder   = 1 << 10,
+  ASDisplayNodeMethodOverrideIsFirstResponder       = 1 << 11,
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
@@ -59,6 +64,9 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
   Synchronous = 1 << 0,
   YogaLayoutInProgress = 1 << 1,
 };
+
+// Can be called without the node's lock. Client is responsible for thread safety.
+#define _loaded(node) (node->_layer != nil)
 
 #define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
 // Returns the old value of the flag as a BOOL.
@@ -72,6 +80,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 #define VISIBILITY_NOTIFICATIONS_DISABLED_BITS 4
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
+
+#define NUM_CLIP_CORNER_LAYERS 4
 
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
@@ -178,7 +188,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   
   CGFloat _cornerRadius;
   ASCornerRoundingType _cornerRoundingType;
-  CALayer *_clipCornerLayers[4];
+  CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
