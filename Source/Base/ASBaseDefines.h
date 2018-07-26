@@ -130,7 +130,7 @@
 #endif
 #endif
 
-#define ASOVERLOADABLE __attribute__((overloadable))
+#define AS_OVERLOADABLE __attribute__((overloadable))
 
 
 #if __has_attribute(noescape)

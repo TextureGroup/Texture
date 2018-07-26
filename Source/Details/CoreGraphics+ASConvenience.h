@@ -17,8 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import <CoreGraphics/CoreGraphics.h>
 #import <tgmath.h>
+#import <UIKit/UIBezierPath.h>
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
@@ -55,5 +55,12 @@ ASDISPLAYNODE_INLINE BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CG
 {
   return fabs(size1.width - size2.width) < delta && fabs(size1.height - size2.height) < delta;
 };
+
+AS_OVERLOADABLE AS_WARN_UNUSED_RESULT AS_EXTERN CGPathRef ASCGRoundedPathCreate(CGRect rect, UIRectCorner corners, CGSize cornerRadii);
+
+AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT CGPathRef ASCGRoundedPathCreate(CGRect rect, CGFloat cornerRadius) {
+  return ASCGRoundedPathCreate(rect, UIRectCornerAllCorners, CGSizeMake(cornerRadius, cornerRadius));
+}
+
 
 NS_ASSUME_NONNULL_END

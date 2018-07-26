@@ -25,6 +25,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
@@ -111,10 +112,13 @@
 
       CGContextTranslateCTM(context, frame.origin.x, frame.origin.y);
 
-      //support cornerRadius
+      // Support cornerRadius
       if (rasterizingFromAscendent && clipsToBounds) {
         if (cornerRadius) {
-          [[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius] addClip];
+          CGPathRef cornerRadiusPath = ASCGRoundedPathCreate(bounds, cornerRadius);
+          CGContextAddPath(context, cornerRadiusPath);
+          CGContextClip(context);
+          CGPathRelease(cornerRadiusPath);
         } else {
           CGContextClipToRect(context, bounds);
         }
@@ -127,13 +131,18 @@
         CGContextFillRect(context, bounds);
       }
 
-      // If there is a display block, call it to get the image, then copy the image into the current context (which is the rasterized container's backing store).
+      // If there is a display block, call it to get the image, then copy the image into the current context (which
+      // is the rasterized container's backing store).
       if (displayBlock) {
         UIImage *image = (UIImage *)displayBlock();
         if (image) {
           BOOL opaque = ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage));
           CGBlendMode blendMode = opaque ? kCGBlendModeCopy : kCGBlendModeNormal;
-          [image drawInRect:bounds blendMode:blendMode alpha:1];
+          CGContextSetBlendMode(context, blendMode);
+          CGContextTranslateCTM(context, 0, CGRectGetMaxY(bounds) + CGRectGetMinY(bounds));
+          CGContextScaleCTM(context, 1, -1);
+          CGContextSetAlpha(context, 1.0);
+          CGContextDrawImage(context, bounds, image.CGImage);
         }
       }
     };
@@ -295,7 +304,10 @@
       ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
       // TODO: This clip path should be removed if we are rasterizing.
       CGRect boundingBox = CGContextGetClipBoundingBox(context);
-      [[UIBezierPath bezierPathWithRoundedRect:boundingBox cornerRadius:cornerRadius] addClip];
+      CGPathRef cornerRadiusPath = ASCGRoundedPathCreate(boundingBox, cornerRadius);
+      CGContextAddPath(context, cornerRadiusPath);
+      CGContextClip(context);
+      CGPathRelease(cornerRadiusPath);
     }
     
     if (willDisplayNodeContentWithRenderingContext) {
@@ -332,34 +344,58 @@
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
       ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
+      context = UIGraphicsGetCurrentContext();
       [*image drawInRect:bounds];
     } else {
       bounds = CGContextGetClipBoundingBox(context);
     }
     
     ASDisplayNodeAssert(UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
+
+    CGContextSaveGState(context);
     
-    UIBezierPath *roundedHole = [UIBezierPath bezierPathWithRect:bounds];
-    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius * contentsScale]];
-    roundedHole.usesEvenOddFillRule = YES;
-    
-    UIBezierPath *roundedPath = nil;
-    if (borderWidth > 0.0f) {  // Don't create roundedPath and stroke if borderWidth is 0.0
-      CGFloat strokeThickness = borderWidth * contentsScale;
-      CGFloat strokeInset = ((strokeThickness + 1.0f) / 2.0f) - 1.0f;
-      roundedPath = [UIBezierPath bezierPathWithRoundedRect:CGRectInset(bounds, strokeInset, strokeInset)
-                                               cornerRadius:_cornerRadius * contentsScale];
-      roundedPath.lineWidth = strokeThickness;
-      [[UIColor colorWithCGColor:borderColor] setStroke];
-    }
+    CGMutablePathRef roundedHole = CGPathCreateMutable();
+    CGPathAddRect(roundedHole, NULL, bounds);
+
+    CGPathRef additionalPath = ASCGRoundedPathCreate(bounds, cornerRadius * contentsScale);
+    CGPathAddPath(roundedHole, NULL, additionalPath);
+
+    CGContextAddPath(context, roundedHole);
     
     // Punch out the corners by copying the backgroundColor over them.
     // This works for everything from clearColor to opaque colors.
-    [backgroundColor setFill];
-    [roundedHole fillWithBlendMode:kCGBlendModeCopy alpha:1.0f];
+    CGContextSetFillColorWithColor(context, backgroundColor.CGColor);
     
-    [roundedPath stroke];  // Won't do anything if borderWidth is 0 and roundedPath is nil.
+    CGContextSetAlpha(context, 1.0);
+    CGContextSetBlendMode(context, kCGBlendModeCopy);
+    CGContextEOFillPath(context);
+      
+    CGPathRelease(additionalPath);
+    CGPathRelease(roundedHole);
     
+    CGContextRestoreGState(context);
+    
+    // Drawing borders with ASCornerRoundingTypePrecomposited set has some problems at the moment. If the borderWidth is
+    // set, besides we are drawing the border with the given corner radius, the CALayer also picks up the borderWidth
+    // value and draws the border without the cornerRadius.
+    if (borderWidth > 0.0f) {  // Don't create roundedPath and stroke if borderWidth is 0.0
+      CGContextSaveGState(context);
+      
+      CGFloat strokeThickness = borderWidth * contentsScale;
+      CGFloat strokeInset = ((strokeThickness + 1.0f) / 2.0f) - 1.0f;
+      CGPathRef roundedPath = ASCGRoundedPathCreate(CGRectInset(bounds, strokeInset, strokeInset), _cornerRadius * contentsScale);
+      CGContextAddPath(context, roundedPath);
+      
+      CGContextSetLineWidth(context, strokeThickness);
+      CGContextSetStrokeColorWithColor(context, borderColor);
+
+      CGContextStrokePath(context);
+
+      CGPathRelease(roundedPath);
+     
+      CGContextRestoreGState(context);
+    }
+
     if (*image) {
       *image = ASGraphicsGetImageAndEndCurrentContext();
     }
