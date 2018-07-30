@@ -94,7 +94,7 @@ AS_EXTERN ASDimension const ASDimensionAuto;
 /**
  * Returns a dimension with the specified type and value.
  */
-AS_OVERLOADABLE ASDISPLAYNODE_INLINE ASDimension ASDimensionMake(ASDimensionUnit unit, CGFloat value)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE ASDimension ASDimensionMake(ASDimensionUnit unit, CGFloat value)
 {
   if (unit == ASDimensionUnitAuto ) {
     ASDisplayNodeCAssert(value == 0, @"ASDimension auto value must be 0.");
@@ -112,7 +112,7 @@ AS_OVERLOADABLE ASDISPLAYNODE_INLINE ASDimension ASDimensionMake(ASDimensionUnit
 /**
  * Returns a dimension with the specified points value.
  */
-AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASDimension ASDimensionMake(CGFloat points)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASDimension ASDimensionMake(CGFloat points)
 {
   return ASDimensionMake(ASDimensionUnitPoints, points);
 }
@@ -122,7 +122,7 @@ AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASDimension ASDimensi
  * Examples: ASDimensionMake(@"50%") = ASDimensionMake(ASDimensionUnitFraction, 0.5)
  *           ASDimensionMake(@"0.5pt") = ASDimensionMake(ASDimensionUnitPoints, 0.5)
  */
-AS_OVERLOADABLE AS_WARN_UNUSED_RESULT AS_EXTERN ASDimension ASDimensionMake(NSString *dimension);
+ASOVERLOADABLE AS_WARN_UNUSED_RESULT AS_EXTERN ASDimension ASDimensionMake(NSString *dimension);
 
 /**
  * Returns a dimension with the specified points value.
@@ -244,7 +244,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeHasSignificantArea(AS
 /**
  * Creates an ASSizeRange with provided min and max size.
  */
-AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize min, CGSize max)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize min, CGSize max)
 {
   ASDisplayNodeCAssertPositiveReal(@"Range min width", min.width);
   ASDisplayNodeCAssertPositiveReal(@"Range min height", min.height);
@@ -263,7 +263,7 @@ AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRan
 /**
  * Creates an ASSizeRange with provided size as both min and max.
  */
-AS_OVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize exactSize)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize exactSize)
 {
   return ASSizeRangeMake(exactSize, exactSize);
 }
