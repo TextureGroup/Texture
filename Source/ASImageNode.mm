@@ -737,43 +737,19 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
 {
   return ^(UIImage *originalImage) {
     ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
-   
-    CGContextRef context = UIGraphicsGetCurrentContext();
+    UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
 
-    CGRect rect = (CGRect){CGPointZero, originalImage.size};
-    CGMutablePathRef path = CGPathCreateMutable();
-
-    CGPathAddEllipseInRect(path, NULL, rect);
-    CGContextAddPath(context, path);
-    
     // Make the image round
-    CGContextClip(context);
-    
-    // Although drawAtPoint:blendMode: would consider the CTM already, we are using CGContext* functions for drawing
-    // the image instead calling drawAtPoint:blendMode. This will save use 50% of retain calls for the image
-    CGContextSetBlendMode(context, kCGBlendModeCopy);
-    CGContextTranslateCTM(context, 0, CGRectGetMaxY(rect) + CGRectGetMinY(rect));
-    CGContextScaleCTM(context, originalImage.scale, -originalImage.scale);
-    CGContextSetAlpha(context, 1.0);
-    CGContextDrawImage(context, rect, originalImage.CGImage);
+    [roundOutline addClip];
 
-    CGPathRelease(path);
+    // Draw the original image
+    [originalImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
 
     // Draw a border on top.
     if (borderWidth > 0.0) {
-      // Begin a new path for the border
-      CGContextBeginPath(context);
-      
-      CGFloat strokeThickness = borderWidth;
-      CGFloat strokeInset = floor((strokeThickness + 1.0f) / 2.0f) - 1.0f;
-      CGPathRef path = CGPathCreateWithEllipseInRect(CGRectInset(rect, strokeInset, strokeInset), NULL);
-      CGContextAddPath(context, path);
-      
-      CGContextSetStrokeColorWithColor(context, borderColor.CGColor);
-      CGContextSetLineWidth(context, borderWidth);
-      CGContextStrokePath(context);
-      
-      CGPathRelease(path);
+      [borderColor setStroke];
+      [roundOutline setLineWidth:borderWidth];
+      [roundOutline stroke];
     }
 
     return ASGraphicsGetImageAndEndCurrentContext();

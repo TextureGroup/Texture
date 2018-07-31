@@ -83,9 +83,7 @@
   layer.shadowColor = [UIColor blackColor].CGColor;
   layer.shadowRadius = 12.0;
   layer.shadowOpacity = 0.45;
-  CGPathRef shadowPath = CGPathCreateWithRect(self.layer.bounds, NULL);
-  layer.shadowPath = shadowPath;
-  CGPathRelease(shadowPath);
+  layer.shadowPath = [UIBezierPath bezierPathWithRect:self.layer.bounds].CGPath;
 }
 
 - (void)setDefaultFocusAppearance
@@ -95,9 +93,7 @@
   layer.shadowColor = [UIColor blackColor].CGColor;
   layer.shadowRadius = 0;
   layer.shadowOpacity = 0;
-  CGPathRef shadowPath = CGPathCreateWithRect(self.layer.bounds, NULL);
-  layer.shadowPath = shadowPath;
-  CGPathRelease(shadowPath);
+  layer.shadowPath = [UIBezierPath bezierPathWithRect:self.layer.bounds].CGPath;
   self.view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
 }
 @end
