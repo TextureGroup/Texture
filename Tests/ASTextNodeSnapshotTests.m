@@ -137,4 +137,20 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
+- (void)testFontPointSizeScaling
+{
+  NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+  paragraphStyle.lineHeightMultiple = 0.5;
+  paragraphStyle.lineSpacing = 2.0;
+
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(60, 80);
+  textNode.pointSizeScaleFactors = @[@0.5];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is an important thing"
+                                                            attributes:@{ NSParagraphStyleAttributeName: paragraphStyle }];
+
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
 @end

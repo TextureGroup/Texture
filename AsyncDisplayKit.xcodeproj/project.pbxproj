@@ -228,6 +228,7 @@
 		ACF6ED611B178DC700DA7C62 /* ASOverlayLayoutSpecSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACF6ED591B178DC700DA7C62 /* ASOverlayLayoutSpecSnapshotTests.mm */; };
 		ACF6ED621B178DC700DA7C62 /* ASRatioLayoutSpecSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACF6ED5A1B178DC700DA7C62 /* ASRatioLayoutSpecSnapshotTests.mm */; };
 		ACF6ED631B178DC700DA7C62 /* ASStackLayoutSpecSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACF6ED5B1B178DC700DA7C62 /* ASStackLayoutSpecSnapshotTests.mm */; };
+		AE440175210FB7CF00B36DA2 /* ASTextKitFontSizeAdjusterTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = AE440174210FB7CF00B36DA2 /* ASTextKitFontSizeAdjusterTests.mm */; };
 		AE6987C11DD04E1000B9E458 /* ASPagerNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AE6987C01DD04E1000B9E458 /* ASPagerNodeTests.m */; };
 		AEEC47E41C21D3D200EC1693 /* ASVideoNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AEEC47E31C21D3D200EC1693 /* ASVideoNodeTests.m */; };
 		B13CA0F81C519EBA00E031AB /* ASCollectionViewLayoutFacilitatorProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = B13CA0F61C519E9400E031AB /* ASCollectionViewLayoutFacilitatorProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -814,6 +815,7 @@
 		ACF6ED591B178DC700DA7C62 /* ASOverlayLayoutSpecSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASOverlayLayoutSpecSnapshotTests.mm; sourceTree = "<group>"; };
 		ACF6ED5A1B178DC700DA7C62 /* ASRatioLayoutSpecSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASRatioLayoutSpecSnapshotTests.mm; sourceTree = "<group>"; };
 		ACF6ED5B1B178DC700DA7C62 /* ASStackLayoutSpecSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASStackLayoutSpecSnapshotTests.mm; sourceTree = "<group>"; };
+		AE440174210FB7CF00B36DA2 /* ASTextKitFontSizeAdjusterTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTextKitFontSizeAdjusterTests.mm; sourceTree = "<group>"; };
 		AE6987C01DD04E1000B9E458 /* ASPagerNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPagerNodeTests.m; sourceTree = "<group>"; };
 		AEB7B0181C5962EA00662EF4 /* ASDefaultPlayButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDefaultPlayButton.h; sourceTree = "<group>"; };
 		AEB7B0191C5962EA00662EF4 /* ASDefaultPlayButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASDefaultPlayButton.m; sourceTree = "<group>"; };
@@ -1253,7 +1255,6 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				CC35CEC520DD87280006448D /* ASCollectionsTests.m */,
 				DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.m */,
 				AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.m */,
 				696FCB301D6E46050093471E /* ASBackgroundLayoutSpecSnapshotTests.mm */,
@@ -1264,6 +1265,7 @@
 				CC051F1E1D7A286A006434CB /* ASCALayerTests.m */,
 				ACF6ED531B178DC700DA7C62 /* ASCenterLayoutSpecSnapshotTests.mm */,
 				CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.m */,
+				CC35CEC520DD87280006448D /* ASCollectionsTests.m */,
 				2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.m */,
 				9F06E5CC1B4CAF4200F015D8 /* ASCollectionViewTests.mm */,
 				CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.m */,
@@ -1314,8 +1316,10 @@
 				3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */,
 				CC4981B21D1A02BE004E13CC /* ASTableViewThrashTests.m */,
 				058D0A33195D057000B7D73C /* ASTextKitCoreTextAdditionsTests.m */,
+				AE440174210FB7CF00B36DA2 /* ASTextKitFontSizeAdjusterTests.mm */,
 				254C6B531BF8FF2A003EC431 /* ASTextKitTests.mm */,
 				254C6B511BF8FE6D003EC431 /* ASTextKitTruncationTests.mm */,
+				C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.m */,
 				CC8B05D71D73979700F54286 /* ASTextNodePerformanceTests.m */,
 				81E95C131D62639600336598 /* ASTextNodeSnapshotTests.m */,
 				058D0A36195D057000B7D73C /* ASTextNodeTests.m */,
@@ -1325,7 +1329,6 @@
 				4496D0721FA9EA6B001CC8D5 /* ASTraitCollectionTests.m */,
 				CC0AEEA31D66316E005D1C78 /* ASUICollectionViewTests.m */,
 				AEEC47E31C21D3D200EC1693 /* ASVideoNodeTests.m */,
-				C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.m */,
 				CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */,
 				83A7D95D1D446A6E00BF333E /* ASWeakMapTests.m */,
 				CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.m */,
@@ -2265,6 +2268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CCEDDDD9200C518800FFCD0A /* ASConfigurationTests.m in Sources */,
+				AE440175210FB7CF00B36DA2 /* ASTextKitFontSizeAdjusterTests.mm in Sources */,
 				E51B78BF1F028ABF00E32604 /* ASLayoutFlatteningTests.m in Sources */,
 				4496D0731FA9EA6B001CC8D5 /* ASTraitCollectionTests.m in Sources */,
 				29CDC2E21AAE70D000833CA4 /* ASBasicImageDownloaderContextTests.m in Sources */,

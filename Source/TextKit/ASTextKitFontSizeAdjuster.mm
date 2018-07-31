@@ -87,8 +87,6 @@
       paragraphStyle.tailIndent = (paragraphStyle.tailIndent * scaleFactor);
       paragraphStyle.minimumLineHeight = (paragraphStyle.minimumLineHeight * scaleFactor);
       paragraphStyle.maximumLineHeight = (paragraphStyle.maximumLineHeight * scaleFactor);
-      paragraphStyle.lineHeightMultiple = (paragraphStyle.lineHeightMultiple * scaleFactor);
-      paragraphStyle.paragraphSpacing = (paragraphStyle.paragraphSpacing * scaleFactor);
       
       [attrString removeAttribute:NSParagraphStyleAttributeName range:range];
       [attrString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
@@ -214,7 +212,7 @@
       
       if (longestWordFits == NO) {
         // we need to check the longest word to make sure it fits
-        longestWordFits = std::ceil((longestWordSize.width * adjustedScale)  <= _constrainedSize.width);
+        longestWordFits = std::ceil((longestWordSize.width * adjustedScale) <= _constrainedSize.width);
       }
       
       // if the longest word fits, go ahead and check max line and height. If it didn't fit continue to the next scale factor
