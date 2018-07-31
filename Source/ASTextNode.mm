@@ -1346,36 +1346,29 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-+ (id)allocWithZone:(struct _NSZone *)zone
+// All direct descendants of ASTextNode get their superclass replaced by ASTextNode2.
++ (void)initialize
 {
-  // If they're not experimenting, just forward.
-  if (!ASActivateExperimentalFeature(ASExperimentalTextNode)) {
-    return [super allocWithZone:zone];
-  }
-  
-  // We are plain ASTextNode. Just swap in an ASTextNode2 instead.
-  if (self == [ASTextNode class]) {
-    return (ASTextNode *)[ASTextNode2 allocWithZone:zone];
-  }
-  
-  // We are descended from ASTextNode. We need to change the superclass for the
-  // ASTextNode subclass to ASTextNode2.
-  // Walk up the class hierarchy until we find ASTextNode.
-  // Note: This may be called on multiple threads simultaneously.
-  Class s;
-  for (Class c = self; c != Nil && c != [ASTextNode class]; c = s) {
-    s = class_getSuperclass(c);
-    if (s == [ASTextNode class]) {
+  // Texture requires that node subclasses call [super initialize]
+  [super initialize];
+
+  if (class_getSuperclass(self) == [ASTextNode class]
+      && ASActivateExperimentalFeature(ASExperimentalTextNode)) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      // Direct descendent. Update superclass of c and end.
-      class_setSuperclass(c, [ASTextNode2 class]);
+    class_setSuperclass(self, [ASTextNode2 class]);
 #pragma clang diagnostic pop
-      break;
-    }
   }
+}
 
-  return [super allocWithZone:zone];
+// For direct allocations of ASTextNode itself, we override allocWithZone:
++ (id)allocWithZone:(struct _NSZone *)zone
+{
+  if (ASActivateExperimentalFeature(ASExperimentalTextNode)) {
+    return (ASTextNode *)[ASTextNode2 allocWithZone:zone];
+  } else {
+    return [super allocWithZone:zone];
+  }
 }
 
 @end
