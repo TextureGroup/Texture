@@ -217,7 +217,7 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 }
 
 // DANGER: Don't use the delegate as the parameters in real code; this is not thread-safe and just for accounting in unit tests!
-+ (UIImage *)displayWithParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(asdisplaynode_iscancelled_block_t)sentinelBlock
++ (UIImage *)displayWithParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)sentinelBlock
 {
   UIImage *contents = bogusImage();
   if (delegate->_displayLayerBlock != NULL) {
@@ -228,7 +228,7 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 }
 
 // DANGER: Don't use the delegate as the parameters in real code; this is not thread-safe and just for accounting in unit tests!
-+ (void)drawRect:(CGRect)bounds withParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(asdisplaynode_iscancelled_block_t)sentinelBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)sentinelBlock isRasterizing:(BOOL)isRasterizing
 {
   __atomic_add_fetch(&delegate->_drawRectCount, 1, __ATOMIC_SEQ_CST);
 }
