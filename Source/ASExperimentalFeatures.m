@@ -23,7 +23,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_infer_layer_defaults",
                                       @"exp_network_image_queue",
                                       @"exp_dealloc_queue_v2",
-                                      @"exp_collection_teardown"]));
+                                      @"exp_collection_teardown",
+                                      @"exp_framesetter_cache"]));
   
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
