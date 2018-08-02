@@ -16,10 +16,14 @@
 //
 
 #import <AsyncDisplayKit/ASTextLayout.h>
+
+#import <AsyncDisplayKit/ASExperimentalFeatures.h>
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import <pthread.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
