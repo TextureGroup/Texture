@@ -27,6 +27,8 @@
 - Create and set delegate for clip corner layers within ASDisplayNode [Michael Schneider](https://github.com/maicki) [#1029](https://github.com/TextureGroup/Texture/pull/1029)
 - Improve locking situation in ASVideoPlayerNode [Michael Schneider](https://github.com/maicki) [#1042](https://github.com/TextureGroup/Texture/pull/1042)
 - Optimize ASDisplayNode -> ASNodeController reference by removing weak proxy and objc associated objects. [Adlai Holler](https://github.com/Adlai-Holler)
+- Remove CA transaction signpost injection because it causes more transactions and is too chatty. [Adlai Holler](https://github.com/Adlai-Holler)
+
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
