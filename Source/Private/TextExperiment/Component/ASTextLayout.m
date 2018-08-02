@@ -17,7 +17,7 @@
 
 #import <AsyncDisplayKit/ASTextLayout.h>
 
-#import <AsyncDisplayKit/ASExperimentalFeatures.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
@@ -921,8 +921,7 @@ dispatch_semaphore_signal(_lock);
   if (attachments.count == 0) {
     attachments = attachmentRanges = attachmentRects = nil;
   }
-  
-  layout.frameSetter = ctSetter;
+
   layout.frame = ctFrame;
   layout.lines = lines;
   layout.truncatedLine = truncatedLine;
