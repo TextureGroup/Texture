@@ -370,6 +370,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASLockScopeSelf();
   [self _ensureTruncationText];
+
+  // Unlike layout, here we must copy the container since drawing is asynchronous.
   ASTextContainer *copiedContainer = [_textContainer copy];
   copiedContainer.size = self.bounds.size;
   [copiedContainer makeImmutable];
