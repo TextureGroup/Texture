@@ -46,17 +46,14 @@
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
-    node->_strongNodeController = self;
-    node->_weakNodeController = nil;
     _strongNode = nil;
   } else {
     // The controller should own the node; weak reference from node to controller.
     _strongNode = node;
-    node->_weakNodeController = self;
-    node->_strongNodeController = nil;
     _weakNode = nil;
   }
 
+  [node __setNodeController:self];
   [node addInterfaceStateDelegate:self];
 }
 
