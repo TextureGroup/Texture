@@ -158,7 +158,7 @@
 		697796611D8AC8D3007E93D7 /* ASLayoutSpec+Subclasses.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6977965E1D8AC8D3007E93D7 /* ASLayoutSpec+Subclasses.mm */; };
 		697B315A1CFE4B410049936F /* ASEditableTextNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 697B31591CFE4B410049936F /* ASEditableTextNodeTests.m */; };
 		698371DB1E4379CD00437585 /* ASNodeController+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = 698371D91E4379CD00437585 /* ASNodeController+Beta.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		698371DC1E4379CD00437585 /* ASNodeController+Beta.m in Sources */ = {isa = PBXBuildFile; fileRef = 698371DA1E4379CD00437585 /* ASNodeController+Beta.m */; };
+		698371DC1E4379CD00437585 /* ASNodeController+Beta.mm in Sources */ = {isa = PBXBuildFile; fileRef = 698371DA1E4379CD00437585 /* ASNodeController+Beta.mm */; };
 		698C8B621CAB49FC0052DC3F /* ASLayoutElementExtensibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 698C8B601CAB49FC0052DC3F /* ASLayoutElementExtensibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		698DFF441E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 698DFF431E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		698DFF471E36B7E9002891F1 /* ASLayoutSpecUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 698DFF461E36B7E9002891F1 /* ASLayoutSpecUtilities.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -716,7 +716,7 @@
 		6977965E1D8AC8D3007E93D7 /* ASLayoutSpec+Subclasses.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASLayoutSpec+Subclasses.mm"; sourceTree = "<group>"; };
 		697B31591CFE4B410049936F /* ASEditableTextNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASEditableTextNodeTests.m; sourceTree = "<group>"; };
 		698371D91E4379CD00437585 /* ASNodeController+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASNodeController+Beta.h"; sourceTree = "<group>"; };
-		698371DA1E4379CD00437585 /* ASNodeController+Beta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ASNodeController+Beta.m"; sourceTree = "<group>"; };
+		698371DA1E4379CD00437585 /* ASNodeController+Beta.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASNodeController+Beta.mm"; sourceTree = "<group>"; };
 		698C8B601CAB49FC0052DC3F /* ASLayoutElementExtensibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutElementExtensibility.h; sourceTree = "<group>"; };
 		698DFF431E36B6C9002891F1 /* ASStackLayoutSpecUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASStackLayoutSpecUtilities.h; sourceTree = "<group>"; };
 		698DFF461E36B7E9002891F1 /* ASLayoutSpecUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutSpecUtilities.h; sourceTree = "<group>"; };
@@ -1197,7 +1197,7 @@
 				055B9FA61A1C154B00035D6D /* ASNetworkImageNode.h */,
 				055B9FA71A1C154B00035D6D /* ASNetworkImageNode.mm */,
 				698371D91E4379CD00437585 /* ASNodeController+Beta.h */,
-				698371DA1E4379CD00437585 /* ASNodeController+Beta.m */,
+				698371DA1E4379CD00437585 /* ASNodeController+Beta.mm */,
 				DBDB83921C6E879900D0098C /* ASPagerFlowLayout.h */,
 				DBDB83931C6E879900D0098C /* ASPagerFlowLayout.m */,
 				25E327541C16819500A2170C /* ASPagerNode.h */,
@@ -2374,7 +2374,7 @@
 				DEFAD8131CC48914000527C4 /* ASVideoNode.mm in Sources */,
 				CCA282C11E9EAE010037E8B7 /* ASTip.m in Sources */,
 				B350624C1B010EFD0018CF92 /* _ASPendingState.mm in Sources */,
-				698371DC1E4379CD00437585 /* ASNodeController+Beta.m in Sources */,
+				698371DC1E4379CD00437585 /* ASNodeController+Beta.mm in Sources */,
 				CC6AA2DB1E9F03B900978E87 /* ASDisplayNode+Ancestry.m in Sources */,
 				509E68621B3AEDA5009B9150 /* ASAbstractLayoutController.mm in Sources */,
 				254C6B861BF94F8A003EC431 /* ASTextKitContext.mm in Sources */,

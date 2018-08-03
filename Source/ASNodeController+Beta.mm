@@ -16,36 +16,16 @@
 //
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASWeakProxy.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
-
-@interface ASDisplayNode (ASNodeControllerOwnership)
-
-// This property exists for debugging purposes. Don't use __nodeController in production code.
-@property (nonatomic, readonly) ASNodeController *__nodeController;
-
-// These setters are mutually exclusive. Setting one will clear the relationship of the other.
-- (void)__setNodeControllerStrong:(ASNodeController *)nodeController;
-- (void)__setNodeControllerWeak:(ASNodeController *)nodeController;
-
-@end
 
 @implementation ASNodeController
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-}
-
-- (instancetype)init
-{
-  self = [super init];
-  if (self) {
-    
-  }
-  return self;
 }
 
 - (void)loadNode
@@ -66,12 +46,14 @@
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
-    [node __setNodeControllerStrong:self];
+    node->_strongNodeController = self;
+    node->_weakNodeController = nil;
     _strongNode = nil;
   } else {
     // The controller should own the node; weak reference from node to controller.
     _strongNode = node;
-    [node __setNodeControllerWeak:self];
+    node->_weakNodeController = self;
+    node->_strongNodeController = nil;
     _weakNode = nil;
   }
 
@@ -111,40 +93,10 @@
 
 @end
 
-@implementation ASDisplayNode (ASNodeControllerOwnership)
-
-- (ASNodeController *)__nodeController
-{
-  ASNodeController *nodeController = nil;
-  id object = objc_getAssociatedObject(self, @selector(__nodeController));
-
-  if ([object isKindOfClass:[ASWeakProxy class]]) {
-    nodeController = (ASNodeController *)[(ASWeakProxy *)object target];
-  } else {
-    nodeController = (ASNodeController *)object;
-  }
-
-  return nodeController;
-}
-
-- (void)__setNodeControllerStrong:(ASNodeController *)nodeController
-{
-  objc_setAssociatedObject(self, @selector(__nodeController), nodeController, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)__setNodeControllerWeak:(ASNodeController *)nodeController
-{
-  // Associated objects don't support weak references. Since assign can become a dangling pointer, use ASWeakProxy.
-  ASWeakProxy *nodeControllerProxy = [ASWeakProxy weakProxyWithTarget:nodeController];
-  objc_setAssociatedObject(self, @selector(__nodeController), nodeControllerProxy, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-@end
-
 @implementation ASDisplayNode (ASNodeController)
 
 - (ASNodeController *)nodeController {
-  return self.__nodeController;
+  return _weakNodeController ?: _strongNodeController;
 }
 
 @end
