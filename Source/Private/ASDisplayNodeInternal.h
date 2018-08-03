@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol _ASDisplayLayerDelegate;
 @class _ASDisplayLayer;
 @class _ASPendingState;
+@class ASNodeController;
 struct ASDisplayNodeFlags;
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
@@ -92,6 +93,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   ASInterfaceState _pendingInterfaceState;
   UIView *_view;
   CALayer *_layer;
+  ASNodeController *_strongNodeController;
+  __weak ASNodeController *_weakNodeController;
 
   std::atomic<ASDisplayNodeAtomicFlags> _atomicFlags;
 
