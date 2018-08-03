@@ -53,7 +53,7 @@
     _weakNode = nil;
   }
 
-  node.nodeController = self;
+  [node __setNodeController:self];
   [node addInterfaceStateDelegate:self];
 }
 

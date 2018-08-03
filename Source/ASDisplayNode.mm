@@ -877,9 +877,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   _automaticallyRelayoutOnLayoutMarginsChanges = flag;
 }
 
-- (void)setNodeController:(ASNodeController *)controller
+- (void)__setNodeController:(ASNodeController *)controller
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  // See docs for why we don't lock.
   if (controller.shouldInvertStrongReference) {
     _strongNodeController = controller;
     _weakNodeController = nil;
