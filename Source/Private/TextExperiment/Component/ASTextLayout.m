@@ -16,6 +16,8 @@
 //
 
 #import <AsyncDisplayKit/ASTextLayout.h>
+
+#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
