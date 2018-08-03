@@ -236,12 +236,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   ASLockScopeSelf();
 
-  ASTextContainer *container = [_textContainer copy];
-  NSAttributedString *attributedText = self.attributedText;
-  container.size = constrainedSize;
+  ASTextContainer *container;
+  if (!CGSizeEqualToSize(container.size, constrainedSize)) {
+    container = [_textContainer copy];
+    container.size = constrainedSize;
+    [container makeImmutable];
+  } else {
+    container = _textContainer;
+  }
   [self _ensureTruncationText];
   
-  NSMutableAttributedString *mutableText = [attributedText mutableCopy];
+  NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
   [self prepareAttributedString:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
   
@@ -367,7 +372,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self _ensureTruncationText];
   ASTextContainer *copiedContainer = [_textContainer copy];
   copiedContainer.size = self.bounds.size;
-  NSMutableAttributedString *mutableText = [self.attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
+  [copiedContainer makeImmutable];
+  NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
   
   [self prepareAttributedString:mutableText];
   

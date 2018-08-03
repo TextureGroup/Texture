@@ -67,6 +67,9 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 /// Creates a container with the specified path. @param path The path.
 + (instancetype)containerWithPath:(nullable UIBezierPath *)path NS_RETURNS_RETAINED;
 
+/// Mark this immutable, so you get free copies going forward.
+- (void)makeImmutable;
+
 /// The constrained size. (if the size is larger than ASTextContainerMaxSize, it will be clipped)
 @property CGSize size;
 
