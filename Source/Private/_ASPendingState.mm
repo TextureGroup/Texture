@@ -607,92 +607,92 @@ static UIColor *defaultTintColor = nil;
 
 - (NSString *)accessibilityLabel
 {
+  if (_flags.setAccessibilityAttributedLabel) {
+    return accessibilityAttributedLabel.string;
+  }
   return accessibilityLabel;
 }
 
 - (void)setAccessibilityLabel:(NSString *)newAccessibilityLabel
 {
-  if (! ASObjectIsEqual(accessibilityLabel, newAccessibilityLabel)) {
-    _flags.setAccessibilityLabel = YES;
-    _flags.setAccessibilityAttributedLabel = YES;
-    accessibilityLabel = newAccessibilityLabel ? [newAccessibilityLabel copy] : nil;
-    accessibilityAttributedLabel = newAccessibilityLabel ? [[NSAttributedString alloc] initWithString:newAccessibilityLabel] : nil;
-  }
+  ASCompareAssignCopy(accessibilityLabel, newAccessibilityLabel);
+  _flags.setAccessibilityLabel = YES;
+  _flags.setAccessibilityAttributedLabel = NO;
 }
 
 - (NSAttributedString *)accessibilityAttributedLabel
 {
+  if (_flags.setAccessibilityLabel) {
+    return [[NSAttributedString alloc] initWithString:accessibilityLabel];
+  }
   return accessibilityAttributedLabel;
 }
 
 - (void)setAccessibilityAttributedLabel:(NSAttributedString *)newAccessibilityAttributedLabel
 {
-  if (! ASObjectIsEqual(accessibilityAttributedLabel, newAccessibilityAttributedLabel)) {
-    _flags.setAccessibilityAttributedLabel = YES;
-    _flags.setAccessibilityLabel = YES;
-    accessibilityAttributedLabel = newAccessibilityAttributedLabel ? [newAccessibilityAttributedLabel copy] : nil;
-    accessibilityLabel = newAccessibilityAttributedLabel ? [newAccessibilityAttributedLabel.string copy] : nil;
-  }
+  ASCompareAssignCopy(accessibilityAttributedLabel, newAccessibilityAttributedLabel);
+  _flags.setAccessibilityAttributedLabel = YES;
+  _flags.setAccessibilityLabel = NO;
 }
 
 - (NSString *)accessibilityHint
 {
+  if (_flags.setAccessibilityAttributedHint) {
+    return accessibilityAttributedHint.string;
+  }
   return accessibilityHint;
 }
 
 - (void)setAccessibilityHint:(NSString *)newAccessibilityHint
 {
-  if (! ASObjectIsEqual(accessibilityHint, newAccessibilityHint)) {
-    _flags.setAccessibilityHint = YES;
-    _flags.setAccessibilityAttributedHint = YES;
-    accessibilityHint = newAccessibilityHint ? [newAccessibilityHint copy] : nil;
-    accessibilityAttributedHint = newAccessibilityHint ? [[NSAttributedString alloc] initWithString:newAccessibilityHint] : nil;
-  }
+  ASCompareAssignCopy(accessibilityHint, newAccessibilityHint);
+  _flags.setAccessibilityHint = YES;
+  _flags.setAccessibilityAttributedHint = NO;
 }
 
 - (NSAttributedString *)accessibilityAttributedHint
 {
+  if (_flags.setAccessibilityHint) {
+    return [[NSAttributedString alloc] initWithString:accessibilityHint];
+  }
   return accessibilityAttributedHint;
 }
 
 - (void)setAccessibilityAttributedHint:(NSAttributedString *)newAccessibilityAttributedHint
 {
-  if (! ASObjectIsEqual(accessibilityAttributedHint, newAccessibilityAttributedHint)) {
-    _flags.setAccessibilityAttributedHint = YES;
-    _flags.setAccessibilityHint = YES;
-    accessibilityAttributedHint = newAccessibilityAttributedHint ? [newAccessibilityAttributedHint copy] : nil;
-    accessibilityHint = newAccessibilityAttributedHint ? [newAccessibilityAttributedHint.string copy] : nil;
-  }
+  ASCompareAssignCopy(accessibilityAttributedHint, newAccessibilityAttributedHint);
+  _flags.setAccessibilityAttributedHint = YES;
+  _flags.setAccessibilityHint = NO;
 }
 
 - (NSString *)accessibilityValue
 {
+  if (_flags.setAccessibilityAttributedValue) {
+    return accessibilityAttributedValue.string;
+  }
   return accessibilityValue;
 }
 
 - (void)setAccessibilityValue:(NSString *)newAccessibilityValue
 {
-  if (! ASObjectIsEqual(accessibilityValue, newAccessibilityValue)) {
-    _flags.setAccessibilityValue = YES;
-    _flags.setAccessibilityAttributedValue = YES;
-    accessibilityValue = newAccessibilityValue ? [newAccessibilityValue copy] : nil;
-    accessibilityAttributedValue = newAccessibilityValue ? [[NSAttributedString alloc] initWithString:newAccessibilityValue] : nil;
-  }
+  ASCompareAssignCopy(accessibilityValue, newAccessibilityValue);
+  _flags.setAccessibilityValue = YES;
+  _flags.setAccessibilityAttributedValue = NO;
 }
 
 - (NSAttributedString *)accessibilityAttributedValue
 {
+  if (_flags.setAccessibilityValue) {
+    return [[NSAttributedString alloc] initWithString:accessibilityValue];
+  }
   return accessibilityAttributedValue;
 }
 
 - (void)setAccessibilityAttributedValue:(NSAttributedString *)newAccessibilityAttributedValue
 {
-  if (! ASObjectIsEqual(accessibilityAttributedValue, newAccessibilityAttributedValue)) {
-    _flags.setAccessibilityAttributedValue = YES;
-    _flags.setAccessibilityValue = YES;
-    accessibilityAttributedValue = newAccessibilityAttributedValue?  [newAccessibilityAttributedValue copy] : nil;
-    accessibilityValue = newAccessibilityAttributedValue ? [newAccessibilityAttributedValue.string copy] : nil;
-  }
+  ASCompareAssignCopy(accessibilityAttributedValue, newAccessibilityAttributedValue);
+  _flags.setAccessibilityAttributedValue = YES;
+  _flags.setAccessibilityValue = NO;
 }
 
 - (UIAccessibilityTraits)accessibilityTraits
@@ -1087,20 +1087,23 @@ static UIColor *defaultTintColor = nil;
   if (flags.setAccessibilityLabel)
     view.accessibilityLabel = accessibilityLabel;
 
-  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedLabel)
-    [view setValue:accessibilityAttributedLabel forKey:@"accessibilityAttributedLabel"];
-
   if (flags.setAccessibilityHint)
     view.accessibilityHint = accessibilityHint;
-
-  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedHint)
-    [view setValue:accessibilityAttributedHint forKey:@"accessibilityAttributedHint"];
 
   if (flags.setAccessibilityValue)
     view.accessibilityValue = accessibilityValue;
 
-  if (AS_AT_LEAST_IOS11 && flags.setAccessibilityAttributedValue)
-    [view setValue:accessibilityAttributedValue forKey:@"accessibilityAttributedValue"];
+  if (AS_AVAILABLE_IOS(11)) {
+    if (flags.setAccessibilityAttributedLabel) {
+      view.accessibilityAttributedLabel = accessibilityAttributedLabel;
+    }
+    if (flags.setAccessibilityAttributedHint) {
+      view.accessibilityAttributedHint = accessibilityAttributedHint;
+    }
+    if (flags.setAccessibilityAttributedValue) {
+      view.accessibilityAttributedValue = accessibilityAttributedValue;
+    }
+  }
 
   if (flags.setAccessibilityTraits)
     view.accessibilityTraits = accessibilityTraits;
