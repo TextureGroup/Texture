@@ -277,6 +277,10 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
  */
 - (void)__setNeedsDisplay;
 
+/**
+ * Setup the node -> controller reference. Strong or weak is based on
+ * the "shouldInvertStrongReference" property of the controller.
+ */
 - (void)setNodeController:(ASNodeController *)controller;
 
 /**
