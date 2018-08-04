@@ -149,14 +149,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 #pragma mark - Cell Layout
 
-- (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements completion:(ASDataControllerCompletionBlock)completionHandler
+- (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements
 {
   ASSERT_ON_EDITING_QUEUE;
   
   NSUInteger nodeCount = elements.count;
   __weak id<ASDataControllerSource> weakDataSource = _dataSource;
   if (nodeCount == 0 || weakDataSource == nil) {
-    completionHandler();
     return;
   }
 
@@ -165,30 +164,23 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   {
     as_activity_create_for_scope("Data controller batch");
 
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    // TODO: Should we use USER_INITIATED here since the user is probably waiting?
+    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0);
     ASDispatchApply(nodeCount, queue, 0, ^(size_t i) {
-      __strong id<ASDataControllerSource> strongDataSource = weakDataSource;
-      if (strongDataSource == nil) {
+      if (!weakDataSource) {
         return;
       }
 
-      // Allocate the node.
-      ASCollectionElement *context = elements[i];
-      ASCellNode *node = context.node;
-      if (node == nil) {
-        ASDisplayNodeAssertNotNil(node, @"Node block created nil node; %@, %@", self, strongDataSource);
-        node = [[ASCellNode alloc] init]; // Fallback to avoid crash for production apps.
-      }
-
+      unowned ASCollectionElement *element = elements[i];
+      unowned ASCellNode *node = element.node;
       // Layout the node if the size range is valid.
-      ASSizeRange sizeRange = context.constrainedSize;
+      ASSizeRange sizeRange = element.constrainedSize;
       if (ASSizeRangeHasSignificantArea(sizeRange)) {
         [self _layoutNode:node withConstrainedSize:sizeRange];
       }
     });
   }
 
-  completionHandler();
   ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (weakDataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
 }
 
@@ -648,28 +640,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
 
-    dispatch_block_t completion = ^() {
-      [_mainSerialQueue performBlockOnMainThread:^{
-        as_activity_scope_leave(&preparationScope);
-        // Step 4: Inform the delegate
-        [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
-          // Step 5: Deploy the new data as "completed"
-          //
-          // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
-          // it will not consume the batch update blocks immediately.
-          // As a result, in a short intermidate time, the view will still be relying on the old data source state.
-          // Thus, we can't just swap the new map immediately before step 4, but until this update block is executed.
-          // (https://github.com/TextureGroup/Texture/issues/378)
-          self.visibleMap = newMap;
-        }];
-      }];
-      --_editingTransactionGroupCount;
-    };
-
     // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
     if (canDelegate) {
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
-      completion();
     } else {
       let elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
       for (ASCollectionElement *element in newMap) {
@@ -682,8 +655,24 @@ typedef void (^ASDataControllerSynchronizationBlock)();
           [elementsToProcess addObject:element];
         }
       }
-      [self _allocateNodesFromElements:elementsToProcess completion:completion];
+      [self _allocateNodesFromElements:elementsToProcess];
     }
+
+    // Step 4: Inform the delegate on main thread
+    [_mainSerialQueue performBlockOnMainThread:^{
+      as_activity_scope_leave(&preparationScope);
+      [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
+        // Step 5: Deploy the new data as "completed"
+        //
+        // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
+        // it will not consume the batch update blocks immediately.
+        // As a result, in a short intermidate time, the view will still be relying on the old data source state.
+        // Thus, we can't just swap the new map immediately before step 4, but until this update block is executed.
+        // (https://github.com/TextureGroup/Texture/issues/378)
+        self.visibleMap = newMap;
+      }];
+    }];
+    --_editingTransactionGroupCount;
   });
   
   if (_usesSynchronousDataLoading) {
