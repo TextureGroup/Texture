@@ -27,6 +27,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalNetworkImageQueue = 1 << 5,                 // exp_network_image_queue
   ASExperimentalDeallocQueue = 1 << 6,                      // exp_dealloc_queue_v2
   ASExperimentalCollectionTeardown = 1 << 7,                // exp_collection_teardown
+  ASExperimentalFramesetterCache = 1 << 8,                  // exp_framesetter_cache
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
