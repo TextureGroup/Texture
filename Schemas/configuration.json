@@ -21,6 +21,7 @@
                     "exp_network_image_queue",
                     "exp_dealloc_queue_v2",
                     "exp_collection_teardown",
+                    "exp_framesetter_cache"
                 ]
     		}
 		}

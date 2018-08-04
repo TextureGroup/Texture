@@ -225,8 +225,6 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 @property (nonatomic, readonly) NSAttributedString *text;
 ///< The text range in full text
 @property (nonatomic, readonly) NSRange range;
-///< CTFrameSetter
-@property (nonatomic, readonly) CTFramesetterRef frameSetter;
 ///< CTFrame
 @property (nonatomic, readonly) CTFrameRef frame;
 ///< Array of `ASTextLine`, no truncated

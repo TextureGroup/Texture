@@ -16,10 +16,14 @@
 //
 
 #import <AsyncDisplayKit/ASTextLayout.h>
+
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import <pthread.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -320,7 +324,6 @@ dispatch_semaphore_signal(_lock);
 @property (nonatomic) NSAttributedString *text;
 @property (nonatomic) NSRange range;
 
-@property (nonatomic) CTFramesetterRef frameSetter;
 @property (nonatomic) CTFrameRef frame;
 @property (nonatomic) NSArray *lines;
 @property (nonatomic) ASTextLine *truncatedLine;
@@ -484,10 +487,71 @@ dispatch_semaphore_signal(_lock);
     frameAttrs[(id)kCTFrameProgressionAttributeName] = @(kCTFrameProgressionRightToLeft);
   }
   
-  // create CoreText objects
-  ctSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)text);
+  /*
+   * Framesetter cache.
+   * Framesetters can only be used by one thread at a time.
+   * Create a CFSet with no callbacks (raw pointers) to keep track of which
+   * framesetters are in use on other threads. If the one for our string is already in use,
+   * just create a new one. This should be pretty rare.
+   */
+  static pthread_mutex_t busyFramesettersLock = PTHREAD_MUTEX_INITIALIZER;
+  static NSCache<NSAttributedString *, id> *framesetterCache;
+  static CFMutableSetRef busyFramesetters;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    if (ASActivateExperimentalFeature(ASExperimentalFramesetterCache)) {
+      framesetterCache = [[NSCache alloc] init];
+      framesetterCache.name = @"org.TextureGroup.Texture.framesetterCache";
+      busyFramesetters = CFSetCreateMutable(NULL, 0, NULL);
+    }
+  });
+
+  BOOL haveCached = NO, useCached = NO;
+  if (framesetterCache) {
+    // Check if there's one in the cache.
+    ctSetter = (__bridge_retained CTFramesetterRef)[framesetterCache objectForKey:text];
+
+    if (ctSetter) {
+      haveCached = YES;
+
+      // Check-and-set busy on the cached one.
+      pthread_mutex_lock(&busyFramesettersLock);
+      BOOL busy = CFSetContainsValue(busyFramesetters, ctSetter);
+      if (!busy) {
+        CFSetAddValue(busyFramesetters, ctSetter);
+        useCached = YES;
+      }
+      pthread_mutex_unlock(&busyFramesettersLock);
+
+      // Release if it was busy.
+      if (busy) {
+        CFRelease(ctSetter);
+        ctSetter = NULL;
+      }
+    }
+  }
+
+  // Create a framesetter if needed.
+  if (!ctSetter) {
+    ctSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)text);
+  }
+
   if (!ctSetter) FAIL_AND_RETURN
   ctFrame = CTFramesetterCreateFrame(ctSetter, ASTextCFRangeFromNSRange(range), cgPath, (CFDictionaryRef)frameAttrs);
+
+  // Return to cache.
+  if (framesetterCache) {
+    if (useCached) {
+      // If reused: mark available.
+      pthread_mutex_lock(&busyFramesettersLock);
+      CFSetRemoveValue(busyFramesetters, ctSetter);
+      pthread_mutex_unlock(&busyFramesettersLock);
+    } else if (!haveCached) {
+      // If first framesetter, add to cache.
+      [framesetterCache setObject:(__bridge id)ctSetter forKey:text];
+    }
+  }
+
   if (!ctFrame) FAIL_AND_RETURN
   lines = [NSMutableArray new];
   ctLines = CTFrameGetLines(ctFrame);
@@ -857,8 +921,7 @@ dispatch_semaphore_signal(_lock);
   if (attachments.count == 0) {
     attachments = attachmentRanges = attachmentRects = nil;
   }
-  
-  layout.frameSetter = ctSetter;
+
   layout.frame = ctFrame;
   layout.lines = lines;
   layout.truncatedLine = truncatedLine;
@@ -903,14 +966,6 @@ dispatch_semaphore_signal(_lock);
   return layouts;
 }
 
-- (void)setFrameSetter:(CTFramesetterRef)frameSetter {
-  if (_frameSetter != frameSetter) {
-    if (frameSetter) CFRetain(frameSetter);
-    if (_frameSetter) CFRelease(_frameSetter);
-    _frameSetter = frameSetter;
-  }
-}
-
 - (void)setFrame:(CTFrameRef)frame {
   if (_frame != frame) {
     if (frame) CFRetain(frame);
@@ -920,7 +975,6 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (void)dealloc {
-  if (_frameSetter) CFRelease(_frameSetter);
   if (_frame) CFRelease(_frame);
   if (_lineRowsIndex) free(_lineRowsIndex);
   if (_lineRowsEdge) free(_lineRowsEdge);

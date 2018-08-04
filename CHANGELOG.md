@@ -29,6 +29,7 @@
 - Optimize ASDisplayNode -> ASNodeController reference by removing weak proxy and objc associated objects. [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove CA transaction signpost injection because it causes more transactions and is too chatty. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimize display node accessibility by not creating attributed & non-attributed copies of hint, label, and value. [Adlai Holler](https://github.com/Adlai-Holler)
+- Add an experimental feature that reuses CTFramesetter objects in ASTextNode2 to improve performance. [Adlai Holler](https://github.com/Adlai-Holler)
 
 
 ## 2.7
