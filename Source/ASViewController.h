@@ -44,7 +44,7 @@ typedef ASTraitCollection * _Nonnull (^ASDisplayTraitsForTraitWindowSizeBlock)(C
  *
  * @see ASVisibilityDepth
  */
-- (instancetype)initWithNode:(DisplayNodeType)node;
+- (instancetype)initWithNode:(DisplayNodeType)node NS_DESIGNATED_INITIALIZER;
 
 NS_ASSUME_NONNULL_END
 
