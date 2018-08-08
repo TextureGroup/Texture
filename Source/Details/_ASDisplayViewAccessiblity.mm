@@ -243,7 +243,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 }
 
 @interface _ASDisplayView () {
-  NSArray *_accessibleElements;
+  NSArray *_accessibilityElements;
 }
 
 @end
@@ -252,43 +252,26 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 
 #pragma mark - UIAccessibility
 
-- (void)setAccessibleElements:(NSArray *)accessibleElements
+- (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
-  _accessibleElements = nil;
+  _accessibilityElements = nil;
 }
 
-- (NSArray *)accessibleElements
+- (NSArray *)accessibilityElements
 {
   ASDisplayNode *viewNode = self.asyncdisplaykit_node;
   if (viewNode == nil) {
     return @[];
   }
   
-  if (_accessibleElements != nil) {
-    return _accessibleElements;
+  if (_accessibilityElements == nil) {
+    NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
+    CollectAccessibilityElementsForView(self, accessibilityElements);
+    SortAccessibilityElements(accessibilityElements);
+    _accessibilityElements = accessibilityElements;
   }
   
-  NSMutableArray *accessibleElements = [[NSMutableArray alloc] init];
-  CollectAccessibilityElementsForView(self, accessibleElements);
-  SortAccessibilityElements(accessibleElements);
-  _accessibleElements = accessibleElements;
-  
-  return _accessibleElements;
-}
-
-- (NSInteger)accessibilityElementCount
-{
-  return self.accessibleElements.count;
-}
-
-- (id)accessibilityElementAtIndex:(NSInteger)index
-{
-  return self.accessibleElements[index];
-}
-
-- (NSInteger)indexOfAccessibilityElement:(id)element
-{
-  return [self.accessibleElements indexOfObjectIdenticalTo:element];
+  return _accessibilityElements;
 }
 
 @end

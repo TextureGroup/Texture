@@ -99,8 +99,8 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   BOOL _inHitTest;
   BOOL _inPointInside;
 
-  NSArray *_accessibleElements;
-  CGRect _lastAccessibleElementsFrame;
+  NSArray *_accessibilityElements;
+  CGRect _lastAccessibilityElementsFrame;
   
   _ASDisplayViewMethodOverrides _methodOverrides;
 }
@@ -303,7 +303,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   [super addSubview:view];
   
 #ifndef ASDK_ACCESSIBILITY_DISABLE
-  self.accessibleElements = nil;
+  self.accessibilityElements = nil;
 #endif
 }
 
@@ -312,7 +312,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   [super willRemoveSubview:subview];
   
 #ifndef ASDK_ACCESSIBILITY_DISABLE
-  self.accessibleElements = nil;
+  self.accessibilityElements = nil;
 #endif
 }
 
