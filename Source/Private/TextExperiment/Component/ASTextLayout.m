@@ -17,6 +17,7 @@
 
 #import <AsyncDisplayKit/ASTextLayout.h>
 
+#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASTextUtilities.h>
 #import <AsyncDisplayKit/ASTextAttribute.h>
@@ -134,26 +135,36 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-  ASTextContainer *one = [self.class new];
+- (id)copyForced:(BOOL)forceCopy
+{
   dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+  if (_readonly && !forceCopy) {
+    dispatch_semaphore_signal(_lock);
+    return self;
+  }
+
+  ASTextContainer *one = [self.class new];
   one->_size = _size;
   one->_insets = _insets;
   one->_path = _path;
-  one->_exclusionPaths = _exclusionPaths.copy;
+  one->_exclusionPaths = [_exclusionPaths copy];
   one->_pathFillEvenOdd = _pathFillEvenOdd;
   one->_pathLineWidth = _pathLineWidth;
   one->_verticalForm = _verticalForm;
   one->_maximumNumberOfRows = _maximumNumberOfRows;
   one->_truncationType = _truncationType;
-  one->_truncationToken = _truncationToken.copy;
+  one->_truncationToken = [_truncationToken copy];
   one->_linePositionModifier = [(NSObject *)_linePositionModifier copy];
   dispatch_semaphore_signal(_lock);
   return one;
 }
 
-- (id)mutableCopyWithZone:(nullable NSZone *)zone {
-  return [self copyWithZone:zone];
+- (id)copyWithZone:(NSZone *)zone {
+  return [self copyForced:NO];
+}
+
+- (id)mutableCopyWithZone:(NSZone *)zone {
+  return [self copyForced:YES];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -189,18 +200,25 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   return self;
 }
 
+- (void)makeImmutable
+{
+  dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+  _readonly = YES;
+  dispatch_semaphore_signal(_lock);
+}
+
 #define Getter(...) \
 dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
 __VA_ARGS__; \
 dispatch_semaphore_signal(_lock);
 
 #define Setter(...) \
-if (_readonly) { \
-@throw [NSException exceptionWithName:NSInternalInconsistencyException \
-reason:@"Cannot change the property of the 'container' in 'ASTextLayout'." userInfo:nil]; \
-return; \
-} \
 dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+if (__builtin_expect(_readonly, NO)) { \
+  ASDisplayNodeFailAssert(@"Attempt to modify immutable text container."); \
+  dispatch_semaphore_signal(_lock); \
+  return; \
+} \
 __VA_ARGS__; \
 dispatch_semaphore_signal(_lock);
 
@@ -407,11 +425,10 @@ dispatch_semaphore_signal(_lock);
   if (lineRowsIndex) free(lineRowsIndex); \
   return nil; }
   
-  text = text.mutableCopy;
-  container = container.copy;
+  container = [container copy];
   if (!text || !container) return nil;
   if (range.location + range.length > text.length) return nil;
-  container->_readonly = YES;
+  [container makeImmutable];
   maximumNumberOfRows = container.maximumNumberOfRows;
   
   // It may use larger constraint size when create CTFrame with
