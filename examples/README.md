@@ -218,7 +218,7 @@ Featuring:
 There is an associated swift version app: LayoutSpecExamples-Swift with same logic implementation.
 
 ### TextureHeroExample [Swift]
-![Hero Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/TextureHeroExample.gif)
+![Hero Example App Screenshot](https://github.com/TextureGroup/Texture/tree/master/docs/static/images/example-app-screenshots/TextureHeroExample.gif)
 
 ## License
 
