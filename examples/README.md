@@ -217,6 +217,9 @@ Featuring:
 
 There is an associated swift version app: LayoutSpecExamples-Swift with same logic implementation.
 
+### TextureHeroExample [Swift]
+![Hero Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/TextureHeroExample.gif)
+
 ## License
 
     This file provided by Facebook is for non-commercial testing and evaluation
