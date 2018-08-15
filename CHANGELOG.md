@@ -32,6 +32,7 @@
 - Add an experimental feature that reuses CTFramesetter objects in ASTextNode2 to improve performance. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add NS_DESIGNATED_INITIALIZER to ASViewController initWithNode: [Michael Schneider](https://github.com/maicki) [#1054](https://github.com/TextureGroup/Texture/pull/1054)
 - Optimize text stack by removing unneeded copying. [Adlai Holler](https://github.com/Adlai-Holler)
+- Remove double scaling of lineHeightMultiple & paragraphSpacing attributes in ASTextKitFontSizeAdjuster. [Eric Jensen](https://github.com/ejensen)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
