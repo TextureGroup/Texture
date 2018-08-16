@@ -323,18 +323,36 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)prepareAttributedString:(NSMutableAttributedString *)attributedString
 {
   ASLockScopeSelf();
- 
+  NSLineBreakMode innerMode;
+  switch (_truncationMode) {
+    case NSLineBreakByWordWrapping:
+    case NSLineBreakByCharWrapping:
+    case NSLineBreakByClipping:
+      innerMode = _truncationMode;
+      break;
+    default:
+      innerMode = NSLineBreakByWordWrapping;
+  }
+
   // Apply paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
-    if (style == nil || style.lineBreakMode == _truncationMode) {
-      return;
+    NSMutableParagraphStyle *paragraphStyle = nil;
+
+    if (style != nil) {
+      if (innerMode == style.lineBreakMode) {
+        return;
+      }
+      paragraphStyle = [style mutableCopy];
+    } else {
+      if (innerMode == NSLineBreakByWordWrapping) {
+        return;
+      }
+      paragraphStyle = [NSMutableParagraphStyle new];
     }
-    
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineBreakMode = _truncationMode;
+    paragraphStyle.lineBreakMode = innerMode;
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
-  
+
   // Apply shadow if needed
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
     NSShadow *shadow = [[NSShadow alloc] init];
