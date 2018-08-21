@@ -1,12 +1,12 @@
 //
 //  ASTextRunDelegate.m
-//  Texture
+//  ASText <https://github.com/ibireme/ASText>
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License").
-//  You may obtain a copy of the License at
+//  Created by ibireme on 14/10/14.
+//  Copyright (c) 2015 ibireme.
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  This source code is licensed under the MIT-style license found in the
+//  LICENSE file in the root directory of this source tree.
 //
 
 #import <AsyncDisplayKit/ASTextRunDelegate.h>

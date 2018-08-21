@@ -1,13 +1,10 @@
-//
-//  ASXCTExtensions.h
-//  Texture
-//
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License").
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
+/**
+ * XCTest extensions for CGGeometry.
+ *
+ * Prefer these to XCTAssert(CGRectEqualToRect(...)) because you get output
+ * that tells you what went wrong.
+ * Could use NSValue, but using strings makes the description messages shorter.
+ */
 
 #import <XCTest/XCTestAssertionsImpl.h>
 
