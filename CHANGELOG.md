@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
 - [ASLayoutTransition] Add support for preserving order after node moves during transitions. (This order defines the z-order as well.) [Kevin Smith](https://github.com/wiseoldduck) [#1006]
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
