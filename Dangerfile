@@ -7,8 +7,6 @@ source_pattern = /(\.m|\.mm|\.h)$/
 declared_trivial = github.pr_title.include? "#trivial"
 has_changes_in_source_directory = !git.modified_files.grep(/Source/).empty?
 
-modified_source_files = git.modified_files.grep(source_pattern)
-has_modified_source_files = !modified_source_files.empty?
 added_source_files = git.added_files.grep(source_pattern)
 has_added_source_files = !added_source_files.empty?
 
@@ -37,7 +35,7 @@ def full_license(partial_license, filename)
     return license_header
 end
 
-def check_file_header(files_to_check, licenses)
+def check_file_header(files_to_check, license)
   repo_name = github.pr_json["base"]["repo"]["full_name"]
   pr_number = github.pr_json["number"]
   files = github.api.pull_request_files(repo_name, pr_number)
@@ -51,18 +49,11 @@ def check_file_header(files_to_check, licenses)
         data += io.read
       }
       
-      correct_license = false
-      licenses.each do |license|
-        license_header = full_license(license, filename)
-        if data.include? "Pinterest, Inc."
-          correct_license = true
-        end
+      license_header = full_license(license, filename)
+      unless data.include? license_header
+        warn ("Please ensure license is correct for #{filename}: \n```\n" + license_header + "```")
       end
-      
-      if correct_license == false
-        warn ("Please ensure license is correct for #{filename}: \n```\n" + full_license(licenses[0], filename) + "```")
-      end
-      
+    
     end
   end
 end
@@ -79,25 +70,5 @@ new_source_license_header = <<-HEREDOC
 HEREDOC
 
 if has_added_source_files
-  check_file_header(added_source_files, [new_source_license_header])
-end
-
-# Ensure modified files have proper header
-modified_source_license_header = <<-HEREDOC
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) through the present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-HEREDOC
-
-if has_modified_source_files
-  check_file_header(modified_source_files, [modified_source_license_header, new_source_license_header])
+  check_file_header(added_source_files, new_source_license_header)
 end
