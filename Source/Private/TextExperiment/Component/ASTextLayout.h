@@ -67,6 +67,9 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 /// Creates a container with the specified path. @param path The path.
 + (instancetype)containerWithPath:(nullable UIBezierPath *)path NS_RETURNS_RETAINED;
 
+/// Mark this immutable, so you get free copies going forward.
+- (void)makeImmutable;
+
 /// The constrained size. (if the size is larger than ASTextContainerMaxSize, it will be clipped)
 @property CGSize size;
 
@@ -225,8 +228,6 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 @property (nonatomic, readonly) NSAttributedString *text;
 ///< The text range in full text
 @property (nonatomic, readonly) NSRange range;
-///< CTFrameSetter
-@property (nonatomic, readonly) CTFramesetterRef frameSetter;
 ///< CTFrame
 @property (nonatomic, readonly) CTFrameRef frame;
 ///< Array of `ASTextLine`, no truncated

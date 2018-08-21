@@ -16,7 +16,7 @@ Both nodes and layoutSpecs conform to the `<ASLayoutable>` protocol.  Any `ASLay
 
 ### Single Child layoutSpecs
 
-<table style="width:100%"  class = "paddingBetweenCols">
+<table style="width:100%" class="paddingBetweenCols">
   <tr>
     <th>LayoutSpec</th>
     <th>Description</th> 
@@ -39,10 +39,10 @@ Both nodes and layoutSpecs conform to the `<ASLayoutable>` protocol.  Any `ASLay
   </tr>
   <tr>
     <td><b><code>ASRatioLayoutSpec</code></b></td>
-    <td><p>Lays out a component at a fixed aspect ratio (which can be scaled).</p> <p><i>This spec is great for objects that do not have an intrinisic size, such as ASNetworkImageNodes and <code>ASVideoNodes</code>.</i></p> </td> 
+    <td><p>Lays out a component at a fixed aspect ratio (which can be scaled).</p> <p><i>This spec is great for objects that do not have an intrinisic size, such as ASNetworkImageNodes and <code>ASVideoNodes</code>.</i></p></td> 
   </tr>
   <tr>
-    <td><b><code>ASRelativeLayoutSpec<code></b></td>
+    <td><b><code>ASRelativeLayoutSpec</code></b></td>
     <td><p>Lays out a component and positions it within the layout bounds according to vertical and horizontal positional specifiers. Similar to the “9-part” image areas, a child can be positioned at any of the 4 corners, or the middle of any of the 4 edges, as well as the center.</p> </td> 
   </tr>
   <tr>
@@ -70,7 +70,7 @@ The following layoutSpecs may contain one or more children.
   </tr>
 </table>
 
-# ASLayoutable Properties
+### ASLayoutable Properties
 
 The following properties can be applied to both nodes _and_ `layoutSpec`s; both conform to the `ASLayoutable` protocol. 
 
