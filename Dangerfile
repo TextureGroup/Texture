@@ -51,7 +51,7 @@ def check_file_header(files_to_check, license)
       
       license_header = full_license(license, filename)
       unless data.include? license_header
-        warn ("Please ensure license is correct for #{filename}: \n```\n" + license_header + "```")
+        warn ("Please ensure license is correct for #{filename}:\n```\n#{license_header}\n```")
       end
     
     end
