@@ -44,4 +44,4 @@ We welcome any contributions. See the [CONTRIBUTING](https://github.com/textureg
 
 ## License
 
-The Texture project is available for free use, as described by the [LICENSE](https://github.com/texturegroup/texture/blob/master/LICENSE.md) (Apache 2.0).
+The Texture project is available for free use, as described by the [LICENSE](https://github.com/texturegroup/texture/blob/master/LICENSE) (Apache 2.0).

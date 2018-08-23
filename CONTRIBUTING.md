@@ -81,19 +81,27 @@ Before submitting a pull request, please make sure the following is done…
 6. If you haven't already, sign the CLA.
 
 **Copyright Notice for files**
-Ensure this license header is included on all files in the repository, including new ones:
+Copy and paste this to the top of your new file(s):
 ```objc
 //
 //  ASDisplayNode.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //  
+```
+
+If you’ve modified an existing file, change the header to:
+```objc
+//
+//  ASDisplayNode.mm
+//  Texture
+//
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
+//
 ```
 
 # Semantic Versioning
