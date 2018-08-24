@@ -107,7 +107,7 @@ NS_INLINE void ASUnlockSet(ASLockSet *lockSet) {
  */
 NS_INLINE ASLockSet ASLockSequence(NS_NOESCAPE ASLockSequenceBlock body)
 {
-  __block ASLockSet locks = (ASLockSet){0};
+  __block ASLockSet locks = (ASLockSet){0, {}};
   BOOL (^addLock)(id<ASLocking>) = ^(id<ASLocking> obj) {
     
     // nil lock = ignore.
