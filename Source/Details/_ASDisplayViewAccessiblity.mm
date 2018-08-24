@@ -254,16 +254,19 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
+  ASDisplayNodeAssertMainThread();
   _accessibilityElements = nil;
 }
 
 - (NSArray *)accessibilityElements
 {
+  ASDisplayNodeAssertMainThread();
+  
   ASDisplayNode *viewNode = self.asyncdisplaykit_node;
   if (viewNode == nil) {
     return @[];
   }
-  
+
   if (_accessibilityElements == nil) {
     NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
     CollectAccessibilityElementsForView(self, accessibilityElements);
