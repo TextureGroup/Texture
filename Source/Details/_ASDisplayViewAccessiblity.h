@@ -18,6 +18,8 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 
-@interface _ASDisplayView (UIAccessibilityContainer)
-@property (copy, nonatomic) NSArray *accessibleElements;
-@end
+// WARNING: When dealing with accessibility elements, please use the `accessibilityElements`
+// property instead of the older methods e.g. `accessibilityElementCount()`. While the older methods
+// should still work as long as accessibility is enabled, this framework provides no guarantees on
+// their correctness. For details, see
+// https://developer.apple.com/documentation/objectivec/nsobject/1615147-accessibilityelements
