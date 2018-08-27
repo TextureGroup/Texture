@@ -152,7 +152,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * Set during beginInteractiveMovementForItemAtIndexPath and UIGestureRecognizerStateEnded
    * (or UIGestureRecognizerStateFailed, UIGestureRecognizerStateCancelled.
    */
-  BOOL _editing;
+  BOOL _reordering;
   
   /**
    * Counter used to keep track of nested batch updates.
@@ -1027,7 +1027,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath
 {
   ASDisplayNodeAssertMainThread();
-  if (!_editing) {
+  if (!_reordering) {
     [self performBatchUpdates:^{
       [_changeSet moveItemAtIndexPath:indexPath toIndexPath:newIndexPath animationOptions:kASCollectionViewAnimationNone];
     } completion:nil];
@@ -1037,17 +1037,17 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 }
 
 - (BOOL)beginInteractiveMovementForItemAtIndexPath:(NSIndexPath *)indexPath {
-  _editing = YES;
+  _reordering = YES;
   return [super beginInteractiveMovementForItemAtIndexPath:indexPath];
 }
 
 - (void)endInteractiveMovement {
-  _editing = NO;
-  return [super endInteractiveMovement];
+  _reordering = NO;
+  [super endInteractiveMovement];
 }
 
 - (void)cancelInteractiveMovement {
-  _editing = NO;
+  _reordering = NO;
   [super cancelInteractiveMovement];
 }
 
