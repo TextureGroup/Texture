@@ -3241,7 +3241,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
-  ASDisplayNodeAssertMainThread();
+  ASDN::MutexLocker l(__instanceLock__);
 
   // Not a fan of lazy loading, but this method won't get called very often and avoiding
   // the overhead of creating this is probably worth it.
