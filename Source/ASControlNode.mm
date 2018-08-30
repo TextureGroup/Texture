@@ -295,7 +295,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
     
     // only show tap-able areas for views with 1 or more addTarget:action: pairs
     if ([ASControlNode enableHitTestDebug] && _debugHighlightOverlay == nil) {
-      ASPerformBlockOnMainThread(^{
+      dispatch_async(dispatch_get_main_queue(), ^{
         // add a highlight overlay node with area of ASControlNode + UIEdgeInsets
         self.clipsToBounds = NO;
         _debugHighlightOverlay = [[ASImageNode alloc] init];
