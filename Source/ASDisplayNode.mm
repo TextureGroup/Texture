@@ -3253,7 +3253,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
-  ASDisplayNodeAssertMainThread();
+  ASDN::MutexLocker l(__instanceLock__);
   [_interfaceStateDelegates removeObject:interfaceStateDelegate];
 }
 
