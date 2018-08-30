@@ -2,12 +2,8 @@
 //  ASConfiguration.m
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASConfiguration.h>
@@ -15,19 +11,16 @@
 
 /// Not too performance-sensitive here.
 
-/// Get this from C++, without the extra exception handling.
-#define autotype __auto_type
-
 @implementation ASConfiguration
 
 - (instancetype)initWithDictionary:(NSDictionary *)dictionary
 {
   if (self = [super init]) {
     if (dictionary != nil) {
-      autotype featureStrings = ASDynamicCast(dictionary[@"experimental_features"], NSArray);
-      autotype version = ASDynamicCast(dictionary[@"version"], NSNumber).integerValue;
+      let featureStrings = ASDynamicCast(dictionary[@"experimental_features"], NSArray);
+      let version = ASDynamicCast(dictionary[@"version"], NSNumber).integerValue;
       if (version != ASConfigurationSchemaCurrentVersion) {
-        NSLog(@"Texture warning: configuration schema is old version (%zd vs %zd)", version, ASConfigurationSchemaCurrentVersion);
+        NSLog(@"Texture warning: configuration schema is old version (%ld vs %ld)", (long)version, (long)ASConfigurationSchemaCurrentVersion);
       }
       self.experimentalFeatures = ASExperimentalFeaturesFromArray(featureStrings);
     } else {

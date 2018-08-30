@@ -2,17 +2,9 @@
 //  ASRunLoopQueue.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
@@ -101,7 +93,7 @@ static void runLoopSourceCallback(void *info) {
         return;
       }
       // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
-      NSInteger count;
+      __unused NSInteger count; // Prevent static analyzer warning if release build
       @autoreleasepool {
 #if ASRunLoopQueueLoggingEnabled
         NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
@@ -220,13 +212,13 @@ static void runLoopSourceCallback(void *info) {
   NSParameterAssert(objectPtr != NULL);
   
   // Cast to CFType so we can manipulate retain count manually.
-  auto cfPtr = (CFTypeRef *)(void *)objectPtr;
+  let cfPtr = (CFTypeRef *)(void *)objectPtr;
   if (!cfPtr || !*cfPtr) {
     return;
   }
   
   _lock.lock();
-  auto isFirstEntry = _queue.empty();
+  let isFirstEntry = _queue.empty();
   // Push the pointer into our queue and clear their pointer.
   // This "steals" the +1 from ARC and nils their pointer so they can't
   // access or release the object.
@@ -244,9 +236,9 @@ static void runLoopSourceCallback(void *info) {
 - (void)drain
 {
   _lock.lock();
-  auto q = std::move(_queue);
+  let q = std::move(_queue);
   _lock.unlock();
-  for (auto ref : q) {
+  for (let ref : q) {
     // NOTE: Could check that retain count is 1 and retry later if not.
     CFRelease(ref);
   }
@@ -254,84 +246,17 @@ static void runLoopSourceCallback(void *info) {
 
 @end
 
-#if AS_KDEBUG_ENABLE
-/**
- * This is real, private CA API. Valid as of iOS 10.
- */
-typedef enum {
-  kCATransactionPhasePreLayout,
-  kCATransactionPhasePreCommit,
-  kCATransactionPhasePostCommit,
-} CATransactionPhase;
-
-@interface CATransaction (Private)
-+ (void)addCommitHandler:(void(^)(void))block forPhase:(CATransactionPhase)phase;
-+ (int)currentState;
-@end
-#endif
-
-#pragma mark - ASAbstractRunLoopQueue
-
-@interface ASAbstractRunLoopQueue (Private)
-+ (void)load;
-+ (void)registerCATransactionObservers;
-@end
-
 @implementation ASAbstractRunLoopQueue
 
 - (instancetype)init
 {
-  if (self != [super init]) {
+  self = [super init];
+  if (self == nil) {
     return nil;
   }
   ASDisplayNodeAssert(self.class != [ASAbstractRunLoopQueue class], @"Should never create instances of abstract class ASAbstractRunLoopQueue.");
   return self;
 }
-
-#if AS_KDEBUG_ENABLE
-+ (void)load
-{
-  [self registerCATransactionObservers];
-}
-
-+ (void)registerCATransactionObservers
-{
-  static BOOL privateCAMethodsExist;
-  static dispatch_block_t preLayoutHandler;
-  static dispatch_block_t preCommitHandler;
-  static dispatch_block_t postCommitHandler;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    privateCAMethodsExist = [CATransaction respondsToSelector:@selector(addCommitHandler:forPhase:)];
-    privateCAMethodsExist &= [CATransaction respondsToSelector:@selector(currentState)];
-    if (!privateCAMethodsExist) {
-      NSLog(@"Private CA methods are gone.");
-    }
-    preLayoutHandler = ^{
-      ASSignpostStartCustom(ASSignpostCATransactionLayout, 0, [CATransaction currentState]);
-    };
-    preCommitHandler = ^{
-      int state = [CATransaction currentState];
-      ASSignpostEndCustom(ASSignpostCATransactionLayout, 0, state, ASSignpostColorDefault);
-      ASSignpostStartCustom(ASSignpostCATransactionCommit, 0, state);
-    };
-    postCommitHandler = ^{
-      ASSignpostEndCustom(ASSignpostCATransactionCommit, 0, [CATransaction currentState], ASSignpostColorDefault);
-      // Can't add new observers inside an observer. rdar://problem/31253952
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [self registerCATransactionObservers];
-      });
-    };
-  });
-
-  if (privateCAMethodsExist) {
-    [CATransaction addCommitHandler:preLayoutHandler forPhase:kCATransactionPhasePreLayout];
-    [CATransaction addCommitHandler:preCommitHandler forPhase:kCATransactionPhasePreCommit];
-    [CATransaction addCommitHandler:postCommitHandler forPhase:kCATransactionPhasePostCommit];
-  }
-}
-
-#endif // AS_KDEBUG_ENABLE
 
 @end
 
@@ -487,11 +412,11 @@ typedef enum {
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  auto count = itemsToProcess.size();
+  let count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    auto itemsEnd = itemsToProcess.cend();
-    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    let itemsEnd = itemsToProcess.cend();
+    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
@@ -710,11 +635,11 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  auto count = itemsToProcess.size();
+  let count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    auto itemsEnd = itemsToProcess.cend();
-    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    let itemsEnd = itemsToProcess.cend();
+    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       [value prepareForCATransactionCommit];
       as_log_verbose(ASDisplayLog(), "processed %@", value);
