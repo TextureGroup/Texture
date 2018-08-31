@@ -1283,7 +1283,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)layout
 {
-
   // Hook for subclasses
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
@@ -3014,8 +3013,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 #pragma mark - Interface State
 
-
-
 /**
  * We currently only set interface state on nodes in table/collection views. For other nodes, if they are
  * in the hierarchy we enable all ASInterfaceState types with `ASInterfaceStateInHierarchy`, otherwise `None`.
@@ -3360,7 +3357,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeCallInterfaceStateDelegates(didExitPreloadState);
-
 }
 
 - (void)clearContents
