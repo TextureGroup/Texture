@@ -2,17 +2,9 @@
 //  ASDisplayNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
@@ -460,6 +452,16 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 #pragma mark - Loading
 
+#define ASDisplayNodeCallInterfaceStateDelegates(method) \
+    __instanceLock__.lock(); \
+    NSHashTable *delegates = [_interfaceStateDelegates copy]; \
+    __instanceLock__.unlock(); \
+    for (id <ASInterfaceStateDelegate> delegate in delegates) { \
+      if ([delegate respondsToSelector:@selector(method)]) { \
+        [delegate method]; \
+      } \
+    }
+
 - (BOOL)_locked_shouldLoadViewOrLayer
 {
   ASAssertLocked(__instanceLock__);
@@ -572,12 +574,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   for (ASDisplayNodeDidLoadBlock block in onDidLoadBlocks) {
     block(self);
   }
-
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(nodeDidLoad)]) {
-      [delegate nodeDidLoad];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(nodeDidLoad);
 }
 
 - (void)didLoad
@@ -1282,11 +1279,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(nodeDidLayout)]) {
-      [delegate nodeDidLayout];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(nodeDidLayout);
 }
 
 #pragma mark Layout Transition
@@ -1509,12 +1502,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   if (_pendingDisplayNodes.isEmpty) {
     
     [self hierarchyDisplayDidFinish];
-    
-    for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-      if ([delegate respondsToSelector:@selector(hierarchyDisplayDidFinish)]) {
-        [delegate hierarchyDisplayDidFinish];
-      }
-    }
+    ASDisplayNodeCallInterfaceStateDelegates(hierarchyDisplayDidFinish);
       
     BOOL placeholderShouldPersist = [self placeholderShouldPersist];
 
@@ -3225,7 +3213,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // Subclass hook
   ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertMainThread();
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
+  __instanceLock__.lock();
+  NSHashTable *delegates = [_interfaceStateDelegates copy];
+  __instanceLock__.unlock();
+  for (id <ASInterfaceStateDelegate> delegate in delegates) {
     if ([delegate respondsToSelector:@selector(interfaceStateDidChange:fromState:)]) {
       [delegate interfaceStateDidChange:newState fromState:oldState];
     }
@@ -3241,8 +3232,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
-  ASDisplayNodeAssertMainThread();
-
+  ASDN::MutexLocker l(__instanceLock__);
   // Not a fan of lazy loading, but this method won't get called very often and avoiding
   // the overhead of creating this is probably worth it.
   if (_interfaceStateDelegates == nil) {
@@ -3253,7 +3243,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
-  ASDisplayNodeAssertMainThread();
+  ASDN::MutexLocker l(__instanceLock__);
   [_interfaceStateDelegates removeObject:interfaceStateDelegate];
 }
 
@@ -3268,11 +3258,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didEnterVisibleState)]) {
-      [delegate didEnterVisibleState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didEnterVisibleState);
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
@@ -3283,11 +3269,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didExitVisibleState)]) {
-      [delegate didExitVisibleState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didExitVisibleState);
 }
 
 - (BOOL)isInDisplayState
@@ -3301,11 +3283,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didEnterDisplayState)]) {
-      [delegate didEnterDisplayState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didEnterDisplayState);
 }
 
 - (void)didExitDisplayState
@@ -3313,11 +3291,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didExitDisplayState)]) {
-      [delegate didExitDisplayState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didExitDisplayState);
 }
 
 - (BOOL)isInPreloadState
@@ -3367,23 +3341,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (self.automaticallyManagesSubnodes) {
     [self layoutIfNeeded];
   }
-
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didEnterPreloadState)]) {
-      [delegate didEnterPreloadState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didEnterPreloadState);
 }
 
 - (void)didExitPreloadState
 {
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  for (id <ASInterfaceStateDelegate> delegate in _interfaceStateDelegates) {
-    if ([delegate respondsToSelector:@selector(didExitPreloadState)]) {
-      [delegate didExitPreloadState];
-    }
-  }
+  ASDisplayNodeCallInterfaceStateDelegates(didExitPreloadState);
 }
 
 - (void)clearContents
