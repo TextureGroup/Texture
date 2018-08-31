@@ -251,6 +251,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     
     // For debugging purposes we don't care about locking for now
     if ([ASImageNode shouldShowImageScalingOverlay] && _debugLabelNode == nil) {
+      // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
+      // holding the lock while calling addSubnode.
       dispatch_async(dispatch_get_main_queue(), ^{
         _debugLabelNode = [[ASTextNode alloc] init];
         _debugLabelNode.layerBacked = YES;
