@@ -1037,8 +1037,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 }
 
 - (BOOL)beginInteractiveMovementForItemAtIndexPath:(NSIndexPath *)indexPath {
-  _reordering = YES;
-  return [super beginInteractiveMovementForItemAtIndexPath:indexPath];
+  BOOL success = [super beginInteractiveMovementForItemAtIndexPath:indexPath];
+  _reordering = success;
+  return success;
 }
 
 - (void)endInteractiveMovement {
