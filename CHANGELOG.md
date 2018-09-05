@@ -1,6 +1,8 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASCollectionView] Fix reording of cells manually for iOS 9 & 10. [Max Wang](https://github.com/wsdwsd0829). [#1081](https://github.com/TextureGroup/Texture/pull/1081)
+- [ASDisplayNode] Allow add/remove interface state delegates on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1090](https://github.com/TextureGroup/Texture/pull/1090)
+- [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
 - [ASLayoutTransition] Add support for preserving order after node moves during transitions. (This order defines the z-order as well.) [Kevin Smith](https://github.com/wiseoldduck) [#1006]
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
@@ -33,6 +35,7 @@
 - Add an experimental feature that reuses CTFramesetter objects in ASTextNode2 to improve performance. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add NS_DESIGNATED_INITIALIZER to ASViewController initWithNode: [Michael Schneider](https://github.com/maicki) [#1054](https://github.com/TextureGroup/Texture/pull/1054)
 - Optimize text stack by removing unneeded copying. [Adlai Holler](https://github.com/Adlai-Holler)
+- Renamed `accessibleElements` to `accessibilityElements` and removed the re-definition of the property in ASDisplayView. [Jia Wern Lim](https://github.com/jiawernlim)
 - Remove double scaling of lineHeightMultiple & paragraphSpacing attributes in ASTextKitFontSizeAdjuster. [Eric Jensen](https://github.com/ejensen)
 
 ## 2.7
