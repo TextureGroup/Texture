@@ -48,6 +48,7 @@
 - [ASPINRemoteImageManager] Add a new API for setting a preconfigured PINRemoteImageManager. [Ernest Ma](https://github.com/ernestmama) [#1124](https://github.com/TextureGroup/Texture/pull/1124)
 - Small optimization to the layout spec & yoga layout systems by eliminating array copies. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimize layout process by removing `ASRectMap`.  [Adlai Holler](https://github.com/Adlai-Holler)
+- Remove necessity to use view to access rangeController in ASTableNode, ASCollectionNode. [Michael Schneider](https://github.com/maicki)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)

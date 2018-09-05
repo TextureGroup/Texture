@@ -25,9 +25,12 @@
 
 #pragma mark - _ASTablePendingState
 
-@interface _ASTablePendingState : NSObject
-@property (weak, nonatomic) id <ASTableDelegate>   delegate;
-@property (weak, nonatomic) id <ASTableDataSource> dataSource;
+@interface _ASTablePendingState : NSObject {
+@public
+  std::vector<std::vector<ASRangeTuningParameters>> _tuningParameters;
+}
+@property (nonatomic, weak) id <ASTableDelegate>   delegate;
+@property (nonatomic, weak) id <ASTableDataSource> dataSource;
 @property (nonatomic) ASLayoutRangeMode rangeMode;
 @property (nonatomic) BOOL allowsSelection;
 @property (nonatomic) BOOL allowsSelectionDuringEditing;
@@ -39,14 +42,19 @@
 @property (nonatomic) CGPoint contentOffset;
 @property (nonatomic) BOOL animatesContentOffset;
 @property (nonatomic) BOOL automaticallyAdjustsContentOffset;
+
 @end
 
 @implementation _ASTablePendingState
+
+#pragma mark - Lifecycle
+
 - (instancetype)init
 {
   self = [super init];
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
+    _tuningParameters = std::vector<std::vector<ASRangeTuningParameters>> (ASLayoutRangeModeCount, std::vector<ASRangeTuningParameters> (ASLayoutRangeTypeCount, ASRangeTuningParametersZero));
     _allowsSelection = YES;
     _allowsSelectionDuringEditing = NO;
     _allowsMultipleSelection = NO;
@@ -61,6 +69,30 @@
   return self;
 }
 
+#pragma mark Tuning Parameters
+
+- (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
+{
+  return [self tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
+{
+  return [self setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  ASDisplayNodeAssert(rangeMode < _tuningParameters.size() && rangeType < _tuningParameters[rangeMode].size(), @"Requesting a range that is OOB for the configured tuning parameters");
+  return _tuningParameters[rangeMode][rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  ASDisplayNodeAssert(rangeMode < _tuningParameters.size() && rangeType < _tuningParameters[rangeMode].size(), @"Setting a range that is OOB for the configured tuning parameters");
+  _tuningParameters[rangeMode][rangeType] = tuningParameters;
+}
+
 @end
 
 #pragma mark - ASTableView
@@ -72,6 +104,7 @@
 }
 
 @property (nonatomic) _ASTablePendingState *pendingState;
+@property (nonatomic, weak) ASRangeController *rangeController;
 @end
 
 @implementation ASTableNode
@@ -116,9 +149,11 @@
   
   ASTableView *view = self.view;
   view.tableNode    = self;
+  
+  _rangeController = view.rangeController;
 
   if (_pendingState) {
-    _ASTablePendingState *pendingState = _pendingState;
+    _ASTablePendingState *pendingState        = _pendingState;
     view.asyncDelegate                        = pendingState.delegate;
     view.asyncDataSource                      = pendingState.dataSource;
     view.inverted                             = pendingState.inverted;
@@ -129,8 +164,23 @@
     view.contentInset                         = pendingState.contentInset;
     self.pendingState                         = nil;
     
+    let tuningParametersVector = pendingState->_tuningParameters;
+    let tuningParametersVectorSize = tuningParametersVector.size();
+    for (NSInteger rangeMode = 0; rangeMode < tuningParametersVectorSize; rangeMode++) {
+      let tuningparametersRangeModeVector = tuningParametersVector[rangeMode];
+      let tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
+      for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
+        ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
+        if (!ASRangeTuningParametersEqualToRangeTuningParameters(tuningParameters, ASRangeTuningParametersZero)) {
+          [_rangeController setTuningParameters:tuningParameters
+                                   forRangeMode:(ASLayoutRangeMode)rangeMode
+                                      rangeType:(ASLayoutRangeType)rangeType];
+        }
+      }
+    }
+    
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
-      [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
+      [_rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
 
     [view setContentOffset:pendingState.contentOffset animated:pendingState.animatesContentOffset];
@@ -159,7 +209,7 @@
   [super didEnterPreloadState];
   // Intentionally allocate the view here and trigger a layout pass on it, which in turn will trigger the intial data load.
   // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
-  [[self view] layoutIfNeeded];
+  [self.view layoutIfNeeded];
 }
 
 #if ASRangeControllerLoggingEnabled
@@ -188,12 +238,6 @@
 - (ASDataController *)dataController
 {
   return self.view.dataController;
-}
-
-// TODO: Implement this without the view.
-- (ASRangeController *)rangeController
-{
-  return self.view.rangeController;
 }
 
 - (_ASTablePendingState *)pendingState
@@ -476,22 +520,30 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
 
 - (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+  return [self tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
 }
 
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
 {
-  [self.rangeController setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+  [self setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
 }
 
 - (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  if ([self pendingState]) {
+    return [_pendingState tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  } else {
+    return [self.rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  }
 }
 
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  if ([self pendingState]) {
+    [_pendingState setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  } else {
+    return [self.rangeController setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  }
 }
 
 #pragma mark - Selection
