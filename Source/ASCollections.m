@@ -53,7 +53,7 @@ static const void *ASTransferRetain(CFAllocatorRef allocator, const void *val) {
     return result;
   }
   
-  NSArray *result = (__bridge_transfer NSArray *)CFArrayCreate(gTransferAllocator, (void *)pointers, count, &callbacks);
+  NSArray *result = (__bridge_transfer NSArray *)CFArrayCreate(gTransferAllocator, (const void **)(void *)pointers, count, &callbacks);
   memset(pointers, 0, count * sizeof(id));
   return result;
 }
