@@ -1252,6 +1252,7 @@
 			isa = PBXGroup;
 			children = (
 				F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */,
+				CC35CEC520DD87280006448D /* ASCollectionsTests.m */,
 				DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.m */,
 				AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.m */,
 				696FCB301D6E46050093471E /* ASBackgroundLayoutSpecSnapshotTests.mm */,
