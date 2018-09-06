@@ -39,7 +39,6 @@
 #import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASMainThreadDeallocation.h>
-#import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
@@ -875,18 +874,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   ASDN::MutexLocker l(__instanceLock__);
   _automaticallyRelayoutOnLayoutMarginsChanges = flag;
-}
-
-- (void)__setNodeController:(ASNodeController *)controller
-{
-  // See docs for why we don't lock.
-  if (controller.shouldInvertStrongReference) {
-    _strongNodeController = controller;
-    _weakNodeController = nil;
-  } else {
-    _weakNodeController = controller;
-    _strongNodeController = nil;
-  }
 }
 
 #pragma mark - UIResponder
