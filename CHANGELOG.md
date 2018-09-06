@@ -37,6 +37,7 @@
 - Optimize text stack by removing unneeded copying. [Adlai Holler](https://github.com/Adlai-Holler)
 - Renamed `accessibleElements` to `accessibilityElements` and removed the re-definition of the property in ASDisplayView. [Jia Wern Lim](https://github.com/jiawernlim)
 - Remove double scaling of lineHeightMultiple & paragraphSpacing attributes in ASTextKitFontSizeAdjuster. [Eric Jensen](https://github.com/ejensen)
+- Add a delegate callback for when the framework has initialized. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
