@@ -454,7 +454,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 #define ASDisplayNodeCallInterfaceStateDelegates(method) \
     __instanceLock__.lock(); \
-    NSHashTable *delegates = [_interfaceStateDelegates copy]; \
+    NSHashTable *delegates = _copiedInterfaceStateDelegates; \
+    if (!delegates) { \
+      delegates = _copiedInterfaceStateDelegates = [_interfaceStateDelegates copy]; \
+    } \
     __instanceLock__.unlock(); \
     for (id <ASInterfaceStateDelegate> delegate in delegates) { \
       if ([delegate respondsToSelector:@selector(method)]) { \
@@ -3238,12 +3241,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (_interfaceStateDelegates == nil) {
     _interfaceStateDelegates = [NSHashTable weakObjectsHashTable];
   }
+  _copiedInterfaceStateDelegates = nil;
   [_interfaceStateDelegates addObject:interfaceStateDelegate];
 }
 
 - (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   ASDN::MutexLocker l(__instanceLock__);
+  _copiedInterfaceStateDelegates = nil;
   [_interfaceStateDelegates removeObject:interfaceStateDelegate];
 }
 
