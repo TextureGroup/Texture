@@ -2848,7 +2848,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     _flags.isExitingHierarchy = YES;
     _flags.isInHierarchy = NO;
 
-    [self._locked_asyncLayer cancelAsyncDisplay];
+    if (![self isLayerBacked]) {
+      [self._locked_asyncLayer cancelAsyncDisplay];
+    }
 
     // Don't call -didExitHierarchy while holding __instanceLock__.
     // This method and subsequent ones (i.e -interfaceState and didExit(.*)State)
@@ -2949,6 +2951,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   if (![self supportsRangeManagedInterfaceState]) {
     self.interfaceState = ASInterfaceStateInHierarchy;
+  } else if ([self isLayerBacked]) {
+    // Should be same as it's non-layerbacked ancestor's interface who has the right interfaceState.
+    ASDisplayNode *ancestor = [self nonLayerBackedAncestor];
+    if (ancestor) {
+      self.interfaceState = ancestor.pendingInterfaceState;
+    }
   }
 }
 
@@ -3004,6 +3012,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       exitVisibleInterfaceState();
     }
   }
+}
+
+- (ASDisplayNode *)nonLayerBackedAncestor
+{
+  if (!self.supernode) {
+    return nil;
+  }
+  if (!self.supernode.isLayerBacked) {
+    return self.supernode;
+  }
+  return [self.supernode nonLayerBackedAncestor];
 }
 
 #pragma mark - Interface State
