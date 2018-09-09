@@ -590,10 +590,9 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 - (void)clearContents
 {
   [super clearContents];
-    
-  __instanceLock__.lock();
-    _weakCacheEntry = nil;  // release contents from the cache.
-  __instanceLock__.unlock();
+  
+  ASDN::MutexLocker l(__instanceLock__);
+  _weakCacheEntry = nil;  // release contents from the cache.
 }
 
 #pragma mark - Cropping

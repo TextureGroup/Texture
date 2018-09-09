@@ -412,8 +412,11 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 #pragma mark - Core Internal
 - (void)_setDisplayedImageIdentifier:(id)displayedImageIdentifier withImage:(UIImage *)image
 {
-  if (ASObjectIsEqual(displayedImageIdentifier, _displayedImageIdentifier))
+  ASDisplayNodeAssertMainThread();
+    
+  if (ASObjectIsEqual(_displayedImageIdentifier, displayedImageIdentifier)) {
     return;
+  }
 
   _displayedImageIdentifier = displayedImageIdentifier;
 
