@@ -40,6 +40,7 @@
 - Remove double scaling of lineHeightMultiple & paragraphSpacing attributes in ASTextKitFontSizeAdjuster. [Eric Jensen](https://github.com/ejensen)
 - Add a delegate callback for when the framework has initialized. [Adlai Holler](https://github.com/Adlai-Holler)
 - Improve TextNode2 by skipping an unneeded copy during measurement. [Adlai Holler](https://github.com/Adlai-Holler)
+- Improve locking around clearContents [Michael Schneider](https://github.com/maicki)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
