@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
 - [ASCollectionView] Fix reording of cells manually for iOS 9 & 10. [Max Wang](https://github.com/wsdwsd0829). [#1081](https://github.com/TextureGroup/Texture/pull/1081)
 - [ASDisplayNode] Allow add/remove interface state delegates on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1090](https://github.com/TextureGroup/Texture/pull/1090)
 - [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
@@ -98,7 +99,6 @@
 - Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
 - Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
-- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
