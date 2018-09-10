@@ -139,12 +139,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * (0 sections) we always check at least once after each update (initial reload is the first update.)
    */
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
-
-  /**
-   * Set during beginInteractiveMovementForItemAtIndexPath and UIGestureRecognizerStateEnded
-   * (or UIGestureRecognizerStateFailed, UIGestureRecognizerStateCancelled.
-   */
-  BOOL _editting;
   
   /**
    * Counter used to keep track of nested batch updates.
@@ -1019,28 +1013,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath
 {
   ASDisplayNodeAssertMainThread();
-  if (!_editting) {
-    [self performBatchUpdates:^{
-      [_changeSet moveItemAtIndexPath:indexPath toIndexPath:newIndexPath animationOptions:kASCollectionViewAnimationNone];
-    } completion:nil];
-  } else {
-    [super moveItemAtIndexPath:indexPath toIndexPath:newIndexPath];
-  }
-}
-
-- (BOOL)beginInteractiveMovementForItemAtIndexPath:(NSIndexPath *)indexPath {
-  _editting = YES;
-  return [super beginInteractiveMovementForItemAtIndexPath:indexPath];
-}
-
-- (void)endInteractiveMovement {
-  _editting = NO;
-  return [super endInteractiveMovement];
-}
-
-- (void)cancelInteractiveMovement {
-  _editting = NO;
-  [super cancelInteractiveMovement];
+  [self performBatchUpdates:^{
+    [_changeSet moveItemAtIndexPath:indexPath toIndexPath:newIndexPath animationOptions:kASCollectionViewAnimationNone];
+  } completion:nil];
 }
 
 #pragma mark -
