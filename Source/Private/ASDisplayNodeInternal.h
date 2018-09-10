@@ -83,6 +83,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
   _ASPendingState *_pendingViewState;
   ASInterfaceState _pendingInterfaceState;
+  ASInterfaceState _preExitingInterfaceState;
+  
   UIView *_view;
   CALayer *_layer;
 
