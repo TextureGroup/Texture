@@ -457,9 +457,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     NSHashTable *delegates = [_interfaceStateDelegates copy]; \
     __instanceLock__.unlock(); \
     for (id <ASInterfaceStateDelegate> delegate in delegates) { \
-      if ([delegate respondsToSelector:@selector(method)]) { \
         [delegate method]; \
-      } \
     }
 
 - (BOOL)_locked_shouldLoadViewOrLayer
