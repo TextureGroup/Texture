@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode] Make interface state delegate protocol required. [Max Wang](https://github.com/wsdwsd0829). [#1112](https://github.com/TextureGroup/Texture/pull/1112)
 - [ASDisplayNode] Allow add/remove interface state delegates on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1090](https://github.com/TextureGroup/Texture/pull/1090)
 - [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
