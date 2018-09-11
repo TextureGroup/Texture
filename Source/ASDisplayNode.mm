@@ -3215,9 +3215,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   NSHashTable *delegates = [_interfaceStateDelegates copy];
   __instanceLock__.unlock();
   for (id <ASInterfaceStateDelegate> delegate in delegates) {
-    if ([delegate respondsToSelector:@selector(interfaceStateDidChange:fromState:)]) {
-      [delegate interfaceStateDidChange:newState fromState:oldState];
-    }
+    [delegate interfaceStateDidChange:newState fromState:oldState];
   }
 }
 
