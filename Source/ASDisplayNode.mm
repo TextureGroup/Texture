@@ -460,9 +460,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     } \
     __instanceLock__.unlock(); \
     for (id <ASInterfaceStateDelegate> delegate in delegates) { \
-      if ([delegate respondsToSelector:@selector(method)]) { \
-        [delegate method]; \
-      } \
+      [delegate method]; \
     }
 
 - (BOOL)_locked_shouldLoadViewOrLayer
@@ -3220,9 +3218,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   NSHashTable *delegates = [_interfaceStateDelegates copy];
   __instanceLock__.unlock();
   for (id <ASInterfaceStateDelegate> delegate in delegates) {
-    if ([delegate respondsToSelector:@selector(interfaceStateDidChange:fromState:)]) {
-      [delegate interfaceStateDidChange:newState fromState:oldState];
-    }
+    [delegate interfaceStateDidChange:newState fromState:oldState];
   }
 }
 
