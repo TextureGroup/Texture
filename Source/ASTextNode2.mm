@@ -246,8 +246,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self prepareAttributedString:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
   
-  [self setNeedsDisplay];
-  
   return layout.textBoundingSize;
 }
 
