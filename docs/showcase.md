@@ -26,7 +26,7 @@ permalink: /showcase.html
 		<br>
 		<b>Pinterest</b>
 		<br>
-		<a href="https://engineering.pinterest.com/blog/re-architecting-pinterests-ios-app">Re-architecting Pinterest's iOS app</a>
+		<a href="https://medium.com/@Pinterest_Engineering/re-architecting-pinterest-039-s-ios-app-e0a2d34a6ac2">Re-architecting Pinterest's iOS app</a>
 		</td>
 		
 		<td width="33%" align="center" valign="top">
