@@ -460,9 +460,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     } \
     __instanceLock__.unlock(); \
     for (id <ASInterfaceStateDelegate> delegate in delegates) { \
-      if ([delegate respondsToSelector:@selector(method)]) { \
-        [delegate method]; \
-      } \
+      [delegate method]; \
     }
 
 - (BOOL)_locked_shouldLoadViewOrLayer
@@ -3146,8 +3144,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
         [self setDisplaySuspended:YES];
         //schedule clear contents on next runloop
         dispatch_async(dispatch_get_main_queue(), ^{
-          ASDN::MutexLocker l(__instanceLock__);
-          if (ASInterfaceStateIncludesDisplay(_interfaceState) == NO) {
+          __instanceLock__.lock();
+          ASInterfaceState interfaceState = _interfaceState;
+          __instanceLock__.unlock();
+          if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
             [self clearContents];
           }
         });
@@ -3164,8 +3164,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
             [[self asyncLayer] cancelAsyncDisplay];
             //schedule clear contents on next runloop
             dispatch_async(dispatch_get_main_queue(), ^{
-              ASDN::MutexLocker l(__instanceLock__);
-              if (ASInterfaceStateIncludesDisplay(_interfaceState) == NO) {
+              __instanceLock__.lock();
+              ASInterfaceState interfaceState = _interfaceState;
+              __instanceLock__.unlock();
+              if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
                 [self clearContents];
               }
             });
@@ -3220,9 +3222,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   NSHashTable *delegates = [_interfaceStateDelegates copy];
   __instanceLock__.unlock();
   for (id <ASInterfaceStateDelegate> delegate in delegates) {
-    if ([delegate respondsToSelector:@selector(interfaceStateDidChange:fromState:)]) {
-      [delegate interfaceStateDidChange:newState fromState:oldState];
-    }
+    [delegate interfaceStateDidChange:newState fromState:oldState];
   }
 }
 
@@ -3359,6 +3359,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)clearContents
 {
   ASDisplayNodeAssertMainThread();
+  ASAssertUnlocked(__instanceLock__);
+
+  ASDN::MutexLocker l(__instanceLock__);
   if (_flags.canClearContentsOfLayer) {
     // No-op if these haven't been created yet, as that guarantees they don't have contents that needs to be released.
     _layer.contents = nil;

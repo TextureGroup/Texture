@@ -80,6 +80,8 @@
 - (void)interfaceStateDidChange:(ASInterfaceState)newState
                       fromState:(ASInterfaceState)oldState {}
 
+- (void)hierarchyDisplayDidFinish {}
+
 @end
 
 @implementation ASDisplayNode (ASNodeController)
