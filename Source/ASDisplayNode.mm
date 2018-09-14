@@ -2846,9 +2846,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     _flags.isExitingHierarchy = YES;
     _flags.isInHierarchy = NO;
 
-    [self._locked_asyncLayer cancelAsyncDisplay];
-
-    // Don't call -didExitHierarchy while holding __instanceLock__.
+    // Don't call -didExitHierarchy while holding __instanceLock__. 
     // This method and subsequent ones (i.e -interfaceState and didExit(.*)State)
     // don't expect that they are called while the lock is being held.
     // More importantly, didExit(.*)State methods are meant to be overriden by clients.
