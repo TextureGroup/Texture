@@ -452,17 +452,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 #pragma mark - Loading
 
-#define ASDisplayNodeCallInterfaceStateDelegates(method) \
-    __instanceLock__.lock(); \
-    NSHashTable *delegates = _copiedInterfaceStateDelegates; \
-    if (!delegates) { \
-      delegates = _copiedInterfaceStateDelegates = [_interfaceStateDelegates copy]; \
-    } \
-    __instanceLock__.unlock(); \
-    for (id <ASInterfaceStateDelegate> delegate in delegates) { \
-      [delegate method]; \
-    }
-
 - (BOOL)_locked_shouldLoadViewOrLayer
 {
   ASAssertLocked(__instanceLock__);
@@ -575,7 +564,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   for (ASDisplayNodeDidLoadBlock block in onDidLoadBlocks) {
     block(self);
   }
-  ASDisplayNodeCallInterfaceStateDelegates(nodeDidLoad);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del nodeDidLoad];
+  }];
 }
 
 - (void)didLoad
@@ -1280,7 +1271,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
-  ASDisplayNodeCallInterfaceStateDelegates(nodeDidLayout);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del nodeDidLayout];
+  }];
 }
 
 #pragma mark Layout Transition
@@ -3218,12 +3211,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // Subclass hook
   ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertMainThread();
-  __instanceLock__.lock();
-  NSHashTable *delegates = [_interfaceStateDelegates copy];
-  __instanceLock__.unlock();
-  for (id <ASInterfaceStateDelegate> delegate in delegates) {
-    [delegate interfaceStateDidChange:newState fromState:oldState];
-  }
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del interfaceStateDidChange:newState fromState:oldState];
+  }];
 }
 
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState
@@ -3236,20 +3226,25 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   ASDN::MutexLocker l(__instanceLock__);
-  // Not a fan of lazy loading, but this method won't get called very often and avoiding
-  // the overhead of creating this is probably worth it.
-  if (_interfaceStateDelegates == nil) {
-    _interfaceStateDelegates = [NSHashTable weakObjectsHashTable];
+  _hasHadInterfaceStateDelegates = YES;
+  for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+    if (_interfaceStateDelegates[i] == nil) {
+      _interfaceStateDelegates[i] = interfaceStateDelegate;
+      return;
+    }
   }
-  _copiedInterfaceStateDelegates = nil;
-  [_interfaceStateDelegates addObject:interfaceStateDelegate];
+  ASDisplayNodeFailAssert(@"Exceeded interface state delegate limit: %d", MAX_INTERFACE_STATE_DELEGATES);
 }
 
 - (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   ASDN::MutexLocker l(__instanceLock__);
-  _copiedInterfaceStateDelegates = nil;
-  [_interfaceStateDelegates removeObject:interfaceStateDelegate];
+  for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+    if (_interfaceStateDelegates[i] == interfaceStateDelegate) {
+      _interfaceStateDelegates[i] = nil;
+      break;
+    }
+  }
 }
 
 - (BOOL)isVisible
@@ -3263,7 +3258,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeCallInterfaceStateDelegates(didEnterVisibleState);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didEnterVisibleState];
+  }];
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
@@ -3274,7 +3271,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeCallInterfaceStateDelegates(didExitVisibleState);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didExitVisibleState];
+  }];
 }
 
 - (BOOL)isInDisplayState
@@ -3288,7 +3287,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeCallInterfaceStateDelegates(didEnterDisplayState);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didEnterDisplayState];
+  }];
 }
 
 - (void)didExitDisplayState
@@ -3296,7 +3297,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // subclass override
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeCallInterfaceStateDelegates(didExitDisplayState);
+
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didExitDisplayState];
+  }];
 }
 
 - (BOOL)isInPreloadState
@@ -3346,14 +3350,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (self.automaticallyManagesSubnodes) {
     [self layoutIfNeeded];
   }
-  ASDisplayNodeCallInterfaceStateDelegates(didEnterPreloadState);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didEnterPreloadState];
+  }];
 }
 
 - (void)didExitPreloadState
 {
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeCallInterfaceStateDelegates(didExitPreloadState);
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
+    [del didExitPreloadState];
+  }];
 }
 
 - (void)clearContents
@@ -3380,7 +3388,29 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   });
 }
 
+- (void)enumerateInterfaceStateDelegates:(void (NS_NOESCAPE ^)(id<ASInterfaceStateDelegate>))block
+{
+  ASAssertUnlocked(__instanceLock__);
 
+  id dels[MAX_INTERFACE_STATE_DELEGATES];
+  int count = 0;
+  {
+    ASLockScopeSelf();
+    // Fast path for non-delegating nodes.
+    if (!_hasHadInterfaceStateDelegates) {
+      return;
+    }
+
+    for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+      if ((dels[count] = _interfaceStateDelegates[i])) {
+        count++;
+      }
+    }
+  }
+  for (int i = 0; i < count; i++) {
+    block(dels[i]);
+  }
+}
 
 #pragma mark - Gesture Recognizing
 
