@@ -21,6 +21,7 @@
 - Create a method to transfer strong C-arrays into immutable NSArrays, reducing retain/release traffic. [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove yoga layout spec, which has been superseded by tighter Yoga integration (`ASDisplayNode+Yoga.h`)
 - Properly consider node for responder methods [Michael Schneider](https://github.com/maicki)
+- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
 - [IGListKit] Adds missing UIScrollViewDelegate method to DataSource proxy [Sergey Pronin](https://github.com/wannabehero)
 - Fix misleading/scary stack trace shown when an assertion occurs during node measurement [Huy Nguyen](https://github.com/nguyenhuy) [#1022](https://github.com/TextureGroup/Texture/pull/1022)
 - Fix build on 32-bit simulator in Xcode 9.3 and later, caused by `Thread-local storage is not supported on this architecture.` [Adlai Holler](https://github.com/Adlai-Holler)
@@ -41,6 +42,7 @@
 - Add a delegate callback for when the framework has initialized. [Adlai Holler](https://github.com/Adlai-Holler)
 - Improve TextNode2 by skipping an unneeded copy during measurement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Improve locking around clearContents [Michael Schneider](https://github.com/maicki)
+- Unlock before cleanup and calling out to subclass hooks for animated images. [Michael Schneider](https://github.com/maicki) [#1087](https://github.com/TextureGroup/Texture/pull/1087)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
@@ -101,8 +103,6 @@
 - Add an experimental deallocation queue implementation that's more efficient. [Adlai Holler](https://github.com/Adlai-Holler)
 - Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
-- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
-- Unlock before cleanup and calling out to subclass hooks for animated images. [Michael Schneider](https://github.com/maicki) [#1087](https://github.com/TextureGroup/Texture/pull/1087)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)
