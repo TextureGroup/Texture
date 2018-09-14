@@ -38,6 +38,8 @@
 - (void)interfaceStateDidChange:(ASInterfaceState)newState
                       fromState:(ASInterfaceState)oldState ASDISPLAYNODE_REQUIRES_SUPER;
 
+- (void)hierarchyDisplayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
+
 @end
 
 @interface ASDisplayNode (ASNodeController)

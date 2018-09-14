@@ -14,6 +14,7 @@
 #import <objc/runtime.h>
 #import <tgmath.h>
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 
@@ -53,6 +54,7 @@ void ASInitializeFrameworkMainThread(void)
     allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
     allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
   }
+  ASNotifyInitialized();
 }
 
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)

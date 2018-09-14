@@ -249,6 +249,10 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 #endif
   
   NSHashTable <id <ASInterfaceStateDelegate>> *_interfaceStateDelegates;
+
+  // never mutated, used to enumerate delegates outside of lock.
+  // set to nil when mutating _interfaceStateDelegates.
+  NSHashTable <id <ASInterfaceStateDelegate>> *_copiedInterfaceStateDelegates;
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;

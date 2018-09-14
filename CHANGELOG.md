@@ -1,6 +1,8 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASDisplayNode] Do not cancel display when in exit hierarchy but let interface state changing to handle it. [Max Wang](https://github.com/wsdwsd0829). [#1110](https://github.com/TextureGroup/Texture/pull/1110)
+- [Breaking][ASDisplayNode] Make interface state delegate protocol required. [Max Wang](https://github.com/wsdwsd0829). [#1112](https://github.com/TextureGroup/Texture/pull/1112)
+- [ASCollectionView] Fix reording of cells manually for iOS 9 & 10. [Max Wang](https://github.com/wsdwsd0829). [#1081](https://github.com/TextureGroup/Texture/pull/1081)
 - [ASDisplayNode] Allow add/remove interface state delegates on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1090](https://github.com/TextureGroup/Texture/pull/1090)
 - [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
@@ -37,6 +39,9 @@
 - Optimize text stack by removing unneeded copying. [Adlai Holler](https://github.com/Adlai-Holler)
 - Renamed `accessibleElements` to `accessibilityElements` and removed the re-definition of the property in ASDisplayView. [Jia Wern Lim](https://github.com/jiawernlim)
 - Remove double scaling of lineHeightMultiple & paragraphSpacing attributes in ASTextKitFontSizeAdjuster. [Eric Jensen](https://github.com/ejensen)
+- Add a delegate callback for when the framework has initialized. [Adlai Holler](https://github.com/Adlai-Holler)
+- Improve TextNode2 by skipping an unneeded copy during measurement. [Adlai Holler](https://github.com/Adlai-Holler)
+- Improve locking around clearContents [Michael Schneider](https://github.com/maicki)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
@@ -98,6 +103,7 @@
 - Standardize property declaration style. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASTableView] Fix an issue that causes table view to use one of a cell's invalid layouts instead of generating a new one. [Huy Nguyen](https://github.com/nguyenhuy) [#942](https://github.com/TextureGroup/Texture/pull/942)
 - Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
+- Unlock before cleanup and calling out to subclass hooks for animated images. [Michael Schneider](https://github.com/maicki) [#1087](https://github.com/TextureGroup/Texture/pull/1087)
 
 ## 2.6
 - [Xcode 9] Updated to require Xcode 9 (to fix warnings) [Garrett Moon](https://github.com/garrettmoon)

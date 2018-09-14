@@ -518,6 +518,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 // Skip the many method calls of the recursive operation if the top level cell node already has the right interfaceState.
 - (void)clearContents
 {
+  ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in [_dataSource elementMapForRangeController:self]) {
     ASCellNode *node = element.nodeIfAllocated;
     if (ASInterfaceStateIncludesDisplay(node.interfaceState)) {
@@ -528,6 +529,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)clearPreloadedData
 {
+  ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in [_dataSource elementMapForRangeController:self]) {
     ASCellNode *node = element.nodeIfAllocated;
     if (ASInterfaceStateIncludesPreload(node.interfaceState)) {

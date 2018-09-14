@@ -22,6 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatures)features;
 
+@optional
+
+/**
+ * Texture framework initialized. This method is called synchronously
+ * on the main thread from ASInitializeFrameworkMainThread if you defined
+ * AS_INITIALIZE_FRAMEWORK_MANUALLY or from the default initialization point
+ * (currently +load) otherwise.
+ */
+- (void)textureDidInitialize;
+
 @end
 
 NS_ASSUME_NONNULL_END
