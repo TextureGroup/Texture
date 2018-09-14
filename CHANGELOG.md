@@ -42,7 +42,6 @@
 - Add a delegate callback for when the framework has initialized. [Adlai Holler](https://github.com/Adlai-Holler)
 - Improve TextNode2 by skipping an unneeded copy during measurement. [Adlai Holler](https://github.com/Adlai-Holler)
 - Improve locking around clearContents [Michael Schneider](https://github.com/maicki)
-- Introduce let / var macros and some further cleanup. [Michael Schneider](https://github.com/maicki) [#1012](https://github.com/TextureGroup/Texture/pull/1012)
 - Unlock before cleanup and calling out to subclass hooks for animated images. [Michael Schneider](https://github.com/maicki) [#1087](https://github.com/TextureGroup/Texture/pull/1087)
 
 ## 2.7
