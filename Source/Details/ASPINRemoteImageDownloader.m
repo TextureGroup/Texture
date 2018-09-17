@@ -75,10 +75,6 @@
 @end
 
 @implementation ASPINRemoteImageManager
-{
-@private
-  PINRemoteImageManager *_preconfiguredPINRemoteImageManager;
-}
 
 //Share image cache with sharedImageManager image cache.
 - (id <PINRemoteImageCaching>)defaultImageCache
@@ -123,52 +119,53 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration
 {
   NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
-  __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:configuration];
+  __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:configuration preconfiguredPINRemoteImageManager:nil];
 }
 
-+ (PINRemoteImageManager *)sharedPINRemoteImageManagerWithConfiguration:(NSURLSessionConfiguration *)configuration
++ (void)setSharedPreconfiguredImageManager:(nullable PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
-  static ASPINRemoteImageManager *sharedPINRemoteImageManager;
+  NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
+  __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:nil preconfiguredPINRemoteImageManager:preconfiguredPINRemoteImageManager];
+}
+
++ (PINRemoteImageManager *)sharedPINRemoteImageManagerWithConfiguration:(NSURLSessionConfiguration *)configuration preconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
+{
+  static PINRemoteImageManager *sharedPINRemoteImageManager;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-
+    
+    if (preconfiguredPINRemoteImageManager) {
+      sharedPINRemoteImageManager = preconfiguredPINRemoteImageManager;
+    } else {
 #if PIN_ANIMATED_AVAILABLE
-    // Check that Carthage users have linked both PINRemoteImage & PINCache by testing for one file each
-    if (!(NSClassFromString(@"PINRemoteImageManager"))) {
-      NSException *e = [NSException
-                        exceptionWithName:@"FrameworkSetupException"
-                        reason:@"Missing the path to the PINRemoteImage framework."
-                        userInfo:nil];
-      @throw e;
-    }
-    if (!(NSClassFromString(@"PINCache"))) {
-      NSException *e = [NSException
-                        exceptionWithName:@"FrameworkSetupException"
-                        reason:@"Missing the path to the PINCache framework."
-                        userInfo:nil];
-      @throw e;
-    }
-    sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
-                                                              alternativeRepresentationProvider:[self sharedDownloader]];
+      // Check that Carthage users have linked both PINRemoteImage & PINCache by testing for one file each
+      if (!(NSClassFromString(@"PINRemoteImageManager"))) {
+        NSException *e = [NSException
+                          exceptionWithName:@"FrameworkSetupException"
+                          reason:@"Missing the path to the PINRemoteImage framework."
+                          userInfo:nil];
+        @throw e;
+      }
+      if (!(NSClassFromString(@"PINCache"))) {
+        NSException *e = [NSException
+                          exceptionWithName:@"FrameworkSetupException"
+                          reason:@"Missing the path to the PINCache framework."
+                          userInfo:nil];
+        @throw e;
+      }
+      sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
+                                                                alternativeRepresentationProvider:[self sharedDownloader]];
 #else
-    sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration];
+      sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration];
 #endif
+    }
   });
   return sharedPINRemoteImageManager;
 }
 
 - (PINRemoteImageManager *)sharedPINRemoteImageManager
 {
-  if (_preconfiguredPINRemoteImageManager) {
-    return _preconfiguredPINRemoteImageManager;
-  }
-  return [ASPINRemoteImageDownloader sharedPINRemoteImageManagerWithConfiguration:nil];
-}
-
-- (PINRemoteImageManager *)setPreconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
-{
-  _preconfiguredPINRemoteImageManager = preconfiguredPINRemoteImageManager;
-  return _preconfiguredPINRemoteImageManager;
+  return [ASPINRemoteImageDownloader sharedPINRemoteImageManagerWithConfiguration:nil preconfiguredPINRemoteImageManager:nil];
 }
 
 - (BOOL)sharedImageManagerSupportsMemoryRemoval
