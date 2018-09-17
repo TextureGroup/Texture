@@ -11,6 +11,7 @@
 - Clean up C-function `extern` decorators. [Adlai Holler](https://github.com/Adlai-Holler)
 - Add an experiment to reduce work involved in collection teardown. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimize layout flattening, particularly reducing retain/release operations. [Adlai Holler](https://github.com/Adlai-Holler)
+- ASNetworkImageNodeDelegate support ASImageContainerProtocol. [Yang](https://github.com/yang152412/)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
