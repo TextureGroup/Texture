@@ -138,25 +138,25 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
       sharedPINRemoteImageManager = preconfiguredPINRemoteImageManager;
     } else {
 #if PIN_ANIMATED_AVAILABLE
-      // Check that Carthage users have linked both PINRemoteImage & PINCache by testing for one file each
-      if (!(NSClassFromString(@"PINRemoteImageManager"))) {
-        NSException *e = [NSException
-                          exceptionWithName:@"FrameworkSetupException"
-                          reason:@"Missing the path to the PINRemoteImage framework."
-                          userInfo:nil];
-        @throw e;
-      }
-      if (!(NSClassFromString(@"PINCache"))) {
-        NSException *e = [NSException
-                          exceptionWithName:@"FrameworkSetupException"
-                          reason:@"Missing the path to the PINCache framework."
-                          userInfo:nil];
-        @throw e;
-      }
-      sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
-                                                                alternativeRepresentationProvider:[self sharedDownloader]];
+    // Check that Carthage users have linked both PINRemoteImage & PINCache by testing for one file each
+    if (!(NSClassFromString(@"PINRemoteImageManager"))) {
+      NSException *e = [NSException
+                        exceptionWithName:@"FrameworkSetupException"
+                        reason:@"Missing the path to the PINRemoteImage framework."
+                        userInfo:nil];
+      @throw e;
+    }
+    if (!(NSClassFromString(@"PINCache"))) {
+      NSException *e = [NSException
+                        exceptionWithName:@"FrameworkSetupException"
+                        reason:@"Missing the path to the PINCache framework."
+                        userInfo:nil];
+      @throw e;
+    }
+    sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
+                                                              alternativeRepresentationProvider:[self sharedDownloader]];
 #else
-      sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration];
+    sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration];
 #endif
     }
   });
