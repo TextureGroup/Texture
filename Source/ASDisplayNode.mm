@@ -2945,6 +2945,15 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   if (![self supportsRangeManagedInterfaceState]) {
     self.interfaceState = ASInterfaceStateInHierarchy;
+  } else if (ASCATransactionQueue.sharedQueue.isEnabled) {
+    __instanceLock__.lock();
+    ASInterfaceState state = _preExitingInterfaceState;
+    _preExitingInterfaceState = ASInterfaceStateNone;
+    __instanceLock__.unlock();
+    // Layer thrash happened, revert to before exiting.
+    if (state != ASInterfaceStateNone) {
+      self.interfaceState = state;
+    }
   }
 }
 
@@ -2983,6 +2992,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       unsigned isStillInHierarchy = _flags.isInHierarchy;
       BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
       ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+      // layer may be thrashed, we need to remember the state so we can reset if it enters in same runloop later.
+      _preExitingInterfaceState = _pendingInterfaceState;
       __instanceLock__.unlock();
       if (!isStillInHierarchy && isVisible) {
 #if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
@@ -3100,6 +3111,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       return;
     }
     _interfaceState = newState;
+    _preExitingInterfaceState = ASInterfaceStateNone;
   }
 
   // It should never be possible for a node to be visible but not be allowed / expected to display.
