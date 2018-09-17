@@ -249,12 +249,10 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   NSTimeInterval _debugTimeToAddSubnodeViews;
   NSTimeInterval _debugTimeForDidLoad;
 #endif
-  
-  NSHashTable <id <ASInterfaceStateDelegate>> *_interfaceStateDelegates;
 
-  // never mutated, used to enumerate delegates outside of lock.
-  // set to nil when mutating _interfaceStateDelegates.
-  NSHashTable <id <ASInterfaceStateDelegate>> *_copiedInterfaceStateDelegates;
+  /// Fast path: tells whether we've ever had an interface state delegate before.
+  BOOL _hasHadInterfaceStateDelegates;
+  __weak id<ASInterfaceStateDelegate> _interfaceStateDelegates[AS_MAX_INTERFACE_STATE_DELEGATES];
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;
@@ -335,6 +333,13 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 @property (nonatomic) CGFloat contentsScaleForDisplay;
 
 - (void)applyPendingViewState;
+
+/**
+ * Makes a local copy of the interface state delegates then calls the block on each.
+ *
+ * Lock is not held during block invocation. Method must not be called with the lock held.
+ */
+- (void)enumerateInterfaceStateDelegates:(void(NS_NOESCAPE ^)(id<ASInterfaceStateDelegate> delegate))block;
 
 /**
  * // TODO: NOT YET IMPLEMENTED
