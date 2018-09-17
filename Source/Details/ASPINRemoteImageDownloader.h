@@ -41,6 +41,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration;
 
 /**
+ * Sets a custom perconconfigured PINRemoteImageManager that will be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes
+ * while loading images off the network. This can be called at anytime. Once this is set, it will always be used with priority.
+ * If this is not set, it will call setSharedImageManagerWithConfiguration with nil.
+ *
+ * @param PINRemoteImageManager the preconfigured remote image manager that will be used by `sharedDownloader`
+ */
+- (void)setPreconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager;
+
+/**
  * The shared instance of a @c PINRemoteImageManager used by all @c ASPINRemoteImageDownloaders
  *
  * @discussion you can use this method to access the shared manager. This is useful to share a cache

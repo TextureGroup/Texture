@@ -75,6 +75,10 @@
 @end
 
 @implementation ASPINRemoteImageManager
+{
+@private
+  PINRemoteImageManager *_preconfiguredPINRemoteImageManager;
+}
 
 //Share image cache with sharedImageManager image cache.
 - (id <PINRemoteImageCaching>)defaultImageCache
@@ -155,7 +159,16 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
 - (PINRemoteImageManager *)sharedPINRemoteImageManager
 {
+  if (_preconfiguredPINRemoteImageManager) {
+    return _preconfiguredPINRemoteImageManager;
+  }
   return [ASPINRemoteImageDownloader sharedPINRemoteImageManagerWithConfiguration:nil];
+}
+
+- (PINRemoteImageManager *)setPreconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
+{
+  _preconfiguredPINRemoteImageManager = preconfiguredPINRemoteImageManager;
+  return _preconfiguredPINRemoteImageManager;
 }
 
 - (BOOL)sharedImageManagerSupportsMemoryRemoval
