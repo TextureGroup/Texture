@@ -1496,7 +1496,9 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   if (_pendingDisplayNodes.isEmpty) {
     
     [self hierarchyDisplayDidFinish];
-    ASDisplayNodeCallInterfaceStateDelegates(hierarchyDisplayDidFinish);
+    [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> delegate) {
+      [delegate hierarchyDisplayDidFinish];
+    }];
       
     BOOL placeholderShouldPersist = [self placeholderShouldPersist];
 
