@@ -75,7 +75,6 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
 
 #define NUM_CLIP_CORNER_LAYERS 4
-#define MAX_INTERFACE_STATE_DELEGATES 4
 
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
