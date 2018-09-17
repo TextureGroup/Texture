@@ -568,8 +568,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   [self didLoad];
   
   __instanceLock__.lock();
-  NSArray *onDidLoadBlocks = [_onDidLoadBlocks copy];
-  _onDidLoadBlocks = nil;
+  let onDidLoadBlocks = ASTransferStrong(_onDidLoadBlocks);
   __instanceLock__.unlock();
   
   for (ASDisplayNodeDidLoadBlock block in onDidLoadBlocks) {
