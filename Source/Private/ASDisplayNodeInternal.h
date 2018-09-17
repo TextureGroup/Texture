@@ -250,7 +250,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
   /// Fast path: tells whether we've ever had an interface state delegate before.
   BOOL _hasHadInterfaceStateDelegates;
-  __weak id<ASInterfaceStateDelegate> _interfaceStateDelegates[MAX_INTERFACE_STATE_DELEGATES];
+  __weak id<ASInterfaceStateDelegate> _interfaceStateDelegates[AS_MAX_INTERFACE_STATE_DELEGATES];
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;

@@ -3229,19 +3229,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDN::MutexLocker l(__instanceLock__);
   _hasHadInterfaceStateDelegates = YES;
-  for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+  for (int i = 0; i < AS_MAX_INTERFACE_STATE_DELEGATES; i++) {
     if (_interfaceStateDelegates[i] == nil) {
       _interfaceStateDelegates[i] = interfaceStateDelegate;
       return;
     }
   }
-  ASDisplayNodeFailAssert(@"Exceeded interface state delegate limit: %d", MAX_INTERFACE_STATE_DELEGATES);
+  ASDisplayNodeFailAssert(@"Exceeded interface state delegate limit: %d", AS_MAX_INTERFACE_STATE_DELEGATES);
 }
 
 - (void)removeInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   ASDN::MutexLocker l(__instanceLock__);
-  for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+  for (int i = 0; i < AS_MAX_INTERFACE_STATE_DELEGATES; i++) {
     if (_interfaceStateDelegates[i] == interfaceStateDelegate) {
       _interfaceStateDelegates[i] = nil;
       break;
@@ -3393,7 +3393,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASAssertUnlocked(__instanceLock__);
 
-  id dels[MAX_INTERFACE_STATE_DELEGATES];
+  id dels[AS_MAX_INTERFACE_STATE_DELEGATES];
   int count = 0;
   {
     ASLockScopeSelf();
@@ -3402,7 +3402,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       return;
     }
 
-    for (int i = 0; i < MAX_INTERFACE_STATE_DELEGATES; i++) {
+    for (int i = 0; i < AS_MAX_INTERFACE_STATE_DELEGATES; i++) {
       if ((dels[count] = _interfaceStateDelegates[i])) {
         count++;
       }
