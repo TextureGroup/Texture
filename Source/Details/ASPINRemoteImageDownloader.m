@@ -37,11 +37,9 @@
 #if PIN_ANIMATED_AVAILABLE
 
 @interface ASPINRemoteImageDownloader () <PINRemoteImageManagerAlternateRepresentationProvider>
-
 @end
 
 @interface PINCachedAnimatedImage (ASPINRemoteImageDownloader) <ASAnimatedImageProtocol>
-
 @end
 
 @implementation PINCachedAnimatedImage (ASPINRemoteImageDownloader)
@@ -97,7 +95,6 @@
 }
 
 @end
-
 
 static ASPINRemoteImageDownloader *sharedDownloader = nil;
 
