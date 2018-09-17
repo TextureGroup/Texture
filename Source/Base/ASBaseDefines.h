@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/NSObjCRuntime.h>
+#import <Foundation/Foundation.h>
 
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
@@ -227,5 +227,20 @@
     } \
     __result = [NSArray arrayByTransferring:__buf count:__i]; \
   } \
+  __result; \
+})
+
+/**
+ * Capture-and-clear a strong reference without the intervening retain/release pair.
+ *
+ * E.g. let localVar = ASTransferStrong(_myIvar);
+ * Post-condition: localVar has the strong value from _myIvar and _myIvar is nil.
+ * No retain/release is emitted when the optimizer is on.
+ */
+#define ASTransferStrong(lvalue) ({ \
+  CFTypeRef *__rawPtr = (CFTypeRef *)(void *)(&(lvalue)); \
+  CFTypeRef __cfValue = *__rawPtr; \
+  *__rawPtr = NULL; \
+  __typeof(lvalue) __result = (__bridge_transfer __typeof(lvalue))__cfValue; \
   __result; \
 })
