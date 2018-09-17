@@ -100,6 +100,8 @@
 
 
 static ASPINRemoteImageDownloader *sharedDownloader = nil;
+static PINRemoteImageManager *sharedPINRemoteImageManager = nil;
+static dispatch_once_t onceToken;
 
 @interface ASPINRemoteImageDownloader ()
 @end
@@ -119,21 +121,22 @@ static ASPINRemoteImageDownloader *sharedDownloader = nil;
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration
 {
   NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
+  NSAssert(sharedPINRemoteImageManager == nil, [NSString stringWithFormat:@"An instance of %@ has been set. Either configuration or preconfigured image manager can be set at a time and only once.", NSStringFromClass([sharedPINRemoteImageManager class])]);
   __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:configuration preconfiguredPINRemoteImageManager:nil];
 }
 
 + (void)setSharedPreconfiguredImageManager:(nullable PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
   NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
+  NSAssert(sharedPINRemoteImageManager == nil, [NSString stringWithFormat:@"An instance of %@ has been set. Either configuration or preconfigured image manager can be set at a time and only once.", NSStringFromClass([sharedPINRemoteImageManager class])]);
   __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:nil preconfiguredPINRemoteImageManager:preconfiguredPINRemoteImageManager];
 }
 
 + (PINRemoteImageManager *)sharedPINRemoteImageManagerWithConfiguration:(NSURLSessionConfiguration *)configuration preconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
-  static PINRemoteImageManager *sharedPINRemoteImageManager;
-  static dispatch_once_t onceToken;
+  NSAssert(configuration != nil && preconfiguredPINRemoteImageManager != nil, @"Either configuration or preconfigured image manager can be set at a time.");
   dispatch_once(&onceToken, ^{
-    
+
     if (preconfiguredPINRemoteImageManager) {
       sharedPINRemoteImageManager = preconfiguredPINRemoteImageManager;
     } else {
