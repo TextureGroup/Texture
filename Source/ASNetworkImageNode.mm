@@ -61,6 +61,7 @@
     unsigned int delegateDidFinishDecoding:1;
     unsigned int delegateDidLoadImage:1;
     unsigned int delegateDidLoadImageWithInfo:1;
+    unsigned int delegateDidLoadImageContainerWithInfo:1;
   } _delegateFlags;
 
   
@@ -304,6 +305,7 @@
   _delegateFlags.delegateDidFinishDecoding = [delegate respondsToSelector:@selector(imageNodeDidFinishDecoding:)];
   _delegateFlags.delegateDidLoadImage = [delegate respondsToSelector:@selector(imageNode:didLoadImage:)];
   _delegateFlags.delegateDidLoadImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImage:info:)];
+  _delegateFlags.delegateDidLoadImageContainerWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImageContainer:info:)];
 }
 
 - (id<ASNetworkImageNodeDelegate>)delegate
@@ -342,20 +344,33 @@
 
     NSURL *url = _URL;
     if (_imageLoaded == NO && url && _downloadIdentifier == nil) {
-      UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:url] asdk_image];
+      id<ASImageContainerProtocol> result = [_cache synchronouslyFetchedCachedImageWithURL:url];
       if (result) {
         [self _setCurrentImageQuality:1.0];
-        [self _locked__setImage:result];
+        
+        NSData *animatedImageData = [result asdk_animatedImageData];
+        if (animatedImageData && _downloaderFlags.downloaderImplementsAnimatedImage) {
+          id animatedImage = [_downloader animatedImageWithData:animatedImageData];
+          [self _locked_setAnimatedImage:animatedImage];
+        } else {
+          UIImage *newImage = [result asdk_image];
+          [self _locked__setImage:newImage];
+        }
+        
         _imageLoaded = YES;
         
         // Call out to the delegate.
-        if (_delegateFlags.delegateDidLoadImageWithInfo) {
+        if (_delegateFlags.delegateDidLoadImageContainerWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
-          [_delegate imageNode:self didLoadImage:result info:info];
+          [_delegate imageNode:self didLoadImageContainer:result info:info];
+        } else if (_delegateFlags.delegateDidLoadImageWithInfo) {
+          ASUnlockScope(self);
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          [_delegate imageNode:self didLoadImage:[result asdk_image] info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
-          [_delegate imageNode:self didLoadImage:result];
+          [_delegate imageNode:self didLoadImage:[result asdk_image]];
         }
       }
     }
@@ -624,6 +639,7 @@
           return;
         }
         
+        id<ASImageContainerProtocol> imageContainer = nil;
         if (_shouldCacheImage) {
           [self _locked__setImage:[UIImage imageNamed:URL.path.lastPathComponent]];
         } else {
@@ -649,6 +665,9 @@
               if ([animatedImage respondsToSelector:@selector(isDataSupported:)] && [animatedImage isDataSupported:data] == NO) {
                 animatedImage = nil;
               }
+              if (animatedImage != nil) {
+                imageContainer = data;
+              }
             }
           }
 
@@ -658,12 +677,18 @@
             [self _locked__setImage:nonAnimatedImage];
           }
         }
-
+        if (imageContainer == nil) {
+          imageContainer = self.image;
+        }
         _imageLoaded = YES;
 
         [self _setCurrentImageQuality:1.0];
 
-        if (_delegateFlags.delegateDidLoadImageWithInfo) {
+        if (_delegateFlags.delegateDidLoadImageContainerWithInfo) {
+          ASUnlockScope(self);
+          auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          [_delegate imageNode:self didLoadImageContainer:imageContainer info:info];
+        } else if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:self.image info:info];
@@ -717,8 +742,12 @@
           
           void (^calloutBlock)(ASNetworkImageNode *inst);
           
-          if (newImage) {
-            if (_delegateFlags.delegateDidLoadImageWithInfo) {
+          if (imageContainer) {
+            if (_delegateFlags.delegateDidLoadImageContainerWithInfo) {
+              ASUnlockScope(self);
+              auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+              [_delegate imageNode:self didLoadImageContainer:imageContainer info:info];
+            } else if (_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
