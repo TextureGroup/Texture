@@ -101,7 +101,6 @@
 
 static ASPINRemoteImageDownloader *sharedDownloader = nil;
 static PINRemoteImageManager *sharedPINRemoteImageManager = nil;
-static dispatch_once_t onceToken;
 
 @interface ASPINRemoteImageDownloader ()
 @end
@@ -135,6 +134,7 @@ static dispatch_once_t onceToken;
 + (PINRemoteImageManager *)sharedPINRemoteImageManagerWithConfiguration:(NSURLSessionConfiguration *)configuration preconfiguredPINRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
   NSAssert(!(configuration != nil && preconfiguredPINRemoteImageManager != nil), @"Either configuration or preconfigured image manager can be set at a time.");
+  static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
 
     if (preconfiguredPINRemoteImageManager) {
