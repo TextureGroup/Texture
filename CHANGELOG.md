@@ -46,6 +46,7 @@
 - Unlock before cleanup and calling out to subclass hooks for animated images. [Michael Schneider](https://github.com/maicki) [#1087](https://github.com/TextureGroup/Texture/pull/1087)
 - [ASDisplayNode] Fix interface state update for layer backed nodes when layer thrashes (interface coaleascing case).[Max Wang](https://github.com/wsdwsd0829). [#1111](https://github.com/TextureGroup/Texture/pull/1111)
 - [ASPINRemoteImageManager] Add a new API for setting a preconfigured PINRemoteImageManager. [Ernest Ma](https://github.com/ernestmama) [#1124](https://github.com/TextureGroup/Texture/pull/1124)
+- Small optimization to the layout spec & yoga layout systems by eliminating array copies. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
