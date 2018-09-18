@@ -13,6 +13,7 @@
 
 #import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -155,10 +156,12 @@
   ASDisplayNodeAssert(childCount == self.yogaChildren.count,
                       @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
 
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:childCount];
+  ASLayout *rawSublayouts[childCount];
+  int i = 0;
   for (ASDisplayNode *subnode in self.yogaChildren) {
-    [sublayouts addObject:[subnode layoutForYogaNode]];
+    rawSublayouts[i++] = [subnode layoutForYogaNode];
   }
+  let sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:childCount];
 
   // The layout for self should have position CGPointNull, but include the calculated size.
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
