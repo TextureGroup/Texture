@@ -391,6 +391,28 @@ NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
   return frameIndex;
 }
 
+- (void)animatedImageSeekToPlayHeadPosition:(CFTimeInterval)playHead
+{
+  ASDisplayNodeAssertMainThread();
+  if (_playHead > self.animatedImage.totalDuration || _playHead < 0) {
+    return;
+  }
+
+  _playHead = playHead;
+
+  NSUInteger frameIndex = [self frameIndexAtPlayHeadPosition:playHead];
+  if (frameIndex == _lastSuccessfulFrameIndex) {
+    return;
+  }
+  
+  CGImageRef frameImage = [self.animatedImage imageAtIndex:frameIndex];
+  if (frameImage) {
+    self.contents = (__bridge id)frameImage;
+    _lastSuccessfulFrameIndex = frameIndex;
+    [self displayDidFinish];
+  }
+}
+
 @end
 
 #pragma mark - ASImageNode(AnimatedImageInvalidation)

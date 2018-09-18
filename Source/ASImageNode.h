@@ -169,6 +169,15 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 @property (copy) NSString *animatedImageRunLoopMode;
 
 /**
+ * @abstract Seek to a play head position of an animated image.
+ *
+ * @param playHead The desired play head position. Must be in valid duration interval.
+ *
+ * @discussion Seeking must be performed on the main-thread.
+ */
+- (void)animatedImageSeekToPlayHeadPosition:(CFTimeInterval)playHead;
+
+/**
  * @abstract Method called when animated image has been set
  *
  * @discussion This method is for subclasses to override so they can know if an animated image
