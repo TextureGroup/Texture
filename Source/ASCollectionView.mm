@@ -2,17 +2,9 @@
 //  ASCollectionView.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASAssert.h>
@@ -23,6 +15,7 @@
 #import <AsyncDisplayKit/ASCollectionInternal.h>
 #import <AsyncDisplayKit/ASCollectionLayout.h>
 #import <AsyncDisplayKit/ASCollectionNode+Beta.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
@@ -146,6 +139,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
    * (0 sections) we always check at least once after each update (initial reload is the first update.)
    */
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
+
+  /**
+   * Set during beginInteractiveMovementForItemAtIndexPath and UIGestureRecognizerStateEnded
+   * (or UIGestureRecognizerStateFailed, UIGestureRecognizerStateCancelled.
+   */
+  BOOL _reordering;
   
   /**
    * Counter used to keep track of nested batch updates.
@@ -751,19 +750,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray<NSIndexPath *> *)convertIndexPathsToCollectionNode:(NSArray<NSIndexPath *> *)indexPaths
 {
-  if (indexPaths == nil) {
-    return nil;
-  }
-
-  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray arrayWithCapacity:indexPaths.count];
-
-  for (NSIndexPath *indexPathInView in indexPaths) {
-    NSIndexPath *indexPath = [self convertIndexPathToCollectionNode:indexPathInView];
-    if (indexPath != nil) {
-      [indexPathsArray addObject:indexPath];
-    }
-  }
-  return indexPathsArray;
+  return ASArrayByFlatMapping(indexPaths, NSIndexPath *viewIndexPath, [self convertIndexPathToCollectionNode:viewIndexPath]);
 }
 
 - (ASCellNode *)supplementaryNodeForElementKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
@@ -1032,9 +1019,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath
 {
   ASDisplayNodeAssertMainThread();
-  [self performBatchUpdates:^{
-    [_changeSet moveItemAtIndexPath:indexPath toIndexPath:newIndexPath animationOptions:kASCollectionViewAnimationNone];
-  } completion:nil];
+  if (!_reordering) {
+    [self performBatchUpdates:^{
+      [_changeSet moveItemAtIndexPath:indexPath toIndexPath:newIndexPath animationOptions:kASCollectionViewAnimationNone];
+    } completion:nil];
+  } else {
+    [super moveItemAtIndexPath:indexPath toIndexPath:newIndexPath];
+  }
+}
+
+- (BOOL)beginInteractiveMovementForItemAtIndexPath:(NSIndexPath *)indexPath {
+  BOOL success = [super beginInteractiveMovementForItemAtIndexPath:indexPath];
+  _reordering = success;
+  return success;
+}
+
+- (void)endInteractiveMovement {
+  _reordering = NO;
+  [super endInteractiveMovement];
+}
+
+- (void)cancelInteractiveMovement {
+  _reordering = NO;
+  [super cancelInteractiveMovement];
 }
 
 #pragma mark -
@@ -1556,7 +1563,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   // If the data source implements canMoveItem, let them decide.
   if (_asyncDataSourceFlags.collectionNodeCanMoveItem) {
-    if (auto cellNode = [self nodeForItemAtIndexPath:indexPath]) {
+    if (let cellNode = [self nodeForItemAtIndexPath:indexPath]) {
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
       return [_asyncDataSource collectionNode:collectionNode canMoveItemWithNode:cellNode];
     }
@@ -1572,7 +1579,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   // Inform the data source first, in case they call nodeForItemAtIndexPath:.
   // We want to make sure we return them the node for the item they have in mind.
-  if (auto collectionNode = self.collectionNode) {
+  if (let collectionNode = self.collectionNode) {
     [_asyncDataSource collectionNode:collectionNode moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
   }
   
@@ -2007,7 +2014,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
 {
   if (_asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection) {
-    auto kinds = [[NSMutableSet<NSString *> alloc] init];
+    let kinds = [[NSMutableSet<NSString *> alloc] init];
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, @[]);
     [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {
       NSArray<NSString *> *kindsForSection = [_asyncDataSource collectionNode:collectionNode supplementaryElementKindsInSection:section];
@@ -2225,13 +2232,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
 
-  NSMutableArray<NSIndexPath *> *uikitIndexPaths = [NSMutableArray arrayWithCapacity:nodes.count];
-  for (ASCellNode *node in nodes) {
-    NSIndexPath *uikitIndexPath = [self indexPathForNode:node];
-    if (uikitIndexPath != nil) {
-      [uikitIndexPaths addObject:uikitIndexPath];
-    }
-  }
+  let uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
   
   [_layoutFacilitator collectionViewWillEditCellsAtIndexPaths:uikitIndexPaths batched:NO];
   
