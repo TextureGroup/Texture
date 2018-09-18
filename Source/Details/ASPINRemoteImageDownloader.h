@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
  * `sharedDownloader` is accessed. If nil is passed in as the PINRemoteImageManager, it will create
  * a default image manager with a nil session configuration.
  *
- * @param PINRemoteImageManager The preconfigured remote image manager that will be used by `sharedDownloader`
+ * @param preconfiguredPINRemoteImageManager The preconfigured remote image manager that will be used by `sharedDownloader`
  */
 + (void)setSharedPreconfiguredRemoteImageManager:(nullable PINRemoteImageManager *)preconfiguredPINRemoteImageManager;
 
