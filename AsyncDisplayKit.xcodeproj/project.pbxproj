@@ -459,9 +459,6 @@
 		DECBD6EA1BE56E1900CF4905 /* ASButtonNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = DECBD6E61BE56E1900CF4905 /* ASButtonNode.mm */; };
 		DEFAD8131CC48914000527C4 /* ASVideoNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEEC47E01C20C2DD00EC1693 /* ASVideoNode.mm */; };
 		E51B78BF1F028ABF00E32604 /* ASLayoutFlatteningTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */; };
-		E52AC9BA1FEA90EB00AA4040 /* ASRectMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = E52AC9B81FEA90EB00AA4040 /* ASRectMap.mm */; };
-		E52AC9BB1FEA90EB00AA4040 /* ASRectMap.h in Headers */ = {isa = PBXBuildFile; fileRef = E52AC9B91FEA90EB00AA4040 /* ASRectMap.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		E52AC9C01FEA916C00AA4040 /* ASRectMapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E52AC9BE1FEA915D00AA4040 /* ASRectMapTests.m */; };
 		E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E00711F1D3828000B30D7 /* ASPagerNode+Beta.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */; };
 		E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */; };
@@ -990,9 +987,6 @@
 		E51B78BD1F01A0EE00E32604 /* ASLayoutFlatteningTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASLayoutFlatteningTests.m; sourceTree = "<group>"; };
 		E52405B21C8FEF03004DC8E7 /* ASLayoutTransition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutTransition.mm; sourceTree = "<group>"; };
 		E52405B41C8FEF16004DC8E7 /* ASLayoutTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASLayoutTransition.h; sourceTree = "<group>"; };
-		E52AC9B81FEA90EB00AA4040 /* ASRectMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASRectMap.mm; sourceTree = "<group>"; };
-		E52AC9B91FEA90EB00AA4040 /* ASRectMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASRectMap.h; sourceTree = "<group>"; };
-		E52AC9BE1FEA915D00AA4040 /* ASRectMapTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASRectMapTests.m; sourceTree = "<group>"; };
 		E54E00711F1D3828000B30D7 /* ASPagerNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASPagerNode+Beta.h"; sourceTree = "<group>"; };
 		E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPageTable.h; sourceTree = "<group>"; };
 		E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPageTable.m; sourceTree = "<group>"; };
@@ -1258,7 +1252,6 @@
 			isa = PBXGroup;
 			children = (
 				F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */,
-				CC35CEC520DD87280006448D /* ASCollectionsTests.m */,
 				DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.m */,
 				AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.m */,
 				696FCB301D6E46050093471E /* ASBackgroundLayoutSpecSnapshotTests.mm */,
@@ -1308,7 +1301,6 @@
 				CC8B05D51D73836400F54286 /* ASPerformanceTestContext.m */,
 				CC7FD9E01BB5F750005CCB2B /* ASPhotosFrameworkImageRequestTests.m */,
 				ACF6ED5A1B178DC700DA7C62 /* ASRatioLayoutSpecSnapshotTests.mm */,
-				E52AC9BE1FEA915D00AA4040 /* ASRectMapTests.m */,
 				CCAA0B81206ADECB0057B336 /* ASRecursiveUnfairLockTests.m */,
 				7AB338681C55B97B0055FDE8 /* ASRelativeLayoutSpecSnapshotTests.mm */,
 				4E9127681F64157600499623 /* ASRunLoopQueueTests.m */,
@@ -1516,8 +1508,6 @@
 				CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */,
 				CC3B20811C3F76D600798563 /* ASPendingStateController.h */,
 				CC3B20821C3F76D600798563 /* ASPendingStateController.mm */,
-				E52AC9B91FEA90EB00AA4040 /* ASRectMap.h */,
-				E52AC9B81FEA90EB00AA4040 /* ASRectMap.mm */,
 				CC55A70F1E52A0F200594372 /* ASResponderChainEnumerator.h */,
 				CC55A7101E52A0F200594372 /* ASResponderChainEnumerator.m */,
 				CC512B841DAC45C60054848E /* ASTableView+Undeprecated.h */,
@@ -1968,7 +1958,6 @@
 				E5775B021F16759300CAC9BC /* ASCollectionLayoutCache.h in Headers */,
 				E5775B001F13D25400CAC9BC /* ASCollectionLayoutState+Private.h in Headers */,
 				E5667E8C1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h in Headers */,
-				E52AC9BB1FEA90EB00AA4040 /* ASRectMap.h in Headers */,
 				E5775AFC1F13CE9F00CAC9BC /* _ASCollectionGalleryLayoutItem.h in Headers */,
 				E5855DF01EBB4D83003639AE /* ASCollectionLayoutDefines.h in Headers */,
 				E5B5B9D11E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h in Headers */,
@@ -2332,7 +2321,6 @@
 				05EA6FE71AC0966E00E35788 /* ASSnapshotTestCase.m in Sources */,
 				CC35CEC620DD87280006448D /* ASCollectionsTests.m in Sources */,
 				ACF6ED631B178DC700DA7C62 /* ASStackLayoutSpecSnapshotTests.mm in Sources */,
-				E52AC9C01FEA916C00AA4040 /* ASRectMapTests.m in Sources */,
 				CCE4F9BA1F0DBB5000062E4E /* ASLayoutTestNode.mm in Sources */,
 				CCAA0B82206ADECB0057B336 /* ASRecursiveUnfairLockTests.m in Sources */,
 				81E95C141D62639600336598 /* ASTextNodeSnapshotTests.m in Sources */,
@@ -2362,7 +2350,6 @@
 				3917EBD51E9C2FC400D04A01 /* _ASCollectionReusableView.m in Sources */,
 				CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.m in Sources */,
 				CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.m in Sources */,
-				E52AC9BA1FEA90EB00AA4040 /* ASRectMap.mm in Sources */,
 				8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.m in Sources */,
 				B30BF6541C59D889004FCD53 /* ASLayoutManager.m in Sources */,
 				92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */,
