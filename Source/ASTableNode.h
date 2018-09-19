@@ -31,8 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) ASTableView *view;
 
 // These properties can be set without triggering the view to be created, so it's fine to set them in -init.
-@property (nullable, weak, nonatomic) id <ASTableDelegate>   delegate;
-@property (nullable, weak, nonatomic) id <ASTableDataSource> dataSource;
+@property (nonatomic, weak) id <ASTableDelegate>   delegate;
+@property (nonatomic, weak) id <ASTableDataSource> dataSource;
 
 /**
  * The number of screens left to scroll before the delegate -tableNode:beginBatchFetchingWithContext: is called.

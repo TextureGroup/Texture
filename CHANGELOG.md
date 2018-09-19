@@ -48,8 +48,8 @@
 - [ASPINRemoteImageManager] Add a new API for setting a preconfigured PINRemoteImageManager. [Ernest Ma](https://github.com/ernestmama) [#1124](https://github.com/TextureGroup/Texture/pull/1124)
 - Small optimization to the layout spec & yoga layout systems by eliminating array copies. [Adlai Holler](https://github.com/Adlai-Holler)
 - Optimize layout process by removing `ASRectMap`.  [Adlai Holler](https://github.com/Adlai-Holler)
-- [ASImageNode+AnimatedImage] Add support for play head seeking. [Josh Beal](https://github.com/joshbeal) [#1130](https://github.com/TextureGroup/Text\
-ure/pull/1130)
+- Remove necessity to use view to access rangeController in ASTableNode, ASCollectionNode. [Michael Schneider](https://github.com/maicki)
+- [ASImageNode+AnimatedImage] Add support for play head seeking. [Josh Beal](https://github.com/joshbeal) [#1130](https://github.com/TextureGroup/Texture/pull/1130)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
