@@ -378,8 +378,8 @@ ASLayoutElementStyleExtensibilityForwarding
 
     // If our new layout's desired size for self doesn't match current size, ask our parent to update it.
     // This can occur for either pre-calculated or newly-calculated layouts.
-    if (!nextLayout.requestedLayoutFromAbove
-        && !CGSizeEqualToSize(boundsSizeForLayout, nextLayout.layout.size)) {
+    if (nextLayout.requestedLayoutFromAbove == NO
+        && CGSizeEqualToSize(boundsSizeForLayout, nextLayout.layout.size) == NO) {
       as_log_verbose(ASLayoutLog(), "Layout size doesn't match bounds size. Requesting layout from above.");
       // The layout that we have specifies that this node (self) would like to be a different size
       // than it currently is.  Because that size has been computed within the constrainedSize, we
@@ -873,8 +873,7 @@ ASLayoutElementStyleExtensibilityForwarding
     ASDN::MutexLocker l(__instanceLock__);
     pendingLayoutTransition = _pendingLayoutTransition;
     if (pendingLayoutTransition != nil) {
-      var pendingLayout = pendingLayoutTransition.pendingLayout;
-      [self _locked_setCalculatedDisplayNodeLayout:pendingLayout];
+      [self _locked_setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];
     }
   }
 
