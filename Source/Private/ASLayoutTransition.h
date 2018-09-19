@@ -50,12 +50,12 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * Previous layout to transition from
  */
-@property (nonatomic, readonly) const ASDisplayNodeLayout &previousLayout;
+@property (nonatomic, readonly) const ASDisplayNodeLayout &previousLayout NS_RETURNS_INNER_POINTER;
 
 /**
  * Pending layout to transition to
  */
-@property (nonatomic, readonly) const ASDisplayNodeLayout &pendingLayout;
+@property (nonatomic, readonly) const ASDisplayNodeLayout &pendingLayout NS_RETURNS_INNER_POINTER;
 
 /**
  * Returns if the layout transition needs to happen synchronously
