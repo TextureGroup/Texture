@@ -15,8 +15,6 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 
-#import <memory>
-
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - ASLayoutElementTransition
@@ -52,12 +50,12 @@ AS_SUBCLASSING_RESTRICTED
 /**
  * Previous layout to transition from
  */
-@property (nonatomic, readonly) std::shared_ptr<ASDisplayNodeLayout> previousLayout;
+@property (nonatomic, readonly) const ASDisplayNodeLayout &previousLayout NS_RETURNS_INNER_POINTER;
 
 /**
  * Pending layout to transition to
  */
-@property (nonatomic, readonly) std::shared_ptr<ASDisplayNodeLayout> pendingLayout;
+@property (nonatomic, readonly) const ASDisplayNodeLayout &pendingLayout NS_RETURNS_INNER_POINTER;
 
 /**
  * Returns if the layout transition needs to happen synchronously
@@ -68,8 +66,8 @@ AS_SUBCLASSING_RESTRICTED
  * Returns a newly initialized layout transition
  */
 - (instancetype)initWithNode:(ASDisplayNode *)node
-               pendingLayout:(std::shared_ptr<ASDisplayNodeLayout>)pendingLayout
-              previousLayout:(std::shared_ptr<ASDisplayNodeLayout>)previousLayout NS_DESIGNATED_INITIALIZER;
+               pendingLayout:(const ASDisplayNodeLayout &)pendingLayout
+              previousLayout:(const ASDisplayNodeLayout &)previousLayout NS_DESIGNATED_INITIALIZER;
 
 /**
  * Insert and remove subnodes that were added or removed between the previousLayout and the pendingLayout

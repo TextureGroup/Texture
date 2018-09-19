@@ -292,8 +292,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
   
-  _calculatedDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>();
-  _pendingDisplayNodeLayout = nullptr;
   _layoutVersion = 1;
   
   _defaultLayoutTransitionDuration = 0.2;
@@ -3812,21 +3810,19 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   [props addObject:@{ @"layoutVersion": @(_layoutVersion.load()) }];
   [props addObject:@{ @"bounds": [NSValue valueWithCGRect:self.bounds] }];
 
-  if (_calculatedDisplayNodeLayout != nullptr) {
-    ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
-    [props addObject:@{ @"calculatedLayout": c.layout }];
-    [props addObject:@{ @"calculatedVersion": @(c.version) }];
-    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(c.constrainedSize) }];
-    if (c.requestedLayoutFromAbove) {
+  if (_calculatedDisplayNodeLayout.layout) {
+    [props addObject:@{ @"calculatedLayout": _calculatedDisplayNodeLayout.layout }];
+    [props addObject:@{ @"calculatedVersion": @(_calculatedDisplayNodeLayout.version) }];
+    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(_calculatedDisplayNodeLayout.constrainedSize) }];
+    if (_calculatedDisplayNodeLayout.requestedLayoutFromAbove) {
       [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
     }
   }
-  if (_pendingDisplayNodeLayout != nullptr) {
-    ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
-    [props addObject:@{ @"pendingLayout": p.layout }];
-    [props addObject:@{ @"pendingVersion": @(p.version) }];
-    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(p.constrainedSize) }];
-    if (p.requestedLayoutFromAbove) {
+  if (_pendingDisplayNodeLayout.layout) {
+    [props addObject:@{ @"pendingLayout": _pendingDisplayNodeLayout.layout }];
+    [props addObject:@{ @"pendingVersion": @(_pendingDisplayNodeLayout.version) }];
+    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(_pendingDisplayNodeLayout.constrainedSize) }];
+    if (_pendingDisplayNodeLayout.requestedLayoutFromAbove) {
       [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
     }
   }
