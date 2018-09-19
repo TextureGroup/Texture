@@ -653,7 +653,7 @@ ASLayoutElementStyleExtensibilityForwarding
         
         // Update calculated layout
         let previousLayout = _calculatedDisplayNodeLayout;
-        var pendingLayout = ASDisplayNodeLayout(newLayout,
+        let pendingLayout = ASDisplayNodeLayout(newLayout,
                                                 constrainedSize,
                                                 constrainedSize.max,
                                                 newLayoutVersion);
