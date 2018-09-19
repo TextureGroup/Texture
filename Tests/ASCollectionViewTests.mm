@@ -369,6 +369,17 @@
   XCTAssertTrue(ASRangeTuningParametersEqualToRangeTuningParameters(preloadParams, [collectionView tuningParametersForRangeType:ASLayoutRangeTypePreload]));
 }
 
+// Informations to test: https://github.com/TextureGroup/Texture/issues/1094
+- (void)testThatCollectionNodeCanHandleNilRangeController
+{
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionNode *collectionNode = [[ASCollectionNode alloc] initWithCollectionViewLayout:layout];
+  [collectionNode recursivelySetInterfaceState:ASInterfaceStateDisplay];
+  [collectionNode setHierarchyState:ASHierarchyStateRangeManaged];
+  [collectionNode recursivelySetInterfaceState:ASInterfaceStateNone];
+  ASCATransactionQueueWait(nil);
+}
+
 /**
  * This may seem silly, but we had issues where the runtime sometimes wouldn't correctly report
  * conformances declared on categories.
