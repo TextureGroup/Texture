@@ -148,7 +148,6 @@
 		6947B0C01E36B4E30007C478 /* ASStackUnpositionedLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6947B0BD1E36B4E30007C478 /* ASStackUnpositionedLayout.mm */; };
 		6947B0C31E36B5040007C478 /* ASStackPositionedLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 6947B0C11E36B5040007C478 /* ASStackPositionedLayout.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6947B0C51E36B5040007C478 /* ASStackPositionedLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6947B0C21E36B5040007C478 /* ASStackPositionedLayout.mm */; };
-		6959433F1D70815300B0EE1F /* ASDisplayNodeLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6959433C1D70815300B0EE1F /* ASDisplayNodeLayout.mm */; };
 		695943401D70815300B0EE1F /* ASDisplayNodeLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 6959433D1D70815300B0EE1F /* ASDisplayNodeLayout.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		695BE2551DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */; };
 		696F01EC1DD2AF450049FBD5 /* ASEventLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 696F01EA1DD2AF450049FBD5 /* ASEventLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -705,7 +704,6 @@
 		6947B0BD1E36B4E30007C478 /* ASStackUnpositionedLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASStackUnpositionedLayout.mm; sourceTree = "<group>"; };
 		6947B0C11E36B5040007C478 /* ASStackPositionedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASStackPositionedLayout.h; sourceTree = "<group>"; };
 		6947B0C21E36B5040007C478 /* ASStackPositionedLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASStackPositionedLayout.mm; sourceTree = "<group>"; };
-		6959433C1D70815300B0EE1F /* ASDisplayNodeLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDisplayNodeLayout.mm; sourceTree = "<group>"; };
 		6959433D1D70815300B0EE1F /* ASDisplayNodeLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDisplayNodeLayout.h; sourceTree = "<group>"; };
 		695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASWrapperSpecSnapshotTests.mm; sourceTree = "<group>"; };
 		696F01EA1DD2AF450049FBD5 /* ASEventLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASEventLog.h; sourceTree = "<group>"; };
@@ -1490,7 +1488,6 @@
 				690BC8C020F6D3490052A434 /* ASDisplayNodeCornerLayerDelegate.m */,
 				058D0A0C195D050800B7D73C /* ASDisplayNodeInternal.h */,
 				6959433D1D70815300B0EE1F /* ASDisplayNodeLayout.h */,
-				6959433C1D70815300B0EE1F /* ASDisplayNodeLayout.mm */,
 				CCA282C61E9EB64B0037E8B7 /* ASDisplayNodeTipState.h */,
 				CCA282C71E9EB64B0037E8B7 /* ASDisplayNodeTipState.m */,
 				68B8A4DB1CBD911D007E4543 /* ASImageNode+AnimatedImagePrivate.h */,
@@ -2497,7 +2494,6 @@
 				DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.m in Sources */,
 				B350620B1B010EFD0018CF92 /* ASTableView.mm in Sources */,
 				B350620E1B010EFD0018CF92 /* ASTextNode.mm in Sources */,
-				6959433F1D70815300B0EE1F /* ASDisplayNodeLayout.mm in Sources */,
 				68355B3E1CB57A60001D4E68 /* ASPINRemoteImageDownloader.m in Sources */,
 				CC034A141E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.m in Sources */,
 				509E68661B3AEDD7009B9150 /* CoreGraphics+ASConvenience.m in Sources */,
