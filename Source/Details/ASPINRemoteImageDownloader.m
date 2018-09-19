@@ -121,7 +121,7 @@ static PINRemoteImageManager *sharedPINRemoteImageManager = nil;
   __unused PINRemoteImageManager *sharedManager = [self sharedPINRemoteImageManagerWithConfiguration:configuration preconfiguredPINRemoteImageManager:nil];
 }
 
-+ (void)setSharedPreconfiguredImageManager:(nullable PINRemoteImageManager *)preconfiguredPINRemoteImageManager
++ (void)setSharedPreconfiguredRemoteImageManager:(nullable PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
   NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
   NSAssert1(sharedPINRemoteImageManager == nil, @"An instance of %@ has been set. Either configuration or preconfigured image manager can be set at a time and only once.", [[sharedPINRemoteImageManager class] description]);
