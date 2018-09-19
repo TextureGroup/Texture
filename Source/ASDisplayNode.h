@@ -24,6 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define ASDisplayNodeLoggingEnabled 0
 
+#ifndef AS_MAX_INTERFACE_STATE_DELEGATES
+#define AS_MAX_INTERFACE_STATE_DELEGATES 4
+#endif
+
 @class ASDisplayNode;
 @protocol ASContextTransitioning;
 
@@ -258,6 +262,8 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @abstract Adds a delegate to receive notifications on interfaceState changes.
  *
  * @warning This must be called from the main thread.
+ * There is a hard limit on the number of delegates a node can have; see
+ * AS_MAX_INTERFACE_STATE_DELEGATES above.
  *
  * @see ASInterfaceState
  */

@@ -40,7 +40,6 @@ typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
 };
 
 @protocol ASInterfaceStateDelegate <NSObject>
-@optional
 
 /**
  * @abstract Called whenever any bit in the ASInterfaceState bitfield is changed.
