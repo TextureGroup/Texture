@@ -868,7 +868,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASAssertUnlocked(__instanceLock__);
 
-  ASLayoutTransition *pendingLayoutTransition = nil;
+  ASLayoutTransition *pendingLayoutTransition;
   {
     ASDN::MutexLocker l(__instanceLock__);
     pendingLayoutTransition = _pendingLayoutTransition;
