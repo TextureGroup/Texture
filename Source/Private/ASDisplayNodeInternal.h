@@ -164,8 +164,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   
   std::atomic<int32_t> _pendingTransitionID;
   ASLayoutTransition *_pendingLayoutTransition;
-  std::shared_ptr<ASDisplayNodeLayout> _calculatedDisplayNodeLayout;
-  std::shared_ptr<ASDisplayNodeLayout> _pendingDisplayNodeLayout;
+  ASDisplayNodeLayout _calculatedDisplayNodeLayout;
+  ASDisplayNodeLayout _pendingDisplayNodeLayout;
   
   /// Sentinel for layout data. Incremented when we get -setNeedsLayout / -invalidateCalculatedLayout.
   /// Starts at 1.
