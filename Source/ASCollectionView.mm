@@ -576,7 +576,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)_asyncDelegateOrDataSourceDidChange
 {
   ASDisplayNodeAssertMainThread();
-  if (_asyncDataSource == nil && _asyncDelegate == nil) {
+  
+  if (_asyncDataSource == nil && _asyncDelegate == nil && !ASActivateExperimentalFeature(ASExperimentalSkipClearData)) {
     [_dataController clearData];
   }
 }
