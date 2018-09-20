@@ -21,20 +21,6 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASViewController.h>
 
-#pragma mark - ASDisplayNode
-
-/**
- * Open access to the method overrides struct for ASDisplayView
- */
-@implementation ASDisplayNode (ASDisplayNodeMethodOverrides_ASDisplayView)
-
-- (ASDisplayNodeMethodOverrides)methodOverrides
-{
-  return _methodOverrides;
-}
-
-@end
-
 #pragma mark - _ASDisplayViewMethodOverrides
 
 typedef NS_OPTIONS(NSUInteger, _ASDisplayViewMethodOverrides)

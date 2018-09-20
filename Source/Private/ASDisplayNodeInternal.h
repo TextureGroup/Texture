@@ -261,7 +261,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 @property (nullable, nonatomic, readonly) _ASDisplayLayer *asyncLayer;
 
 /// Bitmask to check which methods an object overrides.
-@property (nonatomic, readonly) ASDisplayNodeMethodOverrides methodOverrides;
+- (ASDisplayNodeMethodOverrides)methodOverrides;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view

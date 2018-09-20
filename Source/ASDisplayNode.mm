@@ -408,6 +408,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   setFlag(Synchronous, YES);
 }
 
+- (ASDisplayNodeMethodOverrides)methodOverrides
+{
+  return _methodOverrides;
+}
+
 - (void)onDidLoad:(ASDisplayNodeDidLoadBlock)body
 {
   ASDN::MutexLocker l(__instanceLock__);
