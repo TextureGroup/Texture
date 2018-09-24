@@ -280,12 +280,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   // Since truncation text matches style of attributedText, invalidate it now.
-  [self _invalidateTruncationText];
-  
+  [self _locked_invalidateTruncationText];
+
   NSUInteger length = attributedText.length;
   if (length > 0) {
-    self.style.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    self.style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    ASLayoutElementStyle *style = [self _locked_style];
+    style.ascender = [[self class] ascenderWithAttributedString:attributedText];
+    style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -1061,8 +1062,13 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)_invalidateTruncationText
 {
   ASLockScopeSelf();
-  _textContainer.truncationToken = nil;
+  [self _locked_invalidateTruncationText];
   [self setNeedsDisplay];
+}
+
+- (void)_locked_invalidateTruncationText
+{
+  _textContainer.truncationToken = nil;
 }
 
 /**
