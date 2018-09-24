@@ -1,0 +1,48 @@
+{
+  "sections": [
+    {
+      "header": {
+        "use_texture": true,
+        "text": "Protagonists"
+      },
+      "items": [
+        {
+          "use_texture": true,
+          "text": "Pac-Man"
+        },
+        {
+          "use_texture": true,
+          "text": "Ms. Pac-Man"
+        }
+      ]
+    },
+    {
+      "header": {
+        "use_texture": true,
+        "text": "Ghosts"
+      },
+      "footer": {
+        "use_texture": false,
+        "text": "No more ghosts."
+      },
+      "items": [
+        {
+          "use_texture": true,
+          "text": "Blinky"
+        },
+        {
+          "use_texture": true,
+          "text": "Pinky"
+        },
+        {
+          "use_texture": true,
+          "text": "Inky"
+        },
+        {
+          "use_texture": false,
+          "text": "Clyde"
+        }
+      ]
+    }
+  ]
+}

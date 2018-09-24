@@ -331,6 +331,12 @@
 		CC0F886C1E4286FA00576FED /* ReferenceImages_64 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F88691E4286FA00576FED /* ReferenceImages_64 */; };
 		CC0F886D1E4286FA00576FED /* ReferenceImages_iOS_10 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */; };
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */; };
+		CC1217762155CDBD00739E68 /* ASCollectionViewObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1217752155CDBD00739E68 /* ASCollectionViewObserverTests.m */; };
+		CC1217772155CDBD00739E68 /* ASCollectionViewObserverTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC1217752155CDBD00739E68 /* ASCollectionViewObserverTests.m */; };
+		CC12177B2155CDEC00739E68 /* ASCollectionViewObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = CC1217792155CDEC00739E68 /* ASCollectionViewObserver.h */; };
+		CC12177C2155CDEC00739E68 /* ASCollectionViewObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = CC12177A2155CDEC00739E68 /* ASCollectionViewObserver.m */; };
+		CC12177F2155CE4C00739E68 /* ASBoundedQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = CC12177D2155CE4C00739E68 /* ASBoundedQueue.h */; };
+		CC1217802155CE4C00739E68 /* ASBoundedQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC12177E2155CE4C00739E68 /* ASBoundedQueue.mm */; };
 		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC224E962066CA6D00BBA57F /* configuration.json in Resources */ = {isa = PBXBuildFile; fileRef = CC224E952066CA6D00BBA57F /* configuration.json */; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
@@ -841,6 +847,11 @@
 		CC0F88691E4286FA00576FED /* ReferenceImages_64 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_64; sourceTree = "<group>"; };
 		CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_iOS_10; sourceTree = "<group>"; };
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASNetworkImageNodeTests.m; sourceTree = "<group>"; };
+		CC1217752155CDBD00739E68 /* ASCollectionViewObserverTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASCollectionViewObserverTests.m; sourceTree = "<group>"; };
+		CC1217792155CDEC00739E68 /* ASCollectionViewObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASCollectionViewObserver.h; sourceTree = "<group>"; };
+		CC12177A2155CDEC00739E68 /* ASCollectionViewObserver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASCollectionViewObserver.m; sourceTree = "<group>"; };
+		CC12177D2155CE4C00739E68 /* ASBoundedQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASBoundedQueue.h; sourceTree = "<group>"; };
+		CC12177E2155CE4C00739E68 /* ASBoundedQueue.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASBoundedQueue.mm; sourceTree = "<group>"; };
 		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
 		CC224E952066CA6D00BBA57F /* configuration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = configuration.json; sourceTree = "<group>"; };
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
@@ -1326,6 +1337,7 @@
 				CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */,
 				83A7D95D1D446A6E00BF333E /* ASWeakMapTests.m */,
 				CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.m */,
+				CC1217782155CDCC00739E68 /* Thin Embedding */,
 				695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */,
 				057D02C01AC0A66700C7AC3C /* AsyncDisplayKitTestHost */,
 				CC583ABF1EF9BAB400134156 /* Common */,
@@ -1349,6 +1361,8 @@
 		058D09E1195D050800B7D73C /* Details */ = {
 			isa = PBXGroup;
 			children = (
+				CC1217792155CDEC00739E68 /* ASCollectionViewObserver.h */,
+				CC12177A2155CDEC00739E68 /* ASCollectionViewObserver.m */,
 				E5B077EB1E6843AF00C24B5B /* Collection Layout */,
 				25B171EA1C12242700508A7A /* Data Controller */,
 				058D09F7195D050800B7D73C /* Transactions */,
@@ -1369,6 +1383,8 @@
 				299DA1A71A828D2900162D41 /* ASBatchContext.h */,
 				299DA1A81A828D2900162D41 /* ASBatchContext.m */,
 				E5C347B01ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h */,
+				CC12177D2155CE4C00739E68 /* ASBoundedQueue.h */,
+				CC12177E2155CE4C00739E68 /* ASBoundedQueue.mm */,
 				205F0E1B1B373A2C007741D0 /* ASCollectionViewLayoutController.h */,
 				205F0E1C1B373A2C007741D0 /* ASCollectionViewLayoutController.m */,
 				68C215561DE10D330019C4BC /* ASCollectionViewLayoutInspector.h */,
@@ -1665,6 +1681,14 @@
 			path = Layout;
 			sourceTree = "<group>";
 		};
+		CC1217782155CDCC00739E68 /* Thin Embedding */ = {
+			isa = PBXGroup;
+			children = (
+				CC1217752155CDBD00739E68 /* ASCollectionViewObserverTests.m */,
+			);
+			path = "Thin Embedding";
+			sourceTree = "<group>";
+		};
 		CC224E942066CA6D00BBA57F /* Schemas */ = {
 			isa = PBXGroup;
 			children = (
@@ -1841,6 +1865,7 @@
 				E5E2D72E1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h in Headers */,
 				E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */,
 				CCBDDD0520C62A2D00CBA922 /* ASMainThreadDeallocation.h in Headers */,
+				CC12177B2155CDEC00739E68 /* ASCollectionViewObserver.h in Headers */,
 				CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */,
 				E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */,
 				E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */,
@@ -1948,6 +1973,7 @@
 				254C6B7C1BF94DF4003EC431 /* ASTextKitRenderer+TextChecking.h in Headers */,
 				68AF37DB1CBEF4D80077BF76 /* ASImageNode+AnimatedImagePrivate.h in Headers */,
 				CCCCCCDD1EC3EF060087FE10 /* ASTextAttribute.h in Headers */,
+				CC12177F2155CE4C00739E68 /* ASBoundedQueue.h in Headers */,
 				B35062461B010EFD0018CF92 /* ASBasicImageDownloaderInternal.h in Headers */,
 				044285081BAA63FE00D16268 /* ASBatchFetching.h in Headers */,
 				AC026B701BD57DBF00BBC17E /* _ASHierarchyChangeSet.h in Headers */,
@@ -2090,8 +2116,6 @@
 				058D09B8195D04C000B7D73C /* Sources */,
 				058D09B9195D04C000B7D73C /* Frameworks */,
 				058D09BA195D04C000B7D73C /* Resources */,
-				3B9D88CDF51B429C8409E4B6 /* [CP] Copy Pods Resources */,
-				B130AB1AC0A1E5162E211C19 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2211,36 +2235,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3B9D88CDF51B429C8409E4B6 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B130AB1AC0A1E5162E211C19 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -2249,6 +2243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				057D02C71AC0A66700C7AC3C /* AppDelegate.m in Sources */,
+				CC1217772155CDBD00739E68 /* ASCollectionViewObserverTests.m in Sources */,
 				057D02C41AC0A66700C7AC3C /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2329,6 +2324,7 @@
 				CCE4F9BE1F0ECE5200062E4E /* ASTLayoutFixture.mm in Sources */,
 				058D0A40195D057000B7D73C /* ASTextNodeTests.m in Sources */,
 				DBC453221C5FD97200B16017 /* ASDisplayNodeImplicitHierarchyTests.m in Sources */,
+				CC1217762155CDBD00739E68 /* ASCollectionViewObserverTests.m in Sources */,
 				058D0A41195D057000B7D73C /* ASTextNodeWordKernerTests.mm in Sources */,
 				DBC452DE1C5C6A6A00B16017 /* ArrayDiffingTests.m in Sources */,
 				CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.m in Sources */,
@@ -2354,6 +2350,7 @@
 				636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */,
 				B350623D1B010EFD0018CF92 /* _ASAsyncTransaction.mm in Sources */,
 				6947B0C51E36B5040007C478 /* ASStackPositionedLayout.mm in Sources */,
+				CC12177C2155CDEC00739E68 /* ASCollectionViewObserver.m in Sources */,
 				B35062401B010EFD0018CF92 /* _ASAsyncTransactionContainer.m in Sources */,
 				AC026B721BD57DBF00BBC17E /* _ASHierarchyChangeSet.mm in Sources */,
 				B35062421B010EFD0018CF92 /* _ASAsyncTransactionGroup.m in Sources */,
@@ -2467,6 +2464,7 @@
 				254C6B8B1BF94F8A003EC431 /* ASTextKitShadower.mm in Sources */,
 				254C6B851BF94F8A003EC431 /* ASTextKitAttributes.mm in Sources */,
 				90FC784F1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm in Sources */,
+				CC1217802155CE4C00739E68 /* ASBoundedQueue.mm in Sources */,
 				CCA282C91E9EB64B0037E8B7 /* ASDisplayNodeTipState.m in Sources */,
 				509E68601B3AED8E009B9150 /* ASScrollDirection.m in Sources */,
 				B35062091B010EFD0018CF92 /* ASScrollNode.mm in Sources */,

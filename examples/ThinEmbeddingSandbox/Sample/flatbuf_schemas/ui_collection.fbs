@@ -1,0 +1,16 @@
+table Item {
+  use_texture:bool;
+  text:string;
+}
+
+table Section {
+  header:Item;
+  footer:Item;
+  items:[Item];
+}
+
+table UICollection {
+  sections:[Section];
+}
+
+root_type UICollection;
