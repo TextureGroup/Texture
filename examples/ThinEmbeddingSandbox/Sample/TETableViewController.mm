@@ -38,6 +38,10 @@
   [view addSubview:_tableView];
 }
 
+- (ASCollectionViewHelper *)loadTextureHelper {
+  return [[ASCollectionViewHelper alloc] initWithTableView:_tableView dataSource:self];
+}
+
 - (void)reloadData {
   [_tableView reloadData];
 }
@@ -57,18 +61,39 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+  CGFloat height;
+  if ([_textureHelper tableView:tableView heightForRowAtIndexPath:indexPath height:&height]) {
+    return height;
+  }
   return [self sizeAt:TEPath::make(indexPath)].height;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+  
+  CGFloat height;
+  if ([_textureHelper tableView:tableView heightForHeaderInSection:section height:&height]) {
+    return height;
+  }
   return [self sizeAt:TEPath::header(section)].height;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+  CGFloat height;
+  if ([_textureHelper tableView:tableView heightForFooterInSection:section height:&height]) {
+    return height;
+  }
+  
   return [self sizeAt:TEPath::footer(section)].height;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+  if (auto cell = [_textureHelper tableView:tableView cellForRowAtIndexPath:indexPath]) {
+    return cell;
+  }
+  
+  // Native.
+  cell = [tableView dequeueReusableCellWithIdentifier:@"default" forIndexPath:indexPath];
+  
   auto path = TEPath::make(indexPath);
   auto reuseID = [self reuseIdentifierAt:path];
   auto cell = [tableView dequeueReusableCellWithIdentifier:reuseID forIndexPath:indexPath];
@@ -77,6 +102,10 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+  if (auto cell = [_textureHelper tableView:tableView viewForHeaderInSection:section]) {
+    return cell;
+  }
+  
   auto path = TEPath::header(section);
   auto reuseID = [self reuseIdentifierAt:path];
   auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:reuseID];
@@ -85,6 +114,9 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+  if (auto cell = [_textureHelper tableView:tableView viewForFooterInSection:section]) {
+    return cell;
+  }
   auto path = TEPath::footer(section);
   auto reuseID = [self reuseIdentifierAt:path];
   auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:reuseID];

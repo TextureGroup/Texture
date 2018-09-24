@@ -21,7 +21,6 @@
 @end
 
 @implementation TEBaseViewController {
-  ASCollectionViewHelper *_texHelper;
   // NOTE: This is only safe because the NSData behind this pointer is retained
   // by a static variable.
   const UICollection *_data;
@@ -56,6 +55,11 @@
   NSAssert(NO, @"Abstract method.");
 }
 
+- (ASCollectionViewHelper *)loadTextureHelper {
+  NSAssert(NO, @"Abstract method.");
+  return nil;
+}
+
 - (NSInteger)numberOfSections {
   return _data->sections()->size();
 }
@@ -65,6 +69,9 @@
 }
 
 - (CGSize)sizeAt:(const TEPath &)path {
+  if ([_textureHelper managesItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]) {
+    return _textureHelper collectionView:<#(nonnull UICollectionView *)#> layout:<#(nonnull UICollectionViewLayout *)#> sizeForItemAtIndexPath:<#(nonnull NSIndexPath *)#>
+  }
   auto item = [self _itemAt:path];
   // No item is valid. Could be this section has no footer, for example.
   if (!item) {

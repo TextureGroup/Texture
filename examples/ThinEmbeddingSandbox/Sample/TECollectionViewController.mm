@@ -13,6 +13,7 @@
 @end
 
 @implementation TECollectionViewController {
+  ASCollectionViewHelper *_textureHelper;
   UICollectionView *_collectionView;
 }
 
@@ -40,6 +41,10 @@
   [view addSubview:_collectionView];
 }
 
+- (ASCollectionViewHelper *)loadTextureHelper {
+  return [[ASCollectionViewHelper alloc] initWithCollectionView:_collectionView dataSource:self];
+}
+
 - (void)reloadData {
   [_collectionView reloadData];
 }
@@ -57,10 +62,17 @@
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_textureHelper managesItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]) {
+    return [_textureHelper collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath];
+  }
   return [self sizeAt:TEPath::make(indexPath)];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
+  if ([_textureHelper managesHeaderInSection:section]) {
+    
+    return [_textureHelper collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath];
+  }
   return [self sizeAt:TEPath::header(section)];
 }
 

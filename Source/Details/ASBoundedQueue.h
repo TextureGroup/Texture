@@ -1,5 +1,5 @@
 //
-//  BoundedQueue.h
+//  ASBoundedQueue.h
 //  FudgeFlowLayout
 //
 //  Created by Adlai Holler on 8/8/18.
@@ -10,28 +10,28 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BoundedQueue : NSObject
+@interface ASBoundedQueue : NSObject
 
 - (void)dispatch:(void(^)(void))block;
 
-- (void)waitUntilReady;
+- (BOOL)reserve;
 
 @end
 
-static BoundedQueue *_gDefaultBoundedQueue;
+static ASBoundedQueue *_gDefaultBoundedQueue;
 
 NS_INLINE void _EnsureDefaultBoundedQueue(void) {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    _gDefaultBoundedQueue = [[BoundedQueue alloc] init];
+    _gDefaultBoundedQueue = [[ASBoundedQueue alloc] init];
   });
 }
 
-#define BoundedQueueGetDefault() ({ _EnsureDefaultBoundedQueue(); _gDefaultBoundedQueue; })
+#define ASBoundedQueueGetDefault() ({ _EnsureDefaultBoundedQueue(); _gDefaultBoundedQueue; })
 
-@interface BoundedQueue (LayoutQueue)
+@interface ASBoundedQueue (LayoutQueue)
 /// The queue to which cell layouts are submitted by default.
-@property(class, readonly) BoundedQueue *layoutQueue;
+@property(class, readonly) ASBoundedQueue *layoutQueue;
 @end
 
 NS_ASSUME_NONNULL_END

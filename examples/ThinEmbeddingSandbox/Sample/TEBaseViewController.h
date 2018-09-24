@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+#import <AsyncDisplayKit/ASCollectionViewHelper.h>
+
 #import "ui_collection_generated.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+@class ASCollectionViewHelper;
+
 static NSString *const TEViewPlatformPlain = @"plain";
 static NSString *const TEViewPlatformTexture = @"texture";
 
@@ -31,7 +36,10 @@ struct TEPath {
 
 @class TECellView, TEModel, TESectionController;
 
-@interface TEBaseViewController : UIViewController
+@interface TEBaseViewController : UIViewController <ASCollectionViewHelperDataSource> {
+@package
+  ASCollectionViewHelper *_textureHelper
+}
 
 /// Tell the view to reload data. Doesn't affect data source data.
 - (void)reloadData;
@@ -43,7 +51,7 @@ struct TEPath {
 
 @interface TEBaseViewController (UISubclassingHooks)
 
-// Things subclasses call:
+/// Things subclasses call:
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfItemsIn:(NSInteger)section;
 - (CGSize)sizeAt:(const TEPath &)path;

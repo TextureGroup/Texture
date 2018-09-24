@@ -1,11 +1,14 @@
 #import "ASCollectionViewHelper.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <os/log.h>
 #import <future>
 #import <unordered_map>
 #import <objc/runtime.h>
 
-#import "BoundedQueue.h"
+#import "ASBoundedQueue.h"
+
+static NSString *const kASReuseIdentifier = @"texture_cell";
 
 static os_log_t ASCollectionLog2(void) {
   static os_log_t _val;
@@ -16,225 +19,292 @@ static os_log_t ASCollectionLog2(void) {
   return _val;
 }
 
-typedef struct {
-    __unsafe_unretained NSString * _Nullable supplementaryElementKind;
+struct ASCollectionPath {
+    __unsafe_unretained NSString *supplementaryElementKind;
     NSInteger section;
     NSInteger item;
-} ASCollectionElementPath;
+  static ASCollectionPath cell(NSIndexPath *indexPath) {
+    return { nil, indexPath.section, indexPath.item };
+  }
+  static ASCollectionPath header(NSInteger sectionArg) {
+    return { UICollectionElementKindSectionHeader, sectionArg, 0};
+  }
+  static ASCollectionPath footer(NSInteger sectionArg) {
+    return { UICollectionElementKindSectionFooter, sectionArg, 0};
+  }
+  static ASCollectionPath supp(NSIndexPath *indexPath, NSString *kind) {
+    return { kind, indexPath.section, indexPath.item};
+  }
+};
+
 
 using namespace std;
+
+@interface ASCollectionObjectState : NSObject {
+@package
+  shared_future<ASDisplayNode *> _nodeFuture;
+  
+  pair<ASSizeRange, shared_future<CGSize>> _sizeFuture;
+}
+@end
+
+@implementation ASCollectionObjectState
+@end
 
 @interface ASCollectionViewHelper ()
 @end
 
 @implementation ASCollectionViewHelper {
+  BOOL _isTableView;
   __weak id<ASCollectionViewHelperDataSource> _dataSource;
-  NSMutableSet<NSString *> *_registeredViewClassesForSupplementaryKinds;
   
-  // id<ASNodeKey> -> { future<ASDisplayNode>, dispatch_block_t }
-  unordered_map<CFTypeRef, pair<shared_future<CFTypeRef>, dispatch_block_t>> _layouts;
+  // weak object -> state
+  NSMapTable<id, ASCollectionObjectState *> *_data;
 }
 
 - (instancetype)initWithCollectionView:(UICollectionView *)collectionView dataSource:(id<ASCollectionViewHelperDataSource>)dataSource
 {
-  if (self = [super init]) {
+  if (self = [self init]) {
     _dataSource = dataSource;
-    
+
     [collectionView registerClass:UICollectionViewCell.class
-       forCellWithReuseIdentifier:@"asdkCellId"];
-    _registeredViewClassesForSupplementaryKinds = [[NSMutableSet alloc] init];
+       forCellWithReuseIdentifier:kASReuseIdentifier];
+    [collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:kASReuseIdentifier];
+    [collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:kASReuseIdentifier];
   }
   return self;
 }
 
 - (instancetype)initWithTableView:(UITableView *)tableView dataSource:(id<ASCollectionViewHelperDataSource>)dataSource
 {
-  if (self = [super init]) {
+  if (self = [self init]) {
     _dataSource = dataSource;
+    _isTableView = YES;
     
-    [tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"asdkCellId"];
-    _registeredViewClassesForSupplementaryKinds = [[NSMutableSet alloc] init];
+    [tableView registerClass:UITableViewCell.class forCellReuseIdentifier:kASReuseIdentifier];
+    [tableView registerClass:UITableViewHeaderFooterView.class forHeaderFooterViewReuseIdentifier:kASReuseIdentifier];
   }
   return self;
 }
 
-#pragma mark - Data providing
-
-- (CGFloat)heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-  return [self sizeForItemAtIndexPath:indexPath].height;
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _data = [[NSMapTable alloc] initWithKeyOptions:NSMapTableObjectPointerPersonality | NSMapTableWeakMemory valueOptions:NSMapTableStrongMemory capacity:0];
+  }
+  return self;
 }
 
-- (CGFloat)heightForHeaderInSection:(NSInteger)section {
-  return [self sizeForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]].height;
+#pragma mark - Table view data
+
+- (BOOL)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath height:(out CGFloat *)heightPtr {
+  CGSize size;
+  if (![self sizeFor:ASCollectionPath::cell(indexPath) container:tableView sizePtr:&size]) {
+    return NO;
+  }
+#if TARGET_OS_IOS
+  /**
+   * Weirdly enough, Apple expects the return value here to _include_ the height
+   * of the separator, if there is one! So if our node wants to be 43.5, we need
+   * to return 44. UITableView will make a cell of height 44 with a content view
+   * of height 43.5.
+   */
+  if (tableView.separatorStyle != UITableViewCellSeparatorStyleNone) {
+    size.height += 1.0 / ASScreenScale();
+  }
+#endif
+  *heightPtr = size.height;
+  return YES;
 }
 
-- (CGFloat)heightForFooterInSection:(NSInteger)section {
-  return [self sizeForSupplementaryElementOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]].height;
+- (BOOL)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section height:(out CGFloat *)heightPtr {
+  CGSize size;
+  if (![self sizeFor:ASCollectionPath::header(section) container:tableView sizePtr:&size]) {
+    return NO;
+  }
+  *heightPtr = size.height;
+  return YES;
 }
+
+- (BOOL)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section height:(out CGFloat *)heightPtr {
+  CGSize size;
+  if (![self sizeFor:ASCollectionPath::footer(section) container:tableView sizePtr:&size]) {
+    return NO;
+  }
+  *heightPtr = size.height;
+  return YES;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  auto path = ASCollectionPath::cell(indexPath);
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
+    return nil;
+  }
+  auto cell = [tableView dequeueReusableCellWithIdentifier:kASReuseIdentifier forIndexPath:indexPath];
+  [self host:path object:object inContentView:cell.contentView container:tableView];
+  return cell;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+  auto path = ASCollectionPath::header(section);
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
+    return nil;
+  }
+  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:kASReuseIdentifier];
+  [self host:path object:object inContentView:cell.contentView container:tableView];
+  return cell;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+  auto path = ASCollectionPath::footer(section);
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
+    return nil;
+  }
+  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:kASReuseIdentifier];
+  [self host:path object:object inContentView:cell.contentView container:tableView];
+  return cell;
+}
+
+#pragma mark - Collection view data
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASDisplayNodeAssertMainThread();
-  os_log_debug(ASCollectionLog2(), "request cell for node %lu", (unsigned long)indexPath.item);
-  
-  auto cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"asdkCellId" forIndexPath:indexPath];
-  [self host:{ nil, indexPath.section, indexPath.item } inContentView:cell.contentView];
+  auto path = ASCollectionPath::cell(indexPath);
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
+    return nil;
+  }
+  auto cell = [collectionView dequeueReusableCellWithReuseIdentifier:kASReuseIdentifier forIndexPath:indexPath];
+  [self host:path object:object inContentView:cell.contentView container:collectionView];
   return cell;
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-  ASDisplayNodeAssertMainThread();
-  if (![_registeredViewClassesForSupplementaryKinds containsObject:kind]) {
-    [collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:kind withReuseIdentifier:@"asdkSuppId"];
-    [_registeredViewClassesForSupplementaryKinds addObject:kind];
-  }
-  UICollectionReusableView *view = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"asdkSuppId" forIndexPath:indexPath];
-  [self host:{ kind, indexPath.section, indexPath.item } inContentView:view];
-  return view;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+  auto path = ASCollectionPath::supp(indexPath, kind);
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
     return nil;
+  }
+  auto cell = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kASReuseIdentifier forIndexPath:indexPath];
+  [self host:path object:object inContentView:cell container:collectionView];
+  return cell;
 }
 
-- (void)host:(ASCollectionElementPath)element inContentView:(UIView *)contentView
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout sizeForItemAtIndexPath:(NSIndexPath *)indexPath size:(out CGSize *)sizePtr
 {
-  ASDisplayNodeAssertMainThread();
+  return [self sizeFor:ASCollectionPath::cell(indexPath) container:collectionView sizePtr:sizePtr];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout referenceSizeForHeaderInSection:(NSInteger)section size:(out CGSize *)sizePtr
+{
+  return [self sizeFor:ASCollectionPath::header(section) container:collectionView sizePtr:sizePtr];
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)layout referenceSizeForFooterInSection:(NSInteger)section size:(out CGSize *)sizePtr
+{
+  return [self sizeFor:ASCollectionPath::footer(section) container:collectionView sizePtr:sizePtr];
+}
+
+#pragma mark - Funnel Methods
+
+- (BOOL)sizeFor:(const ASCollectionPath &)path container:(UIView *)container sizePtr:(CGSize *)sizePtr
+{
+  id object = [self _objectFromDataSourceAt:path];
+  if (!object) {
+    *sizePtr = CGSizeZero;
+    return NO;
+  }
+  
+  auto state = [self _stateForObject:object];
+  [self _ensureNodeFutureForState:state];
+  auto node = state->_nodeFuture.get();
+  
+  ASSizeRange sizeRange = [self sizeRangeFor:path container:container];
+  if (!ASSizeRangeEqualToSizeRange(sizeRange, <#ASSizeRange rhs#>))
+  *sizePtr = [node layoutThatFits:sizeRange].size;
+  return YES;
+}
+
+- (void)host:(const ASCollectionPath &)element object:(id)object inContentView:(UIView *)contentView container:(UIView *)container
+{
   // Get the node, or bail if this is cell is not a node.
-  auto node = [self _measuredNodeFor:element];
+  auto node = [self _nodeFor:element object:object container:container];
   if (!node) {
     return;
   }
-  unowned let oldCellView = contentView.subviews.firstObject;
   unowned let nodeView = node.view;
-  if (oldCellView != nodeView) {
-    [oldCellView removeFromSuperview];
-    [contentView addSubview:nodeView];
-    nodeView.frame = contentView.bounds;
-    nodeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-  }
-}
-
-- (void)_startPreparingNodeFor:(ASCollectionElementPath)path knownSizeRange:(ASSizeRange)sizeRange
-{
-  ASDisplayNodeAssertMainThread();
-  id object;
-  if (path.supplementaryElementKind == nil) {
-    object = [_dataSource collectionViewHelper:self objectForItemAtIndexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section]];
-  } else {
-    object = [_dataSource collectionViewHelper:self objectForSupplementaryElementOfKind:path.supplementaryElementKind atIndexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section]];
-  }
-  if (object == nil) {
+  let subviews = contentView.subviews;
+  if (NSNotFound != [subviews indexOfObjectIdenticalTo:nodeView]) {
+    // Already hosted.
     return;
   }
   
-  if (ASSizeRangeEqualToSizeRange(sizeRange, ASSizeRangeNull)) {
-    sizeRange = [self _sizeRangeFromLayoutFor:path];
+  for (UIView *view in subviews) {
+    [view removeFromSuperview];
   }
-  
-  auto promise = new std::promise<CFTypeRef>();
-  auto future = promise->get_future().share();
-  __block dispatch_block_t dispatchBlock = dispatch_block_create((dispatch_block_flags_t)0, ^{
-    if (dispatch_block_testcancel(dispatchBlock)) {
+  [contentView addSubview:nodeView];
+  nodeView.frame = contentView.bounds;
+  nodeView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+}
+
+#pragma mark - Internal
+
+- (void)_ensureNodeFutureForState:(ASCollectionObjectState *)state
+{
+  if (!state->_nodeFuture.valid()) {
+    auto promise = new std::promise<ASDisplayNode *>();
+    state->_nodeFuture = promise->get_future().share();
+    auto nodeBlock = [_dataSource collectionViewHelper:self nodeBlockForObject:object indexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section] supplementaryElementKind:path.supplementaryElementKind];
+    __block dispatch_block_t dispatchBlock = dispatch_block_create((dispatch_block_flags_t)0, ^{
+      promise->set_value(nodeBlock());
       delete promise;
-      return;
-    }
-    
-    // We retain the key. The key retains the node.
-    // If the data source also retains the key, then the node survives across updates.
-    // If it doesn't, then we have to regenerate the node.
-    static int nodeAssociationKey;
-    
-    ASDisplayNode *node;
-    @synchronized(object) {
-      node = objc_getAssociatedObject(object, &nodeAssociationKey);
-      if (node) {
-        os_log_debug(ASCollectionLog2(), "reused node at %lu", (unsigned long)path.item);
-      } else {
-        os_log_debug(ASCollectionLog2(), "creating node at %lu", (unsigned long)path.item);
-        node = [object createNode];
-        if ((id)node != (id)object) {
-          objc_setAssociatedObject(object, &nodeAssociationKey, node, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        } else {
-          objc_setAssociatedObject(object, &nodeAssociationKey, node, OBJC_ASSOCIATION_ASSIGN);
-        }
-      }
-    }
-    
-    // Check canceled.
-    if (dispatch_block_testcancel(dispatchBlock)) {
-      os_log_debug(ASCollectionLog2(), "measure canceled", (unsigned long)path.item);
-      delete promise;
-      return;
-    }
-    
-    // Just compute the size and rely on the node's cache.
-    [node layoutThatFits:sizeRange];
-    os_log_debug(ASCollectionLog2(), "measured node at %lu", (unsigned long)path.item);
-    
-    promise->set_value((__bridge CFTypeRef)node);
-    delete promise;
-  });
-  [BoundedQueueGetDefault() dispatch:dispatchBlock];
-  _layouts.insert({ (__bridge_retained CFTypeRef)key, { future, dispatchBlock }});
+    });
+    [ASBoundedQueueGetDefault() dispatch:dispatchBlock];
+  }
 }
 
-/**
- * For sizing calls, the normal pattern (flow layout) is to size all cells upfront.
- *
- * We want to size them all upfront and avoid re-validating our data on each sizing call.
- * To do this, we need some cooperation from the layout object unfortunately. We need to know
- * that the data source is still valid.
- */
-- (CGSize)sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+/// Look up or create an empty state for the given object.
+- (ASCollectionObjectState *)_stateForObject:(id)object
 {
-  ASDisplayNodeAssertMainThread();
-  os_log_debug(ASCollectionLog2(), "request size for node %lu", (unsigned long)indexPath.item);
-  return [self _measuredNodeFor:{ nil, indexPath.section, indexPath.item }].calculatedSize;
+  auto state = [_data objectForKey:object];
+  if (!state) {
+    state = [[ASCollectionObjectState alloc] init];
+    [_data setObject:state forKey:object];
+  }
+  return state;
 }
 
-- (CGSize)flowLayoutReferenceSizeForHeaderInSection:(NSInteger)section
+- (id)_objectFromDataSourceAt:(const ASCollectionPath &)path
 {
-  return [self sizeForSupplementaryElementOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
-}
-
-- (CGSize)flowLayoutReferenceSizeForFooterInSection:(NSInteger)section
-{
-  return [self sizeForSupplementaryElementOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
-}
-
-- (CGSize)sizeForSupplementaryElementOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
-{
-  ASDisplayNodeAssertMainThread();
-  os_log_debug(ASCollectionLog2(), "request size for supp node %@ %lu", elementKind, (unsigned long)indexPath.section);
-  return [self _measuredNodeFor:{ elementKind, indexPath.section, indexPath.item }].calculatedSize;
-}
-
-- (ASDisplayNode *)_measuredNodeFor:(ASCollectionElementPath)path
-{
-  ASDisplayNodeAssertMainThread();
-  id key = [_dataSource collectionViewHelper:self nodeKeyForCollectionPath:path];
-  if (key == nil) {
-    ASDisplayNodeFailAssert(@"Asked for size of item that isn't a node!");
+  if (path.supplementaryElementKind == nil) {
+    return [_dataSource collectionViewHelper:self objectForItemAtIndexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section]];
+  } else if (path.supplementaryElementKind == UICollectionElementKindSectionHeader) {
+    return [_dataSource collectionViewHelper:self objectForHeaderInSection:path.section];
+  } else if (path.supplementaryElementKind == UICollectionElementKindSectionFooter) {
+    return [_dataSource collectionViewHelper:self objectForFooterInSection:path.section];
+  } else {
+    NSAssert(NO, @"Non-header/footer supplementary kinds are not supported currently.");
     return nil;
   }
-  auto it = _layouts.find((__bridge CFTypeRef)key);
-  
-  // We didn't pre-warm this. Known causes of this are:
-  // - Changes in the return value from nodeKeyForCollectionPath: for the same path without
-  //   invalidating the layout.
-  // - Not including a supplementary element in -supplementaryElementsInSection:
-  if (it == _layouts.end()) {
-    os_log_debug(ASCollectionLog2(), "Warning: failed to warm layout for %lu", (unsigned long)path.item);
-    [self _startPreparingNodeFor:path knownSizeRange:ASSizeRangeNull];
-    it = _layouts.find((__bridge CFTypeRef)key);
+}
+
+- (ASSizeRange)sizeRangeFor:(const ASCollectionPath &)path container:(UIView *)container
+{
+  // If we are already hosted in a table view cell, use that cell's width
+  CGRect bounds = container.bounds;
+  if (_isTableView) {
+    return ASSizeRangeMake({CGRectGetWidth(bounds),0}, {CGRectGetWidth(bounds),2009});
+  } else {
+    return ASSizeRangeMake(CGSizeZero, bounds.size);
   }
-  
-  // Blocking: Wait on the layout promise.
-  return (__bridge ASDisplayNode *)it->second.first.get();
 }
 
 @end

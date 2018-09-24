@@ -19,31 +19,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)collectionViewHelper:(ASCollectionViewHelper *)helper
            objectForItemAtIndexPath:(NSIndexPath *)path;
 
-- (nullable id)collectionViewHelper:(ASCollectionViewHelper *)helper
- objectForSupplementaryElementOfKind:(NSString *)elementKind
-                         atIndexPath:(NSIndexPath *)indexPath;
+- (nullable id)collectionViewHelper:(ASCollectionViewHelper *)helper objectForHeaderInSection:(NSInteger)section;
+- (nullable id)collectionViewHelper:(ASCollectionViewHelper *)helper objectForFooterInSection:(NSInteger)section;
+
+- (id(^)(void))collectionViewHelper:(ASCollectionViewHelper *)helper
+                 nodeBlockForObject:(id)object
+                          indexPath:(NSIndexPath *)indexPath
+           supplementaryElementKind:(nullable NSString *)supplementaryElementKind;
+
 @end
 
-
+AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionViewHelper : NSObject
 
-/**
- * Note: Data source is expected to deallocate on the main thread.
- * The collection view's layout must conform to ASCompatibleCollectionViewLayout.
- */
 - (instancetype)initWithCollectionView:(UICollectionView *)collectionView
-                            dataSource:(id<ASCollectionViewHelperDataSource>)dataSource NS_DESIGNATED_INITIALIZER;
+                            dataSource:(id<ASCollectionViewHelperDataSource>)dataSource;
 
 - (instancetype)initWithTableView:(UITableView *)tableView
-                       dataSource:(id<ASCollectionViewHelperDataSource>)dataSource NS_DESIGNATED_INITIALIZER;
-
-#pragma mark - Output
+                       dataSource:(id<ASCollectionViewHelperDataSource>)dataSource;
 
 #pragma mark - Table View
 
-- (CGFloat)heightForRowAtIndexPath:(NSIndexPath *)indexPath;
-- (CGFloat)heightForHeaderInSection:(NSInteger)section;
-- (CGFloat)heightForFooterInSection:(NSInteger)section;
+- (BOOL)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+           height:(out CGFloat *)height;
+- (BOOL)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+           height:(out CGFloat *)height;
+- (BOOL)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+           height:(out CGFloat *)height;
+
 
 /// our implementation of the data source method.
 /// returns nil if this cell is not a node.
@@ -62,14 +65,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Calls to this method outside of UICollectionViewLayout's preparation process result in undefined behavior.
  */
-- (CGSize)sizeForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (BOOL)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)layout
+sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+                  size:(out CGSize *)sizePtr;
 
-- (CGSize)flowLayoutReferenceSizeForHeaderInSection:(NSInteger)section;
-- (CGSize)flowLayoutReferenceSizeForFooterInSection:(NSInteger)section;
+- (BOOL)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)layout
+referenceSizeForHeaderInSection:(NSInteger)section
+                  size:(out CGSize *)sizePtr;
 
-/// Generic supplementary sizing method.
-- (CGSize)sizeForSupplementaryElementOfKind:(NSString *)elementKind
-                                atIndexPath:(NSIndexPath *)indexPath;
+- (BOOL)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)layout
+referenceSizeForFooterInSection:(NSInteger)section
+                  size:(out CGSize *)sizePtr;
 
 /// our implementation of the data source method.
 /// returns nil if this cell is not a node.
@@ -79,10 +88,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
                     viewForSupplementaryElementOfKind:(NSString *)kind
                                           atIndexPath:(NSIndexPath *)indexPath;
-
-#pragma mark - Unavailable
-
-- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

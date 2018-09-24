@@ -214,6 +214,10 @@ typedef struct {
   CGSize max;
 } ASSizeRange;
 
+ASDISPLAYNODE_INLINE BOOL ASSizeIsNull(CGSize size) {
+  return size.width < 0 || size.height < 0;
+}
+
 /**
  * A size range with all dimensions zero.
  */

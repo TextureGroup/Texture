@@ -1,5 +1,5 @@
 //
-//  BoundedQueue.m
+//  ASBoundedQueue.m
 //  FudgeFlowLayout
 //
 //  Created by Adlai Holler on 8/8/18.
@@ -12,7 +12,7 @@
 #import <mutex>
 #import <queue>
 
-@implementation BoundedQueue {
+@implementation ASBoundedQueue {
   std::mutex _lock;
   std::queue<void(^)(void)> _blocks;
   std::condition_variable _ready;
@@ -47,13 +47,13 @@
 - (void)_threadBody
 {
   while (true) {
-    void (^block)() = nil;
+    void (^block)();
     {
       std::lock_guard<std::mutex> l(_lock);
       if (_blocks.empty()) {
         break;
       }
-      block = _blocks.front();
+      block = std::move(_blocks.front());
       _blocks.pop();
     }
     block();
@@ -77,14 +77,14 @@
 
 @end
 
-@implementation BoundedQueue (LayoutQueue)
+@implementation ASBoundedQueue (LayoutQueue)
 
-+ (BoundedQueue *)layoutQueue
++ (ASBoundedQueue *)layoutQueue
 {
-  static BoundedQueue *q;
+  static ASBoundedQueue *q;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    q = [[BoundedQueue alloc] init];
+    q = [[ASBoundedQueue alloc] init];
   });
   return q;
 }
