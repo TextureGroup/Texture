@@ -21,10 +21,9 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
   ASExperimentalLayerDefaults = 1 << 4,                     // exp_infer_layer_defaults
   ASExperimentalNetworkImageQueue = 1 << 5,                 // exp_network_image_queue
-  ASExperimentalDeallocQueue = 1 << 6,                      // exp_dealloc_queue_v2
-  ASExperimentalCollectionTeardown = 1 << 7,                // exp_collection_teardown
-  ASExperimentalFramesetterCache = 1 << 8,                  // exp_framesetter_cache
-  ASExperimentalSkipClearData = 1 << 9,                     // exp_skip_clear_data
+  ASExperimentalCollectionTeardown = 1 << 6,                // exp_collection_teardown
+  ASExperimentalFramesetterCache = 1 << 7,                  // exp_framesetter_cache
+  ASExperimentalSkipClearData = 1 << 8,                     // exp_skip_clear_data
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
