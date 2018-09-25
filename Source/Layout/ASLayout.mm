@@ -20,7 +20,6 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASRectMap.h>
 
 CGPoint const ASPointNull = {NAN, NAN};
 
@@ -54,9 +53,6 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutIsDisplayNodeType(ASLayo
   ASLayoutElementType _layoutElementType;
   std::atomic_bool _retainSublayoutElements;
 }
-
-@property (nonatomic, readonly) ASRectMap *elementToRectMap;
-
 @end
 
 @implementation ASLayout
@@ -110,13 +106,6 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
     }
 
     _sublayouts = [sublayouts copy] ?: @[];
-
-    if (_sublayouts.count > 0) {
-      _elementToRectMap = [ASRectMap rectMapForWeakObjectPointers];
-      for (ASLayout *layout in sublayouts) {
-        [_elementToRectMap setRect:layout.frame forKey:layout.layoutElement];
-      }
-    }
     
     if ([ASLayout shouldRetainSublayoutLayoutElements]) {
       [self retainSublayoutElements];
@@ -294,7 +283,12 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 - (CGRect)frameForElement:(id<ASLayoutElement>)layoutElement
 {
-  return _elementToRectMap ? [_elementToRectMap rectForKey:layoutElement] : CGRectNull;
+  for (ASLayout *l in _sublayouts) {
+    if (l->_layoutElement == layoutElement) {
+      return l.frame;
+    }
+  }
+  return CGRectNull;
 }
 
 - (CGRect)frame

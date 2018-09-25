@@ -113,14 +113,12 @@ ASLayoutElementLayoutCalculationDefaults
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
 
-  [_childrenArray removeAllObjects];
-  
-  NSUInteger i = 0;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
   for (id<ASLayoutElement> child in children) {
     ASDisplayNodeAssert([child conformsToProtocol:NSProtocolFromString(@"ASLayoutElement")], @"Child %@ of spec %@ is not an ASLayoutElement!", child, self);
-    _childrenArray[i] = child;
-    i += 1;
   }
+#endif
+  [_childrenArray setArray:children];
 }
 
 - (nullable NSArray<id<ASLayoutElement>> *)children
@@ -291,7 +289,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
 {
   NSArray *children = self.children;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
+  let count = children.count;
+  ASLayout *rawSublayouts[count];
+  int i = 0;
   
   CGSize size = constrainedSize.min;
   for (id<ASLayoutElement> child in children) {
@@ -301,9 +301,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     size.width = MAX(size.width,  sublayout.size.width);
     size.height = MAX(size.height, sublayout.size.height);
     
-    [sublayouts addObject:sublayout];
+    rawSublayouts[i++] = sublayout;
   }
-  
+  let sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 }
 
