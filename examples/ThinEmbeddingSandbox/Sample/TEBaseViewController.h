@@ -16,8 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASCollectionViewHelper;
 
-static NSString *const TEViewPlatformPlain = @"plain";
-static NSString *const TEViewPlatformTexture = @"texture";
+static NSString *const TECellNativeReuseIdentifier = @"cell_id_native";
 
 struct TEPath {
   int section;  // NSNotFound means "global."
@@ -38,7 +37,7 @@ struct TEPath {
 
 @interface TEBaseViewController : UIViewController <ASCollectionViewHelperDataSource> {
 @package
-  ASCollectionViewHelper *_textureHelper
+  ASCollectionViewHelper *_textureHelper;
 }
 
 /// Tell the view to reload data. Doesn't affect data source data.
@@ -55,7 +54,6 @@ struct TEPath {
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfItemsIn:(NSInteger)section;
 - (CGSize)sizeAt:(const TEPath &)path;
-- (NSString *)reuseIdentifierAt:(const TEPath &)path;
 - (void)hostItemAt:(const TEPath &)path in:(UIView *)contentView;
 
 @end

@@ -12,7 +12,9 @@
 #import "flatbuffers/idl.h"
 #import <AsyncDisplayKit/ASCollectionViewHelper.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
+#import "TECellNode.h"
 #import "TECellView.h"
+#import "TEItem.h"
 #import "UIViewController+TEActions.h"
 #import <memory>
 
@@ -24,6 +26,10 @@
   // NOTE: This is only safe because the NSData behind this pointer is retained
   // by a static variable.
   const UICollection *_data;
+  
+  NSMutableArray<NSMutableArray<ASNodeController *> *> *_nodeControllers;
+  NSMutableArray<ASNodeController *> *_headers;
+  NSMutableArray<ASNodeController *> *_footers;
 }
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -34,9 +40,32 @@
     dispatch_once(&onceToken, ^{
       pacManData = [NSData dataWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"PacMan" ofType:@"bin"]];
     });
+    _headers = [[NSMutableArray alloc] init];
+    _footers = [[NSMutableArray alloc] init];
+    _nodeControllers = [[NSMutableArray alloc] init];
     
-  
     _data = GetUICollection(pacManData.bytes);
+    for (let &section : *_data->sections()) {
+      if (section->header() && section->header()->use_texture()) {
+        [_headers addObject:[[ASNodeController alloc] init]];
+      } else {
+        [_headers addObject:(id)kCFNull];
+      }
+      if (section->footer() && section->footer()->use_texture()) {
+        [_footers addObject:[[ASNodeController alloc] init]];
+      } else {
+        [_footers addObject:(id)kCFNull];
+      }
+      let itemArray = [[NSMutableArray alloc] init];
+      for (let &item : *section->items()) {
+        if (item->use_texture()) {
+          [itemArray addObject:[[ASNodeController alloc] init]];
+        } else {
+          [itemArray addObject:(id)kCFNull];
+        }
+      }
+      [_nodeControllers addObject:itemArray];
+    }
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Act" style:UIBarButtonItemStyleDone target:self action:TEActionShowMenu];
   }
   return self;
@@ -61,50 +90,30 @@
 }
 
 - (NSInteger)numberOfSections {
-  return _data->sections()->size();
+  return _nodeControllers.count;
 }
 
 - (NSInteger)numberOfItemsIn:(NSInteger)section {
-  return _data->sections()->Get((flatbuffers::uoffset_t)section)->items()->size();
+  return _nodeControllers[section].count;
 }
 
 - (CGSize)sizeAt:(const TEPath &)path {
-  if ([_textureHelper managesItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]) {
-    return _textureHelper collectionView:<#(nonnull UICollectionView *)#> layout:<#(nonnull UICollectionViewLayout *)#> sizeForItemAtIndexPath:<#(nonnull NSIndexPath *)#>
-  }
+
   auto item = [self _itemAt:path];
   // No item is valid. Could be this section has no footer, for example.
   if (!item) {
     return CGSizeZero;
   }
   
-  if (item->use_texture()) {
-    ASDisplayNode *node; // TODO: Get the node from somewhere.
-    return node.calculatedSize;
-  } else {
-    return [TECellView sizeForItem:*item inContainer:self.view];
-  }
-}
-
-- (NSString *)reuseIdentifierAt:(const TEPath &)path {
-  return ([self _itemAt:path]->use_texture() ? TEViewPlatformTexture : TEViewPlatformPlain);
+  NSAssert(!item->use_texture(), @"Texture-backed cell should not enter the native code path.");
+  return [TECellView sizeForItem:*item inContainer:self.view];
 }
 
 - (void)hostItemAt:(const TEPath &)path in:(UIView *)contentView {
   auto item = [self _itemAt:path];
-  if (item->use_texture()) {
-    ASDisplayNode *node; // TODO: Get the node from somewhere.
-    unowned UIView *nodeView = node.view;
-    if ([contentView.subviews indexOfObjectIdenticalTo:nodeView] == NSNotFound) {
-      for (UIView *subview in contentView.subviews) {
-        [subview removeFromSuperview];
-      }
-      [contentView addSubview:nodeView];
-    }
-  } else {
-    auto view = [TECellView hostInContentViewIfNeeded:contentView];
-    [view setItem:*item];
-  }
+  NSAssert(!item->use_texture(), @"Texture-backed cell should not enter the native code path.");
+  auto view = [TECellView hostInContentViewIfNeeded:contentView];
+  [view setItem:*item];
 }
 
 - (const Item *)_itemAt:(const TEPath &)path {
@@ -115,6 +124,38 @@
   } else {
     return _data->sections()->Get(path.section)->items()->Get(path.item);
   }
+}
+
+- (id(^)())collectionViewHelper:(ASCollectionViewHelper *)helper nodeBlockForObject:(id)object indexPath:(NSIndexPath *)indexPath supplementaryElementKind:(NSString *)supplementaryElementKind {
+  
+  return ^{
+    return [[TECellNode alloc] init];
+  };
+}
+
+- (id)collectionViewHelper:(ASCollectionViewHelper *)helper objectForFooterInSection:(NSInteger)section {
+  auto item = [self _itemAt:TEPath::footer(section)];
+  if (!item || !item->use_texture()) {
+    return nil;
+  }
+  return _footers[section];
+}
+
+- (id)collectionViewHelper:(ASCollectionViewHelper *)helper objectForHeaderInSection:(NSInteger)section {
+  auto item = [self _itemAt:TEPath::header(section)];
+  if (!item || !item->use_texture()) {
+    return nil;
+  }
+  return _headers[section];
+}
+
+- (id)collectionViewHelper:(ASCollectionViewHelper *)helper objectForItemAtIndexPath:(NSIndexPath *)path {
+  auto item = [self _itemAt:TEPath::make(path)];
+  NSAssert(item, nil);
+  if (!item || !item->use_texture()) {
+    return nil;
+  }
+  return _nodeControllers[path.section][path.item];
 }
 
 @end

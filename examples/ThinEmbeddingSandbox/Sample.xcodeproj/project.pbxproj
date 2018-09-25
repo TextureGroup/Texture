@@ -20,6 +20,7 @@
 		CC1217932155D42200739E68 /* TETableViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC1217922155D42200739E68 /* TETableViewController.mm */; };
 		CC12179A2155D54A00739E68 /* TECellNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC1217992155D54A00739E68 /* TECellNode.mm */; };
 		CC1217B02155DA5100739E68 /* TECellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC1217AF2155DA5100739E68 /* TECellView.mm */; };
+		CCEE54162159BDF7003AD699 /* TEItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCEE54152159BDF7003AD699 /* TEItem.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,8 @@
 		CC1217992155D54A00739E68 /* TECellNode.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TECellNode.mm; sourceTree = "<group>"; };
 		CC1217AE2155DA5100739E68 /* TECellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TECellView.h; sourceTree = "<group>"; };
 		CC1217AF2155DA5100739E68 /* TECellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TECellView.mm; sourceTree = "<group>"; };
+		CCEE54142159BDF7003AD699 /* TEItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TEItem.h; sourceTree = "<group>"; };
+		CCEE54152159BDF7003AD699 /* TEItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TEItem.mm; sourceTree = "<group>"; };
 		F1E539014E1F516F00A8F167 /* libPods-Sample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Sample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3A72D578C378357FF56486A /* Pods-Sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Sample/Pods-Sample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,6 +110,8 @@
 		AC3C4A601A11F47200143C57 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
+				CCEE54142159BDF7003AD699 /* TEItem.h */,
+				CCEE54152159BDF7003AD699 /* TEItem.mm */,
 				CC0AA1642156AC7400622B21 /* flatbuf_gen */,
 				CC0AA1662156AC7500622B21 /* flatbuf_schemas */,
 				AC3C4A651A11F47200143C57 /* TEAppDelegate.h */,
@@ -324,6 +329,7 @@
 				AC3C4A671A11F47200143C57 /* TEAppDelegate.mm in Sources */,
 				CC1217B02155DA5100739E68 /* TECellView.mm in Sources */,
 				CC12179A2155D54A00739E68 /* TECellNode.mm in Sources */,
+				CCEE54162159BDF7003AD699 /* TEItem.mm in Sources */,
 				AC3C4A641A11F47200143C57 /* main.m in Sources */,
 				CC12178D2155D40E00739E68 /* TEBaseViewController.mm in Sources */,
 				CC1217902155D41C00739E68 /* TECollectionViewController.mm in Sources */,

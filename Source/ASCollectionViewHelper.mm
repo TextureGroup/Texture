@@ -42,13 +42,21 @@ using namespace std;
 
 @interface ASCollectionObjectState : NSObject {
 @package
-  shared_future<ASDisplayNode *> _nodeFuture;
+  unowned id _object;
+  shared_future<CFTypeRef> _nodeFuture;
   
   pair<ASSizeRange, shared_future<CGSize>> _sizeFuture;
 }
 @end
 
 @implementation ASCollectionObjectState
+- (void)dealloc
+{
+  // TODO: Avoid blocking on this future if we're going away!
+  if (_nodeFuture.valid()) {
+    CFRelease(_nodeFuture.get());
+  }
+}
 @end
 
 @interface ASCollectionViewHelper ()
@@ -223,23 +231,22 @@ using namespace std;
     return NO;
   }
   
-  auto state = [self _stateForObject:object];
-  [self _ensureNodeFutureForState:state];
-  auto node = state->_nodeFuture.get();
+  // Wait on the node future.
+  let state = [self _stateForObject:object];
+  [self _ensureNodeFutureAt:path state:state];
+  let node = (__bridge ASDisplayNode *)state->_nodeFuture.get();
   
   ASSizeRange sizeRange = [self sizeRangeFor:path container:container];
-  if (!ASSizeRangeEqualToSizeRange(sizeRange, <#ASSizeRange rhs#>))
   *sizePtr = [node layoutThatFits:sizeRange].size;
   return YES;
 }
 
-- (void)host:(const ASCollectionPath &)element object:(id)object inContentView:(UIView *)contentView container:(UIView *)container
+- (void)host:(const ASCollectionPath &)path object:(id)object inContentView:(UIView *)contentView container:(UIView *)container
 {
   // Get the node, or bail if this is cell is not a node.
-  auto node = [self _nodeFor:element object:object container:container];
-  if (!node) {
-    return;
-  }
+  unowned let state = [self _stateForObject:object];
+  [self _ensureNodeFutureAt:path state:state];
+  unowned let node = (__bridge ASDisplayNode *)state->_nodeFuture.get();
   unowned let nodeView = node.view;
   let subviews = contentView.subviews;
   if (NSNotFound != [subviews indexOfObjectIdenticalTo:nodeView]) {
@@ -257,14 +264,14 @@ using namespace std;
 
 #pragma mark - Internal
 
-- (void)_ensureNodeFutureForState:(ASCollectionObjectState *)state
+- (void)_ensureNodeFutureAt:(const ASCollectionPath &)path state:(ASCollectionObjectState *)state
 {
   if (!state->_nodeFuture.valid()) {
-    auto promise = new std::promise<ASDisplayNode *>();
+    let promise = new std::promise<CFTypeRef>();
     state->_nodeFuture = promise->get_future().share();
-    auto nodeBlock = [_dataSource collectionViewHelper:self nodeBlockForObject:object indexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section] supplementaryElementKind:path.supplementaryElementKind];
-    __block dispatch_block_t dispatchBlock = dispatch_block_create((dispatch_block_flags_t)0, ^{
-      promise->set_value(nodeBlock());
+    let nodeBlock = [_dataSource collectionViewHelper:self nodeBlockForObject:state->_object indexPath:[NSIndexPath indexPathForItem:path.item inSection:path.section] supplementaryElementKind:path.supplementaryElementKind];
+    let dispatchBlock = dispatch_block_create((dispatch_block_flags_t)0, ^{
+      promise->set_value((__bridge_retained CFTypeRef)nodeBlock());
       delete promise;
     });
     [ASBoundedQueueGetDefault() dispatch:dispatchBlock];
@@ -277,6 +284,7 @@ using namespace std;
   auto state = [_data objectForKey:object];
   if (!state) {
     state = [[ASCollectionObjectState alloc] init];
+    state->_object = object;
     [_data setObject:state forKey:object];
   }
   return state;

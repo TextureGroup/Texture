@@ -28,18 +28,14 @@
   [super viewDidLoad];
   UIView *view = self.view;
   _tableView = [[UITableView alloc] initWithFrame:view.bounds style:UITableViewStylePlain];
-  [_tableView registerClass:UITableViewCell.class forCellReuseIdentifier:TEViewPlatformPlain];
-  [_tableView registerClass:UITableViewCell.class forCellReuseIdentifier:TEViewPlatformTexture];
+  [_tableView registerClass:UITableViewCell.class forCellReuseIdentifier:TECellNativeReuseIdentifier];
   
-  [_tableView registerClass:UITableViewHeaderFooterView.class forHeaderFooterViewReuseIdentifier:TEViewPlatformPlain];
-  [_tableView registerClass:UITableViewHeaderFooterView.class forHeaderFooterViewReuseIdentifier:TEViewPlatformTexture];
+  [_tableView registerClass:UITableViewHeaderFooterView.class forHeaderFooterViewReuseIdentifier:TECellNativeReuseIdentifier];
+  [_tableView registerClass:UITableViewHeaderFooterView.class forHeaderFooterViewReuseIdentifier:TECellNativeReuseIdentifier];
   _tableView.delegate = self;
   _tableView.dataSource = self;
   [view addSubview:_tableView];
-}
-
-- (ASCollectionViewHelper *)loadTextureHelper {
-  return [[ASCollectionViewHelper alloc] initWithTableView:_tableView dataSource:self];
+  _textureHelper = [[ASCollectionViewHelper alloc] initWithTableView:_tableView dataSource:self];
 }
 
 - (void)reloadData {
@@ -91,12 +87,8 @@
     return cell;
   }
   
-  // Native.
-  cell = [tableView dequeueReusableCellWithIdentifier:@"default" forIndexPath:indexPath];
-  
   auto path = TEPath::make(indexPath);
-  auto reuseID = [self reuseIdentifierAt:path];
-  auto cell = [tableView dequeueReusableCellWithIdentifier:reuseID forIndexPath:indexPath];
+  auto cell = [tableView dequeueReusableCellWithIdentifier:TECellNativeReuseIdentifier forIndexPath:indexPath];
   [self hostItemAt:path in:cell.contentView];
   return cell;
 }
@@ -107,8 +99,7 @@
   }
   
   auto path = TEPath::header(section);
-  auto reuseID = [self reuseIdentifierAt:path];
-  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:reuseID];
+  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:TECellNativeReuseIdentifier];
   [self hostItemAt:path in:cell.contentView];
   return cell;
 }
@@ -118,8 +109,7 @@
     return cell;
   }
   auto path = TEPath::footer(section);
-  auto reuseID = [self reuseIdentifierAt:path];
-  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:reuseID];
+  auto cell = [tableView dequeueReusableHeaderFooterViewWithIdentifier:TECellNativeReuseIdentifier];
   [self hostItemAt:path in:cell.contentView];
   return cell;
 }

@@ -29,20 +29,14 @@
   [super viewDidLoad];
   UIView *view = self.view;
   _collectionView = [[UICollectionView alloc] initWithFrame:view.bounds collectionViewLayout:[UICollectionViewFlowLayout new]];
-  [_collectionView registerClass:UICollectionViewCell.class forCellWithReuseIdentifier:TEViewPlatformTexture];
-  [_collectionView registerClass:UICollectionViewCell.class forCellWithReuseIdentifier:TEViewPlatformPlain];
-  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:TEViewPlatformTexture];
-  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:TEViewPlatformPlain];
-  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:TEViewPlatformTexture];
-  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:TEViewPlatformPlain];
+  [_collectionView registerClass:UICollectionViewCell.class forCellWithReuseIdentifier:TECellNativeReuseIdentifier];
+  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:TECellNativeReuseIdentifier];
+  [_collectionView registerClass:UICollectionReusableView.class forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:TECellNativeReuseIdentifier];
   _collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   _collectionView.delegate = self;
   _collectionView.dataSource = self;
   [view addSubview:_collectionView];
-}
-
-- (ASCollectionViewHelper *)loadTextureHelper {
-  return [[ASCollectionViewHelper alloc] initWithCollectionView:_collectionView dataSource:self];
+  _textureHelper = [[ASCollectionViewHelper alloc] initWithCollectionView:_collectionView dataSource:self];
 }
 
 - (void)reloadData {
@@ -62,36 +56,46 @@
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-  if ([_textureHelper managesItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]) {
-    return [_textureHelper collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath];
+  CGSize texSize;
+  if ([_textureHelper collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath size:&texSize]) {
+    return texSize;
   }
+  
   return [self sizeAt:TEPath::make(indexPath)];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
-  if ([_textureHelper managesHeaderInSection:section]) {
-    
-    return [_textureHelper collectionView:collectionView layout:collectionViewLayout sizeForItemAtIndexPath:indexPath];
+  CGSize texSize;
+  if ([_textureHelper collectionView:collectionView layout:collectionViewLayout referenceSizeForHeaderInSection:section size:&texSize]) {
+    return texSize;
   }
   return [self sizeAt:TEPath::header(section)];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section {
+  CGSize texSize;
+  if ([_textureHelper collectionView:collectionView layout:collectionViewLayout referenceSizeForFooterInSection:section size:&texSize]) {
+    return texSize;
+  }
   return [self sizeAt:TEPath::footer(section)];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+  if (auto texCell = [_textureHelper collectionView:collectionView cellForItemAtIndexPath:indexPath]) {
+    return texCell;
+  }
   auto path = TEPath::make(indexPath);
-  auto reuseID = [self reuseIdentifierAt:path];
-  auto cell = [collectionView dequeueReusableCellWithReuseIdentifier:reuseID forIndexPath:indexPath];
+  auto cell = [collectionView dequeueReusableCellWithReuseIdentifier:TECellNativeReuseIdentifier forIndexPath:indexPath];
   [self hostItemAt:path in:cell.contentView];
   return cell;
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+  if (auto texView = [_textureHelper collectionView:collectionView viewForSupplementaryElementOfKind:kind atIndexPath:indexPath]) {
+    return texView;
+  }
   auto path = TEPath::make(indexPath, kind);
-  auto reuseID = [self reuseIdentifierAt:path];
-  auto cell = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:reuseID forIndexPath:indexPath];
+  auto cell = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:TECellNativeReuseIdentifier forIndexPath:indexPath];
   [self hostItemAt:path in:cell];
   return cell;
 }

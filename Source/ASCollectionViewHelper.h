@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASCollectionViewHelperDataSource <NSObject>
 
 /// always called on main.
+/// Can return nil or NSNull to indicate that this isn't a Texture-managed item.
 - (nullable id)collectionViewHelper:(ASCollectionViewHelper *)helper
            objectForItemAtIndexPath:(NSIndexPath *)path;
 
