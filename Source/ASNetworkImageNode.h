@@ -147,6 +147,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Notification that the image node finished downloading an image, with additional info.
+ * Use this method if your app handles custom types.
  * If implemented, this method will be called instead of `imageNode:didLoadImage:info`.
  *
  * @param imageNode The sender.
