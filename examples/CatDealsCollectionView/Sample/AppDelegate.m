@@ -53,7 +53,7 @@
 + (ASConfiguration *)textureConfiguration
 {
   ASConfiguration *cfg = [[ASConfiguration alloc] init];
-  cfg.experimentalFeatures = ASExperimentalDeallocQueue;
+  cfg.experimentalFeatures = ASExperimentalTextNode;
   return cfg;
 }
 
