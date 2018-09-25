@@ -60,11 +60,13 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   NSArray<ASDisplayNode *> *_removedSubnodes;
   std::vector<NSUInteger> _insertedSubnodePositions;
   std::vector<std::pair<ASDisplayNode *, NSUInteger>> _subnodeMoves;
+  ASDisplayNodeLayout _pendingLayout;
+  ASDisplayNodeLayout _previousLayout;
 }
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
-               pendingLayout:(std::shared_ptr<ASDisplayNodeLayout>)pendingLayout
-              previousLayout:(std::shared_ptr<ASDisplayNodeLayout>)previousLayout
+               pendingLayout:(const ASDisplayNodeLayout &)pendingLayout
+              previousLayout:(const ASDisplayNodeLayout &)previousLayout
 {
   self = [super init];
   if (self) {
@@ -80,7 +82,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 - (BOOL)isSynchronous
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
-  return !ASLayoutCanTransitionAsynchronous(_pendingLayout->layout);
+  return !ASLayoutCanTransitionAsynchronous(_pendingLayout.layout);
 }
 
 - (void)commitTransition
@@ -156,8 +158,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   
   // Create an activity even if no subnodes affected.
   as_activity_create_for_scope("Calculate subnode operations");
-  ASLayout *previousLayout = _previousLayout->layout;
-  ASLayout *pendingLayout = _pendingLayout->layout;
+  ASLayout *previousLayout = _previousLayout.layout;
+  ASLayout *pendingLayout = _pendingLayout.layout;
 
   if (previousLayout) {
 #if AS_IG_LIST_KIT
@@ -226,9 +228,9 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
-    return _previousLayout->layout;
+    return _previousLayout.layout;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
-    return _pendingLayout->layout;
+    return _pendingLayout.layout;
   } else {
     return nil;
   }
@@ -238,9 +240,9 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
-    return _previousLayout->constrainedSize;
+    return _previousLayout.constrainedSize;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
-    return _pendingLayout->constrainedSize;
+    return _pendingLayout.constrainedSize;
   } else {
     return ASSizeRangeMake(CGSizeZero, CGSizeZero);
   }

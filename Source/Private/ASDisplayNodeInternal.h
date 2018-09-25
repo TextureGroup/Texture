@@ -164,8 +164,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   
   std::atomic<int32_t> _pendingTransitionID;
   ASLayoutTransition *_pendingLayoutTransition;
-  std::shared_ptr<ASDisplayNodeLayout> _calculatedDisplayNodeLayout;
-  std::shared_ptr<ASDisplayNodeLayout> _pendingDisplayNodeLayout;
+  ASDisplayNodeLayout _calculatedDisplayNodeLayout;
+  ASDisplayNodeLayout _pendingDisplayNodeLayout;
   
   /// Sentinel for layout data. Incremented when we get -setNeedsLayout / -invalidateCalculatedLayout.
   /// Starts at 1.
@@ -261,7 +261,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 @property (nullable, nonatomic, readonly) _ASDisplayLayer *asyncLayer;
 
 /// Bitmask to check which methods an object overrides.
-@property (nonatomic, readonly) ASDisplayNodeMethodOverrides methodOverrides;
+- (ASDisplayNodeMethodOverrides)methodOverrides;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view

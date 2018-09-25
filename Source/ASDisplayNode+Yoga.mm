@@ -209,7 +209,7 @@
     // For the root node in a Yoga tree, make sure to preserve the constrainedSize originally provided.
     // This will be used for all relayouts triggered by children, since they escalate to root.
     ASSizeRange range = parentNode ? ASSizeRangeUnconstrained : self.constrainedSizeForCalculatedLayout;
-    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, range, parentSize, _layoutVersion);
+    _pendingDisplayNodeLayout = ASDisplayNodeLayout(layout, range, parentSize, _layoutVersion);
   }
 }
 
