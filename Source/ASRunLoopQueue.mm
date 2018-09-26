@@ -31,36 +31,19 @@ static void runLoopSourceCallback(void *info) {
 
 #pragma mark - ASDeallocQueue
 
-@interface ASDeallocQueueV2 : ASDeallocQueue
-@end
-
-@implementation ASDeallocQueue
+@implementation ASDeallocQueue {
+  std::vector<CFTypeRef> _queue;
+  ASDN::Mutex _lock;
+}
 
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    deallocQueue = [[ASDeallocQueueV2 alloc] init];
+    deallocQueue = [[ASDeallocQueue alloc] init];
   });
   return deallocQueue;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-- (void)drain
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-@end
-
-@implementation ASDeallocQueueV2 {
-  std::vector<CFTypeRef> _queue;
-  ASDN::Mutex _lock;
 }
 
 - (void)dealloc
