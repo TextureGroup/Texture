@@ -365,7 +365,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         } else if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           let info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
-          [_delegate imageNode:self didLoadImage:result info:info];
+          [_delegate imageNode:self didLoadImage:[result asdk_image] info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
           [_delegate imageNode:self didLoadImage:[result asdk_image]];
