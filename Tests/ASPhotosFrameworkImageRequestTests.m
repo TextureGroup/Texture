@@ -7,6 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#if AS_USE_PHOTOS
+
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 
@@ -59,3 +61,5 @@ static NSString *const kTestAssetID = @"testAssetID";
 }
 
 @end
+
+#endif
