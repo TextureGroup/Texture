@@ -47,13 +47,3 @@
 }
 
 @end
-
-@implementation ASConfiguration (UserProvided)
-
-+ (ASConfiguration *)textureConfiguration
-{
-  ASConfiguration *cfg = [[ASConfiguration alloc] init];
-  return cfg;
-}
-
-@end
