@@ -239,7 +239,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self prepareAttributedString:mutableText];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:_textContainer text:mutableText];
   
-  return layout.textBoundingSize;
+  return CGSizeMake(layout.textBoundingSize.width - layout.textBoundingRect.origin.x, layout.textBoundingSize.height);
 }
 
 #pragma mark - Modifying User Text
