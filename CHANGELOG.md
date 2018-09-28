@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASPhotosFrameworkImageRequestTests] Guard photo library with macro for tests. [Max Wang](https://github.com/wsdwsd0829). [#1147](https://github.com/TextureGroup/Texture/pull/1147)
 - [ASDisplayNode] Do not cancel display when in exit hierarchy but let interface state changing to handle it. [Max Wang](https://github.com/wsdwsd0829). [#1110](https://github.com/TextureGroup/Texture/pull/1110)
 - [Breaking][ASDisplayNode] Make interface state delegate protocol required. [Max Wang](https://github.com/wsdwsd0829). [#1112](https://github.com/TextureGroup/Texture/pull/1112)
 - [ASCollectionView] Fix reording of cells manually for iOS 9 & 10. [Max Wang](https://github.com/wsdwsd0829). [#1081](https://github.com/TextureGroup/Texture/pull/1081)
