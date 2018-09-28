@@ -533,8 +533,15 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   [super displayDidFinish];
 
   __instanceLock__.lock();
-    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
     UIImage *image = _image;
+    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
+    BOOL shouldPerformDisplayCompletionBlock = (image && displayCompletionBlock);
+
+    // Clear the ivar now. The block is retained and will be executed shortly.
+    if (shouldPerformDisplayCompletionBlock) {
+      _displayCompletionBlock = nil;
+    }
+
     BOOL hasDebugLabel = (_debugLabelNode != nil);
   __instanceLock__.unlock();
 
@@ -556,13 +563,8 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
   
   // If we've got a block to perform after displaying, do it.
-  if (image && displayCompletionBlock) {
-
+  if (shouldPerformDisplayCompletionBlock) {
     displayCompletionBlock(NO);
-
-    __instanceLock__.lock();
-      _displayCompletionBlock = nil;
-    __instanceLock__.unlock();
   }
 }
 
