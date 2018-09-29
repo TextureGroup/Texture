@@ -323,7 +323,7 @@
       bounds.size.height *= contentsScale;
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
-      ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
+      ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), (*image).scale);
       [*image drawInRect:bounds];
     } else {
       bounds = CGContextGetClipBoundingBox(context);
