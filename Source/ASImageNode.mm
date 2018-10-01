@@ -540,38 +540,38 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
   // Update the debug label if necessary
   if (hasDebugLabel) {
-      NSAttributedString *debugText = nil;
-
-      if ([ASImageNode shouldShowImageScalingOverlay]) {
-          // For debugging purposes we don't care about locking for now
-          CGSize imageSize = image.size;
-          CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
-          CGSize boundsSizeInPixels = CGSizeMake(std::floor(self.bounds.size.width * self.contentsScale), std::floor(self.bounds.size.height * self.contentsScale));
-          CGFloat pixelCountRatio            = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
-          if (pixelCountRatio != 1.0) {
-              debugText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.2fx", pixelCountRatio]
-                                                          attributes:[self debugLabelAttributes]];
-          }
-      } else if ([ASImageNode shouldShowDebugOverlay]) {
-          debugText = self.debugText;
+    NSAttributedString *debugText = nil;
+    
+    if ([ASImageNode shouldShowImageScalingOverlay]) {
+      // For debugging purposes we don't care about locking for now
+      CGSize imageSize = image.size;
+      CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
+      CGSize boundsSizeInPixels = CGSizeMake(std::floor(self.bounds.size.width * self.contentsScale), std::floor(self.bounds.size.height * self.contentsScale));
+      CGFloat pixelCountRatio            = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
+      if (pixelCountRatio != 1.0) {
+        debugText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.2fx", pixelCountRatio]
+                                                    attributes:[self debugLabelAttributes]];
       }
-
-      if (debugText) {
-          _debugLabelNode.hidden = NO;
-          _debugLabelNode.attributedText = debugText;
-      } else {
-          _debugLabelNode.hidden = YES;
-          _debugLabelNode.attributedText = nil;
-      }
+    } else if ([ASImageNode shouldShowDebugOverlay]) {
+      debugText = self.debugText;
+    }
+    
+    if (debugText) {
+      _debugLabelNode.hidden = NO;
+      _debugLabelNode.attributedText = debugText;
+    } else {
+      _debugLabelNode.hidden = YES;
+      _debugLabelNode.attributedText = nil;
+    }
   }
   
   // If we've got a block to perform after displaying, do it.
   if (image && displayCompletionBlock) {
-
+    
     displayCompletionBlock(NO);
-
+    
     __instanceLock__.lock();
-      _displayCompletionBlock = nil;
+    _displayCompletionBlock = nil;
     __instanceLock__.unlock();
   }
 }
