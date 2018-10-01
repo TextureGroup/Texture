@@ -571,7 +571,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
     displayCompletionBlock(NO);
 
     __instanceLock__.lock();
-    _displayCompletionBlock = nil;
+      _displayCompletionBlock = nil;
     __instanceLock__.unlock();
   }
 }
