@@ -31,175 +31,19 @@ static void runLoopSourceCallback(void *info) {
 
 #pragma mark - ASDeallocQueue
 
-@interface ASDeallocQueueV1 : ASDeallocQueue
-@end
-@interface ASDeallocQueueV2 : ASDeallocQueue
-@end
-
-@implementation ASDeallocQueue
+@implementation ASDeallocQueue {
+  std::vector<CFTypeRef> _queue;
+  ASDN::Mutex _lock;
+}
 
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    if (ASActivateExperimentalFeature(ASExperimentalDeallocQueue)) {
-      deallocQueue = [[ASDeallocQueueV2 alloc] init];
-    } else {
-      deallocQueue = [[ASDeallocQueueV1 alloc] init];
-    }
+    deallocQueue = [[ASDeallocQueue alloc] init];
   });
   return deallocQueue;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-- (void)drain
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-@end
-
-@implementation ASDeallocQueueV1 {
-  NSThread *_thread;
-  NSCondition *_condition;
-  std::deque<id> _queue;
-  ASDN::RecursiveMutex _queueLock;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  if (objectPtr != NULL && *objectPtr != nil) {
-    ASDN::MutexLocker l(_queueLock);
-    _queue.push_back(*objectPtr);
-    *objectPtr = nil;
-  }
-}
-
-- (void)threadMain
-{
-  @autoreleasepool {
-    __unsafe_unretained __typeof__(self) weakSelf = self;
-    // 100ms timer.  No resources are wasted in between, as the thread sleeps, and each check is fast.
-    // This time is fast enough for most use cases without excessive churn.
-    CFRunLoopTimerRef timer = CFRunLoopTimerCreateWithHandler(NULL, -1, 0.1, 0, 0, ^(CFRunLoopTimerRef timer) {
-      weakSelf->_queueLock.lock();
-      if (weakSelf->_queue.size() == 0) {
-        weakSelf->_queueLock.unlock();
-        return;
-      }
-      // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
-      __unused NSInteger count; // Prevent static analyzer warning if release build
-      @autoreleasepool {
-#if ASRunLoopQueueLoggingEnabled
-        NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
-#endif
-        // Sometimes we release 10,000 objects at a time.  Don't hold the lock while releasing.
-        std::deque<id> currentQueue = weakSelf->_queue;
-        count = currentQueue.size();
-        ASSignpostStartCustom(ASSignpostDeallocQueueDrain, self, count);
-        weakSelf->_queue = std::deque<id>();
-        weakSelf->_queueLock.unlock();
-        currentQueue.clear();
-      }
-      ASSignpostEndCustom(ASSignpostDeallocQueueDrain, self, count, ASSignpostColorDefault);
-    });
-    
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
-    CFRunLoopAddTimer(runloop, timer, kCFRunLoopCommonModes);
-    
-    [_condition lock];
-    [_condition signal];
-    // At this moment, -init is signalled that the thread is guaranteed to be finished starting.
-    [_condition unlock];
-    
-    // Keep processing events until the runloop is stopped.
-    CFRunLoopRun();
-    
-    CFRunLoopTimerInvalidate(timer);
-    CFRunLoopRemoveTimer(runloop, timer, kCFRunLoopCommonModes);
-    CFRelease(timer);
-    
-    [_condition lock];
-    [_condition signal];
-    // At this moment, -stop is signalled that the thread is guaranteed to be finished exiting.
-    [_condition unlock];
-  }
-}
-
-- (instancetype)init
-{
-  if ((self = [super init])) {
-    _condition = [[NSCondition alloc] init];
-    
-    _thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil];
-    _thread.name = @"ASDeallocQueue";
-    
-    // Use condition to ensure NSThread has finished starting.
-    [_condition lock];
-    [_thread start];
-    [_condition wait];
-    [_condition unlock];
-  }
-  return self;
-}
-
-- (void)stop
-{
-  if (!_thread) {
-    return;
-  }
-  
-  [_condition lock];
-  [self performSelector:@selector(_stop) onThread:_thread withObject:nil waitUntilDone:NO];
-  [_condition wait];
-  // At this moment, the thread is guaranteed to be finished running.
-  [_condition unlock];
-  _thread = nil;
-}
-
-- (void)drain
-{
-  [self performSelector:@selector(_drain) onThread:_thread withObject:nil waitUntilDone:YES];
-}
-
-- (void)_drain
-{
-  while (true) {
-    @autoreleasepool {
-      _queueLock.lock();
-      std::deque<id> currentQueue = _queue;
-      _queue = std::deque<id>();
-      _queueLock.unlock();
-
-      if (currentQueue.empty()) {
-        return;
-      } else {
-        currentQueue.clear();
-      }
-    }
-  }
-}
-
-- (void)_stop
-{
-  CFRunLoopStop(CFRunLoopGetCurrent());
-}
-
-- (void)dealloc
-{
-  [self stop];
-}
-
-@end
-
-@implementation ASDeallocQueueV2 {
-  std::vector<CFTypeRef> _queue;
-  ASDN::Mutex _lock;
 }
 
 - (void)dealloc
