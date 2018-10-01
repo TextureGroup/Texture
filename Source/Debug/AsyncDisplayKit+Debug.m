@@ -8,21 +8,23 @@
 //
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
+
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASWeakSet.h>
-#import <AsyncDisplayKit/UIImage+ASConvenience.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASRangeController.h>
-
+#import <AsyncDisplayKit/ASTextNode.h>
+#import <AsyncDisplayKit/ASWeakSet.h>
+#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <AsyncDisplayKit/UIImage+ASConvenience.h>
 
 #pragma mark - ASImageNode (Debugging)
 
 static BOOL __shouldShowImageScalingOverlay = NO;
+static BOOL __shouldShowDebugOverlay = NO;
 
 @implementation ASImageNode (Debugging)
 
@@ -34,6 +36,34 @@ static BOOL __shouldShowImageScalingOverlay = NO;
 + (BOOL)shouldShowImageScalingOverlay
 {
   return __shouldShowImageScalingOverlay;
+}
+
++ (void)setShouldShowDebugOverlay:(BOOL)show
+{
+  __shouldShowDebugOverlay = show;
+}
+
++ (BOOL)shouldShowDebugOverlay
+{
+  return __shouldShowDebugOverlay || __shouldShowImageScalingOverlay;
+}
+
+- (void)setDebugText:(NSAttributedString *)debugText
+{
+    ASDisplayNodeAssertMainThread();
+    if (! ASObjectIsEqual(debugText, self.debugText)) {
+        objc_setAssociatedObject(self,
+                                 @selector(debugText),
+                                 debugText,
+                                 OBJC_ASSOCIATION_COPY_NONATOMIC);
+        [self setNeedsDisplay];
+    }
+}
+
+- (NSAttributedString *)debugText
+{
+    ASDisplayNodeAssertMainThread();
+    return objc_getAssociatedObject(self, @selector(debugText));
 }
 
 @end

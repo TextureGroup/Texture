@@ -22,6 +22,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (class, nonatomic) BOOL shouldShowImageScalingOverlay;
 
+/**
+ * Enables an ASImageNode debug label that shows a debug text, such as image scaling, image URL or placeholder time.
+ * The debug text must be set on each image node via debugText property.
+ */
+@property (class, nonatomic) BOOL shouldShowDebugOverlay;
+
+/**
+ * The debug text for this node. Main thread only
+ */
+@property (nonatomic, copy) NSAttributedString *debugText;
+
 @end
 
 @interface ASControlNode (Debugging)

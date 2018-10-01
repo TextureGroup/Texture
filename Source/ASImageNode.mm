@@ -250,7 +250,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     [self setNeedsDisplay];
     
     // For debugging purposes we don't care about locking for now
-    if ([ASImageNode shouldShowImageScalingOverlay] && _debugLabelNode == nil) {
+    if ([ASImageNode shouldShowDebugOverlay] && _debugLabelNode == nil) {
       // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
       // holding the lock while calling addSubnode.
       dispatch_async(dispatch_get_main_queue(), ^{
@@ -540,18 +540,28 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
   // Update the debug label if necessary
   if (hasDebugLabel) {
-    // For debugging purposes we don't care about locking for now
-    CGSize imageSize = image.size;
-    CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
-    CGSize boundsSizeInPixels = CGSizeMake(std::floor(self.bounds.size.width * self.contentsScale), std::floor(self.bounds.size.height * self.contentsScale));
-    CGFloat pixelCountRatio            = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
-    if (pixelCountRatio != 1.0) {
-      NSString *scaleString            = [NSString stringWithFormat:@"%.2fx", pixelCountRatio];
-      _debugLabelNode.attributedText   = [[NSAttributedString alloc] initWithString:scaleString attributes:[self debugLabelAttributes]];
-      _debugLabelNode.hidden           = NO;
+    NSAttributedString *debugText = nil;
+
+    if ([ASImageNode shouldShowImageScalingOverlay]) {
+      // For debugging purposes we don't care about locking for now
+      CGSize imageSize = image.size;
+      CGSize imageSizeInPixels = CGSizeMake(imageSize.width * image.scale, imageSize.height * image.scale);
+      CGSize boundsSizeInPixels = CGSizeMake(std::floor(self.bounds.size.width * self.contentsScale), std::floor(self.bounds.size.height * self.contentsScale));
+      CGFloat pixelCountRatio = (imageSizeInPixels.width * imageSizeInPixels.height) / (boundsSizeInPixels.width * boundsSizeInPixels.height);
+      if (pixelCountRatio != 1.0) {
+        debugText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.2fx", pixelCountRatio]
+                                                    attributes:[self debugLabelAttributes]];
+      }
+    } else if ([ASImageNode shouldShowDebugOverlay]) {
+      debugText = self.debugText;
+    }
+
+    if (debugText) {
+      _debugLabelNode.hidden = NO;
+      _debugLabelNode.attributedText = debugText;
     } else {
-      _debugLabelNode.hidden           = YES;
-      _debugLabelNode.attributedText   = nil;
+      _debugLabelNode.hidden = YES;
+      _debugLabelNode.attributedText = nil;
     }
   }
   
@@ -718,7 +728,8 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 {
   return @{
     NSFontAttributeName: [UIFont systemFontOfSize:15.0],
-    NSForegroundColorAttributeName: [UIColor redColor]
+    NSForegroundColorAttributeName: [UIColor redColor],
+    NSBackgroundColorAttributeName: [UIColor lightGrayColor]
   };
 }
 
