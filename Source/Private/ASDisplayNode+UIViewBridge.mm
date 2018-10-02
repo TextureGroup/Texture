@@ -944,14 +944,15 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (UISemanticContentAttribute)semanticContentAttribute
 {
-  _bridge_prologue_read;
-  return _getFromViewOnly(semanticContentAttribute);
+  AS::MutexLocker l(__instanceLock__);
+  return _semanticContentAttribute;
 }
 
 - (void)setSemanticContentAttribute:(UISemanticContentAttribute)semanticContentAttribute
 {
-  _bridge_prologue_write;
+  AS::MutexLocker l(__instanceLock__);
   _setToViewOnly(semanticContentAttribute, semanticContentAttribute);
+  _semanticContentAttribute = semanticContentAttribute;
 #if YOGA
   [self semanticContentAttributeDidChange:semanticContentAttribute];
 #endif
