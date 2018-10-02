@@ -887,6 +887,11 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
+/**
+ * In cases where a late layout tree flatten is performed, this is used to perform the transition copy and flatten.
+ * This is import to support const pointer usage instead of shared_ptr when managing layouts and transitions
+ * during the layout flatten/ transition lifecycle.
+ */
 - (ASLayoutTransition *)_locked_flattenLayoutTransitionIfNeeded:(ASLayoutTransition *)pendingLayoutTransition {
   ASLayoutTransition *transition = pendingLayoutTransition;
   if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
