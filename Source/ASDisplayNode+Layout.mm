@@ -663,6 +663,10 @@ ASLayoutElementStyleExtensibilityForwarding
         _pendingLayoutTransition = pendingLayoutTransition = [[ASLayoutTransition alloc] initWithNode:self
                                                                                         pendingLayout:pendingLayout
                                                                                        previousLayout:previousLayout];
+        if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
+          _pendingLayoutTransition = pendingLayoutTransition = [self _locked_flattenLayoutTransitionIfNeeded:_pendingLayoutTransition];
+        }
+        
         // Setup context for pending layout transition. we need to hold a strong reference to the context
         _pendingLayoutTransitionContext = pendingLayoutTransitionContext = [[_ASTransitionContext alloc] initWithAnimation:animated
                                                                                                             layoutDelegate:_pendingLayoutTransition
@@ -871,8 +875,8 @@ ASLayoutElementStyleExtensibilityForwarding
   ASLayoutTransition *pendingLayoutTransition;
   {
     ASDN::MutexLocker l(__instanceLock__);
-    pendingLayoutTransition = _pendingLayoutTransition;
-    if (pendingLayoutTransition != nil) {
+    if (_pendingLayoutTransition != nil) {
+      _pendingLayoutTransition = pendingLayoutTransition = [self _locked_flattenLayoutTransitionIfNeeded:_pendingLayoutTransition];
       [self _locked_setCalculatedDisplayNodeLayout:pendingLayoutTransition.pendingLayout];
     }
   }
@@ -881,6 +885,28 @@ ASLayoutElementStyleExtensibilityForwarding
     [self _completeLayoutTransition:pendingLayoutTransition];
     [self _pendingLayoutTransitionDidComplete];
   }
+}
+
+/**
+ * In cases where a late layout tree flatten is performed, this is used to perform the transition copy and flatten.
+ * This is import to support const pointer usage instead of shared_ptr when managing layouts and transitions
+ * during the layout flatten/ transition lifecycle.
+ */
+- (ASLayoutTransition *)_locked_flattenLayoutTransitionIfNeeded:(ASLayoutTransition *)pendingLayoutTransition {
+  ASLayoutTransition *transition = pendingLayoutTransition;
+  if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
+    ASDisplayNodeLayout pendingLayout = pendingLayoutTransition.pendingLayout;
+    _unflattenedLayout = pendingLayout.layout;
+    ASLayout *newPendingLayout = [pendingLayout.layout filteredNodeLayoutTree];
+    let pendingDisplayNodeLayout = ASDisplayNodeLayout(newPendingLayout,
+                                                       pendingLayout.constrainedSize,
+                                                       pendingLayout.constrainedSize.max,
+                                                       pendingLayout.version);
+    transition = [[ASLayoutTransition alloc] initWithNode:pendingLayoutTransition.node
+                                            pendingLayout:pendingDisplayNodeLayout
+                                           previousLayout:pendingLayoutTransition.previousLayout];
+  }
+  return transition;
 }
 
 /**
@@ -1010,7 +1036,6 @@ ASLayoutElementStyleExtensibilityForwarding
   
   // Flatten the layout if it wasn't done before (@see -calculateLayoutThatFits:).
   if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
-    _unflattenedLayout = _calculatedDisplayNodeLayout.layout; 
     _calculatedDisplayNodeLayout.layout = [_unflattenedLayout filteredNodeLayoutTree];
   }
 }
