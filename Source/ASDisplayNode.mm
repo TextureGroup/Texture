@@ -1223,7 +1223,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
       _unflattenedLayout = layout;
   }
-    layout = [layout filteredNodeLayoutTree];
+  layout = [layout filteredNodeLayoutTree];
   
   return layout;
 }
