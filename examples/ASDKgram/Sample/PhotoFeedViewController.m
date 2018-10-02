@@ -1,27 +1,16 @@
 //
 //  PhotoFeedViewController.m
-//  Sample
+//  Texture
 //
-//  Created by Hannah Troisi on 2/17/16.
-//
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "PhotoFeedViewController.h"
 #import "Utilities.h"
 #import "PhotoTableViewCell.h"
 #import "PhotoFeedModel.h"
-#import "CommentView.h"
 
 #define AUTO_TAIL_LOADING_NUM_SCREENFULS  2.5
 
@@ -73,33 +62,7 @@
 {
   [self.photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
     [self insertNewRows:newPhotos];
-    [self requestCommentsForPhotos:newPhotos];
   } numResultsToReturn:20];
-}
-
-- (void)requestCommentsForPhotos:(NSArray *)newPhotos
-{
-  for (PhotoModel *photo in newPhotos) {
-    [photo.commentFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
-      
-      NSInteger rowNum         = [self.photoFeed indexOfPhotoModel:photo];
-      NSIndexPath *cellPath    = [NSIndexPath indexPathForRow:rowNum inSection:0];
-      PhotoTableViewCell *cell = [_tableView cellForRowAtIndexPath:cellPath];
-      
-      if (cell) {
-        [cell loadCommentsForPhoto:photo];
-        [_tableView beginUpdates];
-        [_tableView endUpdates];
-        
-        // adjust scrollView contentOffset if inserting above visible cells
-        NSIndexPath *visibleCellPath = [_tableView indexPathForCell:_tableView.visibleCells.firstObject];
-        if (cellPath.row < visibleCellPath.row) {
-          CGFloat commentViewHeight = [CommentView heightForCommentFeedModel:photo.commentFeed withWidth:self.view.bounds.size.width];
-          _tableView.contentOffset = CGPointMake(_tableView.contentOffset.x, _tableView.contentOffset.y + commentViewHeight);
-        }
-      }
-    }];
-  }
 }
 
 #pragma mark - UITableViewDataSource methods

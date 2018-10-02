@@ -2,20 +2,14 @@
 //  ASTextNodeTests.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <CoreText/CoreText.h>
+
+#import "ASTestCase.h"
 
 #import <OCMock/OCMock.h>
 
@@ -29,8 +23,12 @@
 @interface ASTextNodeTestDelegate : NSObject <ASTextNodeDelegate>
 
 @property (nonatomic, copy, readonly) NSString *tappedLinkAttribute;
-@property (nonatomic, assign, readonly) id tappedLinkValue;
+@property (nonatomic, readonly) id tappedLinkValue;
 
+@end
+@interface ASTextNodeSubclass : ASTextNode
+@end
+@interface ASTextNodeSecondSubclass : ASTextNodeSubclass
 @end
 
 @implementation ASTextNodeTestDelegate
@@ -50,8 +48,8 @@
 
 @interface ASTextNodeTests : XCTestCase
 
-@property (nonatomic, readwrite, strong) ASTextNode *textNode;
-@property (nonatomic, readwrite, copy) NSAttributedString *attributedText;
+@property (nonatomic) ASTextNode *textNode;
+@property (nonatomic, copy) NSAttributedString *attributedText;
 
 @end
 
@@ -235,4 +233,23 @@
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
 }
 
+- (void)testThatTheExperimentWorksCorrectly
+{
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalTextNode;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  
+  ASTextNode *plainTextNode = [[ASTextNode alloc] init];
+  XCTAssertEqualObjects(plainTextNode.class, [ASTextNode2 class]);
+  
+  ASTextNodeSecondSubclass *sc2 = [[ASTextNodeSecondSubclass alloc] init];
+  XCTAssertEqualObjects([ASTextNodeSubclass superclass], [ASTextNode2 class]);
+  XCTAssertEqualObjects(sc2.superclass, [ASTextNodeSubclass class]);
+}
+
+@end
+
+@implementation ASTextNodeSubclass
+@end
+@implementation ASTextNodeSecondSubclass
 @end

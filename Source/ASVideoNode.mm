@@ -2,25 +2,19 @@
 //  ASVideoNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AVFoundation/AVFoundation.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASVideoNode.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 static BOOL ASAssetIsEqual(AVAsset *asset1, AVAsset *asset2) {
   return ASObjectIsEqual(asset1, asset2)
@@ -130,7 +124,7 @@ static NSString * const kRate = @"rate";
 - (AVPlayerItem *)constructPlayerItem
 {
   ASDisplayNodeAssertMainThread();
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   AVPlayerItem *playerItem = nil;
   if (_assetURL != nil) {
@@ -257,9 +251,7 @@ static NSString * const kRate = @"rate";
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  __instanceLock__.lock();
-  ASDisplayNode *playerNode = _playerNode;
-  __instanceLock__.unlock();
+  ASDisplayNode *playerNode = ASLockedSelf(_playerNode);
 
   CGSize calculatedSize = constrainedSize;
   
@@ -320,9 +312,7 @@ static NSString * const kRate = @"rate";
 
 - (void)setVideoPlaceholderImage:(UIImage *)image
 {
-  __instanceLock__.lock();
-  NSString *gravity = _gravity;
-  __instanceLock__.unlock();
+  NSString *gravity = self.gravity;
   
   if (image != nil) {
     self.contentMode = ASContentModeFromVideoGravity(gravity);
@@ -332,7 +322,7 @@ static NSString * const kRate = @"rate";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   if (object == _currentPlayerItem) {
     if ([keyPath isEqualToString:kStatus]) {
@@ -340,6 +330,7 @@ static NSString * const kRate = @"rate";
         if (self.playerState != ASVideoNodePlayerStatePlaying) {
           self.playerState = ASVideoNodePlayerStateReadyToPlay;
           if (_shouldBePlaying && ASInterfaceStateIncludesVisible(self.interfaceState)) {
+            ASUnlockScope(self);
             [self play];
           }
         }
@@ -362,6 +353,8 @@ static NSString * const kRate = @"rate";
         if (self.playerState == ASVideoNodePlayerStateLoading && _delegateFlags.delegateVideoNodeDidRecoverFromStall) {
           [self.delegate videoNodeDidRecoverFromStall:self];
         }
+        
+        ASUnlockScope(self);
         [self play]; // autoresume after buffer catches up
       }
     } else if ([keyPath isEqualToString:kplaybackBufferEmpty]) {
@@ -400,7 +393,7 @@ static NSString * const kRate = @"rate";
 {
   [super didEnterPreloadState];
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   AVAsset *asset = self.asset;
   // Return immediately if the asset is nil;
   if (asset == nil || self.playerState != ASVideoNodePlayerStateUnknown) {
@@ -441,7 +434,7 @@ static NSString * const kRate = @"rate";
   [super didExitPreloadState];
   
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
 
     self.player = nil;
     self.currentItem = nil;
@@ -453,15 +446,16 @@ static NSString * const kRate = @"rate";
 {
   [super didEnterVisibleState];
   
-  __instanceLock__.lock();
   BOOL shouldPlay = NO;
-  if (_shouldBePlaying || _shouldAutoplay) {
-    if (_player != nil && CMTIME_IS_VALID(_lastPlaybackTime)) {
-      [_player seekToTime:_lastPlaybackTime];
+  {
+    ASLockScopeSelf();
+    if (_shouldBePlaying || _shouldAutoplay) {
+      if (_player != nil && CMTIME_IS_VALID(_lastPlaybackTime)) {
+        [_player seekToTime:_lastPlaybackTime];
+      }
+      shouldPlay = YES;
     }
-    shouldPlay = YES;
   }
-  __instanceLock__.unlock();
   
   if (shouldPlay) {
     [self play];
@@ -472,7 +466,7 @@ static NSString * const kRate = @"rate";
 {
   [super didExitVisibleState];
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   if (_shouldBePlaying) {
     [self pause];
@@ -487,7 +481,7 @@ static NSString * const kRate = @"rate";
 
 - (void)setPlayerState:(ASVideoNodePlayerState)playerState
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASVideoNodePlayerState oldState = _playerState;
   
@@ -513,7 +507,7 @@ static NSString * const kRate = @"rate";
 
 - (NSURL *)assetURL
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   if (_assetURL != nil) {
     return _assetURL;
@@ -535,7 +529,7 @@ static NSString * const kRate = @"rate";
 
 - (AVAsset *)asset
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _asset;
 }
 
@@ -546,7 +540,7 @@ static NSString * const kRate = @"rate";
   [self didExitPreloadState];
   
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     self.videoPlaceholderImage = nil;
     _asset = asset;
     _assetURL = assetURL;
@@ -557,7 +551,7 @@ static NSString * const kRate = @"rate";
 
 - (void)setVideoComposition:(AVVideoComposition *)videoComposition
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   _videoComposition = videoComposition;
   _currentPlayerItem.videoComposition = videoComposition;
@@ -565,13 +559,13 @@ static NSString * const kRate = @"rate";
 
 - (AVVideoComposition *)videoComposition
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _videoComposition;
 }
 
 - (void)setAudioMix:(AVAudioMix *)audioMix
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   _audioMix = audioMix;
   _currentPlayerItem.audioMix = audioMix;
@@ -579,19 +573,19 @@ static NSString * const kRate = @"rate";
 
 - (AVAudioMix *)audioMix
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _audioMix;
 }
 
 - (AVPlayer *)player
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _player;
 }
 
 - (AVPlayerLayer *)playerLayer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return (AVPlayerLayer *)_playerNode.layer;
 }
 
@@ -618,7 +612,15 @@ static NSString * const kRate = @"rate";
 
 - (void)setGravity:(NSString *)gravity
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
+  if (!gravity) {
+    gravity = AVLayerVideoGravityResizeAspect;
+  }
+  
+  if (!ASCompareAssignObjects(_gravity, gravity)) {
+    return;
+  }
+  
   if (_playerNode.isNodeLoaded) {
     ((AVPlayerLayer *)_playerNode.layer).videoGravity = gravity;
   }
@@ -628,19 +630,19 @@ static NSString * const kRate = @"rate";
 
 - (NSString *)gravity
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _gravity;
 }
 
 - (BOOL)muted
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _muted;
 }
 
 - (void)setMuted:(BOOL)muted
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   _player.muted = muted;
   _muted = muted;
@@ -650,33 +652,31 @@ static NSString * const kRate = @"rate";
 
 - (void)play
 {
-  __instanceLock__.lock();
+  ASLockScopeSelf();
 
   if (![self isStateChangeValid:ASVideoNodePlayerStatePlaying]) {
-    __instanceLock__.unlock();
     return;
   }
 
   if (_player == nil) {
-    __instanceLock__.unlock();
-      [self setNeedsPreload];
-    __instanceLock__.lock();
+    ASUnlockScope(self);
+    [self setNeedsPreload];
   }
 
   if (_playerNode == nil) {
     _playerNode = [self constructPlayerNode];
 
-    __instanceLock__.unlock();
+    {
+      ASUnlockScope(self);
       [self addSubnode:_playerNode];
-    __instanceLock__.lock();
-      
+    }
+
     [self setNeedsLayout];
   }
   
   
   [_player play];
   _shouldBePlaying = YES;
-  __instanceLock__.unlock();
 }
 
 - (BOOL)ready
@@ -686,7 +686,7 @@ static NSString * const kRate = @"rate";
 
 - (void)pause
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   if (![self isStateChangeValid:ASVideoNodePlayerStatePaused]) {
     return;
   }
@@ -696,7 +696,7 @@ static NSString * const kRate = @"rate";
 
 - (BOOL)isPlaying
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   return (_player.rate > 0 && !_player.error);
 }
@@ -713,7 +713,7 @@ static NSString * const kRate = @"rate";
 
 - (void)resetToPlaceholder
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   if (_playerNode != nil) {
     [_playerNode removeFromSupernode];
@@ -778,13 +778,13 @@ static NSString * const kRate = @"rate";
 
 - (AVPlayerItem *)currentItem
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _currentPlayerItem;
 }
 
 - (void)setCurrentItem:(AVPlayerItem *)currentItem
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   [self removePlayerItemObservers:_currentPlayerItem];
 
@@ -797,22 +797,23 @@ static NSString * const kRate = @"rate";
 
 - (ASDisplayNode *)playerNode
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _playerNode;
 }
 
 - (void)setPlayerNode:(ASDisplayNode *)playerNode
 {
-  __instanceLock__.lock();
-  _playerNode = playerNode;
-  __instanceLock__.unlock();
+  {
+    ASLockScopeSelf();
+    _playerNode = playerNode;
+  }
 
   [self setNeedsLayout];
 }
 
 - (void)setPlayer:(AVPlayer *)player
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   [self removePlayerObservers:_player];
 
@@ -827,13 +828,13 @@ static NSString * const kRate = @"rate";
 
 - (BOOL)shouldBePlaying
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _shouldBePlaying;
 }
 
 - (void)setShouldBePlaying:(BOOL)shouldBePlaying
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _shouldBePlaying = shouldBePlaying;
 }
 

@@ -1,9 +1,9 @@
 //
 //  ASNetworkImageLoadInfo+Private.h
-//  AsyncDisplayKit
+//  Texture
 //
-//  Created by Adlai on 1/30/18.
-//  Copyright © 2018 Facebook. All rights reserved.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASNetworkImageLoadInfo.h>

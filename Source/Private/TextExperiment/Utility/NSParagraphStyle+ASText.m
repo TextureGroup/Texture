@@ -1,12 +1,9 @@
 //
 //  NSParagraphStyle+ASText.m
-//  Modified from YYText <https://github.com/ibireme/YYText>
+//  Texture
 //
-//  Created by ibireme on 14/10/7.
-//  Copyright (c) 2015 ibireme.
-//
-//  This source code is licensed under the MIT-style license found in the
-//  LICENSE file in the root directory of this source tree.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
@@ -25,6 +22,7 @@
   
   NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
   
+#if TARGET_OS_IOS
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   CGFloat lineSpacing;
@@ -32,6 +30,7 @@
     style.lineSpacing = lineSpacing;
   }
 #pragma clang diagnostic pop
+#endif
   
   CGFloat paragraphSpacing;
   if (CTParagraphStyleGetValueForSpecifier(CTStyle, kCTParagraphStyleSpecifierParagraphSpacing, sizeof(CGFloat), &paragraphSpacing)) {
@@ -114,6 +113,7 @@
   CTParagraphStyleSetting set[kCTParagraphStyleSpecifierCount] = { };
   int count = 0;
   
+#if TARGET_OS_IOS
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   CGFloat lineSpacing = self.lineSpacing;
@@ -122,6 +122,7 @@
   set[count].value = &lineSpacing;
   count++;
 #pragma clang diagnostic pop
+#endif
   
   CGFloat paragraphSpacing = self.paragraphSpacing;
   set[count].spec = kCTParagraphStyleSpecifierParagraphSpacing;

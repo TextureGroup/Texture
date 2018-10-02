@@ -2,17 +2,9 @@
 //  ASVideoNodeTests.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <OCMock/OCMock.h>
@@ -21,6 +13,7 @@
 #import <XCTest/XCTest.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import "ASDisplayNodeTestsHelper.h"
 
 @interface ASVideoNodeTests : XCTestCase <ASVideoNodeDelegate>
 {
@@ -38,11 +31,11 @@
 }
 
 
-@property (nonatomic, readwrite) ASInterfaceState interfaceState;
-@property (nonatomic, readonly) ASDisplayNode *spinner;
-@property (nonatomic, readwrite) ASDisplayNode *playerNode;
-@property (nonatomic, readwrite) AVPlayer *player;
-@property (nonatomic, readwrite) BOOL shouldBePlaying;
+@property ASInterfaceState interfaceState;
+@property (readonly) ASDisplayNode *spinner;
+@property ASDisplayNode *playerNode;
+@property AVPlayer *player;
+@property BOOL shouldBePlaying;
 
 - (void)setVideoPlaceholderImage:(UIImage *)image;
 - (void)prepareToPlayAsset:(AVAsset *)asset withKeys:(NSArray *)requestedKeys;
@@ -351,9 +344,9 @@
 
   [_videoNode setInterfaceState:ASInterfaceStateVisible | ASInterfaceStateDisplay | ASInterfaceStatePreload];
   [_videoNode prepareToPlayAsset:assetMock withKeys:_requestedKeys];
+  ASCATransactionQueueWait(nil);
   [_videoNode pause];
   _videoNode.shouldBePlaying = YES;
-
   XCTAssertFalse(_videoNode.isPlaying);
 
   [_videoNode observeValueForKeyPath:@"playbackLikelyToKeepUp" ofObject:[_videoNode currentItem] change:@{NSKeyValueChangeNewKey : @YES} context:NULL];

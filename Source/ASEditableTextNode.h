@@ -2,17 +2,9 @@
 //  ASEditableTextNode.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASDisplayNode.h>
@@ -48,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
              placeholderTextKitComponents:(ASTextKitComponents *)placeholderTextKitComponents;
 
 //! @abstract The text node's delegate, which must conform to the <ASEditableTextNodeDelegate> protocol.
-@property (nonatomic, readwrite, weak) id <ASEditableTextNodeDelegate> delegate;
+@property (nullable, weak) id <ASEditableTextNodeDelegate> delegate;
 
 #pragma mark - Configuration
 
@@ -62,13 +54,13 @@ NS_ASSUME_NONNULL_BEGIN
   @abstract Access to underlying UITextView for more configuration options.
   @warning This property should only be used on the main thread and should not be accessed before the editable text node's view is created.
  */
-@property (nonatomic, readonly, strong) UITextView *textView;
+@property (nonatomic, readonly) UITextView *textView;
 
 //! @abstract The attributes to apply to new text being entered by the user.
-@property (nonatomic, readwrite, strong, nullable) NSDictionary<NSString *, id> *typingAttributes;
+@property (nullable, nonatomic, copy) NSDictionary<NSString *, id> *typingAttributes;
 
 //! @abstract The range of text currently selected. If length is zero, the range is the cursor location.
-@property (nonatomic, readwrite, assign) NSRange selectedRange;
+@property NSRange selectedRange;
 
 #pragma mark - Placeholder
 /**
@@ -82,14 +74,14 @@ NS_ASSUME_NONNULL_BEGIN
   @abstract The styled placeholder text displayed by the text node while no text is entered
   @discussion The placeholder is displayed when the user has not entered any text and the keyboard is not visible.
  */
-@property (nonatomic, readwrite, strong, nullable) NSAttributedString *attributedPlaceholderText;
+@property (nullable, nonatomic, copy) NSAttributedString *attributedPlaceholderText;
 
 #pragma mark - Modifying User Text
 /**
   @abstract The styled text displayed by the receiver.
   @discussion When the placeholder is displayed (as indicated by -isDisplayingPlaceholder), this value is nil. Otherwise, this value is the attributed text the user has entered. This value can be modified regardless of whether the receiver is the first responder (and thus, editing) or not. Changing this value from nil to non-nil will result in the placeholder being hidden, and the new value being displayed.
  */
-@property (nonatomic, readwrite, copy, nullable) NSAttributedString *attributedText;
+@property (nullable, nonatomic, copy) NSAttributedString *attributedText;
 
 #pragma mark - Managing The Keyboard
 //! @abstract The text input mode used by the receiver's keyboard, if it is visible. This value is undefined if the receiver is not the first responder.
@@ -98,13 +90,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  @abstract The textContainerInset of both the placeholder and typed textView. This value defaults to UIEdgeInsetsZero.
  */
-@property (nonatomic, readwrite) UIEdgeInsets textContainerInset;
+@property (nonatomic) UIEdgeInsets textContainerInset;
 
 /**
  @abstract The maximum number of lines to display. Additional lines will require scrolling.
  @default 0 (No limit)
  */
-@property (nonatomic, assign) NSUInteger maximumLinesToDisplay;
+@property (nonatomic) NSUInteger maximumLinesToDisplay;
 
 /**
   @abstract Indicates whether the receiver's text view is the first responder, and thus has the keyboard visible and is prepared for editing by the user.
@@ -130,22 +122,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  @abstract <UITextInputTraits> properties.
  */
-@property(nonatomic, readwrite, assign) UITextAutocapitalizationType autocapitalizationType; // default is UITextAutocapitalizationTypeSentences
-@property(nonatomic, readwrite, assign) UITextAutocorrectionType autocorrectionType;         // default is UITextAutocorrectionTypeDefault
-@property(nonatomic, readwrite, assign) UITextSpellCheckingType spellCheckingType;           // default is UITextSpellCheckingTypeDefault;
-@property(nonatomic, readwrite, assign) UIKeyboardType keyboardType;                         // default is UIKeyboardTypeDefault
-@property(nonatomic, readwrite, assign) UIKeyboardAppearance keyboardAppearance;             // default is UIKeyboardAppearanceDefault
-@property(nonatomic, readwrite, assign) UIReturnKeyType returnKeyType;                       // default is UIReturnKeyDefault (See note under UIReturnKeyType enum)
-@property(nonatomic, readwrite, assign) BOOL enablesReturnKeyAutomatically;                  // default is NO (when YES, will automatically disable return key when text widget has zero-length contents, and will automatically enable when text widget has non-zero-length contents)
-@property(nonatomic, readwrite, assign, getter=isSecureTextEntry) BOOL secureTextEntry;      // default is NO
+@property (nonatomic) UITextAutocapitalizationType autocapitalizationType; // default is UITextAutocapitalizationTypeSentences
+@property (nonatomic) UITextAutocorrectionType autocorrectionType;         // default is UITextAutocorrectionTypeDefault
+@property (nonatomic) UITextSpellCheckingType spellCheckingType;           // default is UITextSpellCheckingTypeDefault;
+@property (nonatomic) UIKeyboardType keyboardType;                         // default is UIKeyboardTypeDefault
+@property (nonatomic) UIKeyboardAppearance keyboardAppearance;             // default is UIKeyboardAppearanceDefault
+@property (nonatomic) UIReturnKeyType returnKeyType;                       // default is UIReturnKeyDefault (See note under UIReturnKeyType enum)
+@property (nonatomic) BOOL enablesReturnKeyAutomatically;                  // default is NO (when YES, will automatically disable return key when text widget has zero-length contents, and will automatically enable when text widget has non-zero-length contents)
+@property (nonatomic, getter=isSecureTextEntry) BOOL secureTextEntry;      // default is NO
 
 @end
 
 @interface ASEditableTextNode (Unavailable)
 
-- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
 @end
 
@@ -200,12 +192,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)editableTextNodeDidUpdateText:(ASEditableTextNode *)editableTextNode;
 
 /**
-  @abstract Indicates to the delegate that teh text node has finished editing.
+  @abstract Indicates to the delegate that the text node has finished editing.
   @param editableTextNode An editable text node.
   @discussion The invocation of this method coincides with the keyboard animating to become hidden.
  */
 - (void)editableTextNodeDidFinishEditing:(ASEditableTextNode *)editableTextNode;
-
 
 @end
 

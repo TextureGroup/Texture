@@ -1,18 +1,10 @@
 //
 //  ViewController.m
-//  Sample
+//  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ViewController.h"
@@ -35,12 +27,10 @@ static const NSInteger kMaxLitterSize = 100;        // max number of kitten cell
   // array of boxed CGSizes corresponding to placekitten.com kittens
   NSMutableArray *_kittenDataSource;
 
-  BOOL _dataSourceLocked;
   NSIndexPath *_blurbNodeIndexPath;
 }
 
 @property (nonatomic, strong) NSMutableArray *kittenDataSource;
-@property (atomic, assign) BOOL dataSourceLocked;
 
 @end
 
@@ -94,12 +84,6 @@ static const NSInteger kMaxLitterSize = 100;        // max number of kitten cell
     [kittens addObject:[NSValue valueWithCGSize:size]];
   }
   return kittens;
-}
-
-- (void)setKittenDataSource:(NSMutableArray *)kittenDataSource {
-  ASDisplayNodeAssert(!self.dataSourceLocked, @"Could not update data source when it is locked !");
-
-  _kittenDataSource = kittenDataSource;
 }
 
 - (void)toggleEditingMode

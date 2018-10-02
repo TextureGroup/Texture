@@ -1,12 +1,9 @@
 //
 //  NSAttributedString+ASText.m
-//  Modified from YYText <https://github.com/ibireme/YYText>
+//  Texture
 //
-//  Created by ibireme on 14/10/7.
-//  Copyright (c) 2015 ibireme.
-//
-//  This source code is licensed under the MIT-style license found in the
-//  LICENSE file in the root directory of this source tree.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
@@ -600,10 +597,12 @@ return style. _attr_;
   dispatch_once(&onceToken, ^{
     failSet = [NSMutableSet new];
     [failSet addObject:(id)kCTGlyphInfoAttributeName];
+#if TARGET_OS_IOS
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     [failSet addObject:(id)kCTCharacterShapeAttributeName];
 #pragma clang diagnostic pop
+#endif
     [failSet addObject:(id)kCTLanguageAttributeName];
     [failSet addObject:(id)kCTRunDelegateAttributeName];
     [failSet addObject:(id)kCTBaselineClassAttributeName];

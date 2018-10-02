@@ -1,12 +1,10 @@
 //
-//  ASYTextLine.m
-//  Modified from YYText <https://github.com/ibireme/YYText>
+//  ASTextLine.m
+//  Texture
 //
-//  Created by ibireme on 15/3/3.
-//  Copyright (c) 2015 ibireme.
-//
-//  This source code is licensed under the MIT-style license found in the
-//  LICENSE file in the root directory of this source tree.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASTextLine.h>
@@ -16,7 +14,7 @@
   CGFloat _firstGlyphPos; // first glyph position for baseline, typically 0.
 }
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical {
++ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical NS_RETURNS_RETAINED {
   if (!CTLine) return nil;
   ASTextLine *line = [self new];
   line->_position = position;
@@ -147,7 +145,7 @@
 - (NSString *)description {
   NSMutableString *desc = @"".mutableCopy;
   NSRange range = self.range;
-  [desc appendFormat:@"<ASTextLine: %p> row:%zd range:%tu,%tu",self, self.row, range.location, range.length];
+  [desc appendFormat:@"<ASTextLine: %p> row:%ld range:%tu,%tu", self, (long)self.row, range.location, range.length];
   [desc appendFormat:@" position:%@",NSStringFromCGPoint(self.position)];
   [desc appendFormat:@" bounds:%@",NSStringFromCGRect(self.bounds)];
   return desc;
@@ -157,7 +155,7 @@
 
 
 @implementation ASTextRunGlyphRange
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode {
++ (instancetype)rangeWithRange:(NSRange)range drawMode:(ASTextRunGlyphDrawMode)mode NS_RETURNS_RETAINED {
   ASTextRunGlyphRange *one = [self new];
   one.glyphRangeInRun = range;
   one.drawMode = mode;

@@ -2,17 +2,9 @@
 //  ASCollectionNode+Beta.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASCollectionNode.h>
@@ -29,16 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @default [ASCollectionView class] is used whenever this property is unset or nil.
  */
-@property (strong, nonatomic, nullable) Class collectionViewClass;
+@property (nullable, nonatomic) Class collectionViewClass;
 
 /**
  * The elements that are currently displayed. The "UIKit index space". Must be accessed on main thread.
  */
-@property (strong, nonatomic, readonly) ASElementMap *visibleElements;
+@property (nonatomic, readonly) ASElementMap *visibleElements;
 
-@property (strong, readonly, nullable) id<ASCollectionLayoutDelegate> layoutDelegate;
+@property (nullable, readonly) id<ASCollectionLayoutDelegate> layoutDelegate;
 
-@property (nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
+@property (nullable, nonatomic, weak) id<ASBatchFetchingDelegate> batchFetchingDelegate;
 
 /**
  * When this mode is enabled, ASCollectionView matches the timing of UICollectionView as closely as possible, 
@@ -55,7 +47,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @default defaults to NO.
  */
-@property (nonatomic, assign) BOOL usesSynchronousDataLoading;
+@property (nonatomic) BOOL usesSynchronousDataLoading;
+
+/**
+ *  Returns YES if the ASCollectionNode contents are completely synchronized with the underlying collection-view layout.
+ */
+@property (nonatomic, readonly, getter=isSynchronized) BOOL synchronized;
+
+/**
+ *  Schedules a block to be performed (on the main thread) as soon as the completion block is called
+ *  on performBatchUpdates:.
+ *
+ *  When isSynchronized == YES, the block is run block immediately (before the method returns).
+ */
+- (void)onDidFinishSynchronizing:(void (^)(void))didFinishSynchronizing;
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 

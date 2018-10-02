@@ -2,17 +2,9 @@
 //  ASDisplayLayerTests.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <objc/runtime.h>
@@ -42,7 +34,7 @@ static UIImage *bogusImage() {
 }
 
 @interface _ASDisplayLayerTestContainerLayer : CALayer
-@property (nonatomic, assign, readonly) NSUInteger didCompleteTransactionCount;
+@property (nonatomic, readonly) NSUInteger didCompleteTransactionCount;
 @end
 
 @implementation _ASDisplayLayerTestContainerLayer
@@ -66,10 +58,10 @@ static UIImage *bogusImage() {
   BOOL _isInCancelAsyncDisplay;
   BOOL _isInDisplay;
 }
-@property (nonatomic, assign, readonly) NSUInteger displayCount;
-@property (nonatomic, assign, readonly) NSUInteger drawInContextCount;
-@property (nonatomic, assign, readonly) NSUInteger setContentsAsyncCount;
-@property (nonatomic, assign, readonly) NSUInteger setContentsSyncCount;
+@property (nonatomic, readonly) NSUInteger displayCount;
+@property (nonatomic, readonly) NSUInteger drawInContextCount;
+@property (nonatomic, readonly) NSUInteger setContentsAsyncCount;
+@property (nonatomic, readonly) NSUInteger setContentsSyncCount;
 @property (nonatomic, copy, readonly) NSString *setContentsCounts;
 - (BOOL)checkSetContentsCountsWithSyncCount:(NSUInteger)syncCount asyncCount:(NSUInteger)asyncCount;
 @end
@@ -142,16 +134,16 @@ typedef NS_ENUM(NSUInteger, _ASDisplayLayerTestDelegateClassModes) {
 
 @interface _ASDisplayLayerTestDelegate : ASDisplayNode <_ASDisplayLayerDelegate>
 
-@property (nonatomic, assign) NSUInteger didDisplayCount;
-@property (nonatomic, assign) NSUInteger drawParametersCount;
-@property (nonatomic, assign) NSUInteger willDisplayCount;
+@property (nonatomic) NSUInteger didDisplayCount;
+@property (nonatomic) NSUInteger drawParametersCount;
+@property (nonatomic) NSUInteger willDisplayCount;
 
 // for _ASDisplayLayerTestDelegateModeClassDisplay
-@property (nonatomic, assign) NSUInteger displayCount;
-@property (nonatomic, copy) UIImage *(^displayLayerBlock)(void);
+@property (nonatomic) NSUInteger displayCount;
+@property (nonatomic) UIImage *(^displayLayerBlock)(void);
 
 // for _ASDisplayLayerTestDelegateModeClassDrawInContext
-@property (nonatomic, assign) NSUInteger drawRectCount;
+@property (nonatomic) NSUInteger drawRectCount;
 
 @end
 
@@ -217,7 +209,7 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 }
 
 // DANGER: Don't use the delegate as the parameters in real code; this is not thread-safe and just for accounting in unit tests!
-+ (UIImage *)displayWithParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(asdisplaynode_iscancelled_block_t)sentinelBlock
++ (UIImage *)displayWithParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)sentinelBlock
 {
   UIImage *contents = bogusImage();
   if (delegate->_displayLayerBlock != NULL) {
@@ -228,7 +220,7 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 }
 
 // DANGER: Don't use the delegate as the parameters in real code; this is not thread-safe and just for accounting in unit tests!
-+ (void)drawRect:(CGRect)bounds withParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(asdisplaynode_iscancelled_block_t)sentinelBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(_ASDisplayLayerTestDelegate *)delegate isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)sentinelBlock isRasterizing:(BOOL)isRasterizing
 {
   __atomic_add_fetch(&delegate->_drawRectCount, 1, __ATOMIC_SEQ_CST);
 }

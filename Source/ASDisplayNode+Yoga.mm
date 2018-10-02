@@ -2,17 +2,9 @@
 //  ASDisplayNode+Yoga.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
@@ -20,11 +12,11 @@
 #if YOGA /* YOGA */
 
 #import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
-#import <AsyncDisplayKit/ASYogaLayoutSpec.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASLayout.h>
 
@@ -80,7 +72,7 @@
     return;
   }
   if (_yogaChildren == nil) {
-    _yogaChildren = [NSMutableArray array];
+    _yogaChildren = [[NSMutableArray alloc] init];
   }
 
   // Clean up state in case this child had another parent.
@@ -157,15 +149,19 @@
 
 - (void)setupYogaCalculatedLayout
 {
+  ASLockScopeSelf();
+
   YGNodeRef yogaNode = self.style.yogaNode;
   uint32_t childCount = YGNodeGetChildCount(yogaNode);
   ASDisplayNodeAssert(childCount == self.yogaChildren.count,
                       @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
 
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:childCount];
+  ASLayout *rawSublayouts[childCount];
+  int i = 0;
   for (ASDisplayNode *subnode in self.yogaChildren) {
-    [sublayouts addObject:[subnode layoutForYogaNode]];
+    rawSublayouts[i++] = [subnode layoutForYogaNode];
   }
+  let sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:childCount];
 
   // The layout for self should have position CGPointNull, but include the calculated size.
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
@@ -210,7 +206,10 @@
       parentSize.width = YGNodeLayoutGetWidth(parentNode);
       parentSize.height = YGNodeLayoutGetHeight(parentNode);
     }
-    _pendingDisplayNodeLayout = std::make_shared<ASDisplayNodeLayout>(layout, ASSizeRangeUnconstrained, parentSize, 0);
+    // For the root node in a Yoga tree, make sure to preserve the constrainedSize originally provided.
+    // This will be used for all relayouts triggered by children, since they escalate to root.
+    ASSizeRange range = parentNode ? ASSizeRangeUnconstrained : self.constrainedSizeForCalculatedLayout;
+    _pendingDisplayNodeLayout = ASDisplayNodeLayout(layout, range, parentSize, _layoutVersion);
   }
 }
 
@@ -235,9 +234,18 @@
 - (void)invalidateCalculatedYogaLayout
 {
   YGNodeRef yogaNode = self.style.yogaNode;
-  if (yogaNode && YGNodeGetMeasureFunc(yogaNode)) {
+  if (yogaNode && [self shouldHaveYogaMeasureFunc]) {
     // Yoga internally asserts that MarkDirty() may only be called on nodes with a measurement function.
+    BOOL needsTemporaryMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) == NULL);
+    if (needsTemporaryMeasureFunc) {
+      ASDisplayNodeAssert(self.yogaLayoutInProgress == NO,
+                          @"shouldHaveYogaMeasureFunc == YES, and inside a layout pass, but no measure func pointer! %@", self);
+      YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
+    }
     YGNodeMarkDirty(yogaNode);
+    if (needsTemporaryMeasureFunc) {
+      YGNodeSetMeasureFunc(yogaNode, NULL);
+    }
   }
   self.yogaCalculatedLayout = nil;
 }
@@ -253,7 +261,7 @@
     return;
   }
 
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
 
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
@@ -285,7 +293,7 @@
 
   // Reset accessible elements, since layout may have changed.
   ASPerformBlockOnMainThread(^{
-    [(_ASDisplayView *)self.view setAccessibleElements:nil];
+    [(_ASDisplayView *)self.view setAccessibilityElements:nil];
   });
 
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
@@ -305,7 +313,7 @@
       NSLog(@"node = %@", node);
       NSLog(@"style = %@", node.style);
       NSLog(@"layout = %@", node.yogaCalculatedLayout);
-      YGNodePrint(node.style.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
+      YGNodePrint(node.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
     });
   }
 #endif /* YOGA_LAYOUT_LOGGING */

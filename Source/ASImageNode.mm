@@ -2,17 +2,9 @@
 //  ASImageNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASImageNode.h>
@@ -22,7 +14,8 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
@@ -39,8 +32,6 @@
 
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-
-#include <functional>
 
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
@@ -76,14 +67,14 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
  */
 @interface ASImageNodeContentsKey : NSObject
 
-@property (nonatomic, strong) UIImage *image;
+@property (nonatomic) UIImage *image;
 @property CGSize backingSize;
 @property CGRect imageDrawRect;
 @property BOOL isOpaque;
-@property (nonatomic, strong) UIColor *backgroundColor;
-@property (nonatomic, copy) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
-@property (nonatomic, copy) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
-@property (nonatomic, copy) asimagenode_modification_block_t imageModificationBlock;
+@property (nonatomic, copy) UIColor *backgroundColor;
+@property (nonatomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
+@property (nonatomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
+@property (nonatomic) asimagenode_modification_block_t imageModificationBlock;
 
 @end
 
@@ -149,7 +140,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 @private
   UIImage *_image;
   ASWeakMapEntry *_weakCacheEntry;  // Holds a reference that keeps our contents in cache.
-
+  UIColor *_placeholderColor;
 
   void (^_displayCompletionBlock)(BOOL canceled);
   
@@ -226,9 +217,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  __instanceLock__.lock();
-  UIImage *image = _image;
-  __instanceLock__.unlock();
+  let image = ASLockedSelf(_image);
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];
@@ -247,6 +236,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (void)_locked_setImage:(UIImage *)image
 {
+  ASAssertLocked(__instanceLock__);
   if (ASObjectIsEqual(_image, image)) {
     return;
   }
@@ -261,7 +251,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     
     // For debugging purposes we don't care about locking for now
     if ([ASImageNode shouldShowImageScalingOverlay] && _debugLabelNode == nil) {
-      ASPerformBlockOnMainThread(^{
+      // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
+      // holding the lock while calling addSubnode.
+      dispatch_async(dispatch_get_main_queue(), ^{
         _debugLabelNode = [[ASTextNode alloc] init];
         _debugLabelNode.layerBacked = YES;
         [self addSubnode:_debugLabelNode];
@@ -284,31 +276,30 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (UIImage *)image
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  return _image;
+  return ASLockedSelf(_image);
 }
 
-- (UIImage *)_locked_Image
+- (UIColor *)placeholderColor
 {
-  return _image;
+  return ASLockedSelf(_placeholderColor);
 }
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
-  _placeholderColor = placeholderColor;
-
-  // prevent placeholders if we don't have a color
-  self.placeholderEnabled = placeholderColor != nil;
+  ASLockScopeSelf();
+  if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
+    _placeholderEnabled = (placeholderColor != nil);
+  }
 }
 
 #pragma mark - Drawing
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
-  drawParameters->_image = [self _locked_Image];
+  drawParameters->_image = _image;
   drawParameters->_bounds = [self threadSafeBounds];
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
@@ -325,7 +316,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   // Hack for now to retain the weak entry that was created while this drawing happened
   drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     _weakCacheEntry = entry;
   };
   
@@ -599,10 +590,9 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 - (void)clearContents
 {
   [super clearContents];
-    
-  __instanceLock__.lock();
-    _weakCacheEntry = nil;  // release contents from the cache.
-  __instanceLock__.unlock();
+  
+  ASDN::MutexLocker l(__instanceLock__);
+  _weakCacheEntry = nil;  // release contents from the cache.
 }
 
 #pragma mark - Cropping
@@ -736,7 +726,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
 #pragma mark - Extras
 
-extern asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
+asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
   return ^(UIImage *originalImage) {
     ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
@@ -759,7 +749,7 @@ extern asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(
   };
 }
 
-extern asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
+asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
   return ^(UIImage *originalImage) {
     ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);

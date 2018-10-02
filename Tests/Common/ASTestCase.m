@@ -2,12 +2,9 @@
 //  ASTestCase.m
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASTestCase.h"
@@ -31,6 +28,8 @@ static __weak ASTestCase *currentTestCase;
 
 - (void)tearDown
 {
+  [ASConfigurationManager test_resetWithConfiguration:nil];
+  
   // Clear out all application windows. Note: the system will retain these sometimes on its
   // own but we'll do our best.
   for (UIWindow *window in [UIApplication sharedApplication].windows) {
@@ -88,7 +87,7 @@ static __weak ASTestCase *currentTestCase;
   }
 
   // Now that the autorelease pool is drained, drain the dealloc queue also.
-  [[ASDeallocQueue sharedDeallocationQueue] test_drain];
+  [[ASDeallocQueue sharedDeallocationQueue] drain];
 }
 
 + (ASTestCase *)currentTestCase

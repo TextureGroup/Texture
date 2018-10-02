@@ -2,18 +2,9 @@
 //  ASTextNodeSnapshotTests.m
 //  Texture
 //
-//  Created by Garrett Moon on 8/12/16.
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASSnapshotTestCase.h"
@@ -116,6 +107,39 @@
   textNode.shadowOpacity = 0.3;
   textNode.shadowRadius = 3;
   textNode.shadowOffset = CGSizeMake(0, 1);
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
+/**
+ * https://github.com/TextureGroup/Texture/issues/822
+ */
+- (void)DISABLED_testThatTruncationTokenAttributesPrecedeThoseInheritedFromTextWhenTruncateTailMode
+{
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(20, 80);
+  NSMutableAttributedString *mas = [[NSMutableAttributedString alloc] initWithString:@"Quality is an important "];
+  [mas appendAttributedString:[[NSAttributedString alloc] initWithString:@"thing" attributes:@{ NSBackgroundColorAttributeName : UIColor.yellowColor}]];
+  textNode.attributedText = mas;
+  textNode.truncationMode = NSLineBreakByTruncatingTail;
+  
+  textNode.truncationAttributedText = [[NSAttributedString alloc] initWithString:@"\u2026" attributes:@{ NSBackgroundColorAttributeName: UIColor.greenColor }];
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
+- (void)testFontPointSizeScaling
+{
+  NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+  paragraphStyle.lineHeightMultiple = 0.5;
+  paragraphStyle.lineSpacing = 2.0;
+
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(60, 80);
+  textNode.pointSizeScaleFactors = @[@0.5];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is an important thing"
+                                                            attributes:@{ NSParagraphStyleAttributeName: paragraphStyle }];
+
   ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
   ASSnapshotVerifyNode(textNode, nil);
 }
