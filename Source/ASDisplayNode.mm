@@ -1220,6 +1220,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
   ASDisplayNodeLogEvent(self, @"computedLayout: %@", layout);
 
+  // PR #1157: Reduces accuracy of _unflattenedLayout for debugging/Weaver
   if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
       _unflattenedLayout = layout;
   }
