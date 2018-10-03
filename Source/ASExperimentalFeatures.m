@@ -18,6 +18,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_unfair_lock",
                                       @"exp_infer_layer_defaults",
                                       @"exp_network_image_queue",
+                                      @"exp_dealloc_queue_v2",
                                       @"exp_collection_teardown",
                                       @"exp_framesetter_cache",
                                       @"exp_clear_data_during_deallocation"]));
