@@ -55,16 +55,48 @@
 - (void)testMappingNamesToFlags
 {
   // Throw in a bad bit.
-  ASExperimentalFeatures features = ASExperimentalTextNode | ASExperimentalGraphicsContexts | (1 << 22);
-  NSArray *expectedNames = @[ @"exp_graphics_contexts", @"exp_text_node" ];
+  ASExperimentalFeatures features = ASExperimentalTextNode |
+                                    ASExperimentalGraphicsContexts |
+                                    ASExperimentalInterfaceStateCoalescing |
+                                    ASExperimentalUnfairLock |
+                                    ASExperimentalLayerDefaults |
+                                    ASExperimentalNetworkImageQueue |
+                                    ASExperimentalCollectionTeardown |
+                                    ASExperimentalFramesetterCache |
+                                    ASExperimentalSkipClearData | (1 << 22);
+  NSArray *expectedNames = @[@"exp_graphics_contexts",
+                             @"exp_text_node",
+                             @"exp_interface_state_coalesce",
+                             @"exp_unfair_lock",
+                             @"exp_infer_layer_defaults",
+                             @"exp_network_image_queue",
+                             @"exp_collection_teardown",
+                             @"exp_framesetter_cache",
+                             @"exp_skip_clear_data"];
   XCTAssertEqualObjects(expectedNames, ASExperimentalFeaturesGetNames(features));
 }
 
 - (void)testMappingFlagsFromNames
 {
   // Throw in a bad name.
-  NSArray *names = @[ @"exp_text_node", @"exp_graphics_contexts", @"__invalid_name" ];
-  ASExperimentalFeatures expected = ASExperimentalGraphicsContexts | ASExperimentalTextNode;
+  NSArray *names = @[@"exp_graphics_contexts",
+                     @"exp_text_node",
+                     @"exp_interface_state_coalesce",
+                     @"exp_unfair_lock",
+                     @"exp_infer_layer_defaults",
+                     @"exp_network_image_queue",
+                     @"exp_collection_teardown",
+                     @"exp_framesetter_cache",
+                     @"exp_skip_clear_data"];
+  ASExperimentalFeatures expected = ASExperimentalTextNode |
+                                    ASExperimentalGraphicsContexts |
+                                    ASExperimentalInterfaceStateCoalescing |
+                                    ASExperimentalUnfairLock |
+                                    ASExperimentalLayerDefaults |
+                                    ASExperimentalNetworkImageQueue |
+                                    ASExperimentalCollectionTeardown |
+                                    ASExperimentalFramesetterCache |
+                                    ASExperimentalSkipClearData;
   XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(names));
 }
 
