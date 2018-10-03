@@ -55,8 +55,8 @@
 - (void)testMappingNamesToFlags
 {
   // Throw in a bad bit.
-  ASExperimentalFeatures features = ASExperimentalTextNode |
-                                    ASExperimentalGraphicsContexts |
+  ASExperimentalFeatures features = ASExperimentalGraphicsContexts |
+                                    ASExperimentalTextNode |
                                     ASExperimentalInterfaceStateCoalescing |
                                     ASExperimentalUnfairLock |
                                     ASExperimentalLayerDefaults |
@@ -87,9 +87,10 @@
                      @"exp_network_image_queue",
                      @"exp_collection_teardown",
                      @"exp_framesetter_cache",
-                     @"exp_skip_clear_data"];
-  ASExperimentalFeatures expected = ASExperimentalTextNode |
-                                    ASExperimentalGraphicsContexts |
+                     @"exp_skip_clear_data",
+                     @"__invalid_name"];
+  ASExperimentalFeatures expected = ASExperimentalGraphicsContexts |
+                                    ASExperimentalTextNode |
                                     ASExperimentalInterfaceStateCoalescing |
                                     ASExperimentalUnfairLock |
                                     ASExperimentalLayerDefaults |
@@ -98,6 +99,65 @@
                                     ASExperimentalFramesetterCache |
                                     ASExperimentalSkipClearData;
   XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(names));
+}
+
+- (void)testFlagMatchName
+{
+  NSArray *names = @[
+    @"exp_graphics_contexts",
+    @"exp_text_node",
+    @"exp_interface_state_coalesce",
+    @"exp_unfair_lock",
+    @"exp_infer_layer_defaults",
+    @"exp_network_image_queue",
+    @"exp_collection_teardown",
+    @"exp_framesetter_cache",
+    @"exp_skip_clear_data"
+  ];
+  ASExperimentalFeatures features[] = {
+    ASExperimentalGraphicsContexts,
+    ASExperimentalTextNode,
+    ASExperimentalInterfaceStateCoalescing,
+    ASExperimentalUnfairLock,
+    ASExperimentalLayerDefaults,
+    ASExperimentalNetworkImageQueue,
+    ASExperimentalCollectionTeardown,
+    ASExperimentalFramesetterCache,
+    ASExperimentalSkipClearData
+  };
+  for (NSInteger i = 0; i < names.count; i++) {
+    XCTAssertEqual(features[i], ASExperimentalFeaturesFromArray(@[names[i]]));
+  }
+}
+
+- (void)testNameMatchFlag {
+  NSArray *names = @[
+    @"exp_graphics_contexts",
+    @"exp_text_node",
+    @"exp_interface_state_coalesce",
+    @"exp_unfair_lock",
+    @"exp_infer_layer_defaults",
+    @"exp_network_image_queue",
+    @"exp_collection_teardown",
+    @"exp_framesetter_cache",
+    @"exp_skip_clear_data"
+  ];
+  ASExperimentalFeatures features[] = {
+    ASExperimentalGraphicsContexts,
+    ASExperimentalTextNode,
+    ASExperimentalInterfaceStateCoalescing,
+    ASExperimentalUnfairLock,
+    ASExperimentalLayerDefaults,
+    ASExperimentalNetworkImageQueue,
+    ASExperimentalCollectionTeardown,
+    ASExperimentalFramesetterCache,
+    ASExperimentalSkipClearData
+  };
+
+  for (NSInteger i = 0; i < names.count; i++) {
+    NSLog(@"&&& %@", ASExperimentalFeaturesGetNames(features[i]));
+    XCTAssertEqualObjects(@[names[i]], ASExperimentalFeaturesGetNames(features[i]));
+  }
 }
 
 @end
