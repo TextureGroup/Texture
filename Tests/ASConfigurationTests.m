@@ -155,7 +155,6 @@
   };
 
   for (NSInteger i = 0; i < names.count; i++) {
-    NSLog(@"&&& %@", ASExperimentalFeaturesGetNames(features[i]));
     XCTAssertEqualObjects(@[names[i]], ASExperimentalFeaturesGetNames(features[i]));
   }
 }
