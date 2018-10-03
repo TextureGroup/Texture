@@ -1,11 +1,12 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayViewAccessibility] Added checking to the method accessibilityElementAtIndex:(NSInteger)index in order to avoid a crash when accessibility elements are empty
 - [ASPhotosFrameworkImageRequestTests] Guard photo library with macro for tests. [Max Wang](https://github.com/wsdwsd0829). [#1147](https://github.com/TextureGroup/Texture/pull/1147)
 - [ASDisplayNode] Do not cancel display when in exit hierarchy but let interface state changing to handle it. [Max Wang](https://github.com/wsdwsd0829). [#1110](https://github.com/TextureGroup/Texture/pull/1110)
 - [Breaking][ASDisplayNode] Make interface state delegate protocol required. [Max Wang](https://github.com/wsdwsd0829). [#1112](https://github.com/TextureGroup/Texture/pull/1112)
 - [ASCollectionView] Fix reording of cells manually for iOS 9 & 10. [Max Wang](https://github.com/wsdwsd0829). [#1081](https://github.com/TextureGroup/Texture/pull/1081)
 - [ASDisplayNode] Allow add/remove interface state delegates on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1090](https://github.com/TextureGroup/Texture/pull/1090)
-- [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077) 
+- [License] Simplify the Texture license to be pure Apache 2 (removing ASDK-Licenses).[Scott Goodson](https://github.com/appleguy) [#1077](https://github.com/TextureGroup/Texture/pull/1077)
 - [ASNetworkImageNode] Allow delegate methods to be called on background thread. [Max Wang](https://github.com/wsdwsd0829). [#1007](https://github.com/TextureGroup/Texture/pull/1007)
 - [ASLayoutTransition] Add support for preserving order after node moves during transitions. (This order defines the z-order as well.) [Kevin Smith](https://github.com/wiseoldduck) [#1006]
 - [ASDisplayNode] Adds support for multiple interface state delegates. [Garrett Moon](https://github.com/garrettmoon) [#979](https://github.com/TextureGroup/Texture/pull/979)
