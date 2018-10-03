@@ -1220,11 +1220,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
   ASDisplayNodeLogEvent(self, @"computedLayout: %@", layout);
 
-  // Return the (original) unflattened layout if it needs to be stored. The layout will be flattened later on (@see _locked_setCalculatedDisplayNodeLayout:).
-  // Otherwise, flatten it right away.
-  if (! [ASDisplayNode shouldStoreUnflattenedLayouts]) {
-    layout = [layout filteredNodeLayoutTree];
+  // PR #1157: Reduces accuracy of _unflattenedLayout for debugging/Weaver
+  if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
+      _unflattenedLayout = layout;
   }
+  layout = [layout filteredNodeLayoutTree];
   
   return layout;
 }
