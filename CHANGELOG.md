@@ -53,6 +53,7 @@
 - Remove display node's reliance on shared_ptr. [Adlai Holler](https://github.com/Adlai-Holler)
 - [ASCollectionView] Fix a crash that is caused by clearing a collection view's data while it's still being used. [Huy Nguyen](https://github.com/nguyenhuy) [#1154](https://github.com/TextureGroup/Texture/pull/1154)
 - Clean up timing of layout tree flattening/ copying of unflattened tree for Weaver. [Michael Zuccarino](https://github.com/mikezucc) [#1157](https://github.com/TextureGroup/Texture/pull/1157)
+- Fixed up issue where ASEditableTextNode wouldn't be accessible to VoiceOver. [Andrew Yates](https://github.com/ay8s) [#1157](https://github.com/TextureGroup/Texture/pull/1162)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
