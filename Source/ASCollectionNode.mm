@@ -820,7 +820,7 @@
   [self.view registerSupplementaryNodeOfKind:elementKind];
 }
 
-- (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchAnimated:(BOOL)animated updates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
@@ -835,7 +835,7 @@
   }
 }
 
-- (void)performBatchUpdates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchUpdates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   [self performBatchAnimated:UIView.areAnimationsEnabled updates:updates completion:completion];
 }

@@ -465,7 +465,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextContainer *container = layoutDict[@"container"];
   NSAttributedString *text = layoutDict[@"text"];
