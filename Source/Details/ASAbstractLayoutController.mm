@@ -8,7 +8,7 @@
 //
 
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
-
+#import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
 ASRangeTuningParameters const ASRangeTuningParametersZero = {};

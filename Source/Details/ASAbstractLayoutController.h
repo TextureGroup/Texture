@@ -10,8 +10,6 @@
 #import <AsyncDisplayKit/ASLayoutController.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-#include <vector>
-
 NS_ASSUME_NONNULL_BEGIN
 
 AS_EXTERN ASDirectionalScreenfulBuffer ASDirectionalScreenfulBufferHorizontal(ASScrollDirection scrollDirection, ASRangeTuningParameters rangeTuningParameters);
@@ -21,8 +19,6 @@ AS_EXTERN ASDirectionalScreenfulBuffer ASDirectionalScreenfulBufferVertical(ASSc
 AS_EXTERN CGRect CGRectExpandToRangeWithScrollableDirections(CGRect rect, ASRangeTuningParameters tuningParameters, ASScrollDirection scrollableDirections, ASScrollDirection scrollDirection);
 
 @interface ASAbstractLayoutController : NSObject <ASLayoutController>
-
-+ (std::vector<std::vector<ASRangeTuningParameters>>)defaultTuningParameters;
 
 @end
 
