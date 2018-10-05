@@ -172,11 +172,9 @@
       let tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
       for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
         ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
-        if (!ASRangeTuningParametersEqualToRangeTuningParameters(tuningParameters, ASRangeTuningParametersZero)) {
-          [_rangeController setTuningParameters:tuningParameters
-                                   forRangeMode:(ASLayoutRangeMode)rangeMode
-                                      rangeType:(ASLayoutRangeType)rangeType];
-        }
+        [_rangeController setTuningParameters:tuningParameters
+                                 forRangeMode:(ASLayoutRangeMode)rangeMode
+                                    rangeType:(ASLayoutRangeType)rangeType];
       }
     }
     
