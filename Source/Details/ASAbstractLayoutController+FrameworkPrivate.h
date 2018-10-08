@@ -16,6 +16,6 @@
 
 @interface ASAbstractLayoutController (FrameworkPrivate)
 
-+ (std::vector<std::vector<ASRangeTuningParameters>>)defaultTuningParameters;
++ (std::vector<std::vector<ASRangeTuningParameters>>)defaultTuningParameters; 
 
 @end
