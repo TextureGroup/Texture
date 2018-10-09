@@ -34,6 +34,11 @@
 - (ASLayoutElementStyle *)style
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_style];
+}
+
+- (ASLayoutElementStyle *)_locked_style
+{
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
