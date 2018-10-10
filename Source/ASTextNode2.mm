@@ -271,22 +271,22 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     attributedText = [[NSAttributedString alloc] initWithString:@"" attributes:nil];
   }
 
-  // Many accessors in this method will acquire the lock (including ASDisplayNode methods).
-  // Holding it for the duration of the method is more efficient in this case.
-  ASLockScopeSelf();
+  {
+    ASLockScopeSelf();
 
-  if (!ASCompareAssignCopy(_attributedText, attributedText)) {
-    return;
-  }
+    if (!ASCompareAssignCopy(_attributedText, attributedText)) {
+      return;
+    }
 
-  // Since truncation text matches style of attributedText, invalidate it now.
-  [self _locked_invalidateTruncationText];
+    // Since truncation text matches style of attributedText, invalidate it now.
+    [self _locked_invalidateTruncationText];
 
-  NSUInteger length = attributedText.length;
-  if (length > 0) {
-    ASLayoutElementStyle *style = [self _locked_style];
-    style.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    NSUInteger length = attributedText.length;
+    if (length > 0) {
+      ASLayoutElementStyle *style = [self _locked_style];
+      style.ascender = [[self class] ascenderWithAttributedString:attributedText];
+      style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    }
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -296,8 +296,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self setNeedsDisplay];
 
   // Accessiblity
-  self.accessibilityLabel = attributedText.string;
-  self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
+  let currentAttributedText = self.attributedText; // Grab attributed string again in case it changed in the meantime
+  self.accessibilityLabel = currentAttributedText.string;
+  self.isAccessibilityElement = (currentAttributedText.length != 0); // We're an accessibility element by default if there is a string.
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];
