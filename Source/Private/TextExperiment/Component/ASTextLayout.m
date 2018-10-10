@@ -732,9 +732,7 @@ dispatch_semaphore_signal(_lock);
     CGSize size = rect.size;
     if (container.verticalForm) {
       size.width += container.size.width - (rect.origin.x + rect.size.width);
-    } else {
-      size.width += rect.origin.x;
-    }
+    } 
     size.height += rect.origin.y;
     if (size.width < 0) size.width = 0;
     if (size.height < 0) size.height = 0;
