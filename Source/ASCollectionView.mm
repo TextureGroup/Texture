@@ -577,7 +577,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   ASDisplayNodeAssertMainThread();
   
-  if (_asyncDataSource == nil && _asyncDelegate == nil && !ASActivateExperimentalFeature(ASExperimentalSkipClearData)) {
+  if (_asyncDataSource == nil && _asyncDelegate == nil && _isDeallocating && ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
     [_dataController clearData];
   }
 }
@@ -921,7 +921,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchAnimated:(BOOL)animated updates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   ASDisplayNodeAssertMainThread();
   [self beginUpdates];
@@ -936,7 +936,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [self endUpdatesAnimated:animated completion:completion];
 }
 
-- (void)performBatchUpdates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchUpdates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   // We capture the current state of whether animations are enabled if they don't provide us with one.
   [self performBatchAnimated:[UIView areAnimationsEnabled] updates:updates completion:completion];
