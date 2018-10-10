@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASRangeController.h>
+#import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
 
 #pragma mark - _ASTablePendingState
 
@@ -54,7 +55,7 @@
   self = [super init];
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
-    _tuningParameters = std::vector<std::vector<ASRangeTuningParameters>> (ASLayoutRangeModeCount, std::vector<ASRangeTuningParameters> (ASLayoutRangeTypeCount, ASRangeTuningParametersZero));
+    _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
     _allowsSelection = YES;
     _allowsSelectionDuringEditing = NO;
     _allowsMultipleSelection = NO;
@@ -171,11 +172,9 @@
       let tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
       for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
         ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
-        if (!ASRangeTuningParametersEqualToRangeTuningParameters(tuningParameters, ASRangeTuningParametersZero)) {
-          [_rangeController setTuningParameters:tuningParameters
-                                   forRangeMode:(ASLayoutRangeMode)rangeMode
-                                      rangeType:(ASLayoutRangeType)rangeType];
-        }
+        [_rangeController setTuningParameters:tuningParameters
+                                 forRangeMode:(ASLayoutRangeMode)rangeMode
+                                    rangeType:(ASLayoutRangeType)rangeType];
       }
     }
     
