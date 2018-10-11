@@ -27,6 +27,7 @@
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASRangeController.h>
+#import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
 
 #pragma mark - _ASCollectionPendingState
 
@@ -62,7 +63,7 @@
   self = [super init];
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
-    _tuningParameters = std::vector<std::vector<ASRangeTuningParameters>> (ASLayoutRangeModeCount, std::vector<ASRangeTuningParameters> (ASLayoutRangeTypeCount, ASRangeTuningParametersZero));
+    _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
     _allowsSelection = YES;
     _allowsMultipleSelection = NO;
     _inverted = NO;
@@ -220,11 +221,9 @@
       let tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
       for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
         ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
-        if (!ASRangeTuningParametersEqualToRangeTuningParameters(tuningParameters, ASRangeTuningParametersZero)) {
-          [_rangeController setTuningParameters:tuningParameters
-                                   forRangeMode:(ASLayoutRangeMode)rangeMode
-                                      rangeType:(ASLayoutRangeType)rangeType];
-        }
+        [_rangeController setTuningParameters:tuningParameters
+                                 forRangeMode:(ASLayoutRangeMode)rangeMode
+                                    rangeType:(ASLayoutRangeType)rangeType];
       }
     }
     
@@ -820,7 +819,7 @@
   [self.view registerSupplementaryNodeOfKind:elementKind];
 }
 
-- (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchAnimated:(BOOL)animated updates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
@@ -835,7 +834,7 @@
   }
 }
 
-- (void)performBatchUpdates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchUpdates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   [self performBatchAnimated:UIView.areAnimationsEnabled updates:updates completion:completion];
 }

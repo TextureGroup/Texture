@@ -440,39 +440,46 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (attributedText == nil) {
     attributedText = [[NSAttributedString alloc] initWithString:@"" attributes:nil];
   }
-  
-  // Don't hold textLock for too long.
+
   {
     ASLockScopeSelf();
     if (ASObjectIsEqual(attributedText, _attributedText)) {
       return;
     }
 
-    _attributedText = ASCleanseAttributedStringOfCoreTextAttributes(attributedText);
-#if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
-	  [ASTextNode _registerAttributedText:_attributedText];
-#endif
-  }
-    
-  // Since truncation text matches style of attributedText, invalidate it now.
-  [self _invalidateTruncationText];
-  
-  NSUInteger length = _attributedText.length;
-  if (length > 0) {
-    self.style.ascender = [[self class] ascenderWithAttributedString:_attributedText];
-    self.style.descender = [[_attributedText attribute:NSFontAttributeName atIndex:length - 1 effectiveRange:NULL] descender];
-  }
+    NSAttributedString *cleanedAttributedString = ASCleanseAttributedStringOfCoreTextAttributes(attributedText);
 
+    // Invalidating the truncation text must be done while we still hold the lock. Because after we release it,
+    // another thread may set a new truncation text that will then be cleared by this thread, other may draw
+    // this soon-to-be-invalidated text.
+    [self _locked_invalidateTruncationText];
+
+    NSUInteger length = cleanedAttributedString.length;
+    if (length > 0) {
+      // Updating ascender and descender in one transaction while holding the lock.
+      ASLayoutElementStyle *style = [self _locked_style];
+      style.ascender = [[self class] ascenderWithAttributedString:cleanedAttributedString];
+      style.descender = [[attributedText attribute:NSFontAttributeName atIndex:cleanedAttributedString.length - 1 effectiveRange:NULL] descender];
+    }
+   
+    // Update attributed text with cleaned attributed string
+    _attributedText = cleanedAttributedString;
+  }
+  
   // Tell the display node superclasses that the cached layout is incorrect now
   [self setNeedsLayout];
 
   // Force display to create renderer with new size and redisplay with new string
   [self setNeedsDisplay];
   
-  
   // Accessiblity
-  self.accessibilityLabel = _attributedText.string;
-  self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
+  let currentAttributedText = self.attributedText; // Grab attributed string again in case it changed in the meantime
+  self.accessibilityLabel = currentAttributedText.string;
+  self.isAccessibilityElement = (currentAttributedText.length != 0); // We're an accessibility element by default if there is a string.
+
+#if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
+  [ASTextNode _registerAttributedText:_attributedText];
+#endif
 }
 
 #pragma mark - Text Layout
@@ -501,7 +508,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
                                                  textContainerInsets:_textContainerInset];
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(id)parameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(id)parameters isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextNodeDrawParameter *drawParameter = (ASTextNodeDrawParameter *)parameters;
   UIColor *backgroundColor = (isRasterizing || drawParameter == nil) ? nil : drawParameter->_backgroundColor;
@@ -1166,6 +1173,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 {
   if (ASLockedSelfCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
     [self _invalidateTruncationText];
+    [self setNeedsDisplay];
   }
 }
 
@@ -1173,6 +1181,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 {
   if (ASLockedSelfCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
     [self _invalidateTruncationText];
+    [self setNeedsDisplay];
   }
 }
 
@@ -1231,12 +1240,13 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (void)_invalidateTruncationText
 {
-  {
-    ASLockScopeSelf();
-    _composedTruncationText = nil;
-  }
+  ASLockScopeSelf();
+  [self _locked_invalidateTruncationText];
+}
 
-  [self setNeedsDisplay];
+- (void)_locked_invalidateTruncationText
+{
+  _composedTruncationText = nil;
 }
 
 /**
