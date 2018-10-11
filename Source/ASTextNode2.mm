@@ -235,11 +235,16 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   _textContainer.size = constrainedSize;
   [self _ensureTruncationText];
 
-  // If constrained width is max/inf, the text node is calculating its intrinsic size.
-  const BOOL calculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
+  // If the constrained size has max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
+  BOOL isCalculatingIntrinsicSize;
+  if (_textContainer.isVerticalForm) {
+    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
+  } else {
+    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
+  }
 
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
-  [self prepareAttributedString:mutableText forIntrinsicSize:calculatingIntrinsicSize];
+  [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:_textContainer text:mutableText];
   
   return layout.textBoundingSize;
@@ -324,7 +329,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString forIntrinsicSize:(BOOL)isForIntrinsicSize
+- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
 
@@ -381,7 +386,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [copiedContainer makeImmutable];
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
-  [self prepareAttributedString:mutableText forIntrinsicSize:NO];
+  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
   
   return @{
     @"container": copiedContainer,
