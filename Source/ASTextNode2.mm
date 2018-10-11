@@ -234,9 +234,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   _textContainer.size = constrainedSize;
   [self _ensureTruncationText];
-  
+
+  // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
+  BOOL isCalculatingIntrinsicSize;
+  if (_textContainer.isVerticalForm) {
+    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
+  } else {
+    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
+  }
+
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
-  [self prepareAttributedString:mutableText];
+  [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:_textContainer text:mutableText];
   
   return layout.textBoundingSize;
@@ -280,12 +288,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   // Since truncation text matches style of attributedText, invalidate it now.
-  [self _invalidateTruncationText];
-  
+  [self _locked_invalidateTruncationText];
+
   NSUInteger length = attributedText.length;
   if (length > 0) {
-    self.style.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    self.style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    ASLayoutElementStyle *style = [self _locked_style];
+    style.ascender = [[self class] ascenderWithAttributedString:attributedText];
+    style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -320,18 +329,31 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString
+- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
- 
-  // Apply paragraph style if needed
+
+  // Apply/Fix paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
-    if (style == nil || style.lineBreakMode == _truncationMode) {
+
+    const BOOL applyTruncationMode = (style != nil && style.lineBreakMode != _truncationMode);
+    // Only "left" and "justified" alignments are supported while calculating intrinsic size.
+    // Other alignments like "right", "center" and "natural" cause the size to be bigger than needed and thus should be ignored/overridden.
+    const BOOL forceLeftAlignment = (style != nil
+                                     && isForIntrinsicSize
+                                     && style.alignment != NSTextAlignmentLeft
+                                     && style.alignment != NSTextAlignmentJustified);
+    if (!applyTruncationMode && !forceLeftAlignment) {
       return;
     }
-    
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineBreakMode = _truncationMode;
+
+    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy];
+    if (applyTruncationMode) {
+      paragraphStyle.lineBreakMode = _truncationMode;
+    }
+    if (forceLeftAlignment) {
+      paragraphStyle.alignment = NSTextAlignmentLeft;
+    }
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
   
@@ -363,8 +385,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   copiedContainer.size = self.bounds.size;
   [copiedContainer makeImmutable];
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
-  
-  [self prepareAttributedString:mutableText];
+
+  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
   
   return @{
     @"container": copiedContainer,
@@ -465,7 +487,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextContainer *container = layoutDict[@"container"];
   NSAttributedString *text = layoutDict[@"text"];
@@ -1061,8 +1083,13 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (void)_invalidateTruncationText
 {
   ASLockScopeSelf();
-  _textContainer.truncationToken = nil;
+  [self _locked_invalidateTruncationText];
   [self setNeedsDisplay];
+}
+
+- (void)_locked_invalidateTruncationText
+{
+  _textContainer.truncationToken = nil;
 }
 
 /**

@@ -23,7 +23,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalNetworkImageQueue = 1 << 5,                 // exp_network_image_queue
   ASExperimentalCollectionTeardown = 1 << 6,                // exp_collection_teardown
   ASExperimentalFramesetterCache = 1 << 7,                  // exp_framesetter_cache
-  ASExperimentalSkipClearData = 1 << 8,                     // exp_skip_clear_data
+  ASExperimentalClearDataDuringDeallocation = 1 << 8,       // exp_clear_data_during_deallocation
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
