@@ -235,7 +235,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   _textContainer.size = constrainedSize;
   [self _ensureTruncationText];
 
-  // If the constrained size has max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
+  // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
   BOOL isCalculatingIntrinsicSize;
   if (_textContainer.isVerticalForm) {
     isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
@@ -338,7 +338,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
     const BOOL applyTruncationMode = (style != nil && style.lineBreakMode != _truncationMode);
     // Only "left" and "justified" alignments are supported while calculating intrinsic size.
-    // Other alignments such as "right" and "center" causes the text to be bigger than needed and thus should be ignored/overridden.
+    // Other alignments like "right", "center" and "natural" cause the size to be bigger than needed and thus should be ignored/overridden.
     const BOOL forceLeftAlignment = (style != nil
                                      && isForIntrinsicSize
                                      && style.alignment != NSTextAlignmentLeft
