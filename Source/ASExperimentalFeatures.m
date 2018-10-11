@@ -21,7 +21,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_dealloc_queue_v2",
                                       @"exp_collection_teardown",
                                       @"exp_framesetter_cache",
-                                      @"exp_skip_clear_data"]));
+                                      @"exp_clear_data_during_deallocation"]));
   
   if (flags == ASExperimentalFeatureAll) {
     return allNames;

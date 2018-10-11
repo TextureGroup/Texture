@@ -62,9 +62,9 @@
   return self;
 }
 
-- (void)performBlockWithLockedTextKitComponents:(void (^)(NSLayoutManager *,
-                                                          NSTextStorage *,
-                                                          NSTextContainer *))block
+- (void)performBlockWithLockedTextKitComponents:(NS_NOESCAPE void (^)(NSLayoutManager *,
+                                                                      NSTextStorage *,
+                                                                      NSTextContainer *))block
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   if (block) {

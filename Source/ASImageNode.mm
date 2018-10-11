@@ -323,7 +323,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   return drawParameters;
 }
 
-+ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
++ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
 {
   ASImageNodeDrawParameters *drawParameter = (ASImageNodeDrawParameters *)parameter;
 
