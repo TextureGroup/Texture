@@ -234,9 +234,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   _textContainer.size = constrainedSize;
   [self _ensureTruncationText];
-  
+
+  // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
+  BOOL isCalculatingIntrinsicSize;
+  if (_textContainer.isVerticalForm) {
+    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
+  } else {
+    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
+  }
+
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
-  [self prepareAttributedString:mutableText];
+  [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:_textContainer text:mutableText];
   
   return layout.textBoundingSize;
@@ -321,18 +329,31 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString
+- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
- 
-  // Apply paragraph style if needed
+
+  // Apply/Fix paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
-    if (style == nil || style.lineBreakMode == _truncationMode) {
+
+    const BOOL applyTruncationMode = (style != nil && style.lineBreakMode != _truncationMode);
+    // Only "left" and "justified" alignments are supported while calculating intrinsic size.
+    // Other alignments like "right", "center" and "natural" cause the size to be bigger than needed and thus should be ignored/overridden.
+    const BOOL forceLeftAlignment = (style != nil
+                                     && isForIntrinsicSize
+                                     && style.alignment != NSTextAlignmentLeft
+                                     && style.alignment != NSTextAlignmentJustified);
+    if (!applyTruncationMode && !forceLeftAlignment) {
       return;
     }
-    
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineBreakMode = _truncationMode;
+
+    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy];
+    if (applyTruncationMode) {
+      paragraphStyle.lineBreakMode = _truncationMode;
+    }
+    if (forceLeftAlignment) {
+      paragraphStyle.alignment = NSTextAlignmentLeft;
+    }
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
   
@@ -364,8 +385,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   copiedContainer.size = self.bounds.size;
   [copiedContainer makeImmutable];
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
-  
-  [self prepareAttributedString:mutableText];
+
+  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
   
   return @{
     @"container": copiedContainer,

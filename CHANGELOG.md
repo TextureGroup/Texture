@@ -55,6 +55,7 @@
 - [ASCollectionView] Fix a crash that is caused by clearing a collection view's data while it's still being used. [Huy Nguyen](https://github.com/nguyenhuy) [#1154](https://github.com/TextureGroup/Texture/pull/1154)
 - Clean up timing of layout tree flattening/ copying of unflattened tree for Weaver. [Michael Zuccarino](https://github.com/mikezucc) [#1157](https://github.com/TextureGroup/Texture/pull/1157)
 - Fix crash setting attributed text on multiple threads [Michael Schneider](https://github.com/maicki)
+- [ASTextNode2] Ignore certain text alignments while calculating intrinsic size [Huy Nguyen](https://github.com/nguyenhuy) [#1166](https://github.com/TextureGroup/Texture/pull/1166)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
