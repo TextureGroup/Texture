@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASImageNode] Fix incorrect contentsScale when pre-compositing rounded corners on images. [Jason Yu](https://github.com/yxztj). [#1152](https://github.com/TextureGroup/Texture/pull/1152)
 - [ASCollectionViewLayoutController] Set default tuning parameters before view is loaded. [Max Wang](https://github.com/wsdwsd0829). [#1158](https://github.com/TextureGroup/Texture/pull/1158)
 - [ASPhotosFrameworkImageRequestTests] Guard photo library with macro for tests. [Max Wang](https://github.com/wsdwsd0829). [#1147](https://github.com/TextureGroup/Texture/pull/1147)
 - [ASDisplayNode] Do not cancel display when in exit hierarchy but let interface state changing to handle it. [Max Wang](https://github.com/wsdwsd0829). [#1110](https://github.com/TextureGroup/Texture/pull/1110)
