@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol ASNetworkImageNodeDelegate, ASImageCacheProtocol, ASImageDownloaderProtocol;
+@protocol ASNetworkImageNodeDelegate, ASImageCacheProtocol, ASImageDownloaderProtocol, ASImageContainerProtocol;
 @class ASNetworkImageLoadInfo;
 
 
@@ -153,6 +153,19 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion Called on the main thread.
  */
 - (void)imageNodeDidStartFetchingData:(ASNetworkImageNode *)imageNode;
+
+/**
+ * Notification that the image node finished downloading an image, with additional info.
+ * Use this method if your app handles custom types.
+ * If implemented, this method will be called instead of `imageNode:didLoadImage:info`.
+ *
+ * @param imageNode The sender.
+ * @param imageContainer The newly-loaded image.
+ * @param info Additional information about the image load.
+ *
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
+ */
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImageContainer:(id<ASImageContainerProtocol>)imageContainer info:(ASNetworkImageLoadInfo *)info;
 
 /**
  * Notification that the image node finished downloading an image, with additional info.
