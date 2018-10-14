@@ -614,6 +614,8 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
 - (void)_lazilyLoadImageIfNecessary
 {
+  ASDisplayNodeAssertMainThread();
+
   [self lock];
     __weak id<ASNetworkImageNodeDelegate> delegate = _delegate;
     BOOL delegateDidStartFetchingData = _delegateFlags.delegateDidStartFetchingData;
