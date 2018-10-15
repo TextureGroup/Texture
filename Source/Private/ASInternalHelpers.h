@@ -2,17 +2,9 @@
 //  ASInternalHelpers.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASAvailability.h"
@@ -23,47 +15,41 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
+AS_EXTERN void ASInitializeFrameworkMainThread(void);
 
-void ASInitializeFrameworkMainThread(void);
+AS_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);
+AS_EXTERN BOOL ASDefaultAllowsEdgeAntialiasing(void);
 
-BOOL ASDefaultAllowsGroupOpacity(void);
-BOOL ASDefaultAllowsEdgeAntialiasing(void);
-
-BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector);
-BOOL ASSubclassOverridesClassSelector(Class superclass, Class subclass, SEL selector);
+AS_EXTERN BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector);
+AS_EXTERN BOOL ASSubclassOverridesClassSelector(Class superclass, Class subclass, SEL selector);
 
 /// Replace a method from the given class with a block and returns the original method IMP
-IMP ASReplaceMethodWithBlock(Class c, SEL origSEL, id block);
+AS_EXTERN IMP ASReplaceMethodWithBlock(Class c, SEL origSEL, id block);
 
 /// Dispatches the given block to the main queue if not already running on the main thread
-void ASPerformBlockOnMainThread(void (^block)(void));
+AS_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
 
 /// Dispatches the given block to a background queue with priority of DISPATCH_QUEUE_PRIORITY_DEFAULT if not already run on a background queue
-void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
+AS_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
 /// For deallocation of objects on a background thread without GCD overhead / thread explosion
-void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
+AS_EXTERN void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
 
-CGFloat ASScreenScale(void);
+AS_EXTERN CGFloat ASScreenScale(void);
 
-CGSize ASFloorSizeValues(CGSize s);
+AS_EXTERN CGSize ASFloorSizeValues(CGSize s);
 
-CGFloat ASFloorPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASFloorPixelValue(CGFloat f);
 
-CGPoint ASCeilPointValues(CGPoint p);
+AS_EXTERN CGPoint ASCeilPointValues(CGPoint p);
 
-CGSize ASCeilSizeValues(CGSize s);
+AS_EXTERN CGSize ASCeilSizeValues(CGSize s);
 
-CGFloat ASCeilPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASCeilPixelValue(CGFloat f);
 
-CGFloat ASRoundPixelValue(CGFloat f);
+AS_EXTERN CGFloat ASRoundPixelValue(CGFloat f);
 
-BOOL ASClassRequiresMainThreadDeallocation(Class _Nullable c);
-
-Class _Nullable ASGetClassFromType(const char * _Nullable type);
-
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN Class _Nullable ASGetClassFromType(const char * _Nullable type);
 
 ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
   switch (info) {

@@ -2,12 +2,8 @@
 //  ASGraphicsContext.m
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASGraphicsContext.h"
@@ -41,7 +37,7 @@ static UInt8 __contextDataAssociationKey;
 
 #pragma mark - Graphics Contexts
 
-extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
+void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale)
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
@@ -106,7 +102,7 @@ extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGF
   CGContextRelease(context);
 }
 
-extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
+UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_RETAINED
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
@@ -160,7 +156,7 @@ extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext() NS_RETURNS_R
   return result;
 }
 
-extern void ASGraphicsEndImageContext()
+void ASGraphicsEndImageContext()
 {
   if (!ASActivateExperimentalFeature(ASExperimentalGraphicsContexts)) {
     UIGraphicsEndImageContext();

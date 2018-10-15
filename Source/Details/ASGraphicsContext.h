@@ -2,12 +2,8 @@
 //  ASGraphicsContext.h
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
@@ -29,28 +25,26 @@
  */
 
 NS_ASSUME_NONNULL_BEGIN
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  * Creates a one-shot context.
  *
  * Behavior is the same as UIGraphicsBeginImageContextWithOptions.
  */
-extern void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale);
+AS_EXTERN void ASGraphicsBeginImageContextWithOptions(CGSize size, BOOL opaque, CGFloat scale);
 
 /**
  * Generates and image and ends the current one-shot context.
  *
  * Behavior is the same as UIGraphicsGetImageFromCurrentImageContext followed by UIGraphicsEndImageContext.
  */
-extern UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext(void) NS_RETURNS_RETAINED;
+AS_EXTERN UIImage * _Nullable ASGraphicsGetImageAndEndCurrentContext(void) NS_RETURNS_RETAINED;
 
 /**
  * Call this if you want to end the current context without making an image.
  *
  * Behavior is the same as UIGraphicsEndImageContext.
  */
-extern void ASGraphicsEndImageContext(void);
+AS_EXTERN void ASGraphicsEndImageContext(void);
 
-ASDISPLAYNODE_EXTERN_C_END
 NS_ASSUME_NONNULL_END

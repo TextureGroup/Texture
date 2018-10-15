@@ -2,17 +2,9 @@
 //  ASNetworkImageNode.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASImageNode.h>
@@ -54,7 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The delegate, which must conform to the <ASNetworkImageNodeDelegate> protocol.
  */
-@property (nullable, nonatomic, weak, readwrite) id<ASNetworkImageNodeDelegate> delegate;
+@property (nullable, weak) id<ASNetworkImageNodeDelegate> delegate;
+
+/**
+ * The delegate will receive callbacks on main thread. Default to YES.
+ */
+@property (class) BOOL useMainThreadDelegateCallbacks;
 
 /**
  * The image to display.
@@ -65,14 +62,14 @@ NS_ASSUME_NONNULL_BEGIN
  * (<defaultImage>) image while loading and the final image after the new image data was downloaded and processed.
  * If you want to use a placholder image functionality use the defaultImage property instead.
  */
-@property (nullable, nonatomic, strong) UIImage *image;
+@property (nullable) UIImage *image;
 
 /**
  * A placeholder image to display while the URL is loading. This is slightly different than placeholderImage in the
  * ASDisplayNode superclass as defaultImage will *not* be displayed synchronously. If you wish to have the image
  * displayed synchronously, use @c placeholderImage.
  */
-@property (nullable, nonatomic, strong, readwrite) UIImage *defaultImage;
+@property (nullable) UIImage *defaultImage;
 
 /**
  * The URL of a new image to download and display.
@@ -81,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
  * directly set images to the image property will be cleared out and replaced by the placeholder (<defaultImage>) image
  * while loading and the final image after the new image data was downloaded and processed.
  */
-@property (nullable, nonatomic, strong, readwrite) NSURL *URL;
+@property (nullable, copy) NSURL *URL;
 
 /**
   * An array of URLs of increasing cost to download.
@@ -93,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
   * @deprecated This API has been removed for now due to the increased complexity to the class that it brought.
   * Please use .URL instead.
   */
-@property (nullable, nonatomic, strong, readwrite) NSArray <NSURL *> *URLs ASDISPLAYNODE_DEPRECATED_MSG("Please use URL instead.");
+@property (nullable, copy) NSArray <NSURL *> *URLs ASDISPLAYNODE_DEPRECATED_MSG("Please use URL instead.");
 
 /**
  * Download and display a new image.
@@ -110,14 +107,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * If <URL> is a local file, set this property to YES to take advantage of UIKit's image caching.  Defaults to YES.
  */
-@property (nonatomic, assign, readwrite) BOOL shouldCacheImage;
+@property BOOL shouldCacheImage;
 
 /**
  * If the downloader implements progressive image rendering and this value is YES progressive renders of the
  * image will be displayed as the image downloads. Regardless of this properties value, progress renders will
  * only occur when the node is visible. Defaults to YES.
  */
-@property (nonatomic, assign, readwrite) BOOL shouldRenderProgressImages;
+@property BOOL shouldRenderProgressImages;
 
 /**
  * The image quality of the current image.
@@ -129,12 +126,12 @@ NS_ASSUME_NONNULL_BEGIN
  * If the URL is unset, this is 1 if defaultImage or image is set to non-nil.
  *
  */
-@property (nonatomic, assign, readonly) CGFloat currentImageQuality;
+@property (readonly) CGFloat currentImageQuality;
 
 /**
  * The currentImageQuality (value between 0 and 1) of the last image that completed displaying.
  */
-@property (nonatomic, assign, readonly) CGFloat renderedImageQuality;
+@property (readonly) CGFloat renderedImageQuality;
 
 @end
 
@@ -149,6 +146,15 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 /**
+ * Notification that the image node started to load
+ *
+ * @param imageNode The sender.
+ *
+ * @discussion Called on the main thread.
+ */
+- (void)imageNodeDidStartFetchingData:(ASNetworkImageNode *)imageNode;
+
+/**
  * Notification that the image node finished downloading an image, with additional info.
  * If implemented, this method will be called instead of `imageNode:didLoadImage:`.
  *
@@ -156,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param image The newly-loaded image.
  * @param info Additional information about the image load.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info;
 
@@ -166,18 +172,9 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param image The newly-loaded image.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image;
-
-/**
- * Notification that the image node started to load
- *
- * @param imageNode The sender.
- *
- * @discussion Called on a background queue.
- */
-- (void)imageNodeDidStartFetchingData:(ASNetworkImageNode *)imageNode;
 
 /**
  * Notification that the image node failed to download the image.
@@ -185,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param imageNode The sender.
  * @param error The error with details.
  *
- * @discussion Called on a background queue.
+ * @discussion Called on the main thread if useMainThreadDelegateCallbacks=YES (the default), otherwise on a background thread.
  */
 - (void)imageNode:(ASNetworkImageNode *)imageNode didFailWithError:(NSError *)error;
 
@@ -193,6 +190,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Notification that the image node finished decoding an image.
  *
  * @param imageNode The sender.
+ *
+ * @discussion Called on the main thread.
  */
 - (void)imageNodeDidFinishDecoding:(ASNetworkImageNode *)imageNode;
 

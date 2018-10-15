@@ -2,17 +2,9 @@
 //  ASTableView+Undeprecated.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
@@ -31,22 +23,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ASTableView (Undeprecated)
 
-@property (nonatomic, weak) id<ASTableDelegate>   asyncDelegate;
-@property (nonatomic, weak) id<ASTableDataSource> asyncDataSource;
-@property (nonatomic, assign) UIEdgeInsets contentInset;
-@property (nonatomic, assign) CGPoint contentOffset;
-@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
-@property (nonatomic, assign) BOOL inverted;
-@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForVisibleRows;
-@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedRows;
-@property (nonatomic, readonly, nullable) NSIndexPath *indexPathForSelectedRow;
+@property (nullable, nonatomic, weak) id<ASTableDelegate>   asyncDelegate;
+@property (nullable, nonatomic, weak) id<ASTableDataSource> asyncDataSource;
+@property (nonatomic) UIEdgeInsets contentInset;
+@property (nonatomic) CGPoint contentOffset;
+@property (nonatomic) BOOL automaticallyAdjustsContentOffset;
+@property (nonatomic) BOOL inverted;
+@property (nullable, nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleRows;
+@property (nullable, nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForSelectedRows;
+@property (nullable, nonatomic, readonly) NSIndexPath *indexPathForSelectedRow;
 
 /**
  * The number of screens left to scroll before the delegate -tableView:beginBatchFetchingWithContext: is called.
  *
  * Defaults to two screenfuls.
  */
-@property (nonatomic, assign) CGFloat leadingScreensForBatching;
+@property (nonatomic) CGFloat leadingScreensForBatching;
 
 /**
  * Initializer.

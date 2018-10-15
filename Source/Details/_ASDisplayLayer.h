@@ -2,17 +2,9 @@
 //  _ASDisplayLayer.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <UIKit/UIKit.h>
@@ -37,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @default YES (note that this might change for subclasses)
  */
-@property (nonatomic, assign) BOOL displaysAsynchronously;
+@property (nonatomic) BOOL displaysAsynchronously;
 
 /**
  @summary Cancels any pending async display.
@@ -59,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @desc The asyncDelegate will have the opportunity to override the methods related to async display.
  */
-@property (nullable, atomic, weak) id<_ASDisplayLayerDelegate> asyncDelegate;
+@property (nullable, weak) id<_ASDisplayLayerDelegate> asyncDelegate;
 
 /**
  @summary Suspends both asynchronous and synchronous display of the receiver if YES.
@@ -69,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @default NO
  */
-@property (nonatomic, assign, getter=isDisplaySuspended) BOOL displaySuspended;
+@property (nonatomic, getter=isDisplaySuspended) BOOL displaySuspended;
 
 /**
  @summary Bypasses asynchronous rendering and performs a blocking display immediately on the current thread.

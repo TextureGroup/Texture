@@ -2,21 +2,14 @@
 //  ASRunLoopQueue.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASLocking.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 AS_SUBCLASSING_RESTRICTED
-@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <NSLocking>
+@interface ASRunLoopQueue<ObjectType> : ASAbstractRunLoopQueue <ASLocking>
 
 /**
  * Create a new queue with the given run loop and handler.
@@ -48,19 +41,19 @@ AS_SUBCLASSING_RESTRICTED
 
 - (void)enqueue:(ObjectType)object;
 
-@property (atomic, readonly) BOOL isEmpty;
+@property (readonly) BOOL isEmpty;
 
-@property (nonatomic, assign) NSUInteger batchSize;           // Default == 1.
-@property (nonatomic, assign) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
+@property (nonatomic) NSUInteger batchSize;           // Default == 1.
+@property (nonatomic) BOOL ensureExclusiveMembership; // Default == YES.  Set-like behavior.
 
 @end
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
-@property (atomic, readonly) BOOL isEmpty;
+@property (readonly) BOOL isEmpty;
 
-@property (atomic, readonly, getter=isEnabled) BOOL enabled;
+@property (readonly, getter=isEnabled) BOOL enabled;
 
 /**
  * The queue to run on main run loop before CATransaction commit.
@@ -69,21 +62,19 @@ AS_SUBCLASSING_RESTRICTED
  * to get last chance of updating/coalesce info like interface state.
  * Each node will only be called once per transaction commit to reflect interface change.
  */
-@property (class, atomic, readonly) ASCATransactionQueue *sharedQueue;
+@property (class, readonly) ASCATransactionQueue *sharedQueue;
 + (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
 
 @end
 
-
-AS_SUBCLASSING_RESTRICTED
 @interface ASDeallocQueue : NSObject
 
-@property (class, atomic, readonly) ASDeallocQueue *sharedDeallocationQueue;
+@property (class, readonly) ASDeallocQueue *sharedDeallocationQueue;
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
 
-- (void)test_drain;
+- (void)drain;
 
 - (void)releaseObjectInBackground:(id __strong _Nullable * _Nonnull)objectPtr;
 

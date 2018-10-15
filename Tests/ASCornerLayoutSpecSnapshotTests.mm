@@ -2,12 +2,8 @@
 //  ASCornerLayoutSpecSnapshotTests.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASLayoutSpecSnapshotTestsHelper.h"
@@ -23,16 +19,16 @@ typedef NS_ENUM(NSInteger, ASCornerLayoutSpecSnapshotTestsOffsetOption) {
 
 @interface ASCornerLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 
-@property (nonatomic, strong) UIColor *boxColor;
-@property (nonatomic, strong) UIColor *baseColor;
-@property (nonatomic, strong) UIColor *cornerColor;
-@property (nonatomic, strong) UIColor *contextColor;
+@property (nonatomic, copy) UIColor *boxColor;
+@property (nonatomic, copy) UIColor *baseColor;
+@property (nonatomic, copy) UIColor *cornerColor;
+@property (nonatomic, copy) UIColor *contextColor;
 
-@property (nonatomic, assign) CGSize baseSize;
-@property (nonatomic, assign) CGSize cornerSize;
-@property (nonatomic, assign) CGSize contextSize;
+@property (nonatomic) CGSize baseSize;
+@property (nonatomic) CGSize cornerSize;
+@property (nonatomic) CGSize contextSize;
 
-@property (nonatomic, assign) ASSizeRange contextSizeRange;
+@property (nonatomic) ASSizeRange contextSizeRange;
 
 @end
 

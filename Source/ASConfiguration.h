@@ -2,12 +2,8 @@
 //  ASConfiguration.h
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
@@ -35,7 +31,7 @@ AS_SUBCLASSING_RESTRICTED
  * The delegate for configuration-related events.
  * Delegate methods are called from a serial queue.
  */
-@property (nonatomic, strong, nullable) id<ASConfigurationDelegate> delegate;
+@property (nonatomic, nullable) id<ASConfigurationDelegate> delegate;
 
 /**
  * The experimental features to enable in Texture.
