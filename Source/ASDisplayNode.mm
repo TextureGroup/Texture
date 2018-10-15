@@ -3631,6 +3631,26 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _isAccessibilityContainer;
 }
 
+- (NSString *)defaultAccessibilityLabel {
+  return nil;
+}
+
+- (NSString *)defaultAccessibilityHint {
+  return nil;
+}
+
+- (NSString *)defaultAccessibilityValue {
+  return nil;
+}
+
+- (NSString *)defaultAccessibilityIdentifier {
+  return nil;
+}
+
+- (UIAccessibilityTraits)defaultAccessibilityTraits {
+  return UIAccessibilityTraitNone;
+}
+
 #pragma mark - Debugging (Private)
 
 #if ASEVENTLOG_ENABLE

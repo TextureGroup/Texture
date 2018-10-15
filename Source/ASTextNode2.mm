@@ -115,7 +115,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     
     // Accessibility
     self.isAccessibilityElement = YES;
-    self.accessibilityTraits = UIAccessibilityTraitStaticText;
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
     
     // Placeholders
     // Disabled by default in ASDisplayNode, but add a few options for those who toggle
@@ -207,6 +207,15 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
   }
   return YES;
+}
+
+- (NSString *)defaultAccessibilityLabel {
+  ASLockScopeSelf();
+  return _attributedText.string;
+}
+
+- (UIAccessibilityTraits)defaultAccessibilityTraits {
+  return UIAccessibilityTraitStaticText;
 }
 
 #pragma mark - Layout and Sizing

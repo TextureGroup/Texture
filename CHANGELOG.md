@@ -57,6 +57,7 @@
 - Clean up timing of layout tree flattening/ copying of unflattened tree for Weaver. [Michael Zuccarino](https://github.com/mikezucc) [#1157](https://github.com/TextureGroup/Texture/pull/1157)
 - Fix crash setting attributed text on multiple threads [Michael Schneider](https://github.com/maicki)
 - [ASTextNode2] Ignore certain text alignments while calculating intrinsic size [Huy Nguyen](https://github.com/nguyenhuy) [#1166](https://github.com/TextureGroup/Texture/pull/1166)
+- [ASDisplayNode] Expose default Texture-set accessibility values as properties. [Jia Wern Lim](https://github.com/jiawernlim)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
