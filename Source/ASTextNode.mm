@@ -28,6 +28,8 @@
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
 #import <AsyncDisplayKit/ASTextKitShadower.h>
 
+#import <AsyncDisplayKit/ASTextLayout.h>
+
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 
@@ -1382,6 +1384,14 @@ static NSAttributedString *DefaultTruncationAttributedString()
   } else {
     return [super allocWithZone:zone];
   }
+}
+
+#pragma mark - Unavailable
+
+- (ASTextLayout *)textLayoutForConstraint:(ASSizeRange)constrainedSize
+{
+  ASDisplayNodeFailAssert(@"This method is only available in ASTextNode2");
+  return nil;
 }
 
 @end

@@ -11,6 +11,8 @@
 
 #import <AsyncDisplayKit/ASTextNode.h>
 
+@class ASTextLayout;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASTextNode ()
@@ -34,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Returns YES if this node is using the experimental implementation. NO otherwise. Will not change.
  */
 @property (readonly) BOOL usingExperiment;
+
+/*
+ * Returns layout for textNode that fit to constrainedSize's max size.
+ */
+- (ASTextLayout *)textLayoutForConstraint:(ASSizeRange)constrainedSize;
 
 @end
 
