@@ -426,7 +426,7 @@ dispatch_semaphore_signal(_lock);
   // It may use larger constraint size when create CTFrame with
   // CTFramesetterCreateFrame in iOS 10.
   BOOL needFixLayoutSizeBug = AS_AT_LEAST_IOS10;
-  
+
   layout = [[ASTextLayout alloc] _init];
   layout.text = text;
   layout.container = container;
@@ -820,23 +820,33 @@ dispatch_semaphore_signal(_lock);
             }
           }
           int i = 0;
-          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content
+          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content.
             i = removedLines.count - 1;
             while (atLeastOneLine < truncatedWidth && i >= 0) {
+              if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
+                [lastLineText deleteCharactersInRange:NSMakeRange(lastLineText.string.length - 1, 1)];
+                break;
+              }
               [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
               atLeastOneLine += removedLines[i--].width;
             }
             [lastLineText appendAttributedString:truncationToken];
           }
-          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants text following truncated content
+          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants text following truncated content.
             i = 0;
             atLeastOneLine = removedLines[i].width;
             while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
               atLeastOneLine += removedLines[i++].width;
             }
             for (i--; i >= 0; i--) {
-              [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
+              NSAttributedString *nextLine = [text attributedSubstringFromRange:removedLines[i].range];
+              if ([nextLine.string characterAtIndex:nextLine.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
+                lastLineText = [NSMutableAttributedString new];
+              } else {
+                [lastLineText appendAttributedString:nextLine];
+              }
             }
+            [lastLineText insertAttributedString:truncationToken atIndex:0];
           }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
