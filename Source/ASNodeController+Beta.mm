@@ -7,10 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
+#import <AsyncDisplayKit/ASThread.h>
+#import <AsyncDisplayKit/ASWeakProxy.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
@@ -18,15 +19,18 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
+  ASDN::RecursiveMutex __instanceLock__;
 }
 
 - (void)loadNode
 {
+  ASLockScopeSelf();
   self.node = [[ASDisplayNode alloc] init];
 }
 
 - (ASDisplayNode *)node
 {
+  ASLockScopeSelf();
   if (_node == nil) {
     [self loadNode];
   }
@@ -35,6 +39,7 @@
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
 {
+  ASLockScopeSelf();
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
@@ -51,11 +56,13 @@
 
 - (void)setNode:(ASDisplayNode *)node
 {
+  ASLockScopeSelf();
   [self setupReferencesWithNode:node];
 }
 
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
 {
+  ASLockScopeSelf();
   if (_shouldInvertStrongReference != shouldInvertStrongReference) {
     // Because the BOOL controls which ivar we access, get the node before toggling.
     ASDisplayNode *node = _node;
@@ -82,11 +89,24 @@
 
 - (void)hierarchyDisplayDidFinish {}
 
+#pragma mark NSLocking
+
+- (void)lock
+{
+  __instanceLock__.lock();
+}
+
+- (void)unlock
+{
+  __instanceLock__.unlock();
+}
+
 @end
 
 @implementation ASDisplayNode (ASNodeController)
 
-- (ASNodeController *)nodeController {
+- (ASNodeController *)nodeController
+{
   return _weakNodeController ?: _strongNodeController;
 }
 
