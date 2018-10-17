@@ -738,8 +738,8 @@ dispatch_semaphore_signal(_lock);
     size.height += rect.origin.y;
     if (size.width < 0) size.width = 0;
     if (size.height < 0) size.height = 0;
-    size.width = ceil(size.width);
-    size.height = ceil(size.height);
+    size.width = ASCeilPixelValue(size.width);
+    size.height = ASCeilPixelValue(size.height);
     textBoundingSize = size;
   }
   
