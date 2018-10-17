@@ -3278,15 +3278,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // subclass override
   ASDisplayNodeAssertMainThread();
-  ASAssertUnlocked(__instanceLock__);
-
+  
   // Rasterized node's loading state is merged with root node of rasterized tree.
   if (!(self.hierarchyState & ASHierarchyStateRasterized)) {
     ASDisplayNodeAssert(self.isNodeLoaded, @"Node should be loaded before entering visible state.");
   }
+
+  ASAssertUnlocked(__instanceLock__);
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
     [del didEnterVisibleState];
   }];
+  
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
