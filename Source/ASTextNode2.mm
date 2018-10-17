@@ -332,22 +332,44 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
+  NSLineBreakMode innerMode;
+  switch (_truncationMode) {
+    case NSLineBreakByWordWrapping:
+    case NSLineBreakByCharWrapping:
+    case NSLineBreakByClipping:
+      innerMode = _truncationMode;
+      break;
+    default:
+      innerMode = NSLineBreakByWordWrapping;
+  }
 
   // Apply/Fix paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
 
-    const BOOL applyTruncationMode = (style != nil && style.lineBreakMode != _truncationMode);
+    BOOL applyTruncationMode = YES;
+    NSMutableParagraphStyle *paragraphStyle = nil;
     // Only "left" and "justified" alignments are supported while calculating intrinsic size.
     // Other alignments like "right", "center" and "natural" cause the size to be bigger than needed and thus should be ignored/overridden.
     const BOOL forceLeftAlignment = (style != nil
                                      && isForIntrinsicSize
                                      && style.alignment != NSTextAlignmentLeft
                                      && style.alignment != NSTextAlignmentJustified);
+    if (style != nil) {
+      if (innerMode == style.lineBreakMode) {
+        applyTruncationMode = NO;
+      }
+      paragraphStyle = [style mutableCopy];
+    } else {
+      if (innerMode == NSLineBreakByWordWrapping) {
+        applyTruncationMode = NO;
+      }
+      paragraphStyle = [NSMutableParagraphStyle new];
+    }
     if (!applyTruncationMode && !forceLeftAlignment) {
       return;
     }
+    paragraphStyle.lineBreakMode = innerMode;
 
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy];
     if (applyTruncationMode) {
       paragraphStyle.lineBreakMode = _truncationMode;
     }
@@ -356,7 +378,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
-  
+
   // Apply shadow if needed
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
     NSShadow *shadow = [[NSShadow alloc] init];
