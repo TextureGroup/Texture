@@ -2,15 +2,12 @@
 //  ASRecursiveUnfairLock.h
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <pthread/pthread.h>
 #import <os/lock.h>
 
@@ -32,18 +29,16 @@ typedef struct {
   int _count;                  // Protected by lock
 } ASRecursiveUnfairLock;
 
-CF_EXTERN_C_BEGIN
-
 /**
  * Lock, blocking if needed.
  */
-OS_UNFAIR_LOCK_AVAILABILITY
+AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l);
 
 /**
  * Try to lock without blocking. Returns whether we took the lock.
  */
-OS_UNFAIR_LOCK_AVAILABILITY
+AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
 
 /**
@@ -51,9 +46,7 @@ BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
  * the lock will result in an assertion failure, and undefined
  * behavior if foundation assertions are disabled.
  */
-OS_UNFAIR_LOCK_AVAILABILITY
+AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockUnlock(ASRecursiveUnfairLock *l);
-
-CF_EXTERN_C_END
 
 NS_ASSUME_NONNULL_END

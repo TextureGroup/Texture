@@ -2,26 +2,22 @@
 //  ASTextKitComponents.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 
 #import <tgmath.h>
 
-@interface ASTextKitComponentsTextView ()
-@property (atomic, assign) CGRect threadSafeBounds;
+@interface ASTextKitComponentsTextView () {
+  // Prevent UITextView from updating contentOffset while deallocating: https://github.com/TextureGroup/Texture/issues/860
+  BOOL _deallocating;
+}
+@property CGRect threadSafeBounds;
 @end
 
 @implementation ASTextKitComponentsTextView
@@ -31,8 +27,14 @@
   self = [super initWithFrame:frame textContainer:textContainer];
   if (self) {
     _threadSafeBounds = self.bounds;
+    _deallocating = NO;
   }
   return self;
+}
+
+- (void)dealloc
+{
+  _deallocating = YES;
 }
 
 - (void)setFrame:(CGRect)frame
@@ -49,14 +51,24 @@
   self.threadSafeBounds = bounds;
 }
 
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+  if (_deallocating) {
+    return;
+  }
+  
+  [super setContentOffset:contentOffset];
+}
+
+
 @end
 
 @interface ASTextKitComponents ()
 
 // read-write redeclarations
-@property (nonatomic, strong, readwrite) NSTextStorage *textStorage;
-@property (nonatomic, strong, readwrite) NSTextContainer *textContainer;
-@property (nonatomic, strong, readwrite) NSLayoutManager *layoutManager;
+@property (nonatomic) NSTextStorage *textStorage;
+@property (nonatomic) NSTextContainer *textContainer;
+@property (nonatomic) NSLayoutManager *layoutManager;
 
 @end
 
@@ -90,6 +102,11 @@
   [components.layoutManager addTextContainer:components.textContainer];
 
   return components;
+}
+
++ (BOOL)needsMainThreadDeallocation
+{
+  return YES;
 }
 
 #pragma mark - Lifecycle

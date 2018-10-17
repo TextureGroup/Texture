@@ -2,17 +2,9 @@
 //  ASScrollNode.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASDisplayNode.h>
@@ -30,16 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract The node's UIScrollView.
  */
-@property (nonatomic, readonly, strong) UIScrollView *view;
+@property (readonly) UIScrollView *view;
 
 /**
  * @abstract When enabled, the size calculated by the node's layout spec is used as
  * the .contentSize of the scroll view, instead of the bounds size.  The bounds is instead
  * allowed to match the parent's size (whenever it is finite - otherwise, the bounds size
  * also grows to the full contentSize).  It also works with .layoutSpecBlock().
- * NOTE: Most users of ASScrollView will want to use this, and may be enabled by default later.
+ * NOTE: Most users of ASScrollNode will want to use this, and may be enabled by default later.
  */
-@property (nonatomic, assign) BOOL automaticallyManagesContentSize;
+@property BOOL automaticallyManagesContentSize;
 
 /**
  * @abstract This property controls how the constrainedSize is interpreted when sizing the content.
@@ -51,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Vertical & Horizontal: the constrainedSize is interpreted as unbounded in both directions.
  * @default ASScrollDirectionVerticalDirections
  */
-@property (nonatomic, assign) ASScrollDirection scrollableDirections;
+@property ASScrollDirection scrollableDirections;
 
 @end
 

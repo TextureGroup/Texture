@@ -2,12 +2,8 @@
 //  ASPageTable.h
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
@@ -19,8 +15,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-
 /**
  * Represents x and y coordinates of a page.
  */
@@ -29,7 +23,7 @@ typedef uintptr_t ASPageCoordinate;
 /**
  * Returns a page coordinate with the given x and y values. Both of them must be less than 65,535.
  */
-extern ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_UNUSED_RESULT;
+AS_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_UNUSED_RESULT;
 
 /**
  * Returns coordinate of the page that contains the specified point.
@@ -39,13 +33,13 @@ extern ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_UNU
  *
  * @param pageSize The size of each page.
  */
-extern ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize) AS_WARN_UNUSED_RESULT;
+AS_EXTERN ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
-extern uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
+AS_EXTERN uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
 
-extern uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
+AS_EXTERN uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
 
-extern CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize) AS_WARN_UNUSED_RESULT;
+AS_EXTERN CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
 /**
  * Returns coordinate pointers for pages that intersect the specified rect. For each pointer, use ASPageCoordinateFromPointer() to get the original coordinate.
@@ -57,9 +51,7 @@ extern CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSiz
  *
  * @param pageSize The size of each page.
  */
-extern NSPointerArray * _Nullable ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize) AS_WARN_UNUSED_RESULT;
-
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN NSPointerArray * _Nullable ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
 /**
  * An alias for an NSMapTable created to store objects using ASPageCoordinates as keys.

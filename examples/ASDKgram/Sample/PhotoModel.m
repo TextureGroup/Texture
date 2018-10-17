@@ -2,17 +2,9 @@
 //  PhotoModel.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) through the present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "PhotoModel.h"
@@ -22,41 +14,30 @@
 {
   NSDictionary     *_dictionaryRepresentation;
   NSString         *_uploadDateRaw;
-  CommentFeedModel *_commentFeed;
-}
-
-#pragma mark - Properties
-
-- (CommentFeedModel *)commentFeed
-{
-  if (!_commentFeed) {
-    _commentFeed = [[CommentFeedModel alloc] initWithPhotoID:_photoID];
-  }
-  
-  return _commentFeed;
 }
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWith500pxPhoto:(NSDictionary *)photoDictionary
+- (instancetype)initWithUnsplashPhoto:(NSDictionary *)photoDictionary
 {
   self = [super init];
   
   if (self) {
     _dictionaryRepresentation = photoDictionary;
     _uploadDateRaw            = [photoDictionary objectForKey:@"created_at"];
-    _photoID                  = [[photoDictionary objectForKey:@"id"] description];
-    _title                    = [photoDictionary objectForKey:@"title"];
-    _descriptionText          = [photoDictionary valueForKeyPath:@"name"];
-    _commentsCount            = [[photoDictionary objectForKey:@"comments_count"] integerValue];
-    _likesCount               = [[photoDictionary objectForKey:@"positive_votes_count"] integerValue];
+    _photoID                  = [photoDictionary objectForKey:@"id"];
+    _descriptionText          = [photoDictionary valueForKeyPath:@"description"];
+    _likesCount               = [[photoDictionary objectForKey:@"likes"] integerValue];
+    _location                 = [photoDictionary objectForKey:@"location"];
     
-    NSString *urlString       = [[photoDictionary objectForKey:@"image_url"] firstObject];
+    NSString *urlString       = [photoDictionary objectForKey:@"urls"][@"regular"];
     _URL                      = urlString ? [NSURL URLWithString:urlString] : nil;
     
-    _location                 = [[LocationModel alloc] initWith500pxPhoto:photoDictionary];
-    _ownerUserProfile         = [[UserModel alloc] initWith500pxPhoto:photoDictionary];
+    _ownerUserProfile         = [[UserModel alloc] initWithUnsplashPhoto:photoDictionary];
     _uploadDateString         = [NSString elapsedTimeStringSinceDate:_uploadDateRaw];
+    
+    _height = [[photoDictionary objectForKey:@"height"] integerValue];
+    _width = [[photoDictionary objectForKey:@"width"] integerValue];
   }
   
   return self;
@@ -88,7 +69,7 @@
 
 - (NSAttributedString *)locationAttributedStringWithFontSize:(CGFloat)size
 {
-  return [NSAttributedString attributedStringWithString:self.location.locationString fontSize:size color:[UIColor lightBlueColor] firstWordColor:nil];
+  return [NSAttributedString attributedStringWithString:self.location fontSize:size color:[UIColor lightBlueColor] firstWordColor:nil];
 }
 
 - (NSString *)description

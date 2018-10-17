@@ -2,59 +2,45 @@
 //  ASTwoDimensionalArrayUtils.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Helper class for operation on two-dimensional array, where the objects of the root array are each arrays
+ * Helper functions for two-dimensional array, where the objects of the root array are each arrays.
  */
-
-ASDISPLAYNODE_EXTERN_C_BEGIN
 
 /**
  * Deep mutable copy of an array that contains arrays, which contain objects.  It will go one level deep into the array to copy.
  * This method is substantially faster than the generalized version, e.g. about 10x faster, so use it whenever it fits the need.
  */
-extern NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array) AS_WARN_UNUSED_RESULT;
+AS_EXTERN NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array) AS_WARN_UNUSED_RESULT;
 
 /**
  * Delete the elements of the mutable two-dimensional array at given index paths – sorted in descending order!
  */
-extern void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray<NSIndexPath *> *indexPaths);
+AS_EXTERN void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableArray, NSArray<NSIndexPath *> *indexPaths);
 
 /**
  * Return all the index paths of a two-dimensional array, in ascending order.
  */
-extern NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray<NSArray *>* twoDimensionalArray) AS_WARN_UNUSED_RESULT;
+AS_EXTERN NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray<NSArray *>* twoDimensionalArray) AS_WARN_UNUSED_RESULT;
 
 /**
  * Return all the elements of a two-dimensional array, in ascending order.
  */
-extern NSArray *ASElementsInTwoDimensionalArray(NSArray<NSArray *>* twoDimensionalArray) AS_WARN_UNUSED_RESULT;
+AS_EXTERN NSArray *ASElementsInTwoDimensionalArray(NSArray<NSArray *>* twoDimensionalArray) AS_WARN_UNUSED_RESULT;
 
 /**
  * Attempt to get the object at the given index path. Returns @c nil if the index path is out of bounds.
  */
-extern id _Nullable ASGetElementInTwoDimensionalArray(NSArray<NSArray *> *array, NSIndexPath *indexPath) AS_WARN_UNUSED_RESULT;
-
-
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN id _Nullable ASGetElementInTwoDimensionalArray(NSArray<NSArray *> *array, NSIndexPath *indexPath) AS_WARN_UNUSED_RESULT;
 
 NS_ASSUME_NONNULL_END

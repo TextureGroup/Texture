@@ -2,12 +2,8 @@
 //  ASConfigurationTests.m
 //  Texture
 //
-//  Copyright (c) 2018-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <XCTest/XCTest.h>
@@ -16,12 +12,46 @@
 #import "ASConfigurationDelegate.h"
 #import "ASConfigurationInternal.h"
 
+static ASExperimentalFeatures features[] = {
+    ASExperimentalGraphicsContexts,
+    ASExperimentalTextNode,
+    ASExperimentalInterfaceStateCoalescing,
+    ASExperimentalUnfairLock,
+    ASExperimentalLayerDefaults,
+    ASExperimentalNetworkImageQueue,
+    ASExperimentalCollectionTeardown,
+    ASExperimentalFramesetterCache,
+    ASExperimentalClearDataDuringDeallocation
+};
+
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
 
 @end
 
 @implementation ASConfigurationTests {
   void (^onActivate)(ASConfigurationTests *self, ASExperimentalFeatures feature);
+}
+
++ (NSArray *)names {
+  return @[
+           @"exp_graphics_contexts",
+           @"exp_text_node",
+           @"exp_interface_state_coalesce",
+           @"exp_unfair_lock",
+           @"exp_infer_layer_defaults",
+           @"exp_network_image_queue",
+           @"exp_collection_teardown",
+           @"exp_framesetter_cache",
+           @"exp_clear_data_during_deallocation"
+           ];
+}
+
+- (ASExperimentalFeatures)allFeatures {
+  ASExperimentalFeatures allFeatures = 0;
+  for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
+    allFeatures |= features[i];
+  }
+  return allFeatures;
 }
 
 - (void)testExperimentalFeatureConfig
@@ -33,14 +63,11 @@
   [ASConfigurationManager test_resetWithConfiguration:config];
   
   // Set an expectation for a callback, and assert we only get one.
-  XCTestExpectation *e = [self expectationWithDescription:@"Callback 1 done."];
+  XCTestExpectation *e = [self expectationWithDescription:@"Callbacks done."];
+  e.expectedFulfillmentCount = 2;
+  e.assertForOverFulfill = YES;
   onActivate = ^(ASConfigurationTests *self, ASExperimentalFeatures feature) {
-    XCTAssertEqual(feature, ASExperimentalGraphicsContexts);
     [e fulfill];
-    // Next time it's a fail.
-    self->onActivate = ^(ASConfigurationTests *self, ASExperimentalFeatures feature) {
-      XCTFail(@"Too many callbacks.");
-    };
   };
   
   // Now activate the graphics experiment and expect it works.
@@ -48,6 +75,7 @@
   // We should get a callback here
   // Now activate text node and expect it fails.
   XCTAssertFalse(ASActivateExperimentalFeature(ASExperimentalTextNode));
+  // But we should get another callback.
   [self waitForExpectationsWithTimeout:3 handler:nil];
 }
 
@@ -61,17 +89,34 @@
 - (void)testMappingNamesToFlags
 {
   // Throw in a bad bit.
-  ASExperimentalFeatures features = ASExperimentalTextNode | ASExperimentalGraphicsContexts | (1 << 22);
-  NSArray *expectedNames = @[ @"exp_graphics_contexts", @"exp_text_node" ];
-  XCTAssertEqualObjects(expectedNames, ASExperimentalFeaturesGetNames(features));
+  ASExperimentalFeatures allFeatures = [self allFeatures];
+  ASExperimentalFeatures featuresWithBadBit = allFeatures | (1 << 22);
+  NSArray *expectedNames = [ASConfigurationTests names];
+  XCTAssertEqualObjects(expectedNames, ASExperimentalFeaturesGetNames(featuresWithBadBit));
 }
 
 - (void)testMappingFlagsFromNames
 {
   // Throw in a bad name.
-  NSArray *names = @[ @"exp_text_node", @"exp_graphics_contexts", @"__invalid_name" ];
-  ASExperimentalFeatures expected = ASExperimentalGraphicsContexts | ASExperimentalTextNode;
-  XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(names));
+  NSMutableArray *allNames = [[NSMutableArray alloc] initWithArray:[ASConfigurationTests names]];
+  [allNames addObject:@"__invalid_name"];
+  ASExperimentalFeatures expected = [self allFeatures];
+  XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(allNames));
+}
+
+- (void)testFlagMatchName
+{
+  NSArray *names = [ASConfigurationTests names];
+  for (NSInteger i = 0; i < names.count; i++) {
+    XCTAssertEqual(features[i], ASExperimentalFeaturesFromArray(@[names[i]]));
+  }
+}
+
+- (void)testNameMatchFlag {
+  NSArray *names = [ASConfigurationTests names];
+  for (NSInteger i = 0; i < names.count; i++) {
+    XCTAssertEqualObjects(@[names[i]], ASExperimentalFeaturesGetNames(features[i]));
+  }
 }
 
 @end

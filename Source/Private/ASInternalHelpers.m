@@ -2,17 +2,9 @@
 //  ASInternalHelpers.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -22,29 +14,47 @@
 #import <objc/runtime.h>
 #import <tgmath.h>
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 
-static BOOL defaultAllowsGroupOpacity = YES;
-static BOOL defaultAllowsEdgeAntialiasing = NO;
+static NSNumber *allowsGroupOpacityFromUIKitOrNil;
+static NSNumber *allowsEdgeAntialiasingFromUIKitOrNil;
+
+BOOL ASDefaultAllowsGroupOpacity()
+{
+  static BOOL groupOpacity;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSNumber *groupOpacityObj = allowsGroupOpacityFromUIKitOrNil ?: [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewGroupOpacity"];
+    groupOpacity = groupOpacityObj ? groupOpacityObj.boolValue : YES;
+  });
+  return groupOpacity;
+}
+
+BOOL ASDefaultAllowsEdgeAntialiasing()
+{
+  static BOOL edgeAntialiasing;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSNumber *antialiasingObj = allowsEdgeAntialiasingFromUIKitOrNil ?: [NSBundle.mainBundle objectForInfoDictionaryKey:@"UIViewEdgeAntialiasing"];
+    edgeAntialiasing = antialiasingObj ? antialiasingObj.boolValue : NO;
+  });
+  return edgeAntialiasing;
+}
 
 void ASInitializeFrameworkMainThread(void)
 {
-  ASDisplayNodeThreadIsMain();
+  ASDisplayNodeCAssertMainThread();
   // Ensure these values are cached on the main thread before needed in the background.
-  CALayer *layer = [[[UIView alloc] init] layer];
-  defaultAllowsGroupOpacity = layer.allowsGroupOpacity;
-  defaultAllowsEdgeAntialiasing = layer.allowsEdgeAntialiasing;
-}
-
-BOOL ASDefaultAllowsGroupOpacity(void)
-{
-  return defaultAllowsGroupOpacity;
-}
-
-BOOL ASDefaultAllowsEdgeAntialiasing(void)
-{
-  return defaultAllowsEdgeAntialiasing;
+  if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
+    // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
+  } else {
+    CALayer *layer = [[[UIView alloc] init] layer];
+    allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
+    allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
+  }
+  ASNotifyInitialized();
 }
 
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)
@@ -109,33 +119,6 @@ void ASPerformBlockOnBackgroundThread(void (^block)(void))
 void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object)
 {
   [[ASDeallocQueue sharedDeallocationQueue] releaseObjectInBackground:object];
-}
-
-BOOL ASClassRequiresMainThreadDeallocation(Class c)
-{
-  // Specific classes
-  if (c == [UIImage class] || c == [UIColor class]) {
-    return NO;
-  }
-  
-  if ([c isSubclassOfClass:[UIResponder class]]
-      || [c isSubclassOfClass:[CALayer class]]
-      || [c isSubclassOfClass:[UIGestureRecognizer class]]) {
-    return YES;
-  }
-
-  // Apple classes with prefix
-  const char *name = class_getName(c);
-  if (strncmp(name, "UI", 2) == 0 || strncmp(name, "AV", 2) == 0 || strncmp(name, "CA", 2) == 0) {
-    return YES;
-  }
-  
-  // Specific Texture classes
-  if (strncmp(name, "ASTextKitComponents", 19) == 0) {
-    return YES;
-  }
-
-  return NO;
 }
 
 Class _Nullable ASGetClassFromType(const char  * _Nullable type)

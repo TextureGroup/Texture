@@ -2,17 +2,13 @@
 //  ASPageTable.m
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASPageTable.h>
 
-extern ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
+ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
 {
   // Add 1 to the end result because 0 is not accepted by NSArray and NSMapTable.
   // To avoid overflow after adding, x and y can't be UINT16_MAX (0xFFFF) **at the same time**.
@@ -22,29 +18,29 @@ extern ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
   return (x << 16) + y + 1;
 }
 
-extern ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize)
+ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize)
 {
   return ASPageCoordinateMake((MAX(0.0, point.x) / pageSize.width), (MAX(0.0, point.y) / pageSize.height));
 }
 
-extern uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate)
+uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate)
 {
   return (pageCoordinate - 1) >> 16;
 }
 
-extern uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate)
+uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate)
 {
   return (pageCoordinate - 1) & ~(0xFFFF<<16);
 }
 
-extern CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize)
+CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize)
 {
   CGFloat pageWidth = pageSize.width;
   CGFloat pageHeight = pageSize.height;
   return CGRectMake(ASPageCoordinateGetX(pageCoordinate) * pageWidth, ASPageCoordinateGetY(pageCoordinate) * pageHeight, pageWidth, pageHeight);
 }
 
-extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize)
+NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize)
 {
   CGRect contentRect = CGRectMake(0.0, 0.0, contentSize.width, contentSize.height);
   // Make sure the specified rect is within contentRect
@@ -121,7 +117,7 @@ extern NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, C
       ASPageCoordinate page = (ASPageCoordinate)pagePtr;
       NSMutableArray<UICollectionViewLayoutAttributes *> *attrsInPage = [result objectForPage:page];
       if (attrsInPage == nil) {
-        attrsInPage = [NSMutableArray array];
+        attrsInPage = [[NSMutableArray alloc] init];
         [result setObject:attrsInPage forPage:page];
       }
       [attrsInPage addObject:attrs];

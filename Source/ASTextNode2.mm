@@ -2,12 +2,8 @@
 //  ASTextNode2.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASTextNode2.h>
@@ -19,8 +15,9 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
 #import <AsyncDisplayKit/ASTextKitShadower.h>
@@ -75,14 +72,18 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   CGFloat _shadowRadius;
   
   NSAttributedString *_attributedText;
+  NSAttributedString *_truncationAttributedText;
+  NSAttributedString *_additionalTruncationMessage;
   NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
+  NSLineBreakMode _truncationMode;
   
   NSString *_highlightedLinkAttributeName;
   id _highlightedLinkAttributeValue;
   ASTextNodeHighlightStyle _highlightStyle;
   NSRange _highlightRange;
   ASHighlightOverlayLayer *_activeHighlightLayer;
+  UIColor *_placeholderColor;
   
   UILongPressGestureRecognizer *_longPressGestureRecognizer;
 }
@@ -175,8 +176,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [super didLoad];
   
   // If we are view-backed and the delegate cares, support the long-press callback.
+  // Locking is not needed, as all instance variables used are main-thread-only.
   SEL longPressCallback = @selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:);
-  if (!self.isLayerBacked && [_delegate respondsToSelector:longPressCallback]) {
+  if (!self.isLayerBacked && [self.delegate respondsToSelector:longPressCallback]) {
     _longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_handleLongPress:)];
     _longPressGestureRecognizer.cancelsTouchesInView = self.longPressCancelsTouches;
     _longPressGestureRecognizer.delegate = self;
@@ -189,9 +191,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (!super.supportsLayerBacking) {
     return NO;
   }
-  
+
+  ASLockScopeSelf();
   // If the text contains any links, return NO.
-  NSAttributedString *attributedText = self.attributedText;
+  NSAttributedString *attributedText = _attributedText;
   NSRange range = NSMakeRange(0, attributedText.length);
   for (NSString *linkAttributeName in _linkAttributeNames) {
     __block BOOL hasLink = NO;
@@ -210,16 +213,15 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
 {
-  BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(_textContainer.insets, textContainerInset);
-  _textContainer.insets = textContainerInset;
-  
-  if (needsUpdate) {
+  ASLockScopeSelf();
+  if (ASCompareAssignCustom(_textContainer.insets, textContainerInset, UIEdgeInsetsEqualToEdgeInsets)) {
     [self setNeedsLayout];
   }
 }
 
 - (UIEdgeInsets)textContainerInset
 {
+  // textContainer is invariant and has an atomic accessor.
   return _textContainer.insets;
 }
 
@@ -227,17 +229,23 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
   ASDisplayNodeAssert(constrainedSize.height >= 0, @"Constrained height for text (%f) is too short", constrainedSize.height);
-  
-  ASTextContainer *container = [_textContainer copy];
-  NSAttributedString *attributedText = self.attributedText;
-  container.size = constrainedSize;
+
+  ASLockScopeSelf();
+
+  _textContainer.size = constrainedSize;
   [self _ensureTruncationText];
-  
-  NSMutableAttributedString *mutableText = [attributedText mutableCopy];
-  [self prepareAttributedString:mutableText];
-  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:container text:mutableText];
-  
-  [self setNeedsDisplay];
+
+  // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
+  BOOL isCalculatingIntrinsicSize;
+  if (_textContainer.isVerticalForm) {
+    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
+  } else {
+    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
+  }
+
+  NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
+  [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
+  ASTextLayout *layout = [ASTextNode2 compatibleLayoutWithContainer:_textContainer text:mutableText];
   
   return layout.textBoundingSize;
 }
@@ -267,31 +275,26 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)setAttributedText:(NSAttributedString *)attributedText
 {
-  
   if (attributedText == nil) {
     attributedText = [[NSAttributedString alloc] initWithString:@"" attributes:nil];
   }
-  
-  // Don't hold textLock for too long.
-  {
-    ASLockScopeSelf();
-    if (ASObjectIsEqual(attributedText, _attributedText)) {
-      return;
-    }
-    
-    _attributedText = attributedText;
-#if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
-    [ASTextNode _registerAttributedText:_attributedText];
-#endif
+
+  // Many accessors in this method will acquire the lock (including ASDisplayNode methods).
+  // Holding it for the duration of the method is more efficient in this case.
+  ASLockScopeSelf();
+
+  if (!ASCompareAssignCopy(_attributedText, attributedText)) {
+    return;
   }
-  
+
   // Since truncation text matches style of attributedText, invalidate it now.
-  [self _invalidateTruncationText];
-  
+  [self _locked_invalidateTruncationText];
+
   NSUInteger length = attributedText.length;
   if (length > 0) {
-    self.style.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    self.style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    ASLayoutElementStyle *style = [self _locked_style];
+    style.ascender = [[self class] ascenderWithAttributedString:attributedText];
+    style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -299,17 +302,21 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   // Force display to create renderer with new size and redisplay with new string
   [self setNeedsDisplay];
-  
-  
+
   // Accessiblity
   self.accessibilityLabel = attributedText.string;
   self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
+
+#if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
+  [ASTextNode _registerAttributedText:_attributedText];
+#endif
 }
 
 #pragma mark - Text Layout
 
 - (void)setExclusionPaths:(NSArray *)exclusionPaths
 {
+  ASLockScopeSelf();
   _textContainer.exclusionPaths = exclusionPaths;
   
   [self setNeedsLayout];
@@ -318,21 +325,35 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSArray *)exclusionPaths
 {
+  ASLockScopeSelf();
   return _textContainer.exclusionPaths;
 }
 
-- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString
+- (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
- 
-  // Apply paragraph style if needed
+
+  // Apply/Fix paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
-    if (style == nil || style.lineBreakMode == _truncationMode) {
+
+    const BOOL applyTruncationMode = (style != nil && style.lineBreakMode != _truncationMode);
+    // Only "left" and "justified" alignments are supported while calculating intrinsic size.
+    // Other alignments like "right", "center" and "natural" cause the size to be bigger than needed and thus should be ignored/overridden.
+    const BOOL forceLeftAlignment = (style != nil
+                                     && isForIntrinsicSize
+                                     && style.alignment != NSTextAlignmentLeft
+                                     && style.alignment != NSTextAlignmentJustified);
+    if (!applyTruncationMode && !forceLeftAlignment) {
       return;
     }
-    
-    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy] ?: [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineBreakMode = _truncationMode;
+
+    NSMutableParagraphStyle *paragraphStyle = [style mutableCopy];
+    if (applyTruncationMode) {
+      paragraphStyle.lineBreakMode = _truncationMode;
+    }
+    if (forceLeftAlignment) {
+      paragraphStyle.alignment = NSTextAlignmentLeft;
+    }
     [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
   }];
   
@@ -340,7 +361,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (_shadowOpacity > 0 && (_shadowRadius != 0 || !CGSizeEqualToSize(_shadowOffset, CGSizeZero)) && CGColorGetAlpha(_shadowColor) > 0) {
     NSShadow *shadow = [[NSShadow alloc] init];
     if (_shadowOpacity != 1) {
-      shadow.shadowColor = [UIColor colorWithCGColor:CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor))];
+      CGColorRef shadowColorRef = CGColorCreateCopyWithAlpha(_shadowColor, _shadowOpacity * CGColorGetAlpha(_shadowColor));
+      shadow.shadowColor = [UIColor colorWithCGColor:shadowColorRef];
+      CGColorRelease(shadowColorRef);
     } else {
       shadow.shadowColor = [UIColor colorWithCGColor:_shadowColor];
     }
@@ -354,12 +377,16 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  ASLockScopeSelf();
   [self _ensureTruncationText];
+
+  // Unlike layout, here we must copy the container since drawing is asynchronous.
   ASTextContainer *copiedContainer = [_textContainer copy];
   copiedContainer.size = self.bounds.size;
-  NSMutableAttributedString *mutableText = [self.attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
-  
-  [self prepareAttributedString:mutableText];
+  [copiedContainer makeImmutable];
+  NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
+
+  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
   
   return @{
     @"container": copiedContainer,
@@ -384,24 +411,25 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   dispatch_once(&onceToken, ^{
     textLayoutCache = [[NSCache alloc] init];
   });
-  
-  ASTextCacheValue *cacheValue = ({
-    ASDN::StaticMutexLocker lock(layoutCacheLock);
-    cacheValue = [textLayoutCache objectForKey:text];
-    if (cacheValue == nil) {
-      cacheValue = [[ASTextCacheValue alloc] init];
-      [textLayoutCache setObject:cacheValue forKey:[text copy]];
-    }
-    cacheValue;
-  });
-  
+
+  layoutCacheLock.lock();
+
+  ASTextCacheValue *cacheValue = [textLayoutCache objectForKey:text];
+  if (cacheValue == nil) {
+    cacheValue = [[ASTextCacheValue alloc] init];
+    [textLayoutCache setObject:cacheValue forKey:[text copy]];
+  }
+
+  // Lock the cache item for the rest of the method. Only after acquiring can we release the NSCache.
+  ASDN::MutexLocker lock(cacheValue->_m);
+  layoutCacheLock.unlock();
+
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
-    ASDN::MutexLocker lock(cacheValue->_m);
-    for (auto &t : cacheValue->_layouts) {
+    for (let &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
-      
+
       CGSize layoutSize = layout.textBoundingSize;
       // 1. CoreText can return frames that are narrower than the constrained width, for obvious reasons.
       // 2. CoreText can return frames that are slightly wider than the constrained width, for some reason.
@@ -417,7 +445,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       if (!CGRectContainsRect(maxRect, containerBounds)) {
         continue;
       }
-      
+      if (!CGSizeEqualToSize(container.size, constrainedSize)) {
+        continue;
+      }
+
       // Now check container params.
       ASTextContainer *otherContainer = layout.container;
       if (!UIEdgeInsetsEqualToEdgeInsets(container.insets, otherContainer.insets)) {
@@ -439,25 +470,24 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       return layout;
     }
   }
-  
-  // Cache Miss.
-  
-  // Compute the text layout.
+
+  // Cache Miss. Compute the text layout.
   ASTextLayout *layout = [ASTextLayout layoutWithContainer:container text:text];
-  
+
   // Store the result in the cache.
   {
-    ASDN::MutexLocker lock(cacheValue->_m);
+    // This is a critical section. However we also must hold the lock until this point, in case
+    // another thread requests this cache item while a layout is being calculated, so they don't race.
     cacheValue->_layouts.push_front(std::make_tuple(container.size, layout));
     if (cacheValue->_layouts.size() > 3) {
       cacheValue->_layouts.pop_back();
     }
   }
-  
+
   return layout;
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(NSDictionary *)layoutDict isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   ASTextContainer *container = layoutDict[@"container"];
   NSAttributedString *text = layoutDict[@"text"];
@@ -520,7 +550,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // For now, assume that a tap inside this text, but outside the text range is a tap on the
   // truncation token.
   if (![layout textRangeAtPoint:point]) {
-    *inAdditionalTruncationMessageOut = YES;
+    if (inAdditionalTruncationMessageOut != NULL) {
+      *inAdditionalTruncationMessageOut = YES;
+    }
     return nil;
   }
 
@@ -533,9 +565,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
 
     // If highlighting, check with delegate first. If not implemented, assume YES.
+    id<ASTextNodeDelegate> delegate = self.delegate;
     if (highlighting
-        && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName value:value atPoint:point]) {
+        && [delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+        && ![delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName value:value atPoint:point]) {
       value = nil;
       attributeName = nil;
     }
@@ -559,6 +592,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
   ASDisplayNodeAssertMainThread();
+  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
   
   if (gestureRecognizer == _longPressGestureRecognizer) {
     // Don't allow long press on truncation message
@@ -567,8 +601,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
     
     // Ask our delegate if a long-press on an attribute is relevant
-    if ([_delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
-      return [_delegate textNode:(ASTextNode *)self
+    id<ASTextNodeDelegate> delegate = self.delegate;
+    if ([delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
+      return [delegate textNode:(ASTextNode *)self
 		  shouldLongPressLinkAttribute:_highlightedLinkAttributeName
                            value:_highlightedLinkAttributeValue
                          atPoint:[gestureRecognizer locationInView:self.view]];
@@ -605,8 +640,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (NSRange)highlightRange
 {
-  ASDisplayNodeAssertMainThread();
-  
+  ASLockScopeSelf();
+
   return _highlightRange;
 }
 
@@ -622,9 +657,12 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
+  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
+
   // Set these so that link tapping works.
   _highlightedLinkAttributeName = highlightedAttributeName;
   _highlightedLinkAttributeValue = highlightedAttributeValue;
+  _highlightRange = highlightRange;
 
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
   // Much of the code from original ASTextNode is probably usable here.
@@ -679,14 +717,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 #pragma mark - Placeholders
 
+- (UIColor *)placeholderColor
+{
+  return ASLockedSelf(_placeholderColor);
+}
+
 - (void)setPlaceholderColor:(UIColor *)placeholderColor
 {
   ASLockScopeSelf();
-  
-  _placeholderColor = placeholderColor;
-  
-  // prevent placeholders if we don't have a color
-  self.placeholderEnabled = placeholderColor != nil;
+  if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
+    self.placeholderEnabled = CGColorGetAlpha(placeholderColor.CGColor) > 0;
+  }
 }
 
 - (UIImage *)placeholderImage
@@ -781,15 +822,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASDisplayNodeAssertMainThread();
   [super touchesEnded:touches withEvent:event];
-  
-  if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:tappedLinkAttribute:value:atPoint:textRange:)]) {
+
+  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
+  id<ASTextNodeDelegate> delegate = self.delegate;
+  if ([self _pendingLinkTap] && [delegate respondsToSelector:@selector(textNode:tappedLinkAttribute:value:atPoint:textRange:)]) {
     CGPoint point = [[touches anyObject] locationInView:self.view];
-    [_delegate textNode:(ASTextNode *)self tappedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:point textRange:_highlightRange];
+    [delegate textNode:(ASTextNode *)self tappedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:point textRange:_highlightRange];
   }
   
   if ([self _pendingTruncationTap]) {
-    if ([_delegate respondsToSelector:@selector(textNodeTappedTruncationToken:)]) {
-      [_delegate textNodeTappedTruncationToken:(ASTextNode *)self];
+    if ([delegate respondsToSelector:@selector(textNodeTappedTruncationToken:)]) {
+      [delegate textNodeTappedTruncationToken:(ASTextNode *)self];
     }
   }
   
@@ -800,7 +843,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASDisplayNodeAssertMainThread();
   [super touchesMoved:touches withEvent:event];
-  
+
+  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
   UITouch *touch = [touches anyObject];
   CGPoint locationInView = [touch locationInView:self.view];
   // on 3D Touch enabled phones, this gets fired with changes in force, and usually will get fired immediately after touchesBegan:withEvent:
@@ -828,9 +872,11 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   // Respond to long-press when it begins, not when it ends.
   if (longPressRecognizer.state == UIGestureRecognizerStateBegan) {
-    if ([_delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
+    id<ASTextNodeDelegate> delegate = self.delegate;
+    if ([delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
+      ASLockScopeSelf(); // Protect usage of _highlight* ivars.
       CGPoint touchPoint = [_longPressGestureRecognizer locationInView:self.view];
-      [_delegate textNode:(ASTextNode *)self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
+      [delegate textNode:(ASTextNode *)self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
     }
   }
 }
@@ -839,14 +885,12 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 {
   ASLockScopeSelf();
   
-  return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && _delegate != nil;
+  return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && self.delegate != nil;
 }
 
 - (BOOL)_pendingTruncationTap
 {
-  ASLockScopeSelf();
-  
-  return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
+  return [ASLockedSelf(_highlightedLinkAttributeName) isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
 #pragma mark - Shadow Properties
@@ -859,90 +903,56 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
  */
 - (CGColorRef)shadowColor
 {
-  ASLockScopeSelf();
-  
-  return _shadowColor;
+  return ASLockedSelf(_shadowColor);
 }
 
 - (void)setShadowColor:(CGColorRef)shadowColor
 {
-  [self lock];
-  
+  ASLockScopeSelf();
   if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
     CGColorRelease(_shadowColor);
     _shadowColor = CGColorRetain(shadowColor);
-    [self unlock];
-    
     [self setNeedsDisplay];
-    return;
   }
-  
-  [self unlock];
 }
 
 - (CGSize)shadowOffset
 {
-  ASLockScopeSelf();
-  
-  return _shadowOffset;
+  return ASLockedSelf(_shadowOffset);
 }
 
 - (void)setShadowOffset:(CGSize)shadowOffset
 {
-  {
-    ASLockScopeSelf();
-    
-    if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) {
-      return;
-    }
-    _shadowOffset = shadowOffset;
+  ASLockScopeSelf();
+  if (ASCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowOpacity
 {
-  ASLockScopeSelf();
-  
-  return _shadowOpacity;
+  return ASLockedSelf(_shadowOpacity);
 }
 
 - (void)setShadowOpacity:(CGFloat)shadowOpacity
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_shadowOpacity == shadowOpacity) {
-      return;
-    }
-    
-    _shadowOpacity = shadowOpacity;
+  ASLockScopeSelf();
+  if (ASCompareAssign(_shadowOpacity, shadowOpacity)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (CGFloat)shadowRadius
 {
-  ASLockScopeSelf();
-  
-  return _shadowRadius;
+  return ASLockedSelf(_shadowRadius);
 }
 
 - (void)setShadowRadius:(CGFloat)shadowRadius
 {
-  {
-    ASLockScopeSelf();
-    
-    if (_shadowRadius == shadowRadius) {
-      return;
-    }
-    
-    _shadowRadius = shadowRadius;
+  ASLockScopeSelf();
+  if (ASCompareAssign(_shadowRadius, shadowRadius)) {
+    [self setNeedsDisplay];
   }
-  
-  [self setNeedsDisplay];
 }
 
 - (UIEdgeInsets)shadowPadding
@@ -954,22 +964,15 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
 {
   AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  {
-    ASLockScopeSelf();
-    if (ASObjectIsEqual(scaleFactors, _pointSizeScaleFactors)) {
-      return;
-    }
-    
-    _pointSizeScaleFactors = [scaleFactors copy];
+  ASLockScopeSelf();
+  if (ASCompareAssignCopy(_pointSizeScaleFactors, scaleFactors)) {
+    [self setNeedsLayout];
   }
-  
-  [self setNeedsLayout];
 }
 
-- (NSArray *)pointSizeScaleFactors
+- (NSArray<NSNumber *> *)pointSizeScaleFactors
 {
-  ASLockScopeSelf();
-  return _pointSizeScaleFactors;
+  return ASLockedSelf(_pointSizeScaleFactors);
 }
 
 #pragma mark - Truncation Message
@@ -986,29 +989,47 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (void)_ensureTruncationText
 {
+  ASLockScopeSelf();
   if (_textContainer.truncationToken == nil) {
-    ASLockScopeSelf();
     _textContainer.truncationToken = [self _locked_composedTruncationText];
   }
 }
 
+- (NSAttributedString *)truncationAttributedText
+{
+  return ASLockedSelf(_truncationAttributedText);
+}
+
 - (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
 {
-  if (ASLockedSelfCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
+  ASLockScopeSelf();
+  if (ASCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
     [self _invalidateTruncationText];
   }
+}
+
+- (NSAttributedString *)additionalTruncationMessage
+{
+  return ASLockedSelf(_additionalTruncationMessage);
 }
 
 - (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
 {
-  if (ASLockedSelfCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
+  ASLockScopeSelf();
+  if (ASCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
     [self _invalidateTruncationText];
   }
 }
 
+- (NSLineBreakMode)truncationMode
+{
+  return ASLockedSelf(_truncationMode);
+}
+
 - (void)setTruncationMode:(NSLineBreakMode)truncationMode
 {
-  if (ASLockedSelfCompareAssign(_truncationMode, truncationMode)) {
+  ASLockScopeSelf();
+  if (ASCompareAssign(_truncationMode, truncationMode)) {
     ASTextTruncationType truncationType;
     switch (truncationMode) {
       case NSLineBreakByTruncatingHead:
@@ -1038,17 +1059,16 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (NSUInteger)maximumNumberOfLines
 {
+  // _textContainer is invariant and this is just atomic access.
   return _textContainer.maximumNumberOfRows;
 }
 
 - (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
 {
-  if (_textContainer.maximumNumberOfRows == maximumNumberOfLines) {
-    return;
+  ASLockScopeSelf();
+  if (ASCompareAssign(_textContainer.maximumNumberOfRows, maximumNumberOfLines)) {
+    [self setNeedsDisplay];
   }
-  _textContainer.maximumNumberOfRows = maximumNumberOfLines;
-  
-  [self setNeedsDisplay];
 }
 
 - (NSUInteger)lineCount
@@ -1062,8 +1082,14 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (void)_invalidateTruncationText
 {
-  _textContainer.truncationToken = nil;
+  ASLockScopeSelf();
+  [self _locked_invalidateTruncationText];
   [self setNeedsDisplay];
+}
+
+- (void)_locked_invalidateTruncationText
+{
+  _textContainer.truncationToken = nil;
 }
 
 /**
@@ -1095,6 +1121,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_composedTruncationText
 {
+  ASAssertLocked(__instanceLock__);
   if (_composedTruncationText == nil) {
     if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
       NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
@@ -1120,6 +1147,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
 {
+  ASAssertLocked(__instanceLock__);
   NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
   // Grab the attributes from the full string
   if (_attributedText.length > 0) {
@@ -1130,7 +1158,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
     NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
     [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
      ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [NSMutableDictionary dictionaryWithDictionary:originalStringAttributes];
+       NSMutableDictionary *futureTruncationAttributes = [originalStringAttributes mutableCopy];
        [futureTruncationAttributes addEntriesFromDictionary:attributes];
        [truncationMutableString setAttributes:futureTruncationAttributes range:range];
      }];
