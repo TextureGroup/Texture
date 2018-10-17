@@ -34,6 +34,11 @@
 - (ASLayoutElementStyle *)style
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_style];
+}
+
+- (ASLayoutElementStyle *)_locked_style
+{
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
@@ -993,12 +998,6 @@ ASLayoutElementStyleExtensibilityForwarding
   _pendingLayoutTransition = nil;
 }
 
-- (void)_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  [self _locked_setCalculatedDisplayNodeLayout:displayNodeLayout];
-}
-
 - (void)_locked_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
 {
   ASAssertLocked(__instanceLock__);
@@ -1007,12 +1006,6 @@ ASLayoutElementStyleExtensibilityForwarding
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);
   
   _calculatedDisplayNodeLayout = displayNodeLayout;
-  
-  // Flatten the layout if it wasn't done before (@see -calculateLayoutThatFits:).
-  if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
-    _unflattenedLayout = _calculatedDisplayNodeLayout.layout; 
-    _calculatedDisplayNodeLayout.layout = [_unflattenedLayout filteredNodeLayoutTree];
-  }
 }
 
 @end

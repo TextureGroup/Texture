@@ -1,6 +1,8 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASTextNode2] Add improved support for all line-break modes in experimental text node. [Kevin Smith](https://github.com/wiseoldduck). [#1150](https://github.com/TextureGroup/Texture/pull/1150)
+- [ASExperimentalFeatures.m] Fix mismatch name in experimental features. [Max Wang](https://github.com/wsdwsd0829). [#1159](https://github.com/TextureGroup/Texture/pull/1159)
+- [ASCollectionViewLayoutController] Set default tuning parameters before view is loaded. [Max Wang](https://github.com/wsdwsd0829). [#1158](https://github.com/TextureGroup/Texture/pull/1158)
 - [ASPhotosFrameworkImageRequestTests] Guard photo library with macro for tests. [Max Wang](https://github.com/wsdwsd0829). [#1147](https://github.com/TextureGroup/Texture/pull/1147)
 - [ASDisplayNode] Do not cancel display when in exit hierarchy but let interface state changing to handle it. [Max Wang](https://github.com/wsdwsd0829). [#1110](https://github.com/TextureGroup/Texture/pull/1110)
 - [Breaking][ASDisplayNode] Make interface state delegate protocol required. [Max Wang](https://github.com/wsdwsd0829). [#1112](https://github.com/TextureGroup/Texture/pull/1112)
@@ -52,6 +54,10 @@
 - Optimize layout process by removing `ASRectMap`.  [Adlai Holler](https://github.com/Adlai-Holler)
 - Remove necessity to use view to access rangeController in ASTableNode, ASCollectionNode. [Michael Schneider](https://github.com/maicki)
 - Remove display node's reliance on shared_ptr. [Adlai Holler](https://github.com/Adlai-Holler)
+- [ASCollectionView] Fix a crash that is caused by clearing a collection view's data while it's still being used. [Huy Nguyen](https://github.com/nguyenhuy) [#1154](https://github.com/TextureGroup/Texture/pull/1154)
+- Clean up timing of layout tree flattening/ copying of unflattened tree for Weaver. [Michael Zuccarino](https://github.com/mikezucc) [#1157](https://github.com/TextureGroup/Texture/pull/1157)
+- Fix crash setting attributed text on multiple threads [Michael Schneider](https://github.com/maicki)
+- [ASTextNode2] Ignore certain text alignments while calculating intrinsic size [Huy Nguyen](https://github.com/nguyenhuy) [#1166](https://github.com/TextureGroup/Texture/pull/1166)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
