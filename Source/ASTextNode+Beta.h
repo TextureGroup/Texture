@@ -11,8 +11,6 @@
 
 #import <AsyncDisplayKit/ASTextNode.h>
 
-@class ASTextLayout;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ASTextNode ()
@@ -37,10 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (readonly) BOOL usingExperiment;
 
-/*
- * Returns layout for textNode that fit to constrainedSize's max size.
+/**
+ * Returns a Boolean indicating if the text node will truncate for the given constrained size
  */
-- (ASTextLayout *)textLayoutForConstraint:(ASSizeRange)constrainedSize;
+- (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize;
 
 @end
 

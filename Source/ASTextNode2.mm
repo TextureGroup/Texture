@@ -1083,15 +1083,18 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)isTruncated
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  return NO;
+  return ASLockedSelf([self locked_textLayoutForSize:[self _locked_threadSafeBounds].size].truncatedLine == nil);
 }
 
-- (ASTextLayout *)textLayoutForConstraint:(ASSizeRange)constrainedSize
+- (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize
 {
-  ASLockScopeSelf();
+  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine == nil);
+}
+
+- (ASTextLayout *)locked_textLayoutForSize:(CGSize)size
+{
   ASTextContainer *container = [_textContainer copy];
-  container.size = constrainedSize.max;
+  container.size = size;
   return ASTextNodeCompatibleLayoutWithContainerAndText(container, _attributedText);
 }
 
