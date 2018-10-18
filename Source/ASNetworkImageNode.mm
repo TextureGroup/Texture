@@ -359,9 +359,6 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     }
   }
 
-  // TODO: Consider removing this; it predates ASInterfaceState, which now ensures that even non-range-managed nodes get a -preload call.
-  [self didEnterPreloadState];
-  
   if (self.image == nil && _downloaderFlags.downloaderImplementsSetPriority) {
     id downloadIdentifier = ASLockedSelf(_downloadIdentifier);
     if (downloadIdentifier != nil) {
