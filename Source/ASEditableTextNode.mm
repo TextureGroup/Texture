@@ -842,4 +842,30 @@
     [_delegate editableTextNodeDidFinishEditing:self];
 }
 
+
+- (BOOL)isAccessibilityElement
+{
+  return YES;
+}
+
+- (NSInteger)accessibilityElementCount
+{
+  return 1;
+}
+
+- (NSArray *)accessibilityElements
+{
+  return @[self.textView];
+}
+
+- (id)accessibilityElementAtIndex:(NSInteger)index
+{
+  return self.textView;
+}
+
+- (NSInteger)indexOfAccessibilityElement:(id)element
+{
+  return 0;
+}
+
 @end
