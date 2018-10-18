@@ -209,12 +209,14 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return YES;
 }
 
-- (NSString *)defaultAccessibilityLabel {
+- (NSString *)defaultAccessibilityLabel
+{
   ASLockScopeSelf();
   return _attributedText.string;
 }
 
-- (UIAccessibilityTraits)defaultAccessibilityTraits {
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
   return UIAccessibilityTraitStaticText;
 }
 
@@ -313,7 +315,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self setNeedsDisplay];
 
   // Accessiblity
-  self.accessibilityLabel = attributedText.string;
+  self.accessibilityLabel = self.defaultAccessibilityLabel;
   self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS

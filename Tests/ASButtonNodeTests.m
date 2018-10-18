@@ -16,7 +16,8 @@
 
 @implementation ASButtonNodeTests
 
-- (void)testAccessibility {
+- (void)testAccessibility
+{
   // Setup a button with some title.
   ASButtonNode *buttonNode = nil;
   buttonNode = [[ASButtonNode alloc] init];

@@ -3631,23 +3631,28 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _isAccessibilityContainer;
 }
 
-- (NSString *)defaultAccessibilityLabel {
+- (NSString *)defaultAccessibilityLabel
+{
   return nil;
 }
 
-- (NSString *)defaultAccessibilityHint {
+- (NSString *)defaultAccessibilityHint
+{
   return nil;
 }
 
-- (NSString *)defaultAccessibilityValue {
+- (NSString *)defaultAccessibilityValue
+{
   return nil;
 }
 
-- (NSString *)defaultAccessibilityIdentifier {
+- (NSString *)defaultAccessibilityIdentifier
+{
   return nil;
 }
 
-- (UIAccessibilityTraits)defaultAccessibilityTraits {
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
   return UIAccessibilityTraitNone;
 }
 

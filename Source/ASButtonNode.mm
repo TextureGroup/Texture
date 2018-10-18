@@ -540,12 +540,14 @@
   return spec;
 }
 
-- (NSString *)defaultAccessibilityLabel {
+- (NSString *)defaultAccessibilityLabel
+{
   ASLockScopeSelf();
   return _titleNode.accessibilityLabel;
 }
 
-- (UIAccessibilityTraits)defaultAccessibilityTraits {
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
   return self.enabled ? UIAccessibilityTraitButton
                       : (UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled);
 }

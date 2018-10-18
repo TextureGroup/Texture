@@ -101,11 +101,11 @@ typedef struct {
  * example, the default accessibility label for a text node may be its text content, while most
  * other nodes would have nil default labels.
  */
-@property(nullable, readonly, copy) NSString *defaultAccessibilityLabel;
-@property(nullable, readonly, copy) NSString *defaultAccessibilityHint;
-@property(nullable, readonly, copy) NSString *defaultAccessibilityValue;
-@property(nullable, readonly, copy) NSString *defaultAccessibilityIdentifier;
-@property(readonly) UIAccessibilityTraits defaultAccessibilityTraits;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityLabel;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityHint;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityValue;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityIdentifier;
+@property (readonly) UIAccessibilityTraits defaultAccessibilityTraits;
 
 /**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have

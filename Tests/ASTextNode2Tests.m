@@ -24,7 +24,8 @@
 
 @implementation ASTextNode2Tests
 
-- (void)setUp {
+- (void)setUp
+{
   [super setUp];
   _textNode = [[ASTextNode2 alloc] init];
 
@@ -62,7 +63,8 @@
   _textNode.attributedText = _attributedText;
 }
 
-- (void)testAccessibility {
+- (void)testAccessibility
+{
   XCTAssertTrue(_textNode.isAccessibilityElement, @"Should be an accessibility element");
   XCTAssertTrue(_textNode.accessibilityTraits == UIAccessibilityTraitStaticText,
                 @"Should have static text accessibility trait, instead has %llu",
