@@ -78,6 +78,7 @@ NSInteger const ASDefaultDrawingPriority = ASDefaultTransactionPriority;
 
 @synthesize threadSafeBounds = _threadSafeBounds;
 
+static std::atomic_bool suppressesInvalidCollectionUpdateExceptions = ATOMIC_VAR_INIT(NO);
 static std::atomic_bool storesUnflattenedLayouts = ATOMIC_VAR_INIT(NO);
 
 BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector)
@@ -3790,6 +3791,16 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDN::MutexLocker l(__instanceLock__);
   return _unflattenedLayout;
+}
+
++ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses
+{
+  suppressesInvalidCollectionUpdateExceptions.store(suppresses);
+}
+
++ (BOOL)suppressesInvalidCollectionUpdateExceptions
+{
+  return suppressesInvalidCollectionUpdateExceptions.load();
 }
 
 - (NSString *)displayNodeRecursiveDescription
