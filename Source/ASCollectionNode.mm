@@ -70,6 +70,8 @@
     _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
+    _showsVerticalScrollIndicator = YES;
+    _showsHorizontalScrollIndicator = YES;
   }
   return self;
 }
