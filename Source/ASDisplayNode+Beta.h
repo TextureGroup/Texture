@@ -110,8 +110,11 @@ typedef struct {
 /**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
  * an accessibity label and have an interactive UIAccessibilityTrait will automatically receive custom-action handling.
+ *
+ * @return Return a boolean value that determine whether to propagate through the responder chain.
+ * To halt propagation, return YES; otherwise, return NO.
  */
-- (void)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
 
 /**
  * @abstract Currently used by ASNetworkImageNode and ASMultiplexImageNode to allow their placeholders to stay if they are loading an image from the network.

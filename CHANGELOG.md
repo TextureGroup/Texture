@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASTextNode2] Add improved support for all line-break modes in experimental text node. [Kevin Smith](https://github.com/wiseoldduck). [#1150](https://github.com/TextureGroup/Texture/pull/1150)
 - [ASExperimentalFeatures.m] Fix mismatch name in experimental features. [Max Wang](https://github.com/wsdwsd0829). [#1159](https://github.com/TextureGroup/Texture/pull/1159)
 - [ASCollectionViewLayoutController] Set default tuning parameters before view is loaded. [Max Wang](https://github.com/wsdwsd0829). [#1158](https://github.com/TextureGroup/Texture/pull/1158)
 - [ASPhotosFrameworkImageRequestTests] Guard photo library with macro for tests. [Max Wang](https://github.com/wsdwsd0829). [#1147](https://github.com/TextureGroup/Texture/pull/1147)
@@ -57,7 +58,8 @@
 - Clean up timing of layout tree flattening/ copying of unflattened tree for Weaver. [Michael Zuccarino](https://github.com/mikezucc) [#1157](https://github.com/TextureGroup/Texture/pull/1157)
 - Fix crash setting attributed text on multiple threads [Michael Schneider](https://github.com/maicki)
 - [ASTextNode2] Ignore certain text alignments while calculating intrinsic size [Huy Nguyen](https://github.com/nguyenhuy) [#1166](https://github.com/TextureGroup/Texture/pull/1166)
-- [ASDisplayNode] Expose default Texture-set accessibility values as properties. [Jia Wern Lim](https://github.com/jiawernlim)
+- Fix mismatch in UIAccessibilityAction selector method [Michael Schneider](https://github.com/maicki) [#1169](https://github.com/TextureGroup/Texture/pull/1169)
+- [ASDisplayNode] Expose default Texture-set accessibility values as properties. [Jia Wern Lim](https://github.com/jiawernlim) [#1170](https://github.com/TextureGroup/Texture/pull/1170)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
