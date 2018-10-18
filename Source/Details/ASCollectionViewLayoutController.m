@@ -21,7 +21,6 @@ struct ASRangeGeometry {
 };
 typedef struct ASRangeGeometry ASRangeGeometry;
 
-
 #pragma mark -
 #pragma mark ASCollectionViewLayoutController
 

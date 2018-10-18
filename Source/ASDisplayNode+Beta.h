@@ -52,6 +52,19 @@ typedef struct {
 @interface ASDisplayNode (Beta)
 
 /**
+ * ASTableView and ASCollectionView now throw exceptions on invalid updates
+ * like their UIKit counterparts. If YES, these classes will log messages
+ * on invalid updates rather than throwing exceptions.
+ *
+ * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
+ * as it proceeds with an invalid update.
+ *
+ * This property defaults to NO. It will be removed in a future release.
+ */
++ (BOOL)suppressesInvalidCollectionUpdateExceptions AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
++ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses;
+
+/**
  * @abstract Recursively ensures node and all subnodes are displayed.
  * @see Full documentation in ASDisplayNode+FrameworkPrivate.h
  */
@@ -99,8 +112,11 @@ typedef struct {
 /**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
  * an accessibity label and have an interactive UIAccessibilityTrait will automatically receive custom-action handling.
+ *
+ * @return Return a boolean value that determine whether to propagate through the responder chain.
+ * To halt propagation, return YES; otherwise, return NO.
  */
-- (void)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
 
 /**
  * @abstract Currently used by ASNetworkImageNode and ASMultiplexImageNode to allow their placeholders to stay if they are loading an image from the network.

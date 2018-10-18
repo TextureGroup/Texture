@@ -12,12 +12,46 @@
 #import "ASConfigurationDelegate.h"
 #import "ASConfigurationInternal.h"
 
+static ASExperimentalFeatures features[] = {
+    ASExperimentalGraphicsContexts,
+    ASExperimentalTextNode,
+    ASExperimentalInterfaceStateCoalescing,
+    ASExperimentalUnfairLock,
+    ASExperimentalLayerDefaults,
+    ASExperimentalNetworkImageQueue,
+    ASExperimentalCollectionTeardown,
+    ASExperimentalFramesetterCache,
+    ASExperimentalClearDataDuringDeallocation
+};
+
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
 
 @end
 
 @implementation ASConfigurationTests {
   void (^onActivate)(ASConfigurationTests *self, ASExperimentalFeatures feature);
+}
+
++ (NSArray *)names {
+  return @[
+           @"exp_graphics_contexts",
+           @"exp_text_node",
+           @"exp_interface_state_coalesce",
+           @"exp_unfair_lock",
+           @"exp_infer_layer_defaults",
+           @"exp_network_image_queue",
+           @"exp_collection_teardown",
+           @"exp_framesetter_cache",
+           @"exp_clear_data_during_deallocation"
+           ];
+}
+
+- (ASExperimentalFeatures)allFeatures {
+  ASExperimentalFeatures allFeatures = 0;
+  for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
+    allFeatures |= features[i];
+  }
+  return allFeatures;
 }
 
 - (void)testExperimentalFeatureConfig
@@ -55,17 +89,34 @@
 - (void)testMappingNamesToFlags
 {
   // Throw in a bad bit.
-  ASExperimentalFeatures features = ASExperimentalTextNode | ASExperimentalGraphicsContexts | (1 << 22);
-  NSArray *expectedNames = @[ @"exp_graphics_contexts", @"exp_text_node" ];
-  XCTAssertEqualObjects(expectedNames, ASExperimentalFeaturesGetNames(features));
+  ASExperimentalFeatures allFeatures = [self allFeatures];
+  ASExperimentalFeatures featuresWithBadBit = allFeatures | (1 << 22);
+  NSArray *expectedNames = [ASConfigurationTests names];
+  XCTAssertEqualObjects(expectedNames, ASExperimentalFeaturesGetNames(featuresWithBadBit));
 }
 
 - (void)testMappingFlagsFromNames
 {
   // Throw in a bad name.
-  NSArray *names = @[ @"exp_text_node", @"exp_graphics_contexts", @"__invalid_name" ];
-  ASExperimentalFeatures expected = ASExperimentalGraphicsContexts | ASExperimentalTextNode;
-  XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(names));
+  NSMutableArray *allNames = [[NSMutableArray alloc] initWithArray:[ASConfigurationTests names]];
+  [allNames addObject:@"__invalid_name"];
+  ASExperimentalFeatures expected = [self allFeatures];
+  XCTAssertEqual(expected, ASExperimentalFeaturesFromArray(allNames));
+}
+
+- (void)testFlagMatchName
+{
+  NSArray *names = [ASConfigurationTests names];
+  for (NSInteger i = 0; i < names.count; i++) {
+    XCTAssertEqual(features[i], ASExperimentalFeaturesFromArray(@[names[i]]));
+  }
+}
+
+- (void)testNameMatchFlag {
+  NSArray *names = [ASConfigurationTests names];
+  for (NSInteger i = 0; i < names.count; i++) {
+    XCTAssertEqualObjects(@[names[i]], ASExperimentalFeaturesGetNames(features[i]));
+  }
 }
 
 @end
