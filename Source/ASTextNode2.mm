@@ -115,7 +115,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     
     // Accessibility
     self.isAccessibilityElement = YES;
-    self.accessibilityTraits = UIAccessibilityTraitStaticText;
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
     
     // Placeholders
     // Disabled by default in ASDisplayNode, but add a few options for those who toggle
@@ -207,6 +207,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
   }
   return YES;
+}
+
+- (NSString *)defaultAccessibilityLabel
+{
+  ASLockScopeSelf();
+  return _attributedText.string;
+}
+
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
+  return UIAccessibilityTraitStaticText;
 }
 
 #pragma mark - Layout and Sizing
@@ -304,7 +315,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self setNeedsDisplay];
 
   // Accessiblity
-  self.accessibilityLabel = attributedText.string;
+  self.accessibilityLabel = self.defaultAccessibilityLabel;
   self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
