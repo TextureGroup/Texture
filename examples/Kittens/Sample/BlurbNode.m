@@ -44,19 +44,34 @@ static NSString *kLinkAttributeName = @"PlaceKittenNodeLinkAttributeName";
   _textNode.delegate = self;
   _textNode.userInteractionEnabled = YES;
   _textNode.linkAttributeNames = @[ kLinkAttributeName ];
+  _textNode.maximumNumberOfLines = 1;
 
   // generate an attributed string using the custom link attribute specified above
-  NSString *blurb = @"kittens courtesy placekitten.com \U0001F638";
+  ////NSString *blurb = @"Text link: some some some more even more text and even more text";
+//  NSString *blurb = @"Text link: some some";
+  NSString *blurb = @"Text link: some some some more even more text and even more text";  
   NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:blurb];
-  [string addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"HelveticaNeue-Light" size:16.0f] range:NSMakeRange(0, blurb.length)];
+  // [string addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"HelveticaNeue-Light" size:16.0f] range:NSMakeRange(0, blurb.length)];
   [string addAttributes:@{
                           kLinkAttributeName: [NSURL URLWithString:@"http://placekitten.com/"],
                           NSForegroundColorAttributeName: [UIColor grayColor],
                           NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle | NSUnderlinePatternDot),
                           }
-                  range:[blurb rangeOfString:@"placekitten.com"]];
+                  range:[blurb rangeOfString:@"Text"]];
   _textNode.attributedText = string;
+  
+  NSAttributedString *truncationAttributedText = [[NSAttributedString alloc] initWithString:@" ..." attributes:@{}];
+  _textNode.truncationAttributedText = truncationAttributedText;
+  
+  NSAttributedString *additionalTruncationMessage = [[NSAttributedString alloc] initWithString:@" Read More " attributes:@{}];
+  _textNode.additionalTruncationMessage = additionalTruncationMessage;
 
+  //  _textNode.truncationMode = NSLineBreakByTruncatingHead;
+//    _textNode.truncationMode = NSLineBreakByTruncatingHead;
+//  _textNode.truncationMode = NSLineBreakByTruncatingMiddle;  
+ 
+//  _textNode.passthroughNonlinkTouches = YES;
+  
   // add it as a subnode, and we're done
   [self addSubnode:_textNode];
 
@@ -102,19 +117,46 @@ static NSString *kLinkAttributeName = @"PlaceKittenNodeLinkAttributeName";
 }
 #endif
 
-#pragma mark -
-#pragma mark ASTextNodeDelegate methods.
+#pragma mark - Touches Handling
+
+// This will only be called if passthroughNonlinkTouches = YES
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+  [super touchesBegan:touches withEvent:event];
+  
+  NSLog(@"Handle some touches");
+}
+
+#pragma mark - ASTextNodeDelegate methods.
 
 - (BOOL)textNode:(ASTextNode *)richTextNode shouldHighlightLinkAttribute:(NSString *)attribute value:(id)value atPoint:(CGPoint)point
 {
+  NSLog(@"%s", __PRETTY_FUNCTION__);
+  
   // opt into link highlighting -- tap and hold the link to try it!  must enable highlighting on a layer, see -didLoad
   return YES;
 }
 
 - (void)textNode:(ASTextNode *)richTextNode tappedLinkAttribute:(NSString *)attribute value:(NSURL *)URL atPoint:(CGPoint)point textRange:(NSRange)textRange
 {
+  NSLog(@"%s", __PRETTY_FUNCTION__);
+  
   // the node tapped a link, open it
-  [[UIApplication sharedApplication] openURL:URL];
+  // [[UIApplication sharedApplication] openURL:URL];
+}
+
+- (void)textNodeTappedTruncationToken:(ASTextNode *)textNode
+{
+  // This is called if the additional truncation text is tapped 
+  
+  NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+#pragma mark - ASTextNode actions
+
+- (void)touchUpInsideOfTextNode:(id)sender
+{
+  NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 @end

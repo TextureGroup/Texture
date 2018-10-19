@@ -20,7 +20,20 @@
   self.window.backgroundColor = [UIColor whiteColor];
   self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[[ViewController alloc] init]];
   [self.window makeKeyAndVisible];
+  
   return YES;
+}
+
+@end
+
+@implementation ASConfiguration (UserProvided)
+
++ (ASConfiguration *)textureConfiguration
+{
+  ASConfiguration *configuration = [ASConfiguration new];
+  configuration.experimentalFeatures = ASExperimentalTextNode; 
+  return configuration;
+  
 }
 
 @end

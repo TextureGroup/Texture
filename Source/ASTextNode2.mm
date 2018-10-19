@@ -194,6 +194,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     self.userInteractionEnabled = NO;
     self.needsDisplayOnBoundsChange = YES;
     
+    // The default truncation type is end for truncation
     _textContainer.truncationType = ASTextTruncationTypeEnd;
     
     // The common case is for a text node to be non-opaque and blended over some background.
@@ -572,20 +573,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASTextContainer *containerCopy = [_textContainer copy];
   containerCopy.size = self.calculatedSize;
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(containerCopy, _attributedText);
-  NSRange visibleRange = layout.visibleRange;
-  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
 
-  ASTextRange *range = [layout closestTextRangeAtPoint:point];
-
-  // For now, assume that a tap inside this text, but outside the text range is a tap on the
-  // truncation token.
-  if (![layout textRangeAtPoint:point]) {
+  if ([self _locked_pointInsideAdditionalTruncationMessage:point withLayout:layout]) {
     if (inAdditionalTruncationMessageOut != NULL) {
       *inAdditionalTruncationMessageOut = YES;
     }
     return nil;
   }
 
+  NSRange visibleRange = layout.visibleRange;
+  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
+  ASTextRange *range = [layout closestTextRangeAtPoint:point];
   NSRange effectiveRange = NSMakeRange(0, 0);
   for (__strong NSString *attributeName in self.linkAttributeNames) {
     id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
@@ -615,6 +613,63 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   return nil;
+}
+
+- (BOOL)_locked_pointInsideAdditionalTruncationMessage:(CGPoint)point withLayout:(ASTextLayout *)layout
+{
+  // Check if the range is within the additional truncation range
+  BOOL inAdditionalTruncationMessage = NO;
+  
+  CTLineRef truncatedCTLine = layout.truncatedLine.CTLine;
+  if (truncatedCTLine != NULL && _additionalTruncationMessage != nil) {
+    CFIndex stringIndexForPosition = CTLineGetStringIndexForPosition(truncatedCTLine, point);
+    if (stringIndexForPosition != kCFNotFound) {
+      CFIndex truncatedCTLineGlyphCount = CTLineGetGlyphCount(truncatedCTLine);
+      
+      CTLineRef truncationTokenLine =
+      CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
+      CFIndex truncationTokenLineGlyphCount =
+      truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
+      
+      CTLineRef additionalTruncationTokenLine = 
+      CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
+      CFIndex additionalTruncationTokenLineGlyphCount =
+      additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
+      
+      switch (_textContainer.truncationType) {
+        case ASTextTruncationTypeStart: {
+          if (stringIndexForPosition > truncationTokenLineGlyphCount &&
+              stringIndexForPosition < (additionalTruncationTokenLineGlyphCount + truncationTokenLineGlyphCount)) {
+            inAdditionalTruncationMessage = YES;
+          }      
+          break;
+        }
+        case ASTextTruncationTypeMiddle: {
+          CFIndex firstTruncatedTokenIndex = (truncatedCTLineGlyphCount - (truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount)) / 2.0;
+          if ((firstTruncatedTokenIndex + truncationTokenLineGlyphCount) < stringIndexForPosition &&
+              stringIndexForPosition < (firstTruncatedTokenIndex + truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount)) {
+            inAdditionalTruncationMessage = YES;
+          }      
+          break;
+        }
+        case ASTextTruncationTypeEnd: {
+          if (stringIndexForPosition > (truncatedCTLineGlyphCount - additionalTruncationTokenLineGlyphCount)) {
+            inAdditionalTruncationMessage = YES;
+          }
+          break; 
+        }
+        default:
+          // For now, assume that a tap inside this text, but outside the text range is a tap on the
+          // truncation token.
+          if (![layout textRangeAtPoint:point]) {
+            inAdditionalTruncationMessage = YES;
+          }
+          break;
+      }
+    }
+  }
+  
+  return inAdditionalTruncationMessage;
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -790,7 +845,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
   
   if (inAdditionalTruncationMessage) {
-    return YES;
+    return !_passthroughNonlinkTouches;
   } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     return YES;
   } else {
