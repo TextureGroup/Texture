@@ -111,11 +111,13 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
     _currentScaleFactor = [[self fontSizeAdjuster] scaleFactor];
   }
 
+  const CGRect constrainedRect = {CGPointZero, _constrainedSize};
+
   // If we do not scale, do exclusion, or do custom truncation, we should just use NSAttributedString drawing for a fast-path.
   if (self.canUseFastPath) {
     CGRect rect = [_attributes.attributedString boundingRectWithSize:_constrainedSize options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingTruncatesLastVisibleLine context:self.stringDrawingContext];
     // Intersect with constrained rect, in case text kit goes out-of-bounds.
-    rect = CGRectIntersection(rect, {CGPointZero, _constrainedSize});
+    rect = CGRectIntersection(rect, constrainedRect);
     _calculatedSize = [self.shadower outsetSizeWithInsetSize:rect.size];
     return;
   }
@@ -136,7 +138,6 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
   
   [[self truncater] truncate];
   
-  CGRect constrainedRect = {CGPointZero, _constrainedSize};
   __block CGRect boundingRect;
 
   // Force glyph generation and layout, which may not have happened yet (and isn't triggered by
@@ -153,7 +154,7 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
   
   // TextKit often returns incorrect glyph bounding rects in the horizontal direction, so we clip to our bounding rect
   // to make sure our width calculations aren't being offset by glyphs going beyond the constrained rect.
-  boundingRect = CGRectIntersection(boundingRect, {.size = constrainedRect.size});
+  boundingRect = CGRectIntersection(boundingRect, constrainedRect);
   _calculatedSize = [_shadower outsetSizeWithInsetSize:boundingRect.size];
 }
 
