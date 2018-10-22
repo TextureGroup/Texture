@@ -973,9 +973,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   NSUInteger lastCharIndex = NSIntegerMax;
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
 
-  if (inAdditionalTruncationMessage) {
-    return !_passthroughNonlinkTouches;
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     return YES;
   } else {
     return NO;
