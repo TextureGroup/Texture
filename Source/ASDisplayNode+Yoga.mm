@@ -275,10 +275,16 @@
     return;
   }
 
+  [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate>  _Nonnull delegate) {
+    if ([delegate respondsToSelector:@selector(nodeWillCalculateLayout:)]) {
+      [delegate nodeWillCalculateLayout:rootConstrainedSize];
+    }
+  }];
+
   ASLockScopeSelf();
 
   // Prepare all children for the layout pass with the current Yoga tree configuration.
-  ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
+  ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode *_Nonnull node) {
     node.yogaLayoutInProgress = YES;
     if (node.yogaParent) {
       node.style.parentAlignStyle = node.yogaParent.style.alignItems;
