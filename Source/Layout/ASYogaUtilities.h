@@ -40,9 +40,10 @@ AS_EXTERN float yogaDimensionToPercent(ASDimension dimension);
 AS_EXTERN ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
 
 AS_EXTERN void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
+AS_EXTERN float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height);
 AS_EXTERN YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
-                                                float width, YGMeasureMode widthMode,
-                                                float height, YGMeasureMode heightMode);
+                                      float width, YGMeasureMode widthMode,
+                                      float height, YGMeasureMode heightMode);
 
 #pragma mark - Yoga Style Setter Helpers
 

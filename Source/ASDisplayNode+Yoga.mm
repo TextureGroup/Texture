@@ -228,6 +228,7 @@
 - (BOOL)shouldHaveYogaMeasureFunc
 {
   // Size calculation via calculateSizeThatFits: or layoutSpecThatFits:
+  // For these nodes, we assume they may need custom Baseline calculation too.
   // This will be used for ASTextNode, as well as any other node that has no Yoga children
   BOOL isLeafNode = (self.yogaChildren.count == 0);
   BOOL definesCustomLayout = [self implementsLayoutMethod];
