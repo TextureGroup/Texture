@@ -20,7 +20,6 @@
   self.window.backgroundColor = [UIColor whiteColor];
   self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[[ViewController alloc] init]];
   [self.window makeKeyAndVisible];
-  
   return YES;
 }
 
@@ -31,7 +30,7 @@
 + (ASConfiguration *)textureConfiguration
 {
   ASConfiguration *configuration = [ASConfiguration new];
-  configuration.experimentalFeatures = ASExperimentalTextNode; 
+//  configuration.experimentalFeatures = ASExperimentalTextNode; 
   return configuration;
   
 }
