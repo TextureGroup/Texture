@@ -26,6 +26,7 @@
 
 @end
 
+// pre-order, depth-first
 AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
 #pragma mark - Yoga Type Conversion Helpers

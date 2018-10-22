@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 
 #define YOGA_LAYOUT_LOGGING 0
 
@@ -279,6 +280,11 @@
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
     node.yogaLayoutInProgress = YES;
+    if (node.yogaParent) {
+      node.style.parentAlignStyle = node.yogaParent.style.alignItems;
+    } else {
+      node.style.parentAlignStyle = ASStackLayoutAlignItemsNotSet;
+    };
   });
 
   if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {

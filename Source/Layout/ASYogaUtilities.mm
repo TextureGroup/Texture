@@ -7,11 +7,8 @@
 //
 
 #import <AsyncDisplayKit/ASYogaUtilities.h>
+#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #if YOGA /* YOGA */
-
-@interface ASDisplayNode (YogaInternal)
-@property(nonatomic, weak) ASDisplayNode *yogaParent;
-@end
 
 @implementation ASDisplayNode (YogaHelpers)
 
@@ -183,10 +180,8 @@ float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, con
                        @"Yoga context must be <ASLayoutElement>");
 
   ASDisplayNode *displayNode = ASDynamicCast(layoutElement, ASDisplayNode);
-  // baseline doesn't mean anything without a parent (and siblings)
-  ASDisplayNode *parent = [displayNode yogaParent];
 
-  switch (parent.style.alignItems) {
+  switch (displayNode.style.parentAlignStyle) {
     case ASStackLayoutAlignItemsBaselineFirst:
       return layoutElement.style.ascender;
     case ASStackLayoutAlignItemsBaselineLast:
