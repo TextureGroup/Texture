@@ -31,8 +31,17 @@
 
 @implementation ASDisplayNode (Yoga)
 
+- (ASDisplayNode *)yogaRoot {
+  ASDisplayNode *yogaRoot = self;
+  while(yogaRoot.yogaParent) {
+    yogaRoot = yogaRoot.yogaParent;
+  }
+  return yogaRoot;
+}
+
 - (void)setYogaChildren:(NSArray *)yogaChildren
 {
+  ASLockScope(self.yogaRoot);
   for (ASDisplayNode *child in [_yogaChildren copy]) {
     // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
     // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
@@ -51,11 +60,13 @@
 
 - (void)addYogaChild:(ASDisplayNode *)child
 {
+  ASLockScope(self.yogaRoot);
   [self insertYogaChild:child atIndex:_yogaChildren.count];
 }
 
 - (void)removeYogaChild:(ASDisplayNode *)child
 {
+  ASLockScope(self.yogaRoot);
   if (child == nil) {
     return;
   }
@@ -68,6 +79,7 @@
 
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
 {
+  ASLockScope(self.yogaRoot);
   if (child == nil) {
     return;
   }

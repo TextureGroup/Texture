@@ -199,6 +199,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 @property BOOL yogaLayoutInProgress;
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
+@property (weak, readonly) ASDisplayNode *yogaRoot;
 
 // These methods are intended to be used internally to Texture, and should not be called directly.
 - (BOOL)shouldHaveYogaMeasureFunc;
