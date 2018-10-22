@@ -52,6 +52,19 @@ typedef struct {
 @interface ASDisplayNode (Beta)
 
 /**
+ * ASTableView and ASCollectionView now throw exceptions on invalid updates
+ * like their UIKit counterparts. If YES, these classes will log messages
+ * on invalid updates rather than throwing exceptions.
+ *
+ * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
+ * as it proceeds with an invalid update.
+ *
+ * This property defaults to NO. It will be removed in a future release.
+ */
++ (BOOL)suppressesInvalidCollectionUpdateExceptions AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
++ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses;
+
+/**
  * @abstract Recursively ensures node and all subnodes are displayed.
  * @see Full documentation in ASDisplayNode+FrameworkPrivate.h
  */
@@ -95,6 +108,17 @@ typedef struct {
  * not be included in this aggregation, and will be exposed as separate accessibility elements to UIKit.
  */
 @property BOOL isAccessibilityContainer;
+
+/**
+ * @abstract Returns the default accessibility property values set by Texture on this node. For
+ * example, the default accessibility label for a text node may be its text content, while most
+ * other nodes would have nil default labels.
+ */
+@property (nullable, readonly, copy) NSString *defaultAccessibilityLabel;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityHint;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityValue;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityIdentifier;
+@property (readonly) UIAccessibilityTraits defaultAccessibilityTraits;
 
 /**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
