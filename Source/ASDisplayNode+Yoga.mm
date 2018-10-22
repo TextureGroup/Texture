@@ -312,7 +312,9 @@
 
   // Reset accessible elements, since layout may have changed.
   ASPerformBlockOnMainThread(^{
-    [(_ASDisplayView *)self.view setAccessibilityElements:nil];
+    if (self.nodeLoaded && !self.isSynchronous) {
+      [(_ASDisplayView *)self.view setAccessibilityElements:nil];
+    }
   });
 
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
