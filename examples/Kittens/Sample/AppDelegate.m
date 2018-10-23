@@ -30,7 +30,6 @@
 + (ASConfiguration *)textureConfiguration
 {
   ASConfiguration *configuration = [ASConfiguration new];
-//  configuration.experimentalFeatures = ASExperimentalTextNode; 
   return configuration;
   
 }

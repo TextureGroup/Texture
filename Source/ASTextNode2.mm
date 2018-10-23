@@ -194,7 +194,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     self.userInteractionEnabled = NO;
     self.needsDisplayOnBoundsChange = YES;
     
-    // The default truncation type is end for truncation
     _textContainer.truncationType = ASTextTruncationTypeEnd;
     
     // The common case is for a text node to be non-opaque and blended over some background.
@@ -626,28 +625,26 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     if (stringIndexForPosition != kCFNotFound) {
       CFIndex truncatedCTLineGlyphCount = CTLineGetGlyphCount(truncatedCTLine);
       
-      CTLineRef truncationTokenLine =
-      CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
-      CFIndex truncationTokenLineGlyphCount =
-      truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
+      CTLineRef truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
+      CFIndex truncationTokenLineGlyphCount = truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
       
-      CTLineRef additionalTruncationTokenLine = 
-      CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
-      CFIndex additionalTruncationTokenLineGlyphCount =
-      additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
+      CTLineRef additionalTruncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
+      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
       
       switch (_textContainer.truncationType) {
         case ASTextTruncationTypeStart: {
+          CFIndex composedTruncationTextLineGlyphCount = truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount;
           if (stringIndexForPosition > truncationTokenLineGlyphCount &&
-              stringIndexForPosition < (additionalTruncationTokenLineGlyphCount + truncationTokenLineGlyphCount)) {
+              stringIndexForPosition < composedTruncationTextLineGlyphCount) {
             inAdditionalTruncationMessage = YES;
           }      
           break;
         }
         case ASTextTruncationTypeMiddle: {
-          CFIndex firstTruncatedTokenIndex = (truncatedCTLineGlyphCount - (truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount)) / 2.0;
+          CFIndex composedTruncationTextLineGlyphCount = truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount;
+          CFIndex firstTruncatedTokenIndex = (truncatedCTLineGlyphCount - composedTruncationTextLineGlyphCount) / 2.0;
           if ((firstTruncatedTokenIndex + truncationTokenLineGlyphCount) < stringIndexForPosition &&
-              stringIndexForPosition < (firstTruncatedTokenIndex + truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount)) {
+              stringIndexForPosition < (firstTruncatedTokenIndex + composedTruncationTextLineGlyphCount)) {
             inAdditionalTruncationMessage = YES;
           }      
           break;
@@ -844,7 +841,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSUInteger lastCharIndex = NSIntegerMax;
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
   
-  if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     return YES;
   } else {
     return NO;
@@ -885,7 +882,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
     NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
     [self _setHighlightRange:truncationMessageRange forAttributeName:ASTextNodeTruncationTokenAttributeName value:nil animated:YES];
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  } else if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     [self _setHighlightRange:range forAttributeName:linkAttributeName value:linkAttributeValue animated:YES];
   }
 
