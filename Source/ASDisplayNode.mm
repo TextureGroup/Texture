@@ -2216,7 +2216,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertThreadAffinity(self);
   ASAssertUnlocked(__instanceLock__);
-
+  
   as_log_verbose(ASNodeLog(), "Insert subnode %@ at index %zd of %@ and remove subnode %@", subnode, subnodeIndex, self, oldSubnode);
   
   if (subnode == nil || subnode == self) {
