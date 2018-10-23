@@ -32,10 +32,12 @@
 
 @implementation ASDisplayNode (Yoga)
 
-- (ASDisplayNode *)yogaRoot {
+- (ASDisplayNode *)yogaRoot
+{
   ASDisplayNode *yogaRoot = self;
-  while(yogaRoot.yogaParent) {
-    yogaRoot = yogaRoot.yogaParent;
+  ASDisplayNode *yogaParent = nil; 
+  while ((yogaParent = yogaRoot.yogaParent)) {
+    yogaRoot = yogaParent;
   }
   return yogaRoot;
 }
@@ -286,8 +288,9 @@
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode *_Nonnull node) {
     node.yogaLayoutInProgress = YES;
-    if (node.yogaParent) {
-      node.style.parentAlignStyle = node.yogaParent.style.alignItems;
+    ASDisplayNode *yogaParent = node.yogaParent; 
+    if (yogaParent) {
+      node.style.parentAlignStyle = yogaParent.style.alignItems;
     } else {
       node.style.parentAlignStyle = ASStackLayoutAlignItemsNotSet;
     };
