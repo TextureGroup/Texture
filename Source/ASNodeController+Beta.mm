@@ -11,7 +11,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASWeakProxy.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
