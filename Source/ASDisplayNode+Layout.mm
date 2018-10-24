@@ -999,6 +999,12 @@ ASLayoutElementStyleExtensibilityForwarding
   _pendingLayoutTransition = nil;
 }
 
+- (void)_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  [self _locked_setCalculatedDisplayNodeLayout:displayNodeLayout];
+}
+
 - (void)_locked_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
 {
   ASAssertLocked(__instanceLock__);
