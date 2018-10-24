@@ -550,7 +550,7 @@
 		058D09BC195D04C000B7D73C /* TextureTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TextureTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		058D09BD195D04C000B7D73C /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		058D09C0195D04C000B7D73C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		058D09C7195D04C000B7D73C /* AsyncDisplayKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AsyncDisplayKitTests-Info.plist"; sourceTree = "<group>"; };
+		058D09C7195D04C000B7D73C /* TextureTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TextureTests-Info.plist"; sourceTree = "<group>"; };
 		058D09C9195D04C000B7D73C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		058D09D5195D050800B7D73C /* ASControlNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASControlNode.h; sourceTree = "<group>"; };
 		058D09D6195D050800B7D73C /* ASControlNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASControlNode.mm; sourceTree = "<group>"; };
@@ -1355,7 +1355,7 @@
 			children = (
 				CC0F88691E4286FA00576FED /* ReferenceImages_64 */,
 				CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */,
-				058D09C7195D04C000B7D73C /* AsyncDisplayKitTests-Info.plist */,
+				058D09C7195D04C000B7D73C /* TextureTests-Info.plist */,
 				058D09C8195D04C000B7D73C /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -2683,10 +2683,10 @@
 				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				INFOPLIST_FILE = "Tests/AsyncDisplayKitTests-Info.plist";
+				INFOPLIST_FILE = "Tests/TextureTests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AsyncDisplayKitTestHost.app/AsyncDisplayKitTestHost";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TextureTestHost.app/TextureTestHost";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -2706,10 +2706,10 @@
 				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				INFOPLIST_FILE = "Tests/AsyncDisplayKitTests-Info.plist";
+				INFOPLIST_FILE = "Tests/TextureTests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AsyncDisplayKitTestHost.app/AsyncDisplayKitTestHost";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TextureTestHost.app/TextureTestHost";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -2840,10 +2840,10 @@
 				);
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				INFOPLIST_FILE = "Tests/AsyncDisplayKitTests-Info.plist";
+				INFOPLIST_FILE = "Tests/TextureTests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AsyncDisplayKitTestHost.app/AsyncDisplayKitTestHost";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TextureTestHost.app/TextureTestHost";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Profile;
