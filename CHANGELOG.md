@@ -62,6 +62,7 @@
 - [ASDisplayNode] Expose default Texture-set accessibility values as properties. [Jia Wern Lim](https://github.com/jiawernlim) [#1170](https://github.com/TextureGroup/Texture/pull/1170)
 - ASTableNode init method match checks from ASCollectionNode [Michael Schneider](https://github.com/maicki) [#1171]
 - Add NSLocking conformance to ASNodeController [Michael Schneider](https://github.com/maicki)[#1179] (https://github.com/TextureGroup/Texture/pull/1179)
+- Don’t handle touches on additional attributed message if passthrough is enabled [Michael Schneider](https://github.com/maicki)[#1184] (https://github.com/TextureGroup/Texture/pull/1184)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
