@@ -2265,7 +2265,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [_subnodes insertObject:subnode atIndex:subnodeIndex];
     _cachedSubnodes = nil;
   __instanceLock__.unlock();
-  
+
+  if (!isRasterized && self.nodeLoaded) {
+    // Trigger the subnode to load its layer, which will create its view if it needs one.
+    // By doing this prior to downward propagation of .interfaceState in _setSupernode:,
+    // we can guarantee that -didEnterVisibleState is only called with .isNodeLoaded = YES.
+    [subnode layer];
+  }
+
   // This call will apply our .hierarchyState to the new subnode.
   // If we are a managed hierarchy, as in ASCellNode trees, it will also apply our .interfaceState.
   [subnode _setSupernode:self];
@@ -3272,10 +3279,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // subclass override
   ASDisplayNodeAssertMainThread();
+  
+  // Rasterized node's loading state is merged with root node of rasterized tree.
+  if (!(self.hierarchyState & ASHierarchyStateRasterized)) {
+    ASDisplayNodeAssert(self.isNodeLoaded, @"Node should be loaded before entering visible state.");
+  }
+
   ASAssertUnlocked(__instanceLock__);
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
     [del didEnterVisibleState];
   }];
+  
 #if AS_ENABLE_TIPS
   [ASTipsController.shared nodeDidAppear:self];
 #endif
