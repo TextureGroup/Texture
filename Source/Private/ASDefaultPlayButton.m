@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDefaultPlayButton.h>
-#import <AsyncDisplayKit/_ASDisplayLayer.h>
+#import <Texture/ASDefaultPlayButton.h>
+#import <Texture/_ASDisplayLayer.h>
 
 @implementation ASDefaultPlayButton
 

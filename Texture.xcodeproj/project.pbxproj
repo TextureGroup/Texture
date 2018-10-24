@@ -375,7 +375,7 @@
 		CC87BB951DA8193C0090E380 /* ASCellNode+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = CC87BB941DA8193C0090E380 /* ASCellNode+Internal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CC8B05D61D73836400F54286 /* ASPerformanceTestContext.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8B05D51D73836400F54286 /* ASPerformanceTestContext.m */; };
 		CC8B05D81D73979700F54286 /* ASTextNodePerformanceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC8B05D71D73979700F54286 /* ASTextNodePerformanceTests.m */; };
-		CC90E1F41E383C0400FED591 /* AsyncDisplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */; };
+		CC90E1F41E383C0400FED591 /* Texture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B35061DA1B010EDF0018CF92 /* Texture.framework */; };
 		CCA221D31D6FA7EF00AF6A0F /* ASViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.m */; };
 		CCA282B41E9EA7310037E8B7 /* ASTipsController.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282B21E9EA7310037E8B7 /* ASTipsController.h */; };
 		CCA282B51E9EA7310037E8B7 /* ASTipsController.m in Sources */ = {isa = PBXBuildFile; fileRef = CCA282B31E9EA7310037E8B7 /* ASTipsController.m */; };
@@ -440,7 +440,6 @@
 		CCF18FF41D2575E300DF5895 /* NSIndexSet+ASHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CCF1FF5E20C4785000AAD8FC /* ASLocking.h in Headers */ = {isa = PBXBuildFile; fileRef = CCF1FF5D20C4785000AAD8FC /* ASLocking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */; };
 		DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DB55C2601C6408D6004EDCF5 /* _ASTransitionContext.m */; };
 		DBABFAFC1C6A8D2F0039EA4A /* _ASTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C25F1C6408D6004EDCF5 /* _ASTransitionContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DBC452DE1C5C6A6A00B16017 /* ArrayDiffingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.m */; };
@@ -831,7 +830,7 @@
 		B13CA0FF1C52004900E031AB /* ASCollectionNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionNode+Beta.h"; sourceTree = "<group>"; };
 		B30BF6501C5964B0004FCD53 /* ASLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASLayoutManager.h; path = TextKit/ASLayoutManager.h; sourceTree = "<group>"; };
 		B30BF6511C5964B0004FCD53 /* ASLayoutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASLayoutManager.m; path = TextKit/ASLayoutManager.m; sourceTree = "<group>"; };
-		B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AsyncDisplayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B35061DA1B010EDF0018CF92 /* Texture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Texture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASNavigationControllerTests.m; sourceTree = "<group>"; };
 		BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTabBarControllerTests.m; sourceTree = "<group>"; };
 		BDC2D162BD55A807C1475DA5 /* Pods-AsyncDisplayKitTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.profile.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.profile.xcconfig"; sourceTree = "<group>"; };
@@ -1029,7 +1028,6 @@
 		E5E281751E71C845006B67C2 /* ASCollectionLayoutState.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionLayoutState.mm; sourceTree = "<group>"; };
 		E5E2D72D1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionGalleryLayoutDelegate.h; sourceTree = "<group>"; };
 		E5E2D72F1EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASCollectionGalleryLayoutDelegate.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASButtonNodeTests.m; sourceTree = "<group>"; };
 		F325E48F217460B000AC93A4 /* ASTextNode2Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASTextNode2Tests.m; sourceTree = "<group>"; };
 		F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDisplayViewAccessibilityTests.mm; sourceTree = "<group>"; };
@@ -1050,11 +1048,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CC90E1F41E383C0400FED591 /* AsyncDisplayKit.framework in Frameworks */,
+				CC90E1F41E383C0400FED591 /* Texture.framework in Frameworks */,
 				058D09BE195D04C000B7D73C /* XCTest.framework in Frameworks */,
 				058D09C1195D04C000B7D73C /* UIKit.framework in Frameworks */,
 				058D09BF195D04C000B7D73C /* Foundation.framework in Frameworks */,
-				DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */,
 				30A5D117E253CD98B512642A /* libPods-TextureTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1113,7 +1110,7 @@
 			children = (
 				058D09BC195D04C000B7D73C /* TextureTests.xctest */,
 				057D02BF1AC0A66700C7AC3C /* TextureTestHost.app */,
-				B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */,
+				B35061DA1B010EDF0018CF92 /* Texture.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1127,7 +1124,6 @@
 				058D09AF195D04C000B7D73C /* Foundation.framework */,
 				058D09BD195D04C000B7D73C /* XCTest.framework */,
 				058D09C0195D04C000B7D73C /* UIKit.framework */,
-				EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */,
 				A45DCD965F187530AE33B670 /* libPods-TextureTests.a */,
 			);
 			name = Frameworks;
@@ -2136,7 +2132,7 @@
 			);
 			name = Texture;
 			productName = AsyncDisplayKit;
-			productReference = B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */;
+			productReference = B35061DA1B010EDF0018CF92 /* Texture.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -2739,7 +2735,7 @@
 					"-fno-exceptions",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.AsyncDisplayKit;
-				PRODUCT_NAME = AsyncDisplayKit;
+				PRODUCT_NAME = Texture;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2771,7 +2767,7 @@
 					"-fno-exceptions",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.AsyncDisplayKit;
-				PRODUCT_NAME = AsyncDisplayKit;
+				PRODUCT_NAME = Texture;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2891,7 +2887,7 @@
 					"-fno-exceptions",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.AsyncDisplayKit;
-				PRODUCT_NAME = AsyncDisplayKit;
+				PRODUCT_NAME = Texture;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";

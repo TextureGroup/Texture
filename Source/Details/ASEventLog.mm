@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASEventLog.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASTraceEvent.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <Texture/ASEventLog.h>
+#import <Texture/ASThread.h>
+#import <Texture/ASTraceEvent.h>
+#import <Texture/ASObjectDescriptionHelpers.h>
 
 @implementation ASEventLog {
   ASDN::RecursiveMutex __instanceLock__;

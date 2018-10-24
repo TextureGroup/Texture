@@ -11,7 +11,7 @@
 #import <OCMock/OCMock.h>
 #import <objc/runtime.h>
 #import "ASTestCase.h"
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 #import "debugbreak.h"
 
 @interface ASTestCase (OCMockObjectRegistering)

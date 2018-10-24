@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <Texture/ASCollectionElement.h>
+#import <Texture/ASCellNode+Internal.h>
 #import <mutex>
 
 @interface ASCollectionElement ()

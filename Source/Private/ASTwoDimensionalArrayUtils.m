@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASTwoDimensionalArrayUtils.h>
 
 // Import UIKit to get [NSIndexPath indexPathForItem:inSection:] which uses
 // tagged pointers.

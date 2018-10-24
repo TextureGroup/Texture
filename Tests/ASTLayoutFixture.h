@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "ASTestCase.h"
 #import "ASLayoutTestNode.h"
 

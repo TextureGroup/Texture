@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 #ifndef ASEVENTLOG_CAPACITY
 #define ASEVENTLOG_CAPACITY 5

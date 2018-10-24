@@ -9,9 +9,9 @@
 
 #import "ASLayoutSpecSnapshotTestsHelper.h"
 
-#import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
-#import <AsyncDisplayKit/ASRelativeLayoutSpec.h>
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
+#import <Texture/ASBackgroundLayoutSpec.h>
+#import <Texture/ASRelativeLayoutSpec.h>
+#import <Texture/ASStackLayoutSpec.h>
 
 static const ASSizeRange kSize = {{100, 120}, {320, 160}};
 

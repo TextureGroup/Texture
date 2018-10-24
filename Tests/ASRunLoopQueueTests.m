@@ -8,7 +8,7 @@
 
 #import "ASTestCase.h"
 
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <Texture/ASRunLoopQueue.h>
 #import "ASDisplayNodeTestsHelper.h"
 
 static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run for one millisecond each time.

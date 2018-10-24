@@ -8,7 +8,7 @@
 //
 
 #import "ASResponderChainEnumerator.h"
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 
 @implementation ASResponderChainEnumerator {
   UIResponder *_currentResponder;

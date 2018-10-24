@@ -8,8 +8,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/ASButtonNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <Texture/ASButtonNode.h>
+#import <Texture/ASDisplayNode+Beta.h>
 
 @interface ASButtonNodeTests : XCTestCase
 @end

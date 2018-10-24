@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASTextNode.h>
+#import <Texture/ASTextNode.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

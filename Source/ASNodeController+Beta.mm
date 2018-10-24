@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASNodeController+Beta.h>
+#import <Texture/ASThread.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 

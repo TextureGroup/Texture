@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitRenderer+TextChecking.h>
+#import <Texture/ASTextKitRenderer+TextChecking.h>
 
-#import <AsyncDisplayKit/ASTextKitEntityAttribute.h>
-#import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
-#import <AsyncDisplayKit/ASTextKitTailTruncater.h>
+#import <Texture/ASTextKitEntityAttribute.h>
+#import <Texture/ASTextKitRenderer+Positioning.h>
+#import <Texture/ASTextKitTailTruncater.h>
 
 @implementation ASTextKitTextCheckingResult
 

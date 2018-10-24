@@ -11,7 +11,7 @@
 
 // Not strictly necessary, but convenient
 #import <OCMock/OCMock.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "OCMockObject+ASAdditions.h"
 #import "ASConfigurationInternal.h"
 

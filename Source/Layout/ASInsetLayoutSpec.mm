@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
+#import <Texture/ASInsetLayoutSpec.h>
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASInternalHelpers.h>
 
 @interface ASInsetLayoutSpec ()
 {

@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
+#import <Texture/ASLayoutRangeType.h>
 
 @protocol ASRangeControllerUpdateRangeProtocol <NSObject>
 

@@ -11,10 +11,10 @@
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 
 // Concrete classes
-#import <AsyncDisplayKit/ASLayerBackingTipProvider.h>
+#import <Texture/ASLayerBackingTipProvider.h>
 
 @implementation ASTipProvider
 

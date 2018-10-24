@@ -10,9 +10,9 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBlockTypes.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASEventLog.h>
+#import <Texture/ASBlockTypes.h>
+#import <Texture/ASDimension.h>
+#import <Texture/ASEventLog.h>
 #ifdef __cplusplus
 #import <vector>
 #endif

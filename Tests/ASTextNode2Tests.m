@@ -10,8 +10,8 @@
 
 #import "ASTestCase.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASTextNode2.h>
+#import <Texture/ASDisplayNode+Beta.h>
+#import <Texture/ASTextNode2.h>
 
 #import <XCTest/XCTest.h>
 

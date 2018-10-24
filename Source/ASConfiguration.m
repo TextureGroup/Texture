@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASConfiguration.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <Texture/ASConfiguration.h>
+#import <Texture/ASConfigurationInternal.h>
 
 /// Not too performance-sensitive here.
 

@@ -11,7 +11,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/ASTextKitCoreTextAdditions.h>
+#import <Texture/ASTextKitCoreTextAdditions.h>
 
 BOOL floatsCloseEnough(CGFloat float1, CGFloat float2) {
   CGFloat epsilon = 0.00001;

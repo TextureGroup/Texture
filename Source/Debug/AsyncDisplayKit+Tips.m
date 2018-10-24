@@ -8,7 +8,7 @@
 //
 
 #import "AsyncDisplayKit+Tips.h"
-#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
+#import <Texture/ASDisplayNode+Ancestry.h>
 
 @implementation ASDisplayNode (Tips)
 

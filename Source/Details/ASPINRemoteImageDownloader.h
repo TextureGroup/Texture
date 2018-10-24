@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAvailability.h>
 
 #if AS_PIN_REMOTE_IMAGE
 
-#import <AsyncDisplayKit/ASImageProtocols.h>
+#import <Texture/ASImageProtocols.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

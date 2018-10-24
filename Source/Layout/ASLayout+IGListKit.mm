@@ -5,7 +5,7 @@
 //  Copyright (c) Pinterest, Inc.  All rights reserved.
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAvailability.h>
 #if AS_IG_LIST_KIT
 #import "ASLayout+IGListKit.h"
 

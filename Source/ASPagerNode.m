@@ -7,19 +7,19 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPagerNode.h>
-#import <AsyncDisplayKit/ASPagerNode+Beta.h>
+#import <Texture/ASPagerNode.h>
+#import <Texture/ASPagerNode+Beta.h>
 
-#import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
-#import <AsyncDisplayKit/ASCollectionNode+Beta.h>
-#import <AsyncDisplayKit/ASDelegateProxy.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASPagerFlowLayout.h>
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
-#import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
+#import <Texture/ASCollectionGalleryLayoutDelegate.h>
+#import <Texture/ASCollectionNode+Beta.h>
+#import <Texture/ASDelegateProxy.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASPagerFlowLayout.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASCellNode.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
+#import <Texture/UIResponder+AsyncDisplayKit.h>
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {

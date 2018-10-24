@@ -8,8 +8,8 @@
 //
 
 #import "AppDelegate.h"
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASDisplayNode+Beta.h>
 
 @implementation AppDelegate
 

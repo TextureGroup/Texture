@@ -8,9 +8,9 @@
 //
 
 #import "ASXCTExtensions.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "ASLayoutSpecSnapshotTestsHelper.h"
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <stdatomic.h>
 
 @interface ASDisplayNodeLayoutTests : XCTestCase

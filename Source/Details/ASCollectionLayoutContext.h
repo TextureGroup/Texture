@@ -8,8 +8,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASScrollDirection.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASScrollDirection.h>
 
 @class ASElementMap;
 

@@ -9,9 +9,9 @@
 
 #if TARGET_OS_IOS
 #import <CoreMedia/CoreMedia.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASVideoNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASThread.h>
+#import <Texture/ASVideoNode.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 @class AVAsset;
 @class ASButtonNode;

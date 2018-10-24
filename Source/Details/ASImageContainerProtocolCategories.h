@@ -8,7 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASImageProtocols.h>
+#import <Texture/ASImageProtocols.h>
 
 @interface UIImage (ASImageContainerProtocol) <ASImageContainerProtocol>
 

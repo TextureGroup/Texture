@@ -8,7 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 /**
  A threadsafe container for the TextKit components that ASTextKit uses to lay out and truncate its text.

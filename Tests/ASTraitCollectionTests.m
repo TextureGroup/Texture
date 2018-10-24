@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
+#import <Texture/ASTraitCollection.h>
 
 @interface ASTraitCollectionTests : XCTestCase
 

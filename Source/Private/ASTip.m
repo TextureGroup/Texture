@@ -11,7 +11,7 @@
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASDisplayNode.h>
+#import <Texture/ASDisplayNode.h>
 
 @implementation ASTip
 

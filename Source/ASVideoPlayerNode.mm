@@ -11,15 +11,15 @@
 
 #if TARGET_OS_IOS
 
-#import <AsyncDisplayKit/ASVideoPlayerNode.h>
+#import <Texture/ASVideoPlayerNode.h>
 
 #import <AVFoundation/AVFoundation.h>
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDefaultPlaybackButton.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDefaultPlaybackButton.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/ASThread.h>
 
 static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 

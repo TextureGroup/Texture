@@ -6,10 +6,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCornerLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
+#import <Texture/ASCornerLayoutSpec.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASLayoutSpec+Subclasses.h>
+#import <Texture/ASDisplayNode.h>
 
 CGPoint as_calculatedCornerOriginIn(CGRect baseFrame, CGSize cornerSize, ASCornerLayoutLocation cornerLocation, CGPoint offset)
 {

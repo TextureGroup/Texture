@@ -9,9 +9,9 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
-#import <AsyncDisplayKit/ASScrollDirection.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASLayoutRangeType.h>
+#import <Texture/ASScrollDirection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

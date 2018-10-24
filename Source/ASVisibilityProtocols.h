@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASLayoutRangeType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

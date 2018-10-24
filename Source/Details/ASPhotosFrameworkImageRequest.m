@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
+#import <Texture/ASPhotosFrameworkImageRequest.h>
 
 #if AS_USE_PHOTOS
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 NSString *const ASPhotosURLScheme = @"ph";
 

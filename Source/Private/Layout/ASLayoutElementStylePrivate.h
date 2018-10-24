@@ -9,8 +9,8 @@
 
 #pragma once
 
-#import <AsyncDisplayKit/ASLayoutElement.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <Texture/ASLayoutElement.h>
+#import <Texture/ASObjectDescriptionHelpers.h>
 
 @interface ASLayoutElementStyle () <ASDescriptionProvider>
 

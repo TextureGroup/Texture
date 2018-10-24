@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASLog.h>
+#import <Texture/ASLog.h>
 #import <stdatomic.h>
 
 static atomic_bool __ASLogEnabled = ATOMIC_VAR_INIT(YES);

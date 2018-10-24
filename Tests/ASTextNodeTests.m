@@ -13,11 +13,11 @@
 
 #import <OCMock/OCMock.h>
 
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASTextNode.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASTextNode.h>
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <Texture/CoreGraphics+ASConvenience.h>
 
 
 @interface ASTextNodeTestDelegate : NSObject <ASTextNodeDelegate>

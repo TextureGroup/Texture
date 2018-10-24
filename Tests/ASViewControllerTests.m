@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import <OCMock/OCMock.h>
 #import "NSInvocation+ASTestHelpers.h"
 

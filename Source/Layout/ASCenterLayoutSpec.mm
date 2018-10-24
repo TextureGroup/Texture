@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCenterLayoutSpec.h>
+#import <Texture/ASCenterLayoutSpec.h>
 
-#import <AsyncDisplayKit/ASLayout.h>
+#import <Texture/ASLayout.h>
 
 @implementation ASCenterLayoutSpec
 {
