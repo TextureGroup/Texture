@@ -27,6 +27,9 @@
 - (void)nodeDidLoad ASDISPLAYNODE_REQUIRES_SUPER;
 - (void)nodeDidLayout ASDISPLAYNODE_REQUIRES_SUPER;
 
+// This is only called during Yoga-driven layouts.
+- (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize ASDISPLAYNODE_REQUIRES_SUPER;
+
 - (void)didEnterVisibleState ASDISPLAYNODE_REQUIRES_SUPER;
 - (void)didExitVisibleState  ASDISPLAYNODE_REQUIRES_SUPER;
 
