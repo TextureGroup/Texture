@@ -48,13 +48,6 @@
  */
 #define AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS 0
 
-#define AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE() { \
-  static dispatch_once_t onceToken; \
-  dispatch_once(&onceToken, ^{ \
-    NSLog(@"[Texture] Warning: Feature %@ is unimplemented in the experimental text node.", NSStringFromSelector(_cmd)); \
-  });\
-}
-
 /**
  * If it can't find a compatible layout, this method creates one.
  *
