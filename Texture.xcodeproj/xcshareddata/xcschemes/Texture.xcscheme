@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-               BuildableName = "AsyncDisplayKit.framework"
+               BuildableName = "Texture.framework"
                BlueprintName = "Texture"
                ReferencedContainer = "container:Texture.xcodeproj">
             </BuildableReference>
@@ -48,7 +48,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
+            BuildableName = "Texture.framework"
             BlueprintName = "Texture"
             ReferencedContainer = "container:Texture.xcodeproj">
          </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
+            BuildableName = "Texture.framework"
             BlueprintName = "Texture"
             ReferencedContainer = "container:Texture.xcodeproj">
          </BuildableReference>
@@ -95,7 +95,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
+            BuildableName = "Texture.framework"
             BlueprintName = "Texture"
             ReferencedContainer = "container:Texture.xcodeproj">
          </BuildableReference>
