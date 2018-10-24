@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
+#import <Texture/ASBasicImageDownloader.h>
 
 #import <objc/runtime.h>
 
-#import <AsyncDisplayKit/ASBasicImageDownloaderInternal.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASBasicImageDownloaderInternal.h>
+#import <Texture/ASImageContainerProtocolCategories.h>
+#import <Texture/ASThread.h>
 
 
 #pragma mark -

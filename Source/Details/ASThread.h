@@ -15,11 +15,11 @@
 #import <stdbool.h>
 #import <stdlib.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASConfigurationInternal.h>
+#import <Texture/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 {

@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASNetworkImageNode.h>
+#import <Texture/ASNetworkImageNode.h>
 
 @class AVAsset, AVPlayer, AVPlayerLayer, AVPlayerItem, AVVideoComposition, AVAudioMix;
 @protocol ASVideoNodeDelegate;

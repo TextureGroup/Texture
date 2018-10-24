@@ -8,10 +8,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAvailability.h>
 
 #if TARGET_OS_IOS && AS_USE_MAPKIT
-#import <AsyncDisplayKit/ASImageNode.h>
+#import <Texture/ASImageNode.h>
 #import <MapKit/MapKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

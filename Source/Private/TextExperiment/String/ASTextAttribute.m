@@ -10,7 +10,7 @@
 #import "ASTextAttribute.h"
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <Texture/NSAttributedString+ASText.h>
 
 NSString *const ASTextBackedStringAttributeName = @"ASTextBackedString";
 NSString *const ASTextBindingAttributeName = @"ASTextBinding";

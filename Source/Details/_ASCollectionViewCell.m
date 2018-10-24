@@ -8,9 +8,9 @@
 //
 
 #import "_ASCollectionViewCell.h"
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASCellNode+Internal.h>
+#import <Texture/ASCollectionElement.h>
+#import <Texture/ASInternalHelpers.h>
 
 @implementation _ASCollectionViewCell
 

@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASDispatch.h>
+#import <Texture/ASDispatch.h>
 
 @interface ASDispatchTests : XCTestCase
 

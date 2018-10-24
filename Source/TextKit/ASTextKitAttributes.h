@@ -10,7 +10,7 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
+#import <Texture/ASEqualityHelpers.h>
 
 AS_EXTERN NSString *const ASTextKitTruncationAttributeName;
 /**

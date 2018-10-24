@@ -12,7 +12,7 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 #import <AVFoundation/AVFoundation.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "ASDisplayNodeTestsHelper.h"
 
 @interface ASVideoNodeTests : XCTestCase <ASVideoNodeDelegate>

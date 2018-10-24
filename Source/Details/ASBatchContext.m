@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBatchContext.h>
+#import <Texture/ASBatchContext.h>
 
-#import <AsyncDisplayKit/ASLog.h>
+#import <Texture/ASLog.h>
 #import <stdatomic.h>
 
 typedef NS_ENUM(NSInteger, ASBatchContextState) {

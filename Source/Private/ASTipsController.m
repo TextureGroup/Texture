@@ -11,12 +11,12 @@
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASDisplayNodeTipState.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Tips.h>
-#import <AsyncDisplayKit/ASTipNode.h>
-#import <AsyncDisplayKit/ASTipProvider.h>
-#import <AsyncDisplayKit/ASTipsWindow.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeTipState.h>
+#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/ASTipNode.h>
+#import <Texture/ASTipProvider.h>
+#import <Texture/ASTipsWindow.h>
+#import <Texture/ASDisplayNodeExtras.h>
 
 @interface ASTipsController ()
 

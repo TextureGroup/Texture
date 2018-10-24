@@ -1,5 +1,5 @@
-framework module AsyncDisplayKit {
-  umbrella header "AsyncDisplayKit.h"
+framework module Texture {
+  umbrella header "Texture.h"
   
   export *
   module * {

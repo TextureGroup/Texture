@@ -8,7 +8,7 @@
 //
 
 #import "ASSnapshotTestCase.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface ASTextNodeSnapshotTests : ASSnapshotTestCase
 

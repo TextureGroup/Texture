@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
+#import <Texture/ASCollectionViewLayoutController.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
+#import <Texture/ASElementMap.h>
+#import <Texture/CoreGraphics+ASConvenience.h>
+#import <Texture/UICollectionViewLayout+ASConvenience.h>
 
 struct ASRangeGeometry {
   CGRect rangeBounds;

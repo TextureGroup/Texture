@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASStackUnpositionedLayout.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASDimension.h>
+#import <Texture/ASStackUnpositionedLayout.h>
 
 /** Represents a set of laid out and positioned stack layout children. */
 struct ASStackPositionedLayout {

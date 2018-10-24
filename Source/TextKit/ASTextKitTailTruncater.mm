@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitContext.h>
-#import <AsyncDisplayKit/ASTextKitTailTruncater.h>
+#import <Texture/ASTextKitContext.h>
+#import <Texture/ASTextKitTailTruncater.h>
 
 @implementation ASTextKitTailTruncater
 {

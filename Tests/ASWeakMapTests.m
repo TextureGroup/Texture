@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASWeakMap.h>
+#import <Texture/ASWeakMap.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

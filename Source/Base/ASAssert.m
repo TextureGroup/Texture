@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASAvailability.h>
 
 #if AS_TLS_AVAILABLE
 

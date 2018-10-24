@@ -9,12 +9,12 @@
 
 #import "ASLayoutSpecSnapshotTestsHelper.h"
 
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
-#import <AsyncDisplayKit/ASStackLayoutSpecUtilities.h>
-#import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
-#import <AsyncDisplayKit/ASRatioLayoutSpec.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASTextNode.h>
+#import <Texture/ASStackLayoutSpec.h>
+#import <Texture/ASStackLayoutSpecUtilities.h>
+#import <Texture/ASBackgroundLayoutSpec.h>
+#import <Texture/ASRatioLayoutSpec.h>
+#import <Texture/ASInsetLayoutSpec.h>
+#import <Texture/ASTextNode.h>
 
 @interface ASStackLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 @end

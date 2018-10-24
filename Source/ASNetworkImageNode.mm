@@ -7,26 +7,26 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASNetworkImageNode.h>
+#import <Texture/ASNetworkImageNode.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASImageNode+Private.h>
-#import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASNetworkImageLoadInfo+Private.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASBasicImageDownloader.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASImageNode+Private.h>
+#import <Texture/ASImageNode+AnimatedImagePrivate.h>
+#import <Texture/ASImageContainerProtocolCategories.h>
+#import <Texture/ASLog.h>
+#import <Texture/ASNetworkImageLoadInfo+Private.h>
 
 #import <atomic>
 
 #if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
+#import <Texture/ASPINRemoteImageDownloader.h>
 #endif
 
 @interface ASNetworkImageNode ()

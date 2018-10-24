@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDataController.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
+#import <Texture/ASDataController.h>
+#import <Texture/ASTraitCollection.h>
 
 @class ASDisplayNode;
 @protocol ASRangeManagingNode;

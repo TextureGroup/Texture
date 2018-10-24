@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitRenderer.h>
+#import <Texture/ASTextKitRenderer.h>
 
 typedef void (^as_text_component_index_block_t)(NSUInteger characterIndex,
                                                 CGRect glyphBoundingRect,

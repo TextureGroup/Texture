@@ -9,8 +9,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASLayoutElementExtensibility.h>
+#import <Texture/Texture.h>
+#import <Texture/ASLayoutElementExtensibility.h>
 
 #pragma mark - ASDKExtendedLayoutSpec
 

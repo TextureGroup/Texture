@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/UIImage+ASConvenience.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/UIImage+ASConvenience.h>
+#import <Texture/ASGraphicsContext.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASAssert.h>
 
 #pragma mark - ASDKFastImageNamed
 

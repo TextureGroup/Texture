@@ -7,9 +7,9 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASLayoutSpec.h>
 
 @interface ASLayoutFlatteningTests : XCTestCase
 @end

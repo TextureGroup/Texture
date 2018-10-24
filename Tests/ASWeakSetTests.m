@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASWeakSet.h>
+#import <Texture/ASWeakSet.h>
 
 @interface ASWeakSetTests : XCTestCase
 

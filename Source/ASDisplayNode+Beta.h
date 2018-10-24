@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
-#import <AsyncDisplayKit/ASEventLog.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASLayoutRangeType.h>
+#import <Texture/ASEventLog.h>
 
 #if YOGA
   #import YOGA_HEADER_PATH
-  #import <AsyncDisplayKit/ASYogaUtilities.h>
+  #import <Texture/ASYogaUtilities.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

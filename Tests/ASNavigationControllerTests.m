@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "ASNavigationController.h"
 
 @interface ASNavigationControllerTests : XCTestCase

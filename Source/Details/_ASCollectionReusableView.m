@@ -8,8 +8,8 @@
 //
 
 #import "_ASCollectionReusableView.h"
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
+#import <Texture/ASCellNode+Internal.h>
+#import <Texture/ASCollectionElement.h>
 
 @implementation _ASCollectionReusableView
 

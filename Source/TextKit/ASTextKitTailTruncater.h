@@ -9,8 +9,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASTextKitTruncating.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASTextKitTruncating.h>
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASTextKitTailTruncater : NSObject <ASTextKitTruncating>

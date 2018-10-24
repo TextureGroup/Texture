@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASDimension.h>
+#import <Texture/ASDimension.h>
 
 @class ASCATransactionQueue, ASDisplayNode;
 

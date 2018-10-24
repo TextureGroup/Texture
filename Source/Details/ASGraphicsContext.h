@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 #import <CoreGraphics/CoreGraphics.h>
 
 @class UIImage;

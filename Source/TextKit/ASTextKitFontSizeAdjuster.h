@@ -8,8 +8,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASTextKitAttributes.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASTextKitAttributes.h>
+#import <Texture/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

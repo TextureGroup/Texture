@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface ASPagerNodeTestDataSource : NSObject <ASPagerDataSource>
 @end

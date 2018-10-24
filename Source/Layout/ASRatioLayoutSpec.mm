@@ -7,16 +7,16 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASRatioLayoutSpec.h>
+#import <Texture/ASRatioLayoutSpec.h>
 
 #import <algorithm>
 #import <tgmath.h>
 #import <vector>
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASInternalHelpers.h>
 
 #pragma mark - ASRatioLayoutSpec
 

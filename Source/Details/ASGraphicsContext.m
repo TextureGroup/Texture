@@ -7,10 +7,10 @@
 //
 
 #import "ASGraphicsContext.h"
-#import <AsyncDisplayKit/ASCGImageBuffer.h>
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASCGImageBuffer.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASConfigurationInternal.h>
+#import <Texture/ASInternalHelpers.h>
 #import <UIKit/UIGraphics.h>
 #import <UIKit/UIImage.h>
 #import <objc/runtime.h>

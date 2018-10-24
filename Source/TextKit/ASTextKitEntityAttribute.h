@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 /**
  The object that should be embedded with ASTextKitEntityAttributeName.  Please note that the entity you provide MUST

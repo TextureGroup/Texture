@@ -10,8 +10,8 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/ASTextKitContext.h>
-#import <AsyncDisplayKit/ASTextKitTailTruncater.h>
+#import <Texture/ASTextKitContext.h>
+#import <Texture/ASTextKitTailTruncater.h>
 
 @interface ASTextKitTruncationTests : XCTestCase
 

@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASCollectionGalleryLayoutInfo.h>
-#import <AsyncDisplayKit/ASHashing.h>
+#import <Texture/_ASCollectionGalleryLayoutInfo.h>
+#import <Texture/ASHashing.h>
 
 @implementation _ASCollectionGalleryLayoutInfo
 

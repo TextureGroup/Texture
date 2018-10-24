@@ -8,7 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 /**
  * @abstract an immutable class for calculating shadow padding drawing a shadowed background for text

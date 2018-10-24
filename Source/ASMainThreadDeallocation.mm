@@ -6,13 +6,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
+#import <Texture/ASMainThreadDeallocation.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASLog.h>
+#import <Texture/ASThread.h>
 
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>

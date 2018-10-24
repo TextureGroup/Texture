@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
+#import <Texture/ASAsciiArtBoxCreator.h>
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <tgmath.h>

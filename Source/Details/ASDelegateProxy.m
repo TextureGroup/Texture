@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDelegateProxy.h>
-#import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASCollectionNode.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASDelegateProxy.h>
+#import <Texture/ASTableNode.h>
+#import <Texture/ASCollectionNode.h>
+#import <Texture/ASAssert.h>
 
 @implementation ASTableViewProxy
 

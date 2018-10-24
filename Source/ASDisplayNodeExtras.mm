@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASDisplayNode+Ancestry.h>
 
 #import <queue>
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <Texture/ASRunLoopQueue.h>
 
 void ASPerformMainThreadDeallocation(id _Nullable __strong * _Nonnull objectPtr) {
   /**

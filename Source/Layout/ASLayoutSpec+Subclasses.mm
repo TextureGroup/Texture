@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <AsyncDisplayKit/ASLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
+#import <Texture/ASLayoutSpec.h>
+#import <Texture/ASLayoutSpecPrivate.h>
 
 #pragma mark - ASNullLayoutSpec
 

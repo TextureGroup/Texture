@@ -9,13 +9,13 @@
 
 #import <Foundation/Foundation.h>
 #if TARGET_OS_TV
-#import <AsyncDisplayKit/ASImageNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASImageNode.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 #import <GLKit/GLKit.h>
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeExtras.h>
 
 @implementation ASImageNode (tvOS)
 

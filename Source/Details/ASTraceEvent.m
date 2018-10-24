@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTraceEvent.h>
+#import <Texture/ASTraceEvent.h>
 #import <QuartzCore/QuartzCore.h>
 
 static NSString *const ASTraceEventThreadDescriptionKey = @"ASThreadTraceEventDescription";
