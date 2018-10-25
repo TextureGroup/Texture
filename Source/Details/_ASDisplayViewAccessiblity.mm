@@ -268,7 +268,8 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
 
 @implementation ASDisplayNode (AccessibilityInternal)
 
-- (NSArray *)accessibilityElements {
+- (NSArray *)accessibilityElements
+{
   if (!self.isNodeLoaded) {
     ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
     return @[];
