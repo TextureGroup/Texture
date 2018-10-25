@@ -155,6 +155,7 @@
 
   if (_pendingState) {
     _ASTablePendingState *pendingState        = _pendingState;
+    self.pendingState                         = nil;
     view.asyncDelegate                        = pendingState.delegate;
     view.asyncDataSource                      = pendingState.dataSource;
     view.inverted                             = pendingState.inverted;
@@ -162,9 +163,17 @@
     view.allowsSelectionDuringEditing         = pendingState.allowsSelectionDuringEditing;
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
-    view.contentInset                         = pendingState.contentInset;
-    self.pendingState                         = nil;
-    
+
+    UIEdgeInsets contentInset = pendingState.contentInset;
+    if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
+      view.contentInset = contentInset;
+    }
+
+    CGPoint contentOffset = pendingState.contentOffset;
+    if (!CGPointEqualToPoint(contentOffset, CGPointZero)) {
+      [view setContentOffset:contentOffset animated:pendingState.animatesContentOffset];
+    }
+      
     let tuningParametersVector = pendingState->_tuningParameters;
     let tuningParametersVectorSize = tuningParametersVector.size();
     for (NSInteger rangeMode = 0; rangeMode < tuningParametersVectorSize; rangeMode++) {
@@ -181,8 +190,6 @@
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [_rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
-
-    [view setContentOffset:pendingState.contentOffset animated:pendingState.animatesContentOffset];
   }
 }
 

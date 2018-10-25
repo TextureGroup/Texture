@@ -395,8 +395,9 @@ ASLayoutElementStyleExtensibilityForwarding
       nextLayout.requestedLayoutFromAbove = YES;
 
       {
-        ASDN::MutexUnlocker u(__instanceLock__);
+        __instanceLock__.unlock();
         [self _u_setNeedsLayoutFromAbove];
+        __instanceLock__.lock();
       }
 
       // Update the layout's version here because _u_setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
@@ -996,6 +997,12 @@ ASLayoutElementStyleExtensibilityForwarding
   
   // Cleanup pending layout transition
   _pendingLayoutTransition = nil;
+}
+
+- (void)_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  [self _locked_setCalculatedDisplayNodeLayout:displayNodeLayout];
 }
 
 - (void)_locked_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout

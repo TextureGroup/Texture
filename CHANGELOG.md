@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASDisplayNode.m] Make sure node is loaded before enter visible. [Max Wang](https://github.com/wsdwsd0829). [#886](https://github.com/TextureGroup/Texture/pull/886)
 - [ASTextNode2] Add improved support for all line-break modes in experimental text node. [Kevin Smith](https://github.com/wiseoldduck). [#1150](https://github.com/TextureGroup/Texture/pull/1150)
 - [ASExperimentalFeatures.m] Fix mismatch name in experimental features. [Max Wang](https://github.com/wsdwsd0829). [#1159](https://github.com/TextureGroup/Texture/pull/1159)
 - [ASCollectionViewLayoutController] Set default tuning parameters before view is loaded. [Max Wang](https://github.com/wsdwsd0829). [#1158](https://github.com/TextureGroup/Texture/pull/1158)
@@ -59,6 +60,11 @@
 - Fix crash setting attributed text on multiple threads [Michael Schneider](https://github.com/maicki)
 - [ASTextNode2] Ignore certain text alignments while calculating intrinsic size [Huy Nguyen](https://github.com/nguyenhuy) [#1166](https://github.com/TextureGroup/Texture/pull/1166)
 - Fix mismatch in UIAccessibilityAction selector method [Michael Schneider](https://github.com/maicki) [#1169](https://github.com/TextureGroup/Texture/pull/1169)
+- [ASDisplayNode] Expose default Texture-set accessibility values as properties. [Jia Wern Lim](https://github.com/jiawernlim) [#1170](https://github.com/TextureGroup/Texture/pull/1170)
+- ASTableNode init method match checks from ASCollectionNode [Michael Schneider](https://github.com/maicki) [#1171]
+- Add NSLocking conformance to ASNodeController [Michael Schneider](https://github.com/maicki)[#1179] (https://github.com/TextureGroup/Texture/pull/1179)
+- Don’t handle touches on additional attributed message if passthrough is enabled [Michael Schneider](https://github.com/maicki)[#1184] (https://github.com/TextureGroup/Texture/pull/1184)
+- Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
