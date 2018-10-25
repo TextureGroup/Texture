@@ -8,6 +8,8 @@
 
 #import "ASRecursiveUnfairLock.h"
 
+#import <stdatomic.h>
+
 /**
  * For our atomic _thread, we use acquire/release memory order so that we can have
  * the minimum possible constraint on the hardware. The default, `memory_order_seq_cst`

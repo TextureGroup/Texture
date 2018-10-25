@@ -45,16 +45,19 @@ BOOL ASDefaultAllowsEdgeAntialiasing()
 
 void ASInitializeFrameworkMainThread(void)
 {
-  ASDisplayNodeCAssertMainThread();
-  // Ensure these values are cached on the main thread before needed in the background.
-  if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
-    // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
-  } else {
-    CALayer *layer = [[[UIView alloc] init] layer];
-    allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
-    allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
-  }
-  ASNotifyInitialized();
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    ASDisplayNodeCAssertMainThread();
+    // Ensure these values are cached on the main thread before needed in the background.
+    if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
+      // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
+    } else {
+      CALayer *layer = [[[UIView alloc] init] layer];
+      allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
+      allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
+    }
+    ASNotifyInitialized();
+  });
 }
 
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)

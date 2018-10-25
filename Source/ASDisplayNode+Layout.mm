@@ -34,6 +34,11 @@
 - (ASLayoutElementStyle *)style
 {
   ASDN::MutexLocker l(__instanceLock__);
+  return [self _locked_style];
+}
+
+- (ASLayoutElementStyle *)_locked_style
+{
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
@@ -390,8 +395,9 @@ ASLayoutElementStyleExtensibilityForwarding
       nextLayout.requestedLayoutFromAbove = YES;
 
       {
-        ASDN::MutexUnlocker u(__instanceLock__);
+        __instanceLock__.unlock();
         [self _u_setNeedsLayoutFromAbove];
+        __instanceLock__.lock();
       }
 
       // Update the layout's version here because _u_setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
@@ -1007,12 +1013,6 @@ ASLayoutElementStyleExtensibilityForwarding
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);
   
   _calculatedDisplayNodeLayout = displayNodeLayout;
-  
-  // Flatten the layout if it wasn't done before (@see -calculateLayoutThatFits:).
-  if ([ASDisplayNode shouldStoreUnflattenedLayouts]) {
-    _unflattenedLayout = _calculatedDisplayNodeLayout.layout; 
-    _calculatedDisplayNodeLayout.layout = [_unflattenedLayout filteredNodeLayoutTree];
-  }
 }
 
 @end
