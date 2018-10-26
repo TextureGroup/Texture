@@ -318,6 +318,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.insets;
 }
 
+- (void)setTextContainerLinePositionModifier:(id<ASTextLinePositionModifier>)modifier
+{
+  ASLockedSelfCompareAssignObjects(_textContainer.linePositionModifier, modifier);
+}
+
+- (id<ASTextLinePositionModifier>)textContainerLinePositionModifier
+{
+  ASLockScopeSelf();
+  return _textContainer.linePositionModifier;
+}
+
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
