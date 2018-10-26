@@ -832,7 +832,7 @@ dispatch_semaphore_signal(_lock);
               truncatedWidth = cgPathRect.size.width;
             }
           }
-          int i = 0;
+          NSInteger i = 0;
           if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content
             i = removedLines.count - 1;
             while (atLeastOneLine < truncatedWidth && i >= 0) {
