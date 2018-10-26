@@ -1389,6 +1389,21 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 @end
 
+@implementation ASTextNode (Unsupported)
+
+- (void)setTextContainerLinePositionModifier:(id)textContainerLinePositionModifier
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+}
+
+- (id)textContainerLinePositionModifier
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  return nil;
+}
+
+@end
+
 @implementation ASTextNode (Deprecated)
 
 - (void)setAttributedString:(NSAttributedString *)attributedString

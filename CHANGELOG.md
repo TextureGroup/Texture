@@ -65,6 +65,7 @@
 - Add NSLocking conformance to ASNodeController [Michael Schneider](https://github.com/maicki)[#1179] (https://github.com/TextureGroup/Texture/pull/1179)
 - Don’t handle touches on additional attributed message if passthrough is enabled [Michael Schneider](https://github.com/maicki)[#1184] (https://github.com/TextureGroup/Texture/pull/1184)
 - Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
+- Correct linePositionModifier behavior [Michael Schneider](https://github.com/maicki)[#1192] (https://github.com/TextureGroup/Texture/pull/1192)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
