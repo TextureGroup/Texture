@@ -1,5 +1,5 @@
 //
-//  IGListAdapter+AsyncDisplayKit.h
+//  IGListAdapter+Texture.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASCollectionNode;
 
-@interface IGListAdapter (AsyncDisplayKit)
+@interface IGListAdapter (Texture)
 
 /**
  * Connect this list adapter to the given collection node.

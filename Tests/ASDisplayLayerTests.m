@@ -39,7 +39,7 @@ static UIImage *bogusImage() {
 
 @implementation _ASDisplayLayerTestContainerLayer
 
-- (void)asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:(_ASAsyncTransaction *)transaction
+- (void)texture_asyncTransactionContainerDidCompleteTransaction:(_ASAsyncTransaction *)transaction
 {
   _didCompleteTransactionCount++;
 }
@@ -456,7 +456,7 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
 
   // Setup
   _ASDisplayLayerTestContainerLayer *containerLayer = [[_ASDisplayLayerTestContainerLayer alloc] init];
-  containerLayer.asyncdisplaykit_asyncTransactionContainer = YES;
+  containerLayer.texture_asyncTransactionContainer = YES;
   containerLayer.frame = CGRectMake(0.0, 0.0, 100.0, 100.0);
 
   _ASDisplayLayerTestDelegate *layer1Delegate = [[_ASDisplayLayerTestDelegate alloc] initWithModes:delegateModes];

@@ -204,7 +204,7 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize shadowRadius=shadowRadius;
 @synthesize borderWidth=borderWidth;
 @synthesize borderColor=borderColor;
-@synthesize asyncdisplaykit_asyncTransactionContainer=asyncTransactionContainer;
+@synthesize texture_asyncTransactionContainer=asyncTransactionContainer;
 @synthesize semanticContentAttribute=semanticContentAttribute;
 @synthesize layoutMargins=layoutMargins;
 @synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
@@ -557,7 +557,7 @@ static UIColor *defaultTintColor = nil;
   _flags.setBorderColor = YES;
 }
 
-- (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)flag
+- (void)texture_setAsyncTransactionContainer:(BOOL)flag
 {
   asyncTransactionContainer = flag;
   _flags.setAsyncTransactionContainer = YES;
@@ -909,7 +909,7 @@ static UIColor *defaultTintColor = nil;
     layer.edgeAntialiasingMask = edgeAntialiasingMask;
 
   if (flags.setAsyncTransactionContainer)
-    layer.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+    layer.texture_asyncTransactionContainer = asyncTransactionContainer;
 
   if (flags.setOpaque)
     ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
@@ -1052,7 +1052,7 @@ static UIColor *defaultTintColor = nil;
     layer.edgeAntialiasingMask = edgeAntialiasingMask;
 
   if (flags.setAsyncTransactionContainer)
-    view.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+    view.texture_asyncTransactionContainer = asyncTransactionContainer;
 
   if (flags.setOpaque)
     ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");

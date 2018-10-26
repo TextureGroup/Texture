@@ -103,7 +103,7 @@ AS_EXTERN NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitColle
 AS_EXTERN void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
 
 /**
- * Abstraction on top of UITraitCollection for propagation within AsyncDisplayKit-Layout
+ * Abstraction on top of UITraitCollection for propagation within Texture-Layout
  */
 @protocol ASTraitEnvironment <NSObject>
 

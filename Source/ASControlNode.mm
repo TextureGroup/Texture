@@ -12,7 +12,7 @@
 #import <Texture/ASControlNode+Subclasses.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASImageNode.h>
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASControlTargetAction.h>
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // IMPORTANT NOTES:
 // 1. Applications using ASVideoNode must link AVFoundation! (this provides the AV* classes below)
-// 2. This is a relatively new component of AsyncDisplayKit.  It has many useful features, but
+// 2. This is a relatively new component of Texture.  It has many useful features, but
 //    there is room for further expansion and optimization.  Please report any issues or requests
 //    in an issue on GitHub: https://github.com/facebook/AsyncDisplayKit/issues
 

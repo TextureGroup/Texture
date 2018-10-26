@@ -47,11 +47,11 @@
    CALayer *l = node_##l.layer;
 
 static NSString *orderStringFromSublayers(CALayer *l) {
-  return [[[l.sublayers valueForKey:@"asyncdisplaykit_node"] valueForKey:@"debugName"] componentsJoinedByString:@","];
+  return [[[l.sublayers valueForKey:@"texture_node"] valueForKey:@"debugName"] componentsJoinedByString:@","];
 }
 
 static NSString *orderStringFromSubviews(UIView *v) {
-  return [[[v.subviews valueForKey:@"asyncdisplaykit_node"] valueForKey:@"debugName"] componentsJoinedByString:@","];
+  return [[[v.subviews valueForKey:@"texture_node"] valueForKey:@"debugName"] componentsJoinedByString:@","];
 }
 
 static NSString *orderStringFromSubnodes(ASDisplayNode *n) {
@@ -386,7 +386,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 - (void)setUp
 {
   [super setUp];
-  queue = dispatch_queue_create("com.facebook.AsyncDisplayKit.ASDisplayNodeTestsQueue", NULL);
+  queue = dispatch_queue_create("com.facebook.Texture.ASDisplayNodeTestsQueue", NULL);
 }
 
 - (void)testViewCreatedOffThreadCanBeRealizedOnThread
@@ -481,7 +481,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 //  XCTAssertEqualObjects(rgbBlackCGColorIdPtr, (id)node.borderColor, @"default borderColor broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.displaySuspended, @"default displaySuspended broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.displaysAsynchronously, @"default displaysAsynchronously broken %@", hasLoadedView);
-  XCTAssertEqual(NO, node.asyncdisplaykit_asyncTransactionContainer, @"default asyncdisplaykit_asyncTransactionContainer broken %@", hasLoadedView);
+  XCTAssertEqual(NO, node.texture_asyncTransactionContainer, @"default texture_asyncTransactionContainer broken %@", hasLoadedView);
   XCTAssertEqualObjects(nil, node.debugName, @"default name broken %@", hasLoadedView);
   
   XCTAssertEqual(NO, node.isAccessibilityElement, @"default isAccessibilityElement is broken %@", hasLoadedView);
@@ -586,7 +586,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual([[UIColor orangeColor] CGColor], node.borderColor, @"borderColor broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.displaySuspended, @"displaySuspended broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.displaysAsynchronously, @"displaySuspended broken %@", hasLoadedView);
-  XCTAssertEqual(YES, node.asyncdisplaykit_asyncTransactionContainer, @"asyncTransactionContainer broken %@", hasLoadedView);
+  XCTAssertEqual(YES, node.texture_asyncTransactionContainer, @"asyncTransactionContainer broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.userInteractionEnabled, @"userInteractionEnabled broken %@", hasLoadedView);
   XCTAssertEqual((BOOL)!isLayerBacked, node.exclusiveTouch, @"exclusiveTouch broken %@", hasLoadedView);
   XCTAssertEqualObjects(@"quack like a duck", node.debugName, @"debugName broken %@", hasLoadedView);
@@ -655,7 +655,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.borderColor = [[UIColor orangeColor] CGColor];
     node.displaySuspended = YES;
     node.displaysAsynchronously = NO;
-    node.asyncdisplaykit_asyncTransactionContainer = YES;
+    node.texture_asyncTransactionContainer = YES;
     node.userInteractionEnabled = NO;
     node.debugName = @"quack like a duck";
     

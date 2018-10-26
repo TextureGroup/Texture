@@ -56,7 +56,7 @@ typedef struct {
  * like their UIKit counterparts. If YES, these classes will log messages
  * on invalid updates rather than throwing exceptions.
  *
- * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
+ * Note that even if Texture's exception is suppressed, the app may still crash
  * as it proceeds with an invalid update.
  *
  * This property defaults to NO. It will be removed in a future release.

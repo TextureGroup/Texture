@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @discussion ASNavigationController is a drop in replacement for UINavigationController
  * which improves memory efficiency by implementing the @c ASManagesChildVisibilityDepth protocol.
  * You can use ASNavigationController with regular UIViewControllers, as well as ASViewControllers. 
- * It is safe to subclass or use even where AsyncDisplayKit is not adopted.
+ * It is safe to subclass or use even where Texture is not adopted.
  *
  * @see ASManagesChildVisibilityDepth
  */

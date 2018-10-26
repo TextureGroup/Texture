@@ -726,7 +726,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     phRequestLock = [NSLock new];
     phImageRequestQueue = [NSOperationQueue new];
     phImageRequestQueue.maxConcurrentOperationCount = 10;
-    phImageRequestQueue.name = @"org.AsyncDisplayKit.MultiplexImageNode.phImageRequestQueue";
+    phImageRequestQueue.name = @"org.Texture.MultiplexImageNode.phImageRequestQueue";
   });
   
   // Each ASMultiplexImageNode can have max 1 inflight Photos image request operation

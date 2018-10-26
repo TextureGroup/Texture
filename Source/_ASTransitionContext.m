@@ -12,8 +12,8 @@
 #import <Texture/ASLayout.h>
 
 
-NSString * const ASTransitionContextFromLayoutKey = @"org.asyncdisplaykit.ASTransitionContextFromLayoutKey";
-NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransitionContextToLayoutKey";
+NSString * const ASTransitionContextFromLayoutKey = @"org.Texture.ASTransitionContextFromLayoutKey";
+NSString * const ASTransitionContextToLayoutKey = @"org.Texture.ASTransitionContextToLayoutKey";
 
 @interface _ASTransitionContext ()
 

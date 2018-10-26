@@ -66,7 +66,7 @@ ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
  @summary Conditionally performs UIView geometry changes in the given block without animation.
  
  Used primarily to circumvent UITableView forcing insertion animations when explicitly told not to via
- `UITableViewRowAnimationNone`. More info: https://github.com/facebook/AsyncDisplayKit/pull/445
+ `UITableViewRowAnimationNone`. More info: https://github.com/facebookarchive/AsyncDisplayKit/pull/445
  
  @param withoutAnimation Set to `YES` to perform given block without animation
  @param block Perform UIView geometry changes within the passed block

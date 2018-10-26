@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+IGListKitMethods.h
+//  Texture+IGListKitMethods.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -19,9 +19,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * If you are using AsyncDisplayKit with IGListKit, you should use
+ * If you are using Texture with IGListKit, you should use
  * these methods to provide implementations for methods like
- * -cellForItemAtIndex: that don't apply when used with AsyncDisplayKit.
+ * -cellForItemAtIndex: that don't apply when used with Texture.
  *
  * Your section controllers should also conform to @c ASSectionController and your
  * supplementary view sources should conform to @c ASSupplementaryNodeSource.

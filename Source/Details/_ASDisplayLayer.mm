@@ -62,12 +62,12 @@
   if (_delegateFlags.delegateDidChangeBounds) {
     CGRect oldBounds = self.bounds;
     [super setBounds:bounds];
-    self.asyncdisplaykit_node.threadSafeBounds = bounds;
+    self.texture_node.threadSafeBounds = bounds;
     [(id<ASCALayerExtendedDelegate>)self.delegate layer:self didChangeBoundsWithOldValue:oldBounds newValue:bounds];
     
   } else {
     [super setBounds:bounds];
-    self.asyncdisplaykit_node.threadSafeBounds = bounds;
+    self.texture_node.threadSafeBounds = bounds;
   }
 
   if (_attemptedDisplayWhileZeroSized && CGRectIsEmpty(bounds) == NO && self.needsDisplayOnBoundsChange == NO) {
@@ -96,7 +96,7 @@
   ASDisplayNodeAssertMainThread();
   [super layoutSublayers];
 
-  [self.asyncdisplaykit_node __layout];
+  [self.texture_node __layout];
 }
 
 - (void)setNeedsDisplay
@@ -120,7 +120,7 @@
   static dispatch_queue_t displayQueue = NULL;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    displayQueue = dispatch_queue_create("org.AsyncDisplayKit.ASDisplayLayer.displayQueue", DISPATCH_QUEUE_CONCURRENT);
+    displayQueue = dispatch_queue_create("org.Texture.ASDisplayLayer.displayQueue", DISPATCH_QUEUE_CONCURRENT);
     // we use the highpri queue to prioritize UI rendering over other async operations
     dispatch_set_target_queue(displayQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
   });
@@ -190,7 +190,7 @@
 - (NSString *)description
 {
   NSMutableString *description = [[super description] mutableCopy];
-  ASDisplayNode *node = self.asyncdisplaykit_node;
+  ASDisplayNode *node = self.texture_node;
   if (node != nil) {
     NSString *classString = [NSString stringWithFormat:@"%s-", object_getClassName(node)];
     [description replaceOccurrencesOfString:@"_ASDisplay" withString:classString options:kNilOptions range:NSMakeRange(0, description.length)];

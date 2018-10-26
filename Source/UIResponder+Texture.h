@@ -1,5 +1,5 @@
 //
-//  UIResponder+AsyncDisplayKit.h
+//  UIResponder+Texture.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIResponder (AsyncDisplayKit)
+@interface UIResponder (Texture)
 
 /**
  * The nearest view controller above this responder, if one exists.

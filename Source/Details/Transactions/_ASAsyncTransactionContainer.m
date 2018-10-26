@@ -14,44 +14,44 @@
 #import <Texture/_ASAsyncTransactionGroup.h>
 
 @implementation CALayer (ASAsyncTransactionContainerTransactions)
-@dynamic asyncdisplaykit_asyncLayerTransactions;
+@dynamic texture_asyncLayerTransactions;
 
 // No-ops in the base class. Mostly exposed for testing.
-- (void)asyncdisplaykit_asyncTransactionContainerWillBeginTransaction:(_ASAsyncTransaction *)transaction {}
-- (void)asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:(_ASAsyncTransaction *)transaction {}
+- (void)texture_asyncTransactionContainerWillBeginTransaction:(_ASAsyncTransaction *)transaction {}
+- (void)texture_asyncTransactionContainerDidCompleteTransaction:(_ASAsyncTransaction *)transaction {}
 @end
 
 @implementation CALayer (ASAsyncTransactionContainer)
-@dynamic asyncdisplaykit_currentAsyncTransaction;
-@dynamic asyncdisplaykit_asyncTransactionContainer;
+@dynamic texture_currentAsyncTransaction;
+@dynamic texture_asyncTransactionContainer;
 
-- (ASAsyncTransactionContainerState)asyncdisplaykit_asyncTransactionContainerState
+- (ASAsyncTransactionContainerState)texture_asyncTransactionContainerState
 {
-  return ([self.asyncdisplaykit_asyncLayerTransactions count] == 0) ? ASAsyncTransactionContainerStateNoTransactions : ASAsyncTransactionContainerStatePendingTransactions;
+  return ([self.texture_asyncLayerTransactions count] == 0) ? ASAsyncTransactionContainerStateNoTransactions : ASAsyncTransactionContainerStatePendingTransactions;
 }
 
-- (void)asyncdisplaykit_cancelAsyncTransactions
+- (void)texture_cancelAsyncTransactions
 {
   // If there was an open transaction, commit and clear the current transaction. Otherwise:
   // (1) The run loop observer will try to commit a canceled transaction which is not allowed
   // (2) We leave the canceled transaction attached to the layer, dooming future operations
-  _ASAsyncTransaction *currentTransaction = self.asyncdisplaykit_currentAsyncTransaction;
+  _ASAsyncTransaction *currentTransaction = self.texture_currentAsyncTransaction;
   [currentTransaction commit];
-  self.asyncdisplaykit_currentAsyncTransaction = nil;
+  self.texture_currentAsyncTransaction = nil;
 
-  for (_ASAsyncTransaction *transaction in [self.asyncdisplaykit_asyncLayerTransactions copy]) {
+  for (_ASAsyncTransaction *transaction in [self.texture_asyncLayerTransactions copy]) {
     [transaction cancel];
   }
 }
 
-- (_ASAsyncTransaction *)asyncdisplaykit_asyncTransaction
+- (_ASAsyncTransaction *)texture_asyncTransaction
 {
-  _ASAsyncTransaction *transaction = self.asyncdisplaykit_currentAsyncTransaction;
+  _ASAsyncTransaction *transaction = self.texture_currentAsyncTransaction;
   if (transaction == nil) {
-    NSHashTable *transactions = self.asyncdisplaykit_asyncLayerTransactions;
+    NSHashTable *transactions = self.texture_asyncLayerTransactions;
     if (transactions == nil) {
       transactions = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
-      self.asyncdisplaykit_asyncLayerTransactions = transactions;
+      self.texture_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
     transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
@@ -60,20 +60,20 @@
         return;
       }
       [transactions removeObject:completedTransaction];
-      [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
+      [self texture_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
     }];
     [transactions addObject:transaction];
-    self.asyncdisplaykit_currentAsyncTransaction = transaction;
-    [self asyncdisplaykit_asyncTransactionContainerWillBeginTransaction:transaction];
+    self.texture_currentAsyncTransaction = transaction;
+    [self texture_asyncTransactionContainerWillBeginTransaction:transaction];
   }
   [_ASAsyncTransactionGroup.mainTransactionGroup addTransactionContainer:self];
   return transaction;
 }
 
-- (CALayer *)asyncdisplaykit_parentTransactionContainer
+- (CALayer *)texture_parentTransactionContainer
 {
   CALayer *containerLayer = self;
-  while (containerLayer && !containerLayer.asyncdisplaykit_isAsyncTransactionContainer) {
+  while (containerLayer && !containerLayer.texture_isAsyncTransactionContainer) {
     containerLayer = containerLayer.superlayer;
   }
   return containerLayer;
@@ -83,39 +83,39 @@
 
 @implementation UIView (ASAsyncTransactionContainer)
 
-- (BOOL)asyncdisplaykit_isAsyncTransactionContainer
+- (BOOL)texture_isAsyncTransactionContainer
 {
-  return self.layer.asyncdisplaykit_isAsyncTransactionContainer;
+  return self.layer.texture_isAsyncTransactionContainer;
 }
 
-- (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)asyncTransactionContainer
+- (void)texture_setAsyncTransactionContainer:(BOOL)asyncTransactionContainer
 {
-  self.layer.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+  self.layer.texture_asyncTransactionContainer = asyncTransactionContainer;
 }
 
-- (ASAsyncTransactionContainerState)asyncdisplaykit_asyncTransactionContainerState
+- (ASAsyncTransactionContainerState)texture_asyncTransactionContainerState
 {
-  return self.layer.asyncdisplaykit_asyncTransactionContainerState;
+  return self.layer.texture_asyncTransactionContainerState;
 }
 
-- (void)asyncdisplaykit_cancelAsyncTransactions
+- (void)texture_cancelAsyncTransactions
 {
-  [self.layer asyncdisplaykit_cancelAsyncTransactions];
+  [self.layer texture_cancelAsyncTransactions];
 }
 
-- (void)asyncdisplaykit_asyncTransactionContainerStateDidChange
+- (void)texture_asyncTransactionContainerStateDidChange
 {
   // No-op in the base class.
 }
 
-- (void)asyncdisplaykit_setCurrentAsyncTransaction:(_ASAsyncTransaction *)transaction
+- (void)texture_setCurrentAsyncTransaction:(_ASAsyncTransaction *)transaction
 {
-  self.layer.asyncdisplaykit_currentAsyncTransaction = transaction;
+  self.layer.texture_currentAsyncTransaction = transaction;
 }
 
-- (_ASAsyncTransaction *)asyncdisplaykit_currentAsyncTransaction
+- (_ASAsyncTransaction *)texture_currentAsyncTransaction
 {
-  return self.layer.asyncdisplaykit_currentAsyncTransaction;
+  return self.layer.texture_currentAsyncTransaction;
 }
 
 @end

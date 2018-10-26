@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A protocol that your section controllers should conform to,
- * in order to be used with AsyncDisplayKit.
+ * in order to be used with Texture.
  *
  * @note Your supplementary view source should conform to @c ASSupplementaryNodeSource.
  */

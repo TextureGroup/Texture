@@ -171,16 +171,16 @@ static ASDN::StaticMutex& currentRequestsLock = *new ASDN::StaticMutex;
  * NSURLSessionDownloadTask lacks a `userInfo` property, so add this association ourselves.
  */
 @interface NSURLRequest (ASBasicImageDownloader)
-@property (nonatomic) ASBasicImageDownloaderContext *asyncdisplaykit_context;
+@property (nonatomic) ASBasicImageDownloaderContext *texture_context;
 @end
 
 @implementation NSURLRequest (ASBasicImageDownloader)
 static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext.class).UTF8String;
-- (void)setAsyncdisplaykit_context:(ASBasicImageDownloaderContext *)asyncdisplaykit_context
+- (void)setTexture_context:(ASBasicImageDownloaderContext *)texture_context
 {
-  objc_setAssociatedObject(self, kContextKey, asyncdisplaykit_context, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject(self, kContextKey, texture_context, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-- (ASBasicImageDownloader *)asyncdisplaykit_context
+- (ASBasicImageDownloader *)texture_context
 {
   return objc_getAssociatedObject(self, kContextKey);
 }
@@ -254,7 +254,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
     NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [_session downloadTaskWithURL:URL];}];
 
     if (task) {
-      task.originalRequest.asyncdisplaykit_context = context;
+      task.originalRequest.texture_context = context;
 
       // start downloading
       [task resume];
@@ -280,7 +280,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
                                       totalBytesWritten:(int64_t)totalBytesWritten
                               totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-  ASBasicImageDownloaderContext *context = downloadTask.originalRequest.asyncdisplaykit_context;
+  ASBasicImageDownloaderContext *context = downloadTask.originalRequest.texture_context;
   [context performProgressBlocks:(CGFloat)totalBytesWritten / (CGFloat)totalBytesExpectedToWrite];
 }
 
@@ -288,7 +288,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
                               didFinishDownloadingToURL:(NSURL *)location
 {
-  ASBasicImageDownloaderContext *context = downloadTask.originalRequest.asyncdisplaykit_context;
+  ASBasicImageDownloaderContext *context = downloadTask.originalRequest.texture_context;
   if ([context isCancelled]) {
     return;
   }
@@ -303,7 +303,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionDownloadTask *)task
                            didCompleteWithError:(NSError *)error
 {
-  ASBasicImageDownloaderContext *context = task.originalRequest.asyncdisplaykit_context;
+  ASBasicImageDownloaderContext *context = task.originalRequest.texture_context;
   if (context && error) {
     [context completeWithImage:nil error:error];
   }

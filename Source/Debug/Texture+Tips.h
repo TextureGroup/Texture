@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+Tips.h
+//  Texture+Tips.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.

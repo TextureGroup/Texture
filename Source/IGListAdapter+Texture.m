@@ -1,5 +1,5 @@
 //
-//  IGListAdapter+AsyncDisplayKit.m
+//  IGListAdapter+Texture.m
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -11,12 +11,12 @@
 
 #if AS_IG_LIST_KIT
 
-#import "IGListAdapter+AsyncDisplayKit.h"
+#import "IGListAdapter+Texture.h"
 #import "ASIGListAdapterBasedDataSource.h"
 #import "ASAssert.h"
 #import <objc/runtime.h>
 
-@implementation IGListAdapter (AsyncDisplayKit)
+@implementation IGListAdapter (Texture)
 
 - (void)setASDKCollectionNode:(ASCollectionNode *)collectionNode
 {

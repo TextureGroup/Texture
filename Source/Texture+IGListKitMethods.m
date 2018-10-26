@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+IGListKitMethods.m
+//  Texture+IGListKitMethods.m
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -11,7 +11,7 @@
 
 #if AS_IG_LIST_KIT
 
-#import "AsyncDisplayKit+IGListKitMethods.h"
+#import "Texture+IGListKitMethods.h"
 #import <Texture/ASAssert.h>
 #import <Texture/_ASCollectionViewCell.h>
 #import <Texture/_ASCollectionReusableView.h>

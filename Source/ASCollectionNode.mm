@@ -21,7 +21,7 @@
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASCellNode+Internal.h>
 #import <Texture/_ASHierarchyChangeSet.h>
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 #import <Texture/ASSectionContext.h>
 #import <Texture/ASDataController.h>
 #import <Texture/ASCollectionView+Undeprecated.h>

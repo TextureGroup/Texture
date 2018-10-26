@@ -22,7 +22,7 @@
 #import <Texture/ASWeakSet.h>
 
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 
 #define AS_RANGECONTROLLER_LOG_UPDATE_FREQ 0
 

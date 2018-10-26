@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit.h
+//  Texture.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -122,11 +122,11 @@
 #import <Texture/ASGraphicsContext.h>
 #import <Texture/NSArray+Diffing.h>
 #import <Texture/ASObjectDescriptionHelpers.h>
-#import <Texture/UIResponder+AsyncDisplayKit.h>
+#import <Texture/UIResponder+Texture.h>
 
-#import <Texture/AsyncDisplayKit+Debug.h>
-#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/Texture+Debug.h>
+#import <Texture/Texture+Tips.h>
 
-#import <Texture/IGListAdapter+AsyncDisplayKit.h>
-#import <Texture/AsyncDisplayKit+IGListKitMethods.h>
+#import <Texture/IGListAdapter+Texture.h>
+#import <Texture/Texture+IGListKitMethods.h>
 #import <Texture/ASLayout+IGListKit.h>

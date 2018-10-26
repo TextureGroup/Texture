@@ -78,8 +78,8 @@
     for (id<ASAsyncTransactionContainer> container in containersToCommit) {
       // Note that the act of committing a transaction may open a new transaction,
       // so we must nil out the transaction we're committing first.
-      _ASAsyncTransaction *transaction = container.asyncdisplaykit_currentAsyncTransaction;
-      container.asyncdisplaykit_currentAsyncTransaction = nil;
+      _ASAsyncTransaction *transaction = container.texture_currentAsyncTransaction;
+      container.texture_currentAsyncTransaction = nil;
       [transaction commit];
     }
   }

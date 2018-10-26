@@ -13,7 +13,7 @@
 #import <Texture/ASDisplayNodeTipState.h>
 #import <Texture/ASTipNode.h>
 #import <Texture/ASTip.h>
-#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/Texture+Tips.h>
 
 @interface ASTipsWindow ()
 @property (nonatomic, readonly) ASDisplayNode *node;

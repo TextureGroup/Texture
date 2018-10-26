@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+Debug.m
+//  Texture+Debug.m
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 #import <Texture/ASAbstractLayoutController.h>
 #import <Texture/ASGraphicsContext.h>
 #import <Texture/ASLayout.h>

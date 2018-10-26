@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+Debug.h
+//  Texture+Debug.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.

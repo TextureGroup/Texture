@@ -285,7 +285,7 @@ typedef struct {
   } else {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      NSLog(@"WARNING: Use of non-%@ updater with AsyncDisplayKit is discouraged. Updater: %@", NSStringFromClass([IGListAdapterUpdater class]), updater);
+      NSLog(@"WARNING: Use of non-%@ updater with Texture is discouraged. Updater: %@", NSStringFromClass([IGListAdapterUpdater class]), updater);
     });
   }
 }

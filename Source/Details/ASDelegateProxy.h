@@ -21,7 +21,7 @@
 /**
  * Stand-in for delegates like UITableView or UICollectionView's delegate / dataSource.
  * Any selectors flagged by "interceptsSelector" are routed to the interceptor object and are not delivered to the target.
- * Everything else leaves AsyncDisplayKit safely and arrives at the original target object.
+ * Everything else leaves Texture safely and arrives at the original target object.
  */
 
 @interface ASDelegateProxy : NSProxy

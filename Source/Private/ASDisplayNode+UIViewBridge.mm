@@ -1271,38 +1271,38 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 @implementation ASDisplayNode (ASAsyncTransactionContainer)
 
-- (BOOL)asyncdisplaykit_isAsyncTransactionContainer
+- (BOOL)texture_isAsyncTransactionContainer
 {
   _bridge_prologue_read;
-  return _getFromViewOrLayer(asyncdisplaykit_isAsyncTransactionContainer, asyncdisplaykit_isAsyncTransactionContainer);
+  return _getFromViewOrLayer(texture_isAsyncTransactionContainer, texture_isAsyncTransactionContainer);
 }
 
-- (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)asyncTransactionContainer
+- (void)texture_setAsyncTransactionContainer:(BOOL)asyncTransactionContainer
 {
   _bridge_prologue_write;
-  _setToViewOrLayer(asyncdisplaykit_asyncTransactionContainer, asyncTransactionContainer, asyncdisplaykit_asyncTransactionContainer, asyncTransactionContainer);
+  _setToViewOrLayer(texture_asyncTransactionContainer, asyncTransactionContainer, texture_asyncTransactionContainer, asyncTransactionContainer);
 }
 
-- (ASAsyncTransactionContainerState)asyncdisplaykit_asyncTransactionContainerState
+- (ASAsyncTransactionContainerState)texture_asyncTransactionContainerState
 {
   ASDisplayNodeAssertMainThread();
-  return [_layer asyncdisplaykit_asyncTransactionContainerState];
+  return [_layer texture_asyncTransactionContainerState];
 }
 
-- (void)asyncdisplaykit_cancelAsyncTransactions
+- (void)texture_cancelAsyncTransactions
 {
   ASDisplayNodeAssertMainThread();
-  [_layer asyncdisplaykit_cancelAsyncTransactions];
+  [_layer texture_cancelAsyncTransactions];
 }
 
-- (void)asyncdisplaykit_setCurrentAsyncTransaction:(_ASAsyncTransaction *)transaction
+- (void)texture_setCurrentAsyncTransaction:(_ASAsyncTransaction *)transaction
 {
-  _layer.asyncdisplaykit_currentAsyncTransaction = transaction;
+  _layer.texture_currentAsyncTransaction = transaction;
 }
 
-- (_ASAsyncTransaction *)asyncdisplaykit_currentAsyncTransaction
+- (_ASAsyncTransaction *)texture_currentAsyncTransaction
 {
-  return _layer.asyncdisplaykit_currentAsyncTransaction;
+  return _layer.texture_currentAsyncTransaction;
 }
 
 @end

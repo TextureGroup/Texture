@@ -88,7 +88,7 @@
   }
 
   // Get the display block for this node.
-  asyncdisplaykit_async_transaction_operation_block_t displayBlock = [self _displayBlockWithAsynchronous:NO isCancelledBlock:isCancelledBlock rasterizing:YES];
+  texture_async_transaction_operation_block_t displayBlock = [self _displayBlockWithAsynchronous:NO isCancelledBlock:isCancelledBlock rasterizing:YES];
 
   // We'll display something if there is a display block, clipping, translation and/or a background color.
   BOOL shouldDisplay = displayBlock || backgroundColor || CGPointEqualToPoint(CGPointZero, frame.origin) == NO || clipsToBounds;
@@ -152,13 +152,13 @@
   }
 }
 
-- (asyncdisplaykit_async_transaction_operation_block_t)_displayBlockWithAsynchronous:(BOOL)asynchronous
+- (texture_async_transaction_operation_block_t)_displayBlockWithAsynchronous:(BOOL)asynchronous
                                                                     isCancelledBlock:(asdisplaynode_iscancelled_block_t)isCancelledBlock
                                                                          rasterizing:(BOOL)rasterizing
 {
   ASDisplayNodeAssertMainThread();
 
-  asyncdisplaykit_async_transaction_operation_block_t displayBlock = nil;
+  texture_async_transaction_operation_block_t displayBlock = nil;
   ASDisplayNodeFlags flags;
   
   __instanceLock__.lock();
@@ -395,7 +395,7 @@
   }
 
   // Set up displayBlock to call either display or draw on the delegate and return a UIImage contents
-  asyncdisplaykit_async_transaction_operation_block_t displayBlock = [self _displayBlockWithAsynchronous:asynchronously isCancelledBlock:isCancelledBlock rasterizing:NO];
+  texture_async_transaction_operation_block_t displayBlock = [self _displayBlockWithAsynchronous:asynchronously isCancelledBlock:isCancelledBlock rasterizing:NO];
   
   if (!displayBlock) {
     return;
@@ -404,7 +404,7 @@
   ASDisplayNodeAssert(layer, @"Expect _layer to be not nil");
 
   // This block is called back on the main thread after rendering at the completion of the current async transaction, or immediately if !asynchronously
-  asyncdisplaykit_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
+  texture_async_transaction_operation_completion_block_t completionBlock = ^(id<NSObject> value, BOOL canceled){
     ASDisplayNodeCAssertMainThread();
     if (!canceled && !isCancelledBlock()) {
       UIImage *image = (UIImage *)value;
@@ -439,12 +439,12 @@
     // while synchronizing the final application of the results to the layer's contents property (completionBlock).
     
     // First, look to see if we are expected to join a parent's transaction container.
-    CALayer *containerLayer = layer.asyncdisplaykit_parentTransactionContainer ? : layer;
+    CALayer *containerLayer = layer.texture_parentTransactionContainer ? : layer;
     
     // In the case that a transaction does not yet exist (such as for an individual node outside of a container),
     // this call will allocate the transaction and add it to _ASAsyncTransactionGroup.
     // It will automatically commit the transaction at the end of the runloop.
-    _ASAsyncTransaction *transaction = containerLayer.asyncdisplaykit_asyncTransaction;
+    _ASAsyncTransaction *transaction = containerLayer.texture_asyncTransaction;
     
     // Adding this displayBlock operation to the transaction will start it IMMEDIATELY.
     // The only function of the transaction commit is to gate the calling of the completionBlock.

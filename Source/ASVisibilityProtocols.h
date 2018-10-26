@@ -20,7 +20,7 @@ AS_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger visib
  * ASVisibilityDepth
  *
  * @discussion "Visibility Depth" represents the number of user actions required to make an ASDisplayNode or 
- * ASViewController visibile. AsyncDisplayKit uses this information to intelligently manage memory and focus
+ * ASViewController visibile. Texture uses this information to intelligently manage memory and focus
  * resources where they are most visible to the user.
  *
  * The ASVisibilityDepth protocol describes how custom view controllers can integrate with this system.

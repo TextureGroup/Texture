@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion This property overrides the CALayer category method which implements this via associated objects.
  This should result in much better performance for _ASDisplayLayers.
  */
-@property (nullable, nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, nonatomic, weak) ASDisplayNode *texture_node;
 
 /**
  @summary Set to YES to enable asynchronous display for the receiver.

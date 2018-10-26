@@ -23,7 +23,7 @@
 #import <Texture/ASTextNode.h>
 #import <Texture/ASImageNode+AnimatedImagePrivate.h>
 #import <Texture/ASImageNode+CGExtras.h>
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASEqualityHelpers.h>
 #import <Texture/ASHashing.h>

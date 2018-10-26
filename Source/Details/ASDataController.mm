@@ -117,7 +117,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _synchronized = YES;
   _onDidFinishSynchronizingBlocks = [[NSMutableSet alloc] init];
   
-  const char *queueName = [[NSString stringWithFormat:@"org.AsyncDisplayKit.ASDataController.editingTransactionQueue:%p", self] cStringUsingEncoding:NSASCIIStringEncoding];
+  const char *queueName = [[NSString stringWithFormat:@"org.Texture.ASDataController.editingTransactionQueue:%p", self] cStringUsingEncoding:NSASCIIStringEncoding];
   _editingTransactionQueue = dispatch_queue_create(queueName, DISPATCH_QUEUE_SERIAL);
   dispatch_queue_set_specific(_editingTransactionQueue, &kASDataControllerEditingQueueKey, &kASDataControllerEditingQueueContext, NULL);
   _editingTransactionGroup = dispatch_group_create();

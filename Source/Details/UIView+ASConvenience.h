@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic)          UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
 @property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
 @property (nonatomic, getter=isExclusiveTouch) BOOL exclusiveTouch;
-@property (nonatomic, getter=asyncdisplaykit_isAsyncTransactionContainer, setter = asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;
+@property (nonatomic, getter=texture_isAsyncTransactionContainer, setter = texture_setAsyncTransactionContainer:) BOOL texture_asyncTransactionContainer;
 @property (nonatomic)           UIEdgeInsets layoutMargins;
 @property (nonatomic)           BOOL preservesSuperviewLayoutMargins;
 @property (nonatomic)           BOOL insetsLayoutMarginsFromSafeArea;

@@ -1,5 +1,5 @@
 //
-//  AsyncDisplayKit+Tips.m
+//  Texture+Tips.m
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import "AsyncDisplayKit+Tips.h"
+#import "Texture+Tips.h"
 #import <Texture/ASDisplayNode+Ancestry.h>
 
 @implementation ASDisplayNode (Tips)

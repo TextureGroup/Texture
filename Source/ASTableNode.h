@@ -648,7 +648,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param node The node that will be displayed.
  * @param indexPath The index path of the row that will be displayed.
  *
- * @warning AsyncDisplayKit processes table view edits asynchronously. The index path
+ * @warning Texture processes table view edits asynchronously. The index path
  *   passed into this method may not correspond to the same item in your data source
  *   if your data source has been updated since the last edit was processed.
  */
@@ -663,7 +663,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param node The node which was removed from the view hierarchy.
  * @param indexPath The index path at which the node was located before the removal.
  *
- * @warning AsyncDisplayKit processes table view edits asynchronously. The index path
+ * @warning Texture processes table view edits asynchronously. The index path
  *   passed into this method may not correspond to the same item in your data source
  *   if your data source has been updated since the last edit was processed.
  */
@@ -715,7 +715,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param tableView The sender.
  * @param indexPath The index path of the row that will be displayed.
  *
- * @warning AsyncDisplayKit processes table view edits asynchronously. The index path
+ * @warning Texture processes table view edits asynchronously. The index path
  *   passed into this method may not correspond to the same item in your data source
  *   if your data source has been updated since the last edit was processed.
  *

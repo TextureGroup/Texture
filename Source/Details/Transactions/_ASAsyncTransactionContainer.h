@@ -36,19 +36,19 @@ typedef NS_ENUM(NSUInteger, ASAsyncTransactionContainerState) {
 
  @default NO
  */
-@property (nonatomic, getter=asyncdisplaykit_isAsyncTransactionContainer, setter=asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;
+@property (nonatomic, getter=texture_isAsyncTransactionContainer, setter=texture_setAsyncTransactionContainer:) BOOL texture_asyncTransactionContainer;
 
 /**
  @summary The current state of the receiver; indicates if it is currently performing asynchronous operations or if all operations have finished/canceled.
  */
-@property (nonatomic, readonly) ASAsyncTransactionContainerState asyncdisplaykit_asyncTransactionContainerState;
+@property (nonatomic, readonly) ASAsyncTransactionContainerState texture_asyncTransactionContainerState;
 
 /**
  @summary Cancels all async transactions on the receiver.
  */
-- (void)asyncdisplaykit_cancelAsyncTransactions;
+- (void)texture_cancelAsyncTransactions;
 
-@property (nullable, nonatomic, setter=asyncdisplaykit_setCurrentAsyncTransaction:) _ASAsyncTransaction *asyncdisplaykit_currentAsyncTransaction;
+@property (nullable, nonatomic, setter=texture_setCurrentAsyncTransaction:) _ASAsyncTransaction *texture_currentAsyncTransaction;
 
 @end
 
@@ -56,22 +56,22 @@ typedef NS_ENUM(NSUInteger, ASAsyncTransactionContainerState) {
 /**
  @summary Returns the current async transaction for this layer. A new transaction is created if one
  did not already exist. This method will always return an open, uncommitted transaction.
- @desc asyncdisplaykit_asyncTransactionContainer does not need to be YES for this to return a transaction.
+ @desc texture_asyncTransactionContainer does not need to be YES for this to return a transaction.
  Defaults to nil.
  */
-@property (nullable, nonatomic, readonly) _ASAsyncTransaction *asyncdisplaykit_asyncTransaction;
+@property (nullable, nonatomic, readonly) _ASAsyncTransaction *texture_asyncTransaction;
 
 /**
- @summary Goes up the superlayer chain until it finds the first layer with asyncdisplaykit_asyncTransactionContainer=YES (including the receiver) and returns it.
+ @summary Goes up the superlayer chain until it finds the first layer with texture_asyncTransactionContainer=YES (including the receiver) and returns it.
  Returns nil if no parent container is found.
  */
-@property (nullable, nonatomic, readonly) CALayer *asyncdisplaykit_parentTransactionContainer;
+@property (nullable, nonatomic, readonly) CALayer *texture_parentTransactionContainer;
 
 /**
  @summary Whether or not this layer should serve as a transaction container.
  Defaults to NO.
  */
-@property (nonatomic, getter=asyncdisplaykit_isAsyncTransactionContainer, setter = asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;
+@property (nonatomic, getter=texture_isAsyncTransactionContainer, setter = texture_setAsyncTransactionContainer:) BOOL texture_asyncTransactionContainer;
 
 @end
 

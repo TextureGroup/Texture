@@ -323,7 +323,7 @@
   
   UIScrollView *scrollView = self.scrollView;
   
-  ASDisplayNode *owningNode = scrollView.asyncdisplaykit_node;
+  ASDisplayNode *owningNode = scrollView.texture_node;
   if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
     NSIndexPath *ip = [(ASCollectionNode *)owningNode indexPathForNode:self];
     if (ip != nil) {

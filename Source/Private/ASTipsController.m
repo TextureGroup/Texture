@@ -12,7 +12,7 @@
 #if AS_ENABLE_TIPS
 
 #import <Texture/ASDisplayNodeTipState.h>
-#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/Texture+Tips.h>
 #import <Texture/ASTipNode.h>
 #import <Texture/ASTipProvider.h>
 #import <Texture/ASTipsWindow.h>

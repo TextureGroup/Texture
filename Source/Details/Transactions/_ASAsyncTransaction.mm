@@ -25,14 +25,14 @@
 NSInteger const ASDefaultTransactionPriority = 0;
 
 @interface ASAsyncTransactionOperation : NSObject
-- (instancetype)initWithOperationCompletionBlock:(asyncdisplaykit_async_transaction_operation_completion_block_t)operationCompletionBlock;
-@property (nonatomic) asyncdisplaykit_async_transaction_operation_completion_block_t operationCompletionBlock;
+- (instancetype)initWithOperationCompletionBlock:(texture_async_transaction_operation_completion_block_t)operationCompletionBlock;
+@property (nonatomic) texture_async_transaction_operation_completion_block_t operationCompletionBlock;
 @property id value; // set on bg queue by the operation block
 @end
 
 @implementation ASAsyncTransactionOperation
 
-- (instancetype)initWithOperationCompletionBlock:(asyncdisplaykit_async_transaction_operation_completion_block_t)operationCompletionBlock
+- (instancetype)initWithOperationCompletionBlock:(texture_async_transaction_operation_completion_block_t)operationCompletionBlock
 {
   if ((self = [super init])) {
     _operationCompletionBlock = operationCompletionBlock;
@@ -352,10 +352,10 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 #pragma mark - Transaction Management
 
-- (void)addOperationWithBlock:(asyncdisplaykit_async_transaction_operation_block_t)block
+- (void)addOperationWithBlock:(texture_async_transaction_operation_block_t)block
                      priority:(NSInteger)priority
                         queue:(dispatch_queue_t)queue
-                   completion:(asyncdisplaykit_async_transaction_operation_completion_block_t)completion
+                   completion:(texture_async_transaction_operation_completion_block_t)completion
 {
   ASDisplayNodeAssertMainThread();
   NSAssert(self.state == ASAsyncTransactionStateOpen, @"You can only add operations to open transactions");

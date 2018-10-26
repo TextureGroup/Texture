@@ -354,7 +354,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
-  NSLog(@"Warning: AsyncDisplayKit is not designed to be used with Interface Builder.  Table properties set in IB will be lost.");
+  NSLog(@"Warning: Texture is not designed to be used with Interface Builder.  Table properties set in IB will be lost.");
   return [self initWithFrame:CGRectZero style:UITableViewStylePlain];
 }
 
@@ -885,17 +885,17 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)setTableHeaderView:(UIView *)tableHeaderView
 {
   // Typically the view will be nil before setting it, but reset state if it is being re-hosted.
-  [self.tableHeaderView.asyncdisplaykit_node exitHierarchyState:ASHierarchyStateRangeManaged];
+  [self.tableHeaderView.texture_node exitHierarchyState:ASHierarchyStateRangeManaged];
   [super setTableHeaderView:tableHeaderView];
-  [self.tableHeaderView.asyncdisplaykit_node enterHierarchyState:ASHierarchyStateRangeManaged];
+  [self.tableHeaderView.texture_node enterHierarchyState:ASHierarchyStateRangeManaged];
 }
 
 - (void)setTableFooterView:(UIView *)tableFooterView
 {
   // Typically the view will be nil before setting it, but reset state if it is being re-hosted.
-  [self.tableFooterView.asyncdisplaykit_node exitHierarchyState:ASHierarchyStateRangeManaged];
+  [self.tableFooterView.texture_node exitHierarchyState:ASHierarchyStateRangeManaged];
   [super setTableFooterView:tableFooterView];
-  [self.tableFooterView.asyncdisplaykit_node enterHierarchyState:ASHierarchyStateRangeManaged];
+  [self.tableFooterView.texture_node enterHierarchyState:ASHierarchyStateRangeManaged];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

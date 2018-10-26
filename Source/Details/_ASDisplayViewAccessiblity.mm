@@ -199,7 +199,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
-  ASDisplayNode *node = view.asyncdisplaykit_node;
+  ASDisplayNode *node = view.texture_node;
 
   if (node.isAccessibilityContainer) {
     CollectAccessibilityElementsForContainer(node, view, elements);
@@ -254,7 +254,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 {
   ASDisplayNodeAssertMainThread();
   
-  ASDisplayNode *viewNode = self.asyncdisplaykit_node;
+  ASDisplayNode *viewNode = self.texture_node;
   if (viewNode == nil) {
     return @[];
   }

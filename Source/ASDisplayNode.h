@@ -62,7 +62,7 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode *node, ASSizeRange constrainedSize);
 
 /**
- * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
+ * Texture non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
  * errors that happens in production.
  */
 typedef void (^ASDisplayNodeNonFatalErrorBlock)(NSError *error);
@@ -374,7 +374,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @return Defaults to YES, except for synchronous views (ie, those created with -initWithViewBlock: /
  * -initWithLayerBlock:), which are always NO.
  *
- * @discussion If this flag is set, then the node will participate in the current asyncdisplaykit_async_transaction and 
+ * @discussion If this flag is set, then the node will participate in the current texture_async_transaction and 
  * do its rendering on the displayQueue instead of the main thread.
  *
  * Asynchronous rendering proceeds as follows:
@@ -383,8 +383,8 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * After layout, Core Animation will call -display on the _ASDisplayLayer
  * -display enqueues a rendering operation on the displayQueue
  * When the render block executes, it calls the delegate display method (-drawRect:... or -display)
- * The delegate provides contents via this method and an operation is added to the asyncdisplaykit_async_transaction
- * Once all rendering is complete for the current asyncdisplaykit_async_transaction,
+ * The delegate provides contents via this method and an operation is added to the texture_async_transaction
+ * Once all rendering is complete for the current texture_async_transaction,
  * the completion for the block sets the contents on all of the layers in the same frame
  *
  * If asynchronous rendering is disabled:
@@ -948,13 +948,13 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 /*
  * ASDisplayNode participates in ASAsyncTransactions, so you can determine when your subnodes are done rendering.
- * See: -(void)asyncdisplaykit_asyncTransactionContainerStateDidChange in ASDisplayNodeSubclass.h
+ * See: -(void)texture_asyncTransactionContainerStateDidChange in ASDisplayNodeSubclass.h
  */
 @interface ASDisplayNode (ASAsyncTransactionContainer) <ASAsyncTransactionContainer>
 @end
 
-/** UIVIew(AsyncDisplayKit) defines convenience method for adding sub-ASDisplayNode to an UIView. */
-@interface UIView (AsyncDisplayKit)
+/** UIVIew(Texture) defines convenience method for adding sub-ASDisplayNode to an UIView. */
+@interface UIView (Texture)
 /**
  * Convenience method, equivalent to [view addSubview:node.view] or [view.layer addSublayer:node.layer] if layer-backed.
  *
@@ -964,9 +964,9 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @end
 
 /*
- * CALayer(AsyncDisplayKit) defines convenience method for adding sub-ASDisplayNode to a CALayer.
+ * CALayer(Texture) defines convenience method for adding sub-ASDisplayNode to a CALayer.
  */
-@interface CALayer (AsyncDisplayKit)
+@interface CALayer (Texture)
 /**
  * Convenience method, equivalent to [layer addSublayer:node.layer].
  *

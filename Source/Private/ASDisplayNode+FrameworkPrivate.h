@@ -313,11 +313,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 @end
 
 @interface UIView (ASDisplayNodeInternal)
-@property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, weak) ASDisplayNode *texture_node;
 @end
 
 @interface CALayer (ASDisplayNodeInternal)
-@property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, weak) ASDisplayNode *texture_node;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -64,10 +64,10 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  * The finished, drawn content is then shown as soon as it is ready.
  *
  * With this property set to YES, the main thread will be blocked until display is complete for
- * the cell.  This is more similar to UIKit, and in fact makes AsyncDisplayKit scrolling visually
+ * the cell.  This is more similar to UIKit, and in fact makes Texture scrolling visually
  * indistinguishable from UIKit's, except being faster.
  *
- * Using this option does not eliminate all of the performance advantages of AsyncDisplayKit.
+ * Using this option does not eliminate all of the performance advantages of Texture.
  * Normally, a cell has been preloading and is almost done when it reaches the screen, so the
  * blocking time is very short.  If the rangeTuningParameters are set to 0, still this option
  * outperforms UIKit: while the main thread is waiting, subnode display executes concurrently.

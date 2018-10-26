@@ -75,12 +75,12 @@ ASInterfaceState ASInterfaceStateForDisplayNode(ASDisplayNode *displayNode, UIWi
 
 ASDisplayNode *ASLayerToDisplayNode(CALayer *layer)
 {
-  return layer.asyncdisplaykit_node;
+  return layer.texture_node;
 }
 
 ASDisplayNode *ASViewToDisplayNode(UIView *view)
 {
-  return view.asyncdisplaykit_node;
+  return view.texture_node;
 }
 
 void ASDisplayNodePerformBlockOnEveryNode(CALayer * _Nullable layer, ASDisplayNode * _Nullable node, BOOL traverseSublayers, void(^block)(ASDisplayNode *node))

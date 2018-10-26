@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion This property overrides the UIView category method which implements this via associated objects.
  This should result in much better performance for _ASDisplayView.
  */
-@property (nullable, nonatomic, weak) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, nonatomic, weak) ASDisplayNode *texture_node;
 
 // These methods expose a way for ASDisplayNode touch events to let the view call super touch events
 // Some UIKit mechanisms, like UITableView and UICollectionView selection handling, require this to work

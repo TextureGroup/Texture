@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class _ASAsyncTransaction;
 
-typedef void(^asyncdisplaykit_async_transaction_completion_block_t)(_ASAsyncTransaction *completedTransaction, BOOL canceled);
-typedef id<NSObject> _Nullable(^asyncdisplaykit_async_transaction_operation_block_t)(void);
-typedef void(^asyncdisplaykit_async_transaction_operation_completion_block_t)(id _Nullable value, BOOL canceled);
+typedef void(^texture_async_transaction_completion_block_t)(_ASAsyncTransaction *completedTransaction, BOOL canceled);
+typedef id<NSObject> _Nullable(^texture_async_transaction_operation_block_t)(void);
+typedef void(^texture_async_transaction_operation_completion_block_t)(id _Nullable value, BOOL canceled);
 
 /**
  State is initially ASAsyncTransactionStateOpen.
@@ -55,7 +55,7 @@ AS_EXTERN NSInteger const ASDefaultTransactionPriority;
 
  @param completionBlock A block that is called when the transaction is completed.
  */
-- (instancetype)initWithCompletionBlock:(nullable asyncdisplaykit_async_transaction_completion_block_t)completionBlock;
+- (instancetype)initWithCompletionBlock:(nullable texture_async_transaction_completion_block_t)completionBlock;
 
 /**
  @summary Block the main thread until the transaction is complete, including callbacks.
@@ -67,7 +67,7 @@ AS_EXTERN NSInteger const ASDefaultTransactionPriority;
 /**
  A block that is called when the transaction is completed.
  */
-@property (nullable, readonly) asyncdisplaykit_async_transaction_completion_block_t completionBlock;
+@property (nullable, readonly) texture_async_transaction_completion_block_t completionBlock;
 
 /**
  The state of the transaction.
@@ -88,10 +88,10 @@ AS_EXTERN NSInteger const ASDefaultTransactionPriority;
  @param completion The completion block that will be executed with the output of the execution block when all of the
  operations in the transaction are completed. Executed and released on callbackQueue.
  */
-- (void)addOperationWithBlock:(asyncdisplaykit_async_transaction_operation_block_t)block
+- (void)addOperationWithBlock:(texture_async_transaction_operation_block_t)block
                      priority:(NSInteger)priority
                         queue:(dispatch_queue_t)queue
-                   completion:(nullable asyncdisplaykit_async_transaction_operation_completion_block_t)completion;
+                   completion:(nullable texture_async_transaction_operation_completion_block_t)completion;
 
 /**
  @summary Cancels all operations in the transaction.

@@ -1,5 +1,5 @@
 //
-//  UIResponder+AsyncDisplayKit.m
+//  UIResponder+Texture.m
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import "UIResponder+AsyncDisplayKit.h"
+#import "UIResponder+Texture.h"
 
 #import <Texture/ASAssert.h>
 #import <Texture/ASBaseDefines.h>
 #import <Texture/ASResponderChainEnumerator.h>
 
-@implementation UIResponder (AsyncDisplayKit)
+@implementation UIResponder (Texture)
 
 - (__kindof UIViewController *)asdk_associatedViewController
 {

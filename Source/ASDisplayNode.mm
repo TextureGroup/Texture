@@ -11,7 +11,7 @@
 
 #import <Texture/ASDisplayNode+Ancestry.h>
 #import <Texture/ASDisplayNode+Beta.h>
-#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/Texture+Debug.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>
 #import <Texture/ASCellNode+Internal.h>
 
@@ -437,8 +437,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASDisplayNodeAssert(checkFlag(Synchronous) || !ASInterfaceStateIncludesVisible(_interfaceState), @"Node should always be marked invisible before deallocating. Node: %@", self);
   
   self.asyncLayer.asyncDelegate = nil;
-  _view.asyncdisplaykit_node = nil;
-  _layer.asyncdisplaykit_node = nil;
+  _view.texture_node = nil;
+  _layer.texture_node = nil;
 
   // Remove any subnodes so they lose their connection to the now deallocated parent.  This can happen
   // because subnodes do not retain their supernode, but subnodes can legitimately remain alive if another
@@ -542,10 +542,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   } else {
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
-    _view.asyncdisplaykit_node = self;
+    _view.texture_node = self;
     _layer = _view.layer;
   }
-  _layer.asyncdisplaykit_node = self;
+  _layer.texture_node = self;
   
   self._locked_asyncLayer.asyncDelegate = self;
 }
@@ -1548,7 +1548,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   // Otherwise, there is no opportunity to block the main thread after CoreAnimation's transaction commit
   // (even a runloop observer at a late call order will not stop the next frame from compositing, showing placeholders).
   
-  ASDisplayNode *node = [layer asyncdisplaykit_node];
+  ASDisplayNode *node = [layer texture_node];
   
   if (node.isSynchronous && [node _canCallSetNeedsDisplayOfLayer]) {
     // Layers for UIKit components that are wrapped within a node needs to be set to be displayed as the contents of
@@ -1574,7 +1574,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
     // While blocking on one transaction, others may be completing concurrently, so it doesn't matter which blocks first.
     BOOL waitUntilComplete = (!node.shouldBypassEnsureDisplay);
     if (waitUntilComplete) {
-      for (_ASAsyncTransaction *transaction in [layer.asyncdisplaykit_asyncLayerTransactions copy]) {
+      for (_ASAsyncTransaction *transaction in [layer.texture_asyncLayerTransactions copy]) {
         // Even if none of the layers have had a chance to start display earlier, they will still be allowed to saturate a multicore CPU while blocking main.
         // This significantly reduces time on the main thread relative to UIKit.
         [transaction waitUntilComplete];
@@ -1794,7 +1794,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 
   // If we don't know the node, but the layer is an async layer, get the node from the layer.
   if (!node && layer && [layer isKindOfClass:[_ASDisplayLayer class]]) {
-    node = layer.asyncdisplaykit_node;
+    node = layer.texture_node;
   }
 
   // Set the flag on the node.  If this is a pure layer (no node) then this has no effect (plain layers don't support preventing/cancelling display).
@@ -3591,7 +3591,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
   UIView *view = self.view.superview;
   while (view) {
-    ASDisplayNode *viewNode = ((_ASDisplayView *)view).asyncdisplaykit_node;
+    ASDisplayNode *viewNode = ((_ASDisplayView *)view).texture_node;
     if (viewNode) {
       if ([viewNode isKindOfClass:supernodeClass])
         return viewNode;
@@ -3896,13 +3896,13 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @implementation UIView (ASDisplayNodeInternal)
 
-- (void)setAsyncdisplaykit_node:(ASDisplayNode *)node
+- (void)setTexture_node:(ASDisplayNode *)node
 {
   ASWeakProxy *weakProxy = [ASWeakProxy weakProxyWithTarget:node];
   objc_setAssociatedObject(self, ASDisplayNodeAssociatedNodeKey, weakProxy, OBJC_ASSOCIATION_RETAIN); // Weak reference to avoid cycle, since the node retains the view.
 }
 
-- (ASDisplayNode *)asyncdisplaykit_node
+- (ASDisplayNode *)texture_node
 {
   ASWeakProxy *weakProxy = objc_getAssociatedObject(self, ASDisplayNodeAssociatedNodeKey);
   return weakProxy.target;
@@ -3912,13 +3912,13 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @implementation CALayer (ASDisplayNodeInternal)
 
-- (void)setAsyncdisplaykit_node:(ASDisplayNode *)node
+- (void)setTexture_node:(ASDisplayNode *)node
 {
   ASWeakProxy *weakProxy = [ASWeakProxy weakProxyWithTarget:node];
   objc_setAssociatedObject(self, ASDisplayNodeAssociatedNodeKey, weakProxy, OBJC_ASSOCIATION_RETAIN); // Weak reference to avoid cycle, since the node retains the layer.
 }
 
-- (ASDisplayNode *)asyncdisplaykit_node
+- (ASDisplayNode *)texture_node
 {
   ASWeakProxy *weakProxy = objc_getAssociatedObject(self, ASDisplayNodeAssociatedNodeKey);
   return weakProxy.target;
@@ -3926,15 +3926,15 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @end
 
-@implementation UIView (AsyncDisplayKit)
+@implementation UIView (Texture)
 
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
   if (subnode.layerBacked) {
-    // Call -addSubnode: so that we use the asyncdisplaykit_node path if possible.
+    // Call -addSubnode: so that we use the texture_node path if possible.
     [self.layer addSubnode:subnode];
   } else {
-    ASDisplayNode *selfNode = self.asyncdisplaykit_node;
+    ASDisplayNode *selfNode = self.texture_node;
     if (selfNode) {
       [selfNode addSubnode:subnode];
     } else {
@@ -3948,11 +3948,11 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 
 @end
 
-@implementation CALayer (AsyncDisplayKit)
+@implementation CALayer (Texture)
 
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
-  ASDisplayNode *selfNode = self.asyncdisplaykit_node;
+  ASDisplayNode *selfNode = self.texture_node;
   if (selfNode) {
     [selfNode addSubnode:subnode];
   } else {
