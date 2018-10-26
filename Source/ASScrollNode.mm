@@ -52,7 +52,8 @@
   }
 }
 
-- (NSArray *)accessibilityElements {
+- (NSArray *)accessibilityElements
+{
   return [self.asyncdisplaykit_node accessibilityElements];
 }
 
