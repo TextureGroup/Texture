@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <pthread.h>
+#import <CoreText/CoreText.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -621,7 +622,7 @@ dispatch_semaphore_signal(_lock);
   // Give user a chance to modify the line's position.
   [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
   
-  NSUInteger i = 0;
+  BOOL first = YES;
   for (ASTextLine *line in lines) {
     CGPoint position = line.position;
     CGRect rect = line.bounds;
@@ -668,7 +669,8 @@ dispatch_semaphore_signal(_lock);
     rowCount = rowIdx + 1;
     lineCurrentIdx ++;
 
-    if (i++ == 0) {
+    if (first) {
+      first = NO;
       textBoundingRect = rect;
     } else if (!measuringBeyondConstraints) {
       if (maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows) {
