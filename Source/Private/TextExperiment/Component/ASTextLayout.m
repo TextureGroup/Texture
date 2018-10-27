@@ -17,7 +17,6 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <pthread.h>
-#import <CoreText/CoreText.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
