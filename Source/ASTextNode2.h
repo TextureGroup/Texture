@@ -17,7 +17,11 @@ NS_ASSUME_NONNULL_BEGIN
  @abstract Draws interactive rich text.
  @discussion Backed by the code in TextExperiment folder, on top of CoreText.
  */
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 : ASControlNode
+#else
+@interface ASTextNode : ASControlNode
+#endif
 
 /**
  @abstract The styled text displayed by the node.
@@ -215,7 +219,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 (Unavailable)
+#else
+@interface ASTextNode (Unavailable)
+#endif
 
 - (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 

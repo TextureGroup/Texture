@@ -17,6 +17,10 @@
   #define AS_TLS_AVAILABLE 1
 #endif
 
+#ifndef AS_ENABLE_TEXTNODE
+  #define AS_ENABLE_TEXTNODE 1 // Enable old TextNode by default
+#endif
+
 // This needs to stay in sync with Weaver
 #ifndef AS_USE_VIDEO
   #define AS_USE_VIDEO 0

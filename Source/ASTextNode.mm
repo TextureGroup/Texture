@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASTextNode.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASTextNode2.h>
 
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
@@ -1427,3 +1430,5 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 
 @end
+
+#endif
