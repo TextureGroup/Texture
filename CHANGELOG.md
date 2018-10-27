@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASPINRemoteImageManager] Allow specifying an image cache when configuring ASPINRemoteImageManager. [Kevin Smith](https://github.com/wiseoldduck). [#1197](https://github.com/TextureGroup/Texture/pull/1197)
 - [ASDisplayNode.m] Make sure node is loaded before enter visible. [Max Wang](https://github.com/wsdwsd0829). [#886](https://github.com/TextureGroup/Texture/pull/886)
 - [ASTextNode2] Add improved support for all line-break modes in experimental text node. [Kevin Smith](https://github.com/wiseoldduck). [#1150](https://github.com/TextureGroup/Texture/pull/1150)
 - [ASExperimentalFeatures.m] Fix mismatch name in experimental features. [Max Wang](https://github.com/wsdwsd0829). [#1159](https://github.com/TextureGroup/Texture/pull/1159)
