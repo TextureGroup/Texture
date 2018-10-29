@@ -131,7 +131,7 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
   });
 }
 
-static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _ASDisplayView *view, NSMutableArray *elements) {
+static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, UIView *view, NSMutableArray *elements) {
   UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:container containerNode:container];
 
   NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
@@ -202,7 +202,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
 }
 
 /// Collect all accessibliity elements for a given view and view node
-static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableArray *elements)
+static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
@@ -265,15 +265,26 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
   if (viewNode == nil) {
     return @[];
   }
-
   if (_accessibilityElements == nil) {
-    NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
-    CollectAccessibilityElementsForView(self, accessibilityElements);
-    SortAccessibilityElements(accessibilityElements);
-    _accessibilityElements = accessibilityElements;
+    _accessibilityElements = [viewNode accessibilityElements];
   }
-  
   return _accessibilityElements;
+}
+
+@end
+
+@implementation ASDisplayNode (AccessibilityInternal)
+
+- (NSArray *)accessibilityElements
+{
+  if (!self.isNodeLoaded) {
+    ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
+    return @[];
+  }
+  NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
+  CollectAccessibilityElementsForView(self.view, accessibilityElements);
+  SortAccessibilityElements(accessibilityElements);
+  return accessibilityElements;
 }
 
 @end
