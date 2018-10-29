@@ -139,7 +139,14 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
   std::queue<ASDisplayNode *> queue;
   queue.push(container);
 
-  ASDisplayNode *node;
+  // If the container does not have an accessibility label set, or if the label is meant for custom
+  // actions only, then aggregate its subnodes' labels. Otherwise, treat the label as an overriden
+  // value and do not perform the aggregation.
+  BOOL shouldAggregateSubnodeLabels =
+      (container.accessibilityLabel.length == 0) ||
+      (container.accessibilityTraits & InteractiveAccessibilityTraitsMask());
+
+  ASDisplayNode *node = nil;
   while (!queue.empty()) {
     node = queue.front();
     queue.pop();
@@ -156,7 +163,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
         action.containerNode = node.supernode;
         action.container = node.supernode.view;
         [actions addObject:action];
-      } else {
+      } else if (node == container || shouldAggregateSubnodeLabels) {
         // Even though not surfaced to UIKit, create a non-interactive element for purposes of building sorted aggregated label.
         ASAccessibilityElement *nonInteractiveElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:node containerNode:container];
         [labeledNodes addObject:nonInteractiveElement];

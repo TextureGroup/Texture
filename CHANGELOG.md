@@ -66,6 +66,7 @@
 - Don’t handle touches on additional attributed message if passthrough is enabled [Michael Schneider](https://github.com/maicki)[#1184] (https://github.com/TextureGroup/Texture/pull/1184)
 - Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
 - Correct linePositionModifier behavior [Michael Schneider](https://github.com/maicki)[#1192] (https://github.com/TextureGroup/Texture/pull/1192)
+- Tweak a11y label aggregation behavior to enable container label overrides [Michael Schneider](https://github.com/maicki)[#1199] (https://github.com/TextureGroup/Texture/pull/1199)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
