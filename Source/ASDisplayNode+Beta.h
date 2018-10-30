@@ -110,6 +110,17 @@ typedef struct {
 @property BOOL isAccessibilityContainer;
 
 /**
+ * @abstract Returns the default accessibility property values set by Texture on this node. For
+ * example, the default accessibility label for a text node may be its text content, while most
+ * other nodes would have nil default labels.
+ */
+@property (nullable, readonly, copy) NSString *defaultAccessibilityLabel;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityHint;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityValue;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityIdentifier;
+@property (readonly) UIAccessibilityTraits defaultAccessibilityTraits;
+
+/**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
  * an accessibity label and have an interactive UIAccessibilityTrait will automatically receive custom-action handling.
  *
@@ -188,6 +199,9 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 @property BOOL yogaLayoutInProgress;
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
+
+// Will walk up the Yoga tree and returns the root node
+- (ASDisplayNode *)yogaRoot;
 
 // These methods are intended to be used internally to Texture, and should not be called directly.
 - (BOOL)shouldHaveYogaMeasureFunc;

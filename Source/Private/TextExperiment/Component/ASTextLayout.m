@@ -102,6 +102,13 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   id<ASTextLinePositionModifier> _linePositionModifier;
 }
 
+- (NSString *)description
+{
+  return [NSString
+          stringWithFormat:@"immutable: %@, insets: %@, size: %@", self->_readonly ? @"YES" : @"NO",
+                           NSStringFromUIEdgeInsets(self->_insets), NSStringFromCGSize(self->_size)];
+}
+
 + (instancetype)containerWithSize:(CGSize)size NS_RETURNS_RETAINED {
   return [self containerWithSize:size insets:UIEdgeInsetsZero];
 }
@@ -373,6 +380,14 @@ dispatch_semaphore_signal(_lock);
   return self;
 }
 
+- (NSString *)description
+{
+  return [NSString stringWithFormat:@"lines: %ld, visibleRange:%@, textBoundingRect:%@",
+                                    [self.lines count],
+                                    NSStringFromRange(self.visibleRange),
+                                    NSStringFromCGRect(self.textBoundingRect)];
+}
+
 + (ASTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
   ASTextContainer *container = [ASTextContainer containerWithSize:size];
   return [self layoutWithContainer:container text:text];
@@ -599,15 +614,24 @@ dispatch_semaphore_signal(_lock);
     position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
     
     ASTextLine *line = [ASTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
+    
+    [lines addObject:line];
+  }
+  
+  // Give user a chance to modify the line's position.
+  [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
+  
+  BOOL first = YES;
+  for (ASTextLine *line in lines) {
+    CGPoint position = line.position;
     CGRect rect = line.bounds;
-
     if (constraintSizeIsExtended) {
       if (isVerticalForm) {
         if (rect.origin.x + rect.size.width >
             constraintRectBeforeExtended.origin.x +
                 constraintRectBeforeExtended.size.width) {
           measuringBeyondConstraints = YES;
-        };
+        }
       } else {
         if (rect.origin.y + rect.size.height >
             constraintRectBeforeExtended.origin.y +
@@ -640,11 +664,12 @@ dispatch_semaphore_signal(_lock);
     
     line.index = lineCurrentIdx;
     line.row = rowIdx;
-    [lines addObject:line];
+
     rowCount = rowIdx + 1;
     lineCurrentIdx ++;
 
-    if (i == 0) {
+    if (first) {
+      first = NO;
       textBoundingRect = rect;
     } else if (!measuringBeyondConstraints) {
       if (maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows) {
@@ -676,17 +701,6 @@ dispatch_semaphore_signal(_lock);
           ASTextLine *line = lines.lastObject;
           [lines removeLastObject];
           [removedLines addObject:line];
-        }
-      }
-
-      // Give user a chance to modify the line's position.
-      if (container.linePositionModifier) {
-        [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
-        textBoundingRect = CGRectZero;
-        for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-          ASTextLine *line = lines[i];
-          if (i == 0) textBoundingRect = line.bounds;
-          else textBoundingRect = CGRectUnion(textBoundingRect, line.bounds);
         }
       }
 
