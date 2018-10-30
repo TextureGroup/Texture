@@ -132,4 +132,35 @@
   ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
 }
 
+- (void)testASScrollNodeAccessibility {
+  ASDisplayNode *scrollNode = [[ASDisplayNode alloc] init];
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.isAccessibilityContainer = YES;
+  node.accessibilityLabel = @"node";
+  [scrollNode addSubnode:node];
+  node.frame = CGRectMake(0,0,100,100);
+  ASTextNode2 *text = [[ASTextNode2 alloc] init];
+  text.attributedText = [[NSAttributedString alloc] initWithString:@"text"];
+  [node addSubnode:text];
+
+  ASTextNode2 *text2 = [[ASTextNode2 alloc] init];
+  text2.attributedText = [[NSAttributedString alloc] initWithString:@"text2"];
+  [node addSubnode:text2];
+  __unused UIView *view = scrollNode.view;
+  XCTAssertTrue(node.view.accessibilityElements.firstObject, @"node");
+
+  // Following tests will only pass when accessibility is enabled.
+  // More details: https://github.com/TextureGroup/Texture/pull/1188
+
+  // A bunch of a11y containers each of which hold aggregated labels.
+  /* NSArray *a11yElements = [scrollNode.view accessibilityElements];
+  XCTAssertTrue(a11yElements.count > 0, @"accessibilityElements should exist");
+  
+  UIAccessibilityElement *container = a11yElements.firstObject;
+  XCTAssertTrue(container.isAccessibilityElement == false && container.accessibilityElements.count > 0);
+  UIAccessibilityElement *ae = container.accessibilityElements.firstObject;
+  XCTAssertTrue([[ae accessibilityLabel] isEqualToString:@"node, text, text2"]);
+  */
+}
+
 @end
