@@ -15,7 +15,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASEditableTextNode.h>
 
 #import <queue>
 
@@ -238,9 +237,6 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
     } else if ([subnode accessibilityElementCount] > 0) {
       // UIView is itself a UIAccessibilityContainer just add it
       [elements addObject:subnode.view];
-    } else if([subnode isKindOfClass:[ASEditableTextNode class]]){
-      // UITextView is itself a UIAccessibilityElement just add it
-      [elements addObject:((ASEditableTextNode *)subnode).textView];
     }
   }
 }
