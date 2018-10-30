@@ -68,7 +68,7 @@
 - Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
 - Correct linePositionModifier behavior [Michael Schneider](https://github.com/maicki)[#1192] (https://github.com/TextureGroup/Texture/pull/1192)
 - Tweak a11y label aggregation behavior to enable container label overrides [Michael Schneider](https://github.com/maicki)[#1199] (https://github.com/TextureGroup/Texture/pull/1199)
--  Make ASEditableTextNode accessible [Andrew Yates](https://github.com/ay8s)[#1199] (https://github.com/TextureGroup/Texture/pull/1162)
+-  Make ASEditableTextNode accessible [Andrew Yates](https://github.com/ay8s)[#1162] (https://github.com/TextureGroup/Texture/pull/1162)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
