@@ -842,12 +842,6 @@
     [_delegate editableTextNodeDidFinishEditing:self];
 }
 
-
-- (BOOL)isAccessibilityElement
-{
-  return YES;
-}
-
 - (NSInteger)accessibilityElementCount
 {
   return 1;
