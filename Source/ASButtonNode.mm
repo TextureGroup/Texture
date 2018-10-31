@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASButtonNode+Private.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASButtonNode+Yoga.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 #import <AsyncDisplayKit/ASThread.h>
@@ -555,3 +558,5 @@
 }
 
 @end
+
+#endif

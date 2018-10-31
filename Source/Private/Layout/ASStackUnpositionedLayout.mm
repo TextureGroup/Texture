@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASStackUnpositionedLayout.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <tgmath.h>
 #import <numeric>
 
@@ -756,3 +758,5 @@ ASStackUnpositionedLayout ASStackUnpositionedLayout::compute(const std::vector<A
   
   return {.lines = std::move(lines), .stackDimensionSum = layoutStackDimensionSum, .crossDimensionSum = layoutCrossDimensionSum};
 }
+
+#endif

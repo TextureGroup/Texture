@@ -8,6 +8,8 @@
 
 #import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/_ASCollectionGalleryLayoutInfo.h>
 #import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
 #import <AsyncDisplayKit/ASAssert.h>
@@ -135,3 +137,18 @@
 }
 
 @end
+
+#else // AS_ENABLE_LAYOUTSPECS
+
+#import <AsyncDisplayKit/ASCollectionLayoutState.h>
+
+@implementation ASCollectionGalleryLayoutDelegate
+
+AS_NOT_IMPLEMENTED(- (instancetype)initWithScrollableDirections:(ASScrollDirection)scrollableDirections)
+AS_NOT_IMPLEMENTED(- (nullable id)additionalInfoForLayoutWithElements:(nonnull ASElementMap *)elements)
+AS_NOT_IMPLEMENTED(+ (nonnull ASCollectionLayoutState *)calculateLayoutWithContext:(nonnull ASCollectionLayoutContext *)context)
+AS_NOT_IMPLEMENTED(- (ASScrollDirection)scrollableDirections)
+
+@end
+
+#endif // AS_ENABLE_LAYOUTSPECS

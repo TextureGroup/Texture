@@ -8,6 +8,8 @@
 
 #import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementPrivate.h>
@@ -79,3 +81,5 @@ ASLayoutElementLayoutCalculationDefaults
 }
 
 @end
+
+#endif

@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASThread.h>
 
 #if DEBUG
@@ -35,3 +38,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

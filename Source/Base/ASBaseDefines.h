@@ -132,6 +132,14 @@
 #endif
 #endif
 
+#define AS_NOT_IMPLEMENTED(method) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Wmissing-method-return-type\"") \
+  _Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
+  AS_EXTERN NSException *_ASNotImplementedException(SEL, Class); \
+  method NS_UNAVAILABLE { @throw _ASNotImplementedException(_cmd, [self class]); } \
+  _Pragma("clang diagnostic pop")
+
 #define ASOVERLOADABLE __attribute__((overloadable))
 
 

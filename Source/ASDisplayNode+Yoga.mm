@@ -333,8 +333,15 @@
     ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
   }
 
+#if AS_ENABLE_LAYOUTSPECS
   // Delegate to layout spec layout for nodes that do not support Yoga
   return [self calculateLayoutLayoutSpec:constrainedSize];
+#else
+  // Handle leaf nodes manual size calculation via calculateSizeThatFits:
+  CGSize size = [self calculateSizeThatFits:constrainedSize.max];
+  ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
+  return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
+#endif
 }
 
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize

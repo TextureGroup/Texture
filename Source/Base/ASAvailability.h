@@ -18,11 +18,25 @@
 #endif
 
 #ifndef AS_ENABLE_TEXTNODE
-  #define AS_ENABLE_TEXTNODE 1 // Enable old TextNode by default
+  // Enable old TextNode by default for backwards compatibility
+  #define AS_ENABLE_TEXTNODE 1
 #endif
 
 // This needs to stay in sync with Weaver
 #ifndef AS_USE_VIDEO
+  #define AS_USE_VIDEO 0
+#endif
+
+// This needs to stay in sync with Weaver
+// If disabled this will also disable AS_USE_VIDEO
+#ifndef AS_ENABLE_LAYOUTSPECS
+  #define AS_ENABLE_LAYOUTSPECS 0
+#endif
+
+// If AS_ENABLE_LAYOUTSPECS is disabled, AS_USE_VIDEO will be implicitly disabled as video nodes
+// are using layout specs for their layout.
+#if !AS_ENABLE_LAYOUTSPECS
+  #undef AS_USE_VIDEO
   #define AS_USE_VIDEO 0
 #endif
 

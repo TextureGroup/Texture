@@ -9,6 +9,8 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDimension.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 @class ASLayout;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -64,3 +66,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

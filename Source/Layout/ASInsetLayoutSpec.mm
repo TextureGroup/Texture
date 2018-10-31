@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
@@ -121,3 +123,5 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
 }
 
 @end
+
+#endif

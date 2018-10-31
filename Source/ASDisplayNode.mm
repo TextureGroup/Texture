@@ -36,6 +36,7 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 #import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
@@ -218,6 +219,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearPreloadedData)), @"Subclass %@ must not override recursivelyClearFetchedData method.", classString);
   } else {
     // Check if subnodes where modified during the creation of the layout
+#if AS_ENABLE_LAYOUTSPECS
 	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
 		  NSArray *oldSubnodes = _self.subnodes;
 		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
@@ -228,8 +230,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 		  }
 		  return layoutElement;
 	  });
+#endif // AS_ENABLE_LAYOUTSPECS
   }
-#endif
+#endif // ASDISPLAYNODE_ASSERTIONS_ENABLED
 
   // Below we are pre-calculating values per-class and dynamically adding a method (_staticInitialize) to populate these values
   // when each instance is constructed. These values don't change for each class, so there is significant performance benefit
@@ -1138,18 +1141,22 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
+#if AS_ENABLE_LAYOUTSPECS
   switch (self.layoutEngineType) {
     case ASLayoutEngineTypeLayoutSpec:
       return [self calculateLayoutLayoutSpec:constrainedSize];
 #if YOGA
     case ASLayoutEngineTypeYoga:
       return [self calculateLayoutYoga:constrainedSize];
-#endif
+#endif // YOGA
       // If YOGA is not defined but for some reason the layout type engine is Yoga
       // we explicitly fallthrough here
     default:
       break;
   }
+#else
+  return [self calculateLayoutYoga:constrainedSize];
+#endif // AS_ENABLE_LAYOUTSPECS
 
   // If this case is reached a layout type engine was defined for a node that is currently
   // not supported.

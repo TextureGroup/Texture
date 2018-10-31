@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+#if AS_ENABLE_LAYOUTSPECS
 
 @implementation ASDisplayNode (ASLayoutSpec)
 
@@ -144,3 +145,5 @@
 }
 
 @end
+
+#endif

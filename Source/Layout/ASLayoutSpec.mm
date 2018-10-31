@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
 
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
@@ -308,6 +311,36 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 }
 
 @end
+
+#else
+
+@implementation ASLayoutSpec
+
+@dynamic layoutElementType;
+@synthesize style;
+
+AS_NOT_IMPLEMENTED(- (BOOL)layoutOptionExtensionBoolAtIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (UIEdgeInsets)layoutOptionExtensionEdgeInsetsAtIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (NSInteger)layoutOptionExtensionIntegerAtIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (void)setLayoutOptionExtensionBool:(BOOL)value atIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (void)setLayoutOptionExtensionEdgeInsets:(UIEdgeInsets)value atIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (void)setLayoutOptionExtensionInteger:(NSInteger)value atIndex:(int)idx)
+AS_NOT_IMPLEMENTED(- (nonnull ASTraitCollection *)asyncTraitCollection)
+AS_NOT_IMPLEMENTED(- (ASPrimitiveTraitCollection)primitiveTraitCollection)
+AS_NOT_IMPLEMENTED(- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection)
+AS_NOT_IMPLEMENTED(- (nonnull NSString *)asciiArtName)
+AS_NOT_IMPLEMENTED(- (nonnull NSString *)asciiArtString)
+AS_NOT_IMPLEMENTED(- (nonnull ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize)
+AS_NOT_IMPLEMENTED(- (nonnull ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize restrictedToSize:(ASLayoutElementSize)size relativeToParentSize:(CGSize)parentSize)
+AS_NOT_IMPLEMENTED(- (BOOL)implementsLayoutMethod)
+AS_NOT_IMPLEMENTED(- (nonnull ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize)
+AS_NOT_IMPLEMENTED(- (nonnull ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize)
+AS_NOT_IMPLEMENTED(- (nullable NSArray<id<ASLayoutElement>> *)sublayoutElements)
+AS_NOT_IMPLEMENTED(- (BOOL)canLayoutAsynchronous)
+
+@end
+
+#endif
 
 #pragma mark - ASLayoutSpec (Debugging)
 

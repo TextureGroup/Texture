@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASStackPositionedLayout.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <tgmath.h>
 #import <numeric>
 
@@ -184,3 +186,5 @@ ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnposition
   const CGSize finalSize = directionSize(direction, layout.stackDimensionSum, layout.crossDimensionSum);
   return {std::move(positionedItems), ASSizeRangeClamp(sizeRange, finalSize)};
 }
+
+#endif

@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASVideoPlayerNode.h>
 
 #if AS_USE_VIDEO
+
 #if TARGET_OS_IOS
 
 #import <AVFoundation/AVFoundation.h>
@@ -1016,4 +1017,4 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 #endif // TARGET_OS_IOS
 
-#endif
+#endif // AS_USE_VIDEO

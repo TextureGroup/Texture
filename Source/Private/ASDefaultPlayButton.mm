@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASDefaultPlayButton.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 
 @implementation ASDefaultPlayButton
@@ -64,3 +67,5 @@
 }
 
 @end
+
+#endif

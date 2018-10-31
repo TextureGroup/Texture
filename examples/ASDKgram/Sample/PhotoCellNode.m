@@ -90,7 +90,6 @@
     _userNameLabel.backgroundColor                    = [UIColor greenColor];
     _photoLocationLabel.backgroundColor               = [UIColor greenColor];
     _photoTimeIntervalSincePostLabel.backgroundColor  = [UIColor greenColor];
-    _photoCommentsNode.backgroundColor                = [UIColor greenColor];
     _photoDescriptionLabel.backgroundColor            = [UIColor greenColor];
     _photoLikesLabel.backgroundColor                  = [UIColor greenColor];
 #endif
@@ -99,7 +98,7 @@
   return self;
 }
 
-#if !YOGA_LAYOUT
+#if !YOGA_LAYOUT && AS_ENABLE_LAYOUTSPECS
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
 {
   // There are many ways to format ASLayoutSpec code.  In this example, we offer two different formats:
@@ -330,7 +329,7 @@
   _photoImageNode.style.aspectRatio = 1.0;
 
   ASDisplayNode *verticalStack = self;
-  self.style.flexDirection = ASStackLayoutDirectionVertical;
+  verticalStack.style.flexDirection = ASStackLayoutDirectionVertical;
 
   [verticalStack addYogaChild:headerStack];
   [verticalStack addYogaChild:_photoImageNode];

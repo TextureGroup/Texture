@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCollections.h>
@@ -86,3 +89,5 @@ static NSUInteger const kOverlayChildIndex = 1;
 }
 
 @end
+
+#endif

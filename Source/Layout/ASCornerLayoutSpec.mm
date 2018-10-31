@@ -7,6 +7,9 @@
 //
 
 #import <AsyncDisplayKit/ASCornerLayoutSpec.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
@@ -163,3 +166,5 @@ static NSUInteger const kCornerChildIndex = 1;
 }
 
 @end
+
+#endif

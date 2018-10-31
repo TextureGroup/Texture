@@ -223,6 +223,11 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 
 @end
 
+NS_ASSUME_NONNULL_END
+
+#if AS_ENABLE_LAYOUTSPECS
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Simple label-style cell node.  Read its source for an example of custom <ASCellNode>s.
@@ -257,3 +262,5 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

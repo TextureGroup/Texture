@@ -8,6 +8,8 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 /**
  The corner location for positioning corner element.
  */
@@ -73,3 +75,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

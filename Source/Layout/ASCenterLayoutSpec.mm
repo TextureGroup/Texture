@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayout.h>
 
 @implementation ASCenterLayoutSpec
@@ -74,3 +76,5 @@
 }
 
 @end
+
+#endif

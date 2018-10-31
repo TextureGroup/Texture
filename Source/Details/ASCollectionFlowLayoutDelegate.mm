@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASCollectionFlowLayoutDelegate.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
@@ -76,3 +78,5 @@
 }
 
 @end
+
+#endif

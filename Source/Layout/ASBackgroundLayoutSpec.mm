@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
@@ -90,3 +92,5 @@ static NSUInteger const kBackgroundChildIndex = 1;
 }
 
 @end
+
+#endif

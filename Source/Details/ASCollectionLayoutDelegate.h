@@ -9,6 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
 
 @class ASElementMap, ASCollectionLayoutContext, ASCollectionLayoutState;

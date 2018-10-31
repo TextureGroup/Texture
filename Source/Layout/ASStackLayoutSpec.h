@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASStackLayoutDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -131,3 +134,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -128,3 +131,5 @@ typedef NS_ENUM(NSInteger, ASButtonNodeImageAlignment) {
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

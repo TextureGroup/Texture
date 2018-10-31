@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <numeric>
 #import <vector>
 
@@ -210,3 +212,5 @@
 }
 
 @end
+
+#endif

@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASRatioLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <algorithm>
 #import <tgmath.h>
 #import <vector>
@@ -101,3 +103,5 @@
 }
 
 @end
+
+#endif

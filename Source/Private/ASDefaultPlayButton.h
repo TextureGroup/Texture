@@ -9,6 +9,10 @@
 
 #import <AsyncDisplayKit/ASButtonNode.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 @interface ASDefaultPlayButton : ASButtonNode
 
 @end
+
+#endif

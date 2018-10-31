@@ -9,6 +9,9 @@
 #import "TailLoadingNode.h"
 
 #import "Availability.h"
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+
+#define kTailLoadingNodeHeight 100
 
 @interface TailLoadingNode ()
 @property (nonatomic, strong) ASDisplayNode *activityIndicatorNode;
@@ -26,13 +29,16 @@
       [v startAnimating];
       return v;
     }];
-    self.style.height = ASDimensionMake(100);
+
+    // Set a static height for the loading node
+    self.style.height = ASDimensionMake(kTailLoadingNodeHeight);
 
     [self setupYogaLayoutIfNeeded];
   }
   return self;
 }
-#if !YOGA_LAYOUT
+
+#if !YOGA_LAYOUT && AS_ENABLE_LAYOUTSPECS
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
 {
   return [ASCenterLayoutSpec centerLayoutSpecWithCenteringOptions:ASCenterLayoutSpecCenteringXY sizingOptions:ASCenterLayoutSpecSizingOptionMinimumXY child:self.activityIndicatorNode];

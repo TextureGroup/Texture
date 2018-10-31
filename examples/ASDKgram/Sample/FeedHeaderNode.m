@@ -34,7 +34,7 @@ static UIEdgeInsets kFeedHeaderInset = { .top = 20, .bottom = 20, .left = 10, .r
   return self;
 }
 
-#if !YOGA_LAYOUT
+#if !YOGA_LAYOUT && AS_ENABLE_LAYOUTSPECS
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
 {
   return [ASInsetLayoutSpec insetLayoutSpecWithInsets:kFeedHeaderInset child:_textNode];

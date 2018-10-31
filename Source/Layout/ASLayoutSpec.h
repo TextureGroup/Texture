@@ -7,7 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 #import <AsyncDisplayKit/ASLocking.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
@@ -98,3 +102,20 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#else // AS_ENABLE_LAYOUTSPECS
+
+@interface ASLayoutSpec : NSObject <ASLayoutElement>
+@end
+
+@interface ASLayoutSpec (Debugging)
+/**
+ *  Used by other layout specs to create ascii art debug strings
+ */
++ (NSString *)asciiArtStringForChildren:(NSArray *)children parentName:(NSString *)parentName direction:(ASStackLayoutDirection)direction;
++ (NSString *)asciiArtStringForChildren:(NSArray *)children parentName:(NSString *)parentName;
+
+@end
+
+#endif // AS_ENABLE_LAYOUTSPECS
+

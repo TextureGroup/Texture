@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 /** 
   * How the child is positioned within the spec.
   *
@@ -85,3 +87,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
+#endif

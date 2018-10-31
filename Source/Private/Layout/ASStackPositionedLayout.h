@@ -7,6 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASStackUnpositionedLayout.h>
@@ -22,3 +26,5 @@ struct ASStackPositionedLayout {
                                          const ASStackLayoutSpecStyle &style,
                                          const ASSizeRange &constrainedSize);
 };
+
+#endif

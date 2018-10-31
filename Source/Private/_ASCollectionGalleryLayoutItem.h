@@ -7,6 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 
@@ -32,3 +36,5 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

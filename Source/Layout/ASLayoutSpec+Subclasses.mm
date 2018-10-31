@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 #import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
 
@@ -85,3 +87,5 @@
 }
 
 @end
+
+#endif

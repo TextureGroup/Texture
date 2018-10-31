@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 /** How much space the spec will take up. */
 typedef NS_ENUM(NSInteger, ASAbsoluteLayoutSpecSizing) {
   /** The spec will take up the maximum size possible. */
@@ -43,3 +45,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

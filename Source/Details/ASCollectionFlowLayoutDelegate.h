@@ -9,6 +9,8 @@
 
 #import <AsyncDisplayKit/ASCollectionLayoutDelegate.h>
 
+#if AS_ENABLE_LAYOUTSPECS
+
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
@@ -26,3 +28,5 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif
