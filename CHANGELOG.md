@@ -69,6 +69,7 @@
 - Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
 - Correct linePositionModifier behavior [Michael Schneider](https://github.com/maicki)[#1192] (https://github.com/TextureGroup/Texture/pull/1192)
 - Tweak a11y label aggregation behavior to enable container label overrides [Michael Schneider](https://github.com/maicki)[#1199] (https://github.com/TextureGroup/Texture/pull/1199)
+- Fix logic cleaning data if delegate / dataSource changes and bring over logic to ASTableView [Michael Schneider](https://github.com/maicki)[#1200] (https://github.com/TextureGroup/Texture/pull/1200)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
