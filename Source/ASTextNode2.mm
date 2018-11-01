@@ -236,12 +236,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self _ensureTruncationText];
 
   // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
-  BOOL isCalculatingIntrinsicSize;
-  if (_textContainer.isVerticalForm) {
-    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
-  } else {
-    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
-  }
+  // Need to consider both width and height when determining if it is calculating instrinsic size. Even the constrained width is provided, the height can be inf
+  // it may provide a text that is longer than the width and require a wordWrapping line break mode and looking for the height to be calculated.
+  BOOL isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width) || (_textContainer.size.height >= ASTextContainerMaxSize.height);
 
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
   [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
