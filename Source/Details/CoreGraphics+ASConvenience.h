@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 
 #import <CoreGraphics/CoreGraphics.h>
-#import <tgmath.h>
+#import <cmath>
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
