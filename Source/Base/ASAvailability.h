@@ -29,6 +29,14 @@
   #define AS_USE_ASSETS_LIBRARY 0
 #endif
 
+#ifndef AS_USE_AV_FOUNDATION
+  #define AS_USE_AV_FOUNDATION 0
+#endif
+
+#ifndef AS_USE_CORE_MEDIA
+  #define AS_USE_CORE_MEDIA 0
+#endif
+
 #ifndef kCFCoreFoundationVersionNumber_iOS_10_0
   #define kCFCoreFoundationVersionNumber_iOS_10_0 1348.00
 #endif

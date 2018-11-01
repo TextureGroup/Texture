@@ -7,6 +7,16 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if TARGET_OS_IOS && AS_USE_AV_FOUNDATION
+#define AS_ENABLE_VIDEO_NODE 1
+#else
+#define AS_ENABLE_VIDEO_NODE 0
+#endif
+
+#if AS_ENABLE_VIDEO_NODE
+
 #import <AsyncDisplayKit/ASNetworkImageNode.h>
 
 @class AVAsset, AVPlayer, AVPlayerLayer, AVPlayerItem, AVVideoComposition, AVAudioMix;
@@ -164,3 +174,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif  // AS_ENABLE_VIDEO_NODE

@@ -7,13 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
-
-#if TARGET_OS_IOS
-
 #import <AsyncDisplayKit/ASVideoPlayerNode.h>
 
-#import <AVFoundation/AVFoundation.h>
+#if AS_ENABLE_VIDEO_PLAYER_NODE
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASDefaultPlaybackButton.h>

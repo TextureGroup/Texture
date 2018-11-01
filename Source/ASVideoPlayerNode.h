@@ -7,7 +7,17 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#if TARGET_OS_IOS
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if TARGET_OS_IOS && AS_USE_CORE_MEDIA && AS_USE_AV_FOUNDATION
+#define AS_ENABLE_VIDEO_PLAYER_NODE 1
+#else
+#define AS_ENABLE_VIDEO_PLAYER_NODE 0
+#endif
+
+#if AS_ENABLE_VIDEO_PLAYER_NODE
+
+#import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASVideoNode.h>
