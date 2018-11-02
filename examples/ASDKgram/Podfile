@@ -4,5 +4,7 @@ target 'Sample' do
   pod 'Texture/IGListKit', :path => '../..'
   pod 'Texture/PINRemoteImage', :path => '../..'
   pod 'Texture/Yoga', :path => '../..'
-  pod 'Weaver'
+
+  # TODO: Point this to Weaver version 0.1.2 when pod trunk is pushed.
+  pod 'Weaver', :git => 'https://github.com/TextureGroup/Weaver.git', :branch => '0.1.2'
 end
