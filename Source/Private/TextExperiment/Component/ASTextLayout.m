@@ -835,7 +835,7 @@ dispatch_semaphore_signal(_lock);
           }
           int i = 0;
           if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content.
-            i = removedLines.count - 1;
+            i = (int)removedLines.count - 1;
             while (atLeastOneLine < truncatedWidth && i >= 0) {
               if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
                 [lastLineText deleteCharactersInRange:NSMakeRange(lastLineText.string.length - 1, 1)];
