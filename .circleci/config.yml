@@ -6,10 +6,17 @@ version: 2
 jobs:
   build:
 
+    # Limit to Testing branch
+    branches:
+      only:
+        - AHCircleCI
+
     # Specify the Xcode version to use
     macos:
       xcode: "9.4.1"
 
     steps:
       - checkout
-      - command: build.sh all
+      - run: 
+          name: Build.sh all
+          command: ./build.sh all
