@@ -130,6 +130,7 @@ static dispatch_once_t shared_init_predicate;
 
 + (void)setSharedPreconfiguredRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
+  NSAssert(preconfiguredPINRemoteImageManager != nil, @"setSharedPreconfiguredRemoteImageManager requires a non-nil parameter");
   NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
   NSAssert1(sharedPINRemoteImageManager == nil, @"An instance of %@ has been set. Either configuration or preconfigured image manager can be set at a time and only once.", [[sharedPINRemoteImageManager class] description]);
 
