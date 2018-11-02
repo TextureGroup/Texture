@@ -35,7 +35,7 @@
 - (ASDisplayNode *)yogaRoot
 {
   ASDisplayNode *yogaRoot = self;
-  ASDisplayNode *yogaParent = nil; 
+  ASDisplayNode *yogaParent = nil;
   while ((yogaParent = yogaRoot.yogaParent)) {
     yogaRoot = yogaParent;
   }
