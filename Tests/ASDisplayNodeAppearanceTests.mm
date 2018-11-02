@@ -19,8 +19,8 @@
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 
 // helper functions
-IMP theClass_replaceMethodWithBlock(Class theClass, SEL originalSelector, id block);
-IMP theClass_replaceMethodWithBlock(Class theClass, SEL originalSelector, id block)
+IMP class_replaceMethodWithBlock(Class theClass, SEL originalSelector, id block);
+IMP class_replaceMethodWithBlock(Class theClass, SEL originalSelector, id block)
 {
   IMP newImplementation = imp_implementationWithBlock(block);
   Method method = class_getInstanceMethod(theClass, originalSelector);
@@ -34,7 +34,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
     block(swizzedSelf);
     ((void(*)(id, SEL))originalImp)(swizzedSelf, originalSelector);
   };
-  originalImp = theClass_replaceMethodWithBlock(theClass, originalSelector, blockActualSwizzle);
+  originalImp = class_replaceMethodWithBlock(theClass, originalSelector, blockActualSwizzle);
   void (^cleanupBlock)(void) = ^{
     // restore original method
     Method method = class_getInstanceMethod(theClass, originalSelector);
