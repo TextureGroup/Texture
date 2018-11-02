@@ -141,6 +141,7 @@ static dispatch_once_t shared_init_predicate;
 + (PINRemoteImageManager *)PINRemoteImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration imageCache:(nullable id<PINRemoteImageCaching>)imageCache
 {
   PINRemoteImageManager *manager = nil;
+#if DEBUG
   // Check that Carthage users have linked both PINRemoteImage & PINCache by testing for one file each
   if (!(NSClassFromString(@"PINRemoteImageManager"))) {
     NSException *e = [NSException
@@ -156,6 +157,7 @@ static dispatch_once_t shared_init_predicate;
                       userInfo:nil];
     @throw e;
   }
+#endif
 #if PIN_ANIMATED_AVAILABLE
     manager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
                                                                    alternativeRepresentationProvider:[self sharedDownloader]
