@@ -128,7 +128,7 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
     // apply the string scale before truncating or else we may truncate the string after we've done the work to shrink it.
     [[self context] performBlockWithLockedTextKitComponents:^(NSLayoutManager *layoutManager, NSTextStorage *textStorage, NSTextContainer *textContainer) {
       NSMutableAttributedString *scaledString = [[NSMutableAttributedString alloc] initWithAttributedString:textStorage];
-      [ASTextKitFontSizeAdjuster adjustFontSizeForAttributeString:scaledString withScaleFactor:_currentScaleFactor];
+      [ASTextKitFontSizeAdjuster adjustFontSizeForAttributeString:scaledString withScaleFactor:self->_currentScaleFactor];
       scaledTextStorage = [[NSTextStorage alloc] initWithAttributedString:scaledString];
       
       [textStorage removeLayoutManager:layoutManager];
@@ -217,7 +217,7 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
       if (isScaled) {
         // if we are going to scale the text, swap out the non-scaled text for the scaled version.
         NSMutableAttributedString *scaledString = [[NSMutableAttributedString alloc] initWithAttributedString:textStorage];
-        [ASTextKitFontSizeAdjuster adjustFontSizeForAttributeString:scaledString withScaleFactor:_currentScaleFactor];
+        [ASTextKitFontSizeAdjuster adjustFontSizeForAttributeString:scaledString withScaleFactor:self->_currentScaleFactor];
         scaledTextStorage = [[NSTextStorage alloc] initWithAttributedString:scaledString];
         
         [textStorage removeLayoutManager:layoutManager];
