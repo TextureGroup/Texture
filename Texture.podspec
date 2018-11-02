@@ -60,7 +60,7 @@ Pod::Spec.new do |spec|
   end
 
   spec.subspec 'MapKit' do |map|
-    map.frameworks = 'MapKit'
+    map.frameworks = ['CoreLocation', 'MapKit']
     map.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_MAPKIT=1' }
     map.dependency 'Texture/Core'
   end
