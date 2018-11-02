@@ -12,6 +12,7 @@
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
+// TODO: Remove these now that we're all-C++.
 #if defined(__cplusplus)
 # define var auto
 # define let const auto
