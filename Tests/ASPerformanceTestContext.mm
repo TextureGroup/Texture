@@ -57,7 +57,8 @@
   return self;
 }
 
-- (NSDictionary<NSString *,ASPerformanceTestResult *> *)results {
+- (NSDictionary<NSString *, ASPerformanceTestResult *> *)results
+{
   return _results;
 }
 
