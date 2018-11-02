@@ -172,11 +172,9 @@ static dispatch_once_t shared_init_predicate;
 
 - (PINRemoteImageManager *)sharedPINRemoteImageManager
 {
-  if (!sharedPINRemoteImageManager) {
-    dispatch_once(&shared_init_predicate, ^{
-      sharedPINRemoteImageManager = [ASPINRemoteImageDownloader PINRemoteImageManagerWithConfiguration:nil imageCache:nil];
-    });
-  }
+  dispatch_once(&shared_init_predicate, ^{
+    sharedPINRemoteImageManager = [ASPINRemoteImageDownloader PINRemoteImageManagerWithConfiguration:nil imageCache:nil];
+  });
   return sharedPINRemoteImageManager;
 }
 
