@@ -16,6 +16,10 @@ Pod::Spec.new do |spec|
 
   # Subspecs
   spec.subspec 'Core' do |core|
+
+    # These will be lowered into subspecs in the future. Only here for ASVideoNode.
+    core.frameworks = ['AVFoundation', 'CoreMedia']
+
     core.compiler_flags = '-fno-exceptions'
     core.public_header_files = [
       'Source/*.h',
@@ -28,8 +32,7 @@ Pod::Spec.new do |spec|
     ]
     
     core.source_files = [
-      'Source/**/*.{h,m,mm}',
-      'Base/*.{h,m}',
+      'Source/**/*.{h,mm}',
       
       # Most TextKit components are not public because the C++ content
       # in the headers will cause build errors when using
