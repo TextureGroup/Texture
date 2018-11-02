@@ -14,7 +14,7 @@
 
 // TODO: Remove this – we don't need to link GLKit just to convert degrees to radians.
 #import <GLKit/GLKit.h>
-#import <tgmath>
+#import <tgmath.h>
 
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
