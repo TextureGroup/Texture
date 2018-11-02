@@ -157,7 +157,7 @@ static dispatch_once_t shared_init_predicate;
     @throw e;
   }
 #if PIN_ANIMATED_AVAILABLE
-    sharedPINRemoteImageManager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
+    manager = [[ASPINRemoteImageManager alloc] initWithSessionConfiguration:configuration
                                                                    alternativeRepresentationProvider:[self sharedDownloader]
                                                                    imageCache:imageCache];
 #else
