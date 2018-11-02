@@ -50,6 +50,7 @@
 
 @property (nonatomic) ASTextNode *textNode;
 @property (nonatomic, copy) NSAttributedString *attributedText;
+@property (nonatomic) NSMutableArray *textNodeBucket;
 
 @end
 
@@ -59,6 +60,7 @@
 {
   [super setUp];
   _textNode = [[ASTextNode alloc] init];
+  _textNodeBucket = [[NSMutableArray alloc] init];
   
   UIFontDescriptor *desc =
   [UIFontDescriptor fontDescriptorWithName:@"Didot" size:18];
@@ -245,6 +247,61 @@
   ASTextNodeSecondSubclass *sc2 = [[ASTextNodeSecondSubclass alloc] init];
   XCTAssertEqualObjects([ASTextNodeSubclass superclass], [ASTextNode2 class]);
   XCTAssertEqualObjects(sc2.superclass, [ASTextNodeSubclass class]);
+}
+
+- (void)testTextNodeSwitchWorksInMultiThreadEnvironment
+{
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalTextNode;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  XCTestExpectation *exp = [self expectationWithDescription:@"wait for full bucket"];
+
+  dispatch_queue_t queue = dispatch_queue_create("com.texture.AsyncDisplayKit.ASTextNodeTestsQueue", DISPATCH_QUEUE_CONCURRENT);
+  dispatch_group_t g = dispatch_group_create();
+  for (int i = 0; i < 20; i++) {
+    dispatch_group_async(g, queue, ^{
+      ASTextNode *textNode = [[ASTextNodeSecondSubclass alloc] init];
+      XCTAssert([textNode isKindOfClass:[ASTextNode2 class]]);
+      @synchronized(self.textNodeBucket) {
+        [self.textNodeBucket addObject:textNode];
+        if (self.textNodeBucket.count == 20) {
+          [exp fulfill];
+        }
+      }
+    });
+  }
+  [self waitForExpectations:@[exp] timeout:3];
+  exp = nil;
+  [self.textNodeBucket removeAllObjects];
+}
+
+- (void)testTextNodeSwitchWorksInMultiThreadEnvironment2
+{
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalTextNode;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  XCTestExpectation *exp = [self expectationWithDescription:@"wait for full bucket"];
+ 
+  NSLock *lock = [[NSLock alloc] init];
+  NSMutableArray *textNodeBucket = [[NSMutableArray alloc] init];
+  
+  dispatch_queue_t queue = dispatch_queue_create("com.texture.AsyncDisplayKit.ASTextNodeTestsQueue", DISPATCH_QUEUE_CONCURRENT);
+  dispatch_group_t g = dispatch_group_create();
+  for (int i = 0; i < 20; i++) {
+    dispatch_group_async(g, queue, ^{
+      ASTextNode *textNode = [[ASTextNodeSecondSubclass alloc] init];
+      XCTAssert([textNode isKindOfClass:[ASTextNode2 class]]);
+      [lock lock];
+      [textNodeBucket addObject:textNode];
+      if (textNodeBucket.count == 20) {
+        [exp fulfill];
+      }
+      [lock unlock];
+    });
+  }
+  [self waitForExpectations:@[exp] timeout:3];
+  exp = nil;
+  [textNodeBucket removeAllObjects];
 }
 
 @end

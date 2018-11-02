@@ -41,8 +41,7 @@
 
   // Disable the button and verify that accessibility traits has been updated correctly.
   buttonNode.enabled = NO;
-  UIAccessibilityTraits disabledButtonTrait =
-  UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled;
+  UIAccessibilityTraits disabledButtonTrait = UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled;
   XCTAssertTrue(buttonNode.accessibilityTraits == disabledButtonTrait,
                 @"Should have disabled button accessibility trait, instead has %llu",
                 buttonNode.accessibilityTraits);
