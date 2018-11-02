@@ -28,7 +28,8 @@ Pod::Spec.new do |spec|
     ]
     
     core.source_files = [
-      'Source/**/*.{h,mm}',
+      'Source/**/*.{h,m,mm}',
+      'Base/*.{h,m}',
       
       # Most TextKit components are not public because the C++ content
       # in the headers will cause build errors when using
@@ -73,21 +74,9 @@ Pod::Spec.new do |spec|
     assetslib.dependency 'Texture/Core'
   end
 
-  spec.subspec 'AVFoundation' do |avf|
-    avf.frameworks = 'AVFoundation'
-    avf.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_AV_FOUNDATION=1' }
-    avf.dependency 'Texture/Core'
-  end
-
-  spec.subspec 'CoreMedia' do |cm|
-    cm.frameworks = 'CoreMedia'
-    cm.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_CORE_MEDIA=1' }
-    cm.dependency 'Texture/Core'
-  end
-
   # Include these by default for backwards compatibility.
   # This will change in 3.0.
-  spec.default_subspecs = 'PINRemoteImage', 'MapKit', 'AssetsLibrary', 'Photos', 'AVFoundation', 'CoreMedia'
+  spec.default_subspecs = 'PINRemoteImage', 'MapKit', 'AssetsLibrary', 'Photos'
 
   spec.social_media_url = 'https://twitter.com/TextureiOS'
   spec.library = 'c++'
