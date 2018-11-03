@@ -13,15 +13,16 @@
 #import "ASConfigurationInternal.h"
 
 static ASExperimentalFeatures features[] = {
-    ASExperimentalGraphicsContexts,
-    ASExperimentalTextNode,
-    ASExperimentalInterfaceStateCoalescing,
-    ASExperimentalUnfairLock,
-    ASExperimentalLayerDefaults,
-    ASExperimentalNetworkImageQueue,
-    ASExperimentalCollectionTeardown,
-    ASExperimentalFramesetterCache,
-    ASExperimentalClearDataDuringDeallocation
+  ASExperimentalGraphicsContexts,
+  ASExperimentalTextNode,
+  ASExperimentalInterfaceStateCoalescing,
+  ASExperimentalUnfairLock,
+  ASExperimentalLayerDefaults,
+  ASExperimentalNetworkImageQueue,
+  ASExperimentalCollectionTeardown,
+  ASExperimentalFramesetterCache,
+  ASExperimentalClearDataDuringDeallocation,
+  ASExperimentalDidEnterPreloadSkipASMLayout
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -34,16 +35,17 @@ static ASExperimentalFeatures features[] = {
 
 + (NSArray *)names {
   return @[
-           @"exp_graphics_contexts",
-           @"exp_text_node",
-           @"exp_interface_state_coalesce",
-           @"exp_unfair_lock",
-           @"exp_infer_layer_defaults",
-           @"exp_network_image_queue",
-           @"exp_collection_teardown",
-           @"exp_framesetter_cache",
-           @"exp_clear_data_during_deallocation"
-           ];
+    @"exp_graphics_contexts",
+    @"exp_text_node",
+    @"exp_interface_state_coalesce",
+    @"exp_unfair_lock",
+    @"exp_infer_layer_defaults",
+    @"exp_network_image_queue",
+    @"exp_collection_teardown",
+    @"exp_framesetter_cache",
+    @"exp_clear_data_during_deallocation",
+    @"exp_did_enter_preload_skip_asm_layout",
+  ];
 }
 
 - (ASExperimentalFeatures)allFeatures {
