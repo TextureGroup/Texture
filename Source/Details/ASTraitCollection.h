@@ -61,11 +61,11 @@ typedef struct ASPrimitiveTraitCollection {
   UIUserInterfaceSizeClass verticalSizeClass;
 
   CGFloat displayScale;
-  UIDisplayGamut displayGamut;
+  UIDisplayGamut displayGamut API_AVAILABLE(ios(10.0));
 
   UIUserInterfaceIdiom userInterfaceIdiom;
   UIForceTouchCapability forceTouchCapability;
-  UITraitEnvironmentLayoutDirection layoutDirection;
+  UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
 #if TARGET_OS_TV
   UIUserInterfaceStyle userInterfaceStyle;
 #endif
@@ -168,11 +168,11 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, readonly) UIUserInterfaceSizeClass verticalSizeClass;
 
 @property (nonatomic, readonly) CGFloat displayScale;
-@property (nonatomic, readonly) UIDisplayGamut displayGamut;
+@property (nonatomic, readonly) UIDisplayGamut displayGamut API_AVAILABLE(ios(10.0));
 
 @property (nonatomic, readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (nonatomic, readonly) UIForceTouchCapability forceTouchCapability;
-@property (nonatomic, readonly) UITraitEnvironmentLayoutDirection layoutDirection;
+@property (nonatomic, readonly) UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
 #if TARGET_OS_TV
 @property (nonatomic, readonly) UIUserInterfaceStyle userInterfaceStyle;
 #endif

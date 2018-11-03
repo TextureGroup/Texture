@@ -1,6 +1,8 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
 - [ASPINRemoteImageManager] Allow specifying an image cache when configuring ASPINRemoteImageManager. [Kevin Smith](https://github.com/wiseoldduck). [#1197](https://github.com/TextureGroup/Texture/pull/1197)
+- [ASTextNode2] Newline character support and truncated line sizing improvement.  [Kevin Smith](https://github.com/wiseoldduck). [#1193](https://github.com/TextureGroup/Texture/pull/1193)
+- [ASScrollNode] A11y support for ASScrollNode. [Max Wang](https://github.com/wsdwsd0829). [#1188](https://github.com/TextureGroup/Texture/pull/1188)
 - [ASDisplayNode.m] Make sure node is loaded before enter visible. [Max Wang](https://github.com/wsdwsd0829). [#886](https://github.com/TextureGroup/Texture/pull/886)
 - [ASTextNode2] Add improved support for all line-break modes in experimental text node. [Kevin Smith](https://github.com/wiseoldduck). [#1150](https://github.com/TextureGroup/Texture/pull/1150)
 - [ASExperimentalFeatures.m] Fix mismatch name in experimental features. [Max Wang](https://github.com/wsdwsd0829). [#1159](https://github.com/TextureGroup/Texture/pull/1159)
@@ -67,6 +69,9 @@
 - Don’t handle touches on additional attributed message if passthrough is enabled [Michael Schneider](https://github.com/maicki)[#1184] (https://github.com/TextureGroup/Texture/pull/1184)
 - Yoga integration improvements [Michael Schneider](https://github.com/maicki)[#1187] (https://github.com/TextureGroup/Texture/pull/1187)
 - Correct linePositionModifier behavior [Michael Schneider](https://github.com/maicki)[#1192] (https://github.com/TextureGroup/Texture/pull/1192)
+- Tweak a11y label aggregation behavior to enable container label overrides [Michael Schneider](https://github.com/maicki)[#1199] (https://github.com/TextureGroup/Texture/pull/1199)
+- Fix logic cleaning data if delegate / dataSource changes and bring over logic to ASTableView [Michael Schneider](https://github.com/maicki)[#1200] (https://github.com/TextureGroup/Texture/pull/1200)
+- Standardize the code base on Objective-C++. We will still not leak any C++ into public headers, however. [Adlai Holler](https://github.com/Adlai-Holler)
 
 ## 2.7
 - Fix pager node for interface coalescing. [Max Wang](https://github.com/wsdwsd0829) [#877](https://github.com/TextureGroup/Texture/pull/877)
