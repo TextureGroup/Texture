@@ -55,8 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Sets a custom preconfigured PINRemoteImageManager that will be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes
  * while loading images off the network. This must be specified early in the application lifecycle before
- * `sharedDownloader` is accessed. If nil is passed in as the PINRemoteImageManager, it will create
- * a default image manager with a nil session configuration.
+ * `sharedDownloader` is accessed.
  *
  * @param preconfiguredPINRemoteImageManager The preconfigured remote image manager that will be used by `sharedDownloader`
  */
