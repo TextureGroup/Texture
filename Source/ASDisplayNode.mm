@@ -2215,7 +2215,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnode:(ASDisplayNode *)subnode atSubnodeIndex:(NSInteger)subnodeIndex sublayerIndex:(NSInteger)sublayerIndex andRemoveSubnode:(ASDisplayNode *)oldSubnode
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
   
   as_log_verbose(ASNodeLog(), "Insert subnode %@ at index %zd of %@ and remove subnode %@", subnode, subnodeIndex, self, oldSubnode);
   
@@ -2431,7 +2432,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
 
   if (subnode == nil) {
     ASDisplayNodeFailAssert(@"Cannot insert a nil subnode");
@@ -2495,7 +2497,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
 
   if (subnode == nil) {
     ASDisplayNodeFailAssert(@"Cannot insert a nil subnode");
@@ -2557,7 +2560,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
   
   if (subnode == nil) {
     ASDisplayNodeFailAssert(@"Cannot insert a nil subnode");
@@ -2594,7 +2598,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_removeSubnode:(ASDisplayNode *)subnode
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
   
   // Don't call self.supernode here because that will retain/autorelease the supernode.  This method -_removeSupernode: is often called while tearing down a node hierarchy, and the supernode in question might be in the middle of its -dealloc.  The supernode is never messaged, only compared by value, so this is safe.
   // The particular issue that triggers this edge case is when a node calls -removeFromSupernode on a subnode from within its own -dealloc method.
@@ -2620,7 +2625,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_removeFromSupernode
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
   
   __instanceLock__.lock();
     __weak ASDisplayNode *supernode = _supernode;
@@ -2634,7 +2640,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_removeFromSupernodeIfEqualTo:(ASDisplayNode *)supernode
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
+  // ASAssertUnlocked(__instanceLock__);
   
   __instanceLock__.lock();
 
