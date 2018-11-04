@@ -20,7 +20,7 @@ Pod::Spec.new do |spec|
     # These will be lowered into subspecs in the future. Only here for ASVideoNode.
     core.frameworks = ['AVFoundation', 'CoreMedia']
 
-    core.compiler_flags = '-fno-exceptions'
+    core.compiler_flags = '-fno-exceptions -Wno-implicit-retain-self'
     core.public_header_files = [
       'Source/*.h',
       'Source/Details/**/*.h',
