@@ -18,10 +18,9 @@ warn("PR is classed as Work in Progress") if github.pr_title.include? "[WIP]"
 # Warn when there is a big PR
 warn("This is a big PR, please consider splitting it up to ease code review.") if git.lines_of_code > 500
 
-# Changelog entries are required for changes to source files.
-no_changelog_entry = !git.modified_files.include?("CHANGELOG.md")
-if has_changes_in_source_directory && no_changelog_entry && !declared_trivial
-  warn("Any source code changes should have an entry in CHANGELOG.md or have #trivial in their title.")
+# Modifying the changelog will probably get overwritten.
+if git.modified_files.include?("CHANGELOG.md") && !github.pr_title.include?("#changelog")
+  warn("PR modifies CHANGELOG.md, which is a generated file. Add #changelog to the title to suppress this warning.")
 end
 
 def full_license(partial_license, filename)
