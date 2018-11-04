@@ -52,16 +52,16 @@
 {
   dispatch_block_t mainThread = ^{
     do {
-      ASDN::MutexLocker l(_serialQueueLock);
+      ASDN::MutexLocker l(self->_serialQueueLock);
       dispatch_block_t block;
-      if (_blocks.count > 0) {
+      if (self->_blocks.count > 0) {
         block = _blocks[0];
-        [_blocks removeObjectAtIndex:0];
+        [self->_blocks removeObjectAtIndex:0];
       } else {
         break;
       }
       {
-        ASDN::MutexUnlocker u(_serialQueueLock);
+        ASDN::MutexUnlocker u(self->_serialQueueLock);
         block();
       }
     } while (true);

@@ -607,7 +607,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       return;
     }
 
-    for (NSString *attributeName in _linkAttributeNames) {
+    for (NSString *attributeName in self->_linkAttributeNames) {
       NSRange range;
       id value = [attributedString attribute:attributeName atIndex:characterIndex longestEffectiveRange:&range inRange:clampedRange];
       NSString *name = attributeName;
@@ -619,8 +619,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
       // If highlighting, check with delegate first. If not implemented, assume YES.
       if (highlighting
-          && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-          && ![_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
+          && [self->_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+          && ![self->_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
         value = nil;
         name = nil;
       }
