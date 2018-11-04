@@ -1,5 +1,6 @@
 ## master
 * Add your own contributions to the next release on the line below this with your name.
+- [ASPINRemoteImageManager] Allow specifying an image cache when configuring ASPINRemoteImageManager. [Kevin Smith](https://github.com/wiseoldduck). [#1197](https://github.com/TextureGroup/Texture/pull/1197)
 - [ASTextNode2] Newline character support and truncated line sizing improvement.  [Kevin Smith](https://github.com/wiseoldduck). [#1193](https://github.com/TextureGroup/Texture/pull/1193)
 - [ASScrollNode] A11y support for ASScrollNode. [Max Wang](https://github.com/wsdwsd0829). [#1188](https://github.com/TextureGroup/Texture/pull/1188)
 - [ASDisplayNode.m] Make sure node is loaded before enter visible. [Max Wang](https://github.com/wsdwsd0829). [#886](https://github.com/TextureGroup/Texture/pull/886)
