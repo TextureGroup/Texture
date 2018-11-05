@@ -10,7 +10,6 @@
 #import <Foundation/Foundation.h>
 
 #import <assert.h>
-#import <mutex>
 #import <os/lock.h>
 #import <pthread.h>
 #import <stdbool.h>
@@ -113,6 +112,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #endif
 
 #include <memory>
+#include <mutex>
 
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
