@@ -96,7 +96,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 
 #ifdef __cplusplus
 
-#define TIME_LOCKER 0
 /**
  * Enable this flag to collect information on the owning thread and ownership level of a mutex.
  * These properties are useful to determine if a mutex has been acquired and in case of a recursive mutex, how many times that happened.
@@ -111,10 +110,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #define CHECK_LOCKING_SAFETY 1
 #else
 #define CHECK_LOCKING_SAFETY 0
-#endif
-
-#if TIME_LOCKER
-#import <QuartzCore/QuartzCore.h>
 #endif
 
 #include <memory>
