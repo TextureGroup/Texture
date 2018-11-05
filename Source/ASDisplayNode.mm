@@ -667,7 +667,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   // in the background on a loaded node, which isn't currently supported.
   if (_pendingViewState.hasSetNeedsLayout) {
     // Need to unlock before calling setNeedsLayout to avoid deadlocks.
-    // MutexUnlocker will re-lock at the end of scope.
     l.unlock();
     [self __setNeedsLayout];
     l.lock();
@@ -1119,7 +1118,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
-  ASDN::MutexLocker l(__instanceLock__);
+  ASDN::UniqueLock l(__instanceLock__);
 
 #if YOGA
   // There are several cases where Yoga could arrive here:
@@ -1136,11 +1135,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     if ([self shouldHaveYogaMeasureFunc] == NO) {
       // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
       // initiate a new Yoga calculation pass from root.
-      ASDN::MutexUnlocker ul(__instanceLock__);
+      
       as_activity_create_for_scope("Yoga layout calculation");
       if (self.yogaLayoutInProgress == NO) {
         ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
+        l.unlock();
         [self calculateLayoutFromYogaRoot:constrainedSize];
+        l.lock();
       } else {
         ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
       }
