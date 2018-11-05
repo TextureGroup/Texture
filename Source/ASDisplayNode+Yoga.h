@@ -33,6 +33,12 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 // Will walk up the Yoga tree and returns the root node
 - (ASDisplayNode *)yogaRoot;
 
+/**
+ * @discussion Attempts(spinning) to lock all node up to root node when yoga is enabled.
+ * This will lock self when yoga is not enabled;
+ */
+- (ASLockSet)lockToRootIfNeededForLayout;
+
 @end
 
 
@@ -47,6 +53,11 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
 /// For internal usage only
 - (void)invalidateCalculatedYogaLayout;
+/**
+ * @discussion return true only when yoga enabled and the node is in yoga tree and the node is
+ * not leaf that implemented measure function.
+ */
+- (BOOL)locked_shouldLayoutFromYogaRoot;
 
 @end
 
