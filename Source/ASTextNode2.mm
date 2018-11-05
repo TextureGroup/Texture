@@ -1142,7 +1142,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize
 {
-  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine == nil);
+  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine != nil);
 }
 
 - (ASTextLayout *)locked_textLayoutForSize:(CGSize)size
