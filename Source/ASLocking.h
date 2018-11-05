@@ -101,6 +101,7 @@ NS_INLINE void ASUnlockSet(ASLockSet *lockSet) {
  * one of the locks is already locked (recursive.) Only locks taken
  * inside this function are guaranteed not to cause a deadlock.
  */
+ASDISPLAYNODE_DEPRECATED_MSG("Use LockSet in ASThread.h instead.")
 NS_INLINE ASLockSet ASLockSequence(NS_NOESCAPE ASLockSequenceBlock body)
 {
   __block ASLockSet locks = (ASLockSet){0, {}};

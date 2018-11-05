@@ -113,6 +113,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 
 #include <memory>
 #include <mutex>
+#include <thread>
 
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
@@ -309,9 +310,51 @@ namespace ASDN {
   {
     RecursiveMutex () : Mutex (true) {}
   };
-
+  
   typedef std::lock_guard<Mutex> MutexLocker;
   typedef std::unique_lock<Mutex> UniqueLock;
+  
+  /**
+   * A set of unique locks which are acquired safely in a sequence.
+   *
+   * Usage looks like this:
+   * LockSet ls;
+   * while (ls.empty()) {
+   *   if (!ls.try_add(m1)) continue;
+   *   // ... do things with a lock on m1
+   *   if (!ls.try_add(m2)) continue;
+   *   // ... do things with a lock on m2
+   * }
+   * // Now you have m1 and m2
+   */
+  class LockSet
+  {
+    UniqueLock locks_[kCapacity];
+    int locks_count_;
+  public:
+    static int constexpr kCapacity = 32;
+    bool empty()
+    {
+      return locks_count_ == 0;
+    }
+    
+    bool TryAdd(Mutex &mutex)
+    {
+      assert(locks_count_ < kCapacity);
+      if (!mutex.tryLock()) {
+        // Reset our locks and yield.
+        for (int i = 0; i < locks_count_; i++) {
+          locks_[i] = UniqueLock();
+        }
+        locks_count_ = 0;
+        std::this_thread::yield();
+        return false;
+      }
+      
+      locks_[locks_count_++] = UniqueLock(mutex, std::adopt_lock);
+      return true;
+    }
+  };
 
 } // namespace ASDN
 

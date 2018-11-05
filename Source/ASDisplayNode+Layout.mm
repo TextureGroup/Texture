@@ -220,23 +220,26 @@ ASLayoutElementStyleExtensibilityForwarding
   ASAssertUnlocked(__instanceLock__);
 
   as_activity_create_for_scope("Set needs layout from above");
-
-  // Mark the node for layout in the next layout pass
-  [self setNeedsLayout];
   
-  __instanceLock__.lock();
-  // Escalate to the root; entire tree must allow adjustments so the layout fits the new child.
-  // Much of the layout will be re-used as cached (e.g. other items in an unconstrained stack)
-  ASDisplayNode *supernode = _supernode;
-  __instanceLock__.unlock();
-  
-  if (supernode) {
-    // Threading model requires that we unlock before calling a method on our parent.
-    [supernode _u_setNeedsLayoutFromAbove];
-  } else {
-    // Let the root node method know that the size was invalidated
-    [self _rootNodeDidInvalidateSize];
+  // Lock to root.
+  unowned ASDisplayNode *root;
+  ASDN::LockSet locks;
+  while (locks.empty()) {
+  continue_outer:
+    for (unowned ASDisplayNode *node = self; node; node = node->_supernode) {
+      if (!locks.TryAdd(node->__instanceLock__)) goto continue_outer;
+      if (node->_supernode) {
+        [node setNeedsLayout];
+        node = node->_supernode;
+      } else {
+        root = node;
+        break;
+      }
+    }
   }
+  
+  // Let the root node method know that the size was invalidated
+  [root _rootNodeDidInvalidateSize];
 }
 
 - (void)_rootNodeDidInvalidateSize
