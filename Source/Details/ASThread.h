@@ -95,7 +95,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 
 #ifdef __cplusplus
 
-#define TIME_LOCKER 0
 /**
  * Enable this flag to collect information on the owning thread and ownership level of a mutex.
  * These properties are useful to determine if a mutex has been acquired and in case of a recursive mutex, how many times that happened.
@@ -112,11 +111,8 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #define CHECK_LOCKING_SAFETY 0
 #endif
 
-#if TIME_LOCKER
-#import <QuartzCore/QuartzCore.h>
-#endif
-
 #include <memory>
+#include <mutex>
 
 // This MUST always execute, even when assertions are disabled. Otherwise all lock operations become no-ops!
 // (To be explicit, do not turn this into an NSAssert, assert(), or any other kind of statement where the
@@ -143,106 +139,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 
 namespace ASDN {
   
-  template<class T>
-  class Locker
-  {
-    T &_l;
-
-#if TIME_LOCKER
-    CFTimeInterval _ti;
-    const char *_name;
-#endif
-
-  public:
-#if !TIME_LOCKER
-
-    Locker (T &l) noexcept : _l (l) {
-      _l.lock ();
-    }
-
-    ~Locker () {
-      _l.unlock ();
-    }
-
-    // non-copyable.
-    Locker(const Locker<T>&) = delete;
-    Locker &operator=(const Locker<T>&) = delete;
-
-#else
-
-    Locker (T &l, const char *name = NULL) noexcept : _l (l), _name(name) {
-      _ti = CACurrentMediaTime();
-      _l.lock ();
-    }
-
-    ~Locker () {
-      _l.unlock ();
-      if (_name) {
-        printf(_name, NULL);
-        printf(" dt:%f\n", CACurrentMediaTime() - _ti);
-      }
-    }
-
-#endif
-
-  };
-
-  template<class T>
-  class SharedLocker
-  {
-    std::shared_ptr<T> _l;
-    
-#if TIME_LOCKER
-    CFTimeInterval _ti;
-    const char *_name;
-#endif
-    
-  public:
-#if !TIME_LOCKER
-    
-    SharedLocker (std::shared_ptr<T> const& l) noexcept : _l (l) {
-      ASDisplayNodeCAssertTrue(_l != nullptr);
-      _l->lock ();
-    }
-    
-    ~SharedLocker () {
-      _l->unlock ();
-    }
-    
-    // non-copyable.
-    SharedLocker(const SharedLocker<T>&) = delete;
-    SharedLocker &operator=(const SharedLocker<T>&) = delete;
-    
-#else
-    
-    SharedLocker (std::shared_ptr<T> const& l, const char *name = NULL) noexcept : _l (l), _name(name) {
-      _ti = CACurrentMediaTime();
-      _l->lock ();
-    }
-    
-    ~SharedLocker () {
-      _l->unlock ();
-      if (_name) {
-        printf(_name, NULL);
-        printf(" dt:%f\n", CACurrentMediaTime() - _ti);
-      }
-    }
-    
-#endif
-    
-  };
-
-  template<class T>
-  class Unlocker
-  {
-    T &_l;
-  public:
-    Unlocker (T &l) noexcept : _l (l) { _l.unlock (); }
-    ~Unlocker () {_l.lock ();}
-    Unlocker(Unlocker<T>&) = delete;
-    Unlocker &operator=(Unlocker<T>&) = delete;
-  };
-
   // Set once in Mutex constructor. Linker fails if this is a member variable. ??
   static BOOL gMutex_unfair;
   
@@ -414,41 +310,8 @@ namespace ASDN {
     RecursiveMutex () : Mutex (true) {}
   };
 
-  typedef Locker<Mutex> MutexLocker;
-  typedef SharedLocker<Mutex> MutexSharedLocker;
-  typedef Unlocker<Mutex> MutexUnlocker;
-
-  /**
-   If you are creating a static mutex, use StaticMutex. This avoids expensive constructor overhead at startup (or worse, ordering
-   issues between different static objects). It also avoids running a destructor on app exit time (needless expense).
-
-   Note that you can, but should not, use StaticMutex for non-static objects. It will leak its mutex on destruction,
-   so avoid that!
-   */
-  struct StaticMutex
-  {
-    StaticMutex () : _m (PTHREAD_MUTEX_INITIALIZER) {}
-
-    // non-copyable.
-    StaticMutex(const StaticMutex&) = delete;
-    StaticMutex &operator=(const StaticMutex&) = delete;
-
-    void lock () {
-      AS_POSIX_ASSERT_NOERR(pthread_mutex_lock (this->mutex()));
-    }
-
-    void unlock () {
-      AS_POSIX_ASSERT_NOERR(pthread_mutex_unlock (this->mutex()));
-    }
-
-    pthread_mutex_t *mutex () { return &_m; }
-
-  private:
-    pthread_mutex_t _m;
-  };
-
-  typedef Locker<StaticMutex> StaticMutexLocker;
-  typedef Unlocker<StaticMutex> StaticMutexUnlocker;
+  typedef std::lock_guard<Mutex> MutexLocker;
+  typedef std::unique_lock<Mutex> UniqueLock;
 
 } // namespace ASDN
 
