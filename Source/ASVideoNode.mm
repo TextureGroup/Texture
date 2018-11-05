@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASVideoNode.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -322,6 +323,7 @@ static NSString * const kRate = @"rate";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
+  ASDN::UniqueLock l(__instanceLock__);
   ASLockScopeSelf();
 
   if (object == _currentPlayerItem) {
@@ -330,8 +332,9 @@ static NSString * const kRate = @"rate";
         if (self.playerState != ASVideoNodePlayerStatePlaying) {
           self.playerState = ASVideoNodePlayerStateReadyToPlay;
           if (_shouldBePlaying && ASInterfaceStateIncludesVisible(self.interfaceState)) {
-            ASUnlockScope(self);
+            l.unlock();
             [self play];
+            l.lock();
           }
         }
         // If we don't yet have a placeholder image update it now that we should have data available for it
@@ -354,8 +357,10 @@ static NSString * const kRate = @"rate";
           [self.delegate videoNodeDidRecoverFromStall:self];
         }
         
-        ASUnlockScope(self);
+        l.unlock();
         [self play]; // autoresume after buffer catches up
+        // NOTE: Early return without re-locking.
+        return;
       }
     } else if ([keyPath isEqualToString:kplaybackBufferEmpty]) {
       if (_shouldBePlaying && [change[NSKeyValueChangeNewKey] boolValue] == YES && ASInterfaceStateIncludesVisible(self.interfaceState)) {
@@ -373,6 +378,8 @@ static NSString * const kRate = @"rate";
       }
     }
   }
+  
+  // NOTE: Early return above.
 }
 
 - (void)tapped

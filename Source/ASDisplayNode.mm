@@ -416,12 +416,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)onDidLoad:(ASDisplayNodeDidLoadBlock)body
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASDN::UniqueLock l(__instanceLock__);
 
   if ([self _locked_isNodeLoaded]) {
     ASDisplayNodeAssertThreadAffinity(self);
-    ASDN::MutexUnlocker l(__instanceLock__);
+    l.unlock();
     body(self);
+    return;
   } else if (_onDidLoadBlocks == nil) {
     _onDidLoadBlocks = [NSMutableArray arrayWithObject:body];
   } else {
@@ -601,7 +602,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (UIView *)view
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASDN::UniqueLock l(__instanceLock__);
 
   ASDisplayNodeAssert(!_flags.layerBacked, @"Call to -view undefined on layer-backed nodes");
   BOOL isLayerBacked = _flags.layerBacked;
@@ -626,30 +627,28 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   // in the background on a loaded node, which isn't currently supported.
   if (_pendingViewState.hasSetNeedsLayout) {
     // Need to unlock before calling setNeedsLayout to avoid deadlocks.
-    // MutexUnlocker will re-lock at the end of scope.
-    ASDN::MutexUnlocker u(__instanceLock__);
+    l.unlock();
     [self __setNeedsLayout];
+    l.lock();
   }
   
   [self _locked_applyPendingStateToViewOrLayer];
   
-  {
-    // The following methods should not be called with a lock
-    ASDN::MutexUnlocker u(__instanceLock__);
+  // The following methods should not be called with a lock
+  l.unlock();
 
-    // No need for the lock as accessing the subviews or layers are always happening on main
-    [self _addSubnodeViewsAndLayers];
-    
-    // A subclass hook should never be called with a lock
-    [self _didLoad];
-  }
+  // No need for the lock as accessing the subviews or layers are always happening on main
+  [self _addSubnodeViewsAndLayers];
+  
+  // A subclass hook should never be called with a lock
+  [self _didLoad];
 
   return _view;
 }
 
 - (CALayer *)layer
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASDN::UniqueLock l(__instanceLock__);
   if (_layer != nil) {
     return _layer;
   }
@@ -661,6 +660,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   // Loading a layer needs to happen on the main thread
   ASDisplayNodeAssertMainThread();
   [self _locked_loadViewOrLayer];
+  CALayer *layer = _layer;
   
   // FIXME: Ideally we'd call this as soon as the node receives -setNeedsLayout
   // but automatic subnode management would require us to modify the node tree
@@ -668,24 +668,23 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   if (_pendingViewState.hasSetNeedsLayout) {
     // Need to unlock before calling setNeedsLayout to avoid deadlocks.
     // MutexUnlocker will re-lock at the end of scope.
-    ASDN::MutexUnlocker u(__instanceLock__);
+    l.unlock();
     [self __setNeedsLayout];
+    l.lock();
   }
   
   [self _locked_applyPendingStateToViewOrLayer];
   
-  {
-    // The following methods should not be called with a lock
-    ASDN::MutexUnlocker u(__instanceLock__);
+  // The following methods should not be called with a lock
+  l.unlock();
 
-    // No need for the lock as accessing the subviews or layers are always happening on main
-    [self _addSubnodeViewsAndLayers];
-    
-    // A subclass hook should never be called with a lock
-    [self _didLoad];
-  }
+  // No need for the lock as accessing the subviews or layers are always happening on main
+  [self _addSubnodeViewsAndLayers];
+  
+  // A subclass hook should never be called with a lock
+  [self _didLoad];
 
-  return _layer;
+  return layer;
 }
 
 // Returns nil if the layer is not an _ASDisplayLayer; will not create the layer if nil.
@@ -1033,7 +1032,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   
   BOOL loaded = NO;
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASDN::UniqueLock l(__instanceLock__);
     loaded = [self _locked_isNodeLoaded];
     CGRect bounds = _threadSafeBounds;
     
@@ -1055,10 +1054,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
     // This method will confirm that the layout is up to date (and update if needed).
     // Importantly, it will also APPLY the layout to all of our subnodes if (unless parent is transitioning).
-    {
-      ASDN::MutexUnlocker u(__instanceLock__);
-      [self _u_measureNodeWithBoundsIfNecessary:bounds];
-    }
+    l.unlock();
+    [self _u_measureNodeWithBoundsIfNecessary:bounds];
+    l.lock();
     
     [self _locked_layoutPlaceholderIfNecessary];
   }
@@ -3546,15 +3544,15 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertMainThread();
   ASAssertUnlocked(__instanceLock__);
   
-  ASDN::MutexLocker l(__instanceLock__);
+  ASDN::UniqueLock l(__instanceLock__);
   // FIXME: Ideally we'd call this as soon as the node receives -setNeedsLayout
   // but automatic subnode management would require us to modify the node tree
   // in the background on a loaded node, which isn't currently supported.
   if (_pendingViewState.hasSetNeedsLayout) {
     // Need to unlock before calling setNeedsLayout to avoid deadlocks.
-    // MutexUnlocker will re-lock at the end of scope.
-    ASDN::MutexUnlocker u(__instanceLock__);
+    l.unlock();
     [self __setNeedsLayout];
+    l.lock();
   }
   
   [self _locked_applyPendingViewState];
