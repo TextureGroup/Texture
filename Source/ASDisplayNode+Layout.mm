@@ -222,35 +222,33 @@ ASLayoutElementStyleExtensibilityForwarding
   as_activity_create_for_scope("Set needs layout from above");
   
   // Lock to root.
-  unowned ASDisplayNode *root;
+  unowned ASDisplayNode *root = nil;
   ASDN::LockSet locks;
   while (locks.empty()) {
-  continue_outer:
-    for (unowned ASDisplayNode *node = self; node; node = node->_supernode) {
-      if (!locks.TryAdd(node->__instanceLock__)) goto continue_outer;
+    unowned auto node = self;
+    while (!root) {
+      if (!locks.TryAdd(node->__instanceLock__)) break;
+      [node setNeedsLayout];
       if (node->_supernode) {
-        [node setNeedsLayout];
         node = node->_supernode;
       } else {
         root = node;
-        break;
       }
     }
   }
   
   // Let the root node method know that the size was invalidated
-  [root _rootNodeDidInvalidateSize];
+  [root locked_didInvalidateSizeAsRootNode];
 }
 
-- (void)_rootNodeDidInvalidateSize
+- (void)locked_didInvalidateSizeAsRootNode
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
-  
-  __instanceLock__.lock();
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssert(_supernode == nil, nil);
   
   // We are the root node and need to re-flow the layout; at least one child needs a new size.
-  CGSize boundsSizeForLayout = ASCeilSizeValues(self.bounds.size);
+  CGSize boundsSizeForLayout = ASCeilSizeValues(_layer.bounds.size);
 
   // Figure out constrainedSize to use
   ASSizeRange constrainedSize = ASSizeRangeMake(boundsSizeForLayout);
@@ -259,8 +257,6 @@ ASLayoutElementStyleExtensibilityForwarding
   } else if (_calculatedDisplayNodeLayout.layout != nil) {
     constrainedSize = _calculatedDisplayNodeLayout.constrainedSize;
   }
-
-  __instanceLock__.unlock();
 
   // Perform a measurement pass to get the full tree layout, adapting to the child's new size.
   ASLayout *layout = [self layoutThatFits:constrainedSize];
@@ -275,7 +271,6 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)displayNodeDidInvalidateSizeNewSize:(CGSize)size
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
   
   // The default implementation of display node changes the size of itself to the new size
   CGRect oldBounds = self.bounds;
@@ -431,6 +426,7 @@ ASLayoutElementStyleExtensibilityForwarding
   // logic seems correct.  For what case does -this method need to do the CGSizeEqual checks?
   // IF WE CAN REMOVE BOUNDS CHECKS HERE, THEN WE CAN ALSO REMOVE "REQUESTED FROM ABOVE" CHECK
 
+  ASDisplayNodeAssertMainThread();
   ASAssertLocked(__instanceLock__);
 
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.threadSafeBounds.size);

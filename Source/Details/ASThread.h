@@ -329,24 +329,33 @@ namespace ASDN {
    */
   class LockSet
   {
-    UniqueLock locks_[kCapacity];
-    int locks_count_;
   public:
     static int constexpr kCapacity = 32;
-    bool empty()
+    
+    // Returns whether the lock set has any locks. You should use this as the condition
+    // for your outermost while loop.
+    bool empty() const
     {
       return locks_count_ == 0;
     }
     
+    // Unlock and release all owned unique_locks.
+    void clear()
+    {
+      for (int i = 0; i < locks_count_; i++) {
+        locks_[i] = UniqueLock();
+      }
+      locks_count_ = 0;
+    }
+    
+    // Attempt to add a unique lock on the given mutex to the set.
+    // If it fails, the set will clear, and yield the current thread before returning.
     bool TryAdd(Mutex &mutex)
     {
       assert(locks_count_ < kCapacity);
       if (!mutex.tryLock()) {
         // Reset our locks and yield.
-        for (int i = 0; i < locks_count_; i++) {
-          locks_[i] = UniqueLock();
-        }
-        locks_count_ = 0;
+        clear();
         std::this_thread::yield();
         return false;
       }
@@ -354,6 +363,9 @@ namespace ASDN {
       locks_[locks_count_++] = UniqueLock(mutex, std::adopt_lock);
       return true;
     }
+  private:
+    UniqueLock locks_[kCapacity];
+    int locks_count_;
   };
 
 } // namespace ASDN
