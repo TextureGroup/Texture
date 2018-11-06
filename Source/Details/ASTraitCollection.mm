@@ -132,7 +132,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentLayoutDirection(
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-API_AVAILABLE(ios(12), tvos(10))
+AS_UIUSERINTERFACESTYLE_AVAILABILITY
 ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfaceStyle userInterfaceStyle) {
   switch (userInterfaceStyle) {
     case UIUserInterfaceStyleLight:

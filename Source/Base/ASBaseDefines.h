@@ -21,6 +21,13 @@
 # define let const __auto_type
 #endif
 
+/// Macro to support building with iOS 11 SDK (Xcode 9). Remove when we drop Xcode 9.
+#if defined(__IPHONE_12_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0
+#define AS_UIUSERINTERFACESTYLE_AVAILABILITY API_AVAILABLE(tvos(10), ios(12))
+#else
+#define AS_UIUSERINTERFACESTYLE_AVAILABILITY API_AVAILABLE(tvos(10))
+#endif
+
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
 (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
