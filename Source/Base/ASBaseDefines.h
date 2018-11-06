@@ -21,11 +21,16 @@
 # define let const __auto_type
 #endif
 
-/// Macro to support building with iOS 11 SDK (Xcode 9). Remove when we drop Xcode 9.
-#if defined(__IPHONE_12_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0
-#define AS_UIUSERINTERFACESTYLE_AVAILABILITY API_AVAILABLE(tvos(10), ios(12))
+/**
+ * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
+ * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that
+ * references this enum targeting iOS, even if it's guarded with the right availability macros,
+ * because it thinks the entire platform isn't compatible with the enum.
+ */
+#if TARGET_OS_TV || (defined(__IPHONE_12_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0)
+#define AS_BUILD_UIUSERINTERFACESTYLE 1
 #else
-#define AS_UIUSERINTERFACESTYLE_AVAILABILITY API_AVAILABLE(tvos(10))
+#define AS_BUILD_UIUSERINTERFACESTYLE 0
 #endif
 
 #ifdef __GNUC__
