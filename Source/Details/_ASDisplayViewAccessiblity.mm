@@ -11,10 +11,12 @@
 
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASTableNode.h>
 
 #import <queue>
 
@@ -208,7 +210,13 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
   
   ASDisplayNode *node = view.asyncdisplaykit_node;
 
-  if (node.isAccessibilityContainer) {
+  BOOL anySubNodeIsCollection = (nil != ASDisplayNodeFindFirstNode(node,
+      ^BOOL(ASDisplayNode *nodeToCheck) {
+    return ASDynamicCast(nodeToCheck, ASCollectionNode) != nil ||
+           ASDynamicCast(nodeToCheck, ASTableNode) != nil;
+  }));
+
+  if (node.isAccessibilityContainer && !anySubNodeIsCollection) {
     CollectAccessibilityElementsForContainer(node, view, elements);
     return;
   }
