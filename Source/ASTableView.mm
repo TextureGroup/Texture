@@ -1971,7 +1971,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - Accessibility overrides
 
-- (NSArray *)accessibilityElements {
+- (NSArray *)accessibilityElements
+{
   [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
 }

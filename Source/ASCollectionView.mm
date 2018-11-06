@@ -2392,7 +2392,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 #pragma mark - Accessibility overrides
 
-- (NSArray *)accessibilityElements {
+- (NSArray *)accessibilityElements
+{
   [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
 }
