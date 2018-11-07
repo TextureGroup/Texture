@@ -94,6 +94,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 
 #include <memory>
 #include <mutex>
+#include <new>
 #include <thread>
 
 // These macros are here for legacy reasons. We may get rid of them later.
