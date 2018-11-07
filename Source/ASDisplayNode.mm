@@ -2108,14 +2108,21 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 // NOTE: This method must be dealloc-safe (should not retain self).
 - (ASDisplayNode *)supernode
 {
-#if CHECK_LOCKING_SAFETY
-  if (__instanceLock__.locked()) {
-    NSLog(@"WARNING: Accessing supernode while holding recursive instance lock of this node is worrisome. It's likely that you will soon try to acquire the supernode's lock, and this can easily cause deadlocks.");
-  }
-#endif
-  
   ASDN::MutexLocker l(__instanceLock__);
   return _supernode;
+}
+
+- (ASDN::UniqueLock)acquireRootLock __unused {
+  for (;; std::this_thread::yield()) {
+    if (!__instanceLock__.try_lock()) {
+      continue;
+    }
+    ASDN::UniqueLock rootLock(_rootNode->__instanceLock__, std::try_to_lock);
+    if (!rootLock.owns_lock()) {
+      continue;
+    }
+    return rootLock;
+  }
 }
 
 - (void)_setSupernode:(ASDisplayNode *)newSupernode
@@ -2129,6 +2136,20 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
                                   // in case supernode implementation must access one of our properties.
       _supernode = newSupernode;
       supernodeDidChange = YES;
+      
+      unowned ASDisplayNode *newRoot = newSupernode ? newSupernode->_rootNode : self;
+      if (newRoot != self) {
+        _rootNode = newRoot;
+      } else {
+        _rootNode = nil;
+      }
+      // Push new root node ref down while holding self.
+      // In the future, tree modifications could require the root node to be locked and thus
+      // we could guarantee a stable view of a tree on-demand.
+      ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode *node) {
+        ASDN::MutexLocker l(node->__instanceLock__);
+        node->_rootNode = newRoot;
+      });
     }
   }
   
