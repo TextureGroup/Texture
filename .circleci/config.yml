@@ -1,11 +1,6 @@
-# iOS CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/ios-migrating-from-1-2/ for more details
-#
 version: 2
 jobs:
-  build:
-
+  setup_pods_and_sim:
     # Limit to Testing branch
     branches:
       only:
@@ -26,7 +21,68 @@ jobs:
             
       # (For debugging) print simulator list
       - run: xcrun simctl list
-      
+
+  tests:
+    requires:
+      - setup_pods_and_sim
+    steps:
       - run: 
           name: Run build script
-          command: ./build-new.sh all
+          command: ./build-new.sh tests
+
+  examples-pt1:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh examples-pt1
+
+  examples-pt2:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh examples-pt2
+
+  examples-pt3:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh examples-pt3
+
+  examples-extra:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh examples-extra
+
+  life-without-cocoapods:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh life-without-cocoapods
+
+  cocoapods-lint:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh cocoapods-lint
+
+  carthage:
+    requires:
+      - setup_pods_and_sim
+    steps:
+      - run: 
+          name: Run build script
+          command: ./build-new.sh carthage
+
