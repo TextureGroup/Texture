@@ -1,0 +1,25 @@
+PODS:
+  - Texture/Core (2.7)
+  - Texture/Yoga (2.7):
+    - Texture/Core
+    - Yoga (= 1.6.0)
+  - Yoga (1.6.0)
+
+DEPENDENCIES:
+  - Texture/Yoga (from `../..`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Yoga
+
+EXTERNAL SOURCES:
+  Texture:
+    :path: "../.."
+
+SPEC CHECKSUMS:
+  Texture: a02cefb2ff82885f4ea1059f855528155eb57715
+  Yoga: 81670877477311136b1b3f69a6307ce62e1c89cf
+
+PODFILE CHECKSUM: 1bb2033dd086faaf91fe50de24d8eefc4393617e
+
+COCOAPODS: 1.5.3
