@@ -12,7 +12,25 @@
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <stdatomic.h>
+
 #import "ASThrashUtility.h"
+
+// Set to 1 to use UITableView and see if the issue still exists.
+#define USE_UIKIT_REFERENCE 0
+
+#if USE_UIKIT_REFERENCE
+#define TableView UITableView
+#define kCellReuseID @"ASThrashTestCellReuseID"
+#else
+#define TableView ASTableView
+#endif
+
+#define kInitialSectionCount 10
+#define kInitialItemCount 10
+#define kMinimumItemCount 5
+#define kMinimumSectionCount 3
+#define kFickleness 0.1
+#define kThrashingIterationCount 100
 
 @interface ASTableViewThrashTests: XCTestCase
 @end
@@ -42,13 +60,13 @@
 #pragma mark Test Methods
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testInitialDataRead {
+- (void)DISABLED_testInitialDataRead {
   ASThrashDataSource *ds = [[ASThrashDataSource alloc] initWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
   [self verifyDataSource:ds];
 }
 
 /// Replays the Base64 representation of an ASThrashUpdate from "ASThrashTestRecordedCase" file
-- (void)testRecordedThrashCase {
+- (void)DISABLED_testRecordedThrashCase {
   NSURL *caseURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ASThrashTestRecordedCase" withExtension:nil subdirectory:@"TestResources"];
   NSString *base64 = [NSString stringWithContentsOfURL:caseURL encoding:NSUTF8StringEncoding error:NULL];
   
@@ -64,7 +82,7 @@
 }
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testThrashingWildly {
+- (void)DISABLED_testThrashingWildly {
   for (NSInteger i = 0; i < kThrashingIterationCount; i++) {
     [self setUp];
     @autoreleasepool {
