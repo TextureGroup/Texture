@@ -1,12 +1,6 @@
 version: 2
 jobs:
   setup_pods_and_sim:
-    # Limit to Testing branch
-    branches:
-      only:
-        - AHCircleCI
-
-    # Specify the Xcode version to use
     macos:
       xcode: "10.1.0"
 
