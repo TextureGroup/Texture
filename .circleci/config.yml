@@ -102,3 +102,16 @@ jobs:
           name: Run build script
           command: ./build-new.sh carthage
 
+workflows:
+  version: 2
+  github_pr_check:
+    jobs:
+      - setup_pods_and_sim
+      - tests
+      - examples-pt1
+      - examples-pt2
+      - examples-pt3
+      - examples-extra
+      - life-without-cocoapods
+      - cocoapods-lint
+      - carthage
