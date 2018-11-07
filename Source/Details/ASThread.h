@@ -114,13 +114,6 @@ namespace ASDN {
   class Mutex
   {
   public:
-    enum Type {
-      Plain,
-      Recursive,
-      Unfair,
-      RecursiveUnfair
-    };
-    
     /// Constructs a plain mutex (the default).
     Mutex () : Mutex (false) {}
 
@@ -241,6 +234,13 @@ namespace ASDN {
     }
     
   private:
+    enum Type {
+      Plain,
+      Recursive,
+      Unfair,
+      RecursiveUnfair
+    };
+
     void WillUnlock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
       if (--_count == 0) {
