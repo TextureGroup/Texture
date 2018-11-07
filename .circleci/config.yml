@@ -1,9 +1,10 @@
 version: 2
 jobs:
-  setup_pods_and_sim:
+  build:
     macos:
       xcode: "10.1.0"
 
+    parallelism: 2
     steps:
       - checkout
 
@@ -16,96 +17,34 @@ jobs:
       # (For debugging) print simulator list
       - run: xcrun simctl list
 
-  tests:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
       - run: 
           name: Run build script
           command: ./build-new.sh tests
 
-  examples-pt1:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh examples-pt1
 
-  examples-pt2:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh examples-pt2
 
-  examples-pt3:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh examples-pt3
 
-  examples-extra:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh examples-extra
 
-  life-without-cocoapods:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh life-without-cocoapods
 
-  cocoapods-lint:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh cocoapods-lint
 
-  carthage:
-    macos:
-      xcode: "10.1.0"
-    requires:
-      - setup_pods_and_sim
-    steps:
-      - run: 
+      - run:
           name: Run build script
           command: ./build-new.sh carthage
-
-workflows:
-  version: 2
-  github_pr_check:
-    jobs:
-      - setup_pods_and_sim
-      - tests
-      - examples-pt1
-      - examples-pt2
-      - examples-pt3
-      - examples-extra
-      - life-without-cocoapods
-      - cocoapods-lint
-      - carthage
