@@ -23,6 +23,8 @@ jobs:
       - run: xcrun simctl list
 
   tests:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -31,6 +33,8 @@ jobs:
           command: ./build-new.sh tests
 
   examples-pt1:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -39,6 +43,8 @@ jobs:
           command: ./build-new.sh examples-pt1
 
   examples-pt2:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -47,6 +53,8 @@ jobs:
           command: ./build-new.sh examples-pt2
 
   examples-pt3:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -55,6 +63,8 @@ jobs:
           command: ./build-new.sh examples-pt3
 
   examples-extra:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -63,6 +73,8 @@ jobs:
           command: ./build-new.sh examples-extra
 
   life-without-cocoapods:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -71,6 +83,8 @@ jobs:
           command: ./build-new.sh life-without-cocoapods
 
   cocoapods-lint:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
@@ -79,6 +93,8 @@ jobs:
           command: ./build-new.sh cocoapods-lint
 
   carthage:
+    macos:
+      xcode: "10.1.0"
     requires:
       - setup_pods_and_sim
     steps:
