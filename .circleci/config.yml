@@ -9,7 +9,7 @@ commands:
         parameters:
             mode: {type: string}
         steps:
-            - {attach_to_workspace: {at: ~/project}}
+            - {attach_workspace: {at: ~/project}}
             - {run: xcrun simctl list}
             - {run: './build-new.sh << parameters.mode >>'}
 jobs:
