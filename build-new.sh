@@ -61,7 +61,7 @@ fi
 
 if [ "$MODE" = "tests" -o "$MODE" = "all" ]; then
     echo "Building & testing AsyncDisplayKit."
-    pod install
+    pod install --no-repo-update
     set -o pipefail && xcodebuild \
         -workspace AsyncDisplayKit.xcworkspace \
         -scheme AsyncDisplayKit \
@@ -73,7 +73,7 @@ fi
 
 if [ "$MODE" = "tests_listkit" ]; then
     echo "Building & testing AsyncDisplayKit+IGListKit."
-    pod install --project-directory=SubspecWorkspaces/ASDKListKit
+    pod install --project-directory=SubspecWorkspaces/ASDKListKit --no-repo-update
     set -o pipefail && xcodebuild \
         -workspace SubspecWorkspaces/ASDKListKit/ASDKListKit.xcworkspace \
         -scheme ASDKListKitTests \
