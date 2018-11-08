@@ -3,7 +3,7 @@ executors:
     texture_exec:
         macos:
             xcode: 10.1.0
-        working_directory: ~/project
+        # working_directory: ~/project
 commands:
     buildsh:
         parameters:
