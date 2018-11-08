@@ -26,6 +26,10 @@ jobs:
         executor: texture_exec
         steps:
             - {buildsh: {mode: tests}}
+    tests:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: framework}}
     examples-pt1:
         executor: texture_exec
         steps:
@@ -56,6 +60,7 @@ workflows:
         jobs:
             - fetch_deps
             - {tests: {requires: [fetch_deps]}}
+            - {framework: {requires: tests]}}
             - {examples-pt1: {requires: [tests]}}
             - {examples-pt2: {requires: [tests]}}
             - {examples-pt3: {requires: [tests]}}
