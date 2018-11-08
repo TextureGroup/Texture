@@ -12,33 +12,33 @@
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+#import <mutex>
+
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
 @implementation ASNodeController
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  ASDN::RecursiveMutex __instanceLock__;
+  std::once_flag _nodeOnce;
 }
 
-- (void)loadNode
+- (ASDisplayNode *)createNode
 {
-  ASLockScopeSelf();
-  self.node = [[ASDisplayNode alloc] init];
+  return [[ASDisplayNode alloc] init];
 }
 
 - (ASDisplayNode *)node
 {
-  ASLockScopeSelf();
-  if (_node == nil) {
-    [self loadNode];
-  }
+  std::call_once(_nodeOnce, [self](){
+    [self setupReferencesWithNode:[self createNode]];
+  });
   return _node;
 }
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
 {
-  ASLockScopeSelf();
+  ASDN::MutexLocker l(node->__instanceLock__);
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
@@ -53,15 +53,8 @@
   [node addInterfaceStateDelegate:self];
 }
 
-- (void)setNode:(ASDisplayNode *)node
-{
-  ASLockScopeSelf();
-  [self setupReferencesWithNode:node];
-}
-
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
 {
-  ASLockScopeSelf();
   if (_shouldInvertStrongReference != shouldInvertStrongReference) {
     // Because the BOOL controls which ivar we access, get the node before toggling.
     ASDisplayNode *node = _node;
@@ -88,18 +81,6 @@
                       fromState:(ASInterfaceState)oldState {}
 
 - (void)hierarchyDisplayDidFinish {}
-
-#pragma mark NSLocking
-
-- (void)lock
-{
-  __instanceLock__.lock();
-}
-
-- (void)unlock
-{
-  __instanceLock__.unlock();
-}
 
 @end
 
