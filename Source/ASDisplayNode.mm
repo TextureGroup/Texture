@@ -2154,7 +2154,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       // It is safe to access the rootNode ivar because all children
       // are synchronously removed from a node during deallocation
       // i.e. _setSupernode:nil.
-      unowned auto newRoot = newSupernode->_rootNode;
+      unowned auto newRoot = newSupernode ? newSupernode->_rootNode : self;
       _rootNode = newRoot;
 
       // Push new root node ref down while holding self.
