@@ -56,7 +56,7 @@ workflows:
     version: 2.1
     github_pr_check:
         jobs:
-            - setup_pods_and_sim
+            - fetch_deps
             - {tests: {requires: [fetch_deps]}}
             - {examples-pt1: {requires: [tests]}}
             - {examples-pt2: {requires: [tests]}}
