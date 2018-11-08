@@ -281,6 +281,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _eventLog = [[ASEventLog alloc] initWithObject:self];
 #endif
   
+  _rootNode = self;
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
   BOOL isSynchronous = ![_viewClass isSubclassOfClass:[_ASDisplayView class]]
@@ -2118,10 +2119,17 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _supernode;
 }
 
+// Repeatedly: try lock self, try lock root node, unlock self,
+// return the lock on root node. If self is root once we've locked it,
+// we'll return the lock on self.
 - (ASDN::UniqueLock)acquireRootLock __unused {
   for (;; std::this_thread::yield()) {
-    if (!__instanceLock__.try_lock()) {
+    ASDN::UniqueLock selfLock(__instanceLock__, std::try_to_lock);
+    if (!selfLock.owns_lock()) {
       continue;
+    }
+    if (_rootNode == self) {
+      return selfLock;
     }
     ASDN::UniqueLock rootLock(_rootNode->__instanceLock__, std::try_to_lock);
     if (!rootLock.owns_lock()) {
@@ -2143,12 +2151,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       _supernode = newSupernode;
       supernodeDidChange = YES;
       
-      unowned ASDisplayNode *newRoot = newSupernode ? newSupernode->_rootNode : self;
-      if (newRoot != self) {
-        _rootNode = newRoot;
-      } else {
-        _rootNode = nil;
-      }
+      unowned auto newRoot = newSupernode->_rootNode;
+      _rootNode = newRoot;
+
       // Push new root node ref down while holding self.
       // In the future, tree modifications could require the root node to be locked and thus
       // we could guarantee a stable view of a tree on-demand.
