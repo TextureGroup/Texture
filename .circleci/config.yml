@@ -38,10 +38,6 @@ jobs:
         executor: texture_exec
         steps:
             - {buildsh: {mode: examples-pt3}}
-    examples-extra:
-        executor: texture_exec
-        steps:
-            - {buildsh: {mode: examples-extra}}
     life-without-cocoapods:
         executor: texture_exec
         steps:
@@ -63,7 +59,6 @@ workflows:
             - {examples-pt1: {requires: [tests]}}
             - {examples-pt2: {requires: [tests]}}
             - {examples-pt3: {requires: [tests]}}
-            - {examples-extra: {requires: [tests]}}
             - {life-without-cocoapods: {requires: [tests]}}
             - {carthage: {requires: [tests]}}
             - {cocoapods-lint: {requires: [tests], filters: {branches: {only: master}}}}
