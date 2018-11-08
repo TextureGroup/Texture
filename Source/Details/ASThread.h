@@ -203,7 +203,7 @@ namespace ASDN {
 
       for (const auto &b : on_unlocks) {
         AssertNotHeld();
-        b.first(b.second);
+        b.second(b.first);
       }
     }
 
@@ -218,7 +218,7 @@ namespace ASDN {
     // Perform the given block when
     void OnUnlock(id owner, void (^block)(id owner)) {
       AssertHeld();
-      _on_unlocks.emplace_back(block, owner);
+      _on_unlocks.emplace_back(owner, block);
     }
     
     explicit Mutex (bool recursive) {
@@ -287,7 +287,7 @@ namespace ASDN {
       std::mutex _plain;
       std::recursive_mutex _recursive;
     };
-    std::vector<std::pair<void(^)(id), unowned id>> _on_unlocks;
+    std::vector<std::pair<unowned id, void(^)(id)>> _on_unlocks;
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
     std::thread::id _owner;
 #endif

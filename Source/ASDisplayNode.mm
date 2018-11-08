@@ -575,6 +575,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)didLoad
 {
+  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   
   // Subclass hook
@@ -3096,14 +3097,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _pendingInterfaceState;
 }
 
+// TODO: Rename this to locked_applyPendingInterfaceState and assert locked.
+// Currently it is OK to call locked or unlocked.
 - (void)applyPendingInterfaceState:(ASInterfaceState)newPendingState
 {
   //This method is currently called on the main thread. The assert has been added here because all of the
   //did(Enter|Exit)(Display|Visible|Preload)State methods currently guarantee calling on main.
   ASDisplayNodeAssertMainThread();
-
-  // This method manages __instanceLock__ itself, to ensure the lock is not held while didEnter/Exit(.*)State methods are called, thus avoid potential deadlocks
-  ASAssertUnlocked(__instanceLock__);
   
   ASInterfaceState oldState = ASInterfaceStateNone;
   ASInterfaceState newState = ASInterfaceStateNone;
@@ -3140,12 +3140,12 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   if (nowPreload != wasPreload) {
     if (nowPreload) {
-      [self didEnterPreloadState];
+      AS_SCHEDULE_CALLBACK(didEnterPreloadState);
     } else {
       // We don't want to call -didExitPreloadState on nodes that aren't being managed by a range controller.
       // Otherwise we get flashing behavior from normal UIKit manipulations like navigation controller push / pop.
       if ([self supportsRangeManagedInterfaceState]) {
-        [self didExitPreloadState];
+        AS_SCHEDULE_CALLBACK(didExitPreloadState);
       }
     }
   }
@@ -3163,11 +3163,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
         [self setDisplaySuspended:YES];
         //schedule clear contents on next runloop
         dispatch_async(dispatch_get_main_queue(), ^{
-          __instanceLock__.lock();
-          ASInterfaceState interfaceState = _interfaceState;
-          __instanceLock__.unlock();
-          if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
-            [self clearContents];
+          ASDN::MutexLocker l(__instanceLock__);
+          if (!ASInterfaceStateIncludesDisplay(_interfaceState)) {
+            AS_SCHEDULE_CALLBACK(clearContents);
           }
         });
       }
@@ -3183,11 +3181,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
             [[self asyncLayer] cancelAsyncDisplay];
             //schedule clear contents on next runloop
             dispatch_async(dispatch_get_main_queue(), ^{
-              __instanceLock__.lock();
-              ASInterfaceState interfaceState = _interfaceState;
-              __instanceLock__.unlock();
-              if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
-                [self clearContents];
+              ASDN::MutexLocker l(__instanceLock__);
+              if (!ASInterfaceStateIncludesDisplay(_interfaceState)) {
+                AS_SCHEDULE_CALLBACK(clearContents);
               }
             });
           }
@@ -3196,9 +3192,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     }
     
     if (nowDisplay) {
-      [self didEnterDisplayState];
+      AS_SCHEDULE_CALLBACK(didEnterDisplayState);
     } else {
-      [self didExitDisplayState];
+      AS_SCHEDULE_CALLBACK(didExitDisplayState);
     }
   }
 
@@ -3209,9 +3205,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
   if (nowVisible != wasVisible) {
     if (nowVisible) {
-      [self didEnterVisibleState];
+      AS_SCHEDULE_CALLBACK(didEnterVisibleState);
     } else {
-      [self didExitVisibleState];
+      AS_SCHEDULE_CALLBACK(didExitVisibleState);
     }
   }
 
@@ -3223,7 +3219,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   }
   
   ASDisplayNodeLogEvent(self, @"interfaceStateDidChange: %@", NSStringFromASInterfaceStateChange(oldState, newState));
-  [self interfaceStateDidChange:newState fromState:oldState];
+  AS_SCHEDULE_CALLBACK(interfaceStateDidChange:newState fromState:oldState);
 }
 
 - (void)prepareForCATransactionCommit
@@ -3282,6 +3278,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)didEnterVisibleState
 {
   // subclass override
+  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertMainThread();
   
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
@@ -3291,7 +3288,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   }
 #endif
   
-  ASAssertUnlocked(__instanceLock__);
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
     [del didEnterVisibleState];
   }];

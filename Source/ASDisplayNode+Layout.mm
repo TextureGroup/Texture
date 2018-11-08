@@ -953,13 +953,12 @@ ASLayoutElementStyleExtensibilityForwarding
   [self _assertSubnodeState];
 #endif
 
-  // Subclass hook
-  // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-  // ASAssertUnlocked(__instanceLock__);
-  [self calculatedLayoutDidChange];
-
   // Grab lock after calling out to subclass
   ASDN::MutexLocker l(__instanceLock__);
+
+  // We may or may not be locked already when we enter this method. Since we aren't sure,
+  // schedule this callback whenever we DO unlock.
+  AS_SCHEDULE_CALLBACK(calculatedLayoutDidChange);
 
   // We generate placeholders at -layoutThatFits: time so that a node is guaranteed to have a placeholder ready to go.
   // This is also because measurement is usually asynchronous, but placeholders need to be set up synchronously.

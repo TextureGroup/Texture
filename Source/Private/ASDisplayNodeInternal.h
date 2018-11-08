@@ -66,6 +66,9 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
                               : _atomicFlags.fetch_and(~flag)) & flag) != 0)
 
+#define AS_SCHEDULE_CALLBACK(sel) \
+  __instanceLock__.OnUnlock(self, ^(ASDisplayNode *_self) { [_self sel]; });
+
 AS_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
 AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
 
