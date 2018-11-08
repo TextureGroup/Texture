@@ -2702,7 +2702,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 {
   // [A [B [C, D]]
   ASDisplayNode *a = [ASDisplayNode new];
-  XCTAssertNil(a->_rootNode);
+  XCTAssertEqual(a->_rootNode, a);
   ASDisplayNode *b = [ASDisplayNode new];
   [a addSubnode:b];
   XCTAssertEqual(b->_rootNode, a);
@@ -2712,7 +2712,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   [b addSubnode:d];
   XCTAssertEqual(d->_rootNode, a);
   [b removeFromSupernode];
-  XCTAssertNil(b->_rootNode);
+  XCTAssertEqual(b->_rootNode, b);
   XCTAssertEqual(c->_rootNode, b);
 }
 
