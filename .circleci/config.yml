@@ -9,7 +9,8 @@ commands:
         parameters:
             mode: {type: string}
         steps:
-            - {attach_workspace: {at: ~/project}}
+            # - {attach_workspace: {at: ~/project}}
+            - {run: {name: 'Fetch cocoapods spec repo from cache', command: "curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf\n"}}
             - {run: xcrun simctl list}
             - {run: './build-new.sh << parameters.mode >>'}
 jobs:
@@ -17,9 +18,9 @@ jobs:
         executor: texture_exec
         steps:
             - checkout
-            - {attach_workspace: {at: ~/project}}
-            - {run: {name: 'Fetch cocoapods spec repo from cache', command: "curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf\n"}}
-            - {persist_to_workspace: {root: ., paths: .}}
+            # - {attach_workspace: {at: ~/project}}
+            # - {run: {name: 'Fetch cocoapods spec repo from cache', command: "curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf\n"}}
+            # - {persist_to_workspace: {root: ., paths: .}}
     tests:
         executor: texture_exec
         steps:
