@@ -2122,7 +2122,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 // Repeatedly: try lock self, try lock root node, unlock self,
 // return the lock on root node. If self is root once we've locked it,
 // we'll return the lock on self.
-- (ASDN::UniqueLock)acquireRootLock __unused {
+- (ASDN::UniqueLock)acquireRootLock {
   for (;; std::this_thread::yield()) {
     ASDN::UniqueLock selfLock(__instanceLock__, std::try_to_lock);
     if (!selfLock.owns_lock()) {
