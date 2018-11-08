@@ -372,7 +372,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
     // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
     __unsafe_unretained __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-      while (_internalQueue.count > 0) {
+      while (weakSelf->_internalQueue.count > 0) {
       [weakSelf processQueue];
       }
     };
