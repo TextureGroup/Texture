@@ -60,7 +60,7 @@ workflows:
         jobs:
             - fetch_deps
             - {tests: {requires: [fetch_deps]}}
-            - {framework: {requires: tests]}}
+            - {framework: {requires: [tests]}}
             - {examples-pt1: {requires: [tests]}}
             - {examples-pt2: {requires: [tests]}}
             - {examples-pt3: {requires: [tests]}}
