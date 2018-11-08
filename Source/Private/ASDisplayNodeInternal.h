@@ -81,7 +81,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
-@package
+@public
   ASDN::RecursiveMutex __instanceLock__;
 
   _ASPendingState *_pendingViewState;
@@ -129,7 +129,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
     unsigned isDeallocating:1;
   } _flags;
   
-@protected
+@public
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
 

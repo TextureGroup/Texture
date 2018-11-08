@@ -279,7 +279,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Called just before the view is added to a window.
  */
-- (void)willEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
+- (void)locked_willEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
 
 /**
  * Called after the view is removed from the window.

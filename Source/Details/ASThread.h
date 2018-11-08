@@ -16,6 +16,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
@@ -90,6 +91,12 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
   [*lockPtr lock];
 }
 
+#if DEBUG
+#define MUTEX_DEBUG_LOG(msg) if (_debug_name) { as_log_debug(OS_LOG_DEFAULT, "%s: %s", _debug_name, (msg)); }
+#else
+#define MUTEX_DEBUG_LOG(msg)
+#endif
+
 #ifdef __cplusplus
 
 #include <memory>
@@ -158,10 +165,12 @@ namespace ASDN {
       if (success) {
         DidLock();
       }
+      MUTEX_DEBUG_LOG(success ? "try_lock: pass" : "try_lock: fail");
       return success;
     }
     
     void lock() {
+//      MUTEX_DEBUG_LOG("will_lock");
       switch (_type) {
         case Plain:
           _plain.lock();
@@ -177,9 +186,11 @@ namespace ASDN {
           break;
       }
       DidLock();
+      MUTEX_DEBUG_LOG("did_lock");
     }
 
     void unlock() {
+      MUTEX_DEBUG_LOG("unlock");
       __typeof(_on_unlocks) on_unlocks;
       if (WillUnlock()) {
         on_unlocks = std::move(_on_unlocks);
@@ -250,6 +261,12 @@ namespace ASDN {
       }
     }
     
+#if DEBUG
+    void EnableDebugLogging(const char *name) {
+      _debug_name = name;
+    }
+#endif
+
   private:
     enum Type {
       Plain,
@@ -290,6 +307,9 @@ namespace ASDN {
     std::vector<std::pair<unowned id, void(^)(id)>> _on_unlocks;
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
     std::thread::id _owner;
+#endif
+#if DEBUG
+    const char *_debug_name = nullptr;
 #endif
     int _count = 0;
   };

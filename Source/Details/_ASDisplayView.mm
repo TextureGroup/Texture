@@ -157,8 +157,9 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   BOOL visible = (newWindow != nil);
-  if (visible && !node.inHierarchy) {
-    [node __enterHierarchy];
+  ASDN::MutexLocker l(node->__instanceLock__);
+  if (visible && !node->_flags.isInHierarchy) {
+    [node locked_enterHierarchy];
   }
 }
 
@@ -166,8 +167,9 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   BOOL visible = (self.window != nil);
-  if (!visible && node.inHierarchy) {
-    [node __exitHierarchy];
+  ASDN::MutexLocker l(node->__instanceLock__);
+  if (!visible && node->_flags.isInHierarchy) {
+    [node locked_exitHierarchy];
   }
 }
 
@@ -219,11 +221,12 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   UIView *superview = self.superview;
+  ASDN::MutexLocker l(node->__instanceLock__);
   if (superview == nil) {
     // Clearing keepalive_node may cause deallocation of the node.  In this case, __exitHierarchy may not have an opportunity (e.g. _node will be cleared
     // by the time -didMoveToWindow occurs after this) to clear the Visible interfaceState, which we need to do before deallocation to meet an API guarantee.
-    if (node.inHierarchy) {
-      [node __exitHierarchy];
+    if (node->_flags.isInHierarchy) {
+      [node locked_exitHierarchy];
     }
     self.keepalive_node = nil;
   }

@@ -111,9 +111,9 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   self.isAccessibilityElement = userInteractionEnabled;
 }
 
-- (void)__exitHierarchy
+- (void)locked_exitHierarchy
 {
-  [super __exitHierarchy];
+  [super locked_exitHierarchy];
   
   // If a control node is exit the hierarchy and is tracking we have to cancel it
   if (self.tracking) {

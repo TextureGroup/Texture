@@ -2698,4 +2698,21 @@ static bool stringContainsPointer(NSString *description, id p) {
   }
 }
 
+- (void)testLockingSafetyInTreeModification {
+
+  static ASDisplayNode *oldParent = [ASDisplayNode new];
+  [oldParent view];
+  static ASDisplayNode *child = [ASDisplayNode new];
+  [child view];
+  static ASDisplayNode *newParent = [ASDisplayNode new];
+  [newParent view];
+  [oldParent addSubnode:child];
+  
+  oldParent->__instanceLock__.EnableDebugLogging("oldParent");
+  newParent->__instanceLock__.EnableDebugLogging("newParent");
+  child->__instanceLock__.EnableDebugLogging("child");
+  
+  [newParent addSubnode:child];
+}
+
 @end

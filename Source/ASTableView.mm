@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
@@ -29,6 +30,7 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASTableLayoutController.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
+#import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASBatchContext.h>
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
@@ -1920,8 +1922,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   BOOL visible = (newWindow != nil);
   ASDisplayNode *node = self.tableNode;
-  if (visible && !node.inHierarchy) {
-    [node __enterHierarchy];
+  ASDN::MutexLocker l(node->__instanceLock__);
+  if (visible && !node->_flags.inHierarchy) {
+    [node locked_enterHierarchy];
   }
 }
 

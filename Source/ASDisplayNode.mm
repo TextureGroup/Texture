@@ -2081,11 +2081,11 @@ static inline CATransform3D _calculateTransformFromReferenceToTarget(ASDisplayNo
 
 #pragma mark - Managing the Node Hierarchy
 
-ASDISPLAYNODE_INLINE bool shouldDisableNotificationsForMovingBetweenParents(ASDisplayNode *from, ASDisplayNode *to) {
+ASDISPLAYNODE_INLINE bool locked_shouldDisableNotificationsForMovingBetweenParents(ASDisplayNode *from, ASDisplayNode *to) {
   if (!from || !to) return NO;
   if (from.isSynchronous) return NO;
   if (to.isSynchronous) return NO;
-  if (from.isInHierarchy != to.isInHierarchy) return NO;
+  if (from->_flags.isInHierarchy != to->_flags.isInHierarchy) return NO;
   return YES;
 }
 
@@ -2095,8 +2095,10 @@ ASDISPLAYNODE_INLINE NSInteger incrementIfFound(NSInteger i) {
 }
 
 /// Returns if a node is a member of a rasterized tree
-ASDISPLAYNODE_INLINE BOOL canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subnode) {
-  return (subnode.isLayerBacked == NO && node.isLayerBacked == NO);
+ASDISPLAYNODE_INLINE BOOL locked_canUseViewAPI(ASDisplayNode *node, ASDisplayNode *subnode) {
+  ASAssertLocked(node->__instanceLock__);
+  ASAssertLocked(subnode->__instanceLock__);
+  return !subnode->_flags.layerBacked && !node->_flags.layerBacked;
 }
 
 /// Returns if node is a member of a rasterized tree
@@ -2117,12 +2119,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _supernode;
 }
 
-- (void)_setSupernode:(ASDisplayNode *)newSupernode
+- (void)locked_setSupernode:(ASDisplayNode *)newSupernode
 {
+  ASAssertLocked(__instanceLock__);
+  ASAssertLocked(newSupernode->__instanceLock__);
   BOOL supernodeDidChange = NO;
   ASDisplayNode *oldSupernode = nil;
   {
-    ASDN::MutexLocker l(__instanceLock__);
     if (_supernode != newSupernode) {
       oldSupernode = _supernode;  // Access supernode properties outside of lock to avoid remote chance of deadlock,
                                   // in case supernode implementation must access one of our properties.
@@ -2178,9 +2181,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       // Otherwise we will exit the hierarchy when our view/layer does so
       // which has some nice carry-over machinery to handle cases where we are removed from a hierarchy
       // and then added into it again shortly after.
-      __instanceLock__.lock();
       BOOL isInHierarchy = _flags.isInHierarchy;
-      __instanceLock__.unlock();
       
       if (parentWasOrIsRasterized && isInHierarchy) {
         [self __exitHierarchy];
@@ -2210,7 +2211,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
  * @param sublayerIndex The index in layer.sublayers at which to insert the layer (use if either parent or subnode is layer-backed) otherwise pass NSNotFound
  * @param oldSubnode Remove this subnode before inserting; ok to be nil if no removal is desired
  */
-- (void)_insertSubnode:(ASDisplayNode *)subnode atSubnodeIndex:(NSInteger)subnodeIndex sublayerIndex:(NSInteger)sublayerIndex andRemoveSubnode:(ASDisplayNode *)oldSubnode
+- (void)locked_insertSubnode:(ASDisplayNode *)subnode atSubnodeIndex:(NSInteger)subnodeIndex sublayerIndex:(NSInteger)sublayerIndex andRemoveSubnode:(ASDisplayNode *)oldSubnode
 {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
@@ -2239,17 +2240,14 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     return;
   }
 
-  __instanceLock__.lock();
-    NSUInteger subnodesCount = _subnodes.count;
-  __instanceLock__.unlock();
-  if (subnodeIndex > subnodesCount || subnodeIndex < 0) {
+  if (subnodeIndex > _subnodes.count || subnodeIndex < 0) {
     ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)subnodeIndex, (long)subnodesCount);
     return;
   }
   
   // Disable appearance methods during move between supernodes, but make sure we restore their state after we do our thing
-  ASDisplayNode *oldParent = subnode.supernode;
-  BOOL disableNotifications = shouldDisableNotificationsForMovingBetweenParents(oldParent, self);
+  ASDisplayNode *oldParent = subnode->_supernode;
+  BOOL disableNotifications = locked_shouldDisableNotificationsForMovingBetweenParents(oldParent, self);
   if (disableNotifications) {
     [subnode __incrementVisibilityNotificationsDisabled];
   }
@@ -2257,15 +2255,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   [subnode _removeFromSupernode];
   [oldSubnode _removeFromSupernode];
   
-  __instanceLock__.lock();
-    if (_subnodes == nil) {
-      _subnodes = [[NSMutableArray alloc] init];
-    }
-    [_subnodes insertObject:subnode atIndex:subnodeIndex];
-    _cachedSubnodes = nil;
-  __instanceLock__.unlock();
+  if (_subnodes == nil) {
+    _subnodes = [[NSMutableArray alloc] init];
+  }
+  [_subnodes insertObject:subnode atIndex:subnodeIndex];
+  _cachedSubnodes = nil;
 
-  if (!isRasterized && self.nodeLoaded) {
+  if (!isRasterized && _layer != nil) {
     // Trigger the subnode to load its layer, which will create its view if it needs one.
     // By doing this prior to downward propagation of .interfaceState in _setSupernode:,
     // we can guarantee that -didEnterVisibleState is only called with .isNodeLoaded = YES.
@@ -2279,7 +2275,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // If this subnode will be rasterized, enter hierarchy if needed
   // TODO: Move this into _setSupernode: ?
   if (isRasterized) {
-    if (self.inHierarchy) {
+    if (_flags.isInHierarchy) {
       [subnode __enterHierarchy];
     }
   } else if (self.nodeLoaded) {
@@ -2287,7 +2283,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [self _insertSubnodeSubviewOrSublayer:subnode atIndex:sublayerIndex];
   } // Otherwise we will insert subview/sublayer when we get loaded
 
-  ASDisplayNodeAssert(disableNotifications == shouldDisableNotificationsForMovingBetweenParents(oldParent, self), @"Invariant violated");
+  ASDisplayNodeAssert(disableNotifications == locked_shouldDisableNotificationsForMovingBetweenParents(oldParent, self), @"Invariant violated");
   if (disableNotifications) {
     [subnode __decrementVisibilityNotificationsDisabled];
   }
@@ -2303,7 +2299,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_insertSubnodeSubviewOrSublayer:(ASDisplayNode *)subnode atIndex:(NSInteger)idx
 {
   ASDisplayNodeAssertMainThread();
-  ASDisplayNodeAssert(self.nodeLoaded, @"_insertSubnodeSubviewOrSublayer:atIndex: should never be called before our own view is created");
+  ASDisplayNodeAssert(_layer != nil, @"_insertSubnodeSubviewOrSublayer:atIndex: should never be called before our own view is created");
 
   ASDisplayNodeAssert(idx != NSNotFound, @"Try to insert node on an index that was not found");
   if (idx == NSNotFound) {
@@ -2315,10 +2311,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
   // If we can use view API, do. Due to an apple bug, -insertSubview:atIndex: actually wants a LAYER index,
   // which we pass in.
-  if (canUseViewAPI(self, subnode)) {
-    [_view insertSubview:subnode.view atIndex:idx];
+  if (locked_canUseViewAPI(self, subnode)) {
+    [_view insertSubview:subnode->_view atIndex:idx];
   } else {
-    [_layer insertSublayer:subnode.layer atIndex:(unsigned int)idx];
+    [_layer insertSublayer:subnode->_layer atIndex:(unsigned int)idx];
   }
 }
 
@@ -2332,24 +2328,26 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)_addSubnode:(ASDisplayNode *)subnode
 {
   ASDisplayNodeAssertThreadAffinity(self);
+  // Simultaneously lock the node, its current parent, and self:
+  ASLockSequence(^BOOL(ASAddLockBlock  _Nonnull addLock) {
+    if (!addLock(subnode)) { return NO; }
+    if (!addLock(subnode->_supernode)) { return NO; }
+    if (!addLock(self)) { return NO; }
+    return YES;
+  });
   
   ASDisplayNodeAssert(subnode, @"Cannot insert a nil subnode");
     
   // Don't add if it's already a subnode
-  ASDisplayNode *oldParent = subnode.supernode;
+  ASDisplayNode *oldParent = subnode->_supernode;
   if (!subnode || subnode == self || oldParent == self) {
     return;
   }
 
-  NSUInteger subnodesIndex;
-  NSUInteger sublayersIndex;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    subnodesIndex = _subnodes.count;
-    sublayersIndex = _layer.sublayers.count;
-  }
+  NSUInteger subnodesIndex = _subnodes.count;
+  NSUInteger sublayersIndex = _layer.sublayers.count;
   
-  [self _insertSubnode:subnode atSubnodeIndex:subnodesIndex sublayerIndex:sublayersIndex andRemoveSubnode:nil];
+  [self locked_insertSubnode:subnode atSubnodeIndex:subnodesIndex sublayerIndex:sublayersIndex andRemoveSubnode:nil];
 }
 
 - (void)_addSubnodeViewsAndLayers
@@ -2566,31 +2564,29 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     return;
   }
 
+  ASDN::MutexLocker l(__instanceLock__);
   NSInteger sublayerIndex = NSNotFound;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
     
-    if (idx > _subnodes.count || idx < 0) {
-      ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)idx, (long)_subnodes.count);
-      return;
-    }
-    
-    // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
-    // hierarchy and none of this could possibly work.
-    if (subtreeIsRasterized(self) == NO) {
-      // Account for potentially having other subviews
-      if (_layer && idx == 0) {
-        sublayerIndex = 0;
-      } else if (_layer) {
-        ASDisplayNode *positionInRelationTo = (_subnodes.count > 0 && idx > 0) ? _subnodes[idx - 1] : nil;
-        if (positionInRelationTo) {
-          sublayerIndex = incrementIfFound([_layer.sublayers indexOfObjectIdenticalTo:positionInRelationTo.layer]);
-        }
+  if (idx > _subnodes.count || idx < 0) {
+    ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)idx, (long)_subnodes.count);
+    return;
+  }
+  
+  // Don't bother figuring out the sublayerIndex if in a rasterized subtree, because there are no layers in the
+  // hierarchy and none of this could possibly work.
+  if (!(_flags.rasterizesSubtree || (_hierarchyState & ASHierarchyStateRasterized))) {
+    // Account for potentially having other subviews
+    if (_layer && idx == 0) {
+      sublayerIndex = 0;
+    } else if (_layer) {
+      ASDisplayNode *positionInRelationTo = (_subnodes.count > 0 && idx > 0) ? _subnodes[idx - 1] : nil;
+      if (positionInRelationTo) {
+        sublayerIndex = incrementIfFound([_layer.sublayers indexOfObjectIdenticalTo:positionInRelationTo.layer]);
       }
     }
   }
 
-  [self _insertSubnode:subnode atSubnodeIndex:idx sublayerIndex:sublayerIndex andRemoveSubnode:nil];
+  [self locked_insertSubnode:subnode atSubnodeIndex:idx sublayerIndex:sublayerIndex andRemoveSubnode:nil];
 }
 
 - (void)_removeSubnode:(ASDisplayNode *)subnode
@@ -2793,31 +2789,21 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _flags.isInHierarchy;
 }
 
-- (void)__enterHierarchy
+- (void)locked_enterHierarchy
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isEnteringHierarchy, @"Should not cause recursive __enterHierarchy");
-  ASAssertUnlocked(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"enterHierarchy");
-  
-  // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
-  __instanceLock__.lock();
   
   if (!_flags.isInHierarchy && !_flags.visibilityNotificationsDisabled && ![self __selfOrParentHasVisibilityNotificationsDisabled]) {
     _flags.isEnteringHierarchy = YES;
     _flags.isInHierarchy = YES;
 
-    // Don't call -willEnterHierarchy while holding __instanceLock__.
-    // This method and subsequent ones (i.e -interfaceState and didEnter(.*)State)
-    // don't expect that they are called while the lock is being held.
-    // More importantly, didEnter(.*)State methods are meant to be overriden by clients.
-    // And so they can potentially walk up the node tree and cause deadlocks, or do expensive tasks and cause the lock to be held for too long.
-    __instanceLock__.unlock();
-      [self willEnterHierarchy];
-      for (ASDisplayNode *subnode in self.subnodes) {
-        [subnode __enterHierarchy];
-      }
-    __instanceLock__.lock();
+    [self locked_willEnterHierarchy];
+    for (ASDisplayNode *subnode in _subnodes) {
+      [subnode locked_enterHierarchy];
+    }
     
     _flags.isEnteringHierarchy = NO;
 
@@ -2836,21 +2822,16 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       }
     }
   }
-  
-  __instanceLock__.unlock();
 
   [self didEnterHierarchy];
 }
 
-- (void)__exitHierarchy
+- (void)locked_exitHierarchy
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isExitingHierarchy, @"Should not cause recursive __exitHierarchy");
-  ASAssertUnlocked(__instanceLock__);
+  ASAssertLocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"exitHierarchy");
-  
-  // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
-  __instanceLock__.lock();
   
   if (_flags.isInHierarchy && !_flags.visibilityNotificationsDisabled && ![self __selfOrParentHasVisibilityNotificationsDisabled]) {
     _flags.isExitingHierarchy = YES;
@@ -2861,17 +2842,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     // don't expect that they are called while the lock is being held.
     // More importantly, didExit(.*)State methods are meant to be overriden by clients.
     // And so they can potentially walk up the node tree and cause deadlocks, or do expensive tasks and cause the lock to be held for too long.
-    __instanceLock__.unlock();
-      [self didExitHierarchy];
-      for (ASDisplayNode *subnode in self.subnodes) {
-        [subnode __exitHierarchy];
-      }
-    __instanceLock__.lock();
+    AS_SCHEDULE_CALLBACK(didExitHierarchy);
+    for (ASDisplayNode *subnode in _subnodes) {
+      [subnode __exitHierarchy];
+    }
     
     _flags.isExitingHierarchy = NO;
   }
-  
-  __instanceLock__.unlock();
 }
 
 - (void)enterHierarchyState:(ASHierarchyState)hierarchyState

@@ -146,9 +146,9 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 // Changed before calling willEnterHierarchy / didExitHierarchy.
 @property (readonly, getter = isInHierarchy) BOOL inHierarchy;
 // Call willEnterHierarchy if necessary and set inHierarchy = YES if visibility notifications are enabled on all of its parents
-- (void)__enterHierarchy;
+- (void)locked_enterHierarchy;
 // Call didExitHierarchy if necessary and set inHierarchy = NO if visibility notifications are enabled on all of its parents
-- (void)__exitHierarchy;
+- (void)locked_exitHierarchy;
 
 /**
  * @abstract Returns the Hierarchy State of the node.
