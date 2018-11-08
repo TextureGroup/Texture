@@ -10,6 +10,7 @@ commands:
             mode: {type: string}
         steps:
             # - {attach_workspace: {at: ~/project}}
+            - checkout
             - {run: {name: 'Fetch cocoapods spec repo from cache', command: "curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf\n"}}
             - {run: xcrun simctl list}
             - {run: './build-new.sh << parameters.mode >>'}
