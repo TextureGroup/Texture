@@ -673,15 +673,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
   
   [self _locked_applyPendingStateToViewOrLayer];
-  
-  // The following methods should not be called with a lock
-  l.unlock();
 
   // No need for the lock as accessing the subviews or layers are always happening on main
   [self _addSubnodeViewsAndLayers];
   
-  // A subclass hook should never be called with a lock
-  [self _didLoad];
+  __instanceLock__.OnUnlock(self, ^(ASDisplayNode *owner) {
+    [owner _didLoad];
+  });
 
   return layer;
 }

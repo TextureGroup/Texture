@@ -21,6 +21,14 @@
 # define let const __auto_type
 #endif
 
+#define unownedify(var) __unsafe_unretained __typeof(var) ASUnowned_##var = var;
+
+#define strongify(var) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Wshadow\"") \
+  __strong __typeof(var) var = ASUnowned_##var; \
+  _Pragma("clang diagnostic pop")
+
 /**
  * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
  * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that

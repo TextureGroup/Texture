@@ -96,6 +96,7 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #include <mutex>
 #include <new>
 #include <thread>
+#include <vector>
 
 // These macros are here for legacy reasons. We may get rid of them later.
 #define ASAssertLocked(m) m.AssertHeld()
@@ -179,7 +180,12 @@ namespace ASDN {
     }
 
     void unlock() {
-      WillUnlock();
+      __typeof(_on_unlocks) on_unlocks;
+      if (WillUnlock()) {
+        on_unlocks = std::move(_on_unlocks);
+        _on_unlocks.clear();
+      }
+      
       switch (_type) {
         case Plain:
           _plain.unlock();
@@ -194,6 +200,11 @@ namespace ASDN {
           ASRecursiveUnfairLockUnlock(&_runfair);
           break;
       }
+
+      for (const auto &b : on_unlocks) {
+        AssertNotHeld();
+        b.first(b.second);
+      }
     }
 
     void AssertHeld() {
@@ -202,6 +213,12 @@ namespace ASDN {
     
     void AssertNotHeld() {
       ASDisplayNodeCAssert(_owner != std::this_thread::get_id(), @"Thread should not hold lock");
+    }
+    
+    // Perform the given block when
+    void OnUnlock(id owner, void (^block)(id owner)) {
+      AssertHeld();
+      _on_unlocks.emplace_back(block, owner);
     }
     
     explicit Mutex (bool recursive) {
@@ -241,17 +258,22 @@ namespace ASDN {
       RecursiveUnfair
     };
 
-    void WillUnlock() {
+    // returns true if this will be the final unlock (non-recursive)
+    bool WillUnlock() {
+      AssertHeld();
+      _count -= 1;
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
-      if (--_count == 0) {
+      if (_count == 0) {
         _owner = std::thread::id();
       }
 #endif
+      return (_count == 0);
     }
     
     void DidLock() {
+      _count += 1;
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
-      if (++_count == 1) {
+      if (_count == 1) {
         // New owner.
         _owner = std::this_thread::get_id();
       }
@@ -265,10 +287,11 @@ namespace ASDN {
       std::mutex _plain;
       std::recursive_mutex _recursive;
     };
+    std::vector<std::pair<void(^)(id), unowned id>> _on_unlocks;
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
     std::thread::id _owner;
-    int _count;
 #endif
+    int _count = 0;
   };
 #pragma clang diagnostic pop // ignored "-Wunguarded-availability"
   
