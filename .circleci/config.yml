@@ -1,50 +1,66 @@
-version: 2
+version: 2.1
+executors:
+    texture_exec:
+        macos:
+            xcode: 10.1.0
+        working_directory: ~/project
+commands:
+    buildsh:
+        parameters:
+            mode: {type: string}
+        steps:
+            - {attach_to_workspace: {at: ~/project}}
+            - {run: xcrun simctl list}
+            - {run: './build-new.sh << parameters.mode >>'}
 jobs:
-  build:
-    macos:
-      xcode: "10.1.0"
-
-    parallelism: 2
-    steps:
-      - checkout
-
-      # Download cocoapods spec repo from cache
-      - run:
-          name: Fetch cocoapods spec repo from cache
-          command: |
-            curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf
-            
-      # (For debugging) print simulator list
-      - run: xcrun simctl list
-
-      - run: 
-          name: Run build script
-          command: ./build-new.sh tests
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh examples-pt1
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh examples-pt2
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh examples-pt3
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh examples-extra
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh life-without-cocoapods
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh cocoapods-lint
-
-      - run:
-          name: Run build script
-          command: ./build-new.sh carthage
+    setup_pods_and_sim:
+        steps:
+            - checkout
+            - {attach_workspace: {at: ~/project}}
+            - {run: {name: 'Fetch cocoapods spec repo from cache', command: "curl https://cocoapods-specs.circleci.com/fetch-cocoapods-repo-from-s3.sh | bash -s cf\n"}}
+            - {persist_to_workspace: {root: ., paths: .}}
+    tests:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: tests}}
+    examples-pt1:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: examples-pt1}}
+    examples-pt2:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: examples-pt2}}
+    examples-pt3:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: examples-pt3}}
+    examples-extra:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: examples-extra}}
+    life-without-cocoapods:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: life-without-cocoapods}}
+    cocoapods-lint:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: cocoapods-lint}}
+    carthage:
+        executor: texture_exec
+        steps:
+            - {buildsh: {mode: carthage}}
+workflows:
+    version: 2.1
+    github_pr_check:
+        jobs:
+            - setup_pods_and_sim
+            - {tests: {requires: [setup_pods_and_sim]}}
+            - {examples-pt1: {requires: [tests]}}
+            - {examples-pt2: {requires: [tests]}}
+            - {examples-pt3: {requires: [tests]}}
+            - {examples-extra: {requires: [tests]}}
+            - {life-without-cocoapods: {requires: [tests]}}
+            - {carthage: {requires: [tests]}}
+            - {cocoapods-lint: {requires: [tests], filters: {branches: {only: master}}}}
