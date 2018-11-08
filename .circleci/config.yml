@@ -26,7 +26,7 @@ jobs:
         executor: texture_exec
         steps:
             - {buildsh: {mode: tests}}
-    tests:
+    framework:
         executor: texture_exec
         steps:
             - {buildsh: {mode: framework}}
