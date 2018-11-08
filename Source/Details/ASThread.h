@@ -266,8 +266,8 @@ namespace ASDN {
       std::recursive_mutex _recursive;
     };
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
-    std::thread::id _owner;
-    int _count;
+    std::thread::id _owner = std::thread::id();
+    int _count = 0;
 #endif
   };
 #pragma clang diagnostic pop // ignored "-Wunguarded-availability"
