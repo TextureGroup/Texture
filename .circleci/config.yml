@@ -13,7 +13,8 @@ commands:
             - {run: xcrun simctl list}
             - {run: './build-new.sh << parameters.mode >>'}
 jobs:
-    setup_pods_and_sim:
+    fetch_deps:
+        executor: texture_exec
         steps:
             - checkout
             - {attach_workspace: {at: ~/project}}
@@ -56,7 +57,7 @@ workflows:
     github_pr_check:
         jobs:
             - setup_pods_and_sim
-            - {tests: {requires: [setup_pods_and_sim]}}
+            - {tests: {requires: [fetch_deps]}}
             - {examples-pt1: {requires: [tests]}}
             - {examples-pt2: {requires: [tests]}}
             - {examples-pt3: {requires: [tests]}}
