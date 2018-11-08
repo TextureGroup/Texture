@@ -2108,12 +2108,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 // NOTE: This method must be dealloc-safe (should not retain self).
 - (ASDisplayNode *)supernode
 {
-#if CHECK_LOCKING_SAFETY
-  if (__instanceLock__.locked()) {
-    NSLog(@"WARNING: Accessing supernode while holding recursive instance lock of this node is worrisome. It's likely that you will soon try to acquire the supernode's lock, and this can easily cause deadlocks.");
-  }
-#endif
-  
   ASDN::MutexLocker l(__instanceLock__);
   return _supernode;
 }
