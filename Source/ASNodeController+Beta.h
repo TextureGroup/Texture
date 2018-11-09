@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /* ASNodeController is currently beta and open to change in the future */
 @interface ASNodeController<__covariant DisplayNodeType : ASDisplayNode *>
-    : NSObject <ASInterfaceStateDelegate>
+    : NSObject <ASInterfaceStateDelegate, ASLocking>
 
 @property (strong, readonly /* may be weak! */) DisplayNodeType node;
 
@@ -46,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
                       fromState:(ASInterfaceState)oldState ASDISPLAYNODE_REQUIRES_SUPER;
 
 - (void)hierarchyDisplayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
+
+// Called when ownership is inverted and the node is deallocated.
+- (void)nodeWillDeallocate ASDISPLAYNODE_REQUIRES_SUPER;
 
 @end
 
