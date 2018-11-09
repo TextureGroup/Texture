@@ -58,23 +58,6 @@
   }
 }
 
-- (void)lock
-{
-  [self.node lock];
-}
-
-- (void)unlock
-{
-  // Since the node is already locked, we don't need to 
-  ASDN::MutexLocker l(_nodeLock);
-  [_node unlock];
-}
-
-- (BOOL)tryLock
-{
-  return [self.node tryLock];
-}
-
 - (void)nodeWillDeallocate
 {
   ASDN::MutexLocker l(_nodeLock);
@@ -107,6 +90,25 @@
                       fromState:(ASInterfaceState)oldState {}
 
 - (void)hierarchyDisplayDidFinish {}
+
+#pragma mark NSLocking
+
+- (void)lock
+{
+  [self.node lock];
+}
+
+- (void)unlock
+{
+  // Since the node is already locked, we don't need to 
+  ASDN::MutexLocker l(_nodeLock);
+  [_node unlock];
+}
+
+- (BOOL)tryLock
+{
+  return [self.node tryLock];
+}
 
 @end
 
