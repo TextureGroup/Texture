@@ -32,6 +32,7 @@
       ASDisplayNodeCFailAssert(@"Returned nil from -createNode.");
       node = [[ASDisplayNode alloc] init];
     }
+    _node = node;
     if (!_shouldInvertStrongReference) {
       CFRetain((__bridge CFTypeRef)node);
     }
