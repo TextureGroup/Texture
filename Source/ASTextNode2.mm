@@ -55,14 +55,14 @@
  */
 static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainerAndText(ASTextContainer *container, NSAttributedString *text)  {
   // Allocate layoutCacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-  static ASDN::StaticMutex& layoutCacheLock = *new ASDN::StaticMutex;
+  static auto *layoutCacheLock = new ASDN::Mutex;
   static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     textLayoutCache = [[NSCache alloc] init];
   });
 
-  layoutCacheLock.lock();
+  layoutCacheLock->lock();
 
   ASTextCacheValue *cacheValue = [textLayoutCache objectForKey:text];
   if (cacheValue == nil) {
@@ -72,7 +72,7 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
 
   // Lock the cache item for the rest of the method. Only after acquiring can we release the NSCache.
   ASDN::MutexLocker lock(cacheValue->_m);
-  layoutCacheLock.unlock();
+  layoutCacheLock->unlock();
 
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
@@ -1142,7 +1142,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize
 {
-  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine == nil);
+  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine != nil);
 }
 
 - (ASTextLayout *)locked_textLayoutForSize:(CGSize)size

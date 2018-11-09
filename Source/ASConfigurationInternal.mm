@@ -74,7 +74,7 @@
     return NO;
   }
   
-  NSAssert(__builtin_popcount(requested) == 1, @"Cannot activate multiple features at once with this method.");
+  NSAssert(__builtin_popcountl(requested) == 1, @"Cannot activate multiple features at once with this method.");
   
   // We need to call out, whether it's enabled or not.
   // A/B testing requires even "control" users to be activated.

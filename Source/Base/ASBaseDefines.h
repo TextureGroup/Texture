@@ -21,6 +21,18 @@
 # define let const __auto_type
 #endif
 
+/**
+ * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
+ * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that
+ * references this enum targeting iOS, even if it's guarded with the right availability macros,
+ * because it thinks the entire platform isn't compatible with the enum.
+ */
+#if TARGET_OS_TV || (defined(__IPHONE_12_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0)
+#define AS_BUILD_UIUSERINTERFACESTYLE 1
+#else
+#define AS_BUILD_UIUSERINTERFACESTYLE 0
+#endif
+
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
 (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))

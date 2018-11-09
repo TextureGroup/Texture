@@ -1,11 +1,6 @@
 require 'open-uri'
 
 source_pattern = /(\.m|\.mm|\.h)$/
-  
-# Sometimes it's a README fix, or something like that - which isn't relevant for
-# including in a project's CHANGELOG for example
-declared_trivial = github.pr_title.include? "#trivial"
-has_changes_in_source_directory = !git.modified_files.grep(/Source/).empty?
 
 modified_source_files = git.modified_files.grep(source_pattern)
 has_modified_source_files = !modified_source_files.empty?
