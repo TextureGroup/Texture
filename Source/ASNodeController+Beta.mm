@@ -12,9 +12,12 @@
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+#define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
+
 @implementation ASNodeController
 {
-  unowned ASDisplayNode *_node;
+  ASDisplayNode *_strongNode;
+  __weak ASDisplayNode *_weakNode;
   ASDN::Mutex _nodeLock;
 }
 
@@ -26,50 +29,43 @@
 - (ASDisplayNode *)node
 {
   ASDN::MutexLocker l(_nodeLock);
-  if (!_node) {
-    ASDisplayNode *node = [self createNode];
+  ASDisplayNode *node = _node;
+  if (!node) {
+    node = [self createNode];
     if (!node) {
       ASDisplayNodeCFailAssert(@"Returned nil from -createNode.");
       node = [[ASDisplayNode alloc] init];
     }
-    _node = node;
-    if (!_shouldInvertStrongReference) {
-      CFRetain((__bridge CFTypeRef)node);
-    }
-    ASDN::MutexLocker l(node->__instanceLock__);
-    [node __setNodeController:self];
-    [node addInterfaceStateDelegate:self];
+    [self setupReferencesWithNode:node];
   }
-  return _node;
+  return node;
+}
+
+- (void)setupReferencesWithNode:(ASDisplayNode *)node
+{
+  ASLockScopeSelf();
+  if (_shouldInvertStrongReference) {
+    // The node should own the controller; weak reference from controller to node.
+    _weakNode = node;
+    _strongNode = nil;
+  } else {
+    // The controller should own the node; weak reference from node to controller.
+    _strongNode = node;
+    _weakNode = nil;
+  }
+
+  [node __setNodeController:self];
+  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
 {
-  if (_shouldInvertStrongReference == shouldInvertStrongReference) {
-    return;
-  }
-  
-  ASDN::MutexLocker l(_nodeLock);
-  if (_node) {
-    if (shouldInvertStrongReference) {
-      CFRelease((__bridge CFTypeRef)_node);
-    } else {
-      CFRetain((__bridge CFTypeRef)_node);
-    }
-  }
-}
-
-- (void)nodeWillDeallocate
-{
-  ASDN::MutexLocker l(_nodeLock);
-  _node = nil;
-}
-
-- (void)dealloc
-{
-  ASDN::MutexLocker l(_nodeLock);
-  if (_node && !_shouldInvertStrongReference) {
-    CFRelease((__bridge CFTypeRef)_node);
+  ASLockScopeSelf();
+  if (_shouldInvertStrongReference != shouldInvertStrongReference) {
+    // Because the BOOL controls which ivar we access, get the node before toggling.
+    ASDisplayNode *node = _node;
+    _shouldInvertStrongReference = shouldInvertStrongReference;
+    [self setupReferencesWithNode:node];
   }
 }
 
@@ -101,8 +97,8 @@
 
 - (void)unlock
 {
-  // Since the node is already locked, we don't need to 
-  ASDN::MutexLocker l(_nodeLock);
+  // Since the node was already locked on this thread, we don't need to call our accessor or take our lock.
+  ASDisplayNodeAssertNotNil(_node, @"Node deallocated while locked.");
   [_node unlock];
 }
 

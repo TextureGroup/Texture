@@ -47,9 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)hierarchyDisplayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
 
-// Called when ownership is inverted and the node is deallocated.
-- (void)nodeWillDeallocate ASDISPLAYNODE_REQUIRES_SUPER;
-
 @end
 
 @interface ASDisplayNode (ASNodeController)

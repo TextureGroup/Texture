@@ -441,9 +441,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   _view.asyncdisplaykit_node = nil;
   _layer.asyncdisplaykit_node = nil;
 
-  [_strongNodeController nodeWillDeallocate];
-  // No need to call nodeWillDeallocate on weak controller, because it owns us.
-  
   // Remove any subnodes so they lose their connection to the now deallocated parent.  This can happen
   // because subnodes do not retain their supernode, but subnodes can legitimately remain alive if another
   // thing outside the view hierarchy system (e.g. async display, controller code, etc). keeps a retained
