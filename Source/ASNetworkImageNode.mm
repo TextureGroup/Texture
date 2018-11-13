@@ -729,17 +729,17 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           void (^calloutBlock)(ASNetworkImageNode *inst);
           
           if (newImage) {
-            if (self->_delegateFlags.delegateDidLoadImageWithInfo) {
+            if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
               };
-            } else if (self->_delegateFlags.delegateDidLoadImage) {
+            } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
                 [delegate imageNode:strongSelf didLoadImage:newImage];
               };
             }
-          } else if (error && self->_delegateFlags.delegateDidFailWithError) {
+          } else if (error && strongSelf->_delegateFlags.delegateDidFailWithError) {
             calloutBlock = ^(ASNetworkImageNode *strongSelf) {
               [delegate imageNode:strongSelf didFailWithError:error];
             };
@@ -753,7 +753,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
                 }
               });
             } else {
-              calloutBlock(self);
+              calloutBlock(strongSelf);
             }
           }
         });
