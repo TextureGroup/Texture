@@ -2139,6 +2139,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       stateToEnterOrExit |= ASHierarchyStateRasterized;
     }
     if (newSupernode) {
+      
+      // Now that we have a supernode, propagate its traits to self.
+      // This should be done before possibly forcing self to load so we have traits in -didLoad
+      ASTraitCollectionPropagateDown(self, newSupernode.primitiveTraitCollection);
+      
+      if (!parentWasOrIsRasterized && newSupernode.nodeLoaded) {
+        // Trigger the subnode to load its layer, which will create its view if it needs one.
+        // By doing this prior to the downward propagation of newSupernode's interface state,
+        // we can guarantee that -didEnterVisibleState is only called with .isNodeLoaded = YES.
+        [self layer];
+      }
+      
       [self enterHierarchyState:stateToEnterOrExit];
       
       // If a node was added to a supernode, the supernode could be in a layout pending state. All of the hierarchy state
@@ -2158,10 +2170,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
           }
         }
       }
-      
-      // Now that we have a supernode, propagate its traits to self.
-      ASTraitCollectionPropagateDown(self, newSupernode.primitiveTraitCollection);
-      
     } else {
       // If a node will be removed from the supernode it should go out from the layout pending state to remove all
       // layout pending state related properties on the node
@@ -2259,13 +2267,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [_subnodes insertObject:subnode atIndex:subnodeIndex];
     _cachedSubnodes = nil;
   __instanceLock__.unlock();
-
-  if (!isRasterized && self.nodeLoaded) {
-    // Trigger the subnode to load its layer, which will create its view if it needs one.
-    // By doing this prior to downward propagation of .interfaceState in _setSupernode:,
-    // we can guarantee that -didEnterVisibleState is only called with .isNodeLoaded = YES.
-    [subnode layer];
-  }
 
   // This call will apply our .hierarchyState to the new subnode.
   // If we are a managed hierarchy, as in ASCellNode trees, it will also apply our .interfaceState.
