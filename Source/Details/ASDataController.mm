@@ -550,12 +550,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
   
-  NSTimeInterval transactionQueueFlushDuration = 0.0f;
-  {
-    ASDN::ScopeTimer t(transactionQueueFlushDuration);
-    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
-  }
-  
   // If the initial reloadData has not been called, just bail because we don't have our old data source counts.
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.
@@ -563,6 +557,12 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     as_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
     [changeSet executeCompletionHandlerWithFinished:YES];
     return;
+  }
+  
+  NSTimeInterval transactionQueueFlushDuration = 0.0f;
+  {
+    ASDN::ScopeTimer t(transactionQueueFlushDuration);
+    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
   }
   
   [self invalidateDataSourceItemCounts];
