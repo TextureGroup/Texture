@@ -164,7 +164,7 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 @implementation ASThrashDataSource
 
-- (instancetype)initWithData:(NSArray <ASThrashTestSection *> *)data {
+- (instancetype)initTableViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data {
     self = [super init];
     if (self != nil) {
         _data = [[NSArray alloc] initWithArray:data copyItems:YES];
@@ -185,6 +185,29 @@ static atomic_uint ASThrashTestSectionNextID = 1;
         [_tableView layoutIfNeeded];
     }
     return self;
+}
+
+- (instancetype)initCollectionViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data {
+  self = [super init];
+  if (self != nil) {
+    _data = [[NSArray alloc] initWithArray:data copyItems:YES];
+    _window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    _collectionView = [[CollectionView alloc] initWithCollectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
+    _allNodes = [[ASWeakSet alloc] init];
+    [_window addSubview:_tableView];
+#if USE_UIKIT_REFERENCE
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellReuseID];
+#else
+    _tableView.asyncDelegate = self;
+    _tableView.asyncDataSource = self;
+    [_tableView reloadData];
+    [_tableView waitUntilAllUpdatesAreCommitted];
+#endif
+    [_tableView layoutIfNeeded];
+  }
+  return self;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

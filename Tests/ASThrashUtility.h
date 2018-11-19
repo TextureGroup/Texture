@@ -23,9 +23,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if USE_UIKIT_REFERENCE
 #define TableView UITableView
+#define CollectionView UICollectionView
 #define kCellReuseID @"ASThrashTestCellReuseID"
 #else
 #define TableView ASTableView
+#define CollectionView ASCollectionNode
 #endif
 
 static NSInteger ASThrashUpdateCurrentSerializationVersion = 1;
@@ -60,11 +62,13 @@ static atomic_uint ASThrashTestItemNextID;
 
 @property (nonatomic, readonly) UIWindow *window;
 @property (nonatomic, readonly) TableView *tableView;
+@property (nonatomic, readonly) CollectionView *collectionView;
 @property (nonatomic) NSArray <ASThrashTestSection *> *data;
 // Only access on main
 @property (nonatomic) ASWeakSet *allNodes;
 
-- (instancetype)initWithData:(NSArray <ASThrashTestSection *> *)data;
+- (instancetype)initTableViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data;
+- (instancetype)initCollectionViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data;
 - (NSPredicate *)predicateForDeallocatedHierarchy;
 @end
 

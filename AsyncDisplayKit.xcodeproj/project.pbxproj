@@ -191,6 +191,7 @@
 		92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */; };
 		92DD2FE81BF4D0A80074C9DD /* ASMapNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9644CFE02193777C00213478 /* ASThrashUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 9644CFDF2193777C00213478 /* ASThrashUtility.m */; };
+		9692B4FF219E12370060C2C3 /* ASCollectionViewThrashTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */; };
 		9C49C3701B853961000B0DD5 /* ASStackLayoutElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C49C36E1B853957000B0DD5 /* ASStackLayoutElement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C55866B1BD54A1900B50E3A /* ASAsciiArtBoxCreator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C5586681BD549CB00B50E3A /* ASAsciiArtBoxCreator.mm */; };
 		9C55866C1BD54A3000B50E3A /* ASAsciiArtBoxCreator.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C5586671BD549CB00B50E3A /* ASAsciiArtBoxCreator.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -762,6 +763,7 @@
 		92DD2FE51BF4D05E0074C9DD /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		9644CFDE2193777C00213478 /* ASThrashUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASThrashUtility.h; sourceTree = "<group>"; };
 		9644CFDF2193777C00213478 /* ASThrashUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASThrashUtility.m; sourceTree = "<group>"; };
+		9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionViewThrashTests.mm; sourceTree = "<group>"; };
 		9C49C36E1B853957000B0DD5 /* ASStackLayoutElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASStackLayoutElement.h; sourceTree = "<group>"; };
 		9C5586671BD549CB00B50E3A /* ASAsciiArtBoxCreator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASAsciiArtBoxCreator.h; sourceTree = "<group>"; };
 		9C5586681BD549CB00B50E3A /* ASAsciiArtBoxCreator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAsciiArtBoxCreator.mm; sourceTree = "<group>"; };
@@ -1287,6 +1289,7 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */,
 				F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */,
 				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
 				F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */,
@@ -2311,6 +2314,7 @@
 				052EE0661A159FEF002C6279 /* ASMultiplexImageNodeTests.mm in Sources */,
 				058D0A3C195D057000B7D73C /* ASMutableAttributedStringBuilderTests.mm in Sources */,
 				F325E48C21745F9E00AC93A4 /* ASButtonNodeTests.mm in Sources */,
+				9692B4FF219E12370060C2C3 /* ASCollectionViewThrashTests.mm in Sources */,
 				E586F96C1F9F9E2900ECE00E /* ASScrollNodeTests.mm in Sources */,
 				CC8B05D81D73979700F54286 /* ASTextNodePerformanceTests.mm in Sources */,
 				CC583AD91EF9BDC600134156 /* ASDisplayNode+OCMock.mm in Sources */,

@@ -15,23 +15,6 @@
 
 #import "ASThrashUtility.h"
 
-// Set to 1 to use UITableView and see if the issue still exists.
-#define USE_UIKIT_REFERENCE 0
-
-#if USE_UIKIT_REFERENCE
-#define TableView UITableView
-#define kCellReuseID @"ASThrashTestCellReuseID"
-#else
-#define TableView ASTableView
-#endif
-
-#define kInitialSectionCount 10
-#define kInitialItemCount 10
-#define kMinimumItemCount 5
-#define kMinimumSectionCount 3
-#define kFickleness 0.1
-#define kThrashingIterationCount 100
-
 @interface ASTableViewThrashTests: XCTestCase
 @end
 
@@ -61,7 +44,7 @@
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
 - (void)testInitialDataRead {
-  ASThrashDataSource *ds = [[ASThrashDataSource alloc] initWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
+  ASThrashDataSource *ds = [[ASThrashDataSource alloc] initTableViewDataSourceWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
   [self verifyDataSource:ds];
 }
 
@@ -75,7 +58,7 @@
     return;
   }
   
-  ASThrashDataSource *ds = [[ASThrashDataSource alloc] initWithData:_update.oldData];
+  ASThrashDataSource *ds = [[ASThrashDataSource alloc] initTableViewDataSourceWithData:_update.oldData];
   ds.tableView.test_enableSuperUpdateCallLogging = YES;
   [self applyUpdate:_update toDataSource:ds];
   [self verifyDataSource:ds];
@@ -88,7 +71,7 @@
     @autoreleasepool {
       NSArray *sections = [ASThrashTestSection sectionsWithCount:kInitialSectionCount];
       _update = [[ASThrashUpdate alloc] initWithData:sections];
-      ASThrashDataSource *ds = [[ASThrashDataSource alloc] initWithData:sections];
+      ASThrashDataSource *ds = [[ASThrashDataSource alloc] initTableViewDataSourceWithData:sections];
 
       [self applyUpdate:_update toDataSource:ds];
       [self verifyDataSource:ds];
@@ -146,7 +129,7 @@
   for (NSInteger i = 0; i < tableView.numberOfSections; i++) {
     XCTAssertEqual([tableView numberOfRowsInSection:i], data[i].items.count);
     XCTAssertEqual([tableView rectForHeaderInSection:i].size.height, data[i].headerHeight);
-    
+
     for (NSInteger j = 0; j < [tableView numberOfRowsInSection:i]; j++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:j inSection:i];
       ASThrashTestItem *item = data[i].items[j];
