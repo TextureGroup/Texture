@@ -106,6 +106,10 @@ float yogaFloatForCGFloat(CGFloat value)
   }
 }
 
+float cgFloatForYogaFloat(float yogaFloat) {
+  return (yogaFloat == YGUndefined) ? CGFLOAT_MAX : yogaFloat;
+}
+
 float yogaDimensionToPoints(ASDimension dimension)
 {
   ASDisplayNodeCAssert(dimension.unit == ASDimensionUnitPoints,
@@ -196,6 +200,9 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
 {
   id <ASLayoutElement> layoutElement = (__bridge id <ASLayoutElement>)YGNodeGetContext(yogaNode);
   ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)], @"Yoga context must be <ASLayoutElement>");
+
+  width = cgFloatForYogaFloat(width);
+  height = cgFloatForYogaFloat(height);
 
   ASSizeRange sizeRange;
   sizeRange.min = CGSizeZero;
