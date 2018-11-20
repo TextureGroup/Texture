@@ -106,7 +106,8 @@ float yogaFloatForCGFloat(CGFloat value)
   }
 }
 
-float cgFloatForYogaFloat(float yogaFloat) {
+float cgFloatForYogaFloat(float yogaFloat)
+{
   return (yogaFloat == YGUndefined) ? CGFLOAT_MAX : yogaFloat;
 }
 
