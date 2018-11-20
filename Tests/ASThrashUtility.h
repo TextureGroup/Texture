@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define kMinimumItemCount 5
 #define kMinimumSectionCount 3
 #define kFickleness 0.1
-#define kThrashingIterationCount 100
+#define kThrashingIterationCount 2
 
 // Set to 1 to use UITableView and see if the issue still exists.
 #define USE_UIKIT_REFERENCE 0
