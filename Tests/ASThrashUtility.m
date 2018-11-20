@@ -195,17 +195,15 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     _collectionView = [[CollectionView alloc] initWithCollectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
     _allNodes = [[ASWeakSet alloc] init];
     [_window addSubview:_tableView];
+    _collectionView.delegate = self;
+    _collectionView.dataSource = self;
 #if USE_UIKIT_REFERENCE
-    _tableView.dataSource = self;
-    _tableView.delegate = self;
-    [_tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellReuseID];
+    [_collectionView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellReuseID];
 #else
-    _tableView.asyncDelegate = self;
-    _tableView.asyncDataSource = self;
-    [_tableView reloadData];
-    [_tableView waitUntilAllUpdatesAreCommitted];
+    [_collectionView reloadData];
+    [_collectionView waitUntilAllUpdatesAreProcessed];
 #endif
-    [_tableView layoutIfNeeded];
+    [_collectionView layoutIfNeeded];
   }
   return self;
 }
@@ -221,6 +219,15 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return self.data[section].headerHeight;
+}
+
+- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section {
+  return self.data[section].items.count;
+}
+
+
+- (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode {
+  return self.data.count;
 }
 
 /// Object passed into predicate is ignored.
@@ -246,6 +253,13 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 }
 
 #else
+
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath {
+  ASThrashTestNode *node = [[ASThrashTestNode alloc] init];
+  node.item = self.data[indexPath.section].items[indexPath.row];
+  [self.allNodes addObject:node];
+  return node;
+}
 
 - (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {

@@ -55,9 +55,9 @@ static atomic_uint ASThrashTestItemNextID;
 
 @interface ASThrashDataSource: NSObject
 #if USE_UIKIT_REFERENCE
-<UITableViewDataSource, UITableViewDelegate>
+<UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate>
 #else
-<ASTableDataSource, ASTableDelegate>
+<ASTableDataSource, ASTableDelegate, ASCollectionDelegate, ASCollectionDataSource>
 #endif
 
 @property (nonatomic, readonly) UIWindow *window;
