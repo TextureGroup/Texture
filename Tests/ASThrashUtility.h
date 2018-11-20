@@ -1,8 +1,9 @@
 //
-//  ASThrashUtility.h
+//  ASTableViewThrashTests.mm
 //  Texture
 //
-//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
@@ -16,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define kMinimumItemCount 5
 #define kMinimumSectionCount 3
 #define kFickleness 0.1
-#define kThrashingIterationCount 2
+#define kThrashingIterationCount 100
 
 // Set to 1 to use UITableView and see if the issue still exists.
 #define USE_UIKIT_REFERENCE 0

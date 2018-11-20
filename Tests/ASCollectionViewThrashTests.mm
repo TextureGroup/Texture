@@ -1,9 +1,10 @@
 //
-//  ASCollectionViewThrashTests.m
-//  AsyncDisplayKitTests
+//  ASTableViewThrashTests.mm
+//  Texture
 //
-//  Created by Michael Zuccarino on 11/15/18.
-//  Copyright © 2018 Pinterest. All rights reserved.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <XCTest/XCTest.h>
@@ -125,7 +126,7 @@
     [self tearDown];
   }
 
-  [self waitForExpectationsWithTimeout:60 handler:nil];
+  [self waitForExpectationsWithTimeout:100 handler:nil];
 }
 
 #pragma mark Helpers
@@ -176,7 +177,7 @@
   }
 
   if (wait) {
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
   }
 }
 
