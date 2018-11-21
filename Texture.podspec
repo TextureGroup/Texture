@@ -16,10 +16,6 @@ Pod::Spec.new do |spec|
 
   # Subspecs
   spec.subspec 'Core' do |core|
-
-    # These will be lowered into subspecs in the future. Only here for ASVideoNode.
-    core.frameworks = ['AVFoundation', 'CoreMedia']
-
     core.compiler_flags = '-fno-exceptions -Wno-implicit-retain-self'
     core.public_header_files = [
       'Source/*.h',
@@ -59,6 +55,12 @@ Pod::Spec.new do |spec|
     yoga.dependency 'Texture/Core'
   end
 
+  spec.subspec 'Video' do |video|
+    video.frameworks = ['AVFoundation', 'CoreMedia']
+    video.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_VIDEO=1' }
+    video.dependency 'Texture/Core'
+  end 
+
   spec.subspec 'MapKit' do |map|
     map.frameworks = ['CoreLocation', 'MapKit']
     map.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_MAPKIT=1' }
@@ -79,7 +81,7 @@ Pod::Spec.new do |spec|
 
   # Include these by default for backwards compatibility.
   # This will change in 3.0.
-  spec.default_subspecs = 'PINRemoteImage', 'MapKit', 'AssetsLibrary', 'Photos'
+  spec.default_subspecs = 'Core', 'PINRemoteImage', 'Video', 'MapKit', 'AssetsLibrary', 'Photos'
 
   spec.social_media_url = 'https://twitter.com/TextureiOS'
   spec.library = 'c++'
