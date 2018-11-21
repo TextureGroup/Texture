@@ -49,10 +49,14 @@
   BOOL _shouldRenderProgressImages;
 
   struct {
+    unsigned int delegateWillStartDisplayAsynchronously:1;
+    unsigned int delegateWillLoadImageFromCache:1;
+    unsigned int delegateWillLoadImageFromNetwork:1;
     unsigned int delegateDidStartFetchingData:1;
     unsigned int delegateDidFailWithError:1;
     unsigned int delegateDidFinishDecoding:1;
     unsigned int delegateDidLoadImage:1;
+    unsigned int delegateDidLoadImageFromCache:1;
     unsigned int delegateDidLoadImageWithInfo:1;
   } _delegateFlags;
 
@@ -297,10 +301,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   ASLockScopeSelf();
   _delegate = delegate;
   
+  _delegateFlags.delegateWillStartDisplayAsynchronously = [delegate respondsToSelector:@selector(imageNodeWillStartDisplayAsynchronously:)];
+  _delegateFlags.delegateWillLoadImageFromCache = [delegate respondsToSelector:@selector(imageNodeWillLoadImageFromCache:)];
+  _delegateFlags.delegateWillLoadImageFromNetwork = [delegate respondsToSelector:@selector(imageNodeWillLoadImageFromNetwork:)];
   _delegateFlags.delegateDidStartFetchingData = [delegate respondsToSelector:@selector(imageNodeDidStartFetchingData:)];
   _delegateFlags.delegateDidFailWithError = [delegate respondsToSelector:@selector(imageNode:didFailWithError:)];
   _delegateFlags.delegateDidFinishDecoding = [delegate respondsToSelector:@selector(imageNodeDidFinishDecoding:)];
   _delegateFlags.delegateDidLoadImage = [delegate respondsToSelector:@selector(imageNode:didLoadImage:)];
+  _delegateFlags.delegateDidLoadImageFromCache = [delegate respondsToSelector:@selector(imageNodeDidLoadImageFromCache:)];
   _delegateFlags.delegateDidLoadImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImage:info:)];
 }
 
@@ -334,6 +342,10 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
   [super displayWillStartAsynchronously:asynchronously];
+  
+  if (_delegateFlags.delegateWillStartDisplayAsynchronously) {
+    [_delegate imageNodeWillStartDisplayAsynchronously:self];
+  }
   
   if (asynchronously == NO && _cacheFlags.cacheSupportsSynchronousFetch) {
     ASLockScopeSelf();
@@ -773,18 +785,31 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           }
           
           if ([imageContainer asdk_image] == nil && self->_downloader != nil) {
+            if (self->_delegateFlags.delegateWillLoadImageFromNetwork) {
+              [delegate imageNodeWillLoadImageFromNetwork:self];
+            }
             [self _downloadImageWithCompletion:^(id<ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
               finished(imageContainer, error, downloadIdentifier, ASNetworkImageSourceDownload, userInfo);
             }];
           } else {
+            if (self->_delegateFlags.delegateDidLoadImageFromCache) {
+              [delegate imageNodeDidLoadImageFromCache:self];
+            }
             as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@", self, [imageContainer asdk_image], URL);
             finished(imageContainer, nil, nil, ASNetworkImageSourceAsynchronousCache, nil);
           }
         };
+        
+        if (self->_delegateFlags.delegateWillLoadImageFromCache) {
+          [delegate imageNodeWillLoadImageFromCache:self];
+        }
         [_cache cachedImageWithURL:URL
                      callbackQueue:[self callbackQueue]
                         completion:completion];
       } else {
+        if (self->_delegateFlags.delegateWillLoadImageFromNetwork) {
+          [delegate imageNodeWillLoadImageFromNetwork:self];
+        }
         [self _downloadImageWithCompletion:^(id<ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
           finished(imageContainer, error, downloadIdentifier, ASNetworkImageSourceDownload, userInfo);
         }];
