@@ -8,13 +8,16 @@
 
 #import <XCTest/XCTest.h>
 #import "ASTestCase.h"
+#import "ASAvailability.h"
 #import "ASConfiguration.h"
 #import "ASConfigurationDelegate.h"
 #import "ASConfigurationInternal.h"
 
 static ASExperimentalFeatures features[] = {
   ASExperimentalGraphicsContexts,
+#if AS_ENABLE_TEXTNODE
   ASExperimentalTextNode,
+#endif
   ASExperimentalInterfaceStateCoalescing,
   ASExperimentalUnfairLock,
   ASExperimentalLayerDefaults,
@@ -56,6 +59,8 @@ static ASExperimentalFeatures features[] = {
   return allFeatures;
 }
 
+#if AS_ENABLE_TEXTNODE
+
 - (void)testExperimentalFeatureConfig
 {
   // Set the config
@@ -80,6 +85,8 @@ static ASExperimentalFeatures features[] = {
   // But we should get another callback.
   [self waitForExpectationsWithTimeout:3 handler:nil];
 }
+
+#endif
 
 - (void)textureDidActivateExperimentalFeatures:(ASExperimentalFeatures)feature
 {

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -16,7 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalGraphicsContexts = 1 << 0,                  // exp_graphics_contexts
+#if AS_ENABLE_TEXTNODE
   ASExperimentalTextNode = 1 << 1,                          // exp_text_node
+#endif
   ASExperimentalInterfaceStateCoalescing = 1 << 2,          // exp_interface_state_coalesce
   ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
   ASExperimentalLayerDefaults = 1 << 4,                     // exp_infer_layer_defaults

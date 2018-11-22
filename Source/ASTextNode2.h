@@ -231,6 +231,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#if (!AS_ENABLE_TEXTNODE)
+// For the time beeing remap ASTextNode2 to ASTextNode
+#define ASTextNode2 ASTextNode
+#endif
+
 NS_ASSUME_NONNULL_END
 
 

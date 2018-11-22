@@ -24,7 +24,9 @@
   // This will use ASTextNode2 for snapshot tests.
   // All tests are duplicated from ASTextNodeSnapshotTests.
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
+#if AS_ENABLE_TEXTNODE
   config.experimentalFeatures = ASExperimentalTextNode;
+#endif
   [ASConfigurationManager test_resetWithConfiguration:config];
 
   self.recordMode = NO;
