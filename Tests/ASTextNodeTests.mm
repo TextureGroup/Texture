@@ -13,6 +13,7 @@
 
 #import <OCMock/OCMock.h>
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 
@@ -235,6 +236,7 @@
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
 }
 
+#if AS_ENABLE_TEXTNODE
 - (void)testThatTheExperimentWorksCorrectly
 {
   ASConfiguration *config = [ASConfiguration new];
@@ -303,6 +305,7 @@
   exp = nil;
   [textNodeBucket removeAllObjects];
 }
+#endif
 
 @end
 

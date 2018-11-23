@@ -141,11 +141,19 @@ static const CGFloat ASTextNodeHighlightLightOpacity = 0.11;
 static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 () <UIGestureRecognizerDelegate>
+#else
+@interface ASTextNode () <UIGestureRecognizerDelegate>
+#endif
 
 @end
 
+#if AS_ENABLE_TEXTNODE
 @implementation ASTextNode2 {
+#else
+@implementation ASTextNode {
+#endif
   ASTextContainer *_textContainer;
   
   CGSize _shadowOffset;

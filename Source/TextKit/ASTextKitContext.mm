@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASTextKitContext.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 
@@ -73,3 +76,5 @@
 }
 
 @end
+
+#endif
