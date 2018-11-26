@@ -321,4 +321,21 @@
 
 @end
 
+@implementation ASDisplayNode (YogaDebugging)
+
+- (NSString *)yogaTreeDescription {
+  return [self _yogaTreeDescription:@""];
+}
+
+- (NSString *)_yogaTreeDescription:(NSString *)indent {
+  NSMutableString *subtree = [[[indent stringByAppendingString:self.description]
+                               stringByAppendingString:@"\n"] mutableCopy];
+  for (ASDisplayNode *n in self.yogaChildren) {
+    [subtree appendString:[n _yogaTreeDescription:[indent stringByAppendingString:@"| "]]];
+  }
+  return subtree;
+}
+
+@end
+
 #endif /* YOGA */
