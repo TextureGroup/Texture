@@ -343,8 +343,15 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 {
   [super displayWillStartAsynchronously:asynchronously];
   
-  if (_delegateFlags.delegateWillStartDisplayAsynchronously) {
-    [_delegate imageNodeWillStartDisplayAsynchronously:self];
+  id<ASNetworkImageNodeDelegate> delegate;
+  BOOL notifyDelegate;
+  {
+    ASLockedSelf();
+    notifyDelegate = _delegateFlags.delegateWillStartDisplayAsynchronously;
+    delegate = _delegate;
+  }
+  if (notifyDelegate) {
+    [delegate imageNodeWillStartDisplayAsynchronously:self];
   }
   
   if (asynchronously == NO && _cacheFlags.cacheSupportsSynchronousFetch) {
