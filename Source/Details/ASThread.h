@@ -302,10 +302,10 @@ namespace ASDN {
     StaticMutex(const StaticMutex&) = delete;
     StaticMutex &operator=(const StaticMutex&) = delete;
     void lock () {
-      AS_POSIX_ASSERT_NOERR(pthread_mutex_lock (this->mutex()));
+      pthread_mutex_lock (this->mutex());
     }
     void unlock () {
-      AS_POSIX_ASSERT_NOERR(pthread_mutex_unlock (this->mutex()));
+      pthread_mutex_unlock (this->mutex());
     }
     pthread_mutex_t *mutex () { return &_m; }
   private:
