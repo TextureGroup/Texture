@@ -287,8 +287,34 @@ namespace ASDN {
     RecursiveMutex () : Mutex (true) {}
   };
 
+  /**
+   If you are creating a static mutex, use StaticMutex. This avoids expensive constructor overhead at startup (or worse, ordering
+   issues between different static objects). It also avoids running a destructor on app exit time (needless expense).
+   Note that you can, but should not, use StaticMutex for non-static objects. It will leak its mutex on destruction,
+   so avoid that!
+   
+   TODO: Remove StaticMutex and use Mutex everywhere once the unfair lock experiment is shipped
+   */
+  struct StaticMutex
+  {
+    StaticMutex () : _m (PTHREAD_MUTEX_INITIALIZER) {}
+    // non-copyable.
+    StaticMutex(const StaticMutex&) = delete;
+    StaticMutex &operator=(const StaticMutex&) = delete;
+    void lock () {
+      AS_POSIX_ASSERT_NOERR(pthread_mutex_lock (this->mutex()));
+    }
+    void unlock () {
+      AS_POSIX_ASSERT_NOERR(pthread_mutex_unlock (this->mutex()));
+    }
+    pthread_mutex_t *mutex () { return &_m; }
+  private:
+    pthread_mutex_t _m;
+  };
+
   typedef std::lock_guard<Mutex> MutexLocker;
   typedef std::unique_lock<Mutex> UniqueLock;
+  typedef std::lock_guard<StaticMutex> StaticMutexLocker;
 
 } // namespace ASDN
 

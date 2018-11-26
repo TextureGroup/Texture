@@ -36,8 +36,8 @@
   if (self = [super init]) {
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
     // Allocate mutex on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-    static auto *mutex = new ASDN::Mutex;
-    ASDN::MutexLocker l(*mutex);
+    static auto *mutex = new ASDN::StaticMutex;
+    ASDN::StaticMutexLocker l(*mutex);
     
     __instanceLock__ = std::make_shared<ASDN::Mutex>();
     
