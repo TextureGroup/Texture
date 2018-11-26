@@ -433,13 +433,17 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
-// Allocate cacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-static auto *cacheLock = new ASDN::StaticMutex;
 
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
+  static dispatch_once_t onceToken;
+  static ASDN::Mutex *cacheLock = nil;
+  dispatch_once(&onceToken, ^{
+    cacheLock = new ASDN::Mutex();
+  });
+  
   {
-    ASDN::StaticMutexLocker l(*cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     if (!cache) {
       cache = [[ASWeakMap alloc] init];
     }
@@ -456,7 +460,7 @@ static auto *cacheLock = new ASDN::StaticMutex;
   }
 
   {
-    ASDN::StaticMutexLocker l(*cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     return [cache setObject:contents forKey:key];
   }
 }

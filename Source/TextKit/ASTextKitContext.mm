@@ -34,10 +34,14 @@
 
 {
   if (self = [super init]) {
+    static dispatch_once_t onceToken;
+    static ASDN::Mutex *mutex;
+    dispatch_once(&onceToken, ^{
+      mutex = new ASDN::Mutex();
+    });
+    
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    // Allocate mutex on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-    static auto *mutex = new ASDN::StaticMutex;
-    ASDN::StaticMutexLocker l(*mutex);
+    ASDN::MutexLocker l(*mutex);
     
     __instanceLock__ = std::make_shared<ASDN::Mutex>();
     
