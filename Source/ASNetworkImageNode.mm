@@ -365,14 +365,19 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         [self _locked__setImage:result];
         _imageLoaded = YES;
         
+        id<ASNetworkImageNodeDelegate> delegate;
+        {
+          delegate = _delegate;
+        }
+        
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
           let info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
-          [_delegate imageNode:self didLoadImage:result info:info];
+          [delegate imageNode:self didLoadImage:result info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
-          [_delegate imageNode:self didLoadImage:result];
+          [delegate imageNode:self didLoadImage:result];
         }
       }
     }
