@@ -346,7 +346,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   id<ASNetworkImageNodeDelegate> delegate;
   BOOL notifyDelegate;
   {
-    ASLockedSelf();
+    ASLockScopeSelf();
     notifyDelegate = _delegateFlags.delegateWillStartDisplayAsynchronously;
     delegate = _delegate;
   }
