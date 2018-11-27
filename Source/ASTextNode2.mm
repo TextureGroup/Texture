@@ -54,11 +54,11 @@
  * NOTE: Be careful to copy `text` if needed.
  */
 static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainerAndText(ASTextContainer *container, NSAttributedString *text)  {
-  // Allocate layoutCacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-  static auto *layoutCacheLock = new ASDN::Mutex;
-  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   static dispatch_once_t onceToken;
+  static ASDN::Mutex *layoutCacheLock;
+  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   dispatch_once(&onceToken, ^{
+    layoutCacheLock = new ASDN::Mutex();
     textLayoutCache = [[NSCache alloc] init];
   });
 
