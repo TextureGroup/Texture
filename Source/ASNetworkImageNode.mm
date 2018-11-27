@@ -365,11 +365,6 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         [self _locked__setImage:result];
         _imageLoaded = YES;
         
-        id<ASNetworkImageNodeDelegate> delegate;
-        {
-          delegate = _delegate;
-        }
-        
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
@@ -640,6 +635,9 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   [self lock];
     __weak id<ASNetworkImageNodeDelegate> delegate = _delegate;
     BOOL delegateDidStartFetchingData = _delegateFlags.delegateDidStartFetchingData;
+    BOOL delegateWillLoadImageFromCache = _delegateFlags.delegateWillLoadImageFromCache;
+    BOOL delegateWillLoadImageFromNetwork = _delegateFlags.delegateWillLoadImageFromNetwork;
+    BOOL delegateDidLoadImageFromCache = _delegateFlags.delegateDidLoadImageFromCache;
     BOOL isImageLoaded = _imageLoaded;
     NSURL *URL = _URL;
     id currentDownloadIdentifier = _downloadIdentifier;
@@ -797,14 +795,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           }
           
           if ([imageContainer asdk_image] == nil && self->_downloader != nil) {
-            if (self->_delegateFlags.delegateWillLoadImageFromNetwork) {
+            if (delegateWillLoadImageFromNetwork) {
               [delegate imageNodeWillLoadImageFromNetwork:self];
             }
             [self _downloadImageWithCompletion:^(id<ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
               finished(imageContainer, error, downloadIdentifier, ASNetworkImageSourceDownload, userInfo);
             }];
           } else {
-            if (self->_delegateFlags.delegateDidLoadImageFromCache) {
+            if (delegateDidLoadImageFromCache) {
               [delegate imageNodeDidLoadImageFromCache:self];
             }
             as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@", self, [imageContainer asdk_image], URL);
@@ -812,14 +810,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           }
         };
         
-        if (self->_delegateFlags.delegateWillLoadImageFromCache) {
+        if (delegateWillLoadImageFromCache) {
           [delegate imageNodeWillLoadImageFromCache:self];
         }
         [_cache cachedImageWithURL:URL
                      callbackQueue:[self callbackQueue]
                         completion:completion];
       } else {
-        if (self->_delegateFlags.delegateWillLoadImageFromNetwork) {
+        if (delegateWillLoadImageFromNetwork) {
           [delegate imageNodeWillLoadImageFromNetwork:self];
         }
         [self _downloadImageWithCompletion:^(id<ASImageContainerProtocol> imageContainer, NSError *error, id downloadIdentifier, id userInfo) {
