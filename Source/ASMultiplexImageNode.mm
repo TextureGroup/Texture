@@ -276,9 +276,9 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   
   if (_downloaderImplementsSetPriority) {
     {
-      ASDN::MutexLocker l(_downloadIdentifierLock);
-      if (_downloadIdentifier != nil) {
-        [_downloader setPriority:ASImageDownloaderPriorityImminent withDownloadIdentifier:_downloadIdentifier];
+      id downloadIdentifier = ASLockedSelf(_downloadIdentifier);
+      if (downloadIdentifier != nil) {
+        [_downloader setPriority:ASImageDownloaderPriorityImminent withDownloadIdentifier:downloadIdentifier];
       }
     }
   }
