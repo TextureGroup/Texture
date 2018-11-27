@@ -271,9 +271,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
   [super displayWillStartAsynchronously:asynchronously];
-  
-  [self didEnterPreloadState];
-  
+    
   if (_downloaderImplementsSetPriority) {
     {
       ASDN::MutexLocker l(_downloadIdentifierLock);
