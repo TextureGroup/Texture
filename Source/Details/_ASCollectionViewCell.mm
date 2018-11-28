@@ -27,7 +27,7 @@
   ASCellNode *node = element.node;
   node.layoutAttributes = _layoutAttributes;
   _element = element;
-
+  
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
 }
