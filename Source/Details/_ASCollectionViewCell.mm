@@ -105,7 +105,8 @@
 /**
  * Forwards the call of pointInside to its node so that it manages taps outside of its bounds.
  */
-- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
   return [self.node pointInside:point withEvent:event];
 }
 
