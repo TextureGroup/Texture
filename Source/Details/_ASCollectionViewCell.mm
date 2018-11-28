@@ -8,6 +8,7 @@
 //
 
 #import <AsyncDisplayKit/_ASCollectionViewCell.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
@@ -26,7 +27,7 @@
   ASCellNode *node = element.node;
   node.layoutAttributes = _layoutAttributes;
   _element = element;
-  
+
   [node __setSelectedFromUIKit:self.selected];
   [node __setHighlightedFromUIKit:self.highlighted];
 }
@@ -92,6 +93,20 @@
 {
   [super layoutSubviews];
   self.node.frame = self.contentView.bounds;
+}
+
+/**
+ * Forwards the call of hitTest to its node so that it manages taps outside of its bounds.
+ */
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
+  return [self.node hitTest:point withEvent:event];
+}
+
+/**
+ * Forwards the call of pointInside to its node so that it manages taps outside of its bounds.
+ */
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+  return [self.node pointInside:point withEvent:event];
 }
 
 @end
