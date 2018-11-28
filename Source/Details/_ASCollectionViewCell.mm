@@ -98,7 +98,8 @@
 /**
  * Forwards the call of hitTest to its node so that it manages taps outside of its bounds.
  */
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
   return [self.node hitTest:point withEvent:event];
 }
 
