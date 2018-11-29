@@ -286,6 +286,7 @@
 
 - (void)invalidateCalculatedYogaLayout
 {
+  ASLockScopeSelf();
   YGNodeRef yogaNode = self.style.yogaNode;
   if (yogaNode && [self shouldHaveYogaMeasureFunc]) {
     // Yoga internally asserts that MarkDirty() may only be called on nodes with a measurement function.
@@ -338,6 +339,7 @@
 
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
+  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
   ASDisplayNode *yogaRoot = self.yogaRoot;
 
   if (self != yogaRoot) {
@@ -357,7 +359,6 @@
       [delegate nodeWillCalculateLayout:rootConstrainedSize];
     }
   }];
-
 
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode *_Nonnull node) {
