@@ -18,22 +18,27 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  ASDN::RecursiveMutex __instanceLock__;
+  ASDN::Mutex _nodeLock;
 }
 
-- (void)loadNode
+- (ASDisplayNode *)createNode
 {
-  ASLockScopeSelf();
-  self.node = [[ASDisplayNode alloc] init];
+  return [[ASDisplayNode alloc] init];
 }
 
 - (ASDisplayNode *)node
 {
-  ASLockScopeSelf();
-  if (_node == nil) {
-    [self loadNode];
+  ASDN::MutexLocker l(_nodeLock);
+  ASDisplayNode *node = _node;
+  if (!node) {
+    node = [self createNode];
+    if (!node) {
+      ASDisplayNodeCFailAssert(@"Returned nil from -createNode.");
+      node = [[ASDisplayNode alloc] init];
+    }
+    [self setupReferencesWithNode:node];
   }
-  return _node;
+  return node;
 }
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
@@ -53,12 +58,6 @@
   [node addInterfaceStateDelegate:self];
 }
 
-- (void)setNode:(ASDisplayNode *)node
-{
-  ASLockScopeSelf();
-  [self setupReferencesWithNode:node];
-}
-
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
 {
   ASLockScopeSelf();
@@ -73,6 +72,7 @@
 // subclass overrides
 - (void)nodeDidLoad {}
 - (void)nodeDidLayout {}
+- (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize {}
 
 - (void)didEnterVisibleState {}
 - (void)didExitVisibleState  {}
@@ -92,12 +92,19 @@
 
 - (void)lock
 {
-  __instanceLock__.lock();
+  [self.node lock];
 }
 
 - (void)unlock
 {
-  __instanceLock__.unlock();
+  // Since the node was already locked on this thread, we don't need to call our accessor or take our lock.
+  ASDisplayNodeAssertNotNil(_node, @"Node deallocated while locked.");
+  [_node unlock];
+}
+
+- (BOOL)tryLock
+{
+  return [self.node tryLock];
 }
 
 @end

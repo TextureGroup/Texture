@@ -48,28 +48,21 @@
  */
 #define AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS 0
 
-#define AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE() { \
-  static dispatch_once_t onceToken; \
-  dispatch_once(&onceToken, ^{ \
-    NSLog(@"[Texture] Warning: Feature %@ is unimplemented in the experimental text node.", NSStringFromSelector(_cmd)); \
-  });\
-}
-
 /**
  * If it can't find a compatible layout, this method creates one.
  *
  * NOTE: Be careful to copy `text` if needed.
  */
 static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainerAndText(ASTextContainer *container, NSAttributedString *text)  {
-  // Allocate layoutCacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-  static ASDN::StaticMutex& layoutCacheLock = *new ASDN::StaticMutex;
-  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   static dispatch_once_t onceToken;
+  static ASDN::Mutex *layoutCacheLock;
+  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   dispatch_once(&onceToken, ^{
+    layoutCacheLock = new ASDN::Mutex();
     textLayoutCache = [[NSCache alloc] init];
   });
 
-  layoutCacheLock.lock();
+  layoutCacheLock->lock();
 
   ASTextCacheValue *cacheValue = [textLayoutCache objectForKey:text];
   if (cacheValue == nil) {
@@ -79,7 +72,7 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
 
   // Lock the cache item for the rest of the method. Only after acquiring can we release the NSCache.
   ASDN::MutexLocker lock(cacheValue->_m);
-  layoutCacheLock.unlock();
+  layoutCacheLock->unlock();
 
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
@@ -148,11 +141,19 @@ static const CGFloat ASTextNodeHighlightLightOpacity = 0.11;
 static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 () <UIGestureRecognizerDelegate>
+#else
+@interface ASTextNode () <UIGestureRecognizerDelegate>
+#endif
 
 @end
 
+#if AS_ENABLE_TEXTNODE
 @implementation ASTextNode2 {
+#else
+@implementation ASTextNode {
+#endif
   ASTextContainer *_textContainer;
   
   CGSize _shadowOffset;
@@ -325,6 +326,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return _textContainer.insets;
 }
 
+- (void)setTextContainerLinePositionModifier:(id<ASTextLinePositionModifier>)modifier
+{
+  ASLockedSelfCompareAssignObjects(_textContainer.linePositionModifier, modifier);
+}
+
+- (id<ASTextLinePositionModifier>)textContainerLinePositionModifier
+{
+  ASLockScopeSelf();
+  return _textContainer.linePositionModifier;
+}
+
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
@@ -336,17 +348,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   [self _ensureTruncationText];
 
   // If the constrained size has a max/inf value on the text's forward direction, the text node is calculating its intrinsic size.
-  BOOL isCalculatingIntrinsicSize;
-  if (_textContainer.isVerticalForm) {
-    isCalculatingIntrinsicSize = (_textContainer.size.height >= ASTextContainerMaxSize.height);
-  } else {
-    isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width);
-  }
+  // Need to consider both width and height when determining if it is calculating instrinsic size. Even the constrained width is provided, the height can be inf
+  // it may provide a text that is longer than the width and require a wordWrapping line break mode and looking for the height to be calculated.
+  BOOL isCalculatingIntrinsicSize = (_textContainer.size.width >= ASTextContainerMaxSize.width) || (_textContainer.size.height >= ASTextContainerMaxSize.height);
 
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
   [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, mutableText);
-  
+  if (layout.truncatedLine != nil && layout.truncatedLine.size.width > layout.textBoundingSize.width) {
+    return (CGSize) {MIN(constrainedSize.width, layout.truncatedLine.size.width), layout.textBoundingSize.height};
+  }
+
   return layout.textBoundingSize;
 }
 
@@ -572,20 +584,17 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASTextContainer *containerCopy = [_textContainer copy];
   containerCopy.size = self.calculatedSize;
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(containerCopy, _attributedText);
-  NSRange visibleRange = layout.visibleRange;
-  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
 
-  ASTextRange *range = [layout closestTextRangeAtPoint:point];
-
-  // For now, assume that a tap inside this text, but outside the text range is a tap on the
-  // truncation token.
-  if (![layout textRangeAtPoint:point]) {
+  if ([self _locked_pointInsideAdditionalTruncationMessage:point withLayout:layout]) {
     if (inAdditionalTruncationMessageOut != NULL) {
       *inAdditionalTruncationMessageOut = YES;
     }
     return nil;
   }
 
+  NSRange visibleRange = layout.visibleRange;
+  NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
+  ASTextRange *range = [layout closestTextRangeAtPoint:point];
   NSRange effectiveRange = NSMakeRange(0, 0);
   for (__strong NSString *attributeName in self.linkAttributeNames) {
     id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
@@ -615,6 +624,61 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   return nil;
+}
+
+- (BOOL)_locked_pointInsideAdditionalTruncationMessage:(CGPoint)point withLayout:(ASTextLayout *)layout
+{
+  // Check if the range is within the additional truncation range
+  BOOL inAdditionalTruncationMessage = NO;
+  
+  CTLineRef truncatedCTLine = layout.truncatedLine.CTLine;
+  if (truncatedCTLine != NULL && _additionalTruncationMessage != nil) {
+    CFIndex stringIndexForPosition = CTLineGetStringIndexForPosition(truncatedCTLine, point);
+    if (stringIndexForPosition != kCFNotFound) {
+      CFIndex truncatedCTLineGlyphCount = CTLineGetGlyphCount(truncatedCTLine);
+      
+      CTLineRef truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
+      CFIndex truncationTokenLineGlyphCount = truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
+      
+      CTLineRef additionalTruncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
+      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
+      
+      switch (_textContainer.truncationType) {
+        case ASTextTruncationTypeStart: {
+          CFIndex composedTruncationTextLineGlyphCount = truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount;
+          if (stringIndexForPosition > truncationTokenLineGlyphCount &&
+              stringIndexForPosition < composedTruncationTextLineGlyphCount) {
+            inAdditionalTruncationMessage = YES;
+          }      
+          break;
+        }
+        case ASTextTruncationTypeMiddle: {
+          CFIndex composedTruncationTextLineGlyphCount = truncationTokenLineGlyphCount + additionalTruncationTokenLineGlyphCount;
+          CFIndex firstTruncatedTokenIndex = (truncatedCTLineGlyphCount - composedTruncationTextLineGlyphCount) / 2.0;
+          if ((firstTruncatedTokenIndex + truncationTokenLineGlyphCount) < stringIndexForPosition &&
+              stringIndexForPosition < (firstTruncatedTokenIndex + composedTruncationTextLineGlyphCount)) {
+            inAdditionalTruncationMessage = YES;
+          }      
+          break;
+        }
+        case ASTextTruncationTypeEnd: {
+          if (stringIndexForPosition > (truncatedCTLineGlyphCount - additionalTruncationTokenLineGlyphCount)) {
+            inAdditionalTruncationMessage = YES;
+          }
+          break; 
+        }
+        default:
+          // For now, assume that a tap inside this text, but outside the text range is a tap on the
+          // truncation token.
+          if (![layout textRangeAtPoint:point]) {
+            inAdditionalTruncationMessage = YES;
+          }
+          break;
+      }
+    }
+  }
+  
+  return inAdditionalTruncationMessage;
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -789,9 +853,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   NSUInteger lastCharIndex = NSIntegerMax;
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
   
-  if (inAdditionalTruncationMessage) {
-    return YES;
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     return YES;
   } else {
     return NO;
@@ -832,7 +894,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
     NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
     [self _setHighlightRange:truncationMessageRange forAttributeName:ASTextNodeTruncationTokenAttributeName value:nil animated:YES];
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  } else if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     [self _setHighlightRange:range forAttributeName:linkAttributeName value:linkAttributeValue animated:YES];
   }
 
@@ -1088,7 +1150,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 - (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize
 {
-  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine == nil);
+  return ASLockedSelf([self locked_textLayoutForSize:constrainedSize.max].truncatedLine != nil);
 }
 
 - (ASTextLayout *)locked_textLayoutForSize:(CGSize)size

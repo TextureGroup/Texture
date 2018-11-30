@@ -7,8 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitContext.h>
 #import <AsyncDisplayKit/ASTextKitTailTruncater.h>
+
+#if AS_ENABLE_TEXTNODE
+
+#import <AsyncDisplayKit/ASTextKitContext.h>
 
 @implementation ASTextKitTailTruncater
 {
@@ -157,7 +160,7 @@
                                                               actualGlyphRange:NULL];
 
     // Check if text is truncated, and if so apply our truncation string
-    if (visibleCharacterRange.length < originalStringLength && _truncationAttributedString.length > 0) {
+    if (visibleCharacterRange.length < originalStringLength && self->_truncationAttributedString.length > 0) {
       NSInteger firstCharacterIndexToReplace = [self _calculateCharacterIndexBeforeTruncationMessage:layoutManager
                                                                                          textStorage:textStorage
                                                                                        textContainer:textContainer];
@@ -171,10 +174,10 @@
                                                        textStorage.length - firstCharacterIndexToReplace);
       // Replace the end of the visible message with the truncation string
       [textStorage replaceCharactersInRange:truncationReplacementRange
-                       withAttributedString:_truncationAttributedString];
+                       withAttributedString:self->_truncationAttributedString];
     }
 
-    _visibleRanges = { visibleCharacterRange };
+    self->_visibleRanges = { visibleCharacterRange };
   }];
 }
 
@@ -189,3 +192,5 @@
 }
 
 @end
+
+#endif

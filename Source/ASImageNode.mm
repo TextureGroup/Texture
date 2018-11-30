@@ -433,13 +433,17 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
-// Allocate cacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
+  static dispatch_once_t onceToken;
+  static ASDN::Mutex *cacheLock = nil;
+  dispatch_once(&onceToken, ^{
+    cacheLock = new ASDN::Mutex();
+  });
+  
   {
-    ASDN::StaticMutexLocker l(cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     if (!cache) {
       cache = [[ASWeakMap alloc] init];
     }
@@ -456,7 +460,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
 
   {
-    ASDN::StaticMutexLocker l(cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     return [cache setObject:contents forKey:key];
   }
 }
@@ -533,8 +537,15 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   [super displayDidFinish];
 
   __instanceLock__.lock();
-    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
     UIImage *image = _image;
+    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
+    BOOL shouldPerformDisplayCompletionBlock = (image && displayCompletionBlock);
+
+    // Clear the ivar now. The block is retained and will be executed shortly.
+    if (shouldPerformDisplayCompletionBlock) {
+      _displayCompletionBlock = nil;
+    }
+
     BOOL hasDebugLabel = (_debugLabelNode != nil);
   __instanceLock__.unlock();
 
@@ -556,13 +567,8 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
   
   // If we've got a block to perform after displaying, do it.
-  if (image && displayCompletionBlock) {
-
+  if (shouldPerformDisplayCompletionBlock) {
     displayCompletionBlock(NO);
-
-    __instanceLock__.lock();
-      _displayCompletionBlock = nil;
-    __instanceLock__.unlock();
   }
 }
 

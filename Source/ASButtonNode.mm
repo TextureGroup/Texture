@@ -63,7 +63,7 @@
     _contentVerticalAlignment = ASVerticalAlignmentCenter;
     _contentEdgeInsets = UIEdgeInsetsZero;
     _imageAlignment = ASButtonNodeImageAlignmentBeginning;
-    self.accessibilityTraits = self.defaultAccessibilityTraits;;
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
   }
   return self;
 }

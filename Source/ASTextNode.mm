@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASTextNode.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASTextNode2.h>
 
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
@@ -607,7 +610,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
       return;
     }
 
-    for (NSString *attributeName in _linkAttributeNames) {
+    for (NSString *attributeName in self->_linkAttributeNames) {
       NSRange range;
       id value = [attributedString attribute:attributeName atIndex:characterIndex longestEffectiveRange:&range inRange:clampedRange];
       NSString *name = attributeName;
@@ -619,8 +622,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
       // If highlighting, check with delegate first. If not implemented, assume YES.
       if (highlighting
-          && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-          && ![_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
+          && [self->_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+          && ![self->_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
         value = nil;
         name = nil;
       }
@@ -973,9 +976,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   NSUInteger lastCharIndex = NSIntegerMax;
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
 
-  if (inAdditionalTruncationMessage) {
-    return YES;
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     return YES;
   } else {
     return NO;
@@ -1011,7 +1012,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
     }
     NSRange truncationMessageRange = [self _additionalTruncationMessageRangeWithVisibleRange:visibleRange];
     [self _setHighlightRange:truncationMessageRange forAttributeName:ASTextNodeTruncationTokenAttributeName value:nil animated:YES];
-  } else if (range.length && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
+  } else if (range.length > 0 && !linkCrossesVisibleRange && linkAttributeValue != nil && linkAttributeName != nil) {
     [self _setHighlightRange:range forAttributeName:linkAttributeName value:linkAttributeValue animated:YES];
   }
 }
@@ -1391,6 +1392,21 @@ static NSAttributedString *DefaultTruncationAttributedString()
 
 @end
 
+@implementation ASTextNode (Unsupported)
+
+- (void)setTextContainerLinePositionModifier:(id)textContainerLinePositionModifier
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+}
+
+- (id)textContainerLinePositionModifier
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  return nil;
+}
+
+@end
+
 @implementation ASTextNode (Deprecated)
 
 - (void)setAttributedString:(NSAttributedString *)attributedString
@@ -1414,3 +1430,5 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 
 @end
+
+#endif
