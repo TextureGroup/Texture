@@ -273,7 +273,8 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
   if (viewNode == nil) {
     return @[];
   }
-  if (_accessibilityElements == nil) {
+
+  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDisableAccessibilityCache)) {
     _accessibilityElements = [viewNode accessibilityElements];
   }
   return _accessibilityElements;
