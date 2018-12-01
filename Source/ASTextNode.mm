@@ -487,6 +487,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   let currentAttributedText = self.attributedText; // Grab attributed string again in case it changed in the meantime
   self.accessibilityLabel = self.defaultAccessibilityLabel;
   self.isAccessibilityElement = (currentAttributedText.length != 0); // We're an accessibility element by default if there is a string.
+  [self invalidateAccessibleElementsIfNeeded];
 
 #if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];

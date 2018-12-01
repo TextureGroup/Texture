@@ -410,7 +410,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // Accessiblity
   self.accessibilityLabel = self.defaultAccessibilityLabel;
   self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
-
+  [self invalidateAccessibleElementsIfNeeded];
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];
 #endif

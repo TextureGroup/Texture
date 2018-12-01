@@ -14,6 +14,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 
 #import <objc/runtime.h>
 
@@ -2286,6 +2287,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (disableNotifications) {
     [subnode __decrementVisibilityNotificationsDisabled];
   }
+  [subnode invalidateAccessibleElementsIfNeeded];
 }
 
 /*
@@ -2620,7 +2622,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
   // ASAssertUnlocked(__instanceLock__);
-  
+
+  [self invalidateAccessibleElementsIfNeeded];
+
   __instanceLock__.lock();
     __weak ASDisplayNode *supernode = _supernode;
     __weak UIView *view = _view;
@@ -3672,6 +3676,48 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (UIAccessibilityTraits)defaultAccessibilityTraits
 {
   return UIAccessibilityTraitNone;
+}
+
+- (void)invalidateAccessibleElementsIfNeeded {
+  // The container needs to reaggregate.
+  [self invalidateUptoContainer];
+
+  // The view needs to reggregate.
+  if (self.isLayerBacked) {
+    [self.supernode invalidateForLayerBackedNodes];
+  }
+}
+
+// Find the first container and invalidated it so that the container can reaggregate next time.
+- (void)invalidateUptoContainer {
+  if (self.isAccessibilityContainer) {
+    if (self.isNodeLoaded) {
+      if (ASDisplayNodeThreadIsMain()) {
+        [ASDynamicCast(self.view, _ASDisplayView) setAccessibilityElements:nil];
+      } else {
+        ASPerformBlockOnMainThread(^{
+          [ASDynamicCast(self.view, _ASDisplayView) setAccessibilityElements:nil];
+        });
+      }
+    }
+    return;
+  }
+  [self.supernode invalidateUptoContainer];
+}
+
+// Find first view up the tree and invalidated it.
+- (void)invalidateForLayerBackedNodes {
+  if (self.isLayerBacked) {
+    [self.supernode invalidateForLayerBackedNodes];
+  } else if (self.isNodeLoaded) {
+    if (ASDisplayNodeThreadIsMain()) {
+      [ASDynamicCast(self.view, _ASDisplayView) setAccessibilityElements:nil];
+    } else {
+      ASPerformBlockOnMainThread(^{
+        [ASDynamicCast(self.view, _ASDisplayView) setAccessibilityElements:nil];
+      });
+    }
+  }
 }
 
 #pragma mark - Debugging (Private)

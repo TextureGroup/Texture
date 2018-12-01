@@ -314,6 +314,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 
 @interface ASDisplayNode (AccessibilityInternal)
 - (NSArray *)accessibilityElements;
+- (void)invalidateAccessibleElementsIfNeeded;
 @end;
 
 @interface UIView (ASDisplayNodeInternal)
