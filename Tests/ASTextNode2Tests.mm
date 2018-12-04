@@ -12,6 +12,7 @@
 
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
+#import <AsyncDisplayKit/ASTextNode+Beta.h>
 
 #import <XCTest/XCTest.h>
 
@@ -61,6 +62,14 @@
 
   _attributedText = mas;
   _textNode.attributedText = _attributedText;
+}
+
+- (void)testTruncation
+{
+  XCTAssertTrue([(ASTextNode *)_textNode shouldTruncateForConstrainedSize:ASSizeRangeMake(CGSizeMake(100, 100))], @"Text Node should truncate");
+
+  _textNode.frame = CGRectMake(0, 0, 100, 100);
+  XCTAssertTrue(_textNode.isTruncated, @"Text Node should be truncated");
 }
 
 - (void)testAccessibility
