@@ -16,6 +16,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
+#import <AsyncDisplayKit/ASTextNode+Beta.h>
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
@@ -101,6 +102,14 @@
 }
 
 #pragma mark - ASTextNode
+
+- (void)testTruncation
+{
+  XCTAssertTrue([_textNode shouldTruncateForConstrainedSize:ASSizeRangeMake(CGSizeMake(100, 100))], @"");
+
+  _textNode.frame = CGRectMake(0, 0, 100, 100);
+  XCTAssertTrue(_textNode.isTruncated, @"Text Node should be truncated");
+}
 
 - (void)testSettingTruncationMessage
 {
