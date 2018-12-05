@@ -333,6 +333,10 @@
     return;
   }
 
+  if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
+    rootConstrainedSize = [self _locked_constrainedSizeForLayoutPass];
+  }
+
   [self willCalculateLayout:rootConstrainedSize];
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate>  _Nonnull delegate) {
     if ([delegate respondsToSelector:@selector(nodeWillCalculateLayout:)]) {
@@ -351,10 +355,6 @@
       node.style.parentAlignStyle = ASStackLayoutAlignItemsNotSet;
     };
   });
-
-  if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
-    rootConstrainedSize = [self _locked_constrainedSizeForLayoutPass];
-  }
 
   ASYogaLog("CALCULATING at Yoga root with constraint = {%@, %@}: %@",
             NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max), self);
