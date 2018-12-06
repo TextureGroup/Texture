@@ -407,6 +407,12 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     ASLayoutElementStyle *style = [self _locked_style];
     style.ascender = [[self class] ascenderWithAttributedString:attributedText];
     style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+
+    // Set our truncation ivar if a paragraph style is specified
+    NSParagraphStyle *paragraphStyle = [attributedText attribute:NSParagraphStyleAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL];
+    if (paragraphStyle) {
+      _truncationMode = paragraphStyle.lineBreakMode;
+    }
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now

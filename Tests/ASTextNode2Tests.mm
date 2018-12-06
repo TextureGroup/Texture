@@ -91,4 +91,27 @@
                 _textNode.defaultAccessibilityLabel, _attributedText.string);
 }
 
+- (void)testAttributedTextTruncationOverridesTruncationProperty
+{
+  // capture previous values, restore after testing
+  NSLineBreakMode prevMode = _textNode.truncationMode;
+  NSAttributedString *prevString = _textNode.attributedText;
+
+  // set the property to word-wrapping
+  _textNode.truncationMode = NSLineBreakByWordWrapping;
+
+  // set attributed text with middle truncation
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
+  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor "
+                                                             attributes:@{NSParagraphStyleAttributeName : paragraphStyle}];
+
+  // Assert that our attributed text overrides the property
+  XCTAssertEqual(_textNode.truncationMode, NSLineBreakByTruncatingMiddle);
+
+  // restore previous values
+  _textNode.truncationMode = prevMode;
+  _textNode.attributedText = prevString;
+}
+
 @end
