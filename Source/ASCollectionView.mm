@@ -791,7 +791,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return visibleNodes;
 }
 
-- (void)invalidateFlowLayoutDelegateMetrics {
+- (void)invalidateFlowLayoutDelegateMetrics
+{
+  // Subclass hook
 }
 
 #pragma mark Internal
@@ -2148,8 +2150,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (BOOL)rangeControllerShouldUpdateRanges:(ASRangeController *)rangeController
 {
-  BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
-  return !disableRangeController;
+  return !ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
 }
 
 - (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
@@ -2190,7 +2191,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
       
       __block NSUInteger numberOfUpdates = 0;
-      void(^completion)(BOOL finished) = ^(BOOL finished){
+      let completion = ^(BOOL finished) {
         as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
         as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
@@ -2213,39 +2214,39 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         [super reloadData];
         completion(YES);
       } else {
-      [self _superPerformBatchUpdates:^{
-        updates();
+        [self _superPerformBatchUpdates:^{
+          updates();
 
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
-          [super reloadItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload]) {
-          [super reloadSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
-          [super deleteItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
-          [super deleteSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
-          [super insertSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
-          [super insertItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-      } completion:completion];
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
+            [super reloadItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload]) {
+            [super reloadSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
+            [super deleteItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
+            [super deleteSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
+            [super insertSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
+            [super insertItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+        } completion:completion];
       }
 
       as_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);

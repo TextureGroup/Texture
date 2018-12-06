@@ -141,6 +141,7 @@ typedef struct {
     [_collectionDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:context];
     return;
   }
+  
   ASIGSectionController *ctrl = self.sectionControllerForBatchFetching;
   self.sectionControllerForBatchFetching = nil;
   [ctrl beginBatchFetchWithContext:context];

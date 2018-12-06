@@ -209,7 +209,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     return;
   }
 
-  if ([_delegate rangeControllerShouldUpdateRanges:self] == NO) {
+  if (![_delegate rangeControllerShouldUpdateRanges:self]) {
     return;
   }
 

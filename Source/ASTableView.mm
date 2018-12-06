@@ -1676,7 +1676,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return YES;
 }
 
-- (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController {
+- (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController
+{
   return NO;
 }
 

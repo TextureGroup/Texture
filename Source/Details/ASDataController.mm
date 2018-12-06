@@ -188,6 +188,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   if (![_dataSource dataController:self shouldEagerlyLayoutNode:node]) {
     return;
   }
+  
   ASDisplayNodeAssert(ASSizeRangeHasSignificantArea(constrainedSize), @"Attempt to layout cell node with invalid size range %@", NSStringFromASSizeRange(constrainedSize));
 
   CGRect frame = CGRectZero;
