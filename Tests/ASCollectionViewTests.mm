@@ -1049,6 +1049,7 @@
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];
   ASCollectionNode *cn = testController.collectionNode;
+  cn.cellLayoutMode = ASCellLayoutModeAlwaysAsync;
   [cn setTuningParameters:{ .leadingBufferScreenfuls = 2, .trailingBufferScreenfuls = 0 } forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
   window.rootViewController = testController;
 

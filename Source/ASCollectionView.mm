@@ -63,6 +63,10 @@
   flowLayout ? flowLayout.property : default;                                                 \
 })
 
+// ASCellLayoutMode is an NSUInteger-based NS_OPTIONS field. Be careful with BOOL handling on the
+// 32-bit Objective-C runtime, and pattern after ASInterfaceStateIncludesVisible() & friends.
+#define ASCellLayoutModeIncludes(layoutMode) ((_cellLayoutMode & layoutMode) == layoutMode)
+
 /// What, if any, invalidation should we perform during the next -layoutSubviews.
 typedef NS_ENUM(NSUInteger, ASCollectionViewInvalidationStyle) {
   /// Perform no invalidation.
@@ -685,9 +689,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (wrapperNode.sizeForItemBlock) {
       return wrapperNode.sizeForItemBlock(wrapperNode, element.constrainedSize.max);
     } else {
-      // In this case, we should use the exact value that was stashed earlier by calling sizeForItem:, referenceSizeFor*, etc.
-      // Although the node would use the preferredSize in layoutThatFits, we can skip this because there's no constrainedSize.
-      return wrapperNode.style.preferredSize;
+      // In this case, it is possible the model indexPath for this element will be nil. Attempt to convert it,
+      // and call out to the delegate directly. If it has been deleted from the model, the size returned will be the layout's default.
+      NSIndexPath *indexPath = [_dataController.visibleMap indexPathForElement:element];
+      return [self _sizeForUIKitCellWithKind:element.supplementaryElementKind atIndexPath:indexPath];
     }
   } else {
     return [node layoutThatFits:element.constrainedSize].size;
@@ -786,37 +791,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return visibleNodes;
 }
 
-- (BOOL)usesSynchronousDataLoading
-{
-  return self.dataController.usesSynchronousDataLoading;
-}
-
-- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
-{
-  self.dataController.usesSynchronousDataLoading = usesSynchronousDataLoading;
-}
-
 - (void)invalidateFlowLayoutDelegateMetrics {
-  for (ASCollectionElement *element in self.dataController.pendingMap) {
-    // This may be either a Supplementary or Item type element.
-    // For UIKit passthrough cells of either type, re-fetch their sizes from the standard UIKit delegate methods.
-    ASCellNode *node = element.node;
-    if (node.shouldUseUIKitCell) {
-      ASWrapperCellNode *wrapperNode = (ASWrapperCellNode *)node;
-      if (wrapperNode.sizeForItemBlock) {
-        continue;
-      }
-      NSIndexPath *indexPath = [_dataController.pendingMap indexPathForElement:element];
-      NSString *kind = [element supplementaryElementKind];
-      CGSize previousSize = node.style.preferredSize;
-      CGSize size = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
-
-      if (!CGSizeEqualToSize(previousSize, size)) {
-        node.style.preferredSize = size;
-        [node invalidateCalculatedLayout];
-      }
-    }
-  }
 }
 
 #pragma mark Internal
@@ -879,9 +854,21 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)_superPerformBatchUpdates:(void(^)())updates completion:(void(^)(BOOL finished))completion
 {
   ASDisplayNodeAssertMainThread();
-  
+
   _superBatchUpdateCount++;
-  [super performBatchUpdates:updates completion:completion];
+
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData)) {
+    if (updates) {
+      updates();
+    }
+    [super reloadData];
+    if (completion) {
+      completion(YES);
+    }
+  } else {
+    [super performBatchUpdates:updates completion:completion];
+  }
+
   _superBatchUpdateCount--;
 }
 
@@ -1757,7 +1744,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   switch (invalidationStyle) {
     case ASCollectionViewInvalidationStyleWithAnimation:
       if (0 == _superBatchUpdateCount) {
-        [self _superPerformBatchUpdates:^{ } completion:nil];
+        BOOL shouldReloadData = ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData);
+        if (shouldReloadData) {
+          [super reloadData];
+        } else {
+          [self _superPerformBatchUpdates:^{ } completion:nil];
+        }
       }
       break;
     case ASCollectionViewInvalidationStyleWithoutAnimation:
@@ -1864,6 +1856,41 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 #pragma mark - ASDataControllerSource
 
+- (BOOL)dataController:(ASDataController *)dataController shouldEagerlyLayoutNode:(ASCellNode *)node
+{
+  NSAssert(!ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysLazy),
+           @"ASCellLayoutModeAlwaysLazy flag is no longer supported");
+  return !node.shouldUseUIKitCell;
+}
+
+- (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
+{
+  // If we have AlwaysSync set, block and donate main priority.
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysSync)) {
+    return YES;
+  }
+  // Prioritize AlwaysAsync over the remaining heuristics for the Default mode.
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysAsync)) {
+    return NO;
+  }
+  // The heuristics below apply to the ASCellLayoutModeDefault.
+  // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
+  if (changeSet.countForAsyncLayout < 2) {
+    return YES;
+  }
+  CGSize contentSize = self.contentSize;
+  CGSize boundsSize = self.bounds.size;
+  if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
+    return YES;
+  }
+  return NO;
+}
+
+- (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController
+{
+  return ASCellLayoutModeIncludes(ASCellLayoutModeSerializeNodeCreation);
+}
+
 - (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   if (!_asyncDataSourceFlags.nodeModelForItem) {
@@ -1874,7 +1901,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_asyncDataSource collectionNode:collectionNode nodeModelForItemAtIndexPath:indexPath];
 }
 
-- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath shouldAsyncLayout:(BOOL *)shouldAsyncLayout
 {
   ASDisplayNodeAssertMainThread();
   ASCellNodeBlock block = nil;
@@ -1904,22 +1931,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       // or it is an error.
       if (_asyncDataSourceFlags.interop) {
         cell = [[ASWrapperCellNode alloc] init];
-        cell.style.preferredSize = [self _sizeForUIKitCellWithKind:nil atIndexPath:indexPath];
       } else {
         ASDisplayNodeFailAssert(@"ASCollection could not get a node block for item at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
         cell = [[ASCellNode alloc] init];
       }
     }
+
+    // This condition is intended to run for either cells received from the datasource, or created just above.
+    if (cell.shouldUseUIKitCell) {
+      *shouldAsyncLayout = NO;
+    }
   }
 
   // Wrap the node block
+  BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
   __weak __typeof__(self) weakSelf = self;
   return ^{
     __typeof__(self) strongSelf = weakSelf;
     ASCellNode *node = (block ? block() : cell);
     ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]], @"ASCollectionNode provided a non-ASCellNode! %@, %@", node, strongSelf);
-    [node enterHierarchyState:ASHierarchyStateRangeManaged];
-    
+
+    if (!disableRangeController) {
+      [node enterHierarchyState:ASHierarchyStateRangeManaged];
+    }
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;
     }
@@ -2001,7 +2035,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       BOOL useUIKitCell = _asyncDataSourceFlags.interopViewForSupplementaryElement;
       if (useUIKitCell) {
         cell = [[ASWrapperCellNode alloc] init];
-        cell.style.preferredSize = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
       } else {
         cell = [[ASCellNode alloc] init];
       }
@@ -2113,6 +2146,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 #pragma mark - ASRangeControllerDelegate
 
+- (BOOL)rangeControllerShouldUpdateRanges:(ASRangeController *)rangeController
+{
+  BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
+  return !disableRangeController;
+}
+
 - (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
@@ -2151,7 +2190,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
       
       __block NSUInteger numberOfUpdates = 0;
-      id completion = ^(BOOL finished){
+      void(^completion)(BOOL finished) = ^(BOOL finished){
         as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
         as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
@@ -2160,6 +2199,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         [changeSet executeCompletionHandlerWithFinished:finished];
       };
 
+      BOOL shouldReloadData = ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData);
+      // TODO: Consider adding !changeSet.isEmpty as a check to also disable shouldReloadData.
+      if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysBatchUpdateSectionReload) &&
+          [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload].count > 0) {
+        shouldReloadData = NO;
+      }
+
+      if (shouldReloadData) {
+        // When doing a reloadData, the insert / delete calls are not necessary.
+        // Calling updates() is enough, as it commits .pendingMap to .visibleMap.
+        updates();
+        [super reloadData];
+        completion(YES);
+      } else {
       [self _superPerformBatchUpdates:^{
         updates();
 
@@ -2193,6 +2246,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
           numberOfUpdates++;
         }
       } completion:completion];
+      }
 
       as_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);
       
