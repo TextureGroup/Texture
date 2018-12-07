@@ -1874,7 +1874,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysAsync)) {
     return NO;
   }
-  // The heuristics below apply to the ASCellLayoutModeDefault.
+  // The heuristics below apply to the ASCellLayoutModeNone.
   // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
   if (changeSet.countForAsyncLayout < 2) {
     return YES;
