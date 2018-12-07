@@ -846,31 +846,31 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return size;
 }
 
+- (void)_superReloadData:(void(^)())updates completion:(void(^)(BOOL finished))completion
+{
+  if (updates) {
+    updates();
+  }
+  [super reloadData];
+  if (completion) {
+    completion(YES);
+  }
+}
+
 /**
- Performing nested batch updates with super (e.g. resizing a cell node & updating collection view during same frame)
- can cause super to throw data integrity exceptions because it checks the data source counts before
- the update is complete.
- 
- Always call [self _superPerform:] rather than [super performBatch:] so that we can keep our `superPerformingBatchUpdates` flag updated.
+ * Performing nested batch updates with super (e.g. resizing a cell node & updating collection view
+ * during same frame) can cause super to throw data integrity exceptions because it checks the data
+ * source counts before the update is complete.
+ *
+ * Always call [self _superPerform:] rather than [super performBatch:] so that we can keep our
+ * `superPerformingBatchUpdates` flag updated.
 */
 - (void)_superPerformBatchUpdates:(void(^)())updates completion:(void(^)(BOOL finished))completion
 {
   ASDisplayNodeAssertMainThread();
 
   _superBatchUpdateCount++;
-
-  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData)) {
-    if (updates) {
-      updates();
-    }
-    [super reloadData];
-    if (completion) {
-      completion(YES);
-    }
-  } else {
-    [super performBatchUpdates:updates completion:completion];
-  }
-
+  [super performBatchUpdates:updates completion:completion];
   _superBatchUpdateCount--;
 }
 
@@ -1746,11 +1746,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   switch (invalidationStyle) {
     case ASCollectionViewInvalidationStyleWithAnimation:
       if (0 == _superBatchUpdateCount) {
-        BOOL shouldReloadData = ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData);
-        if (shouldReloadData) {
-          [super reloadData];
+        if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData)) {
+          [self _superReloadData:nil completion:nil];
         } else {
-          [self _superPerformBatchUpdates:^{ } completion:nil];
+          [self _superPerformBatchUpdates:nil completion:nil];
         }
       }
       break;
@@ -2210,9 +2209,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       if (shouldReloadData) {
         // When doing a reloadData, the insert / delete calls are not necessary.
         // Calling updates() is enough, as it commits .pendingMap to .visibleMap.
-        updates();
-        [super reloadData];
-        completion(YES);
+        [self _superReloadData:updates completion:completion];
       } else {
         [self _superPerformBatchUpdates:^{
           updates();
