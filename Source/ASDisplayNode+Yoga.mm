@@ -268,12 +268,12 @@
 
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
-  ASDisplayNode *yogaParent = self.yogaParent;
+  ASDisplayNode *yogaRoot = self.yogaRoot;
 
-  if (yogaParent) {
+  if (self != yogaRoot) {
     ASYogaLog("ESCALATING to Yoga root: %@", self);
     // TODO(appleguy): Consider how to get the constrainedSize for the yogaRoot when escalating manually.
-    [yogaParent calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained];
+    [yogaRoot calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained];
     return;
   }
 
