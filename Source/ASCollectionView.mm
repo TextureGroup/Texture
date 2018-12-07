@@ -348,7 +348,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
  */
 - (void)reloadData
 {
-  [super reloadData];
+  [self _superReloadData:nil completion:nil];
 
   // UICollectionView calls -reloadData during first layoutSubviews and when the data source changes.
   // This fires off the first load of cell nodes.
@@ -2183,7 +2183,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (changeSet.includesReloadData) {
       _superIsPendingDataLoad = YES;
       updates();
-      [super reloadData];
+      [self _superReloadData:nil completion:nil];
       as_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
     } else {
