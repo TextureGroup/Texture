@@ -23,7 +23,8 @@
 
 @implementation ASDisplayViewAccessibilityTests
 
-- (void)setUp {
+- (void)setUp
+{
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
   config.experimentalFeatures = ASExperimentalDisableAccessibilityCache;
   [ASConfigurationManager test_resetWithConfiguration:config];
@@ -48,7 +49,8 @@
   XCTAssertEqual([node.view indexOfAccessibilityElement:node.view.accessibilityElements.firstObject], 0);*/
 }
 
-- (void)testThatSubnodeAccessibilityLabelAggregationWorks {
+- (void)testThatSubnodeAccessibilityLabelAggregationWorks
+{
   // Setup nodes
   ASDisplayNode *node = nil;
   ASDisplayNode *innerNode1 = nil;
@@ -71,7 +73,8 @@
                         [node.view.accessibilityElements.firstObject accessibilityLabel]);
 }
 
-- (void)testThatContainerAccessibilityLabelOverrideStopsAggregation {
+- (void)testThatContainerAccessibilityLabelOverrideStopsAggregation
+{
   // Setup nodes
   ASDisplayNode *node = nil;
   ASDisplayNode *innerNode = nil;
@@ -127,7 +130,9 @@
   NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello, world, !!!!"]);
 }
-- (void)testAccessibilityNonLayerbackedNodesOperationInContainer {
+
+- (void)testAccessibilityNonLayerbackedNodesOperationInContainer
+{
   ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
   contianer.frame = CGRectMake(50, 50, 200, 600);
   contianer.backgroundColor = [UIColor grayColor];
@@ -160,7 +165,9 @@
   NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello, world, !!!!"]);
 }
-- (void)testAccessibilityNonLayerbackedNodesOperationInNonContainer {
+
+- (void)testAccessibilityNonLayerbackedNodesOperationInNonContainer
+{
   ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
   contianer.frame = CGRectMake(50, 50, 200, 600);
   contianer.backgroundColor = [UIColor grayColor];
@@ -196,7 +203,8 @@
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   XCTAssertTrue([[updatedElements2.lastObject accessibilityLabel] isEqualToString:@"world"]);
 }
-- (void)testAccessibilityLayerbackedNodesOperationInNonContainer {
+- (void)testAccessibilityLayerbackedNodesOperationInNonContainer
+{
   ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
   contianer.frame = CGRectMake(50, 50, 200, 600);
   contianer.backgroundColor = [UIColor grayColor];
@@ -236,7 +244,8 @@
   XCTAssertTrue([[updatedElements2.lastObject accessibilityLabel] isEqualToString:@"world"]);
 }
 
-- (void)testAccessibilityUpdatesWithElementsChanges {
+- (void)testAccessibilityUpdatesWithElementsChanges
+{
   ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
   contianer.frame = CGRectMake(50, 50, 200, 600);
   contianer.backgroundColor = [UIColor grayColor];
