@@ -25,7 +25,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
   ASExperimentalClearDataDuringDeallocation,
-  ASExperimentalDidEnterPreloadSkipASMLayout
+  ASExperimentalDidEnterPreloadSkipASMLayout,
+  ASExperimentalDisableAccessibilityCache
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -48,6 +49,7 @@ static ASExperimentalFeatures features[] = {
     @"exp_framesetter_cache",
     @"exp_clear_data_during_deallocation",
     @"exp_did_enter_preload_skip_asm_layout",
+    @"exp_disable_a11y_cache"
   ];
 }
 
