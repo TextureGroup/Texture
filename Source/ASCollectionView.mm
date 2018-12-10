@@ -2019,7 +2019,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   __weak __typeof__(self) weakSelf = self;
   return ^{
     __typeof__(self) strongSelf = weakSelf;
-    ASCellNode *node = (block ? block() : cell);
+    ASCellNode *node = block();
     ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]],
                         @"ASCollectionNode provided a non-ASCellNode! %@, %@", node, strongSelf);
 
