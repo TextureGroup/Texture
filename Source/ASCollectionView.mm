@@ -63,6 +63,10 @@
   flowLayout ? flowLayout.property : default;                                                 \
 })
 
+// ASCellLayoutMode is an NSUInteger-based NS_OPTIONS field. Be careful with BOOL handling on the
+// 32-bit Objective-C runtime, and pattern after ASInterfaceStateIncludesVisible() & friends.
+#define ASCellLayoutModeIncludes(layoutMode) ((_cellLayoutMode & layoutMode) == layoutMode)
+
 /// What, if any, invalidation should we perform during the next -layoutSubviews.
 typedef NS_ENUM(NSUInteger, ASCollectionViewInvalidationStyle) {
   /// Perform no invalidation.
@@ -344,7 +348,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
  */
 - (void)reloadData
 {
-  [super reloadData];
+  [self _superReloadData:nil completion:nil];
 
   // UICollectionView calls -reloadData during first layoutSubviews and when the data source changes.
   // This fires off the first load of cell nodes.
@@ -685,9 +689,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (wrapperNode.sizeForItemBlock) {
       return wrapperNode.sizeForItemBlock(wrapperNode, element.constrainedSize.max);
     } else {
-      // In this case, we should use the exact value that was stashed earlier by calling sizeForItem:, referenceSizeFor*, etc.
-      // Although the node would use the preferredSize in layoutThatFits, we can skip this because there's no constrainedSize.
-      return wrapperNode.style.preferredSize;
+      // In this case, it is possible the model indexPath for this element will be nil. Attempt to convert it,
+      // and call out to the delegate directly. If it has been deleted from the model, the size returned will be the layout's default.
+      NSIndexPath *indexPath = [_dataController.visibleMap indexPathForElement:element];
+      return [self _sizeForUIKitCellWithKind:element.supplementaryElementKind atIndexPath:indexPath];
     }
   } else {
     return [node layoutThatFits:element.constrainedSize].size;
@@ -786,37 +791,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return visibleNodes;
 }
 
-- (BOOL)usesSynchronousDataLoading
+- (void)invalidateFlowLayoutDelegateMetrics
 {
-  return self.dataController.usesSynchronousDataLoading;
-}
-
-- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
-{
-  self.dataController.usesSynchronousDataLoading = usesSynchronousDataLoading;
-}
-
-- (void)invalidateFlowLayoutDelegateMetrics {
-  for (ASCollectionElement *element in self.dataController.pendingMap) {
-    // This may be either a Supplementary or Item type element.
-    // For UIKit passthrough cells of either type, re-fetch their sizes from the standard UIKit delegate methods.
-    ASCellNode *node = element.node;
-    if (node.shouldUseUIKitCell) {
-      ASWrapperCellNode *wrapperNode = (ASWrapperCellNode *)node;
-      if (wrapperNode.sizeForItemBlock) {
-        continue;
-      }
-      NSIndexPath *indexPath = [_dataController.pendingMap indexPathForElement:element];
-      NSString *kind = [element supplementaryElementKind];
-      CGSize previousSize = node.style.preferredSize;
-      CGSize size = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
-
-      if (!CGSizeEqualToSize(previousSize, size)) {
-        node.style.preferredSize = size;
-        [node invalidateCalculatedLayout];
-      }
-    }
-  }
+  // Subclass hook
 }
 
 #pragma mark Internal
@@ -869,17 +846,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return size;
 }
 
+- (void)_superReloadData:(void(^)())updates completion:(void(^)(BOOL finished))completion
+{
+  if (updates) {
+    updates();
+  }
+  [super reloadData];
+  if (completion) {
+    completion(YES);
+  }
+}
+
 /**
- Performing nested batch updates with super (e.g. resizing a cell node & updating collection view during same frame)
- can cause super to throw data integrity exceptions because it checks the data source counts before
- the update is complete.
- 
- Always call [self _superPerform:] rather than [super performBatch:] so that we can keep our `superPerformingBatchUpdates` flag updated.
+ * Performing nested batch updates with super (e.g. resizing a cell node & updating collection view
+ * during same frame) can cause super to throw data integrity exceptions because it checks the data
+ * source counts before the update is complete.
+ *
+ * Always call [self _superPerform:] rather than [super performBatch:] so that we can keep our
+ * `superPerformingBatchUpdates` flag updated.
 */
 - (void)_superPerformBatchUpdates:(void(^)())updates completion:(void(^)(BOOL finished))completion
 {
   ASDisplayNodeAssertMainThread();
-  
+
   _superBatchUpdateCount++;
   [super performBatchUpdates:updates completion:completion];
   _superBatchUpdateCount--;
@@ -1757,7 +1746,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   switch (invalidationStyle) {
     case ASCollectionViewInvalidationStyleWithAnimation:
       if (0 == _superBatchUpdateCount) {
-        [self _superPerformBatchUpdates:^{ } completion:nil];
+        if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData)) {
+          [self _superReloadData:nil completion:nil];
+        } else {
+          [self _superPerformBatchUpdates:nil completion:nil];
+        }
       }
       break;
     case ASCollectionViewInvalidationStyleWithoutAnimation:
@@ -1864,6 +1857,41 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 #pragma mark - ASDataControllerSource
 
+- (BOOL)dataController:(ASDataController *)dataController shouldEagerlyLayoutNode:(ASCellNode *)node
+{
+  NSAssert(!ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysLazy),
+           @"ASCellLayoutModeAlwaysLazy flag is no longer supported");
+  return !node.shouldUseUIKitCell;
+}
+
+- (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
+{
+  // If we have AlwaysSync set, block and donate main priority.
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysSync)) {
+    return YES;
+  }
+  // Prioritize AlwaysAsync over the remaining heuristics for the Default mode.
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysAsync)) {
+    return NO;
+  }
+  // The heuristics below apply to the ASCellLayoutModeNone.
+  // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
+  if (changeSet.countForAsyncLayout < 2) {
+    return YES;
+  }
+  CGSize contentSize = self.contentSize;
+  CGSize boundsSize = self.bounds.size;
+  if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
+    return YES;
+  }
+  return NO;
+}
+
+- (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController
+{
+  return ASCellLayoutModeIncludes(ASCellLayoutModeSerializeNodeCreation);
+}
+
 - (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   if (!_asyncDataSourceFlags.nodeModelForItem) {
@@ -1874,7 +1902,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_asyncDataSource collectionNode:collectionNode nodeModelForItemAtIndexPath:indexPath];
 }
 
-- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath shouldAsyncLayout:(BOOL *)shouldAsyncLayout
 {
   ASDisplayNodeAssertMainThread();
   ASCellNodeBlock block = nil;
@@ -1904,22 +1932,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       // or it is an error.
       if (_asyncDataSourceFlags.interop) {
         cell = [[ASWrapperCellNode alloc] init];
-        cell.style.preferredSize = [self _sizeForUIKitCellWithKind:nil atIndexPath:indexPath];
       } else {
         ASDisplayNodeFailAssert(@"ASCollection could not get a node block for item at index path %@: %@, %@. If you are trying to display a UICollectionViewCell, make sure your dataSource conforms to the <ASCollectionDataSourceInterop> protocol!", indexPath, cell, block);
         cell = [[ASCellNode alloc] init];
       }
     }
+
+    // This condition is intended to run for either cells received from the datasource, or created just above.
+    if (cell.shouldUseUIKitCell) {
+      *shouldAsyncLayout = NO;
+    }
   }
 
   // Wrap the node block
+  BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
   __weak __typeof__(self) weakSelf = self;
   return ^{
     __typeof__(self) strongSelf = weakSelf;
     ASCellNode *node = (block ? block() : cell);
     ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]], @"ASCollectionNode provided a non-ASCellNode! %@, %@", node, strongSelf);
-    [node enterHierarchyState:ASHierarchyStateRangeManaged];
-    
+
+    if (!disableRangeController) {
+      [node enterHierarchyState:ASHierarchyStateRangeManaged];
+    }
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;
     }
@@ -2001,7 +2036,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       BOOL useUIKitCell = _asyncDataSourceFlags.interopViewForSupplementaryElement;
       if (useUIKitCell) {
         cell = [[ASWrapperCellNode alloc] init];
-        cell.style.preferredSize = [self _sizeForUIKitCellWithKind:kind atIndexPath:indexPath];
       } else {
         cell = [[ASCellNode alloc] init];
       }
@@ -2113,6 +2147,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 #pragma mark - ASRangeControllerDelegate
 
+- (BOOL)rangeControllerShouldUpdateRanges:(ASRangeController *)rangeController
+{
+  return !ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
+}
+
 - (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
@@ -2144,14 +2183,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     if (changeSet.includesReloadData) {
       _superIsPendingDataLoad = YES;
       updates();
-      [super reloadData];
+      [self _superReloadData:nil completion:nil];
       as_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
     } else {
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
       
       __block NSUInteger numberOfUpdates = 0;
-      id completion = ^(BOOL finished){
+      let completion = ^(BOOL finished) {
         as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
         as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
@@ -2160,39 +2199,52 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         [changeSet executeCompletionHandlerWithFinished:finished];
       };
 
-      [self _superPerformBatchUpdates:^{
-        updates();
+      BOOL shouldReloadData = ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData);
+      // TODO: Consider adding !changeSet.isEmpty as a check to also disable shouldReloadData.
+      if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysBatchUpdateSectionReload) &&
+          [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload].count > 0) {
+        shouldReloadData = NO;
+      }
 
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
-          [super reloadItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload]) {
-          [super reloadSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
-          [super deleteItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
-          [super deleteSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
-          [super insertSections:change.indexSet];
-          numberOfUpdates++;
-        }
-        
-        for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
-          [super insertItemsAtIndexPaths:change.indexPaths];
-          numberOfUpdates++;
-        }
-      } completion:completion];
+      if (shouldReloadData) {
+        // When doing a reloadData, the insert / delete calls are not necessary.
+        // Calling updates() is enough, as it commits .pendingMap to .visibleMap.
+        [self _superReloadData:updates completion:completion];
+      } else {
+        [self _superPerformBatchUpdates:^{
+          updates();
+
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeReload]) {
+            [super reloadItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeReload]) {
+            [super reloadSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
+            [super deleteItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalDelete]) {
+            [super deleteSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
+            [super insertSections:change.indexSet];
+            numberOfUpdates++;
+          }
+
+          for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeOriginalInsert]) {
+            [super insertItemsAtIndexPaths:change.indexPaths];
+            numberOfUpdates++;
+          }
+        } completion:completion];
+      }
 
       as_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);
       

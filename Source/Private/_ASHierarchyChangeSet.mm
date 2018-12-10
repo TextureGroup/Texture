@@ -119,6 +119,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 @end
 
 @implementation _ASHierarchyChangeSet {
+  NSUInteger _countForAsyncLayout;
   std::vector<NSInteger> _oldItemCounts;
   std::vector<NSInteger> _newItemCounts;
   void (^_completionHandler)(BOOL finished);
@@ -127,6 +128,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 @synthesize reverseSectionMapping = _reverseSectionMapping;
 @synthesize itemMappings = _itemMappings;
 @synthesize reverseItemMappings = _reverseItemMappings;
+@synthesize countForAsyncLayout = _countForAsyncLayout;
 
 - (instancetype)init
 {
