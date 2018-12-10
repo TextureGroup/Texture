@@ -42,7 +42,7 @@
 @property (nonatomic) BOOL allowsSelection; // default is YES
 @property (nonatomic) BOOL allowsMultipleSelection; // default is NO
 @property (nonatomic) BOOL inverted; //default is NO
-@property (nonatomic) BOOL usesSynchronousDataLoading;
+@property (nonatomic) ASCellLayoutMode cellLayoutMode;
 @property (nonatomic) CGFloat leadingScreensForBatching;
 @property (nonatomic, weak) id <ASCollectionViewLayoutInspecting> layoutInspector;
 @property (nonatomic) BOOL alwaysBounceVertical;
@@ -193,7 +193,7 @@
     view.inverted                       = pendingState.inverted;
     view.allowsSelection                = pendingState.allowsSelection;
     view.allowsMultipleSelection        = pendingState.allowsMultipleSelection;
-    view.usesSynchronousDataLoading     = pendingState.usesSynchronousDataLoading;
+    view.cellLayoutMode                 = pendingState.cellLayoutMode;
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
@@ -628,21 +628,21 @@
   return _batchFetchingDelegate;
 }
 
-- (BOOL)usesSynchronousDataLoading
+- (ASCellLayoutMode)cellLayoutMode
 {
   if ([self pendingState]) {
-    return _pendingState.usesSynchronousDataLoading; 
+    return _pendingState.cellLayoutMode;
   } else {
-    return self.view.usesSynchronousDataLoading;
+    return self.view.cellLayoutMode;
   }
 }
 
-- (void)setUsesSynchronousDataLoading:(BOOL)usesSynchronousDataLoading
+- (void)setCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
 {
   if ([self pendingState]) {
-    _pendingState.usesSynchronousDataLoading = usesSynchronousDataLoading; 
+    _pendingState.cellLayoutMode = cellLayoutMode;
   } else {
-    self.view.usesSynchronousDataLoading = usesSynchronousDataLoading;
+    self.view.cellLayoutMode = cellLayoutMode;
   }
 }
 

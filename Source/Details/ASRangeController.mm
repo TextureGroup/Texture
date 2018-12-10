@@ -208,7 +208,11 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (!_layoutController || !_dataSource) {
     return;
   }
-  
+
+  if (![_delegate rangeControllerShouldUpdateRanges:self]) {
+    return;
+  }
+
 #if AS_RANGECONTROLLER_LOG_UPDATE_FREQ
   _updateCountThisFrame += 1;
 #endif
