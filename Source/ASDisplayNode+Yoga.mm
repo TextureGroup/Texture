@@ -328,8 +328,7 @@
 }
 
 - (NSString *)_yogaTreeDescription:(NSString *)indent {
-  NSMutableString *subtree = [[[indent stringByAppendingString:self.description]
-                               stringByAppendingString:@"\n"] mutableCopy];
+  auto subtree = [NSMutableString stringWithFormat:@"%@%@\n", indent, self.description];
   for (ASDisplayNode *n in self.yogaChildren) {
     [subtree appendString:[n _yogaTreeDescription:[indent stringByAppendingString:@"| "]]];
   }
