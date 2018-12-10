@@ -210,6 +210,12 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 @end
 
+@interface ASDisplayNode (YogaDebugging)
+
+- (NSString *)yogaTreeDescription;
+
+@end
+
 @interface ASLayoutElementStyle (Yoga)
 
 - (YGNodeRef)yogaNodeCreateIfNeeded;
