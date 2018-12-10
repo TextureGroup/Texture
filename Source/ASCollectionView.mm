@@ -2049,7 +2049,22 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     block = ^{ return cell; };
   }
 
-  return block;
+  // Wrap the node block
+  __weak __typeof__(self) weakSelf = self;
+  return ^{
+    __typeof__(self) strongSelf = weakSelf;
+    ASCellNode *node = block();
+    ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]],
+                        @"ASCollectionNode provided a non-ASCellNode! %@, %@", node, strongSelf);
+
+    if (node.interactionDelegate == nil) {
+      node.interactionDelegate = strongSelf;
+    }
+    if (strongSelf.inverted) {
+      node.transform = CATransform3DMakeScale(1, -1, 1);
+    }
+    return node;
+  };
 }
 
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
