@@ -163,6 +163,7 @@
     view.allowsSelectionDuringEditing         = pendingState.allowsSelectionDuringEditing;
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
+    view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
 
     UIEdgeInsets contentInset = pendingState.contentInset;
     if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
