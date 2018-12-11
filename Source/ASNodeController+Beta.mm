@@ -43,7 +43,7 @@
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
 {
-  ASLockScopeSelf();
+  ASDN::MutexLocker l(_nodeLock);
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
