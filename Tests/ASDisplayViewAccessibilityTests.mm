@@ -15,8 +15,8 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode.h>
-#import "ASConfiguration.h"
-#import "ASConfigurationInternal.h"
+#import <AsyncDisplayKit/ASConfiguration.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 @interface ASDisplayViewAccessibilityTests : XCTestCase
 @end

@@ -7,11 +7,13 @@
 //
 
 #import <XCTest/XCTest.h>
+
+#import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASConfiguration.h>
+#import <AsyncDisplayKit/ASConfigurationDelegate.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
+
 #import "ASTestCase.h"
-#import "ASAvailability.h"
-#import "ASConfiguration.h"
-#import "ASConfigurationDelegate.h"
-#import "ASConfigurationInternal.h"
 
 static ASExperimentalFeatures features[] = {
   ASExperimentalGraphicsContexts,
