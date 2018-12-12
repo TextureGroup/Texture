@@ -801,7 +801,7 @@
 - (void)testAutomaticallyAdjustingContentOffset
 {
   ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
-  node.view.automaticallyAdjustsContentOffset = YES;
+  node.automaticallyAdjustsContentOffset = YES;
   node.bounds = CGRectMake(0, 0, 100, 100);
   ASTableViewFilledDataSource *ds = [[ASTableViewFilledDataSource alloc] init];
   node.dataSource = ds;
