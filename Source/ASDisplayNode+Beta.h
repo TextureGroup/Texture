@@ -189,7 +189,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 @interface ASDisplayNode (Yoga)
 
 // TODO: Make this and yogaCalculatedLayout atomic (lock).
-@property (nullable, nonatomic) NSArray *yogaChildren;
+@property (nonatomic, copy) NSArray *yogaChildren;
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;

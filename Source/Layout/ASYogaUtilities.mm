@@ -49,7 +49,9 @@ void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)
     return;
   }
   block(node);
-  for (ASDisplayNode *child in [node yogaChildren]) {
+  // We use the accessor here despite the copy, because the block may modify the yoga tree e.g.
+  // replacing a node.
+  for (ASDisplayNode *child in node.yogaChildren) {
     ASDisplayNodePerformBlockOnEveryYogaChild(child, block);
   }
 }

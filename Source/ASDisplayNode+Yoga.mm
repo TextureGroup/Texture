@@ -58,7 +58,7 @@
 
 - (NSArray *)yogaChildren
 {
-  return _yogaChildren;
+  return [_yogaChildren copy] ?: @[];
 }
 
 - (void)addYogaChild:(ASDisplayNode *)child
@@ -168,8 +168,9 @@
 
   YGNodeRef yogaNode = self.style.yogaNode;
   uint32_t childCount = YGNodeGetChildCount(yogaNode);
-  ASDisplayNodeAssert(childCount == self.yogaChildren.count,
-                      @"Yoga tree should always be in sync with .yogaNodes array! %@", self.yogaChildren);
+  ASDisplayNodeAssert(childCount == _yogaChildren.count,
+                      @"Yoga tree should always be in sync with .yogaNodes array! %@",
+                      _yogaChildren);
 
   ASLayout *rawSublayouts[childCount];
   int i = 0;
