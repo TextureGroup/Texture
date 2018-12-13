@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 
 #import <AsyncDisplayKit/ASControlNode.h>
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNodeCommon.h>
 
 #if (!AS_ENABLE_TEXTNODE)
