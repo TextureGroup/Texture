@@ -581,15 +581,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   ASDisplayNodeAssertMainThread();
 
-  if (_asyncDataSource == nil && _asyncDelegate == nil) {
-    if (ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
-      if (_isDeallocating) {
-        [_dataController clearData];          
-      }
-    } else {
-      [_dataController clearData];
-    }
-  }  
+  if (_asyncDataSource == nil && _asyncDelegate == nil && _isDeallocating
+      && ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
+    [_dataController clearData];
+  }
 }
 
 - (void)setCollectionViewLayout:(nonnull UICollectionViewLayout *)collectionViewLayout
