@@ -581,12 +581,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   ASDisplayNodeAssertMainThread();
 
-  if (_asyncDataSource == nil && _asyncDelegate == nil
-      && ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
-    if (_isDeallocating) {
-      [_dataController clearData];
+  if (_asyncDataSource == nil && _asyncDelegate == nil) {
+    if (ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
+      if (_isDeallocating) {
+        [_dataController clearData];
+      }
+      // We may want to test other cases in which clear data is needed.
     }
-    // We may want to test other cases in which clear data is needed.
   }
 }
 
