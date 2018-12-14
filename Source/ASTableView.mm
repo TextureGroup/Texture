@@ -514,9 +514,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   ASDisplayNodeAssertMainThread();
  
-  if (_asyncDataSource == nil && _asyncDelegate == nil && _isDeallocating
+  if (_asyncDataSource == nil && _asyncDelegate == nil
       && ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
-    [_dataController clearData];
+    if (_isDeallocating) {
+      [_dataController clearData];
+    }
+    // We may want to test other cases in which clear data is needed.
   }
 }
 
