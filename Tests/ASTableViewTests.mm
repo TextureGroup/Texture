@@ -8,6 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <JGMethodSwizzler/JGMethodSwizzler.h>
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableView.h>
@@ -16,9 +17,9 @@
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
-#import <JGMethodSwizzler/JGMethodSwizzler.h>
-#import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import "ASXCTExtensions.h"
 
 #define NumberOfSections 10
 #define NumberOfReloadIterations 50

@@ -8,13 +8,13 @@
 
 #import <CoreText/CoreText.h>
 
-#import "ASTestCase.h"
+#import <XCTest/XCTest.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 
-#import <XCTest/XCTest.h>
+#import "ASTestCase.h"
 
 @interface ASTextNode2Tests : XCTestCase
 

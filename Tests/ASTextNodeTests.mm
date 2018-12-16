@@ -9,17 +9,17 @@
 
 #import <CoreText/CoreText.h>
 
-#import "ASTestCase.h"
-
+#import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
-
-#import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+
+#import "ASTestCase.h"
+
 
 
 @interface ASTextNodeTestDelegate : NSObject <ASTextNodeDelegate>
