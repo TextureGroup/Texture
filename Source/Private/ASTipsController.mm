@@ -47,11 +47,7 @@
 
 + (ASTipsController *)shared
 {
-  static ASTipsController *ctrl;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    ctrl = [[ASTipsController alloc] init];
-  });
+  static ASTipsController *ctrl = [[ASTipsController alloc] init];
   return ctrl;
 }
 

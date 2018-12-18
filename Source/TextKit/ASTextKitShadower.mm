@@ -42,11 +42,7 @@ static inline UIEdgeInsets _invertInsets(UIEdgeInsets insets)
   /**
    * For all cases where no shadow is drawn, we share this singleton shadower to save resources.
    */
-  static dispatch_once_t onceToken;
-  static ASTextKitShadower *sharedNonShadower;
-  dispatch_once(&onceToken, ^{
-    sharedNonShadower = [[ASTextKitShadower alloc] initWithShadowOffset:CGSizeZero shadowColor:nil shadowOpacity:0 shadowRadius:0];
-  });
+  static ASTextKitShadower *sharedNonShadower = [[ASTextKitShadower alloc] initWithShadowOffset:CGSizeZero shadowColor:nil shadowOpacity:0 shadowRadius:0];
 
   BOOL hasShadow = shadowOpacity > 0 && (shadowRadius > 0 || CGSizeEqualToSize(shadowOffset, CGSizeZero) == NO) && CGColorGetAlpha(shadowColor.CGColor) > 0;
   if (hasShadow == NO) {

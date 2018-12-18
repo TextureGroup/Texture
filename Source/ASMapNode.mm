@@ -264,11 +264,7 @@
 
 + (UIImage *)defaultPinImageWithCenterOffset:(CGPoint *)centerOffset NS_RETURNS_RETAINED
 {
-  static MKAnnotationView *pin;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pin = [[MKPinAnnotationView alloc] initWithAnnotation:nil reuseIdentifier:@""];
-  });
+  static MKAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:nil reuseIdentifier:@""];
   *centerOffset = pin.centerOffset;
   return pin.image;
 }

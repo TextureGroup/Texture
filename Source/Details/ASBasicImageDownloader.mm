@@ -41,11 +41,7 @@ static NSMutableDictionary *currentRequests = nil;
 
 + (ASDN::Mutex *)currentRequestLock
 {
-  static dispatch_once_t onceToken;
-  static ASDN::Mutex *currentRequestsLock;
-  dispatch_once(&onceToken, ^{
-    currentRequestsLock = new ASDN::Mutex();
-  });
+  static ASDN::Mutex *currentRequestsLock = new ASDN::Mutex();
   return currentRequestsLock;
 }
 
@@ -208,11 +204,7 @@ static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext
 
 + (ASBasicImageDownloader *)sharedImageDownloader
 {
-  static ASBasicImageDownloader *sharedImageDownloader = nil;
-  static dispatch_once_t once = 0;
-  dispatch_once(&once, ^{
-    sharedImageDownloader = [[ASBasicImageDownloader alloc] _init];
-  });
+  static ASBasicImageDownloader *sharedImageDownloader = [[ASBasicImageDownloader alloc] _init];
   return sharedImageDownloader;
 }
 

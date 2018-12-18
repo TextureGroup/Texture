@@ -1191,17 +1191,13 @@ style. _attr_ = _attr_; \
 }
 
 + (NSArray *)as_allDiscontinuousAttributeKeys {
-  static NSArray *keys;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    keys = @[(id)kCTSuperscriptAttributeName,
-             (id)kCTRunDelegateAttributeName,
-             ASTextBackedStringAttributeName,
-             ASTextBindingAttributeName,
-             ASTextAttachmentAttributeName,
-             (id)kCTRubyAnnotationAttributeName,
-             NSAttachmentAttributeName];
-  });
+  static NSArray *keys = @[(id)kCTSuperscriptAttributeName,
+                           (id)kCTRunDelegateAttributeName,
+                           ASTextBackedStringAttributeName,
+                           ASTextBindingAttributeName,
+                           ASTextAttachmentAttributeName,
+                           (id)kCTRubyAnnotationAttributeName,
+                           NSAttachmentAttributeName];
   return keys;
 }
 

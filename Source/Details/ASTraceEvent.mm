@@ -23,12 +23,8 @@ static NSString *const ASTraceEventThreadDescriptionKey = @"ASThreadTraceEventDe
 {
   self = [super init];
   if (self != nil) {
-    static NSTimeInterval refTime;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-      refTime = CACurrentMediaTime();
-    });
-    
+    static NSTimeInterval refTime = CACurrentMediaTime();
+
     // Create the format string passed to us.
     _message = [[NSString alloc] initWithFormat:format arguments:args];
 	  

@@ -24,11 +24,7 @@
 /// Return CFTypeRef to avoid retain/release on this singleton.
 + (CFTypeRef)sharedInstance
 {
-  static CFTypeRef inst;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    inst = (__bridge_retained CFTypeRef)[[ASConfigurationManager alloc] init];
-  });
+  static CFTypeRef inst = (__bridge_retained CFTypeRef)[[ASConfigurationManager alloc] init];
   return inst;
 }
 

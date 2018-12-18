@@ -2322,13 +2322,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     // If we think we're going to animate, check if this node will prevent it.
     if (invalidationStyle == ASCollectionViewInvalidationStyleWithAnimation) {
       // TODO: Incorporate `shouldAnimateSizeChanges` into ASEnvironmentState for performance benefit.
-      static dispatch_once_t onceToken;
-      static BOOL (^shouldNotAnimateBlock)(ASDisplayNode *);
-      dispatch_once(&onceToken, ^{
-        shouldNotAnimateBlock = ^BOOL(ASDisplayNode * _Nonnull node) {
-          return (node.shouldAnimateSizeChanges == NO);
-        };
-      });
+      static BOOL (^shouldNotAnimateBlock)(ASDisplayNode *) = ^BOOL(ASDisplayNode * _Nonnull node) {
+        return (node.shouldAnimateSizeChanges == NO);
+      };
       if (ASDisplayNodeFindFirstNode(node, shouldNotAnimateBlock) != nil) {
         // One single non-animated node causes the whole layout update to be non-animated
         invalidationStyle = ASCollectionViewInvalidationStyleWithoutAnimation;

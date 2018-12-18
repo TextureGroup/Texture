@@ -65,11 +65,7 @@
  */
 + (NSValue * _Nonnull)_ivarsThatMayNeedMainDeallocation NS_RETURNS_RETAINED
 {
-  static NSCache<Class, NSValue *> *ivarsCache;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    ivarsCache = [[NSCache alloc] init];
-  });
+  static NSCache<Class, NSValue *> *ivarsCache = [[NSCache alloc] init];
   
   NSValue *result = [ivarsCache objectForKey:self];
   if (result != nil) {

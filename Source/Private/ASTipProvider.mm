@@ -30,11 +30,7 @@
 
 + (NSArray<ASTipProvider *> *)all
 {
-  static NSArray<ASTipProvider *> *providers;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    providers = @[ [ASLayerBackingTipProvider new] ];
-  });
+  static NSArray<ASTipProvider *> *providers = @[ [ASLayerBackingTipProvider new] ];
   return providers;
 }
 

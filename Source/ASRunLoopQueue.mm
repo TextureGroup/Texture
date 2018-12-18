@@ -38,11 +38,7 @@ static void runLoopSourceCallback(void *info) {
 
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
-  static ASDeallocQueue *deallocQueue = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    deallocQueue = [[ASDeallocQueue alloc] init];
-  });
+  static ASDeallocQueue *deallocQueue = [[ASDeallocQueue alloc] init];
   return deallocQueue;
 }
 
@@ -344,11 +340,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
 
 + (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED
 {
-  static dispatch_once_t onceToken;
-  static ASCATransactionQueue *sharedQueue;
-  dispatch_once(&onceToken, ^{
-    sharedQueue = [[ASCATransactionQueue alloc] init];
-  });
+  static ASCATransactionQueue *sharedQueue = [[ASCATransactionQueue alloc] init];
   return sharedQueue;
 }
 

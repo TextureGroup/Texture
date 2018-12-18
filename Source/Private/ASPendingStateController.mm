@@ -40,10 +40,7 @@
 + (ASPendingStateController *)sharedInstance
 {
   static dispatch_once_t onceToken;
-  static ASPendingStateController *controller = nil;
-  dispatch_once(&onceToken, ^{
-    controller = [[ASPendingStateController alloc] init];
-  });
+  static ASPendingStateController *controller = [[ASPendingStateController alloc] init];
   return controller;
 }
 

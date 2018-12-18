@@ -28,11 +28,7 @@
  */
 + (NSCache<ASEventLog *, NSMutableArray<ASTraceEvent *> *> *)contentsCache
 {
-  static NSCache *cache;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cache = [[NSCache alloc] init];
-  });
+  static NSCache *cache = [[NSCache alloc] init];
   return cache;
 }
 

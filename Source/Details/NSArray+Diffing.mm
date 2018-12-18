@@ -159,18 +159,11 @@ typedef BOOL (^compareBlock)(id _Nonnull lhs, id _Nonnull rhs);
   return common;
 }
 
-static compareBlock defaultCompare = nil;
-
 + (compareBlock)defaultCompareBlock
 {
-  static dispatch_once_t onceToken;
-
-  dispatch_once(&onceToken, ^{
-    defaultCompare = ^BOOL(id lhs, id rhs) {
-      return [lhs isEqual:rhs];
-    };
-  });
-
+  static compareBlock defaultCompare = ^BOOL(id lhs, id rhs) {
+    return [lhs isEqual:rhs];
+  };
   return defaultCompare;
 }
 

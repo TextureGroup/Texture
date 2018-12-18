@@ -53,12 +53,7 @@ NSCharacterSet *ASTextVerticalFormRotateCharacterSet() {
 }
 
 NSCharacterSet *ASTextVerticalFormRotateAndMoveCharacterSet() {
-  static NSMutableCharacterSet *set;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    set = [NSMutableCharacterSet new];
-    [set addCharactersInString:@"，。、．"];
-  });
+  static NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@"，。、．"];
   return set;
 }
 

@@ -19,23 +19,19 @@
 #pragma mark - Public
 BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attributeName)
 {
-  static NSSet *coreTextAttributes;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    coreTextAttributes = [NSSet setWithObjects:(__bridge id)kCTForegroundColorAttributeName,
-                          kCTForegroundColorFromContextAttributeName,
-                          kCTForegroundColorAttributeName,
-                          kCTStrokeColorAttributeName,
-                          kCTUnderlineStyleAttributeName,
-                          kCTVerticalFormsAttributeName,
-                          kCTRunDelegateAttributeName,
-                          kCTBaselineClassAttributeName,
-                          kCTBaselineInfoAttributeName,
-                          kCTBaselineReferenceInfoAttributeName,
-                          kCTUnderlineColorAttributeName,
-                          kCTParagraphStyleAttributeName,
-                          nil];
-  });
+  static NSSet *coreTextAttributes = [NSSet setWithObjects:(__bridge id)kCTForegroundColorAttributeName,
+                                      kCTForegroundColorFromContextAttributeName,
+                                      kCTForegroundColorAttributeName,
+                                      kCTStrokeColorAttributeName,
+                                      kCTUnderlineStyleAttributeName,
+                                      kCTVerticalFormsAttributeName,
+                                      kCTRunDelegateAttributeName,
+                                      kCTBaselineClassAttributeName,
+                                      kCTBaselineInfoAttributeName,
+                                      kCTBaselineReferenceInfoAttributeName,
+                                      kCTUnderlineColorAttributeName,
+                                      kCTParagraphStyleAttributeName,
+                                      nil];
   return [coreTextAttributes containsObject:attributeName];
 }
 

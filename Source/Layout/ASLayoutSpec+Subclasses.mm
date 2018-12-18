@@ -23,11 +23,7 @@
 
 + (ASNullLayoutSpec *)null
 {
-  static ASNullLayoutSpec *sharedNullLayoutSpec = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sharedNullLayoutSpec = [[self alloc] init];
-  });
+  static ASNullLayoutSpec *sharedNullLayoutSpec = [[self alloc] init];
   return sharedNullLayoutSpec;
 }
 

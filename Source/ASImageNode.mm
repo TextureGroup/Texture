@@ -436,11 +436,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  static dispatch_once_t onceToken;
-  static ASDN::Mutex *cacheLock = nil;
-  dispatch_once(&onceToken, ^{
-    cacheLock = new ASDN::Mutex();
-  });
+  static ASDN::Mutex *cacheLock = new ASDN::Mutex();
   
   {
     ASDN::MutexLocker l(*cacheLock);

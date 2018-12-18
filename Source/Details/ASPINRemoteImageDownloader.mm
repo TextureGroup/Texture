@@ -182,11 +182,7 @@ static dispatch_once_t shared_init_predicate;
 
 - (BOOL)sharedImageManagerSupportsMemoryRemoval
 {
-  static BOOL sharedImageManagerSupportsMemoryRemoval = NO;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sharedImageManagerSupportsMemoryRemoval = [[[self sharedPINRemoteImageManager] cache] respondsToSelector:@selector(removeObjectForKeyFromMemory:)];
-  });
+  static BOOL sharedImageManagerSupportsMemoryRemoval = [[[self sharedPINRemoteImageManager] cache] respondsToSelector:@selector(removeObjectForKeyFromMemory:)];
   return sharedImageManagerSupportsMemoryRemoval;
 }
 

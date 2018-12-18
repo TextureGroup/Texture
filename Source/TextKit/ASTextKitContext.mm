@@ -34,11 +34,7 @@
 
 {
   if (self = [super init]) {
-    static dispatch_once_t onceToken;
-    static ASDN::Mutex *mutex;
-    dispatch_once(&onceToken, ^{
-      mutex = new ASDN::Mutex();
-    });
+    static ASDN::Mutex *mutex = new ASDN::Mutex();
     
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
     ASDN::MutexLocker l(*mutex);

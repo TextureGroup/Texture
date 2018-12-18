@@ -1695,11 +1695,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
     if (visible) {
       for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
         if (_clipCornerLayers[idx] == nil) {
-          static ASDisplayNodeCornerLayerDelegate *clipCornerLayers;
-          static dispatch_once_t onceToken;
-          dispatch_once(&onceToken, ^{
-            clipCornerLayers = [[ASDisplayNodeCornerLayerDelegate alloc] init];
-          });
+          static ASDisplayNodeCornerLayerDelegate *clipCornerLayers = [[ASDisplayNodeCornerLayerDelegate alloc] init];
           _clipCornerLayers[idx] = [[CALayer alloc] init];
           _clipCornerLayers[idx].zPosition = 99999;
           _clipCornerLayers[idx].delegate = clipCornerLayers;

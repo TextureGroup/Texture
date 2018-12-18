@@ -151,11 +151,7 @@
 #endif
 
 #define ASCreateOnce(expr) ({ \
-  static dispatch_once_t onceToken; \
-  static __typeof__(expr) staticVar; \
-  dispatch_once(&onceToken, ^{ \
-    staticVar = expr; \
-  }); \
+  static __typeof__(expr) staticVar = expr; \
   staticVar; \
 })
 

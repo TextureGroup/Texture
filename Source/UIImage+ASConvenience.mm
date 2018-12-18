@@ -18,14 +18,10 @@
 
 UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollection) NS_RETURNS_RETAINED
 {
-  static NSCache *imageCache = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    // Because NSCache responds to memory warnings, we do not need an explicit limit.
-    // all of these objects contain compressed image data and are relatively small
-    // compared to the backing stores of text and image views.
-    imageCache = [[NSCache alloc] init];
-  });
+  // Because NSCache responds to memory warnings, we do not need an explicit limit.
+  // all of these objects contain compressed image data and are relatively small
+  // compared to the backing stores of text and image views.
+  static NSCache *imageCache = [[NSCache alloc] init];
 
   UIImage *image = nil;
   if ([imageName length] > 0) {

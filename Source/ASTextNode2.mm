@@ -54,13 +54,8 @@
  * NOTE: Be careful to copy `text` if needed.
  */
 static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainerAndText(ASTextContainer *container, NSAttributedString *text)  {
-  static dispatch_once_t onceToken;
-  static ASDN::Mutex *layoutCacheLock;
-  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
-  dispatch_once(&onceToken, ^{
-    layoutCacheLock = new ASDN::Mutex();
-    textLayoutCache = [[NSCache alloc] init];
-  });
+  static ASDN::Mutex *layoutCacheLock = new ASDN::Mutex();
+  static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache = [[NSCache alloc] init];
 
   layoutCacheLock->lock();
 
@@ -1071,11 +1066,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 static NSAttributedString *DefaultTruncationAttributedString()
 {
-  static NSAttributedString *defaultTruncationAttributedString;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
-  });
+  static NSAttributedString *defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
   return defaultTruncationAttributedString;
 }
 
@@ -1272,13 +1263,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
 + (void)_registerAttributedText:(NSAttributedString *)str
 {
-  static NSMutableArray *array;
-  static NSLock *lock;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    lock = [NSLock new];
-    array = [NSMutableArray new];
-  });
+  static NSMutableArray *array = [NSMutableArray new];
+  static NSLock *lock = [NSLock new];
   [lock lock];
   [array addObject:str];
   if (array.count % 20 == 0) {

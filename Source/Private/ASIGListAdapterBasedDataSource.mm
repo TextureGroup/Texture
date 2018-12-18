@@ -313,11 +313,7 @@ typedef struct {
 
 + (ASSupplementarySourceOverrides)overridesForSupplementarySourceClass:(Class)c
 {
-  static NSCache<Class, NSValue *> *cache;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cache = [[NSCache alloc] init];
-  });
+  static NSCache<Class, NSValue *> *cache = [[NSCache alloc] init];
   NSValue *obj = [cache objectForKey:c];
   ASSupplementarySourceOverrides o;
   if (obj == nil) {
@@ -332,11 +328,7 @@ typedef struct {
 
 + (ASSectionControllerOverrides)overridesForSectionControllerClass:(Class)c
 {
-  static NSCache<Class, NSValue *> *cache;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cache = [[NSCache alloc] init];
-  });
+  static NSCache<Class, NSValue *> *cache = [[NSCache alloc] init];
   NSValue *obj = [cache objectForKey:c];
   ASSectionControllerOverrides o;
   if (obj == nil) {

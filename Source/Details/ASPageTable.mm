@@ -77,32 +77,19 @@ NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize c
 
 + (instancetype)pageTableWithValuePointerFunctions:(NSPointerFunctions *)valueFuncs NS_RETURNS_RETAINED
 {
-  static NSPointerFunctions *pageCoordinatesFuncs;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    pageCoordinatesFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsIntegerPersonality | NSPointerFunctionsOpaqueMemory];
-  });
-  
+  static NSPointerFunctions *pageCoordinatesFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsIntegerPersonality | NSPointerFunctionsOpaqueMemory];
   return [[NSMapTable alloc] initWithKeyPointerFunctions:pageCoordinatesFuncs valuePointerFunctions:valueFuncs capacity:0];
 }
 
 + (ASPageTable *)pageTableForStrongObjectPointers NS_RETURNS_RETAINED
 {
-  static NSPointerFunctions *strongObjectPointerFuncs;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    strongObjectPointerFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsStrongMemory];
-  });
+  static NSPointerFunctions *strongObjectPointerFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsStrongMemory];
   return [self pageTableWithValuePointerFunctions:strongObjectPointerFuncs];
 }
 
 + (ASPageTable *)pageTableForWeakObjectPointers NS_RETURNS_RETAINED
 {
-  static NSPointerFunctions *weakObjectPointerFuncs;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    weakObjectPointerFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsWeakMemory];
-  });
+  static NSPointerFunctions *weakObjectPointerFuncs = [NSPointerFunctions pointerFunctionsWithOptions:NSPointerFunctionsWeakMemory];
   return [self pageTableWithValuePointerFunctions:weakObjectPointerFuncs];
 }
 

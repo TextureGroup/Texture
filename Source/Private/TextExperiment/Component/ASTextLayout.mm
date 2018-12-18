@@ -45,11 +45,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
  attribute in iOS7. This should be a bug of CoreText, and may cause crash. Here's a workaround.
  */
 static CGColorRef ASTextGetCGColor(CGColorRef color) {
-  static UIColor *defaultColor;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    defaultColor = [UIColor blackColor];
-  });
+  static UIColor *defaultColor = [UIColor blackColor];
   if (!color) return defaultColor.CGColor;
   if ([((__bridge NSObject *)color) respondsToSelector:@selector(CGColor)]) {
     return ((__bridge UIColor *)color).CGColor;

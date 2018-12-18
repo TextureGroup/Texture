@@ -47,11 +47,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #define UITABLEVIEW_RESPONDS_TO_SELECTOR() \
   ({ \
-    static BOOL superResponds; \
-    static dispatch_once_t onceToken; \
-    dispatch_once(&onceToken, ^{ \
-      superResponds = [UITableView instancesRespondToSelector:_cmd]; \
-    }); \
+    static BOOL superResponds = [UITableView instancesRespondToSelector:_cmd]; \
     superResponds; \
   })
 

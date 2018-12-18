@@ -39,21 +39,17 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
-  static SortAccessibilityElementsComparator comparator = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-      comparator = ^NSComparisonResult(id<ASAccessibilityElementPositioning> a, id<ASAccessibilityElementPositioning> b) {
-        CGPoint originA = a.accessibilityFrame.origin;
-        CGPoint originB = b.accessibilityFrame.origin;
-        if (originA.y == originB.y) {
-          if (originA.x == originB.x) {
-            return NSOrderedSame;
-          }
-          return (originA.x < originB.x) ? NSOrderedAscending : NSOrderedDescending;
-        }
-        return (originA.y < originB.y) ? NSOrderedAscending : NSOrderedDescending;
-      };
-  });
+  static SortAccessibilityElementsComparator comparator = ^NSComparisonResult(id<ASAccessibilityElementPositioning> a, id<ASAccessibilityElementPositioning> b) {
+    CGPoint originA = a.accessibilityFrame.origin;
+    CGPoint originB = b.accessibilityFrame.origin;
+    if (originA.y == originB.y) {
+      if (originA.x == originB.x) {
+        return NSOrderedSame;
+      }
+      return (originA.x < originB.x) ? NSOrderedAscending : NSOrderedDescending;
+    }
+    return (originA.y < originB.y) ? NSOrderedAscending : NSOrderedDescending;
+  };
   [elements sortUsingComparator:comparator];
 }
 

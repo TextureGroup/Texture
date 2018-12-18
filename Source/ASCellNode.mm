@@ -276,11 +276,7 @@
 
 + (BOOL)requestsVisibilityNotifications
 {
-  static NSCache<Class, NSNumber *> *cache;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    cache = [[NSCache alloc] init];
-  });
+  static NSCache<Class, NSNumber *> *cache = [[NSCache alloc] init];
   NSNumber *result = [cache objectForKey:self];
   if (result == nil) {
     BOOL overrides = ASSubclassOverridesSelector([ASCellNode class], self, @selector(cellNodeVisibilityEvent:inScrollView:withCellFrame:));

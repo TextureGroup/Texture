@@ -1168,11 +1168,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 static NSAttributedString *DefaultTruncationAttributedString()
 {
-  static NSAttributedString *defaultTruncationAttributedString;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
-  });
+  static NSAttributedString *defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
   return defaultTruncationAttributedString;
 }
 
@@ -1344,13 +1340,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
 #if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
 + (void)_registerAttributedText:(NSAttributedString *)str
 {
-  static NSMutableArray *array;
-  static NSLock *lock;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    lock = [NSLock new];
-    array = [NSMutableArray new];
-  });
+  static NSMutableArray *array = [NSMutableArray new];
+  static NSLock *lock = [NSLock new];
   [lock lock];
   [array addObject:str];
   if (array.count % 20 == 0) {
