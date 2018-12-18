@@ -629,6 +629,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
   ++_editingTransactionGroupCount;
   dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
+    if (_delegate.isDeallocating) {
+      as_log_debug(ASCollectionLog(), "Editing queue consumed during dealloc");
+      return;
+    }
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
 
@@ -653,7 +657,15 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     // Step 4: Inform the delegate on main thread
     [_mainSerialQueue performBlockOnMainThread:^{
       as_activity_scope_leave(&preparationScope);
+      if (_delegate.isDeallocating) {
+        as_log_debug(ASCollectionLog(), "datacontroller batchupdate during dealloc");
+        return;
+      }
       [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
+        if (_delegate.isDeallocating) {
+          as_log_debug(ASCollectionLog(), "updateWithChangeSet during dealloc");
+          return;
+        }
         // Step 5: Deploy the new data as "completed"
         //
         // Note that since the backing collection view might be busy responding to user events (e.g scrolling),

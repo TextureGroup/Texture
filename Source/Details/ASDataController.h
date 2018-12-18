@@ -113,6 +113,19 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  */
 - (void)dataController:(ASDataController *)dataController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates;
 
+/**
+ * Communicate to the child whether or not its parent is scheduled for deallocation.
+ *
+ * @discussion This is in response to a hard to reproduce crash where
+ * `performBatchUpdates` is sent on a valid pointer, however the internal UIKit
+ * collection view components such as _UICollectionViewData later reference a nil shared
+ * indexPath store during their many block invokes for a colleciton view update.
+ * This could be attributed the editingQueue still consuming its tasks
+ * while the collection view is being async deallocated. We want to early return
+ * at editing transation block invocation time since we can not destroy queued blocks;
+ */
+- (BOOL)isDeallocating;
+
 @end
 
 @protocol ASDataControllerLayoutDelegate <NSObject>
