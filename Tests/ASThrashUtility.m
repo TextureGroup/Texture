@@ -191,7 +191,7 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 - (instancetype)initCollectionViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data {
   self = [super init];
   if (self != nil) {
-    _data = [[NSArray alloc] initWithArray:data copyItems:YES];
+    _data = data != nil ? [[NSArray alloc] initWithArray:data copyItems:YES] : [[NSArray alloc] init];
     _window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     _collectionView = [[CollectionView alloc] initWithCollectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
     _allNodes = [[ASWeakSet alloc] init];
@@ -207,6 +207,10 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     [_collectionView layoutIfNeeded];
   }
   return self;
+}
+
+- (void)setData:(NSArray<ASThrashTestSection *> *)data {
+  _data = data;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

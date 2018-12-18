@@ -1,5 +1,5 @@
 //
-//  ASTableViewThrashTests.mm
+//  ASCollectionViewThrashTests.mm
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -33,12 +33,14 @@
 }
 
 // NOTE: Despite the documentation, this is not always called if an exception is caught.
-- (void)recordFailureWithDescription:(NSString *)description inFile:(NSString *)filePath atLine:(NSUInteger)lineNumber expected:(BOOL)expected {
+- (void)recordFailureWithDescription:(NSString *)description inFile:(NSString *)filePath atLine:(NSUInteger)lineNumber expected:(BOOL)expected
+{
   _failed = YES;
   [super recordFailureWithDescription:description inFile:filePath atLine:lineNumber expected:expected];
 }
 
-- (void)verifyDataSource:(ASThrashDataSource *)ds {
+- (void)verifyDataSource:(ASThrashDataSource *)ds
+{
   CollectionView *collectionView = ds.collectionView;
   NSArray <ASThrashTestSection *> *data = [ds data];
   for (NSInteger i = 0; i < collectionView.numberOfSections; i++) {
@@ -55,14 +57,15 @@
 
 #pragma mark Test Methods
 
-// Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testInitialDataRead {
+- (void)testInitialDataRead
+{
   ASThrashDataSource *ds = [[ASThrashDataSource alloc] initCollectionViewDataSourceWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
   [self verifyDataSource:ds];
 }
 
 /// Replays the Base64 representation of an ASThrashUpdate from "ASThrashTestRecordedCase" file
-- (void)testRecordedThrashCase {
+- (void)testRecordedThrashCase
+{
   NSURL *caseURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ASThrashTestRecordedCase" withExtension:nil subdirectory:@"TestResources"];
   NSString *base64 = [NSString stringWithContentsOfURL:caseURL encoding:NSUTF8StringEncoding error:NULL];
 
@@ -72,8 +75,6 @@
   }
 
   ASThrashDataSource *ds = [[ASThrashDataSource alloc] initCollectionViewDataSourceWithData:_update.oldData];
-  // why is ds.collectionView.test_enableSuperUpdateCallLogging available on table view but now collection view>?
-//  ds.collectionView.test_enableSuperUpdateCallLogging = YES;
   [self applyUpdateUsingBatchUpdates:_update
                         toDataSource:ds
                             animated:NO
@@ -81,7 +82,8 @@
   [self verifyDataSource:ds];
 }
 
-- (void)testThrashingWildly {
+- (void)testThrashingWildly
+{
   for (NSInteger i = 0; i < kThrashingIterationCount; i++) {
     [self setUp];
     @autoreleasepool {
@@ -102,7 +104,35 @@
   }
 }
 
-- (void)testThrashingWildlyDispatchWildly {
+- (void)testThrashingWildlyOnSameCollectionView
+{
+  XCTestExpectation *expectation = [self expectationWithDescription:@"last test ran"];
+  ASThrashDataSource *ds = [[ASThrashDataSource alloc] initCollectionViewDataSourceWithData:nil];
+  for (NSInteger i = 0; i < 1000; i++) {
+    [self setUp];
+    @autoreleasepool {
+      NSArray *sections = [ASThrashTestSection sectionsWithCount:kInitialSectionCount];
+      _update = [[ASThrashUpdate alloc] initWithData:sections];
+      [ds setData:sections];
+      [ds.collectionView reloadData];
+
+      [self applyUpdateUsingBatchUpdates:_update
+                            toDataSource:ds
+                                animated:NO
+                           useXCTestWait:NO];
+      [self verifyDataSource:ds];
+      if (i == 999) {
+        [expectation fulfill];
+      }
+    }
+
+    [self tearDown];
+  }
+  [self waitForExpectationsWithTimeout:3 handler:nil];
+}
+
+- (void)testThrashingWildlyDispatchWildly
+{
   XCTestExpectation *expectation = [self expectationWithDescription:@"last test ran"];
   for (NSInteger i = 0; i < kThrashingIterationCount; i++) {
     [self setUp];
