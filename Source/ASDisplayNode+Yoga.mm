@@ -48,32 +48,43 @@
   for (ASDisplayNode *child in [_yogaChildren copy]) {
     // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
     // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
-    [self removeYogaChild:child];
+    [self _locked_removeYogaChild:child];
   }
   _yogaChildren = nil;
   for (ASDisplayNode *child in yogaChildren) {
-    [self addYogaChild:child];
+    [self _locked_addYogaChild:child];
   }
 }
 
 - (NSArray *)yogaChildren
 {
+  ASLockScope(self.yogaRoot);
   return [_yogaChildren copy] ?: @[];
 }
 
 - (void)addYogaChild:(ASDisplayNode *)child
 {
   ASLockScope(self.yogaRoot);
+  [self _locked_addYogaChild:child];
+}
+
+- (void)_locked_addYogaChild:(ASDisplayNode *)child
+{
   [self insertYogaChild:child atIndex:_yogaChildren.count];
 }
 
 - (void)removeYogaChild:(ASDisplayNode *)child
 {
   ASLockScope(self.yogaRoot);
+  [self _locked_removeYogaChild:child];
+}
+
+- (void)_locked_removeYogaChild:(ASDisplayNode *)child
+{
   if (child == nil) {
     return;
   }
-  
+
   [_yogaChildren removeObjectIdenticalTo:child];
 
   // YGNodeRef removal is done in setParent:
@@ -83,6 +94,11 @@
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
 {
   ASLockScope(self.yogaRoot);
+  [self _locked_insertYogaChild:child atIndex:index];
+}
+
+- (void)_locked_insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
+{
   if (child == nil) {
     return;
   }
@@ -91,13 +107,15 @@
   }
 
   // Clean up state in case this child had another parent.
-  [self removeYogaChild:child];
+  [self _locked_removeYogaChild:child];
 
   [_yogaChildren insertObject:child atIndex:index];
 
   // YGNodeRef insertion is done in setParent:
   child.yogaParent = self;
 }
+
+#pragma mark - Subclass Hooks
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute
 {

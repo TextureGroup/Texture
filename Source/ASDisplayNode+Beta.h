@@ -188,8 +188,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 @interface ASDisplayNode (Yoga)
 
-// TODO: Make this and yogaCalculatedLayout atomic (lock).
-@property (nonatomic, copy) NSArray *yogaChildren;
+@property (copy) NSArray *yogaChildren;
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;
@@ -198,6 +197,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
 @property BOOL yogaLayoutInProgress;
+// TODO: Make this atomic (lock).
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
 
 // Will walk up the Yoga tree and returns the root node
