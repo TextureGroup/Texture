@@ -1,5 +1,5 @@
 //
-//  ASTableViewThrashTests.mm
+//  Tests/ASThrashUtility.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
