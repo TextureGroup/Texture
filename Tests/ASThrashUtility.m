@@ -11,7 +11,8 @@
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 
-static NSString *ASThrashArrayDescription(NSArray *array) {
+static NSString *ASThrashArrayDescription(NSArray *array)
+{
   NSMutableString *str = [NSMutableString stringWithString:@"(\n"];
   NSInteger i = 0;
   for (id obj in array) {
@@ -24,11 +25,13 @@ static NSString *ASThrashArrayDescription(NSArray *array) {
 
 @implementation ASThrashTestItem
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return YES;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     self = [super init];
     if (self != nil) {
         _itemID = atomic_fetch_add(&ASThrashTestItemNextID, 1);
@@ -36,7 +39,8 @@ static NSString *ASThrashArrayDescription(NSArray *array) {
     return self;
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
     self = [super init];
     if (self != nil) {
         _itemID = [aDecoder decodeIntegerForKey:@"itemID"];
@@ -45,11 +49,13 @@ static NSString *ASThrashArrayDescription(NSArray *array) {
     return self;
 }
 
-- (void)encodeWithCoder:(NSCoder *)aCoder {
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
     [aCoder encodeInteger:_itemID forKey:@"itemID"];
 }
 
-+ (NSMutableArray <ASThrashTestItem *> *)itemsWithCount:(NSInteger)count {
++ (NSMutableArray <ASThrashTestItem *> *)itemsWithCount:(NSInteger)count
+{
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:count];
     for (NSInteger i = 0; i < count; i += 1) {
         [result addObject:[[ASThrashTestItem alloc] init]];
@@ -57,11 +63,13 @@ static NSString *ASThrashArrayDescription(NSArray *array) {
     return result;
 }
 
-- (CGFloat)rowHeight {
+- (CGFloat)rowHeight
+{
     return (self.itemID % 400) ?: 44;
 }
 
-- (NSString *)description {
+- (NSString *)description
+{
     return [NSString stringWithFormat:@"<Item %lu>", (unsigned long)_itemID];
 }
 
@@ -71,7 +79,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 @implementation ASThrashTestSection
 
 /// Create an array of sections with the given count
-+ (NSMutableArray <ASThrashTestSection *> *)sectionsWithCount:(NSInteger)count {
++ (NSMutableArray <ASThrashTestSection *> *)sectionsWithCount:(NSInteger)count
+{
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:count];
     for (NSInteger i = 0; i < count; i += 1) {
         [result addObject:[[ASThrashTestSection alloc] initWithCount:kInitialItemCount]];
@@ -79,7 +88,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     return result;
 }
 
-- (instancetype)initWithCount:(NSInteger)count {
+- (instancetype)initWithCount:(NSInteger)count
+{
     self = [super init];
     if (self != nil) {
         _sectionID = atomic_fetch_add(&ASThrashTestSectionNextID, 1);
@@ -88,11 +98,13 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     return self;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     return [self initWithCount:0];
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
     self = [super init];
     if (self != nil) {
         _items = [aDecoder decodeObjectOfClass:[NSArray class] forKey:@"items"];
@@ -102,31 +114,37 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     return self;
 }
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
     return YES;
 }
 
-- (void)encodeWithCoder:(NSCoder *)aCoder {
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
     [aCoder encodeObject:_items forKey:@"items"];
     [aCoder encodeInteger:_sectionID forKey:@"sectionID"];
 }
 
-- (CGFloat)headerHeight {
+- (CGFloat)headerHeight
+{
     return self.sectionID % 400 ?: 44;
 }
 
-- (NSString *)description {
+- (NSString *)description
+{
     return [NSString stringWithFormat:@"<Section %lu: itemCount=%lu, items=%@>", (unsigned long)_sectionID, (unsigned long)self.items.count, ASThrashArrayDescription(self.items)];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (id)copyWithZone:(NSZone *)zone
+{
     ASThrashTestSection *copy = [[ASThrashTestSection alloc] init];
     copy->_sectionID = _sectionID;
     copy->_items = [_items mutableCopy];
     return copy;
 }
 
-- (BOOL)isEqual:(id)object {
+- (BOOL)isEqual:(id)object
+{
     if ([object isKindOfClass:[ASThrashTestSection class]]) {
         return [(ASThrashTestSection *)object sectionID] == _sectionID;
     } else {
@@ -138,7 +156,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 @implementation NSIndexSet (ASThrashHelpers)
 
-- (NSArray <NSIndexPath *> *)indexPathsInSection:(NSInteger)section {
+- (NSArray <NSIndexPath *> *)indexPathsInSection:(NSInteger)section
+{
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:self.count];
     [self enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
         [result addObject:[NSIndexPath indexPathForItem:idx inSection:section]];
@@ -147,7 +166,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 }
 
 /// `insertMode` means that for each index selected, the max goes up by one.
-+ (NSMutableIndexSet *)randomIndexesLessThan:(NSInteger)max probability:(float)probability insertMode:(BOOL)insertMode {
++ (NSMutableIndexSet *)randomIndexesLessThan:(NSInteger)max probability:(float)probability insertMode:(BOOL)insertMode
+{
     NSMutableIndexSet *indexes = [[NSMutableIndexSet alloc] init];
     u_int32_t cutoff = probability * 100;
     for (NSInteger i = 0; i < max; i++) {
@@ -165,7 +185,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 @implementation ASThrashDataSource
 
-- (instancetype)initTableViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data {
+- (instancetype)initTableViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data
+{
     self = [super init];
     if (self != nil) {
         _data = [[NSArray alloc] initWithArray:data copyItems:YES];
@@ -188,7 +209,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
     return self;
 }
 
-- (instancetype)initCollectionViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data {
+- (instancetype)initCollectionViewDataSourceWithData:(NSArray <ASThrashTestSection *> *)data
+{
   self = [super init];
   if (self != nil) {
     _data = data != nil ? [[NSArray alloc] initWithArray:data copyItems:YES] : [[NSArray alloc] init];
@@ -209,29 +231,35 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   return self;
 }
 
-- (void)setData:(NSArray<ASThrashTestSection *> *)data {
+- (void)setData:(NSArray<ASThrashTestSection *> *)data
+{
   _data = data;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return self.data[section].items.count;
 }
 
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     return self.data.count;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
     return self.data[section].headerHeight;
 }
 
-- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section {
+- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section
+{
   return self.data[section].items.count;
 }
 
 
-- (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode {
+- (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode
+{
   return self.data.count;
 }
 
@@ -248,18 +276,21 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 #if USE_UIKIT_REFERENCE
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     return [tableView dequeueReusableCellWithIdentifier:kCellReuseID forIndexPath:indexPath];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     ASThrashTestItem *item = self.data[indexPath.section].items[indexPath.item];
     return item.rowHeight;
 }
 
 #else
 
-- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
   ASThrashTestNode *node = [[ASThrashTestNode alloc] init];
   node.item = self.data[indexPath.section].items[indexPath.row];
   [self.allNodes addObject:node];
@@ -292,7 +323,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 @implementation ASThrashUpdate
 
-- (instancetype)initWithData:(NSArray<ASThrashTestSection *> *)data {
+- (instancetype)initWithData:(NSArray<ASThrashTestSection *> *)data
+{
   self = [super init];
   if (self != nil) {
     _data = [[NSMutableArray alloc] initWithArray:data copyItems:YES];
@@ -376,19 +408,23 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   return self;
 }
 
-+ (BOOL)supportsSecureCoding {
++ (BOOL)supportsSecureCoding
+{
   return YES;
 }
 
-+ (ASThrashUpdate *)thrashUpdateWithBase64String:(NSString *)base64 {
++ (ASThrashUpdate *)thrashUpdateWithBase64String:(NSString *)base64
+{
   return [NSKeyedUnarchiver unarchiveObjectWithData:[[NSData alloc] initWithBase64EncodedString:base64 options:kNilOptions]];
 }
 
-- (NSString *)base64Representation {
+- (NSString *)base64Representation
+{
   return [[NSKeyedArchiver archivedDataWithRootObject:self] base64EncodedStringWithOptions:kNilOptions];
 }
 
-- (void)encodeWithCoder:(NSCoder *)aCoder {
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
   NSDictionary *dict = [self dictionaryWithValuesForKeys:@[
                                                            @"oldData",
                                                            @"data",
@@ -407,7 +443,8 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   [aCoder encodeInteger:ASThrashUpdateCurrentSerializationVersion forKey:@"_version"];
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
   self = [super init];
   if (self != nil) {
     NSAssert(ASThrashUpdateCurrentSerializationVersion == [aDecoder decodeIntegerForKey:@"_version"], @"This thrash update was archived from a different version and can't be read. Sorry.");
@@ -417,11 +454,13 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   return self;
 }
 
-- (NSString *)description {
+- (NSString *)description
+{
   return [NSString stringWithFormat:@"<ASThrashUpdate %p:\nOld data: %@\nDeleted items: %@\nDeleted sections: %@\nReplaced items: %@\nReplaced sections: %@\nInserted items: %@\nInserted sections: %@\nNew data: %@>", self, ASThrashArrayDescription(_oldData), ASThrashArrayDescription(_deletedItemIndexes), _deletedSectionIndexes, ASThrashArrayDescription(_replacedItemIndexes), _replacedSectionIndexes, ASThrashArrayDescription(_insertedItemIndexes), _insertedSectionIndexes, ASThrashArrayDescription(_data)];
 }
 
-- (NSString *)logFriendlyBase64Representation {
+- (NSString *)logFriendlyBase64Representation
+{
   return [NSString stringWithFormat:@"\n\n**********\nBase64 Representation:\n**********\n%@\n**********\nEnd Base64 Representation\n**********", self.base64Representation];
 }
 

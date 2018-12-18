@@ -18,7 +18,8 @@
 
 @end
 
-@implementation ASCollectionViewThrashTests  {
+@implementation ASCollectionViewThrashTests
+{
   // The current update, which will be logged in case of a failure.
   ASThrashUpdate *_update;
   BOOL _failed;
@@ -163,7 +164,8 @@
 
 - (void)applyUpdateUsingBatchUpdates:(ASThrashUpdate *)update
                         toDataSource:(ASThrashDataSource *)dataSource animated:(BOOL)animated
-                       useXCTestWait:(BOOL)wait {
+                       useXCTestWait:(BOOL)wait
+{
   CollectionView *collectionView = dataSource.collectionView;
 
   XCTestExpectation *expectation;

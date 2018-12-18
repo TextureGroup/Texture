@@ -18,7 +18,8 @@
 @interface ASTableViewThrashTests: XCTestCase
 @end
 
-@implementation ASTableViewThrashTests {
+@implementation ASTableViewThrashTests
+{
   // The current update, which will be logged in case of a failure.
   ASThrashUpdate *_update;
   BOOL _failed;
@@ -26,7 +27,8 @@
 
 #pragma mark Overrides
 
-- (void)tearDown {
+- (void)tearDown
+{
   if (_failed && _update != nil) {
     NSLog(@"Failed update %@: %@", _update, _update.logFriendlyBase64Representation);
   }
@@ -35,7 +37,8 @@
 }
 
 // NOTE: Despite the documentation, this is not always called if an exception is caught.
-- (void)recordFailureWithDescription:(NSString *)description inFile:(NSString *)filePath atLine:(NSUInteger)lineNumber expected:(BOOL)expected {
+- (void)recordFailureWithDescription:(NSString *)description inFile:(NSString *)filePath atLine:(NSUInteger)lineNumber expected:(BOOL)expected
+{
   _failed = YES;
   [super recordFailureWithDescription:description inFile:filePath atLine:lineNumber expected:expected];
 }
@@ -43,13 +46,15 @@
 #pragma mark Test Methods
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testInitialDataRead {
+- (void)testInitialDataRead
+{
   ASThrashDataSource *ds = [[ASThrashDataSource alloc] initTableViewDataSourceWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
   [self verifyDataSource:ds];
 }
 
 /// Replays the Base64 representation of an ASThrashUpdate from "ASThrashTestRecordedCase" file
-- (void)testRecordedThrashCase {
+- (void)testRecordedThrashCase
+{
   NSURL *caseURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ASThrashTestRecordedCase" withExtension:nil subdirectory:@"TestResources"];
   NSString *base64 = [NSString stringWithContentsOfURL:caseURL encoding:NSUTF8StringEncoding error:NULL];
   
@@ -65,7 +70,8 @@
 }
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testThrashingWildly {
+- (void)testThrashingWildly
+{
   for (NSInteger i = 0; i < kThrashingIterationCount; i++) {
     [self setUp];
     @autoreleasepool {
@@ -85,7 +91,8 @@
 
 #pragma mark Helpers
 
-- (void)applyUpdate:(ASThrashUpdate *)update toDataSource:(ASThrashDataSource *)dataSource {
+- (void)applyUpdate:(ASThrashUpdate *)update toDataSource:(ASThrashDataSource *)dataSource
+{
   TableView *tableView = dataSource.tableView;
   
   [tableView beginUpdates];
@@ -122,7 +129,8 @@
   }
 }
 
-- (void)verifyDataSource:(ASThrashDataSource *)ds {
+- (void)verifyDataSource:(ASThrashDataSource *)ds
+{
   TableView *tableView = ds.tableView;
   NSArray <ASThrashTestSection *> *data = [ds data];
   XCTAssertEqual(data.count, tableView.numberOfSections);
