@@ -444,16 +444,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 - (void)prepareAttributedString:(NSMutableAttributedString *)attributedString isForIntrinsicSize:(BOOL)isForIntrinsicSize
 {
   ASLockScopeSelf();
-  NSLineBreakMode innerMode;
-  switch (_truncationMode) {
-    case NSLineBreakByWordWrapping:
-    case NSLineBreakByCharWrapping:
-    case NSLineBreakByClipping:
-      innerMode = _truncationMode;
-      break;
-    default:
-      innerMode = NSLineBreakByWordWrapping;
-  }
+  NSLineBreakMode innerMode = _truncationMode;
 
   // Apply/Fix paragraph style if needed
   [attributedString enumerateAttribute:NSParagraphStyleAttributeName inRange:NSMakeRange(0, attributedString.length) options:kNilOptions usingBlock:^(NSParagraphStyle *style, NSRange range, BOOL * _Nonnull stop) {
