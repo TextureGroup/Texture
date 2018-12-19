@@ -113,6 +113,17 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  */
 - (void)dataController:(ASDataController *)dataController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates;
 
+@end
+
+
+/**
+ * Delegate to describe if a parent is deallocating. Used
+ * in the batchUpdates script to check if the blocks should early
+ * return.
+ */
+
+@protocol ASDeallocateStatusProtocol <NSObject>
+
 /**
  * Communicate to the child whether or not its parent is scheduled for deallocation.
  *
@@ -203,6 +214,11 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  Delegate to notify when data is updated.
  */
 @property (nonatomic, weak) id<ASDataControllerDelegate> delegate;
+
+/**
+ Delegate to check if parent is deallocating
+ */
+@property (nonatomic, weak) id<ASDeallocateStatusProtocol> deallocDelegate;
 
 /**
  * Delegate for preparing layouts. Main thead only.
