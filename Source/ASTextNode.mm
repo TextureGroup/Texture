@@ -204,7 +204,14 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
 }
 @dynamic placeholderEnabled;
 
-static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
+static NSArray *DefaultLinkAttributeNames() {
+  static NSArray *names;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    names = @[ NSLinkAttributeName ];
+  });
+  return names;
+}
 
 - (instancetype)init
 {
@@ -225,7 +232,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     self.opaque = NO;
     self.backgroundColor = [UIColor clearColor];
 
-    self.linkAttributeNames = DefaultLinkAttributeNames;
+    self.linkAttributeNames = DefaultLinkAttributeNames();
 
     // Accessibility
     self.isAccessibilityElement = YES;
