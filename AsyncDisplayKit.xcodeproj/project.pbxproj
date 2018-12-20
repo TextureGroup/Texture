@@ -473,7 +473,7 @@
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
 		E5667E8C1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = E5667E8B1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E5667E8E1F33872700FA6FC0 /* _ASCollectionGalleryLayoutInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5667E8D1F33872700FA6FC0 /* _ASCollectionGalleryLayoutInfo.mm */; };
-		E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */ = {isa = PBXBuildFile; fileRef = E5711A2A1C840C81009619D4 /* ASCollectionElement.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E5711A2C1C840C81009619D4 /* ASCollectionElement.h in Headers */ = {isa = PBXBuildFile; fileRef = E5711A2A1C840C81009619D4 /* ASCollectionElement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5711A301C840C96009619D4 /* ASCollectionElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5711A2D1C840C96009619D4 /* ASCollectionElement.mm */; };
 		E5775AFC1F13CE9F00CAC9BC /* _ASCollectionGalleryLayoutItem.h in Headers */ = {isa = PBXBuildFile; fileRef = E5775AFB1F13CE9F00CAC9BC /* _ASCollectionGalleryLayoutItem.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E5775AFE1F13CF7400CAC9BC /* _ASCollectionGalleryLayoutItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5775AFD1F13CF7400CAC9BC /* _ASCollectionGalleryLayoutItem.mm */; };
