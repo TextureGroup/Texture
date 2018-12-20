@@ -29,7 +29,6 @@
 - (void)_locked_setDefaultImage:(UIImage *)image;
 @end
 
-NSString *const ASAnimatedImageDefaultRunLoopMode = NSRunLoopCommonModes;
 
 @implementation ASImageNode (AnimatedImage)
 
