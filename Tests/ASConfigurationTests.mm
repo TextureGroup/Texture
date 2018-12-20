@@ -24,7 +24,7 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalNetworkImageQueue,
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
-  ASExperimentalClearDataDuringDeallocation,
+  ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
   ASExperimentalDisableAccessibilityCache
 };
@@ -47,7 +47,7 @@ static ASExperimentalFeatures features[] = {
     @"exp_network_image_queue",
     @"exp_collection_teardown",
     @"exp_framesetter_cache",
-    @"exp_clear_data_during_deallocation",
+    @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
     @"exp_disable_a11y_cache"
   ];
