@@ -834,33 +834,51 @@ dispatch_semaphore_signal(_lock);
             }
           }
           int i = 0;
-          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content.
-            i = (int)removedLines.count - 1;
-            while (atLeastOneLine < truncatedWidth && i >= 0) {
-              if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
-                [lastLineText deleteCharactersInRange:NSMakeRange(lastLineText.string.length - 1, 1)];
-                break;
+          if (type == kCTLineTruncationStart) {
+              atLeastOneLine = 0;
+              lastLineText = [NSMutableAttributedString new];
+              while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
+                  NSMutableAttributedString *nextLineText = [text attributedSubstringFromRange:removedLines[i].range].mutableCopy;
+                  if (nextLineText.length > 0 && [nextLineText.string characterAtIndex:nextLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
+                      [nextLineText deleteCharactersInRange:NSMakeRange(nextLineText.string.length - 1, 1)];
+                      break;
+                  }
+                  [lastLineText insertAttributedString:nextLineText atIndex:0];
+                  atLeastOneLine += removedLines[i++].width;
               }
-              [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
-              atLeastOneLine += removedLines[i--].width;
-            }
-            [lastLineText appendAttributedString:truncationToken];
-          }
-          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants text following truncated content.
-            i = 0;
-            atLeastOneLine = removedLines[i].width;
-            while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
-              atLeastOneLine += removedLines[i++].width;
-            }
-            for (i--; i >= 0; i--) {
-              NSAttributedString *nextLine = [text attributedSubstringFromRange:removedLines[i].range];
-              if ([nextLine.string characterAtIndex:nextLine.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
-                lastLineText = [NSMutableAttributedString new];
+              if (atLeastOneLine <= truncatedWidth) {
+                  [lastLineText insertAttributedString:truncationToken atIndex:0];
+              }
+          } else if (type == kCTLineTruncationMiddle) {
+              NSMutableAttributedString *tailText = [NSMutableAttributedString new];
+              while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
+                  NSMutableAttributedString *nextLineText = [text attributedSubstringFromRange:removedLines[i].range].mutableCopy;
+                  if (nextLineText.length > 0 && [nextLineText.string characterAtIndex:nextLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
+                    [nextLineText deleteCharactersInRange:NSMakeRange(nextLineText.string.length - 1, 1)];
+                    break;
+                }
+                  [tailText insertAttributedString:nextLineText atIndex:0];
+                  atLeastOneLine += removedLines[i++].width;
+              }
+              if (atLeastOneLine > truncatedWidth) {
+                  [lastLineText appendAttributedString:tailText];
               } else {
-                [lastLineText appendAttributedString:nextLine];
+                  if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') {
+                      [lastLineText deleteCharactersInRange:NSMakeRange(lastLineText.string.length - 1, 1)];
+                  }
+                  // The result might be greater than truncatedWidth.
+                  [lastLineText appendAttributedString:truncationToken];
+                  CGRect lastLineBoundingRect = [lastLineText boundingRectWithSize:ASTextContainerMaxSize
+                                                                         options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                                                         context:nil];
+                  CGFloat lastLineWidth = isVerticalForm ? CGRectGetHeight(lastLineBoundingRect) : CGRectGetWidth(lastLineBoundingRect);
+                  // If the result greater than truncatedWidth, we should set type to end.
+                  if (lastLineWidth > truncatedWidth) {
+                      type = kCTLineTruncationEnd;
+                  }
               }
-            }
-            [lastLineText insertAttributedString:truncationToken atIndex:0];
+          } else {
+              [lastLineText appendAttributedString:truncationToken];
           }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
