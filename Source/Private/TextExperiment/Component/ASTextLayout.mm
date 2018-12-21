@@ -860,7 +860,9 @@ dispatch_semaphore_signal(_lock);
                 [lastLineText appendAttributedString:nextLine];
               }
             }
-            [lastLineText insertAttributedString:truncationToken atIndex:0];
+            if (type == kCTLineTruncationStart) {
+              [lastLineText insertAttributedString:truncationToken atIndex:0];
+            }
           }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
