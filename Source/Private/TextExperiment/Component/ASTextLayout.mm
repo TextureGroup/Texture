@@ -868,14 +868,8 @@ dispatch_semaphore_signal(_lock);
                   }
                   // The result might be greater than truncatedWidth.
                   [lastLineText appendAttributedString:truncationToken];
-                  CGRect lastLineBoundingRect = [lastLineText boundingRectWithSize:ASTextContainerMaxSize
-                                                                         options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
-                                                                         context:nil];
-                  CGFloat lastLineWidth = isVerticalForm ? CGRectGetHeight(lastLineBoundingRect) : CGRectGetWidth(lastLineBoundingRect);
-                  // If the result greater than truncatedWidth, we should set type to end.
-                  if (lastLineWidth > truncatedWidth) {
-                      type = kCTLineTruncationEnd;
-                  }
+                  // We should set type to end which is likes UILabel's behavior.
+                  type = kCTLineTruncationEnd;
               }
           } else {
               [lastLineText appendAttributedString:truncationToken];
