@@ -835,6 +835,7 @@ dispatch_semaphore_signal(_lock);
           }
           int i = 0;
           if (type == kCTLineTruncationStart) {
+              // If it is the start type, the last line is made up of the removed lines from the back to the front.
               atLeastOneLine = 0;
               lastLineText = [NSMutableAttributedString new];
               while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
@@ -846,16 +847,21 @@ dispatch_semaphore_signal(_lock);
                   [lastLineText insertAttributedString:nextLineText atIndex:0];
                   atLeastOneLine += removedLines[i++].width;
               }
+              // If the last line width is not greater than truncatedWidth, we should insert truncationToken to head.
+              // Because the CTLineCreateTruncatedLine() method will do nothing.
               if (atLeastOneLine <= truncatedWidth) {
                   [lastLineText insertAttributedString:truncationToken atIndex:0];
               }
           } else if (type == kCTLineTruncationMiddle) {
+              // If it is the middle type, we do't known where is the middle position.
+              // So that the last line should add all removed lines and the CTLineCreateTruncatedLine() method make truncation correct.
               i = (int)removedLines.count - 1;
               while (i >= 0) {
                   NSAttributedString *nextLineText = [text attributedSubstringFromRange:removedLines[i].range];
                   [lastLineText appendAttributedString:nextLineText];
                   atLeastOneLine += removedLines[i--].width;
               }
+              // If the last line width is not greater than truncatedWidth, we can't make truncation is middle type.
               if (atLeastOneLine <= truncatedWidth) {
                   lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
                   // The result might be greater than truncatedWidth.
@@ -864,6 +870,7 @@ dispatch_semaphore_signal(_lock);
                   type = kCTLineTruncationEnd;
               }
           } else {
+              // If it is the end type, we simply add it to the end.
               [lastLineText appendAttributedString:truncationToken];
           }
 
