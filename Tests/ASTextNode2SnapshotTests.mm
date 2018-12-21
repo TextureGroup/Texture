@@ -16,21 +16,41 @@
 @end
 
 @interface LineBreakConfig : NSObject
+
 @property (nonatomic, assign) NSUInteger numberOfLines;
 @property (nonatomic, assign) NSLineBreakMode lineBreakMode;
 
++ (NSArray<LineBreakConfig *> *)configs;
+
 - (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode;
 
-+ (NSArray<LineBreakConfig *> *)configs;
 @end
 
 @implementation LineBreakConfig
-static dispatch_once_t init_predicate;
-static NSArray<LineBreakConfig *> *allConfigs = nil;
+
++ (NSArray<LineBreakConfig *> *)configs
+{
+  static dispatch_once_t init_predicate;
+  static NSArray<LineBreakConfig *> *allConfigs = nil;
+
+  dispatch_once(&init_predicate, ^{
+    NSMutableArray *setup = [NSMutableArray new];
+    for (int i = 0; i <= 3; i++) {
+      for (int j = NSLineBreakByWordWrapping; j <= NSLineBreakByTruncatingMiddle; j++) {
+        if (j == NSLineBreakByClipping) continue;
+        [setup addObject:[[LineBreakConfig alloc] initWithNumberOfLines:i lineBreakMode:(NSLineBreakMode) j]];
+      }
+
+      allConfigs = [NSArray arrayWithArray:setup];
+    }
+  });
+  return allConfigs;
+}
 
 - (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode
 {
-  if ((self = [super init]) != nil) {
+  self = [super init];
+  if (self != nil) {
     _numberOfLines = numberOfLines;
     _lineBreakMode = lineBreakMode;
 
@@ -68,21 +88,6 @@ static NSArray<LineBreakConfig *> *allConfigs = nil;
   return [NSString stringWithFormat:@"numberOfLines: %lu\nlineBreakMode: %@", (unsigned long) self.numberOfLines, lineBreak];
 }
 
-+ (NSArray<LineBreakConfig *> *)configs
-{
-  dispatch_once(&init_predicate, ^{
-    NSMutableArray *setup = [NSMutableArray new];
-    for (int i = 0; i <= 3; i++) {
-      for (int j = NSLineBreakByWordWrapping; j <= NSLineBreakByTruncatingMiddle; j++) {
-        if (j == NSLineBreakByClipping) continue;
-        [setup addObject:[[LineBreakConfig alloc] initWithNumberOfLines:i lineBreakMode:(NSLineBreakMode) j]];
-      }
-
-      allConfigs = [NSArray arrayWithArray:setup];
-    }
-  });
-  return allConfigs;
-}
 @end
 
 @implementation ASTextNode2SnapshotTests
@@ -124,19 +129,11 @@ static NSArray<LineBreakConfig *> *allConfigs = nil;
 
 - (void)testTextTruncationModes_ASTextNode2
 {
-  ASTextNode *textNode;
-  UILabel *reference;
+  UIView *container = [[UIView alloc] initWithFrame:(CGRect) {CGPointZero, (CGSize) {375.0f, 667.0f}}];
 
-  UILabel *textNodeLabel;
-  UILabel *uiLabelLabel;
-  UILabel *description;
-  UIView *container;
-
-  container = [[UIView alloc] initWithFrame:(CGRect) {CGPointZero, (CGSize) {375.0f, 667.0f}}];
-
-  textNodeLabel = [[UILabel alloc] init];
-  uiLabelLabel = [[UILabel alloc] init];
-  description = [[UILabel alloc] init];
+  UILabel *textNodeLabel = [[UILabel alloc] init];
+  UILabel *uiLabelLabel = [[UILabel alloc] init];
+  UILabel *description = [[UILabel alloc] init];
   textNodeLabel.text = @"ASTextNode2:";
   textNodeLabel.font = [UIFont boldSystemFontOfSize:16.0];
   textNodeLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
@@ -150,8 +147,8 @@ static NSArray<LineBreakConfig *> *allConfigs = nil;
 
   uiLabelLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
 
-  reference = [[UILabel alloc] init];
-  textNode = [[ASTextNode alloc] init]; // ASTextNode2
+  UILabel *reference = [[UILabel alloc] init];
+  ASTextNode *textNode = [[ASTextNode alloc] init]; // ASTextNode2
 
   NSMutableAttributedString *refString = [[NSMutableAttributedString alloc] initWithString:@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
           attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:18.0f] }];
