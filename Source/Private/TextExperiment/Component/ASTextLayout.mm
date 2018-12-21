@@ -850,25 +850,17 @@ dispatch_semaphore_signal(_lock);
                   [lastLineText insertAttributedString:truncationToken atIndex:0];
               }
           } else if (type == kCTLineTruncationMiddle) {
-              NSMutableAttributedString *tailText = [NSMutableAttributedString new];
-              while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
-                  NSMutableAttributedString *nextLineText = [text attributedSubstringFromRange:removedLines[i].range].mutableCopy;
-                  if (nextLineText.length > 0 && [nextLineText.string characterAtIndex:nextLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
-                    [nextLineText deleteCharactersInRange:NSMakeRange(nextLineText.string.length - 1, 1)];
-                    break;
-                }
-                  [tailText insertAttributedString:nextLineText atIndex:0];
-                  atLeastOneLine += removedLines[i++].width;
+              i = (int)removedLines.count - 1;
+              while (i >= 0) {
+                  NSAttributedString *nextLineText = [text attributedSubstringFromRange:removedLines[i].range];
+                  [lastLineText appendAttributedString:nextLineText];
+                  atLeastOneLine += removedLines[i--].width;
               }
-              if (atLeastOneLine > truncatedWidth) {
-                  [lastLineText appendAttributedString:tailText];
-              } else {
-                  if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') {
-                      [lastLineText deleteCharactersInRange:NSMakeRange(lastLineText.string.length - 1, 1)];
-                  }
+              if (atLeastOneLine <= truncatedWidth) {
+                  lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
                   // The result might be greater than truncatedWidth.
                   [lastLineText appendAttributedString:truncationToken];
-                  // We should set type to end which is likes UILabel's behavior.
+                  // We should set type to end which is like UILabel's behavior.
                   type = kCTLineTruncationEnd;
               }
           } else {
