@@ -199,7 +199,7 @@ static NSArray<LineBreakConfig *> *allConfigs = nil;
     [container setNeedsLayout];
     NSString *identifier = [NSString stringWithFormat:@"%lu_%lu", (unsigned long)config.lineBreakMode, (unsigned long)config.numberOfLines];
     [ASSnapshotTestCase hackilySynchronouslyRecursivelyRenderNode:textNode];
-    ASSnapshotVerifyView(container, identifier);
+    ASSnapshotVerifyViewWithTolerance(container, identifier, 5);
   }
 }
 
