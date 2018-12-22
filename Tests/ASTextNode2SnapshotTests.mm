@@ -23,6 +23,7 @@
 + (NSArray<LineBreakConfig *> *)configs;
 
 - (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode;
+- (NSString *)breakModeDescription;
 
 @end
 
@@ -59,33 +60,37 @@
   return nil;
 }
 
-- (NSString *)description
-{
+- (NSString *)breakModeDescription {
   NSString *lineBreak = nil;
   switch (self.lineBreakMode) {
     case NSLineBreakByTruncatingHead:
       lineBreak = @"NSLineBreakByTruncatingHead";
-      break;
+          break;
     case NSLineBreakByCharWrapping:
       lineBreak = @"NSLineBreakByCharWrapping";
-      break;
+          break;
     case NSLineBreakByClipping:
       lineBreak = @"NSLineBreakByClipping";
-      break;
+          break;
     case NSLineBreakByWordWrapping:
       lineBreak = @"NSLineBreakByWordWrapping";
-      break;
+          break;
     case NSLineBreakByTruncatingTail:
       lineBreak = @"NSLineBreakByTruncatingTail";
-      break;
+          break;
     case NSLineBreakByTruncatingMiddle:
       lineBreak = @"NSLineBreakByTruncatingMiddle";
-      break;
+          break;
     default:
       lineBreak = @"Unknown?";
-      break;
+          break;
   }
-  return [NSString stringWithFormat:@"numberOfLines: %lu\nlineBreakMode: %@", (unsigned long) self.numberOfLines, lineBreak];
+  return lineBreak;
+}
+
+- (NSString *)description
+{
+  return [NSString stringWithFormat:@"numberOfLines: %lu\nlineBreakMode: %@", (unsigned long) self.numberOfLines, [self breakModeDescription]];
 }
 
 @end
@@ -104,7 +109,7 @@
 #endif
   [ASConfigurationManager test_resetWithConfiguration:config];
 
-  self.recordMode = NO;
+  self.recordMode = YES;
 }
 
 - (void)tearDown
@@ -194,9 +199,9 @@
     reference.numberOfLines = textNode.maximumNumberOfLines = config.numberOfLines;
     description.text = config.description;
     [container setNeedsLayout];
-    NSString *identifier = [NSString stringWithFormat:@"%lu_%lu", (unsigned long)config.lineBreakMode, (unsigned long)config.numberOfLines];
+    NSString *identifier = [NSString stringWithFormat:@"%@_%luLines", [config breakModeDescription], (unsigned long)config.numberOfLines];
     [ASSnapshotTestCase hackilySynchronouslyRecursivelyRenderNode:textNode];
-    ASSnapshotVerifyViewWithTolerance(container, identifier, 0.015);
+    ASSnapshotVerifyViewWithTolerance(container, identifier, 0.01);
   }
 }
 
