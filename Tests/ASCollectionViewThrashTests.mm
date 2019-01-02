@@ -25,7 +25,8 @@
   BOOL _failed;
 }
 
-- (void)tearDown {
+- (void)tearDown
+{
   if (_failed && _update != nil) {
     NSLog(@"Failed update %@: %@", _update, _update.logFriendlyBase64Representation);
   }
