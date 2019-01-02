@@ -334,6 +334,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASPerformBackgroundDeallocation(&_rangeController);
 }
 
+- (BOOL)isDeallocating {
+  return _isDeallocating;
+}
+
 #pragma mark -
 #pragma mark Overrides.
 
