@@ -17,6 +17,7 @@
 - (instancetype)init
 {
   if (self = [super init]) {
+    self.automaticallyManagesSubnodes = YES;
     _activityIndicatorNode = [[ASDisplayNode alloc] initWithViewBlock:^{
       UIActivityIndicatorView *v = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
       [v startAnimating];
