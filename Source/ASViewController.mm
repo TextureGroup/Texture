@@ -344,6 +344,8 @@ ASVisibilityDepthImplementation;
   [self propagateNewTraitCollection:traitCollection];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -352,5 +354,6 @@ ASVisibilityDepthImplementation;
   traitCollection.containerSize = self.view.bounds.size;
   [self propagateNewTraitCollection:traitCollection];
 }
+#pragma clang diagnostic pop
 
 @end

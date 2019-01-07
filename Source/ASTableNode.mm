@@ -847,10 +847,13 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)waitUntilAllUpdatesAreCommitted
 {
   [self waitUntilAllUpdatesAreProcessed];
 }
+#pragma clang diagnostic pop
 
 #pragma mark - Debugging (Private)
 
