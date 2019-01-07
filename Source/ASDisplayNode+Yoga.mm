@@ -285,6 +285,48 @@
   self.yogaCalculatedLayout = nil;
 }
 
+- (ASLayout *)calculateLayoutYoga:(ASSizeRange)constrainedSize
+{
+  ASDN::UniqueLock l(__instanceLock__);
+
+  // There are several cases where Yoga could arrive here:
+  // - This node is not in a Yoga tree: it has neither a yogaParent nor yogaChildren.
+  // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
+  // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
+  // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
+  YGNodeRef yogaNode = _style.yogaNode;
+  BOOL hasYogaParent = (_yogaParent != nil);
+  BOOL hasYogaChildren = (_yogaChildren.count > 0);
+  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
+  if (usesYoga) {
+    // This node has some connection to a Yoga tree.
+    if ([self shouldHaveYogaMeasureFunc] == NO) {
+      // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
+      // initiate a new Yoga calculation pass from root.
+
+      as_activity_create_for_scope("Yoga layout calculation");
+      if (self.yogaLayoutInProgress == NO) {
+        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
+        l.unlock();
+        [self calculateLayoutFromYogaRoot:constrainedSize];
+        l.lock();
+      } else {
+        ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
+      }
+      ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
+      return _yogaCalculatedLayout;
+    } else {
+      // If we're a yoga leaf node with custom measurement function, proceed with normal layout so layoutSpecs can run (e.g. ASButtonNode).
+      ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
+    }
+  }
+
+  // Manual size calculation via calculateSizeThatFits:
+  CGSize size = [self calculateSizeThatFits:constrainedSize.max];
+  ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
+  return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
+}
+
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
 {
   ASDisplayNode *yogaRoot = self.yogaRoot;

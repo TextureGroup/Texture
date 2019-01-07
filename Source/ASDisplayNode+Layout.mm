@@ -7,6 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -143,19 +144,19 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASDisplayNode (ASLayout)
 
-- (void)setLayoutSpecBlock:(ASLayoutSpecBlock)layoutSpecBlock
+- (ASLayoutType)layoutType
 {
-  // For now there should never be an override of layoutSpecThatFits: and a layoutSpecBlock together.
-  ASDisplayNodeAssert(!(_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits),
-                      @"Nodes with a .layoutSpecBlock must not also implement -layoutSpecThatFits:");
+#if YOGA
   ASDN::MutexLocker l(__instanceLock__);
-  _layoutSpecBlock = layoutSpecBlock;
-}
+  YGNodeRef yogaNode = _style.yogaNode;
+  BOOL hasYogaParent = (_yogaParent != nil);
+  BOOL hasYogaChildren = (_yogaChildren.count > 0);
+  if (yogaNode != NULL && (hasYogaParent || hasYogaChildren)) {
+    return ASLayoutTypeYoga;
+  }
+#endif
 
-- (ASLayoutSpecBlock)layoutSpecBlock
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  return _layoutSpecBlock;
+  return ASLayoutTypeLayoutSpec;
 }
 
 - (ASLayout *)calculatedLayout
