@@ -130,7 +130,7 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  * @discussion This is in response to a hard to reproduce crash where
  * `performBatchUpdates` is sent on a valid pointer, however the internal UIKit
  * collection view components such as _UICollectionViewData later reference a nil shared
- * indexPath store during their many block invokes for a colleciton view update.
+ * indexPath store during their many block invokes for a collection view update.
  * This could be attributed the editingQueue still consuming its tasks
  * while the collection view is being async deallocated. We want to early return
  * at editing transation block invocation time since we can not destroy queued blocks;
@@ -262,7 +262,7 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
 
 /**
  * Re-measures all loaded nodes in the backing store.
- * 
+ *
  * @discussion Used to respond to a change in size of the containing view
  * (e.g. ASTableView or ASCollectionView after an orientation change).
  *
