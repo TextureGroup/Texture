@@ -654,8 +654,8 @@ ASLayoutElementStyleExtensibilityForwarding
         ASDN::MutexLocker l(__instanceLock__);
         
         // Update calculated layout
-        let previousLayout = _calculatedDisplayNodeLayout;
-        let pendingLayout = ASDisplayNodeLayout(newLayout,
+        const auto previousLayout = _calculatedDisplayNodeLayout;
+        const auto pendingLayout = ASDisplayNodeLayout(newLayout,
                                                 constrainedSize,
                                                 constrainedSize.max,
                                                 newLayoutVersion);
@@ -775,10 +775,10 @@ ASLayoutElementStyleExtensibilityForwarding
   
   NSArray<ASDisplayNode *> *removedSubnodes = [context removedSubnodes];
   NSMutableArray<ASDisplayNode *> *insertedSubnodes = [[context insertedSubnodes] mutableCopy];
-  let movedSubnodes = [[NSMutableArray<ASDisplayNode *> alloc] init];
+  const auto movedSubnodes = [[NSMutableArray<ASDisplayNode *> alloc] init];
   
-  let insertedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
-  let removedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
+  const auto insertedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
+  const auto removedSubnodeContexts = [[NSMutableArray<_ASAnimatedTransitionContext *> alloc] init];
   
   for (ASDisplayNode *subnode in [context subnodesForKey:ASTransitionContextToLayoutKey]) {
     if ([insertedSubnodes containsObject:subnode] == NO) {
@@ -916,9 +916,9 @@ ASLayoutElementStyleExtensibilityForwarding
   NSArray *subnodes = [self subnodes];
   NSArray *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
 
-  let currentSubnodes = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
+  const auto currentSubnodes = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
                                                      capacity:subnodes.count];
-  let layoutSubnodes  = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
+  const auto layoutSubnodes  = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
                                                      capacity:sublayouts.count];;
   for (ASDisplayNode *subnode in subnodes) {
     [currentSubnodes addObject:subnode];
