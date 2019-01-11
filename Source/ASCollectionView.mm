@@ -2044,7 +2044,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 
   // Wrap the node block
-  BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
+  // BOOL disableRangeController = ASCellLayoutModeIncludes(ASCellLayoutModeDisableRangeController);
   __weak __typeof__(self) weakSelf = self;
   return ^{
     __typeof__(self) strongSelf = weakSelf;
@@ -2052,9 +2052,15 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]],
                         @"ASCollectionNode provided a non-ASCellNode! %@, %@", node, strongSelf);
 
+    // TODO: ASRangeController doesn't currently support managing interfaceState for supplementary nodes.
+    // For now, we allow the standard ASInterfaceStateInHierarchy behavior by ensuring we do not inform
+    // the node that it should expect external management of interfaceState.
+    /*
     if (!disableRangeController) {
       [node enterHierarchyState:ASHierarchyStateRangeManaged];
     }
+    */
+    
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;
     }
