@@ -21,6 +21,8 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 
+#import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
+
 #define YOGA_LAYOUT_LOGGING 0
 
 #pragma mark - ASDisplayNode+Yoga
@@ -321,10 +323,8 @@
     }
   }
 
-  // Manual size calculation via calculateSizeThatFits:
-  CGSize size = [self calculateSizeThatFits:constrainedSize.max];
-  ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
-  return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
+  // Delegate to layout spec layout for nodes that do not support Yoga
+  return [self calculateLayoutLayoutSpec:constrainedSize];
 }
 
 - (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize

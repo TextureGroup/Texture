@@ -1109,18 +1109,22 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
-  switch (self.layoutType) {
-    case ASLayoutTypeLayoutSpec:
+  switch (self.layoutEngineType) {
+    case ASLayoutEngineTypeLayoutSpec:
       return [self calculateLayoutLayoutSpec:constrainedSize];
-    case ASLayoutTypeYoga:
 #if YOGA
+    case ASLayoutEngineTypeYoga:
       return [self calculateLayoutYoga:constrainedSize];
 #endif
-    // If not YOGA we fallthrough here
+      // If YOGA is not defined but for some reason the layout type engine is Yoga
+      // we explicitly fallthrough here
     default:
-      ASDisplayNodeAssert(NO, @"No layout type determined");
+      break;
   }
 
+  // If this case is reached a layout type engine was defined for a node that is currently
+  // not supported.
+  ASDisplayNodeAssert(NO, @"No layout type determined");
   return nil;
 }
 

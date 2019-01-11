@@ -144,7 +144,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @implementation ASDisplayNode (ASLayout)
 
-- (ASLayoutType)layoutType
+- (ASLayoutEngineType)layoutEngineType
 {
 #if YOGA
   ASDN::MutexLocker l(__instanceLock__);
@@ -152,11 +152,11 @@ ASLayoutElementStyleExtensibilityForwarding
   BOOL hasYogaParent = (_yogaParent != nil);
   BOOL hasYogaChildren = (_yogaChildren.count > 0);
   if (yogaNode != NULL && (hasYogaParent || hasYogaChildren)) {
-    return ASLayoutTypeYoga;
+    return ASLayoutEngineTypeYoga;
   }
 #endif
 
-  return ASLayoutTypeLayoutSpec;
+  return ASLayoutEngineTypeLayoutSpec;
 }
 
 - (ASLayout *)calculatedLayout

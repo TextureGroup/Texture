@@ -817,9 +817,9 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-typedef NS_ENUM(NSInteger, ASLayoutType) {
-  ASLayoutTypeLayoutSpec,
-  ASLayoutTypeYoga
+typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
+  ASLayoutEngineTypeLayoutSpec,
+  ASLayoutEngineTypeYoga
 };
 
 @interface ASDisplayNode (ASLayout)
@@ -827,7 +827,7 @@ typedef NS_ENUM(NSInteger, ASLayoutType) {
 /**
  * @abstract Returns the current layout type the node uses for layout the subtree.
  */
-@property (readonly) ASLayoutType layoutType;
+@property (readonly) ASLayoutEngineType layoutEngineType;
 
 /**
  * @abstract Return the calculated size.

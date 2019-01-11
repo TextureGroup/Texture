@@ -194,7 +194,6 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   NSInteger _layoutComputationNumberOfPasses;
 
 
-
   // View Loading
   ASDisplayNodeViewBlock _viewBlock;
   ASDisplayNodeLayerBlock _layerBlock;
