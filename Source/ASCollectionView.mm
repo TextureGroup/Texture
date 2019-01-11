@@ -1869,14 +1869,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return NO;
   }
   // The heuristics below apply to the ASCellLayoutModeNone.
-  // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
-  if (changeSet.countForAsyncLayout < 2) {
-    return YES;
-  }
-  CGSize contentSize = self.contentSize;
-  CGSize boundsSize = self.bounds.size;
-  if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
-    return YES;
+  if (!ASActivateExperimentalFeature(ASExperimentalSkipDefaultCellLayoutMode)) {
+    // Reload data is expensive, don't block main while doing so.
+    if (changeSet.includesReloadData) {
+      return NO;
+    }
+    // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
+    if (changeSet.countForAsyncLayout < 2) {
+      return YES;
+    }
+    CGSize contentSize = self.contentSize;
+    CGSize boundsSize = self.bounds.size;
+    if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
+      return YES;
+    }
   }
   return NO;
 }
