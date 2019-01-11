@@ -22,7 +22,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_framesetter_cache",
                                       @"exp_skip_clear_data",
                                       @"exp_did_enter_preload_skip_asm_layout",
-                                      @"exp_disable_a11y_cache"]));
+                                      @"exp_disable_a11y_cache",
+                                      @"exp_skip_a11y_wait"]));
   
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
