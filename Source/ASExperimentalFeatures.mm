@@ -23,7 +23,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_skip_clear_data",
                                       @"exp_did_enter_preload_skip_asm_layout",
                                       @"exp_disable_a11y_cache",
-                                      @"exp_skip_a11y_wait"]));
+                                      @"exp_skip_a11y_wait",
+                                      @"exp_skip_default_cell_layout_mode"]));
   
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
