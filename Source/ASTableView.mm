@@ -2004,7 +2004,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray *)accessibilityElements
 {
-  [self waitUntilAllUpdatesAreCommitted];
+  if (!ASActivateExperimentalFeature(ASExperimentalSkipAccessibilityWait)) {
+    [self waitUntilAllUpdatesAreCommitted];
+  }
   return [super accessibilityElements];
 }
 

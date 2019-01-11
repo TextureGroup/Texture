@@ -2455,7 +2455,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray *)accessibilityElements
 {
-  [self waitUntilAllUpdatesAreCommitted];
+  if (!ASActivateExperimentalFeature(ASExperimentalSkipAccessibilityWait)) {
+    [self waitUntilAllUpdatesAreCommitted];
+  }
   return [super accessibilityElements];
 }
 
