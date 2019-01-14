@@ -15,6 +15,8 @@ There are a few conventions to follow:
 1. Invocations of the UIKit API must happen on the main thread `dispatch_get_main_queue()`
 2. Anything else should generally happen on a background thread.
 
+## Run Loop, Threads, and Queues
+
 ## Threading by example
 
 Let's take a look at collection view. UIKit calls (such as batch updates) can be invoked from the background due to network calls returning with fresh models. These models are then used to calculate a change set used by the collection view to perform a batch update. This batch update calls into UIKit API for insertions, deletions, and moves in one continuous operation that modifies the view hierarchy. As we know, all UIKit operations must occur on the main thread. How can we design the interface to get the most efficient distribution of work?
@@ -66,6 +68,6 @@ The other condition is that we want to use change sets via `performBatchUpdates:
 <!-- <img src="/static/images/development/threading3.png"> -->
 ![Threading3](/static/images/development/threading3.png)
 
-One small note is these diagrams are missing a representation of the main dispatch queue. This is separate from the main thread. All the work that goes from the background threads to the main thread is first put onto the main dispatch queue.
+One small note is these diagrams are missing a representation of the main dispatch queue. This is separate from the main thread. It is a data structure operated by GCD similarly which handles execution to the main thread. All the work that goes from the background threads to the main thread is first put onto the main dispatch queue.
 
 .
