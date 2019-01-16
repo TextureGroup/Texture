@@ -12,7 +12,7 @@ The Texture philosophy is about efficient utilization of resources in order to p
 
 There are a few conventions to follow:
 
-1. Invocations of the UIKit API must happen on the main thread via `dispatch_get_main_queue()`
+1. Invocations of the UIKit API must happen on the main thread via either `dispatch_get_main_queue()` or with `ASPerformBlockOnMainThread()`
 2. Anything else should generally happen on a background thread, with prioritization
 
 ## Run Loop, Threads, and Queues
