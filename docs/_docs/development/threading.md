@@ -165,23 +165,7 @@ Looking at the logs, we can see how GCD reaches a maximum background thread coun
 10 ns block 64
 ```
 
-## Threading by example
-
-Let's take a look at collection view. UIKit calls (such as batch updates) can be invoked from the background due to network calls returning with fresh models. These models are then used to calculate a change set used by the collection view to perform a batch update. This batch update calls into UIKit API for insertions, deletions, and moves in one continuous operation that modifies the view hierarchy. As we know, all UIKit operations must occur on the main thread. How can we design the interface to get the most efficient distribution of work?
-
-So we have the following situation:
-1. A data source that talks and responds to events from the network
-2. A data source that calculates a change set for the collection view
-2. A collection view that performs batch updates, calling into UIKit API
-3. Batch updates must happen serially, as they use transformations rather than clearingAllData
-
-`ASDataController`
-
-This is our data source that talks to the network. It doesn't really in Texture, but we can pretend that this interface is receiving invocations from a network object. The network object invokes a completion block created by the `ASDataController` in a background thread context. This is correct behavior, because we want non-UI related work to happen off of the main thread as much as possible.
-
- Since the data source still needs to have usable data while the network and calculations are occurring, we keep two different data structures: `pendingMap` and `visibleMap`. The `visibleMap` is node map for display on the collection view and the `pendingMap` is an ephemeral for calculating the change set. The change set is the exact least amount of work required to shuffle the collection view items from the old set to the new set.
-
-__Main Serial Queue__
+## ASMainSerialQueue
 
 The `ASMainSerialQueue` ensures that work can be performed serially on the main thread without being interrupted. The key difference between this and purely using `dispatch_async(dispatch_get_main_queue, block)` is that the main thread can be interrupted between execution of blocks in its queue, where as this interface will execute everything possible in its queue on the main thread before returning control back to the OS.
 
@@ -190,33 +174,6 @@ This interface calls to `ASPerformBlockOnMainThread`. This interface will lock o
 This should also be used a synchronization mechanism. Since the `ASMainSerialQueue` is serial, you can be sure that it will execute in order. An example would be to queue the following blocks: change view property -> trigger layout update -> animate. Remember that funny situations can occur since execution of work on `ASMainSerialQueue` can early execute blocks that were scheduled later than blocks sent using `dispatch_async(dispatch_get_main_queue())` if the `ASMainSerialQueue` is already consuming blocks. The execution time of the `[ASMainSerialQueue runBlocks]` is uncertain given that more work can be scheduled.
 
 This is really just a buffer to the main dispatch queue. It behaves the same, except this offers some more visibility onto how much work is scheduled. This interface guarantees that everything scheduled will execute in one operation serially on the main thread.
-
-__Editing Transaction Queue__
-
-The Editing Transaction Queue is an example of using a background queue to schedule work that may be long running in a way that won't block the application from receiving callbacks from the main thread's Run Loop or other main thread only work such as calls to UIKit API.
-
-This is a `dispatch_queue_t` that is privately held by each UICollectionView. The work scheduled gets performed on a background thread.
-
-__Describing the Batch Update flow__
-
-<!-- <img src="/static/images/development/threading1.png"> -->
-![Threading1](/static/images/development/threading1.png)
-
-Starting with a simple example, let's say everything was on the main thread. The app would then appear unresponsive to the user until the entire flow finished. This is because the main thread's run loop (which receives operating system events for input) and the main thread dispatch queue compete for service time on the main thread. Execution goes back and forth between the run loop and the main dispatch queue while work is present in either. Now you can see that the work your code wants to schedule competes for time with system and user input events.
-
-Let's identify the items that are not critical for execution on the main thread and dispatch those as blocks onto a background thread.
-
-<!-- <img src="/static/images/development/threading2.png"> -->
-![Threading2](/static/images/development/threading2.png)
-
-Ok, this is starting to look better. The main thread now only performs the minimal amount of work. This means the app will feel responsive to the user as it is able to consume Run Loop events with little interruption. However, a lot of the background work is still being done serially in one long running operation. If the network is the longest running task in this sequence, you would want to make sure they get fired off as early as possible. Let's also introduce another condition, we have a NSTimer running which injects a "hint" cell into the collection view. This is to demonstrate how the editing transaction queue is consumed serially.
-
-The reason we must design the work to consume the editing transaction queue serially alongside the main queue is change sets must represent a transformation of the current data set in the collection view. This means that each time a `performBatchUpdate` is intended to be performed, it _must_ calculate using the latest data set used for display in the collection view. In this following image, this means that change sets can only be calculated from `A -> B`, and then when `performBatchUpdate` task is fully finished, another calculation can be done from `B -> C`. Consider data sets `B` and `C` coming in right after the other. If the queues consumed concurrently, then you would get a change set for `A -> B` and `A -> C`. The collection view will crash if a change set is requested for `A -> C`, while a `performBatchUpdate` is updating the collection view to reflect `A -> B` with a `A -> C` operation is queued. All this means that we create a pseudo-lock on the `editingTransactionQueue` by consuming it one operation at a time, either when the queue is empty or when an operation has finished as called by the completed `performBatchUpdate` invocation.
-
-<!-- <img src="/static/images/development/threading3.png"> -->
-![Threading3](/static/images/development/threading3.png)
-
-One small note is these diagrams are missing a representation of the main dispatch queue. Remember this is separate from the main thread. It is a data structure operated by GCD similarly to ASMainSerialQueue which handles execution to the main thread. All the work that goes from the background threads to the main thread is first put onto the main dispatch queue when using `dispatch_async(dispatch_get_main_queue())`.
 
 ## ASRunLoopQueue
 
@@ -265,13 +222,17 @@ if (!isQueueDrained) {
 
 ## Locks and Safety
 
-Carrying on from our last example, we have to make sure that during our processing of the queue for objects that need to be deallocated remains untampered to avoid bounds errors. The execution of this function must be synchronous. In this particular example, we can guarantee that the execution of this will always happen on a designated run loop's single thread, and therefore synchronously. However, we want to design more robust software.
+Carrying on from our last example, we have to make sure that during our processing of the queue for objects that need to be deallocated remains untampered to avoid bounds errors. The execution of this function must be synchronous. In this particular example, we can guarantee that the execution of this will always happen on a designated run loop's single thread, and therefore synchronously. However, we want to design robust software that won't deadlock or crash.
+
+__Method 1__
 
 Looking at `-(void)processQueue`, we have the following locking convention:
 ```
 @interface ASRunLoopQueue () {
   ASDN::RecursiveMutex _internalQueueLock;
 }
+
+ASSynthesizeLockingMethodsWithMutex(_internalQueueLock) // Texture macro for creating the lock
 
 - (void)processQueue
 {
@@ -283,6 +244,36 @@ Looking at `-(void)processQueue`, we have the following locking convention:
 }
 ```
 
+`ASDN::MutexLocker l(_internalQueueLock);` will lock the recursive mutex. This prevents other threads other than the current thread from entering this routine again, which is fine since a thread serially executes. The lock will free itself once the stack frame is popped.
+
+Since this lock is also shared, it will prevent other routines from entering until this lock is released. This is mandatory for safe synchronization of shared objects between threads.
+
+__Method 2__
+
+An alternative method is to manage the duration of the lock hold manually rather than using the runtime and scope. You must remember to unlock.
+
+```
+@implementation ASDeallocQueue {
+  ASDN::Mutex _lock;
+}
+
+- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
+{
+  NSParameterAssert(objectPtr != NULL); // do I actually need to lock ?
+  // other conditions or non-shared tasks
+  _lock.lock();
+  sharedObject.modify(newData);
+  _lock.unlock();
+}
+```
+
+## Thread Contention
+
+Although locks are critical to guaranteeing safer multithreading synchronization, they must be used with some caution, as threads are slept if they can not hold the lock immediately. In order to sleep/wake a thread, many CPU cycles are consumed. Some `std::mutex` implementations are able to spinlock for a bit at first to combat the overhead of sleeping and waking a thread for failed lock holds. However, the performance loss here is a necessary sacrifice in order to attain thread safety. In order to make up for the potential loss in performance, the programmer should design as little opportunity for contention as possible, and to lock only the smallest amount of work.
+
+An interesting investigation can be found [here](https://stackoverflow.com/a/49712993/2584565)
+
+> Bottom line, a mutex is implemented with atomics. To synchronize atomics between cores an internal bus must be locked which freezes the corresponding cache line for several hundred clock cycles.
 
 ## Other Threading Practices in Texture
 
@@ -292,4 +283,51 @@ API | Description |
 --- | --- |
 `ASDisplayNodeAssertMainThread();` | Place this at the start of the every function definition that performs work synchronously on the main thread.
 `ASPerformBlockOnMainThread(block)` | If on main thread already, run block synchronously, otherwise use `dispatch_async(dispatch_get_main_queue(block))`
+`ASPerformMainThreadDeallocation(&object)` | Schedule async deallocation of UIKit components
+`ASPerformBackgroundDeallocation(&object)` | Schedule async deallocation of __non-UIKit__ objects
+`ASPerformBlockOnBackgroundThread(block)` | Perform work on background
+
+
+## Threading by example
+
+Let's take a look at collection view. UIKit calls (such as batch updates) can be invoked from the background due to network calls returning with fresh models. These models are then used to calculate a change set used by the collection view to perform a batch update. This batch update calls into UIKit API for insertions, deletions, and moves in one continuous operation that modifies the view hierarchy. As we know, all UIKit operations must occur on the main thread. How can we design the interface to get the most efficient distribution of work?
+
+So we have the following situation:
+1. A data source that talks and responds to events from the network
+2. A data source that calculates a change set for the collection view
+2. A collection view that performs batch updates, calling into UIKit API
+3. Batch updates must happen serially, as they use transformations rather than clearingAllData
+
+`ASDataController`
+
+This is our data source that talks to the network. It doesn't really in Texture, but we can pretend that this interface is receiving invocations from a network object. The network object invokes a completion block created by the `ASDataController` in a background thread context. This is correct behavior, because we want non-UI related work to happen off of the main thread as much as possible.
+
+ Since the data source still needs to have usable data while the network and calculations are occurring, we keep two different data structures: `pendingMap` and `visibleMap`. The `visibleMap` is node map for display on the collection view and the `pendingMap` is an ephemeral for calculating the change set. The change set is the exact least amount of work required to shuffle the collection view items from the old set to the new set.
+
+__Editing Transaction Queue__
+
+The Editing Transaction Queue is an example of using a background queue to schedule work that may be long running in a way that won't block the application from receiving callbacks from the main thread's Run Loop or other main thread only work such as calls to UIKit API.
+
+This is a `dispatch_queue_t` that is privately held by each UICollectionView. The work scheduled gets performed on a background thread.
+
+__Describing the Batch Update flow__
+
+<!-- <img src="/static/images/development/threading1.png"> -->
+![Threading1](/static/images/development/threading1.png)
+
+Starting with a simple example, let's say everything was on the main thread. The app would then appear unresponsive to the user until the entire flow finished. This is because the main thread's run loop (which receives operating system events for input) and the main thread dispatch queue compete for service time on the main thread. Execution goes back and forth between the run loop and the main dispatch queue while work is present in either. Now you can see that the work your code wants to schedule competes for time with system and user input events.
+
+Let's identify the items that are not critical for execution on the main thread and dispatch those as blocks onto a background thread.
+
+<!-- <img src="/static/images/development/threading2.png"> -->
+![Threading2](/static/images/development/threading2.png)
+
+Ok, this is starting to look better. The main thread now only performs the minimal amount of work. This means the app will feel responsive to the user as it is able to consume Run Loop events with little interruption. However, a lot of the background work is still being done serially in one long running operation. If the network is the longest running task in this sequence, you would want to make sure they get fired off as early as possible. Let's also introduce another condition, we have a NSTimer running which injects a "hint" cell into the collection view. This is to demonstrate how the editing transaction queue is consumed serially.
+
+The reason we must design the work to consume the editing transaction queue serially alongside the main queue is change sets must represent a transformation of the current data set in the collection view. This means that each time a `performBatchUpdate` is intended to be performed, it _must_ calculate using the latest data set used for display in the collection view. In this following image, this means that change sets can only be calculated from `A -> B`, and then when `performBatchUpdate` task is fully finished, another calculation can be done from `B -> C`. Consider data sets `B` and `C` coming in right after the other. If the queues consumed concurrently, then you would get a change set for `A -> B` and `A -> C`. The collection view will crash if a change set is requested for `A -> C`, while a `performBatchUpdate` is updating the collection view to reflect `A -> B` with a `A -> C` operation is queued. All this means that we create a pseudo-lock on the `editingTransactionQueue` by consuming it one operation at a time, either when the queue is empty or when an operation has finished as called by the completed `performBatchUpdate` invocation.
+
+<!-- <img src="/static/images/development/threading3.png"> -->
+![Threading3](/static/images/development/threading3.png)
+
+One small note is these diagrams are missing a representation of the main dispatch queue. Remember this is separate from the main thread. It is a data structure operated by GCD similarly to ASMainSerialQueue which handles execution to the main thread. All the work that goes from the background threads to the main thread is first put onto the main dispatch queue when using `dispatch_async(dispatch_get_main_queue())`.
 .
