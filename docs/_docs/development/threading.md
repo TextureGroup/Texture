@@ -156,7 +156,7 @@ for (int i=0; i < 1000; i++) {
     });
 }
 ```
-Looking at the logs, we can see how GCD reaches a maximum background thread count
+Looking at the logs, we can see how GCD reaches a maximum background thread count, varied by CPU. This example was run on the 8 core Macbook Pro
 ```
 1 ns block 62
 1 ns block 63
@@ -264,6 +264,33 @@ An alternative method is to manage the duration of the lock hold manually rather
   _lock.lock();
   sharedObject.modify(newData);
   _lock.unlock();
+}
+```
+
+__Method 3__
+
+`ASThread` provides `ASLockScopeSelf()`. This is a convenience over `ASLockScopeUnowned(<NSLocking>)`. This will unlock itself once the scope in which the lock was created is released. Only use this when you are confident that the lock should remain until scope is complete. You can only have one lock defined for `self`, thus it will block all other branches.
+
+```
+#define ASLockScopeUnowned(nsLocking) \
+  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
+  [__lockToken lock];
+
+ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
+  [*lockPtr unlock];
+}
+```
+
+Usage example
+```
+- (ASImageNode *)imageNode
+{
+  ASLockScopeSelf();
+  if (!_imageNode) {
+    _imageNode = [[ASImageNode alloc] init];
+    [_imageNode setLayerBacked:YES];
+  }
+  return _imageNode;
 }
 ```
 
