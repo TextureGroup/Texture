@@ -151,18 +151,18 @@ for (int i=0; i < 1000; i++) {
         uint64_t end = mach_absolute_time();
         uint64_t elapsed = end - start;
         uint64_t nanosec = elapsed * s_timebase_info.numer / s_timebase_info.denom;
-        printf("%llu ns block %i\n", nanosec / kOneMillion, i);
+        printf("%llu ms block %i\n", nanosec / kOneMillion, i);
         usleep(10000);
     });
 }
 ```
 Looking at the logs, we can see how GCD reaches a maximum background thread count, varied by CPU. This example was run on the 8 core Macbook Pro
 ```
-1 ns block 62
-1 ns block 63
-10 ns block 65
-10 ns block 66
-10 ns block 64
+1 ms block 62
+1 ms block 63
+10 ms block 65
+10 ms block 66
+10 ms block 64
 ```
 
 ## ASMainSerialQueue
@@ -196,7 +196,7 @@ CFRunLoopAddObserver(_runLoop, _runLoopObserver,  kCFRunLoopCommonModes);
 ```
 This creates a run loop observer that can be added to the targeted run loop, in this case always the main thread's run loop. The [kCFRunLoopBeforeWaiting](https://developer.apple.com/documentation/corefoundation/cfrunloopactivity?language=objc) places the call to this observer just after the run loop has finished processing the other inputs and sources and just before it will be put to sleep. This ensures that high priority tasks such as responding to user events such as touches are handled first.
 
-However, there is one nuance to using `kCFRunLoopBeforeWaiting`, the handler will not be called if there were no inputs or sources to be handled for that run loop iteration. In order to combat that, we introduce a no-op source so that there is "work" to be performed for each iteration of the run loop.
+However, there is one nuance to using `kCFRunLoopBeforeWaiting`, the handler will not be called if there were no inputs or sources to wake up the run loop again in a situation where the deallocation has to be batched. In order to wake the run loop for another cycle, we introduce a no-op source so that there is "work" to be performed for each iteration of the run loop and then invoke the Core Foundation API to iterate the run loop.
 
 ```
 static void runLoopSourceCallback(void *info) {
