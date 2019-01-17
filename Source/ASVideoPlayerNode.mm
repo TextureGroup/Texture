@@ -286,7 +286,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
       
       {
         ASUnlockScope(self);
-        for (var subnode : subnodes) {
+        for (ASDisplayNode *subnode : subnodes) {
           [self addSubnode:subnode];
         }
       }

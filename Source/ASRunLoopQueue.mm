@@ -260,7 +260,7 @@ static void runLoopSourceCallback(void *info) {
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     const auto itemsEnd = itemsToProcess.cend();
-    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
@@ -464,7 +464,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     const auto itemsEnd = itemsToProcess.cend();
-    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       [value prepareForCATransactionCommit];
       as_log_verbose(ASDisplayLog(), "processed %@", value);
