@@ -183,14 +183,18 @@ static NSMutableDictionary *currentRequests = nil;
 @end
 
 @implementation NSURLRequest (ASBasicImageDownloader)
-static const char *kContextKey = NSStringFromClass(ASBasicImageDownloaderContext.class).UTF8String;
+
+static const void *ContextKey() {
+  return @selector(asyncdisplaykit_context);
+}
+
 - (void)setAsyncdisplaykit_context:(ASBasicImageDownloaderContext *)asyncdisplaykit_context
 {
-  objc_setAssociatedObject(self, kContextKey, asyncdisplaykit_context, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+  objc_setAssociatedObject(self, ContextKey(), asyncdisplaykit_context, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 - (ASBasicImageDownloader *)asyncdisplaykit_context
 {
-  return objc_getAssociatedObject(self, kContextKey);
+  return objc_getAssociatedObject(self, ContextKey());
 }
 @end
 
