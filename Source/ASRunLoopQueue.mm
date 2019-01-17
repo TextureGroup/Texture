@@ -82,7 +82,7 @@ static void runLoopSourceCallback(void *info) {
   _lock.lock();
   const auto q = std::move(_queue);
   _lock.unlock();
-  for (let ref : q) {
+  for (CFTypeRef ref : q) {
     // NOTE: Could check that retain count is 1 and retry later if not.
     CFRelease(ref);
   }

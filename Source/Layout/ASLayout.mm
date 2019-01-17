@@ -151,7 +151,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   if (_retainSublayoutElements.load()) {
     for (ASLayout *sublayout in _sublayouts) {
       // We retained this, so there's no risk of it deallocating on us.
-      if (let cfElement = (__bridge CFTypeRef)sublayout->_layoutElement) {
+      if (CFTypeRef cfElement = (__bridge CFTypeRef)sublayout->_layoutElement) {
         CFRelease(cfElement);
       }
     }
@@ -326,7 +326,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
   NSMutableArray *result = [NSMutableArray array];
   [result addObject:@{ @"size" : [NSValue valueWithCGSize:self.size] }];
 
-  if (let layoutElement = self.layoutElement) {
+  if (id<ASLayoutElement> layoutElement = self.layoutElement) {
     [result addObject:@{ @"layoutElement" : layoutElement }];
   }
 

@@ -120,7 +120,7 @@
 
   const auto result = [[ASIntegerMap alloc] init];
   
-  for (let &e : _map) {
+  for (const auto &e : _map) {
     result->_map[e.second] = e.first;
   }
   return result;
@@ -152,7 +152,7 @@
   } else {
     // { 1->2 3->4 5->6 }
     NSMutableString *str = [NSMutableString string];
-    for (let &e : _map) {
+    for (const auto &e : _map) {
       [str appendFormat:@" %ld->%ld", (long)e.first, (long)e.second];
     }
     // Remove leading space
@@ -176,7 +176,7 @@
     return YES;
   }
 
-  if (let otherMap = ASDynamicCast(object, ASIntegerMap)) {
+  if (ASIntegerMap *otherMap = ASDynamicCast(object, ASIntegerMap)) {
     return otherMap->_map == _map;
   }
   return NO;
