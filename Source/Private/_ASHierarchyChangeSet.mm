@@ -285,7 +285,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     const auto insertMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalInsertItemChanges];
     const auto deleteMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalDeleteItemChanges];
     NSInteger oldSection = 0;
-    for (let oldCount : _oldItemCounts) {
+    for (NSInteger oldCount : _oldItemCounts) {
       NSInteger newSection = [self newSectionForOldSection:oldSection];
       ASIntegerMap *table;
       if (newSection == NSNotFound) {
