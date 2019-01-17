@@ -195,7 +195,7 @@
   for (ASDisplayNode *subnode in self.yogaChildren) {
     rawSublayouts[i++] = [subnode layoutForYogaNode];
   }
-  let sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:childCount];
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:childCount];
 
   // The layout for self should have position CGPointNull, but include the calculated size.
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));

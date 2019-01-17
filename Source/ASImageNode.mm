@@ -217,7 +217,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  let image = ASLockedSelf(_image);
+  const auto image = ASLockedSelf(_image);
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];

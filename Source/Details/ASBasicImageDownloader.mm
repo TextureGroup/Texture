@@ -249,7 +249,7 @@ static const void *ContextKey() {
   // cause significant performance issues.
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // associate metadata with it
-    let callbackData = [[NSMutableDictionary alloc] init];
+    const auto callbackData = [[NSMutableDictionary alloc] init];
     callbackData[kASBasicImageDownloaderContextCallbackQueue] = callbackQueue ? : dispatch_get_main_queue();
 
     if (downloadProgress) {

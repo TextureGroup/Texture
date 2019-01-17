@@ -76,7 +76,7 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
 
   CGRect containerBounds = (CGRect){ .size = container.size };
   {
-    for (let &t : cacheValue->_layouts) {
+    for (const auto &t : cacheValue->_layouts) {
       CGSize constrainedSize = std::get<0>(t);
       ASTextLayout *layout = std::get<1>(t);
 

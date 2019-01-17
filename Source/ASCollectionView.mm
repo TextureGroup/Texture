@@ -1562,7 +1562,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
   // If the data source implements canMoveItem, let them decide.
   if (_asyncDataSourceFlags.collectionNodeCanMoveItem) {
-    if (let cellNode = [self nodeForItemAtIndexPath:indexPath]) {
+    if (ASCellNode *cellNode = [self nodeForItemAtIndexPath:indexPath]) {
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
       return [_asyncDataSource collectionNode:collectionNode canMoveItemWithNode:cellNode];
     }
@@ -1578,7 +1578,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   // Inform the data source first, in case they call nodeForItemAtIndexPath:.
   // We want to make sure we return them the node for the item they have in mind.
-  if (let collectionNode = self.collectionNode) {
+  if (ASCollectionNode *collectionNode = self.collectionNode) {
     [_asyncDataSource collectionNode:collectionNode moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
   }
   
@@ -2083,7 +2083,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections
 {
   if (_asyncDataSourceFlags.collectionNodeSupplementaryElementKindsInSection) {
-    let kinds = [[NSMutableSet<NSString *> alloc] init];
+    const auto kinds = [[NSMutableSet<NSString *> alloc] init];
     GET_COLLECTIONNODE_OR_RETURN(collectionNode, @[]);
     [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL * _Nonnull stop) {
       NSArray<NSString *> *kindsForSection = [_asyncDataSource collectionNode:collectionNode supplementaryElementKindsInSection:section];
@@ -2218,7 +2218,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
       
       __block NSUInteger numberOfUpdates = 0;
-      let completion = ^(BOOL finished) {
+      const auto completion = ^(BOOL finished) {
         as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
         as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
@@ -2319,7 +2319,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return;
   }
 
-  let uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
+  const auto uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
   
   [_layoutFacilitator collectionViewWillEditCellsAtIndexPaths:uikitIndexPaths batched:NO];
   
