@@ -1866,7 +1866,10 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
   [self displayDidFinish];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)displayWillStart {}
+#pragma clang diagnostic pop
 - (void)displayWillStartAsynchronously:(BOOL)asynchronously
 {
   ASDisplayNodeAssertMainThread();
@@ -3840,10 +3843,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   suppressesInvalidCollectionUpdateExceptions.store(suppresses);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (BOOL)suppressesInvalidCollectionUpdateExceptions
 {
   return suppressesInvalidCollectionUpdateExceptions.load();
 }
+#pragma clang diagnostic pop
 
 - (NSString *)displayNodeRecursiveDescription
 {

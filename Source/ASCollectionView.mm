@@ -340,6 +340,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma mark -
 #pragma mark Overrides.
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 /**
  * This method is not available to be called by the public i.e.
  * it should only be called by UICollectionView itself. UICollectionView
@@ -358,6 +360,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     } completion:nil];
   }
 }
+#pragma clang diagnostic pop
 
 - (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated
 {
@@ -656,6 +659,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [_rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)setZeroContentInsets:(BOOL)zeroContentInsets
 {
   _zeroContentInsets = zeroContentInsets;
@@ -665,6 +670,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   return _zeroContentInsets;
 }
+#pragma clang diagnostic pop
 
 /// Uses latest size range from data source and -layoutThatFits:.
 - (CGSize)sizeForElement:(ASCollectionElement *)element
@@ -693,6 +699,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (CGSize)calculatedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
@@ -700,6 +708,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASCollectionElement *e = [_dataController.visibleMap elementForItemAtIndexPath:indexPath];
   return [self sizeForElement:e];
 }
+#pragma clang diagnostic pop
 
 - (ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
