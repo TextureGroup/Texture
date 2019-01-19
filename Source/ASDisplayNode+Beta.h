@@ -196,6 +196,12 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
 
+/**
+ * @discussion Attempts(spinning) to lock all node up to root node when yoga is enabled.
+ * This will lock self when yoga is not enabled;
+ */
+- (ASLockSet)lockToRootIfNeededForLayout;
+
 @property BOOL yogaLayoutInProgress;
 // TODO: Make this atomic (lock).
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;

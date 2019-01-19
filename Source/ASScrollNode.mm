@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASScrollNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
@@ -79,7 +80,7 @@
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASLockScopeSelf();  // Lock for using our instance variables.
+  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
 
   ASSizeRange contentConstrainedSize = constrainedSize;
   if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections)) {

@@ -316,6 +316,16 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (NSArray *)accessibilityElements;
 @end;
 
+@interface ASDisplayNode (YogaInternal)
+
+/**
+ * @discussion return true only when yoga enabled and the node is in yoga tree and the node is
+ * not leaf that implemented measure function.
+ */
+- (BOOL)locked_shouldLayoutFromYogaRoot;
+
+@end
+
 @interface UIView (ASDisplayNodeInternal)
 @property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;
 @end

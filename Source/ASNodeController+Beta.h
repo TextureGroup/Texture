@@ -47,6 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)hierarchyDisplayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
 
+/**
+ * @discussion Attempts (via ASLockSequence, a backing-off spinlock similar to
+ * std::lock()) to lock both the node and its ASNodeController, if one exists.
+ */
+- (ASLockSet)lockPair;
+
 @end
 
 @interface ASDisplayNode (ASNodeController)

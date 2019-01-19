@@ -1026,7 +1026,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)__layout
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   
   BOOL loaded = NO;
   {
@@ -1077,7 +1077,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   // Hook for subclasses
   ASDisplayNodeAssertMainThread();
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
 }
 
@@ -1117,7 +1117,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
-  ASDN::UniqueLock l(__instanceLock__);
+  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
 
 #if YOGA
   // There are several cases where Yoga could arrive here:
@@ -1125,31 +1125,24 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
   // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
   // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
-  YGNodeRef yogaNode = _style.yogaNode;
-  BOOL hasYogaParent = (_yogaParent != nil);
-  BOOL hasYogaChildren = (_yogaChildren.count > 0);
-  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
-  if (usesYoga) {
-    // This node has some connection to a Yoga tree.
-    if ([self shouldHaveYogaMeasureFunc] == NO) {
-      // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
-      // initiate a new Yoga calculation pass from root.
-      
-      as_activity_create_for_scope("Yoga layout calculation");
-      if (self.yogaLayoutInProgress == NO) {
-        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
-        l.unlock();
-        [self calculateLayoutFromYogaRoot:constrainedSize];
-        l.lock();
-      } else {
-        ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
-      }
-      ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
-      return _yogaCalculatedLayout;
+  if ([self locked_shouldLayoutFromYogaRoot]) {
+    // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
+    // initiate a new Yoga calculation pass from root.
+    as_activity_create_for_scope("Yoga layout calculation");
+    if (self.yogaLayoutInProgress == NO) {
+      ASYogaLog("Calculating yoga layout from root %@, %@", self,
+                NSStringFromASSizeRange(constrainedSize));
+      [self calculateLayoutFromYogaRoot:constrainedSize];
     } else {
-      // If we're a yoga leaf node with custom measurement function, proceed with normal layout so layoutSpecs can run (e.g. ASButtonNode).
-      ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
+      ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
     }
+    ASDisplayNodeAssert(_yogaCalculatedLayout,
+                        @"Yoga node should have a non-nil layout at this stage: %@", self);
+    return _yogaCalculatedLayout;
+  } else {
+    // If we're a yoga leaf node with custom measurement function, proceed with normal layout so
+    // layoutSpecs can run (e.g. ASButtonNode).
+    ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
   }
 #endif /* YOGA */
   
@@ -1270,7 +1263,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   // Hook for subclasses
   ASDisplayNodeAssertMainThread();
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
     [del nodeDidLayout];
@@ -2792,7 +2785,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isEnteringHierarchy, @"Should not cause recursive __enterHierarchy");
-  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"enterHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
@@ -2841,7 +2833,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isExitingHierarchy, @"Should not cause recursive __exitHierarchy");
-  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"exitHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
