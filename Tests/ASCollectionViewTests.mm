@@ -1048,10 +1048,6 @@
 
 - (void)testInitialRangeBounds
 {
-  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalSkipDefaultCellLayoutMode;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-  
   [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeNone];
 }
 
@@ -1076,19 +1072,15 @@
   // Trigger the initial reload to start 
   [window layoutIfNeeded];
 
-  // Test the APIs that monitor ASCollectionNode update handling if collection node should
-  // layout asynchronously
-  if (![cn.view dataController:nil shouldSynchronouslyProcessChangeSet:nil]) {
-    XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
-
-    [cn onDidFinishProcessingUpdates:^{
-      XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates inside -onDidFinishProcessingUpdates: block");
-    }];
-
-    // Wait for ASDK reload to finish
-    [cn waitUntilAllUpdatesAreProcessed];
-  }
-
+  XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
+  
+  [cn onDidFinishProcessingUpdates:^{
+    XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates inside -onDidFinishProcessingUpdates: block");
+  }];
+  
+  // Wait for ASDK reload to finish
+  [cn waitUntilAllUpdatesAreProcessed];
+  
   XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates after -wait call");
 
   // Force UIKit to read updated data & range controller to update and account for it
