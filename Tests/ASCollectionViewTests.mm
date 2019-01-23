@@ -1046,15 +1046,28 @@
 
 - (void)testInitialRangeBounds
 {
-  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeNone];
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeNone
+           shouldWaitUntilAllUpdatesAreProcessed:YES];
+}
+
+- (void)testInitialRangeBoundsCellLayoutModeSyncForSmallContent
+{
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
+  config.experimentalFeatures = ASExperimentalNewDefaultCellLayoutMode;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeSyncForSmallContent
+           shouldWaitUntilAllUpdatesAreProcessed:YES]; // Need to wait because the first initial data load is always async
 }
 
 - (void)testInitialRangeBoundsCellLayoutModeAlwaysAsync
 {
-  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeAlwaysAsync];
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeAlwaysAsync
+           shouldWaitUntilAllUpdatesAreProcessed:YES];
 }
 
 - (void)testInitialRangeBoundsWithCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
+           shouldWaitUntilAllUpdatesAreProcessed:(BOOL)shouldWait
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];
@@ -1070,14 +1083,16 @@
   // Trigger the initial reload to start 
   [window layoutIfNeeded];
 
-  XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
-  
-  [cn onDidFinishProcessingUpdates:^{
-    XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates inside -onDidFinishProcessingUpdates: block");
-  }];
-  
-  // Wait for ASDK reload to finish
-  [cn waitUntilAllUpdatesAreProcessed];
+  if (shouldWait) {
+    XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
+    
+    [cn onDidFinishProcessingUpdates:^{
+      XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates inside -onDidFinishProcessingUpdates: block");
+    }];
+    
+    // Wait for ASDK reload to finish
+    [cn waitUntilAllUpdatesAreProcessed];
+  }
   
   XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates after -wait call");
 
