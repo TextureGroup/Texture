@@ -1052,10 +1052,6 @@
 
 - (void)testInitialRangeBoundsCellLayoutModeSyncForSmallContent
 {
-  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalNewDefaultCellLayoutMode;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-  
   [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeSyncForSmallContent
            shouldWaitUntilAllUpdatesAreProcessed:YES]; // Need to wait because the first initial data load is always async
 }
