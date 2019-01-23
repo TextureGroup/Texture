@@ -317,6 +317,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   [self _configureCollectionViewLayout:layout];
   
+  if (ASActivateExperimentalFeature(ASExperimentalNewDefaultCellLayoutMode)) {
+    _cellLayoutMode = ASCellLayoutModeSyncForSmallContent;
+  } else {
+    _cellLayoutMode = ASCellLayoutModeNone;
+  }
+  
   return self;
 }
 
@@ -1868,8 +1874,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysAsync)) {
     return NO;
   }
-  // The heuristics below apply to the ASCellLayoutModeNone.
-  if (!ASActivateExperimentalFeature(ASExperimentalSkipDefaultCellLayoutMode)) {
+  if (ASCellLayoutModeIncludes(ASCellLayoutModeSyncForSmallContent)) {
     // Reload data is expensive, don't block main while doing so.
     if (changeSet.includesReloadData) {
       return NO;
@@ -1884,7 +1889,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       return YES;
     }
   }
-  return NO;
+  return NO; // ASCellLayoutModeNone
 }
 
 - (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController

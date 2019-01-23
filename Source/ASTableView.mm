@@ -1677,7 +1677,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
-  if (!ASActivateExperimentalFeature(ASExperimentalSkipDefaultCellLayoutMode)) {
+  if (ASActivateExperimentalFeature(ASExperimentalNewDefaultCellLayoutMode)) {
     // Reload data is expensive, don't block main while doing so.
     if (changeSet.includesReloadData) {
       return NO;
