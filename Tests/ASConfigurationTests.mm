@@ -28,7 +28,9 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
-  ASExperimentalDisableAccessibilityCache
+  ASExperimentalDisableAccessibilityCache,
+  ASExperimentalSkipAccessibilityWait,
+  ASExperimentalNewDefaultCellLayoutMode
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -51,7 +53,9 @@ static ASExperimentalFeatures features[] = {
     @"exp_framesetter_cache",
     @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
-    @"exp_disable_a11y_cache"
+    @"exp_disable_a11y_cache",
+    @"exp_skip_a11y_wait",
+    @"exp_new_default_cell_layout_mode"
   ];
 }
 

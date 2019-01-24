@@ -29,6 +29,8 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalSkipClearData = 1 << 8,                     // exp_skip_clear_data
   ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 9,      // exp_did_enter_preload_skip_asm_layout
   ASExperimentalDisableAccessibilityCache = 1 << 10,        // exp_disable_a11y_cache
+  ASExperimentalSkipAccessibilityWait = 1 << 11,            // exp_skip_a11y_wait
+  ASExperimentalNewDefaultCellLayoutMode = 1 << 12,         // exp_new_default_cell_layout_mode
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
