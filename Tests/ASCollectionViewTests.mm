@@ -1081,15 +1081,15 @@
 
   if (shouldWait) {
     XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
-    
+
     [cn onDidFinishProcessingUpdates:^{
       XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates inside -onDidFinishProcessingUpdates: block");
     }];
-    
+
     // Wait for ASDK reload to finish
     [cn waitUntilAllUpdatesAreProcessed];
   }
-  
+
   XCTAssertTrue(!cn.isProcessingUpdates, @"ASCollectionNode should no longer be processing updates after -wait call");
 
   // Force UIKit to read updated data & range controller to update and account for it
