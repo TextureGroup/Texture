@@ -1174,6 +1174,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // Update the selected background view in collectionView:willDisplayCell:forItemAtIndexPath: otherwise it could be too
   // early e.g. if the selectedBackgroundView was set in didLoad()
   cell.selectedBackgroundView = cellNode.selectedBackgroundView;
+  cell.backgroundView = cellNode.backgroundView
   
   // Under iOS 10+, cells may be removed/re-added to the collection view without
   // receiving prepareForReuse/applyLayoutAttributes, as an optimization for e.g.
