@@ -116,6 +116,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     self.backgroundColor = node.backgroundColor;
     self.selectionStyle = node.selectionStyle;
     self.selectedBackgroundView = node.selectedBackgroundView;
+    self.backgroundView = node.backgroundView;
     self.separatorInset = node.separatorInset;
     self.selectionStyle = node.selectionStyle;
     self.accessoryType = node.accessoryType;
