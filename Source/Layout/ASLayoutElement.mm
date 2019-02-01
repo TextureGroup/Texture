@@ -2,17 +2,9 @@
 //  ASLayoutElement.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -50,39 +42,66 @@ CGSize const ASLayoutElementParentSizeUndefined = {ASLayoutElementParentDimensio
 int32_t const ASLayoutElementContextInvalidTransitionID = 0;
 int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContextInvalidTransitionID + 1;
 
-static void ASLayoutElementDestructor(void *p) {
-  if (p != NULL) {
-    ASDisplayNodeCFailAssert(@"Thread exited without clearing layout element context!");
-    CFBridgingRelease(p);
-  }
-};
+#if AS_TLS_AVAILABLE
 
-pthread_key_t ASLayoutElementContextKey()
-{
-  return ASPthreadStaticKey(ASLayoutElementDestructor);
-}
+static _Thread_local __unsafe_unretained ASLayoutElementContext *tls_context;
 
 void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
   // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
-  ASDisplayNodeCAssertNil(ASLayoutElementGetCurrentContext(), @"Nested ASLayoutElementContexts aren't supported.");
-  pthread_setspecific(ASLayoutElementContextKey(), CFBridgingRetain(context));
+  ASDisplayNodeCAssertNil(tls_context, @"Nested ASLayoutElementContexts aren't supported.");
+  
+  tls_context = (__bridge ASLayoutElementContext *)(__bridge_retained CFTypeRef)context;
 }
 
 ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 {
   // Don't retain here. Caller will retain if it wants to!
-  return (__bridge __unsafe_unretained ASLayoutElementContext *)pthread_getspecific(ASLayoutElementContextKey());
+  return tls_context;
 }
 
 void ASLayoutElementPopContext()
 {
-  ASLayoutElementContextKey();
-  ASDisplayNodeCAssertNotNil(ASLayoutElementGetCurrentContext(), @"Attempt to pop context when there wasn't a context!");
-  auto key = ASLayoutElementContextKey();
-  CFBridgingRelease(pthread_getspecific(key));
-  pthread_setspecific(key, NULL);
+  ASDisplayNodeCAssertNotNil(tls_context, @"Attempt to pop context when there wasn't a context!");
+  CFRelease((__bridge CFTypeRef)tls_context);
+  tls_context = nil;
 }
+
+#else
+
+static pthread_key_t ASLayoutElementContextKey() {
+  static pthread_key_t k;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    pthread_key_create(&k, NULL);
+  });
+  return k;
+}
+void ASLayoutElementPushContext(ASLayoutElementContext *context)
+{
+  // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
+  ASDisplayNodeCAssertNil(pthread_getspecific(ASLayoutElementContextKey()), @"Nested ASLayoutElementContexts aren't supported.");
+  
+  const auto cfCtx = (__bridge_retained CFTypeRef)context;
+  pthread_setspecific(ASLayoutElementContextKey(), cfCtx);
+}
+
+ASLayoutElementContext *ASLayoutElementGetCurrentContext()
+{
+  // Don't retain here. Caller will retain if it wants to!
+  const auto ctxPtr = pthread_getspecific(ASLayoutElementContextKey());
+  return (__bridge ASLayoutElementContext *)ctxPtr;
+}
+
+void ASLayoutElementPopContext()
+{
+  const auto ctx = (CFTypeRef)pthread_getspecific(ASLayoutElementContextKey());
+  ASDisplayNodeCAssertNotNil(ctx, @"Attempt to pop context when there wasn't a context!");
+  CFRelease(ctx);
+  pthread_setspecific(ASLayoutElementContextKey(), NULL);
+}
+
+#endif // AS_TLS_AVAILABLE
 
 #pragma mark - ASLayoutElementStyle
 
@@ -136,7 +155,7 @@ do {\
 @implementation ASLayoutElementStyle {
   ASDN::RecursiveMutex __instanceLock__;
   ASLayoutElementStyleExtensions _extensions;
-  
+
   std::atomic<ASLayoutElementSize> _size;
   std::atomic<CGFloat> _spacingBefore;
   std::atomic<CGFloat> _spacingAfter;
@@ -161,6 +180,7 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
+  ASStackLayoutAlignItems _parentAlignStyle;
 #endif
 }
 
@@ -183,9 +203,14 @@ do {\
   self = [super init];
   if (self) {
     _size = ASLayoutElementSizeMake();
+#if YOGA
+    _parentAlignStyle = ASStackLayoutAlignItemsNotSet;
+#endif
   }
   return self;
 }
+
+ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 #pragma mark - ASLayoutElementStyleSize
 
@@ -756,6 +781,10 @@ do {\
 - (ASEdgeInsets)padding                       { return _padding.load(); }
 - (ASEdgeInsets)border                        { return _border.load(); }
 - (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
+// private (ASLayoutElementStylePrivate.h)
+- (ASStackLayoutAlignItems)parentAlignStyle {
+  return _parentAlignStyle;
+}
 
 - (void)setFlexWrap:(YGWrap)flexWrap {
   _flexWrap.store(flexWrap);
@@ -800,6 +829,10 @@ do {\
 - (void)setAspectRatio:(CGFloat)aspectRatio {
   _aspectRatio.store(aspectRatio);
   ASLayoutElementStyleCallDelegate(ASYogaAspectRatioProperty);
+}
+// private (ASLayoutElementStylePrivate.h)
+- (void)setParentAlignStyle:(ASStackLayoutAlignItems)style {
+  _parentAlignStyle = style;
 }
 
 #endif /* YOGA */

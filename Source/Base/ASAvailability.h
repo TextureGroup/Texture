@@ -2,22 +2,41 @@
 //  ASAvailability.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <CoreFoundation/CFBase.h>
 
 #pragma once
+
+#ifdef __i386__
+  #define AS_TLS_AVAILABLE 0
+#else
+  #define AS_TLS_AVAILABLE 1
+#endif
+
+#ifndef AS_ENABLE_TEXTNODE
+  #define AS_ENABLE_TEXTNODE 1 // Enable old TextNode by default
+#endif
+
+// This needs to stay in sync with Weaver
+#ifndef AS_USE_VIDEO
+  #define AS_USE_VIDEO 0
+#endif
+
+#ifndef AS_USE_PHOTOS
+  #define AS_USE_PHOTOS 0
+#endif
+
+#ifndef AS_USE_MAPKIT
+  #define AS_USE_MAPKIT 0
+#endif
+
+#ifndef AS_USE_ASSETS_LIBRARY
+  #define AS_USE_ASSETS_LIBRARY 0
+#endif
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_10_0
   #define kCFCoreFoundationVersionNumber_iOS_10_0 1348.00
@@ -36,9 +55,13 @@
 
 // Use __builtin_available if we're on Xcode >= 9, AS_AT_LEAST otherwise.
 #if __has_builtin(__builtin_available)
-  #define AS_AVAILABLE_IOS(ver)   __builtin_available(iOS ver, *)
+  #define AS_AVAILABLE_IOS(ver)               __builtin_available(iOS ver, *)
+  #define AS_AVAILABLE_TVOS(ver)              __builtin_available(tvOS ver, *)
+  #define AS_AVAILABLE_IOS_TVOS(ver1, ver2)   __builtin_available(iOS ver1, tvOS ver2, *)
 #else
-  #define AS_AVAILABLE_IOS(ver)   AS_AT_LEAST_IOS##ver
+  #define AS_AVAILABLE_IOS(ver)               (TARGET_OS_IOS && AS_AT_LEAST_IOS##ver)
+  #define AS_AVAILABLE_TVOS(ver)              (TARGET_OS_TV && AS_AT_LEAST_IOS##ver)
+  #define AS_AVAILABLE_IOS_TVOS(ver1, ver2)   (AS_AVAILABLE_IOS(ver1) || AS_AVAILABLE_TVOS(ver2))
 #endif
 
 // If Yoga is available, make it available anywhere we use ASAvailability.
@@ -52,11 +75,8 @@
   #define YOGA __has_include(YOGA_HEADER_PATH)
 #endif
 
-// When enabled, use ASTextNode2 for ALL instances of ASTextNode.
-// This includes what ASButtonNode uses internally, as well as all app references to ASTextNode.
-// See ASTextNode+Beta.h declaration of ASTextNodeExperimentOptions for more details.
-#ifndef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
-  #define ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE 0
+#ifdef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
+  #error "ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE is unavailable. See ASConfiguration.h."
 #endif
 
 #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)

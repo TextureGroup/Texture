@@ -2,22 +2,18 @@
 //  ASTextKitFontSizeAdjuster.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <UIKit/UIKit.h>
+
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASTextKitAttributes.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 AS_SUBCLASSING_RESTRICTED
 @interface ASTextKitFontSizeAdjuster : NSObject
 
-@property (nonatomic, assign) CGSize constrainedSize;
+@property (nonatomic) CGSize constrainedSize;
 
 /**
  *  Creates a class that will return a scale factor the will make a string fit inside the constrained size.
@@ -58,3 +54,5 @@ AS_SUBCLASSING_RESTRICTED
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

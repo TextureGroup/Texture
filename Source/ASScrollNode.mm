@@ -2,25 +2,18 @@
 //  ASScrollNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASScrollNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 @interface ASScrollView : UIScrollView
 @end
@@ -59,6 +52,11 @@
   }
 }
 
+- (NSArray *)accessibilityElements
+{
+  return [self.asyncdisplaykit_node accessibilityElements];
+}
+
 @end
 
 @implementation ASScrollNode
@@ -81,7 +79,7 @@
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASDN::MutexLocker l(__instanceLock__);  // Lock for using our instance variables.
+  ASLockScopeSelf();  // Lock for using our instance variables.
 
   ASSizeRange contentConstrainedSize = constrainedSize;
   if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections)) {
@@ -123,7 +121,7 @@
 {
   [super layout];
   
-  ASDN::MutexLocker l(__instanceLock__);  // Lock for using our two instance variables.
+  ASLockScopeSelf();  // Lock for using our two instance variables.
   
   if (_automaticallyManagesContentSize) {
     CGSize contentSize = _contentCalculatedSizeFromLayout;
@@ -137,13 +135,13 @@
 
 - (BOOL)automaticallyManagesContentSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _automaticallyManagesContentSize;
 }
 
 - (void)setAutomaticallyManagesContentSize:(BOOL)automaticallyManagesContentSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _automaticallyManagesContentSize = automaticallyManagesContentSize;
   if (_automaticallyManagesContentSize == YES
       && ASScrollDirectionContainsVerticalDirection(_scrollableDirections) == NO
@@ -156,13 +154,13 @@
 
 - (ASScrollDirection)scrollableDirections
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _scrollableDirections;
 }
 
 - (void)setScrollableDirections:(ASScrollDirection)scrollableDirections
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   if (_scrollableDirections != scrollableDirections) {
     _scrollableDirections = scrollableDirections;
     [self setNeedsLayout];

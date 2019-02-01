@@ -2,17 +2,9 @@
 //  ASAssert.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #pragma once
@@ -21,7 +13,11 @@
 #import <pthread.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-#define ASDISPLAYNODE_ASSERTIONS_ENABLED (!defined(NS_BLOCK_ASSERTIONS))
+#if !defined(NS_BLOCK_ASSERTIONS)
+  #define ASDISPLAYNODE_ASSERTIONS_ENABLED 1
+#else
+  #define ASDISPLAYNODE_ASSERTIONS_ENABLED 0
+#endif
 
 /**
  * Note: In some cases it would be sufficient to do e.g.:
@@ -67,6 +63,7 @@
 #define ASDisplayNodeCAssertPositiveReal(description, num) ASDisplayNodeCAssert(num >= 0 && num <= CGFLOAT_MAX, @"%@ must be a real positive integer: %f.", description, (CGFloat)num)
 #define ASDisplayNodeCAssertInfOrPositiveReal(description, num) ASDisplayNodeCAssert(isinf(num) || (num >= 0 && num <= CGFLOAT_MAX), @"%@ must be infinite or a real positive integer: %f.", description, (CGFloat)num)
 
+#define ASDisplayNodeCAssertPermanent(object) ASDisplayNodeCAssert(CFGetRetainCount((__bridge CFTypeRef)(object)) == CFGetRetainCount(kCFNull), @"Expected %s to be a permanent object.", #object)
 #define ASDisplayNodeErrorDomain @"ASDisplayNodeErrorDomain"
 #define ASDisplayNodeNonFatalErrorCode 1
 
@@ -77,13 +74,11 @@
  */
 #pragma mark - Main Thread Assertions Disabling
 
-ASDISPLAYNODE_EXTERN_C_BEGIN
-BOOL ASMainThreadAssertionsAreDisabled(void);
+AS_EXTERN BOOL ASMainThreadAssertionsAreDisabled(void);
 
-void ASPushMainThreadAssertionsDisabled(void);
+AS_EXTERN void ASPushMainThreadAssertionsDisabled(void);
 
-void ASPopMainThreadAssertionsDisabled(void);
-ASDISPLAYNODE_EXTERN_C_END
+AS_EXTERN void ASPopMainThreadAssertionsDisabled(void);
 
 #pragma mark - Non-Fatal Assertions
 

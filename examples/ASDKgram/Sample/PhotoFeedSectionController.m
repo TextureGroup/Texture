@@ -1,9 +1,9 @@
 //
 //  PhotoFeedSectionController.m
-//  Sample
+//  Texture
 //
-//  Created by Adlai Holler on 12/29/16.
-//  Copyright © 2016 Facebook. All rights reserved.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "PhotoFeedSectionController.h"
@@ -82,12 +82,17 @@
       [self setItems:newItems animated:NO completion:nil];
     }
 
-    // Start the fetch, then update the items (removing the spinner) when they are loaded.
-    [_photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
-      [self setItems:_photoFeed.photos animated:NO completion:^{
-        [context completeBatchFetching:YES];
-      }];
-    } numResultsToReturn:20];
+    // Push to next runloop to give time to insert the spinner
+    dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        // Start the fetch, then update the items (removing the spinner) when they are loaded.
+        [_photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
+          [self setItems:_photoFeed.photos animated:NO completion:^{
+            [context completeBatchFetching:YES];
+          }];
+        } numResultsToReturn:20];
+      });
+    });
   });
 }
 

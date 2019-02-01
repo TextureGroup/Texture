@@ -2,12 +2,8 @@
 //  ASYogaUtilities.h
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
@@ -30,23 +26,23 @@
 
 @end
 
-extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
-
-ASDISPLAYNODE_EXTERN_C_BEGIN
+// pre-order, depth-first
+AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
 #pragma mark - Yoga Type Conversion Helpers
 
-YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems);
-YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent);
-YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf);
-YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction);
-float yogaFloatForCGFloat(CGFloat value);
-float yogaDimensionToPoints(ASDimension dimension);
-float yogaDimensionToPercent(ASDimension dimension);
-ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
+AS_EXTERN YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems);
+AS_EXTERN YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent);
+AS_EXTERN YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf);
+AS_EXTERN YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction);
+AS_EXTERN float yogaFloatForCGFloat(CGFloat value);
+AS_EXTERN float yogaDimensionToPoints(ASDimension dimension);
+AS_EXTERN float yogaDimensionToPercent(ASDimension dimension);
+AS_EXTERN ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
 
-void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
-YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
+AS_EXTERN void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
+AS_EXTERN float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height);
+AS_EXTERN YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
                                       float width, YGMeasureMode widthMode,
                                       float height, YGMeasureMode heightMode);
 
@@ -78,7 +74,5 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
   } else { \
     YGNodeStyleSet##property(yogaNode, edge, YGUndefined); \
   } \
-
-ASDISPLAYNODE_EXTERN_C_END
 
 #endif /* YOGA */

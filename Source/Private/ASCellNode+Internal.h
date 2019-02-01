@@ -2,17 +2,9 @@
 //  ASCellNode+Internal.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASCellNode.h>
@@ -57,13 +49,27 @@ NS_ASSUME_NONNULL_BEGIN
  *   that it's always safe simply to retain it, and copy if needed. Since @c UICollectionViewLayoutAttributes
  *   is always mutable, @c copy is never "free" like it is for e.g. NSString.
  */
-@property (nonatomic, strong, nullable) UICollectionViewLayoutAttributes *layoutAttributes;
+@property (nullable, nonatomic) UICollectionViewLayoutAttributes *layoutAttributes;
 
-@property (atomic, weak, nullable) ASCollectionElement *collectionElement;
+@property (weak, nullable) ASCollectionElement *collectionElement;
 
-@property (atomic, weak, nullable) id<ASRangeManagingNode> owningNode;
+@property (weak, nullable) id<ASRangeManagingNode> owningNode;
 
-@property (nonatomic, assign) BOOL shouldUseUIKitCell;
+@property (nonatomic, readonly) BOOL shouldUseUIKitCell;
+
+@end
+
+@class ASWrapperCellNode;
+
+typedef CGSize (^ASSizeForItemBlock)(ASWrapperCellNode *node, CGSize collectionSize);
+typedef UICollectionViewCell * _Nonnull(^ASCellForItemBlock)(ASWrapperCellNode *node);
+typedef UICollectionReusableView * _Nonnull(^ASViewForSupplementaryBlock)(ASWrapperCellNode *node);
+
+@interface ASWrapperCellNode : ASCellNode
+
+@property (nonatomic, readonly) ASSizeForItemBlock sizeForItemBlock;
+@property (nonatomic, readonly) ASCellForItemBlock cellForItemBlock;
+@property (nonatomic, readonly) ASViewForSupplementaryBlock viewForSupplementaryBlock;
 
 @end
 

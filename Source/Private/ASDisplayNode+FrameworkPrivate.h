@@ -2,17 +2,9 @@
 //  ASDisplayNode+FrameworkPrivate.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 //
@@ -133,13 +125,14 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 + (Class)viewClass;
 
 // Thread safe way to access the bounds of the node
-@property (nonatomic, assign) CGRect threadSafeBounds;
+@property (nonatomic) CGRect threadSafeBounds;
 
 // Returns the bounds of the node without reaching the view or layer
 - (CGRect)_locked_threadSafeBounds;
 
-// delegate to inform of ASInterfaceState changes (used by ASNodeController)
-@property (nonatomic, weak) id<ASInterfaceStateDelegate> interfaceStateDelegate;
+// The -pendingInterfaceState holds the value that will be applied to -interfaceState by the
+// ASCATransactionQueue. If already applied, it matches -interfaceState. Thread-safe access.
+@property (nonatomic, readonly) ASInterfaceState pendingInterfaceState;
 
 // These methods are recursive, and either union or remove the provided interfaceState to all sub-elements.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
@@ -151,7 +144,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)exitHierarchyState:(ASHierarchyState)hierarchyState;
 
 // Changed before calling willEnterHierarchy / didExitHierarchy.
-@property (readonly, assign, getter = isInHierarchy) BOOL inHierarchy;
+@property (readonly, getter = isInHierarchy) BOOL inHierarchy;
 // Call willEnterHierarchy if necessary and set inHierarchy = YES if visibility notifications are enabled on all of its parents
 - (void)__enterHierarchy;
 // Call didExitHierarchy if necessary and set inHierarchy = NO if visibility notifications are enabled on all of its parents
@@ -164,7 +157,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  *
  * @see ASInterfaceState
  */
-@property (nonatomic, readwrite) ASHierarchyState hierarchyState;
+@property (nonatomic) ASHierarchyState hierarchyState;
 
 /**
  * @abstract Return if the node is range managed or not
@@ -230,12 +223,31 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  * ASNetworkImageNode and ASMultiplexImageNode set this to YES, because they load data from a database or server,
  * and are expected to support a placeholder state given that display is often blocked on slow data fetching.
  */
-@property (nonatomic, assign) BOOL shouldBypassEnsureDisplay;
+@property BOOL shouldBypassEnsureDisplay;
 
 /**
  * @abstract Checks whether a node should be scheduled for display, considering its current and new interface states.
  */
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState;
+
+/**
+ * @abstract safeAreaInsets will fallback to this value if the corresponding UIKit property is not available
+ * (due to an old iOS version).
+ *
+ * @discussion This should be set by the owning view controller based on it's layout guides.
+ * If this is not a view controllet's node the value will be calculated automatically by the parent node.
+ */
+@property (nonatomic) UIEdgeInsets fallbackSafeAreaInsets;
+
+/**
+ * @abstract Indicates if this node is a view controller's root node. Defaults to NO.
+ *
+ * @discussion Set to YES in -[ASViewController initWithNode:].
+ *
+ * YES here only means that this node is used as an ASViewController node. It doesn't mean that this node is a root of
+ * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASViewController.
+ */
+@property (nonatomic, getter=isViewControllerRoot) BOOL viewControllerRoot;
 
 @end
 
@@ -278,13 +290,18 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (BOOL)_isLayoutTransitionInvalid;
 
 /**
+ * Same as @c -_isLayoutTransitionInvalid but must be called with the node's instance lock held.
+ */
+- (BOOL)_locked_isLayoutTransitionInvalid;
+
+/**
  * Internal method that can be overriden by subclasses to add specific behavior after the measurement of a layout
  * transition did finish.
  */
 - (void)_layoutTransitionMeasurementDidFinish;
 
 /**
- * Informs the node that hte pending layout transition did complete
+ * Informs the node that the pending layout transition did complete
  */
 - (void)_completePendingLayoutTransition;
 
@@ -295,12 +312,16 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 
 @end
 
+@interface ASDisplayNode (AccessibilityInternal)
+- (NSArray *)accessibilityElements;
+@end;
+
 @interface UIView (ASDisplayNodeInternal)
-@property (nullable, atomic, weak, readwrite) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;
 @end
 
 @interface CALayer (ASDisplayNodeInternal)
-@property (nullable, atomic, weak, readwrite) ASDisplayNode *asyncdisplaykit_node;
+@property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;
 @end
 
 NS_ASSUME_NONNULL_END

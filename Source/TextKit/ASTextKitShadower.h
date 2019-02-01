@@ -2,20 +2,17 @@
 //  ASTextKitShadower.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <UIKit/UIKit.h>
+
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 /**
@@ -34,16 +31,16 @@ AS_SUBCLASSING_RESTRICTED
  * @discussion A positive width will move the shadow to the right.
  *             A positive height will move the shadow downwards.
  */
-@property (nonatomic, readonly, assign) CGSize shadowOffset;
+@property (nonatomic, readonly) CGSize shadowOffset;
 
 //! CGColor in which the shadow is drawn
-@property (nonatomic, readonly, strong) UIColor *shadowColor;
+@property (nonatomic, copy, readonly) UIColor *shadowColor;
 
 //! Alpha of the shadow
-@property (nonatomic, readonly, assign) CGFloat shadowOpacity;
+@property (nonatomic, readonly) CGFloat shadowOpacity;
 
 //! Radius, in pixels
-@property (nonatomic, readonly, assign) CGFloat shadowRadius;
+@property (nonatomic, readonly) CGFloat shadowRadius;
 
 /**
  * @abstract The edge insets which represent shadow padding
@@ -77,3 +74,5 @@ AS_SUBCLASSING_RESTRICTED
 - (void)setShadowInContext:(CGContextRef)context;
 
 @end
+
+#endif

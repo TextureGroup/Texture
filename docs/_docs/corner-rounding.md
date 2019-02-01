@@ -84,7 +84,7 @@ Clip corners applies to two main types of corner rounding situations:
 
 There are a few, quite rare cases in which it is appropriate to use `.cornerRadius.` These include when there is dynamic content moving _both_ through the inside and underneath the corner.  For certain animations, this is impossible to avoid.  However, in many cases, it is easy to adjust your design to eliminate one of the sources of movement.  One such case was discussed in the section on corner movement.
 
-It is much less bad, and okay as a shortcut, to use `.cornerRadius.` for screens in which nothing moves.  However, *any* motion on the screen, even movement that doesn't involve the corners, will cause the `.cornerRadius.` perfromance tax.  For example, having a rounded element in the navigation bar with a scrolling view beneath it will cause the impact even if they don't overlap.  Animating anything onscreen, even if the user doesn't interact, will as well.'  Additionally, any type of screen refresh will incur the cost of corner rounding. 
+It is much less bad, and okay as a shortcut, to use `.cornerRadius.` for screens in which nothing moves.  However, *any* motion on the screen, even movement that doesn't involve the corners, will cause the `.cornerRadius.` performance tax.  For example, having a rounded element in the navigation bar with a scrolling view beneath it will cause the impact even if they don't overlap.  Animating anything onscreen, even if the user doesn't interact, will as well.'  Additionally, any type of screen refresh will incur the cost of corner rounding. 
 
 ### Rasterization and Layerbacking
 
@@ -97,3 +97,130 @@ CALayer's `.shouldRasterize` is unrelated to Texture `node.shouldRasterizeDescen
 Use this flowchart to select the most performant strategy to round a set of corners.
 
 <img src="/static/images/corner-rounding-flowchart-v2.png" alt="corner rounding strategy flowchart">
+
+## Texture Support
+
+The following code exemplifies different ways how to archive corner rounding within Texture:
+
+### Use `.cornerRadius`
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+<div class = "code">
+<pre lang="objc" class="objcCode">
+CGFloat cornerRadius = 20.0;
+    
+_photoImageNode.cornerRoundingType = ASCornerRoundingTypeDefaultSlowCALayer;
+_photoImageNode.cornerRadius = cornerRadius;
+</pre>
+<pre lang="swift" class = "swiftCode hidden">
+var cornerRadius: CGFloat = 20.0
+
+photoImageNode.cornerRoundingType = ASCornerRoundingTypeDefaultSlowCALayer
+photoImageNode.cornerRadius = cornerRadius
+</pre>
+</div>
+</div>
+
+
+### Use precomposition for rounding corners
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+<div class = "code">
+<pre lang="objc" class="objcCode">
+CGFloat cornerRadius = 20.0;
+    
+_photoImageNode.cornerRoundingType = ASCornerRoundingTypePrecomposited;
+_photoImageNode.cornerRadius = cornerRadius;
+</pre>
+<pre lang="swift" class = "swiftCode hidden">
+var cornerRadius: CGFloat = 20.0
+
+// Use precomposition for rounding corners
+photoImageNode.cornerRoundingType = ASCornerRoundingTypePrecomposited
+photoImageNode.cornerRadius = cornerRadius
+</pre>
+</div>
+</div>
+
+
+### Use clipping for rounding corners
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+<div class = "code">
+<pre lang="objc" class="objcCode">
+CGFloat cornerRadius = 20.0;
+
+_photoImageNode.cornerRoundingType = ASCornerRoundingTypeClipping;
+_photoImageNode.backgroundColor = [UIColor whiteColor];
+_photoImageNode.cornerRadius = cornerRadius;
+</pre>
+<pre lang="swift" class = "swiftCode hidden">
+var cornerRadius: CGFloat = 20.0
+
+photoImageNode.cornerRoundingType = ASCornerRoundingTypeClipping
+photoImageNode.backgroundColor = UIColor.white
+photoImageNode.cornerRadius = cornerRadius
+</pre>
+</div>
+</div>
+
+
+### Use `willDisplayNodeContentWithRenderingContext` to set a clipping path for the content for rounding corners
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+<div class = "code">
+<pre lang="objc" class="objcCode">
+CGFloat cornerRadius = 20.0;
+    
+// Use the screen scale for corner radius to respect content scale
+CGFloat screenScale = UIScreen.mainScreen.scale;
+_photoImageNode.willDisplayNodeContentWithRenderingContext = ^(CGContextRef context, id drawParameters) {
+    CGRect bounds = CGContextGetClipBoundingBox(context);
+    CGFloat radius = cornerRadius * screenScale; 
+    UIImage *overlay = [UIImage as_resizableRoundedImageWithCornerRadius:radius
+                                                             cornerColor:[UIColor clearColor]
+                                                               fillColor:[UIColor clearColor]];
+    [overlay drawInRect:bounds];
+    [[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:radius] addClip];
+};
+
+</pre>
+<pre lang="swift" class = "swiftCode hidden">
+var cornerRadius: CGFloat = 20.0
+
+// Use the screen scale for corner radius to respect content scale
+var screenScale: CGFloat = UIScreen.main.scale
+photoImageNode.willDisplayNodeContentWithRenderingContext = { context, drawParameters in
+    var bounds: CGRect = context.boundingBoxOfClipPath()
+    var radius: CGFloat = cornerRadius * screenScale
+    var overlay = UIImage.as_resizableRoundedImage(withCornerRadius: radius, cornerColor: UIColor.clear, fill: UIColor.clear)
+    overlay.draw(in: bounds)
+    UIBezierPath(roundedRect: bounds, cornerRadius: radius).addClip()
+}
+</pre>
+</div>
+</div>
+
+### Use `ASImageNode` extras to round the image and add a border.
+
+This is great for example to round avatar images.
+
+<div class = "highlight-group">
+<span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
+<div class = "code">
+<pre lang="objc" class="objcCode">
+CGFloat cornerRadius = 20.0;
+
+_photoImageNode.imageModificationBlock = ASImageNodeRoundBorderModificationBlock(5.0, [UIColor orangeColor]);
+</pre>
+<pre lang="swift" class = "swiftCode hidden">
+var cornerRadius: CGFloat = 20.0
+
+photoImageNode.imageModificationBlock = ASImageNodeRoundBorderModificationBlock(5.0, UIColor.orange)
+</pre>
+</div>
+</div>

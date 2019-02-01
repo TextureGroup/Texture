@@ -2,17 +2,9 @@
 //  _ASHierarchyChangeSet.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <Foundation/Foundation.h>
@@ -71,7 +63,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 // FIXME: Generalize this to `changeMetadata` dict?
 @property (nonatomic, readonly) ASDataControllerAnimationOptions animationOptions;
 
-@property (nonatomic, strong, readonly) NSIndexSet *indexSet;
+@property (nonatomic, readonly) NSIndexSet *indexSet;
 
 @property (nonatomic, readonly) _ASHierarchyChangeType changeType;
 
@@ -88,7 +80,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 @property (nonatomic, readonly) ASDataControllerAnimationOptions animationOptions;
 
 /// Index paths are sorted descending for changeType .Delete, ascending otherwise
-@property (nonatomic, strong, readonly) NSArray<NSIndexPath *> *indexPaths;
+@property (nonatomic, readonly) NSArray<NSIndexPath *> *indexPaths;
 
 @property (nonatomic, readonly) _ASHierarchyChangeType changeType;
 
@@ -105,21 +97,24 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 @interface _ASHierarchyChangeSet : NSObject <ASDescriptionProvider, ASDebugDescriptionProvider>
 
 /// @precondition The change set must be completed.
-@property (nonatomic, strong, readonly) NSIndexSet *deletedSections;
+@property (nonatomic, readonly) NSIndexSet *deletedSections;
 
 /// @precondition The change set must be completed.
-@property (nonatomic, strong, readonly) NSIndexSet *insertedSections;
+@property (nonatomic, readonly) NSIndexSet *insertedSections;
 
 @property (nonatomic, readonly) BOOL completed;
 
 /// Whether or not changes should be animated.
 // TODO: if any update in this chagne set is non-animated, the whole update should be non-animated.
-@property (nonatomic, readwrite) BOOL animated;
+@property (nonatomic) BOOL animated;
 
 @property (nonatomic, readonly) BOOL includesReloadData;
 
 /// Indicates whether the change set is empty, that is it includes neither reload data nor per item or section changes.
 @property (nonatomic, readonly) BOOL isEmpty;
+
+/// The count of new ASCellNodes that can undergo async layout calculation. May be zero if all UIKit passthrough cells.
+@property (nonatomic, assign) NSUInteger countForAsyncLayout;
 
 /// The top-level activity for this update.
 @property (nonatomic, OS_ACTIVITY_NULLABLE) os_activity_t rootActivity;
@@ -158,12 +153,12 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 /**
  * A table that maps old section indexes to new section indexes.
  */
-@property (nonatomic, readonly, strong) ASIntegerMap *sectionMapping;
+@property (nonatomic, readonly) ASIntegerMap *sectionMapping;
 
 /**
  * A table that maps new section indexes to old section indexes.
  */
-@property (nonatomic, readonly, strong) ASIntegerMap *reverseSectionMapping;
+@property (nonatomic, readonly) ASIntegerMap *reverseSectionMapping;
 
 /**
  * A table that provides the item mapping for the old section. If the section was deleted

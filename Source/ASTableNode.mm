@@ -2,17 +2,9 @@
 //  ASTableNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASTableNode.h>
@@ -30,31 +22,40 @@
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASRangeController.h>
+#import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
 
 #pragma mark - _ASTablePendingState
 
-@interface _ASTablePendingState : NSObject
-@property (weak, nonatomic) id <ASTableDelegate>   delegate;
-@property (weak, nonatomic) id <ASTableDataSource> dataSource;
-@property (nonatomic, assign) ASLayoutRangeMode rangeMode;
-@property (nonatomic, assign) BOOL allowsSelection;
-@property (nonatomic, assign) BOOL allowsSelectionDuringEditing;
-@property (nonatomic, assign) BOOL allowsMultipleSelection;
-@property (nonatomic, assign) BOOL allowsMultipleSelectionDuringEditing;
-@property (nonatomic, assign) BOOL inverted;
-@property (nonatomic, assign) CGFloat leadingScreensForBatching;
-@property (nonatomic, assign) UIEdgeInsets contentInset;
-@property (nonatomic, assign) CGPoint contentOffset;
-@property (nonatomic, assign) BOOL animatesContentOffset;
-@property (nonatomic, assign) BOOL automaticallyAdjustsContentOffset;
+@interface _ASTablePendingState : NSObject {
+@public
+  std::vector<std::vector<ASRangeTuningParameters>> _tuningParameters;
+}
+@property (nonatomic, weak) id <ASTableDelegate>   delegate;
+@property (nonatomic, weak) id <ASTableDataSource> dataSource;
+@property (nonatomic) ASLayoutRangeMode rangeMode;
+@property (nonatomic) BOOL allowsSelection;
+@property (nonatomic) BOOL allowsSelectionDuringEditing;
+@property (nonatomic) BOOL allowsMultipleSelection;
+@property (nonatomic) BOOL allowsMultipleSelectionDuringEditing;
+@property (nonatomic) BOOL inverted;
+@property (nonatomic) CGFloat leadingScreensForBatching;
+@property (nonatomic) UIEdgeInsets contentInset;
+@property (nonatomic) CGPoint contentOffset;
+@property (nonatomic) BOOL animatesContentOffset;
+@property (nonatomic) BOOL automaticallyAdjustsContentOffset;
+
 @end
 
 @implementation _ASTablePendingState
+
+#pragma mark - Lifecycle
+
 - (instancetype)init
 {
   self = [super init];
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
+    _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
     _allowsSelection = YES;
     _allowsSelectionDuringEditing = NO;
     _allowsMultipleSelection = NO;
@@ -69,6 +70,30 @@
   return self;
 }
 
+#pragma mark Tuning Parameters
+
+- (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
+{
+  return [self tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
+{
+  return [self setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  ASDisplayNodeAssert(rangeMode < _tuningParameters.size() && rangeType < _tuningParameters[rangeMode].size(), @"Requesting a range that is OOB for the configured tuning parameters");
+  return _tuningParameters[rangeMode][rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  ASDisplayNodeAssert(rangeMode < _tuningParameters.size() && rangeType < _tuningParameters[rangeMode].size(), @"Setting a range that is OOB for the configured tuning parameters");
+  _tuningParameters[rangeMode][rangeType] = tuningParameters;
+}
+
 @end
 
 #pragma mark - ASTableView
@@ -79,7 +104,8 @@
   id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 
-@property (nonatomic, strong) _ASTablePendingState *pendingState;
+@property (nonatomic) _ASTablePendingState *pendingState;
+@property (nonatomic, weak) ASRangeController *rangeController;
 @end
 
 @implementation ASTableNode
@@ -104,6 +130,18 @@
   return [self initWithStyle:UITableViewStylePlain];
 }
 
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
+- (void)dealloc
+{
+  if (self.nodeLoaded) {
+    __weak UIView *view = self.view;
+    ASPerformBlockOnMainThread(^{
+      ASDisplayNodeCAssertNil(view.superview, @"Node's view should be removed from hierarchy.");
+    });
+  }
+}
+#endif
+
 #pragma mark ASDisplayNode
 
 - (void)didLoad
@@ -112,9 +150,12 @@
   
   ASTableView *view = self.view;
   view.tableNode    = self;
+  
+  _rangeController = view.rangeController;
 
   if (_pendingState) {
-    _ASTablePendingState *pendingState = _pendingState;
+    _ASTablePendingState *pendingState        = _pendingState;
+    self.pendingState                         = nil;
     view.asyncDelegate                        = pendingState.delegate;
     view.asyncDataSource                      = pendingState.dataSource;
     view.inverted                             = pendingState.inverted;
@@ -122,14 +163,34 @@
     view.allowsSelectionDuringEditing         = pendingState.allowsSelectionDuringEditing;
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
-    view.contentInset                         = pendingState.contentInset;
-    self.pendingState                         = nil;
-    
-    if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
-      [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
+    view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
+
+    UIEdgeInsets contentInset = pendingState.contentInset;
+    if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
+      view.contentInset = contentInset;
     }
 
-    [view setContentOffset:pendingState.contentOffset animated:pendingState.animatesContentOffset];
+    CGPoint contentOffset = pendingState.contentOffset;
+    if (!CGPointEqualToPoint(contentOffset, CGPointZero)) {
+      [view setContentOffset:contentOffset animated:pendingState.animatesContentOffset];
+    }
+      
+    const auto tuningParametersVector = pendingState->_tuningParameters;
+    const auto tuningParametersVectorSize = tuningParametersVector.size();
+    for (NSInteger rangeMode = 0; rangeMode < tuningParametersVectorSize; rangeMode++) {
+      const auto tuningparametersRangeModeVector = tuningParametersVector[rangeMode];
+      const auto tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
+      for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
+        ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
+        [_rangeController setTuningParameters:tuningParameters
+                                 forRangeMode:(ASLayoutRangeMode)rangeMode
+                                    rangeType:(ASLayoutRangeType)rangeType];
+      }
+    }
+    
+    if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
+      [_rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
+    }
   }
 }
 
@@ -155,7 +216,7 @@
   [super didEnterPreloadState];
   // Intentionally allocate the view here and trigger a layout pass on it, which in turn will trigger the intial data load.
   // We can get rid of this call later when ASDataController, ASRangeController and ASCollectionLayout can operate without the view.
-  [[self view] layoutIfNeeded];
+  [self.view layoutIfNeeded];
 }
 
 #if ASRangeControllerLoggingEnabled
@@ -184,12 +245,6 @@
 - (ASDataController *)dataController
 {
   return self.view.dataController;
-}
-
-// TODO: Implement this without the view.
-- (ASRangeController *)rangeController
-{
-  return self.view.rangeController;
 }
 
 - (_ASTablePendingState *)pendingState
@@ -472,22 +527,30 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
 
 - (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+  return [self tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
 }
 
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
 {
-  [self.rangeController setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+  [self setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
 }
 
 - (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  if ([self pendingState]) {
+    return [_pendingState tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  } else {
+    return [self.rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+  }
 }
 
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
 {
-  return [self.rangeController setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  if ([self pendingState]) {
+    [_pendingState setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  } else {
+    return [self.rangeController setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+  }
 }
 
 #pragma mark - Selection
@@ -673,7 +736,7 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   [self.view relayoutItems];
 }
 
-- (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchAnimated:(BOOL)animated updates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
@@ -690,7 +753,7 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   }
 }
 
-- (void)performBatchUpdates:(void (^)())updates completion:(void (^)(BOOL))completion
+- (void)performBatchUpdates:(NS_NOESCAPE void (^)())updates completion:(void (^)(BOOL))completion
 {
   [self performBatchAnimated:YES updates:updates completion:completion];
 }
@@ -764,8 +827,11 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   return (self.nodeLoaded ? [self.view isProcessingUpdates] : NO);
 }
 
-- (void)onDidFinishProcessingUpdates:(nullable void (^)())completion
+- (void)onDidFinishProcessingUpdates:(void (^)())completion
 {
+  if (!completion) {
+    return;
+  }
   if (!self.nodeLoaded) {
     completion();
   } else {
@@ -781,10 +847,13 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)waitUntilAllUpdatesAreCommitted
 {
   [self waitUntilAllUpdatesAreProcessed];
 }
+#pragma clang diagnostic pop
 
 #pragma mark - Debugging (Private)
 

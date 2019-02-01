@@ -2,16 +2,12 @@
 //  ASYogaUtilities.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASYogaUtilities.h>
-
+#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #if YOGA /* YOGA */
 
 @implementation ASDisplayNode (YogaHelpers)
@@ -47,13 +43,15 @@
 
 @end
 
-extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node))
+void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node))
 {
   if (node == nil) {
     return;
   }
   block(node);
-  for (ASDisplayNode *child in [node yogaChildren]) {
+  // We use the accessor here despite the copy, because the block may modify the yoga tree e.g.
+  // replacing a node.
+  for (ASDisplayNode *child in node.yogaChildren) {
     ASDisplayNodePerformBlockOnEveryYogaChild(child, block);
   }
 }
@@ -110,6 +108,11 @@ float yogaFloatForCGFloat(CGFloat value)
   }
 }
 
+float cgFloatForYogaFloat(float yogaFloat)
+{
+  return (yogaFloat == YGUndefined) ? CGFLOAT_MAX : yogaFloat;
+}
+
 float yogaDimensionToPoints(ASDimension dimension)
 {
   ASDisplayNodeCAssert(dimension.unit == ASDimensionUnitPoints,
@@ -147,23 +150,51 @@ void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElemen
   if (yogaNode == NULL) {
     return;
   }
-  BOOL hasMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) != NULL);
 
-  if (layoutElement != nil && [layoutElement implementsLayoutMethod]) {
-    if (hasMeasureFunc == NO) {
+  BOOL shouldHaveMeasureFunc = [layoutElement implementsLayoutMethod];
+  // How expensive is it to set a baselineFunc on all (leaf) nodes?
+  BOOL shouldHaveBaselineFunc = YES;
+
+  if (layoutElement != nil) {
+    if (shouldHaveMeasureFunc || shouldHaveBaselineFunc) {
       // Retain the Context object. This must be explicitly released with a
       // __bridge_transfer - YGNodeFree() is not sufficient.
       YGNodeSetContext(yogaNode, (__bridge_retained void *)layoutElement);
+    }
+    if (shouldHaveMeasureFunc) {
       YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
+    }
+    if (shouldHaveBaselineFunc) {
+      YGNodeSetBaselineFunc(yogaNode, &ASLayoutElementYogaBaselineFunc);
     }
     ASDisplayNodeCAssert(YGNodeGetContext(yogaNode) == (__bridge void *)layoutElement,
                          @"Yoga node context should contain layoutElement: %@", layoutElement);
-  } else if (hasMeasureFunc == YES) {
-    // If we lack any of the conditions above, and currently have a measure func, get rid of it.
+  } else {
+    // If we lack any of the conditions above, and currently have a measureFn/baselineFn/context,
+    // get rid of it.
     // Release the __bridge_retained Context object.
-    __unused id <ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
+    __unused id<ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
     YGNodeSetContext(yogaNode, NULL);
     YGNodeSetMeasureFunc(yogaNode, NULL);
+    YGNodeSetBaselineFunc(yogaNode, NULL);
+  }
+}
+
+float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height)
+{
+  id<ASLayoutElement> layoutElement = (__bridge id<ASLayoutElement>)YGNodeGetContext(yogaNode);
+  ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)],
+                       @"Yoga context must be <ASLayoutElement>");
+
+  ASDisplayNode *displayNode = ASDynamicCast(layoutElement, ASDisplayNode);
+
+  switch (displayNode.style.parentAlignStyle) {
+    case ASStackLayoutAlignItemsBaselineFirst:
+      return layoutElement.style.ascender;
+    case ASStackLayoutAlignItemsBaselineLast:
+      return height + layoutElement.style.descender;
+    default:
+      return 0;
   }
 }
 
@@ -172,6 +203,9 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
 {
   id <ASLayoutElement> layoutElement = (__bridge id <ASLayoutElement>)YGNodeGetContext(yogaNode);
   ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)], @"Yoga context must be <ASLayoutElement>");
+
+  width = cgFloatForYogaFloat(width);
+  height = cgFloatForYogaFloat(height);
 
   ASSizeRange sizeRange;
   sizeRange.min = CGSizeZero;

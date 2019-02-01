@@ -2,17 +2,9 @@
 //  ASTableView.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <UIKit/UIKit.h>
@@ -65,17 +57,17 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Defaults to two screenfuls.
  */
-@property (nonatomic, assign) CGFloat leadingScreensForBatching ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
+@property (nonatomic) CGFloat leadingScreensForBatching ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
 /**
  * The distance that the content view is inset from the table view edges. Defaults to UIEdgeInsetsZero.
  */
-@property (nonatomic, assign) UIEdgeInsets contentInset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead");
+@property (nonatomic) UIEdgeInsets contentInset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead");
 
 /**
  * The offset of the content view's origin from the table node's origin. Defaults to CGPointZero.
  */
-@property (nonatomic, assign) CGPoint contentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
+@property (nonatomic) CGPoint contentOffset ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
 /**
  * YES to automatically adjust the contentOffset when cells are inserted or deleted above
@@ -91,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * A Boolean value that determines whether the nodes that the data source renders will be flipped.
  */
-@property (nonatomic, assign) BOOL inverted ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
+@property (nonatomic) BOOL inverted ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
 @property (nonatomic, readonly, nullable) NSIndexPath *indexPathForSelectedRow  ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode property instead.");
 
@@ -219,7 +211,7 @@ NS_ASSUME_NONNULL_BEGIN
  * See ASTableNode.h for full documentation of these methods.
  */
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
-- (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
+- (void)onDidFinishProcessingUpdates:(void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("Use -[ASTableNode waitUntilAllUpdatesAreProcessed] instead.");
 
 - (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode method instead.");

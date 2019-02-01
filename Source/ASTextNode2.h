@@ -2,37 +2,15 @@
 //  ASTextNode2.h
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASTextNodeCommon.h>
 
-#if !ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
-// Import this to get ASTextNodeHighlightStyle
-#import <AsyncDisplayKit/ASTextNode.h>
-#else
-@protocol ASTextNodeDelegate;
-
-/**
- * Highlight styles.
- */
-typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
-  /**
-   * Highlight style for text on a light background.
-   */
-  ASTextNodeHighlightStyleLight,
-
-  /**
-   * Highlight style for text on a dark background.
-   */
-  ASTextNodeHighlightStyleDark
-};
-#endif
+@protocol ASTextLinePositionModifier;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,14 +18,18 @@ NS_ASSUME_NONNULL_BEGIN
  @abstract Draws interactive rich text.
  @discussion Backed by the code in TextExperiment folder, on top of CoreText.
  */
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 : ASControlNode
+#else
+@interface ASTextNode : ASControlNode
+#endif
 
 /**
  @abstract The styled text displayed by the node.
  @discussion Defaults to nil, no text is shown.
  For inline image attachments, add an attribute of key NSAttachmentAttributeName, with a value of an NSTextAttachment.
  */
-@property (nullable, nonatomic, copy) NSAttributedString *attributedText;
+@property (nullable, copy) NSAttributedString *attributedText;
 
 #pragma mark - Truncation
 
@@ -55,37 +37,37 @@ NS_ASSUME_NONNULL_BEGIN
  @abstract The attributedText to use when the text must be truncated.
  @discussion Defaults to a localized ellipsis character.
  */
-@property (nullable, nonatomic, copy) NSAttributedString *truncationAttributedText;
+@property (nullable, copy) NSAttributedString *truncationAttributedText;
 
 /**
  @summary The second attributed string appended for truncation.
  @discussion This string will be highlighted on touches.
  @default nil
  */
-@property (nullable, nonatomic, copy) NSAttributedString *additionalTruncationMessage;
+@property (nullable, copy) NSAttributedString *additionalTruncationMessage;
 
 /**
  @abstract Determines how the text is truncated to fit within the receiver's maximum size.
  @discussion Defaults to NSLineBreakByWordWrapping.
  @note Setting a truncationMode in attributedString will override the truncation mode set here.
  */
-@property (nonatomic, assign) NSLineBreakMode truncationMode;
+@property NSLineBreakMode truncationMode;
 
 /**
  @abstract If the text node is truncated. Text must have been sized first.
  */
-@property (nonatomic, readonly, assign, getter=isTruncated) BOOL truncated;
+@property (readonly, getter=isTruncated) BOOL truncated;
 
 /**
  @abstract The maximum number of lines to render of the text before truncation.
  @default 0 (No limit)
  */
-@property (nonatomic, assign) NSUInteger maximumNumberOfLines;
+@property NSUInteger maximumNumberOfLines;
 
 /**
  @abstract The number of lines in the text. Text must have been sized first.
  */
-@property (nonatomic, readonly, assign) NSUInteger lineCount;
+@property (readonly) NSUInteger lineCount;
 
 /**
  * An array of path objects representing the regions where text should not be displayed.
@@ -95,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the text node's bounds. You can use this property to have text wrap around images,
  * shapes or other text like a fancy magazine.
  */
-@property (nullable, nonatomic, strong) NSArray<UIBezierPath *> *exclusionPaths;
+@property (nullable, copy) NSArray<UIBezierPath *> *exclusionPaths;
 
 #pragma mark - Placeholders
 
@@ -106,27 +88,27 @@ NS_ASSUME_NONNULL_BEGIN
  * following the true shape of the text's wrapping.  This visually mirrors the overall
  * shape and weight of paragraphs, making the appearance of the finished text less jarring.
  */
-@property (nonatomic, assign) BOOL placeholderEnabled;
+@property BOOL placeholderEnabled;
 
 /**
  @abstract The placeholder color.
  */
-@property (nullable, nonatomic, strong) UIColor *placeholderColor;
+@property (nullable, copy) UIColor *placeholderColor;
 
 /**
  @abstract Inset each line of the placeholder.
  */
-@property (nonatomic, assign) UIEdgeInsets placeholderInsets;
+@property UIEdgeInsets placeholderInsets;
 
 #pragma mark - Shadow
 
 /**
  @abstract When you set these ASDisplayNode properties, they are composited into the bitmap instead of being applied by CA.
  
- @property (nonatomic, assign) CGColorRef shadowColor;
- @property (nonatomic, assign) CGFloat    shadowOpacity;
- @property (nonatomic, assign) CGSize     shadowOffset;
- @property (nonatomic, assign) CGFloat    shadowRadius;
+ @property (nonatomic) CGColorRef shadowColor;
+ @property (nonatomic) CGFloat    shadowOpacity;
+ @property (nonatomic) CGSize     shadowOffset;
+ @property (nonatomic) CGFloat    shadowRadius;
  */
 
 /**
@@ -135,7 +117,7 @@ NS_ASSUME_NONNULL_BEGIN
  UIEdgeInsetsRect(boundingRectForText, shadowPadding)
  will return a CGRect large enough to fit both the text and the appropriate shadow padding.
  */
-@property (nonatomic, readonly, assign) UIEdgeInsets shadowPadding;
+@property (nonatomic, readonly) UIEdgeInsets shadowPadding;
 
 #pragma mark - Positioning
 
@@ -196,12 +178,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  @abstract The style to use when highlighting text.
  */
-@property (nonatomic, assign) ASTextNodeHighlightStyle highlightStyle;
+@property (nonatomic) ASTextNodeHighlightStyle highlightStyle;
 
 /**
  @abstract The range of text highlighted by the receiver. Changes to this property are not animated by default.
  */
-@property (nonatomic, assign) NSRange highlightRange;
+@property (nonatomic) NSRange highlightRange;
 
 /**
  @abstract Set the range of text to highlight, with optional animation.
@@ -218,29 +200,42 @@ NS_ASSUME_NONNULL_BEGIN
  textNode:longPressedLinkAttribute:value:atPoint:textRange: in order for
  the long press gesture recognizer to be installed.
  */
-@property (nonatomic, weak) id<ASTextNodeDelegate> delegate;
+@property (weak) id<ASTextNodeDelegate> delegate;
 
 /**
  @abstract If YES and a long press is recognized, touches are cancelled. Default is NO
  */
-@property (nonatomic, assign) BOOL longPressCancelsTouches;
+@property (nonatomic) BOOL longPressCancelsTouches;
 
 /**
  @abstract if YES will not intercept touches for non-link areas of the text. Default is NO.
  */
-@property (nonatomic, assign) BOOL passthroughNonlinkTouches;
+@property (nonatomic) BOOL passthroughNonlinkTouches;
 
 + (void)enableDebugging;
 
+#pragma mark - Layout and Sizing
+
+@property (nullable, nonatomic) id<ASTextLinePositionModifier> textContainerLinePositionModifier;
+
 @end
 
+#if AS_ENABLE_TEXTNODE
 @interface ASTextNode2 (Unavailable)
+#else
+@interface ASTextNode (Unavailable)
+#endif
 
-- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock __unavailable;
+- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(nullable ASDisplayNodeDidLoadBlock)didLoadBlock NS_UNAVAILABLE;
 
 @end
+
+#if (!AS_ENABLE_TEXTNODE)
+// For the time beeing remap ASTextNode2 to ASTextNode
+#define ASTextNode2 ASTextNode
+#endif
 
 NS_ASSUME_NONNULL_END
 

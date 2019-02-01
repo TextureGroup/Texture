@@ -2,18 +2,14 @@
 //  ASIntegerMap.mm
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASIntegerMap.h"
 #import <AsyncDisplayKit/ASAssert.h>
 #import <unordered_map>
-#import <NSIndexSet+ASHelpers.h>
+#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 /**
@@ -31,7 +27,7 @@
 
 #pragma mark - Singleton
 
-+ (ASIntegerMap *)identityMap
++ (ASIntegerMap *)identityMap NS_RETURNS_RETAINED
 {
   static ASIntegerMap *identityMap;
   static dispatch_once_t onceToken;
@@ -43,7 +39,7 @@
   return identityMap;
 }
 
-+ (ASIntegerMap *)emptyMap
++ (ASIntegerMap *)emptyMap NS_RETURNS_RETAINED
 {
   static ASIntegerMap *emptyMap;
   static dispatch_once_t onceToken;
@@ -55,7 +51,7 @@
   return emptyMap;
 }
 
-+ (ASIntegerMap *)mapForUpdateWithOldCount:(NSInteger)oldCount deleted:(NSIndexSet *)deletions inserted:(NSIndexSet *)insertions
++ (ASIntegerMap *)mapForUpdateWithOldCount:(NSInteger)oldCount deleted:(NSIndexSet *)deletions inserted:(NSIndexSet *)insertions NS_RETURNS_RETAINED
 {
   if (oldCount == 0) {
     return ASIntegerMap.emptyMap;
@@ -102,7 +98,7 @@
     return NSNotFound;
   }
 
-  auto result = _map.find(key);
+  const auto result = _map.find(key);
   return result != _map.end() ? result->second : NSNotFound;
 }
 
@@ -122,9 +118,10 @@
     return self;
   }
 
-  auto result = [[ASIntegerMap alloc] init];
-  for (auto it = _map.begin(); it != _map.end(); it++) {
-    result->_map[it->second] = it->first;
+  const auto result = [[ASIntegerMap alloc] init];
+  
+  for (const auto &e : _map) {
+    result->_map[e.second] = e.first;
   }
   return result;
 }
@@ -137,7 +134,7 @@
     return self;
   }
 
-  auto newMap = [[ASIntegerMap allocWithZone:zone] init];
+  const auto newMap = [[ASIntegerMap allocWithZone:zone] init];
   newMap->_map = _map;
   return newMap;
 }
@@ -155,8 +152,8 @@
   } else {
     // { 1->2 3->4 5->6 }
     NSMutableString *str = [NSMutableString string];
-    for (auto it = _map.begin(); it != _map.end(); it++) {
-      [str appendFormat:@" %zd->%zd", it->first, it->second];
+    for (const auto &e : _map) {
+      [str appendFormat:@" %ld->%ld", (long)e.first, (long)e.second];
     }
     // Remove leading space
     if (str.length > 0) {
@@ -179,7 +176,7 @@
     return YES;
   }
 
-  if (auto otherMap = ASDynamicCast(object, ASIntegerMap)) {
+  if (ASIntegerMap *otherMap = ASDynamicCast(object, ASIntegerMap)) {
     return otherMap->_map == _map;
   }
   return NO;

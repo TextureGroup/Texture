@@ -2,17 +2,9 @@
 //  ASButtonNode.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
@@ -34,41 +26,41 @@ typedef NS_ENUM(NSInteger, ASButtonNodeImageAlignment) {
 
 @interface ASButtonNode : ASControlNode
 
-@property (nonatomic, readonly) ASTextNode  * titleNode;
-@property (nonatomic, readonly) ASImageNode * imageNode;
-@property (nonatomic, readonly) ASImageNode * backgroundImageNode;
+@property (readonly) ASTextNode  * titleNode;
+@property (readonly) ASImageNode * imageNode;
+@property (readonly) ASImageNode * backgroundImageNode;
 
 /**
  Spacing between image and title. Defaults to 8.0.
  */
-@property (nonatomic, assign) CGFloat contentSpacing;
+@property CGFloat contentSpacing;
 
 /**
  Whether button should be laid out vertically (image on top of text) or horizontally (image to the left of text).
  ASButton node does not yet support RTL but it should be fairly easy to implement.
  Defaults to YES.
  */
-@property (nonatomic, assign) BOOL laysOutHorizontally;
+@property BOOL laysOutHorizontally;
 
 /** Horizontally align content (text or image).
  Defaults to ASHorizontalAlignmentMiddle.
  */
-@property (nonatomic, assign) ASHorizontalAlignment contentHorizontalAlignment;
+@property ASHorizontalAlignment contentHorizontalAlignment;
 
 /** Vertically align content (text or image).
  Defaults to ASVerticalAlignmentCenter.
  */
-@property (nonatomic, assign) ASVerticalAlignment contentVerticalAlignment;
+@property ASVerticalAlignment contentVerticalAlignment;
 
 /**
  * @discussion The insets used around the title and image node
  */
-@property (nonatomic, assign) UIEdgeInsets contentEdgeInsets;
+@property UIEdgeInsets contentEdgeInsets;
 
 /**
  * @discusstion Whether the image should be aligned at the beginning or at the end of node. Default is `ASButtonNodeImageAlignmentBeginning`.
  */
-@property (nonatomic, assign) ASButtonNodeImageAlignment imageAlignment;
+@property ASButtonNodeImageAlignment imageAlignment;
 
 /**
  *  Returns the styled title associated with the specified state.

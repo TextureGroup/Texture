@@ -2,30 +2,27 @@
 //  _ASCoreAnimationExtras.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
-extern void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image)
+void ASDisplayNodeSetupLayerContentsWithResizableImage(CALayer *layer, UIImage *image)
 {
   ASDisplayNodeSetResizableContents(layer, image);
 }
 
-extern void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
+void ASDisplayNodeSetResizableContents(id<ASResizableContents> obj, UIImage *image)
 {
+  // FIXME (https://github.com/TextureGroup/Texture/issues/1046): This method does not currently handle UIImageResizingModeTile, which is the default.
+  // See also https://developer.apple.com/documentation/uikit/uiimage/1624157-resizingmode?language=objc
+  // I'm not sure of a way to use CALayer directly to perform such tiling on the GPU, though the stretch is handled by the GPU,
+  // and CALayer.h documents the fact that contentsCenter is used to stretch the pixels.
+
   if (image) {
     ASDisplayNodeCAssert(image.resizingMode == UIImageResizingModeStretch || UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero),
                          @"Image insets must be all-zero or resizingMode has to be UIImageResizingModeStretch. XCode assets default value is UIImageResizingModeTile which is not supported by Texture because of GPU-accelerated CALayer features.");
@@ -65,42 +62,58 @@ struct _UIContentModeStringLUTEntry {
   NSString *const string;
 };
 
-static const struct _UIContentModeStringLUTEntry UIContentModeCAGravityLUT[] = {
-  {UIViewContentModeScaleToFill,     kCAGravityResize},
-  {UIViewContentModeScaleAspectFit,  kCAGravityResizeAspect},
-  {UIViewContentModeScaleAspectFill, kCAGravityResizeAspectFill},
-  {UIViewContentModeCenter,          kCAGravityCenter},
-  {UIViewContentModeTop,             kCAGravityBottom},
-  {UIViewContentModeBottom,          kCAGravityTop},
-  {UIViewContentModeLeft,            kCAGravityLeft},
-  {UIViewContentModeRight,           kCAGravityRight},
-  {UIViewContentModeTopLeft,         kCAGravityBottomLeft},
-  {UIViewContentModeTopRight,        kCAGravityBottomRight},
-  {UIViewContentModeBottomLeft,      kCAGravityTopLeft},
-  {UIViewContentModeBottomRight,     kCAGravityTopRight},
-};
+static const _UIContentModeStringLUTEntry *UIContentModeCAGravityLUT(size_t *count)
+{
+  // Initialize this in a function (instead of at file level) to avoid
+  // startup initialization time.
+  static const _UIContentModeStringLUTEntry sUIContentModeCAGravityLUT[] = {
+    {UIViewContentModeScaleToFill,     kCAGravityResize},
+    {UIViewContentModeScaleAspectFit,  kCAGravityResizeAspect},
+    {UIViewContentModeScaleAspectFill, kCAGravityResizeAspectFill},
+    {UIViewContentModeCenter,          kCAGravityCenter},
+    {UIViewContentModeTop,             kCAGravityBottom},
+    {UIViewContentModeBottom,          kCAGravityTop},
+    {UIViewContentModeLeft,            kCAGravityLeft},
+    {UIViewContentModeRight,           kCAGravityRight},
+    {UIViewContentModeTopLeft,         kCAGravityBottomLeft},
+    {UIViewContentModeTopRight,        kCAGravityBottomRight},
+    {UIViewContentModeBottomLeft,      kCAGravityTopLeft},
+    {UIViewContentModeBottomRight,     kCAGravityTopRight},
+  };
+  *count = sizeof(sUIContentModeCAGravityLUT) / sizeof(sUIContentModeCAGravityLUT[0]);
+  return sUIContentModeCAGravityLUT;
+}
 
-static const struct _UIContentModeStringLUTEntry UIContentModeDescriptionLUT[] = {
-  {UIViewContentModeScaleToFill,     @"scaleToFill"},
-  {UIViewContentModeScaleAspectFit,  @"aspectFit"},
-  {UIViewContentModeScaleAspectFill, @"aspectFill"},
-  {UIViewContentModeRedraw,          @"redraw"},
-  {UIViewContentModeCenter,          @"center"},
-  {UIViewContentModeTop,             @"top"},
-  {UIViewContentModeBottom,          @"bottom"},
-  {UIViewContentModeLeft,            @"left"},
-  {UIViewContentModeRight,           @"right"},
-  {UIViewContentModeTopLeft,         @"topLeft"},
-  {UIViewContentModeTopRight,        @"topRight"},
-  {UIViewContentModeBottomLeft,      @"bottomLeft"},
-  {UIViewContentModeBottomRight,     @"bottomRight"},
-};
+static const _UIContentModeStringLUTEntry *UIContentModeDescriptionLUT(size_t *count)
+{
+  // Initialize this in a function (instead of at file level) to avoid
+  // startup initialization time.
+  static const _UIContentModeStringLUTEntry sUIContentModeDescriptionLUT[] = {
+    {UIViewContentModeScaleToFill,     @"scaleToFill"},
+    {UIViewContentModeScaleAspectFit,  @"aspectFit"},
+    {UIViewContentModeScaleAspectFill, @"aspectFill"},
+    {UIViewContentModeRedraw,          @"redraw"},
+    {UIViewContentModeCenter,          @"center"},
+    {UIViewContentModeTop,             @"top"},
+    {UIViewContentModeBottom,          @"bottom"},
+    {UIViewContentModeLeft,            @"left"},
+    {UIViewContentModeRight,           @"right"},
+    {UIViewContentModeTopLeft,         @"topLeft"},
+    {UIViewContentModeTopRight,        @"topRight"},
+    {UIViewContentModeBottomLeft,      @"bottomLeft"},
+    {UIViewContentModeBottomRight,     @"bottomRight"},
+  };
+  *count = sizeof(sUIContentModeDescriptionLUT) / sizeof(sUIContentModeDescriptionLUT[0]);
+  return sUIContentModeDescriptionLUT;
+}
 
 NSString *ASDisplayNodeNSStringFromUIContentMode(UIViewContentMode contentMode)
 {
-  for (int i=0; i< ARRAY_COUNT(UIContentModeDescriptionLUT); i++) {
-    if (UIContentModeDescriptionLUT[i].contentMode == contentMode) {
-      return UIContentModeDescriptionLUT[i].string;
+  size_t lutSize;
+  const _UIContentModeStringLUTEntry *lut = UIContentModeDescriptionLUT(&lutSize);
+  for (size_t i = 0; i < lutSize; ++i) {
+    if (lut[i].contentMode == contentMode) {
+      return lut[i].string;
     }
   }
   return [NSString stringWithFormat:@"%d", (int)contentMode];
@@ -108,9 +121,11 @@ NSString *ASDisplayNodeNSStringFromUIContentMode(UIViewContentMode contentMode)
 
 UIViewContentMode ASDisplayNodeUIContentModeFromNSString(NSString *string)
 {
-  for (int i=0; i < ARRAY_COUNT(UIContentModeDescriptionLUT); i++) {
-    if (ASObjectIsEqual(UIContentModeDescriptionLUT[i].string, string)) {
-      return UIContentModeDescriptionLUT[i].contentMode;
+  size_t lutSize;
+  const _UIContentModeStringLUTEntry *lut = UIContentModeDescriptionLUT(&lutSize);
+  for (size_t i = 0; i < lutSize; ++i) {
+    if (ASObjectIsEqual(lut[i].string, string)) {
+      return lut[i].contentMode;
     }
   }
   return UIViewContentModeScaleToFill;
@@ -118,12 +133,14 @@ UIViewContentMode ASDisplayNodeUIContentModeFromNSString(NSString *string)
 
 NSString *const ASDisplayNodeCAContentsGravityFromUIContentMode(UIViewContentMode contentMode)
 {
-  for (int i=0; i < ARRAY_COUNT(UIContentModeCAGravityLUT); i++) {
-    if (UIContentModeCAGravityLUT[i].contentMode == contentMode) {
-      return UIContentModeCAGravityLUT[i].string;
+  size_t lutSize;
+  const _UIContentModeStringLUTEntry *lut = UIContentModeCAGravityLUT(&lutSize);
+  for (size_t i = 0; i < lutSize; ++i) {
+    if (lut[i].contentMode == contentMode) {
+      return lut[i].string;
     }
   }
-  ASDisplayNodeCAssert(contentMode == UIViewContentModeRedraw, @"Encountered an unknown contentMode %zd. Is this a new version of iOS?", contentMode);
+  ASDisplayNodeCAssert(contentMode == UIViewContentModeRedraw, @"Encountered an unknown contentMode %ld. Is this a new version of iOS?", (long)contentMode);
   // Redraw is ok to return nil.
   return nil;
 }
@@ -140,9 +157,11 @@ UIViewContentMode ASDisplayNodeUIContentModeFromCAContentsGravity(NSString *cons
     return cachedModes[foundCacheIndex];
   }
   
-  for (int i = 0; i < ARRAY_COUNT(UIContentModeCAGravityLUT); i++) {
-    if (ASObjectIsEqual(UIContentModeCAGravityLUT[i].string, contentsGravity)) {
-      UIViewContentMode foundContentMode = UIContentModeCAGravityLUT[i].contentMode;
+    size_t lutSize;
+    const _UIContentModeStringLUTEntry *lut = UIContentModeCAGravityLUT(&lutSize);
+    for (size_t i = 0; i < lutSize; ++i) {
+    if (ASObjectIsEqual(lut[i].string, contentsGravity)) {
+      UIViewContentMode foundContentMode = lut[i].contentMode;
       
       if (currentCacheIndex < ContentModeCacheSize) {
         // Cache the input value.  This is almost always a different pointer than in our LUT and will frequently

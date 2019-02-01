@@ -2,21 +2,14 @@
 //  ASLayoutSpec.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
+#import <AsyncDisplayKit/ASLocking.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,14 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A layout spec is an immutable object that describes a layout, loosely inspired by React.
  */
-@interface ASLayoutSpec : NSObject <ASLayoutElement, ASLayoutElementStylability, NSFastEnumeration, ASDescriptionProvider>
+@interface ASLayoutSpec : NSObject <ASLayoutElement, ASLayoutElementStylability, NSFastEnumeration, ASDescriptionProvider, ASLocking>
 
 /** 
  * Creation of a layout spec should only happen by a user in layoutSpecThatFits:. During that method, a
  * layout spec can be created and mutated. Once it is passed back to ASDK, the isMutable flag will be
  * set to NO and any further mutations will cause an assert.
  */
-@property (nonatomic, assign) BOOL isMutable;
+@property (nonatomic) BOOL isMutable;
 
 /**
  * First child within the children's array.
@@ -46,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * setChild:atIndex: internally. For example, ASBackgroundLayoutSpec exposes a "background"
  * property that behind the scenes is calling setChild:atIndex:.
  */
-@property (nullable, strong, nonatomic) id<ASLayoutElement> child;
+@property (nullable, nonatomic) id<ASLayoutElement> child;
 
 /**
  * An array of ASLayoutElement children
@@ -57,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  * For good measure, in these layout specs it probably makes sense to define
  * setChild: and setChild:forIdentifier: methods to do something appropriate or to assert.
  */
-@property (nullable, strong, nonatomic) NSArray<id<ASLayoutElement>> *children;
+@property (nullable, nonatomic) NSArray<id<ASLayoutElement>> *children;
 
 @end
 
@@ -71,12 +64,12 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Returns an ASWrapperLayoutSpec object with the given layoutElement as child.
  */
-+ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement AS_WARN_UNUSED_RESULT;
++ (instancetype)wrapperWithLayoutElement:(id<ASLayoutElement>)layoutElement NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /*
  * Returns an ASWrapperLayoutSpec object with the given layoutElements as children.
  */
-+ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements AS_WARN_UNUSED_RESULT;
++ (instancetype)wrapperWithLayoutElements:(NSArray<id<ASLayoutElement>> *)layoutElements NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /*
  * Returns an ASWrapperLayoutSpec object initialized with the given layoutElement as child.
@@ -91,7 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Init not available for ASWrapperLayoutSpec
  */
-- (instancetype)init __unavailable;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

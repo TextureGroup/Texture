@@ -1,20 +1,10 @@
 //
 //  PhotoCellNode.m
-//  Sample
+//  Texture
 //
-//  Created by Hannah Troisi on 2/17/16.
-//
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "PhotoCellNode.h"
@@ -22,15 +12,10 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 
-#import "Utilities.h"
-#import "CommentsNode.h"
+#import "Availability.h"
 #import "PINImageView+PINRemoteImage.h"
 #import "PINButton+PINRemoteImage.h"
-
-// There are many ways to format ASLayoutSpec code.  In this example, we offer two different formats:
-// A flatter, more ordinary Objective-C style; or a more structured, "visually" declarative style.
-#define YOGA_LAYOUT 0
-#define FLAT_LAYOUT 0
+#import "Utilities.h"
 
 #define DEBUG_PHOTOCELL_LAYOUT  0
 
@@ -44,10 +29,12 @@
 #define InsetForHeader UIEdgeInsetsMake(0, HORIZONTAL_BUFFER, 0, HORIZONTAL_BUFFER)
 #define InsetForFooter UIEdgeInsetsMake(VERTICAL_BUFFER, HORIZONTAL_BUFFER, VERTICAL_BUFFER, HORIZONTAL_BUFFER)
 
+@interface PhotoCellNode () <ASNetworkImageNodeDelegate>
+@end
+
 @implementation PhotoCellNode
 {
   PhotoModel          *_photoModel;
-  CommentsNode        *_photoCommentsNode;
   ASNetworkImageNode  *_userAvatarImageNode;
   ASNetworkImageNode  *_photoImageNode;
   ASTextNode          *_userNameLabel;
@@ -77,6 +64,7 @@
     }];
 
     _photoImageNode          = [[ASNetworkImageNode alloc] init];
+    _photoImageNode.delegate = self;
     _photoImageNode.URL      = photo.URL;
     _photoImageNode.layerBacked = YES;
     
@@ -85,25 +73,12 @@
     
     _photoLocationLabel      = [[ASTextNode alloc] init];
     _photoLocationLabel.maximumNumberOfLines = 1;
-    [photo.location reverseGeocodedLocationWithCompletionBlock:^(LocationModel *locationModel) {
-      
-      // check and make sure this is still relevant for this cell (and not an old cell)
-      // make sure to use _photoModel instance variable as photo may change when cell is reused,
-      // where as local variable will never change
-      if (locationModel == _photoModel.location) {
-        _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
-        [self setNeedsLayout];
-      }
-    }];
+    _photoLocationLabel.attributedText = [photo locationAttributedStringWithFontSize:FONT_SIZE];
     
     _photoTimeIntervalSincePostLabel = [self createLayerBackedTextNodeWithString:[photo uploadDateAttributedStringWithFontSize:FONT_SIZE]];
     _photoLikesLabel                 = [self createLayerBackedTextNodeWithString:[photo likesAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel           = [self createLayerBackedTextNodeWithString:[photo descriptionAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel.maximumNumberOfLines = 3;
-    
-    _photoCommentsNode = [[CommentsNode alloc] init];
-    
-    _photoCommentsNode.layerBacked = YES;
     
     // instead of adding everything addSubnode:
     self.automaticallyManagesSubnodes = YES;
@@ -171,7 +146,7 @@
     // Create the last stack before assembling everything: the Footer Stack contains the description and comments.
     ASStackLayoutSpec *footerStack = [ASStackLayoutSpec verticalStackLayoutSpec];
     footerStack.spacing = VERTICAL_BUFFER;
-    footerStack.children = @[_photoLikesLabel, _photoDescriptionLabel, _photoCommentsNode];
+    footerStack.children = @[_photoLikesLabel, _photoDescriptionLabel];
 
     // Main Vertical Stack: contains header, large main photo with fixed aspect ratio, and footer.
     ASStackLayoutSpec *verticalStack = [ASStackLayoutSpec verticalStackLayoutSpec];
@@ -264,8 +239,7 @@
                   alignItems:ASStackLayoutAlignItemsStretch
                   children:@[
                              _photoLikesLabel,
-                             _photoDescriptionLabel,
-                             _photoCommentsNode
+                             _photoDescriptionLabel
                              ]]
                  ]
             ]];
@@ -278,10 +252,19 @@
 - (void)didEnterPreloadState
 {
   [super didEnterPreloadState];
-  
-  [_photoModel.commentFeed refreshFeedWithCompletionBlock:^(NSArray *newComments) {
-    [self loadCommentsForPhoto:_photoModel];
-  }];
+}
+
+#pragma mark - Network Image Delegate
+
+- (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info
+{
+  // Docs say method is called from bg but right now it's called from main.
+  // Save main thread time by shunting this.
+  if (info.sourceType == ASNetworkImageSourceDownload) {
+    ASPerformBlockOnBackgroundThread(^{
+      NSLog(@"Received image %@ from %@ with userInfo %@", image, info.url.path, ASObjectDescriptionMakeTiny(info.userInfo));
+    });
+  }
 }
 
 #pragma mark - Helper Methods
@@ -294,15 +277,6 @@
   return textNode;
 }
 
-- (void)loadCommentsForPhoto:(PhotoModel *)photo
-{
-  if (photo.commentFeed.numberOfItemsInFeed > 0) {
-    [_photoCommentsNode updateWithCommentFeedModel:photo.commentFeed];
-    
-    [self setNeedsLayout];
-  }
-}
-
 - (void)setupYogaLayoutIfNeeded
 {
 #if YOGA_LAYOUT
@@ -310,7 +284,6 @@
   [_userAvatarImageNode.style yogaNodeCreateIfNeeded];
   [_userNameLabel.style yogaNodeCreateIfNeeded];
   [_photoImageNode.style yogaNodeCreateIfNeeded];
-  [_photoCommentsNode.style yogaNodeCreateIfNeeded];
   [_photoLikesLabel.style yogaNodeCreateIfNeeded];
   [_photoDescriptionLabel.style yogaNodeCreateIfNeeded];
   [_photoLocationLabel.style yogaNodeCreateIfNeeded];
@@ -351,7 +324,7 @@
   ASDisplayNode *footerStack = [ASDisplayNode yogaVerticalStack];
   footerStack.style.margin = ASEdgeInsetsMake(InsetForFooter);
   footerStack.style.padding = ASEdgeInsetsMake(UIEdgeInsetsMake(0.0, 0.0, VERTICAL_BUFFER, 0.0));
-  footerStack.yogaChildren = @[_photoLikesLabel, _photoDescriptionLabel, _photoCommentsNode];
+  footerStack.yogaChildren = @[_photoLikesLabel, _photoDescriptionLabel];
 
   // Main Vertical Stack: contains header, large main photo with fixed aspect ratio, and footer.
   _photoImageNode.style.aspectRatio = 1.0;

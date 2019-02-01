@@ -2,16 +2,12 @@
 //  ASTLayoutFixture.h
 //  Texture
 //
-//  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+
 #import "ASTestCase.h"
 #import "ASLayoutTestNode.h"
 
@@ -21,14 +17,14 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASTLayoutFixture : NSObject
 
 /// The correct layout. The root should be unpositioned (same as -calculatedLayout).
-@property (nonatomic, strong, nullable) ASLayout *layout;
+@property (nonatomic, nullable) ASLayout *layout;
 
 /// The layoutSpecBlocks for non-leaf nodes.
-@property (nonatomic, strong, readonly) NSMapTable<ASDisplayNode *, ASLayoutSpecBlock> *layoutSpecBlocks;
+@property (nonatomic, readonly) NSMapTable<ASDisplayNode *, ASLayoutSpecBlock> *layoutSpecBlocks;
 
-@property (nonatomic, strong, readonly) ASLayoutTestNode *rootNode;
+@property (nonatomic, readonly) ASLayoutTestNode *rootNode;
 
-@property (nonatomic, strong, readonly) NSSet<ASLayoutTestNode *> *allNodes;
+@property (nonatomic, readonly) NSSet<ASLayoutTestNode *> *allNodes;
 
 /// Get the (correct) layout for the specified node.
 - (ASLayout *)layoutForNode:(ASLayoutTestNode *)node;
@@ -43,6 +39,9 @@ AS_SUBCLASSING_RESTRICTED
 
 /// Get the first expected size range for the node.
 - (ASSizeRange)firstSizeRangeForNode:(ASLayoutTestNode *)node;
+
+/// Enumerate all the size ranges for all the nodes using the provided block.
+- (void)withSizeRangesForAllNodesUsingBlock:(void (^)(ASLayoutTestNode *node, ASSizeRange sizeRange))block;
 
 /// Enumerate all the size ranges for the node.
 - (void)withSizeRangesForNode:(ASLayoutTestNode *)node block:(void (^)(ASSizeRange sizeRange))block;

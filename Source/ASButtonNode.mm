@@ -2,28 +2,21 @@
 //  ASButtonNode.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASButtonNode.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 #import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @interface ASButtonNode ()
 {
@@ -71,13 +64,14 @@
     _contentVerticalAlignment = ASVerticalAlignmentCenter;
     _contentEdgeInsets = UIEdgeInsetsZero;
     _imageAlignment = ASButtonNodeImageAlignmentBeginning;
-    self.accessibilityTraits = UIAccessibilityTraitButton;
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
   }
   return self;
 }
 
 - (ASTextNode *)titleNode
 {
+  ASLockScopeSelf();
   if (!_titleNode) {
     _titleNode = [[ASTextNode alloc] init];
 #if TARGET_OS_IOS 
@@ -92,6 +86,7 @@
 
 - (ASImageNode *)imageNode
 {
+  ASLockScopeSelf();
   if (!_imageNode) {
     _imageNode = [[ASImageNode alloc] init];
     [_imageNode setLayerBacked:YES];
@@ -101,6 +96,7 @@
 
 - (ASImageNode *)backgroundImageNode
 {
+  ASLockScopeSelf();
   if (!_backgroundImageNode) {
     _backgroundImageNode = [[ASImageNode alloc] init];
     [_backgroundImageNode setLayerBacked:YES];
@@ -119,11 +115,7 @@
 {
   if (self.enabled != enabled) {
     [super setEnabled:enabled];
-    if (enabled) {
-      self.accessibilityTraits = UIAccessibilityTraitButton;
-    } else {
-      self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled;
-    }
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
     [self updateButtonContent];
   }
 }
@@ -161,8 +153,8 @@
 
 - (void)updateImage
 {
-  __instanceLock__.lock();
-
+  [self lock];
+  
   UIImage *newImage;
   if (self.enabled == NO && _disabledImage) {
     newImage = _disabledImage;
@@ -178,18 +170,18 @@
   
   if ((_imageNode != nil || newImage != nil) && newImage != self.imageNode.image) {
     _imageNode.image = newImage;
-    __instanceLock__.unlock();
+    [self unlock];
 
     [self setNeedsLayout];
     return;
   }
   
-  __instanceLock__.unlock();
+  [self unlock];
 }
 
 - (void)updateTitle
 {
-  __instanceLock__.lock();
+  [self lock];
 
   NSAttributedString *newTitle;
   if (self.enabled == NO && _disabledAttributedTitle) {
@@ -207,19 +199,19 @@
   // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
   if ((_titleNode != nil || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
     _titleNode.attributedText = newTitle;
-    __instanceLock__.unlock();
+    [self unlock];
     
-    self.accessibilityLabel = _titleNode.accessibilityLabel;
+    self.accessibilityLabel = self.defaultAccessibilityLabel;
     [self setNeedsLayout];
     return;
   }
   
-  __instanceLock__.unlock();
+  [self unlock];
 }
 
 - (void)updateBackgroundImage
 {
-  __instanceLock__.lock();
+  [self lock];
   
   UIImage *newImage;
   if (self.enabled == NO && _disabledBackgroundImage) {
@@ -236,100 +228,86 @@
   
   if ((_backgroundImageNode != nil || newImage != nil) && newImage != self.backgroundImageNode.image) {
     _backgroundImageNode.image = newImage;
-    __instanceLock__.unlock();
+    [self unlock];
     
     [self setNeedsLayout];
     return;
   }
   
-  __instanceLock__.unlock();
+  [self unlock];
 }
 
 - (CGFloat)contentSpacing
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _contentSpacing;
 }
 
 - (void)setContentSpacing:(CGFloat)contentSpacing
 {
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    if (contentSpacing == _contentSpacing) {
-      return;
-    }
-    
-    _contentSpacing = contentSpacing;
+  if (ASLockedSelfCompareAssign(_contentSpacing, contentSpacing)) {
+    [self setNeedsLayout];
   }
-
-  [self setNeedsLayout];
 }
 
 - (BOOL)laysOutHorizontally
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _laysOutHorizontally;
 }
 
 - (void)setLaysOutHorizontally:(BOOL)laysOutHorizontally
 {
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    if (laysOutHorizontally == _laysOutHorizontally) {
-      return;
-    }
-  
-    _laysOutHorizontally = laysOutHorizontally;
+  if (ASLockedSelfCompareAssign(_laysOutHorizontally, laysOutHorizontally)) {
+    [self setNeedsLayout];
   }
-
-  [self setNeedsLayout];
 }
 
 - (ASVerticalAlignment)contentVerticalAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _contentVerticalAlignment;
 }
 
 - (void)setContentVerticalAlignment:(ASVerticalAlignment)contentVerticalAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _contentVerticalAlignment = contentVerticalAlignment;
 }
 
 - (ASHorizontalAlignment)contentHorizontalAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _contentHorizontalAlignment;
 }
 
 - (void)setContentHorizontalAlignment:(ASHorizontalAlignment)contentHorizontalAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _contentHorizontalAlignment = contentHorizontalAlignment;
 }
 
 - (UIEdgeInsets)contentEdgeInsets
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _contentEdgeInsets;
 }
 
 - (void)setContentEdgeInsets:(UIEdgeInsets)contentEdgeInsets
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _contentEdgeInsets = contentEdgeInsets;
 }
 
 - (ASButtonNodeImageAlignment)imageAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   return _imageAlignment;
 }
 
 - (void)setImageAlignment:(ASButtonNodeImageAlignment)imageAlignment
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   _imageAlignment = imageAlignment;
 }
 
@@ -349,7 +327,7 @@
 
 - (NSAttributedString *)attributedTitleForState:(UIControlState)state
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   switch (state) {
     case UIControlStateNormal:
       return _normalAttributedTitle;
@@ -374,7 +352,7 @@
 - (void)setAttributedTitle:(NSAttributedString *)title forState:(UIControlState)state
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     switch (state) {
       case UIControlStateNormal:
         _normalAttributedTitle = [title copy];
@@ -406,7 +384,7 @@
 
 - (UIImage *)imageForState:(UIControlState)state
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   switch (state) {
     case UIControlStateNormal:
       return _normalImage;
@@ -431,7 +409,7 @@
 - (void)setImage:(UIImage *)image forState:(UIControlState)state
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     switch (state) {
       case UIControlStateNormal:
         _normalImage = image;
@@ -463,7 +441,7 @@
 
 - (UIImage *)backgroundImageForState:(UIControlState)state
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASLockScopeSelf();
   switch (state) {
     case UIControlStateNormal:
       return _normalBackgroundImage;
@@ -488,7 +466,7 @@
 - (void)setBackgroundImage:(UIImage *)image forState:(UIControlState)state
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     switch (state) {
       case UIControlStateNormal:
         _normalBackgroundImage = image;
@@ -525,7 +503,7 @@
   ASLayoutSpec *spec;
   ASStackLayoutSpec *stack = [[ASStackLayoutSpec alloc] init];
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    ASLockScopeSelf();
     stack.direction = _laysOutHorizontally ? ASStackLayoutDirectionHorizontal : ASStackLayoutDirectionVertical;
     stack.spacing = _contentSpacing;
     stack.horizontalAlignment = _contentHorizontalAlignment;
@@ -561,6 +539,18 @@
   }
   
   return spec;
+}
+
+- (NSString *)defaultAccessibilityLabel
+{
+  ASLockScopeSelf();
+  return _titleNode.defaultAccessibilityLabel;
+}
+
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
+  return self.enabled ? UIAccessibilityTraitButton
+                      : (UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled);
 }
 
 - (void)layout

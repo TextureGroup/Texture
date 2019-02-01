@@ -1,21 +1,10 @@
 //
 //  PhotoFeedBaseController.m
-//  Sample
+//  Texture
 //
-//  Created by Huy Nguyen on 20/12/16.
-//  Copyright © 2016 Facebook. All rights reserved.
-//
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-//  FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-//  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "PhotoFeedBaseController.h"
@@ -60,7 +49,6 @@
     [_activityIndicatorView stopAnimating];
     
     [self.tableView reloadData];
-    [self requestCommentsForPhotos:newPhotos];
     
     // immediately start second larger fetch
     [self loadPage];
@@ -85,6 +73,11 @@
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
   return UIStatusBarStyleLightContent;
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return NO;
 }
 
 - (CGSize)imageSizeForScreenWidth
@@ -112,11 +105,6 @@
 }
 
 - (void)loadPage
-{
-  NSAssert(NO, @"Subclasses must override this method");
-}
-
-- (void)requestCommentsForPhotos:(NSArray *)newPhotos
 {
   NSAssert(NO, @"Subclasses must override this method");
 }

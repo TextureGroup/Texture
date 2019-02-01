@@ -2,17 +2,9 @@
 //  AppDelegate.m
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "AppDelegate.h"
@@ -40,8 +32,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
-  ASEnableNoCopyRendering();
-  
   // this UIWindow subclass is neccessary to make the status bar opaque
   _window                  = [[WindowWithStatusBarUnderlay alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   _window.backgroundColor  = [UIColor whiteColor];
@@ -49,18 +39,23 @@
   // ASDK Home Feed viewController & navController
   PhotoFeedNodeController *asdkHomeFeedVC      = [[PhotoFeedNodeController alloc] init];
   UINavigationController *asdkHomeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:asdkHomeFeedVC];
+  asdkHomeFeedNavCtrl.navigationBar.barStyle = UIBarStyleBlack;
   asdkHomeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"ASDK" image:[UIImage imageNamed:@"home"] tag:0];
   asdkHomeFeedNavCtrl.hidesBarsOnSwipe         = YES;
 
   // ListKit Home Feed viewController & navController
   PhotoFeedListKitViewController *listKitHomeFeedVC      = [[PhotoFeedListKitViewController alloc] init];
   UINavigationController *listKitHomeFeedNavCtrl  = [[UINavigationController alloc] initWithRootViewController:listKitHomeFeedVC];
+  listKitHomeFeedNavCtrl.navigationBar.barStyle = UIBarStyleBlack;
   listKitHomeFeedNavCtrl.tabBarItem               = [[UITabBarItem alloc] initWithTitle:@"ListKit" image:[UIImage imageNamed:@"home"] tag:0];
   listKitHomeFeedNavCtrl.hidesBarsOnSwipe         = YES;
+
+
 
   // UIKit Home Feed viewController & navController
   PhotoFeedViewController *uikitHomeFeedVC     = [[PhotoFeedViewController alloc] init];
   UINavigationController *uikitHomeFeedNavCtrl = [[UINavigationController alloc] initWithRootViewController:uikitHomeFeedVC];
+  uikitHomeFeedNavCtrl.navigationBar.barStyle = UIBarStyleBlack;
   uikitHomeFeedNavCtrl.tabBarItem              = [[UITabBarItem alloc] initWithTitle:@"UIKit" image:[UIImage imageNamed:@"home"] tag:0];
   uikitHomeFeedNavCtrl.hidesBarsOnSwipe        = YES;
 
@@ -80,10 +75,6 @@
   [[UINavigationBar appearance] setBarTintColor:[UIColor darkBlueColor]];
   [[UINavigationBar appearance] setTranslucent:NO];
   
-  // iOS8 hides the status bar in landscape orientation, this forces the status bar hidden status to NO
-  [application setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
-  [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
-
 #if WEAVER
   WVDebugger *debugger = [WVDebugger defaultInstance];
   [debugger enableLayoutElementDebuggingWithApplication:application];

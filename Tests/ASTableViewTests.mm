@@ -2,20 +2,13 @@
 //  ASTableViewTests.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <XCTest/XCTest.h>
+#import <JGMethodSwizzler/JGMethodSwizzler.h>
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableView.h>
@@ -24,9 +17,9 @@
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
-#import <JGMethodSwizzler/JGMethodSwizzler.h>
-#import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import "ASXCTExtensions.h"
 
 #define NumberOfSections 10
 #define NumberOfReloadIterations 50
@@ -53,7 +46,7 @@
 @end
 
 @interface ASTestTableView : ASTableView
-@property (nonatomic, copy) void (^willDeallocBlock)(ASTableView *tableView);
+@property (nonatomic) void (^willDeallocBlock)(ASTableView *tableView);
 @end
 
 @implementation ASTestTableView
@@ -79,7 +72,7 @@
 @end
 
 @interface ASTableViewTestDelegate : NSObject <ASTableDataSource, ASTableDelegate>
-@property (nonatomic, copy) void (^willDeallocBlock)(ASTableViewTestDelegate *delegate);
+@property (nonatomic) void (^willDeallocBlock)(ASTableViewTestDelegate *delegate);
 @property (nonatomic) CGFloat headerHeight;
 @property (nonatomic) CGFloat footerHeight;
 @end
@@ -139,8 +132,9 @@
 
 @interface ASTableViewFilledDataSource : NSObject <ASTableDataSource, ASTableDelegate>
 @property (nonatomic) BOOL usesSectionIndex;
+@property (nonatomic) NSInteger numberOfSections;
 @property (nonatomic) NSInteger rowsPerSection;
-@property (nonatomic, nullable, copy) ASCellNodeBlock(^nodeBlockForItem)(NSIndexPath *);
+@property (nonatomic, nullable) ASCellNodeBlock(^nodeBlockForItem)(NSIndexPath *);
 @end
 
 @implementation ASTableViewFilledDataSource
@@ -149,6 +143,7 @@
 {
   self = [super init];
   if (self != nil) {
+    _numberOfSections = NumberOfSections;
     _rowsPerSection = 20;
   }
   return self;
@@ -165,7 +160,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return NumberOfSections;
+  return _numberOfSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -807,7 +802,7 @@
 - (void)testAutomaticallyAdjustingContentOffset
 {
   ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
-  node.view.automaticallyAdjustsContentOffset = YES;
+  node.automaticallyAdjustsContentOffset = YES;
   node.bounds = CGRectMake(0, 0, 100, 100);
   ASTableViewFilledDataSource *ds = [[ASTableViewFilledDataSource alloc] init];
   node.dataSource = ds;
@@ -831,6 +826,52 @@
   // Now that row (0,0) is deleted, we should have slid up to be at just 10
   // i.e. we should have subtracted the deleted row height from our content offset.
   XCTAssertEqual(node.contentOffset.y, 10);
+}
+
+- (void)testTableViewReloadDoesReloadIfEditableTextNodeIsFirstResponder
+{
+  ASEditableTextNode *editableTextNode = [[ASEditableTextNode alloc] init];
+  
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 375, 667)];
+  ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStyleGrouped];
+  node.frame = window.bounds;
+  [window addSubnode:node];
+  
+  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+  dataSource.rowsPerSection = 1;
+  dataSource.numberOfSections = 1;
+  // Currently this test requires that the text in the cell node fills the
+  // visible width, so we use the long description for the index path.
+  dataSource.nodeBlockForItem = ^(NSIndexPath *indexPath) {
+    return (ASCellNodeBlock)^{
+      ASCellNode *cellNode = [[ASCellNode alloc] init];
+      cellNode.automaticallyManagesSubnodes = YES;
+      cellNode.layoutSpecBlock = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+        return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(10, 10, 10, 10) child:editableTextNode];
+      };
+      return cellNode;
+    };
+  };
+  node.delegate = dataSource;
+  node.dataSource = dataSource;
+  
+  // Reload the data for the initial load
+  [node reloadData];
+  [node waitUntilAllUpdatesAreProcessed];
+  [node setNeedsLayout];
+  [node layoutIfNeeded];
+ 
+  // Set the textView as first responder
+  [editableTextNode.textView becomeFirstResponder];
+  
+  // Change data source count and try to reload a second time
+  dataSource.rowsPerSection = 2;
+  [node reloadData];
+  [node waitUntilAllUpdatesAreProcessed];
+  
+  // Check that numberOfRows in section 0 is 2
+  XCTAssertEqual([node numberOfRowsInSection:0], 2);
+  XCTAssertEqual([node.view numberOfRowsInSection:0], 2);
 }
 
 @end

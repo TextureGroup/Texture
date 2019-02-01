@@ -2,17 +2,9 @@
 //  ASStackLayoutSpec.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASLayoutSpec.h>
@@ -47,33 +39,33 @@ NS_ASSUME_NONNULL_BEGIN
  Specifies the direction children are stacked in. If horizontalAlignment and verticalAlignment were set, 
  they will be resolved again, causing justifyContent and alignItems to be updated accordingly
  */
-@property (nonatomic, assign) ASStackLayoutDirection direction;
+@property (nonatomic) ASStackLayoutDirection direction;
 /** The amount of space between each child. */
-@property (nonatomic, assign) CGFloat spacing;
+@property (nonatomic) CGFloat spacing;
 /** 
  Specifies how children are aligned horizontally. Depends on the stack direction, setting the alignment causes either
  justifyContent or alignItems to be updated. The alignment will remain valid after future direction changes.
  Thus, it is preferred to those properties
  */
-@property (nonatomic, assign) ASHorizontalAlignment horizontalAlignment;
+@property (nonatomic) ASHorizontalAlignment horizontalAlignment;
 /** 
  Specifies how children are aligned vertically. Depends on the stack direction, setting the alignment causes either
  justifyContent or alignItems to be updated. The alignment will remain valid after future direction changes.
  Thus, it is preferred to those properties
  */
-@property (nonatomic, assign) ASVerticalAlignment verticalAlignment;
+@property (nonatomic) ASVerticalAlignment verticalAlignment;
 /** The amount of space between each child. Defaults to ASStackLayoutJustifyContentStart */
-@property (nonatomic, assign) ASStackLayoutJustifyContent justifyContent;
+@property (nonatomic) ASStackLayoutJustifyContent justifyContent;
 /** Orientation of children along cross axis. Defaults to ASStackLayoutAlignItemsStretch */
-@property (nonatomic, assign) ASStackLayoutAlignItems alignItems;
+@property (nonatomic) ASStackLayoutAlignItems alignItems;
 /** Whether children are stacked into a single or multiple lines. Defaults to single line (ASStackLayoutFlexWrapNoWrap) */
-@property (nonatomic, assign) ASStackLayoutFlexWrap flexWrap;
+@property (nonatomic) ASStackLayoutFlexWrap flexWrap;
 /** Orientation of lines along cross axis if there are multiple lines. Defaults to ASStackLayoutAlignContentStart */
-@property (nonatomic, assign) ASStackLayoutAlignContent alignContent;
+@property (nonatomic) ASStackLayoutAlignContent alignContent;
 /** If the stack spreads on multiple lines using flexWrap, the amount of space between lines. */
-@property (nonatomic, assign) CGFloat lineSpacing;
+@property (nonatomic) CGFloat lineSpacing;
 /** Whether this stack can dispatch to other threads, regardless of which thread it's running on */
-@property (nonatomic, assign, getter=isConcurrent) BOOL concurrent;
+@property (nonatomic, getter=isConcurrent) BOOL concurrent;
 
 - (instancetype)init;
 
@@ -88,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      spacing:(CGFloat)spacing
                               justifyContent:(ASStackLayoutJustifyContent)justifyContent
                                   alignItems:(ASStackLayoutAlignItems)alignItems
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  @param direction The direction of the stack view (horizontal or vertical)
@@ -105,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
                                   alignItems:(ASStackLayoutAlignItems)alignItems
                                     flexWrap:(ASStackLayoutFlexWrap)flexWrap
                                 alignContent:(ASStackLayoutAlignContent)alignContent
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  @param direction The direction of the stack view (horizontal or vertical)
@@ -124,17 +116,17 @@ NS_ASSUME_NONNULL_BEGIN
                                     flexWrap:(ASStackLayoutFlexWrap)flexWrap
                                 alignContent:(ASStackLayoutAlignContent)alignContent
                                  lineSpacing:(CGFloat)lineSpacing
-                                    children:(NSArray<id<ASLayoutElement>> *)children AS_WARN_UNUSED_RESULT;
+                                    children:(NSArray<id<ASLayoutElement>> *)children NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * @return A stack layout spec with direction of ASStackLayoutDirectionVertical
  **/
-+ (instancetype)verticalStackLayoutSpec AS_WARN_UNUSED_RESULT;
++ (instancetype)verticalStackLayoutSpec NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  * @return A stack layout spec with direction of ASStackLayoutDirectionHorizontal
  **/
-+ (instancetype)horizontalStackLayoutSpec AS_WARN_UNUSED_RESULT;
++ (instancetype)horizontalStackLayoutSpec NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 @end
 

@@ -2,17 +2,9 @@
 //  ASPagerNode.h
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <AsyncDisplayKit/ASCollectionNode.h>
@@ -96,12 +88,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The underlying ASCollectionView object.
  */
-@property (nonatomic, readonly) ASCollectionView *view;
+@property (readonly) ASCollectionView *view;
 
 /**
- * Returns the current page index
+ * Returns the current page index. Main thread only.
  */
-@property (nonatomic, assign, readonly) NSInteger currentPageIndex;
+@property (nonatomic, readonly) NSInteger currentPageIndex;
 
 /**
  * Scroll the contents of the receiver to ensure that the page is visible
@@ -134,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the pager node will set the property on the view controller to NO and log a warning message. In the future,
  * the pager node will just log the warning, and you'll need to configure your view controller on your own.
  */
-@property (nonatomic, assign) BOOL allowsAutomaticInsetsAdjustment;
+@property (nonatomic) BOOL allowsAutomaticInsetsAdjustment;
 
 @end
 

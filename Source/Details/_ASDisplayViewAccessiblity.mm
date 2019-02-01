@@ -2,27 +2,20 @@
 //  _ASDisplayViewAccessiblity.mm
 //  Texture
 //
-//  Copyright (c) 2014-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the /ASDK-Licenses directory of this source tree. An additional
-//  grant of patent rights can be found in the PATENTS file in the same directory.
-//
-//  Modifications to this file made after 4/13/2017 are: Copyright (c) 2017-present,
-//  Pinterest, Inc.  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #ifndef ASDK_ACCESSIBILITY_DISABLE
 
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASTableNode.h>
 
 #import <queue>
 
@@ -65,8 +58,8 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 
 @interface ASAccessibilityElement : UIAccessibilityElement<ASAccessibilityElementPositioning>
 
-@property (nonatomic, strong) ASDisplayNode *node;
-@property (nonatomic, strong) ASDisplayNode *containerNode;
+@property (nonatomic) ASDisplayNode *node;
+@property (nonatomic) ASDisplayNode *containerNode;
 
 + (ASAccessibilityElement *)accessibilityElementWithContainer:(UIView *)container node:(ASDisplayNode *)node containerNode:(ASDisplayNode *)containerNode;
 
@@ -85,7 +78,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
-  if (AS_AVAILABLE_IOS(11)) {
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
     accessibilityElement.accessibilityAttributedHint = node.accessibilityAttributedHint;
     accessibilityElement.accessibilityAttributedValue = node.accessibilityAttributedValue;
@@ -107,9 +100,9 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 
 @interface ASAccessibilityCustomAction : UIAccessibilityCustomAction<ASAccessibilityElementPositioning>
 
-@property (nonatomic, strong) UIView *container;
-@property (nonatomic, strong) ASDisplayNode *node;
-@property (nonatomic, strong) ASDisplayNode *containerNode;
+@property (nonatomic) UIView *container;
+@property (nonatomic) ASDisplayNode *node;
+@property (nonatomic) ASDisplayNode *containerNode;
 
 @end
 
@@ -139,15 +132,22 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
   });
 }
 
-static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _ASDisplayView *view, NSMutableArray *elements) {
+static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, UIView *view, NSMutableArray *elements) {
   UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:container containerNode:container];
 
-  NSMutableArray<ASAccessibilityElement *> *labeledNodes = [NSMutableArray array];
-  NSMutableArray<ASAccessibilityCustomAction *> *actions = [NSMutableArray array];
+  NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
+  NSMutableArray<ASAccessibilityCustomAction *> *actions = [[NSMutableArray alloc] init];
   std::queue<ASDisplayNode *> queue;
   queue.push(container);
 
-  ASDisplayNode *node;
+  // If the container does not have an accessibility label set, or if the label is meant for custom
+  // actions only, then aggregate its subnodes' labels. Otherwise, treat the label as an overriden
+  // value and do not perform the aggregation.
+  BOOL shouldAggregateSubnodeLabels =
+      (container.accessibilityLabel.length == 0) ||
+      (container.accessibilityTraits & InteractiveAccessibilityTraitsMask());
+
+  ASDisplayNode *node = nil;
   while (!queue.empty()) {
     node = queue.front();
     queue.pop();
@@ -164,7 +164,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
         action.containerNode = node.supernode;
         action.container = node.supernode.view;
         [actions addObject:action];
-      } else {
+      } else if (node == container || shouldAggregateSubnodeLabels) {
         // Even though not surfaced to UIKit, create a non-interactive element for purposes of building sorted aggregated label.
         ASAccessibilityElement *nonInteractiveElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:node containerNode:container];
         [labeledNodes addObject:nonInteractiveElement];
@@ -179,7 +179,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
   SortAccessibilityElements(labeledNodes);
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
-  if (AS_AVAILABLE_IOS(11)) {
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
     NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
     [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -203,13 +203,19 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
 }
 
 /// Collect all accessibliity elements for a given view and view node
-static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableArray *elements)
+static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
   ASDisplayNode *node = view.asyncdisplaykit_node;
 
-  if (node.isAccessibilityContainer) {
+  BOOL anySubNodeIsCollection = (nil != ASDisplayNodeFindFirstNode(node,
+      ^BOOL(ASDisplayNode *nodeToCheck) {
+    return ASDynamicCast(nodeToCheck, ASCollectionNode) != nil ||
+           ASDynamicCast(nodeToCheck, ASTableNode) != nil;
+  }));
+
+  if (node.isAccessibilityContainer && !anySubNodeIsCollection) {
     CollectAccessibilityElementsForContainer(node, view, elements);
     return;
   }
@@ -243,7 +249,7 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 }
 
 @interface _ASDisplayView () {
-  NSArray *_accessibleElements;
+  NSArray *_accessibilityElements;
 }
 
 @end
@@ -252,43 +258,41 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
 
 #pragma mark - UIAccessibility
 
-- (void)setAccessibleElements:(NSArray *)accessibleElements
+- (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
-  _accessibleElements = nil;
+  ASDisplayNodeAssertMainThread();
+  _accessibilityElements = nil;
 }
 
-- (NSArray *)accessibleElements
+- (NSArray *)accessibilityElements
 {
+  ASDisplayNodeAssertMainThread();
+  
   ASDisplayNode *viewNode = self.asyncdisplaykit_node;
   if (viewNode == nil) {
     return @[];
   }
-  
-  if (_accessibleElements != nil) {
-    return _accessibleElements;
+
+  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDisableAccessibilityCache)) {
+    _accessibilityElements = [viewNode accessibilityElements];
   }
-  
-  NSMutableArray *accessibleElements = [NSMutableArray array];
-  CollectAccessibilityElementsForView(self, accessibleElements);
-  SortAccessibilityElements(accessibleElements);
-  _accessibleElements = accessibleElements;
-  
-  return _accessibleElements;
+  return _accessibilityElements;
 }
 
-- (NSInteger)accessibilityElementCount
-{
-  return self.accessibleElements.count;
-}
+@end
 
-- (id)accessibilityElementAtIndex:(NSInteger)index
-{
-  return self.accessibleElements[index];
-}
+@implementation ASDisplayNode (AccessibilityInternal)
 
-- (NSInteger)indexOfAccessibilityElement:(id)element
+- (NSArray *)accessibilityElements
 {
-  return [self.accessibleElements indexOfObjectIdenticalTo:element];
+  if (!self.isNodeLoaded) {
+    ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
+    return @[];
+  }
+  NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
+  CollectAccessibilityElementsForView(self.view, accessibilityElements);
+  SortAccessibilityElements(accessibilityElements);
+  return accessibilityElements;
 }
 
 @end
