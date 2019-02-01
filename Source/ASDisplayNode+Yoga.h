@@ -37,7 +37,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 
 // These methods are intended to be used internally to Texture, and should not be called directly.
-@interface ASDisplayNode (YogaDebugging)
+@interface ASDisplayNode (YogaInternal)
 
 /// For internal usage only
 - (BOOL)shouldHaveYogaMeasureFunc;
