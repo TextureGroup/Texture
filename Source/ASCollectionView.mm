@@ -949,8 +949,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)registerSupplementaryNodeOfKind:(NSString *)elementKind
 {
   ASDisplayNodeAssert(elementKind != nil, @"A kind is needed for supplementary node registration");
-  [_registeredSupplementaryKinds addObject:elementKind];
-  [self registerClass:[_ASCollectionReusableView class] forSupplementaryViewOfKind:elementKind withReuseIdentifier:kReuseIdentifier];
+  if (![_registeredSupplementaryKinds containsObject:elementKind]) {
+    [_registeredSupplementaryKinds addObject:elementKind];
+    [self registerClass:[_ASCollectionReusableView class] forSupplementaryViewOfKind:elementKind withReuseIdentifier:kReuseIdentifier];
+  }
 }
 
 - (void)insertSections:(NSIndexSet *)sections
