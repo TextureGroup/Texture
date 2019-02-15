@@ -2,8 +2,13 @@ source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, '9.0'
 
+target :'AsyncDisplayKit' do
+  pod 'PINRemoteImage', '3.0.0-beta.13'
+  pod 'Yoga'
+end
+
 target :'AsyncDisplayKitTests' do
-  pod 'OCMock', '=3.4.1' # 3.4.2 currently has issues.
+  pod 'OCMock', '=3.4.1'
   pod 'FBSnapshotTestCase/Core', '~> 2.1'
   pod 'JGMethodSwizzler', :git => 'https://github.com/JonasGessner/JGMethodSwizzler', :branch => 'master'
 
