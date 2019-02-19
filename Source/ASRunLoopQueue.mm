@@ -31,175 +31,19 @@ static void runLoopSourceCallback(void *info) {
 
 #pragma mark - ASDeallocQueue
 
-@interface ASDeallocQueueV1 : ASDeallocQueue
-@end
-@interface ASDeallocQueueV2 : ASDeallocQueue
-@end
-
-@implementation ASDeallocQueue
+@implementation ASDeallocQueue {
+  std::vector<CFTypeRef> _queue;
+  ASDN::Mutex _lock;
+}
 
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
 {
   static ASDeallocQueue *deallocQueue = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    if (ASActivateExperimentalFeature(ASExperimentalDeallocQueue)) {
-      deallocQueue = [[ASDeallocQueueV2 alloc] init];
-    } else {
-      deallocQueue = [[ASDeallocQueueV1 alloc] init];
-    }
+    deallocQueue = [[ASDeallocQueue alloc] init];
   });
   return deallocQueue;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-- (void)drain
-{
-  ASDisplayNodeFailAssert(@"Abstract method.");
-}
-
-@end
-
-@implementation ASDeallocQueueV1 {
-  NSThread *_thread;
-  NSCondition *_condition;
-  std::deque<id> _queue;
-  ASDN::RecursiveMutex _queueLock;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  if (objectPtr != NULL && *objectPtr != nil) {
-    ASDN::MutexLocker l(_queueLock);
-    _queue.push_back(*objectPtr);
-    *objectPtr = nil;
-  }
-}
-
-- (void)threadMain
-{
-  @autoreleasepool {
-    __unsafe_unretained __typeof__(self) weakSelf = self;
-    // 100ms timer.  No resources are wasted in between, as the thread sleeps, and each check is fast.
-    // This time is fast enough for most use cases without excessive churn.
-    CFRunLoopTimerRef timer = CFRunLoopTimerCreateWithHandler(NULL, -1, 0.1, 0, 0, ^(CFRunLoopTimerRef timer) {
-      weakSelf->_queueLock.lock();
-      if (weakSelf->_queue.size() == 0) {
-        weakSelf->_queueLock.unlock();
-        return;
-      }
-      // The scope below is entered while already locked. @autorelease is crucial here; see PR 2890.
-      __unused NSInteger count; // Prevent static analyzer warning if release build
-      @autoreleasepool {
-#if ASRunLoopQueueLoggingEnabled
-        NSLog(@"ASDeallocQueue Processing: %lu objects destroyed", weakSelf->_queue.size());
-#endif
-        // Sometimes we release 10,000 objects at a time.  Don't hold the lock while releasing.
-        std::deque<id> currentQueue = weakSelf->_queue;
-        count = currentQueue.size();
-        ASSignpostStartCustom(ASSignpostDeallocQueueDrain, self, count);
-        weakSelf->_queue = std::deque<id>();
-        weakSelf->_queueLock.unlock();
-        currentQueue.clear();
-      }
-      ASSignpostEndCustom(ASSignpostDeallocQueueDrain, self, count, ASSignpostColorDefault);
-    });
-    
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
-    CFRunLoopAddTimer(runloop, timer, kCFRunLoopCommonModes);
-    
-    [_condition lock];
-    [_condition signal];
-    // At this moment, -init is signalled that the thread is guaranteed to be finished starting.
-    [_condition unlock];
-    
-    // Keep processing events until the runloop is stopped.
-    CFRunLoopRun();
-    
-    CFRunLoopTimerInvalidate(timer);
-    CFRunLoopRemoveTimer(runloop, timer, kCFRunLoopCommonModes);
-    CFRelease(timer);
-    
-    [_condition lock];
-    [_condition signal];
-    // At this moment, -stop is signalled that the thread is guaranteed to be finished exiting.
-    [_condition unlock];
-  }
-}
-
-- (instancetype)init
-{
-  if ((self = [super init])) {
-    _condition = [[NSCondition alloc] init];
-    
-    _thread = [[NSThread alloc] initWithTarget:self selector:@selector(threadMain) object:nil];
-    _thread.name = @"ASDeallocQueue";
-    
-    // Use condition to ensure NSThread has finished starting.
-    [_condition lock];
-    [_thread start];
-    [_condition wait];
-    [_condition unlock];
-  }
-  return self;
-}
-
-- (void)stop
-{
-  if (!_thread) {
-    return;
-  }
-  
-  [_condition lock];
-  [self performSelector:@selector(_stop) onThread:_thread withObject:nil waitUntilDone:NO];
-  [_condition wait];
-  // At this moment, the thread is guaranteed to be finished running.
-  [_condition unlock];
-  _thread = nil;
-}
-
-- (void)drain
-{
-  [self performSelector:@selector(_drain) onThread:_thread withObject:nil waitUntilDone:YES];
-}
-
-- (void)_drain
-{
-  while (true) {
-    @autoreleasepool {
-      _queueLock.lock();
-      std::deque<id> currentQueue = _queue;
-      _queue = std::deque<id>();
-      _queueLock.unlock();
-
-      if (currentQueue.empty()) {
-        return;
-      } else {
-        currentQueue.clear();
-      }
-    }
-  }
-}
-
-- (void)_stop
-{
-  CFRunLoopStop(CFRunLoopGetCurrent());
-}
-
-- (void)dealloc
-{
-  [self stop];
-}
-
-@end
-
-@implementation ASDeallocQueueV2 {
-  std::vector<CFTypeRef> _queue;
-  ASDN::Mutex _lock;
 }
 
 - (void)dealloc
@@ -212,13 +56,13 @@ static void runLoopSourceCallback(void *info) {
   NSParameterAssert(objectPtr != NULL);
   
   // Cast to CFType so we can manipulate retain count manually.
-  let cfPtr = (CFTypeRef *)(void *)objectPtr;
+  const auto cfPtr = (CFTypeRef *)(void *)objectPtr;
   if (!cfPtr || !*cfPtr) {
     return;
   }
   
   _lock.lock();
-  let isFirstEntry = _queue.empty();
+  const auto isFirstEntry = _queue.empty();
   // Push the pointer into our queue and clear their pointer.
   // This "steals" the +1 from ARC and nils their pointer so they can't
   // access or release the object.
@@ -236,9 +80,9 @@ static void runLoopSourceCallback(void *info) {
 - (void)drain
 {
   _lock.lock();
-  let q = std::move(_queue);
+  const auto q = std::move(_queue);
   _lock.unlock();
-  for (let ref : q) {
+  for (CFTypeRef ref : q) {
     // NOTE: Could check that retain count is 1 and retry later if not.
     CFRelease(ref);
   }
@@ -347,7 +191,7 @@ static void runLoopSourceCallback(void *info) {
 #if ASRunLoopQueueLoggingEnabled
 - (void)checkRunLoop
 {
-    NSLog(@"<%@> - Jobs: %ld", self, _internalQueue.size());
+    NSLog(@"<%@> - Jobs: %ld", self, _internalQueue.count);
 }
 #endif
 
@@ -412,11 +256,11 @@ static void runLoopSourceCallback(void *info) {
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  let count = itemsToProcess.size();
+  const auto count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    let itemsEnd = itemsToProcess.cend();
-    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    const auto itemsEnd = itemsToProcess.cend();
+    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
@@ -479,10 +323,8 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
   CFRunLoopRef _runLoop;
   CFRunLoopSourceRef _runLoopSource;
   CFRunLoopObserverRef _preTransactionObserver;
-  CFRunLoopObserverRef _postTransactionObserver;
   NSPointerArray *_internalQueue;
   ASDN::RecursiveMutex _internalQueueLock;
-  BOOL _CATransactionCommitInProgress;
 
   // In order to not pollute the top-level activities, each queue has 1 root activity.
   os_activity_t _rootActivity;
@@ -499,9 +341,6 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 // CoreAnimation commit order is 2000000, the goal of this is to process shortly beforehand
 // but after most other scheduled work on the runloop has processed.
 static int const kASASCATransactionQueueOrder = 1000000;
-// This will mark the end of current loop and any node enqueued between kASASCATransactionQueueOrder
-// and kASASCATransactionQueuePostOrder will apply interface change immediately.
-static int const kASASCATransactionQueuePostOrder = 3000000;
 
 + (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED
 {
@@ -533,17 +372,13 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
     __unsafe_unretained __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+      while (weakSelf->_internalQueue.count > 0) {
       [weakSelf processQueue];
-    };
-    void (^postHandlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
-      ASDN::MutexLocker l(_internalQueueLock);
-      _CATransactionCommitInProgress = NO;
+      }
     };
     _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, handlerBlock);
-    _postTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueuePostOrder, postHandlerBlock);
 
     CFRunLoopAddObserver(_runLoop, _preTransactionObserver,  kCFRunLoopCommonModes);
-    CFRunLoopAddObserver(_runLoop, _postTransactionObserver,  kCFRunLoopCommonModes);
 
     // It is not guaranteed that the runloop will turn if it has no scheduled work, and this causes processing of
     // the queue to stop. Attaching a custom loop source to the run loop and signal it if new work needs to be done
@@ -572,19 +407,14 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   if (CFRunLoopObserverIsValid(_preTransactionObserver)) {
     CFRunLoopObserverInvalidate(_preTransactionObserver);
   }
-  if (CFRunLoopObserverIsValid(_postTransactionObserver)) {
-    CFRunLoopObserverInvalidate(_postTransactionObserver);
-  }
   CFRelease(_preTransactionObserver);
-  CFRelease(_postTransactionObserver);
   _preTransactionObserver = nil;
-  _postTransactionObserver = nil;
 }
 
 #if ASRunLoopQueueLoggingEnabled
 - (void)checkRunLoop
 {
-  NSLog(@"<%@> - Jobs: %ld", self, _internalQueue.size());
+  NSLog(@"<%@> - Jobs: %ld", self, _internalQueue.count);
 }
 #endif
 
@@ -596,11 +426,6 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
 
   {
     ASDN::MutexLocker l(_internalQueueLock);
-
-    // Mark the queue will end coalescing shortly until after CATransactionCommit.
-    // This will give the queue a chance to apply any further interfaceState changes/enqueue
-    // immediately within current runloop instead of pushing the work to next runloop cycle.
-    _CATransactionCommitInProgress = YES;
 
     NSInteger internalQueueCount = _internalQueue.count;
     // Early-exit if the queue is empty.
@@ -635,11 +460,11 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
   }
 
   // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
-  let count = itemsToProcess.size();
+  const auto count = itemsToProcess.size();
   if (count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    let itemsEnd = itemsToProcess.cend();
-    for (var iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
+    const auto itemsEnd = itemsToProcess.cend();
+    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
       __unsafe_unretained id value = *iterator;
       [value prepareForCATransactionCommit];
       as_log_verbose(ASDisplayLog(), "processed %@", value);
@@ -658,7 +483,7 @@ static int const kASASCATransactionQueuePostOrder = 3000000;
     return;
   }
 
-  if (!self.enabled || _CATransactionCommitInProgress) {
+  if (!self.enabled) {
     [object prepareForCATransactionCommit];
     return;
   }

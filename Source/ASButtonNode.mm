@@ -16,6 +16,7 @@
 #import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @interface ASButtonNode ()
 {
@@ -63,7 +64,7 @@
     _contentVerticalAlignment = ASVerticalAlignmentCenter;
     _contentEdgeInsets = UIEdgeInsetsZero;
     _imageAlignment = ASButtonNodeImageAlignmentBeginning;
-    self.accessibilityTraits = UIAccessibilityTraitButton;
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
   }
   return self;
 }
@@ -114,11 +115,7 @@
 {
   if (self.enabled != enabled) {
     [super setEnabled:enabled];
-    if (enabled) {
-      self.accessibilityTraits = UIAccessibilityTraitButton;
-    } else {
-      self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled;
-    }
+    self.accessibilityTraits = self.defaultAccessibilityTraits;
     [self updateButtonContent];
   }
 }
@@ -204,7 +201,7 @@
     _titleNode.attributedText = newTitle;
     [self unlock];
     
-    self.accessibilityLabel = _titleNode.accessibilityLabel;
+    self.accessibilityLabel = self.defaultAccessibilityLabel;
     [self setNeedsLayout];
     return;
   }
@@ -542,6 +539,18 @@
   }
   
   return spec;
+}
+
+- (NSString *)defaultAccessibilityLabel
+{
+  ASLockScopeSelf();
+  return _titleNode.defaultAccessibilityLabel;
+}
+
+- (UIAccessibilityTraits)defaultAccessibilityTraits
+{
+  return self.enabled ? UIAccessibilityTraitButton
+                      : (UIAccessibilityTraitButton | UIAccessibilityTraitNotEnabled);
 }
 
 - (void)layout

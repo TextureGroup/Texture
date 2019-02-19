@@ -17,7 +17,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
@@ -217,7 +216,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  let image = ASLockedSelf(_image);
+  const auto image = ASLockedSelf(_image);
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];
@@ -251,6 +250,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     
     // For debugging purposes we don't care about locking for now
     if ([ASImageNode shouldShowImageScalingOverlay] && _debugLabelNode == nil) {
+      // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
+      // holding the lock while calling addSubnode.
       dispatch_async(dispatch_get_main_queue(), ^{
         _debugLabelNode = [[ASTextNode alloc] init];
         _debugLabelNode.layerBacked = YES;
@@ -321,7 +322,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   return drawParameters;
 }
 
-+ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
++ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
 {
   ASImageNodeDrawParameters *drawParameter = (ASImageNodeDrawParameters *)parameter;
 
@@ -431,13 +432,17 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
-// Allocate cacheLock on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 
 + (ASWeakMapEntry *)contentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
+  static dispatch_once_t onceToken;
+  static ASDN::Mutex *cacheLock = nil;
+  dispatch_once(&onceToken, ^{
+    cacheLock = new ASDN::Mutex();
+  });
+  
   {
-    ASDN::StaticMutexLocker l(cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     if (!cache) {
       cache = [[ASWeakMap alloc] init];
     }
@@ -454,7 +459,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
 
   {
-    ASDN::StaticMutexLocker l(cacheLock);
+    ASDN::MutexLocker l(*cacheLock);
     return [cache setObject:contents forKey:key];
   }
 }
@@ -531,8 +536,15 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   [super displayDidFinish];
 
   __instanceLock__.lock();
-    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
     UIImage *image = _image;
+    void (^displayCompletionBlock)(BOOL canceled) = _displayCompletionBlock;
+    BOOL shouldPerformDisplayCompletionBlock = (image && displayCompletionBlock);
+
+    // Clear the ivar now. The block is retained and will be executed shortly.
+    if (shouldPerformDisplayCompletionBlock) {
+      _displayCompletionBlock = nil;
+    }
+
     BOOL hasDebugLabel = (_debugLabelNode != nil);
   __instanceLock__.unlock();
 
@@ -554,13 +566,8 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   }
   
   // If we've got a block to perform after displaying, do it.
-  if (image && displayCompletionBlock) {
-
+  if (shouldPerformDisplayCompletionBlock) {
     displayCompletionBlock(NO);
-
-    __instanceLock__.lock();
-      _displayCompletionBlock = nil;
-    __instanceLock__.unlock();
   }
 }
 
@@ -588,10 +595,9 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
 - (void)clearContents
 {
   [super clearContents];
-    
-  __instanceLock__.lock();
-    _weakCacheEntry = nil;  // release contents from the cache.
-  __instanceLock__.unlock();
+  
+  ASDN::MutexLocker l(__instanceLock__);
+  _weakCacheEntry = nil;  // release contents from the cache.
 }
 
 #pragma mark - Cropping

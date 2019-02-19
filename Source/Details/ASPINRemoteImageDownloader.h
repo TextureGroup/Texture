@@ -16,6 +16,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class PINRemoteImageManager;
+@protocol PINRemoteImageCaching;
 
 @interface ASPINRemoteImageDownloader : NSObject <ASImageCacheProtocol, ASImageDownloaderProtocol>
 
@@ -26,9 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This is the default downloader used by network backed image nodes if PINRemoteImage and PINCache are
  * available. It uses PINRemoteImage's features to provide caching and progressive image downloads.
  */
-@property (class, readonly) ASPINRemoteImageDownloader *sharedDownloader;
 + (ASPINRemoteImageDownloader *)sharedDownloader NS_RETURNS_RETAINED;
-
 
 /**
  * Sets the default NSURLSessionConfiguration that will be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes
@@ -39,6 +38,28 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration;
+
+/**
+ * Sets the default NSURLSessionConfiguration that will be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes
+ * while loading images off the network. This must be specified early in the application lifecycle before
+ * `sharedDownloader` is accessed.
+ *
+ * @param configuration The session configuration that will be used by `sharedDownloader`
+ * @param imageCache The cache to be used by PINRemoteImage - nil will set up a default cache: PINCache
+ * if it is available, PINRemoteImageBasicCache (NSCache) if not.
+ *
+ */
++ (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration
+                                    imageCache:(nullable id<PINRemoteImageCaching>)imageCache;
+
+/**
+ * Sets a custom preconfigured PINRemoteImageManager that will be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes
+ * while loading images off the network. This must be specified early in the application lifecycle before
+ * `sharedDownloader` is accessed.
+ *
+ * @param preconfiguredPINRemoteImageManager The preconfigured remote image manager that will be used by `sharedDownloader`
+ */
++ (void)setSharedPreconfiguredRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager;
 
 /**
  * The shared instance of a @c PINRemoteImageManager used by all @c ASPINRemoteImageDownloaders

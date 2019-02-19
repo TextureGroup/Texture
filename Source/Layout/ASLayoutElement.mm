@@ -82,20 +82,20 @@ void ASLayoutElementPushContext(ASLayoutElementContext *context)
   // NOTE: It would be easy to support nested contexts – just use an NSMutableArray here.
   ASDisplayNodeCAssertNil(pthread_getspecific(ASLayoutElementContextKey()), @"Nested ASLayoutElementContexts aren't supported.");
   
-  let cfCtx = (__bridge_retained CFTypeRef)context;
+  const auto cfCtx = (__bridge_retained CFTypeRef)context;
   pthread_setspecific(ASLayoutElementContextKey(), cfCtx);
 }
 
 ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 {
   // Don't retain here. Caller will retain if it wants to!
-  let ctxPtr = pthread_getspecific(ASLayoutElementContextKey());
+  const auto ctxPtr = pthread_getspecific(ASLayoutElementContextKey());
   return (__bridge ASLayoutElementContext *)ctxPtr;
 }
 
 void ASLayoutElementPopContext()
 {
-  let ctx = (CFTypeRef)pthread_getspecific(ASLayoutElementContextKey());
+  const auto ctx = (CFTypeRef)pthread_getspecific(ASLayoutElementContextKey());
   ASDisplayNodeCAssertNotNil(ctx, @"Attempt to pop context when there wasn't a context!");
   CFRelease(ctx);
   pthread_setspecific(ASLayoutElementContextKey(), NULL);
@@ -155,7 +155,7 @@ do {\
 @implementation ASLayoutElementStyle {
   ASDN::RecursiveMutex __instanceLock__;
   ASLayoutElementStyleExtensions _extensions;
-  
+
   std::atomic<ASLayoutElementSize> _size;
   std::atomic<CGFloat> _spacingBefore;
   std::atomic<CGFloat> _spacingAfter;
@@ -180,6 +180,7 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
+  ASStackLayoutAlignItems _parentAlignStyle;
 #endif
 }
 
@@ -202,6 +203,9 @@ do {\
   self = [super init];
   if (self) {
     _size = ASLayoutElementSizeMake();
+#if YOGA
+    _parentAlignStyle = ASStackLayoutAlignItemsNotSet;
+#endif
   }
   return self;
 }
@@ -777,6 +781,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (ASEdgeInsets)padding                       { return _padding.load(); }
 - (ASEdgeInsets)border                        { return _border.load(); }
 - (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
+// private (ASLayoutElementStylePrivate.h)
+- (ASStackLayoutAlignItems)parentAlignStyle {
+  return _parentAlignStyle;
+}
 
 - (void)setFlexWrap:(YGWrap)flexWrap {
   _flexWrap.store(flexWrap);
@@ -821,6 +829,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (void)setAspectRatio:(CGFloat)aspectRatio {
   _aspectRatio.store(aspectRatio);
   ASLayoutElementStyleCallDelegate(ASYogaAspectRatioProperty);
+}
+// private (ASLayoutElementStylePrivate.h)
+- (void)setParentAlignStyle:(ASStackLayoutAlignItems)style {
+  _parentAlignStyle = style;
 }
 
 #endif /* YOGA */

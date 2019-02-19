@@ -8,6 +8,9 @@
 //
 
 #import <AsyncDisplayKit/ASTextKitContext.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 
@@ -31,10 +34,14 @@
 
 {
   if (self = [super init]) {
+    static dispatch_once_t onceToken;
+    static ASDN::Mutex *mutex;
+    dispatch_once(&onceToken, ^{
+      mutex = new ASDN::Mutex();
+    });
+    
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    // Allocate __staticMutex on the heap to prevent destruction at app exit (https://github.com/TextureGroup/Texture/issues/136)
-    static ASDN::StaticMutex& __staticMutex = *new ASDN::StaticMutex;
-    ASDN::StaticMutexLocker l(__staticMutex);
+    ASDN::MutexLocker l(*mutex);
     
     __instanceLock__ = std::make_shared<ASDN::Mutex>();
     
@@ -62,14 +69,16 @@
   return self;
 }
 
-- (void)performBlockWithLockedTextKitComponents:(void (^)(NSLayoutManager *,
-                                                          NSTextStorage *,
-                                                          NSTextContainer *))block
+- (void)performBlockWithLockedTextKitComponents:(NS_NOESCAPE void (^)(NSLayoutManager *,
+                                                                      NSTextStorage *,
+                                                                      NSTextContainer *))block
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   if (block) {
     block(_layoutManager, _textStorage, _textContainer);
   }
 }
 
 @end
+
+#endif

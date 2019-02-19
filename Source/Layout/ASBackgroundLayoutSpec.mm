@@ -12,6 +12,7 @@
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASCollections.h>
 
 static NSUInteger const kForegroundChildIndex = 0;
 static NSUInteger const kBackgroundChildIndex = 1;
@@ -48,17 +49,19 @@ static NSUInteger const kBackgroundChildIndex = 1;
 {
   ASLayout *contentsLayout = [self.child layoutThatFits:constrainedSize parentSize:parentSize];
 
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:2];
+  ASLayout *rawSublayouts[2];
+  int i = 0;
   if (self.background) {
     // Size background to exactly the same size.
     ASLayout *backgroundLayout = [self.background layoutThatFits:ASSizeRangeMake(contentsLayout.size)
                                                       parentSize:parentSize];
     backgroundLayout.position = CGPointZero;
-    [sublayouts addObject:backgroundLayout];
+    rawSublayouts[i++] = backgroundLayout;
   }
   contentsLayout.position = CGPointZero;
-  [sublayouts addObject:contentsLayout];
+  rawSublayouts[i++] = contentsLayout;
 
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:contentsLayout.size sublayouts:sublayouts];
 }
 

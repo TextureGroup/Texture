@@ -26,7 +26,7 @@ permalink: /showcase.html
 		<br>
 		<b>Pinterest</b>
 		<br>
-		<a href="https://engineering.pinterest.com/blog/re-architecting-pinterests-ios-app">Re-architecting Pinterest's iOS app</a>
+		<a href="https://medium.com/@Pinterest_Engineering/re-architecting-pinterest-039-s-ios-app-e0a2d34a6ac2">Re-architecting Pinterest's iOS app</a>
 		</td>
 		
 		<td width="33%" align="center" valign="top">
@@ -261,6 +261,21 @@ permalink: /showcase.html
 		<a href="https://itunes.apple.com/app/id1194341019"><img class="roundrect" src="https://is4-ssl.mzstatic.com/image/thumb/Purple118/v4/df/da/a7/dfdaa795-b8bd-d3dc-1276-515a7bf9334e/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-4.png/246x0w.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
 		<b>Wishpoke</b>
+		</td>
+		
+		</tr>
+		<tr>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/app/id1320454688"><img class="roundrect" src="https://is5-ssl.mzstatic.com/image/thumb/Purple128/v4/a7/ad/0f/a7ad0fc1-1516-5879-84bd-8945f622b518/source/512x512bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Bluebird</b>
+		</td>
+		
+		<td align="center" valign="top">
+		</td>
+		
+		<td align="center" valign="top">
 		</td>
 
 		</tr>

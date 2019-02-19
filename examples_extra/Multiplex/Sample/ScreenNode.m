@@ -136,7 +136,7 @@
       }
       
       if (completion) {
-        completion([UIImage imageWithData:data], connectionError, nil);
+        completion([UIImage imageWithData:data], connectionError, nil, nil);
       }
     });
   };

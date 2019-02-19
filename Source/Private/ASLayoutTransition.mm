@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/ASLayoutTransition.h>
 
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
 #import <AsyncDisplayKit/ASLayout.h>
@@ -60,11 +59,13 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   NSArray<ASDisplayNode *> *_removedSubnodes;
   std::vector<NSUInteger> _insertedSubnodePositions;
   std::vector<std::pair<ASDisplayNode *, NSUInteger>> _subnodeMoves;
+  ASDisplayNodeLayout _pendingLayout;
+  ASDisplayNodeLayout _previousLayout;
 }
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
-               pendingLayout:(std::shared_ptr<ASDisplayNodeLayout>)pendingLayout
-              previousLayout:(std::shared_ptr<ASDisplayNodeLayout>)previousLayout
+               pendingLayout:(const ASDisplayNodeLayout &)pendingLayout
+              previousLayout:(const ASDisplayNodeLayout &)previousLayout
 {
   self = [super init];
   if (self) {
@@ -79,8 +80,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (BOOL)isSynchronous
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
-  return !ASLayoutCanTransitionAsynchronous(_pendingLayout->layout);
+  ASDN::MutexLocker l(*__instanceLock__);
+  return !ASLayoutCanTransitionAsynchronous(_pendingLayout.layout);
 }
 
 - (void)commitTransition
@@ -91,7 +92,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)applySubnodeInsertionsAndMoves
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   
   // Create an activity even if no subnodes affected.
@@ -129,7 +130,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 - (void)applySubnodeRemovals
 {
   as_activity_scope(as_activity_create("Apply subnode removals", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
 
   if (_removedSubnodes.count == 0) {
@@ -149,15 +150,15 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)calculateSubnodeOperationsIfNeeded
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   if (_calculatedSubnodeOperations) {
     return;
   }
   
   // Create an activity even if no subnodes affected.
   as_activity_create_for_scope("Calculate subnode operations");
-  ASLayout *previousLayout = _previousLayout->layout;
-  ASLayout *pendingLayout = _pendingLayout->layout;
+  ASLayout *previousLayout = _previousLayout.layout;
+  ASLayout *pendingLayout = _pendingLayout.layout;
 
   if (previousLayout) {
 #if AS_IG_LIST_KIT
@@ -204,31 +205,31 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (NSArray<ASDisplayNode *> *)currentSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   return _node.subnodes;
 }
 
 - (NSArray<ASDisplayNode *> *)insertedSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   return _insertedSubnodes;
 }
 
 - (NSArray<ASDisplayNode *> *)removedSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   return _removedSubnodes;
 }
 
 - (ASLayout *)transitionContext:(_ASTransitionContext *)context layoutForKey:(NSString *)key
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
-    return _previousLayout->layout;
+    return _previousLayout.layout;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
-    return _pendingLayout->layout;
+    return _pendingLayout.layout;
   } else {
     return nil;
   }
@@ -236,11 +237,11 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (ASSizeRange)transitionContext:(_ASTransitionContext *)context constrainedSizeForKey:(NSString *)key
 {
-  ASDN::MutexSharedLocker l(__instanceLock__);
+  ASDN::MutexLocker l(*__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
-    return _previousLayout->constrainedSize;
+    return _previousLayout.constrainedSize;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
-    return _pendingLayout->constrainedSize;
+    return _pendingLayout.constrainedSize;
   } else {
     return ASSizeRangeMake(CGSizeZero, CGSizeZero);
   }

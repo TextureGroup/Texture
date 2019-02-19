@@ -7,6 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_USE_VIDEO
+
 #if TARGET_OS_IOS
 #import <CoreMedia/CoreMedia.h>
 #import <AsyncDisplayKit/ASThread.h>
@@ -216,4 +220,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 NS_ASSUME_NONNULL_END
+#endif  // TARGET_OS_IOS
+
 #endif

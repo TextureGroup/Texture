@@ -7,18 +7,28 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/NSObjCRuntime.h>
+#import <Foundation/Foundation.h>
 
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
-#if defined(__cplusplus)
-# define var auto
-# define let const auto
+/**
+ * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
+ * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that
+ * references this enum targeting iOS, even if it's guarded with the right availability macros,
+ * because it thinks the entire platform isn't compatible with the enum.
+ */
+#if TARGET_OS_TV || (defined(__IPHONE_12_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0)
+#define AS_BUILD_UIUSERINTERFACESTYLE 1
 #else
-# define var __auto_type
-# define let const __auto_type
+#define AS_BUILD_UIUSERINTERFACESTYLE 0
 #endif
+
+/**
+ * Decorates methods that clients can implement in categories on our base class. These methods
+ * will be stubbed with an empty implementation if no implementation is provided.
+ */
+#define AS_CATEGORY_IMPLEMENTABLE
 
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
@@ -227,5 +237,20 @@
     } \
     __result = [NSArray arrayByTransferring:__buf count:__i]; \
   } \
+  __result; \
+})
+
+/**
+ * Capture-and-clear a strong reference without the intervening retain/release pair.
+ *
+ * E.g. const auto localVar = ASTransferStrong(_myIvar);
+ * Post-condition: localVar has the strong value from _myIvar and _myIvar is nil.
+ * No retain/release is emitted when the optimizer is on.
+ */
+#define ASTransferStrong(lvalue) ({ \
+  CFTypeRef *__rawPtr = (CFTypeRef *)(void *)(&(lvalue)); \
+  CFTypeRef __cfValue = *__rawPtr; \
+  *__rawPtr = NULL; \
+  __typeof(lvalue) __result = (__bridge_transfer __typeof(lvalue))__cfValue; \
   __result; \
 })

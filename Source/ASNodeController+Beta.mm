@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
@@ -18,23 +18,32 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
+  ASDN::Mutex _nodeLock;
 }
 
-- (void)loadNode
+- (ASDisplayNode *)createNode
 {
-  self.node = [[ASDisplayNode alloc] init];
+  return [[ASDisplayNode alloc] init];
 }
 
 - (ASDisplayNode *)node
 {
-  if (_node == nil) {
-    [self loadNode];
+  ASDN::MutexLocker l(_nodeLock);
+  ASDisplayNode *node = _node;
+  if (!node) {
+    node = [self createNode];
+    if (!node) {
+      ASDisplayNodeCFailAssert(@"Returned nil from -createNode.");
+      node = [[ASDisplayNode alloc] init];
+    }
+    [self setupReferencesWithNode:node];
   }
-  return _node;
+  return node;
 }
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
 {
+  ASLockScopeSelf();
   if (_shouldInvertStrongReference) {
     // The node should own the controller; weak reference from controller to node.
     _weakNode = node;
@@ -49,13 +58,9 @@
   [node addInterfaceStateDelegate:self];
 }
 
-- (void)setNode:(ASDisplayNode *)node
-{
-  [self setupReferencesWithNode:node];
-}
-
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
 {
+  ASLockScopeSelf();
   if (_shouldInvertStrongReference != shouldInvertStrongReference) {
     // Because the BOOL controls which ivar we access, get the node before toggling.
     ASDisplayNode *node = _node;
@@ -67,6 +72,7 @@
 // subclass overrides
 - (void)nodeDidLoad {}
 - (void)nodeDidLayout {}
+- (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize {}
 
 - (void)didEnterVisibleState {}
 - (void)didExitVisibleState  {}
@@ -80,11 +86,33 @@
 - (void)interfaceStateDidChange:(ASInterfaceState)newState
                       fromState:(ASInterfaceState)oldState {}
 
+- (void)hierarchyDisplayDidFinish {}
+
+#pragma mark NSLocking
+
+- (void)lock
+{
+  [self.node lock];
+}
+
+- (void)unlock
+{
+  // Since the node was already locked on this thread, we don't need to call our accessor or take our lock.
+  ASDisplayNodeAssertNotNil(_node, @"Node deallocated while locked.");
+  [_node unlock];
+}
+
+- (BOOL)tryLock
+{
+  return [self.node tryLock];
+}
+
 @end
 
 @implementation ASDisplayNode (ASNodeController)
 
-- (ASNodeController *)nodeController {
+- (ASNodeController *)nodeController
+{
   return _weakNodeController ?: _strongNodeController;
 }
 

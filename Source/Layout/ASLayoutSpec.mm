@@ -113,14 +113,12 @@ ASLayoutElementLayoutCalculationDefaults
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
 
-  [_childrenArray removeAllObjects];
-  
-  NSUInteger i = 0;
+#if ASDISPLAYNODE_ASSERTIONS_ENABLED
   for (id<ASLayoutElement> child in children) {
     ASDisplayNodeAssert([child conformsToProtocol:NSProtocolFromString(@"ASLayoutElement")], @"Child %@ of spec %@ is not an ASLayoutElement!", child, self);
-    _childrenArray[i] = child;
-    i += 1;
   }
+#endif
+  [_childrenArray setArray:children];
 }
 
 - (nullable NSArray<id<ASLayoutElement>> *)children
@@ -158,10 +156,10 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription
 {
-  let result = [NSMutableArray<NSDictionary *> array];
+  const auto result = [NSMutableArray<NSDictionary *> array];
   if (NSArray *children = self.children) {
     // Use tiny descriptions because these trees can get nested very deep.
-    let tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
+    const auto tinyDescriptions = ASArrayByFlatMapping(children, id object, ASObjectDescriptionMakeTiny(object));
     [result addObject:@{ @"children": tinyDescriptions }];
   }
   return result;
@@ -291,7 +289,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
 {
   NSArray *children = self.children;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
+  const auto count = children.count;
+  ASLayout *rawSublayouts[count];
+  int i = 0;
   
   CGSize size = constrainedSize.min;
   for (id<ASLayoutElement> child in children) {
@@ -301,9 +301,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     size.width = MAX(size.width,  sublayout.size.width);
     size.height = MAX(size.height, sublayout.size.height);
     
-    [sublayouts addObject:sublayout];
+    rawSublayouts[i++] = sublayout;
   }
-  
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 }
 

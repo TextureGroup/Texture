@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASCollections.h>
 
 static NSUInteger const kUnderlayChildIndex = 0;
 static NSUInteger const kOverlayChildIndex = 1;
@@ -70,14 +71,17 @@ static NSUInteger const kOverlayChildIndex = 1;
 {
   ASLayout *contentsLayout = [self.child layoutThatFits:constrainedSize parentSize:parentSize];
   contentsLayout.position = CGPointZero;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithObject:contentsLayout];
+  ASLayout *rawSublayouts[2];
+  int i = 0;
+  rawSublayouts[i++] = contentsLayout;
   if (self.overlay) {
     ASLayout *overlayLayout = [self.overlay layoutThatFits:ASSizeRangeMake(contentsLayout.size)
                                                 parentSize:contentsLayout.size];
     overlayLayout.position = CGPointZero;
-    [sublayouts addObject:overlayLayout];
+    rawSublayouts[i++] = overlayLayout;
   }
   
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:contentsLayout.size sublayouts:sublayouts];
 }
 

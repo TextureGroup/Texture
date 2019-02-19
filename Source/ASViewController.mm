@@ -27,6 +27,9 @@
   UIEdgeInsets _fallbackAdditionalSafeAreaInsets;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
@@ -48,6 +51,8 @@
   
   return self;
 }
+
+#pragma clang diagnostic pop
 
 - (instancetype)initWithNode:(ASDisplayNode *)node
 {
@@ -339,6 +344,8 @@ ASVisibilityDepthImplementation;
   [self propagateNewTraitCollection:traitCollection];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -347,5 +354,6 @@ ASVisibilityDepthImplementation;
   traitCollection.containerSize = self.view.bounds.size;
   [self propagateNewTraitCollection:traitCollection];
 }
+#pragma clang diagnostic pop
 
 @end

@@ -11,10 +11,11 @@
 
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASTableNode.h>
 
 #import <queue>
 
@@ -131,7 +132,7 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
   });
 }
 
-static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _ASDisplayView *view, NSMutableArray *elements) {
+static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, UIView *view, NSMutableArray *elements) {
   UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:container containerNode:container];
 
   NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
@@ -139,7 +140,14 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
   std::queue<ASDisplayNode *> queue;
   queue.push(container);
 
-  ASDisplayNode *node;
+  // If the container does not have an accessibility label set, or if the label is meant for custom
+  // actions only, then aggregate its subnodes' labels. Otherwise, treat the label as an overriden
+  // value and do not perform the aggregation.
+  BOOL shouldAggregateSubnodeLabels =
+      (container.accessibilityLabel.length == 0) ||
+      (container.accessibilityTraits & InteractiveAccessibilityTraitsMask());
+
+  ASDisplayNode *node = nil;
   while (!queue.empty()) {
     node = queue.front();
     queue.pop();
@@ -156,7 +164,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
         action.containerNode = node.supernode;
         action.container = node.supernode.view;
         [actions addObject:action];
-      } else {
+      } else if (node == container || shouldAggregateSubnodeLabels) {
         // Even though not surfaced to UIKit, create a non-interactive element for purposes of building sorted aggregated label.
         ASAccessibilityElement *nonInteractiveElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:node containerNode:container];
         [labeledNodes addObject:nonInteractiveElement];
@@ -195,13 +203,19 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, _
 }
 
 /// Collect all accessibliity elements for a given view and view node
-static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableArray *elements)
+static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
   ASDisplayNode *node = view.asyncdisplaykit_node;
 
-  if (node.isAccessibilityContainer) {
+  BOOL anySubNodeIsCollection = (nil != ASDisplayNodeFindFirstNode(node,
+      ^BOOL(ASDisplayNode *nodeToCheck) {
+    return ASDynamicCast(nodeToCheck, ASCollectionNode) != nil ||
+           ASDynamicCast(nodeToCheck, ASTableNode) != nil;
+  }));
+
+  if (node.isAccessibilityContainer && !anySubNodeIsCollection) {
     CollectAccessibilityElementsForContainer(node, view, elements);
     return;
   }
@@ -259,14 +273,26 @@ static void CollectAccessibilityElementsForView(_ASDisplayView *view, NSMutableA
     return @[];
   }
 
-  if (_accessibilityElements == nil) {
-    NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
-    CollectAccessibilityElementsForView(self, accessibilityElements);
-    SortAccessibilityElements(accessibilityElements);
-    _accessibilityElements = accessibilityElements;
+  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDisableAccessibilityCache)) {
+    _accessibilityElements = [viewNode accessibilityElements];
   }
-  
   return _accessibilityElements;
+}
+
+@end
+
+@implementation ASDisplayNode (AccessibilityInternal)
+
+- (NSArray *)accessibilityElements
+{
+  if (!self.isNodeLoaded) {
+    ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
+    return @[];
+  }
+  NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
+  CollectAccessibilityElementsForView(self.view, accessibilityElements);
+  SortAccessibilityElements(accessibilityElements);
+  return accessibilityElements;
 }
 
 @end

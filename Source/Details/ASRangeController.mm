@@ -208,7 +208,11 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (!_layoutController || !_dataSource) {
     return;
   }
-  
+
+  if (![_delegate rangeControllerShouldUpdateRanges:self]) {
+    return;
+  }
+
 #if AS_RANGECONTROLLER_LOG_UPDATE_FREQ
   _updateCountThisFrame += 1;
 #endif
@@ -217,7 +221,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
   // TODO: Consider if we need to use this codepath, or can rely on something more similar to the data & display ranges
   // Example: ... = [_layoutController indexPathsForScrolling:scrollDirection rangeType:ASLayoutRangeTypeVisible];
-  var visibleElements = [_dataSource visibleElementsForRangeController:self];
+  auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
   ASSignpostStart(ASSignpostRangeControllerUpdate);
@@ -518,6 +522,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 // Skip the many method calls of the recursive operation if the top level cell node already has the right interfaceState.
 - (void)clearContents
 {
+  ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in [_dataSource elementMapForRangeController:self]) {
     ASCellNode *node = element.nodeIfAllocated;
     if (ASInterfaceStateIncludesDisplay(node.interfaceState)) {
@@ -528,6 +533,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)clearPreloadedData
 {
+  ASDisplayNodeAssertMainThread();
   for (ASCollectionElement *element in [_dataSource elementMapForRangeController:self]) {
     ASCellNode *node = element.nodeIfAllocated;
     if (ASInterfaceStateIncludesPreload(node.interfaceState)) {

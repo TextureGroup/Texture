@@ -15,6 +15,7 @@
 #if YOGA
   #import YOGA_HEADER_PATH
   #import <AsyncDisplayKit/ASYogaUtilities.h>
+  #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -50,6 +51,19 @@ typedef struct {
 } ASDisplayNodePerformanceMeasurements;
 
 @interface ASDisplayNode (Beta)
+
+/**
+ * ASTableView and ASCollectionView now throw exceptions on invalid updates
+ * like their UIKit counterparts. If YES, these classes will log messages
+ * on invalid updates rather than throwing exceptions.
+ *
+ * Note that even if AsyncDisplayKit's exception is suppressed, the app may still crash
+ * as it proceeds with an invalid update.
+ *
+ * This property defaults to NO. It will be removed in a future release.
+ */
++ (BOOL)suppressesInvalidCollectionUpdateExceptions AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Collection update exceptions are thrown if assertions are enabled.");
++ (void)setSuppressesInvalidCollectionUpdateExceptions:(BOOL)suppresses;
 
 /**
  * @abstract Recursively ensures node and all subnodes are displayed.
@@ -97,10 +111,24 @@ typedef struct {
 @property BOOL isAccessibilityContainer;
 
 /**
+ * @abstract Returns the default accessibility property values set by Texture on this node. For
+ * example, the default accessibility label for a text node may be its text content, while most
+ * other nodes would have nil default labels.
+ */
+@property (nullable, readonly, copy) NSString *defaultAccessibilityLabel;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityHint;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityValue;
+@property (nullable, readonly, copy) NSString *defaultAccessibilityIdentifier;
+@property (readonly) UIAccessibilityTraits defaultAccessibilityTraits;
+
+/**
  * @abstract Invoked when a user performs a custom action on an accessible node. Nodes that are children of accessibility containers, have
  * an accessibity label and have an interactive UIAccessibilityTrait will automatically receive custom-action handling.
+ *
+ * @return Return a boolean value that determine whether to propagate through the responder chain.
+ * To halt propagation, return YES; otherwise, return NO.
  */
-- (void)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
 
 /**
  * @abstract Currently used by ASNetworkImageNode and ASMultiplexImageNode to allow their placeholders to stay if they are loading an image from the network.
@@ -115,7 +143,14 @@ typedef struct {
  * this hook could be called up to 1 + (pJPEGcount * pJPEGrenderCount) times. The render count depends on how many times the downloader calls the
  * progressImage block.
  */
-- (void)hierarchyDisplayDidFinish;
+AS_CATEGORY_IMPLEMENTABLE
+- (void)hierarchyDisplayDidFinish NS_REQUIRES_SUPER;
+
+/**
+ * Only called on the root during yoga layout.
+ */
+AS_CATEGORY_IMPLEMENTABLE
+- (void)willCalculateLayout:(ASSizeRange)constrainedSize NS_REQUIRES_SUPER;
 
 /**
  * Only ASLayoutRangeModeVisibleOnly or ASLayoutRangeModeLowMemory are recommended.  Default is ASLayoutRangeModeVisibleOnly,
@@ -152,55 +187,5 @@ typedef struct {
 - (void)enableSubtreeRasterization;
 
 @end
-
-#pragma mark - Yoga Layout Support
-
-#if YOGA
-
-AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
-
-@interface ASDisplayNode (Yoga)
-
-// TODO: Make this and yogaCalculatedLayout atomic (lock).
-@property (nullable, nonatomic) NSArray *yogaChildren;
-
-- (void)addYogaChild:(ASDisplayNode *)child;
-- (void)removeYogaChild:(ASDisplayNode *)child;
-- (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index;
-
-- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
-
-@property BOOL yogaLayoutInProgress;
-@property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
-
-// These methods are intended to be used internally to Texture, and should not be called directly.
-- (BOOL)shouldHaveYogaMeasureFunc;
-- (void)invalidateCalculatedYogaLayout;
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
-
-@end
-
-@interface ASLayoutElementStyle (Yoga)
-
-- (YGNodeRef)yogaNodeCreateIfNeeded;
-- (void)destroyYogaNode;
-
-@property (readonly) YGNodeRef yogaNode;
-
-@property ASStackLayoutDirection flexDirection;
-@property YGDirection direction;
-@property ASStackLayoutJustifyContent justifyContent;
-@property ASStackLayoutAlignItems alignItems;
-@property YGPositionType positionType;
-@property ASEdgeInsets position;
-@property ASEdgeInsets margin;
-@property ASEdgeInsets padding;
-@property ASEdgeInsets border;
-@property CGFloat aspectRatio;
-@property YGWrap flexWrap;
-
-@end
-
-#endif
 
 NS_ASSUME_NONNULL_END

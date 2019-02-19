@@ -301,7 +301,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)_layoutTransitionMeasurementDidFinish;
 
 /**
- * Informs the node that hte pending layout transition did complete
+ * Informs the node that the pending layout transition did complete
  */
 - (void)_completePendingLayoutTransition;
 
@@ -311,6 +311,10 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)_pendingLayoutTransitionDidComplete;
 
 @end
+
+@interface ASDisplayNode (AccessibilityInternal)
+- (NSArray *)accessibilityElements;
+@end;
 
 @interface UIView (ASDisplayNodeInternal)
 @property (nullable, weak) ASDisplayNode *asyncdisplaykit_node;

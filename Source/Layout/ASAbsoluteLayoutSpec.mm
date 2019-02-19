@@ -9,6 +9,7 @@
 
 #import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
@@ -64,7 +65,8 @@
   };
   
   NSArray *children = self.children;
-  NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
+  ASLayout *rawSublayouts[children.count];
+  int i = 0;
 
   for (id<ASLayoutElement> child in children) {
     CGPoint layoutPosition = child.style.layoutPosition;
@@ -77,13 +79,14 @@
     
     ASLayout *sublayout = [child layoutThatFits:childConstraint parentSize:size];
     sublayout.position = layoutPosition;
-    [sublayouts addObject:sublayout];
+    rawSublayouts[i++] = sublayout;
   }
-  
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
+
   if (_sizing == ASAbsoluteLayoutSpecSizingSizeToFit || isnan(size.width)) {
     size.width = constrainedSize.min.width;
     for (ASLayout *sublayout in sublayouts) {
-      size.width  = MAX(size.width,  sublayout.position.x + sublayout.size.width);
+      size.width = MAX(size.width,  sublayout.position.x + sublayout.size.width);
     }
   }
   

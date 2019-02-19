@@ -21,20 +21,6 @@
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASViewController.h>
 
-#pragma mark - ASDisplayNode
-
-/**
- * Open access to the method overrides struct for ASDisplayView
- */
-@implementation ASDisplayNode (ASDisplayNodeMethodOverrides_ASDisplayView)
-
-- (ASDisplayNodeMethodOverrides)methodOverrides
-{
-  return _methodOverrides;
-}
-
-@end
-
 #pragma mark - _ASDisplayViewMethodOverrides
 
 typedef NS_OPTIONS(NSUInteger, _ASDisplayViewMethodOverrides)
@@ -288,6 +274,14 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
       [node _removeFromSupernode];
     }
   }
+}
+
+- (void)insertSubview:(UIView *)view atIndex:(NSInteger)index {
+  [super insertSubview:view atIndex:index];
+
+#ifndef ASDK_ACCESSIBILITY_DISABLE
+  self.accessibilityElements = nil;
+#endif
 }
 
 - (void)addSubview:(UIView *)view

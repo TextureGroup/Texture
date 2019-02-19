@@ -22,6 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 AS_EXTERN BOOL ASActivateExperimentalFeature(ASExperimentalFeatures option);
 
+/**
+ * Notify the configuration delegate that the framework initialized, if needed.
+ */
+AS_EXTERN void ASNotifyInitialized(void);
+
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfigurationManager : NSObject
 
@@ -29,6 +34,9 @@ AS_SUBCLASSING_RESTRICTED
  * No API for now.
  * Just use ASActivateExperimentalFeature to access this efficiently.
  */
+
+/* Exposed for testing purposes only */
++ (void)test_resetWithConfiguration:(nullable ASConfiguration *)configuration;
 
 @end
 

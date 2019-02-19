@@ -12,6 +12,7 @@
 #import <numeric>
 #import <vector>
 
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
@@ -151,12 +152,14 @@
     self.style.ascender = stackChildren.front().style.ascender;
     self.style.descender = stackChildren.back().style.descender;
   }
-  
-  const auto sublayouts = [[NSMutableArray<ASLayout *> alloc] init];
+
+  ASLayout *rawSublayouts[positionedLayout.items.size()];
+  int i = 0;
   for (const auto &item : positionedLayout.items) {
-    [sublayouts addObject:item.layout];
+    rawSublayouts[i++] = item.layout;
   }
 
+  const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:i];
   return [ASLayout layoutWithLayoutElement:self size:positionedLayout.size sublayouts:sublayouts];
 }
 
