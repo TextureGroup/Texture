@@ -95,6 +95,22 @@ ASDISPLAYNODE_INLINE UIEdgeInsets ASConcatInsets(UIEdgeInsets insetsA, UIEdgeIns
   return insetsA;
 }
 
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASImageDownloaderPriority ASImageDownloaderPriorityWithInterfaceState(ASInterfaceState interfaceState) {
+  if (ASInterfaceStateIncludesVisible(interfaceState)) {
+    return ASImageDownloaderPriorityVisible;
+  }
+
+  if (ASInterfaceStateIncludesDisplay(interfaceState)) {
+    return ASImageDownloaderPriorityImminent;
+  }
+
+  if (ASInterfaceStateIncludesPreload(interfaceState)) {
+    return ASImageDownloaderPriorityPreload;
+  }
+
+  return ASImageDownloaderPriorityPreload;
+}
+
 @interface NSIndexPath (ASInverseComparison)
 - (NSComparisonResult)asdk_inverseCompare:(NSIndexPath *)otherIndexPath;
 @end

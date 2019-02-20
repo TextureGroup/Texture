@@ -25,6 +25,19 @@ NSString * const kASBasicImageDownloaderContextCallbackQueue = @"kASBasicImageDo
 NSString * const kASBasicImageDownloaderContextProgressBlock = @"kASBasicImageDownloaderContextProgressBlock";
 NSString * const kASBasicImageDownloaderContextCompletionBlock = @"kASBasicImageDownloaderContextCompletionBlock";
 
+static inline NSURLSessionTaskPriority NSURLSessionTaskPriorityWithImageDownloaderPriority(ASImageDownloaderPriority priority) {
+  switch (priority) {
+    case ASImageDownloaderPriorityPreload:
+      return NSURLSessionTaskPriorityLow;
+
+    case ASImageDownloaderPriorityImminent:
+      return NSURLSessionTaskPriorityDefault;
+
+    case ASImageDownloaderPriorityVisible:
+      return NSURLSessionTaskPriorityHigh;
+  }
+}
+
 @interface ASBasicImageDownloaderContext ()
 {
   BOOL _invalid;
@@ -238,10 +251,23 @@ static const void *ContextKey() {
 
 #pragma mark ASImageDownloaderProtocol.
 
-- (id)downloadImageWithURL:(NSURL *)URL
-             callbackQueue:(dispatch_queue_t)callbackQueue
-          downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
-                completion:(ASImageDownloaderCompletion)completion
+- (nullable id)downloadImageWithURL:(NSURL *)URL
+                      callbackQueue:(dispatch_queue_t)callbackQueue
+                   downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
+                         completion:(ASImageDownloaderCompletion)completion
+{
+  return [self downloadImageWithURL:URL
+                           priority:ASImageDownloaderPriorityImminent // maps to default priority
+                      callbackQueue:callbackQueue
+                   downloadProgress:downloadProgress
+                         completion:completion];
+}
+
+- (nullable id)downloadImageWithURL:(NSURL *)URL
+                           priority:(ASImageDownloaderPriority)priority
+                      callbackQueue:(dispatch_queue_t)callbackQueue
+                   downloadProgress:(ASImageDownloaderProgress)downloadProgress
+                         completion:(ASImageDownloaderCompletion)completion
 {
   ASBasicImageDownloaderContext *context = [ASBasicImageDownloaderContext contextForURL:URL];
 
@@ -266,6 +292,7 @@ static const void *ContextKey() {
     NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [_session downloadTaskWithURL:URL];}];
 
     if (task) {
+      task.priority = NSURLSessionTaskPriorityWithImageDownloaderPriority(priority);
       task.originalRequest.asyncdisplaykit_context = context;
 
       // start downloading

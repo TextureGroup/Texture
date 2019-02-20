@@ -47,6 +47,7 @@
   CGFloat _currentImageQuality;
   CGFloat _renderedImageQuality;
   BOOL _shouldRenderProgressImages;
+  BOOL _isInImageDownloaderPriorityExperiment;
 
   struct {
     unsigned int delegateWillStartDisplayAsynchronously:1;
@@ -68,6 +69,7 @@
     unsigned int downloaderImplementsSetPriority:1;
     unsigned int downloaderImplementsAnimatedImage:1;
     unsigned int downloaderImplementsCancelWithResume:1;
+    unsigned int downloaderImplementsDownloadWithPriority:1;
   } _downloaderFlags;
 
   // Immutable and set on init only. We don't need to lock in this case.
@@ -98,12 +100,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   _downloaderFlags.downloaderImplementsSetPriority = [downloader respondsToSelector:@selector(setPriority:withDownloadIdentifier:)];
   _downloaderFlags.downloaderImplementsAnimatedImage = [downloader respondsToSelector:@selector(animatedImageWithData:)];
   _downloaderFlags.downloaderImplementsCancelWithResume = [downloader respondsToSelector:@selector(cancelImageDownloadWithResumePossibilityForIdentifier:)];
+  _downloaderFlags.downloaderImplementsDownloadWithPriority = [downloader respondsToSelector:@selector(downloadImageWithURL:priority:callbackQueue:downloadProgress:completion:)];
 
   _cacheFlags.cacheSupportsClearing = [cache respondsToSelector:@selector(clearFetchedImageFromCacheWithURL:)];
   _cacheFlags.cacheSupportsSynchronousFetch = [cache respondsToSelector:@selector(synchronouslyFetchedCachedImageWithURL:)];
   
   _shouldCacheImage = YES;
   _shouldRenderProgressImages = YES;
+  _isInImageDownloaderPriorityExperiment = ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority);
   self.shouldBypassEnsureDisplay = YES;
 
   return self;
@@ -336,10 +340,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
   id<ASNetworkImageNodeDelegate> delegate;
   BOOL notifyDelegate;
+  ASInterfaceState interfaceState;
+  id downloadIdentifier;
   {
     ASLockScopeSelf();
     notifyDelegate = _delegateFlags.delegateWillStartDisplayAsynchronously;
     delegate = _delegate;
+    downloadIdentifier = _downloaderFlags.downloaderImplementsSetPriority ? _downloadIdentifier : nil;
+    interfaceState = _interfaceState;
   }
   if (notifyDelegate) {
     [delegate imageNodeWillStartDisplayAsynchronously:self];
@@ -369,11 +377,13 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     }
   }
 
-  if (self.image == nil && _downloaderFlags.downloaderImplementsSetPriority) {
-    id downloadIdentifier = ASLockedSelf(_downloadIdentifier);
-    if (downloadIdentifier != nil) {
-      [_downloader setPriority:ASImageDownloaderPriorityImminent withDownloadIdentifier:downloadIdentifier];
+  if (self.image == nil && downloadIdentifier != nil) {
+    ASImageDownloaderPriority priority = ASImageDownloaderPriorityImminent;
+    if (_isInImageDownloaderPriorityExperiment) {
+      priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
     }
+
+    [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
   }
 }
 
@@ -382,16 +392,26 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)didEnterVisibleState
 {
   [super didEnterVisibleState];
-  
-  id downloadIdentifier = ({
-    ASLockScopeSelf();
-    _downloaderFlags.downloaderImplementsSetPriority ? _downloadIdentifier : nil;
-  });
-  
-  if (downloadIdentifier != nil) {
-    [_downloader setPriority:ASImageDownloaderPriorityVisible withDownloadIdentifier:downloadIdentifier];
+
+  if (_downloaderFlags.downloaderImplementsSetPriority) {
+    id downloadIdentifier;
+    ASInterfaceState interfaceState;
+    {
+      ASLockScopeSelf();
+      downloadIdentifier = _downloadIdentifier;
+      interfaceState = _interfaceState;
+    }
+
+    if (downloadIdentifier != nil) {
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityVisible;
+      if (_isInImageDownloaderPriorityExperiment) {
+        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+      }
+
+      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+    }
   }
-  
+
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
@@ -399,16 +419,46 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 {
   [super didExitVisibleState];
 
-  id downloadIdentifier = ({
-    ASLockScopeSelf();
-    _downloaderFlags.downloaderImplementsSetPriority ? _downloadIdentifier : nil;
-  });
-  
-  if (downloadIdentifier != nil) {
-    [_downloader setPriority:ASImageDownloaderPriorityPreload withDownloadIdentifier:downloadIdentifier];
+  if (_downloaderFlags.downloaderImplementsSetPriority) {
+    id downloadIdentifier;
+    ASInterfaceState interfaceState;
+    {
+      ASLockScopeSelf();
+      downloadIdentifier = _downloadIdentifier;
+      interfaceState = _interfaceState;
+    }
+
+    if (downloadIdentifier != nil) {
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityPreload;
+      if (_isInImageDownloaderPriorityExperiment) {
+        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+      }
+
+      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+    }
   }
-  
+
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
+}
+
+- (void)didExitDisplayState
+{
+  [super didExitDisplayState];
+
+  if (_downloaderFlags.downloaderImplementsSetPriority && _isInImageDownloaderPriorityExperiment) {
+    id downloadIdentifier;
+    ASInterfaceState interfaceState;
+    {
+      ASLockScopeSelf();
+      downloadIdentifier = _downloadIdentifier;
+      interfaceState = _interfaceState;
+    }
+
+    if (downloadIdentifier != nil) {
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+    }
+  }
 }
 
 - (void)didExitPreloadState
@@ -574,24 +624,55 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     NSURL *url;
     id downloadIdentifier;
     BOOL cancelAndReattempt = NO;
-    
+    ASInterfaceState interfaceState;
+
     // Below, to avoid performance issues, we're calling downloadImageWithURL without holding the lock. This is a bit ugly because
     // We need to reobtain the lock after and ensure that the task we've kicked off still matches our URL. If not, we need to cancel
     // it and try again.
     {
       ASLockScopeSelf();
       url = self->_URL;
+      interfaceState = self->_interfaceState;
     }
 
+    dispatch_queue_t callbackQueue = [self callbackQueue];
+    ASImageDownloaderProgress downloadProgress = NULL;
+    ASImageDownloaderCompletion completion = ^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier, id _Nullable userInfo) {
+      if (finished != NULL) {
+        finished(imageContainer, error, downloadIdentifier, userInfo);
+      }
+    };
 
-    downloadIdentifier = [self->_downloader downloadImageWithURL:url
-                                             callbackQueue:[self callbackQueue]
-                                          downloadProgress:NULL
-                                                completion:^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier, id _Nullable userInfo) {
-                                                  if (finished != NULL) {
-                                                    finished(imageContainer, error, downloadIdentifier, userInfo);
-                                                  }
-                                                }];
+    if (self->_downloaderFlags.downloaderImplementsDownloadWithPriority
+        && self->_isInImageDownloaderPriorityExperiment) {
+      /*
+        Decide a priority based on the current interface state of this node.
+        It can happen that this method was called when the node entered preload state
+        but the interface state, at this point, tells us that the node is (going to be) visible.
+        If that's the case, we jump to a higher priority directly.
+       */
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+
+      downloadIdentifier = [self->_downloader downloadImageWithURL:url
+                                                          priority:priority
+                                                     callbackQueue:callbackQueue
+                                                  downloadProgress:downloadProgress
+                                                        completion:completion];
+    } else {
+      /*
+        Kick off a download with default priority.
+        The actual "default" value is decided by the downloader.
+        ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
+        which is mapped to NSURLSessionTaskPriorityDefault.
+
+       This means that preload and display nodes use the same priority
+        and their requests are put into the same pool.
+      */
+      downloadIdentifier = [self->_downloader downloadImageWithURL:url
+                                                     callbackQueue:callbackQueue
+                                                  downloadProgress:downloadProgress
+                                                        completion:completion];
+    }
     as_log_verbose(ASImageLoadingLog(), "Downloading image for %@ url: %@", self, url);
   
     {

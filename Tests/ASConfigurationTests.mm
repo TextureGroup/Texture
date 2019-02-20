@@ -30,7 +30,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDisableAccessibilityCache,
   ASExperimentalSkipAccessibilityWait,
   ASExperimentalNewDefaultCellLayoutMode,
-  ASExperimentalDispatchApply
+  ASExperimentalDispatchApply,
+  ASExperimentalImageDownloaderPriority
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -55,7 +56,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_disable_a11y_cache",
     @"exp_skip_a11y_wait",
     @"exp_new_default_cell_layout_mode",
-    @"exp_dispatch_apply"
+    @"exp_dispatch_apply",
+    @"exp_image_downloader_priority"
   ];
 }
 
