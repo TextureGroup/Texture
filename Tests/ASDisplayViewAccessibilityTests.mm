@@ -18,6 +18,49 @@
 #import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 
+@interface ASAccessiblityForwardingTestDisplayNode : ASDisplayNode
+
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityActivate;
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityIncrement;
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityDecrement;
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityScroll;
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityPerformEscape;
+@property (nonatomic, readonly) BOOL didReceiveAccessibilityPerformMagicTap;
+
+@end
+
+@implementation ASAccessiblityForwardingTestDisplayNode
+
+- (BOOL)accessibilityActivate {
+  _didReceiveAccessibilityActivate = YES;
+  return YES;
+}
+
+- (void)accessibilityIncrement {
+  _didReceiveAccessibilityIncrement = YES;
+}
+
+- (void)accessibilityDecrement {
+  _didReceiveAccessibilityDecrement = YES;
+}
+
+- (BOOL)accessibilityScroll:(UIAccessibilityScrollDirection)direction {
+  _didReceiveAccessibilityScroll = YES;
+  return YES;
+}
+
+- (BOOL)accessibilityPerformEscape {
+  _didReceiveAccessibilityPerformEscape = YES;
+  return YES;
+}
+
+- (BOOL)accessibilityPerformMagicTap {
+  _didReceiveAccessibilityPerformMagicTap = YES;
+  return YES;
+}
+
+@end
+
 @interface ASDisplayViewAccessibilityTests : XCTestCase
 @end
 
@@ -267,6 +310,27 @@
   NSArray<UIAccessibilityElement *> *elements2 = contianer.view.accessibilityElements;
   XCTAssertTrue(elements2.count == 1);
   XCTAssertTrue([[elements2.firstObject accessibilityLabel] isEqualToString:@"greeting"]);
+}
+
+#pragma mark -
+#pragma mark UIAccessibilityAction Forwarding
+
+- (void)testActionForwarding {
+  ASAccessiblityForwardingTestDisplayNode *node = [ASAccessiblityForwardingTestDisplayNode new];
+  UIView *view = node.view;
+  
+  [view accessibilityActivate];
+  XCTAssertTrue(node.didReceiveAccessibilityActivate);
+  [view accessibilityIncrement];
+  XCTAssertTrue(node.didReceiveAccessibilityIncrement);
+  [view accessibilityDecrement];
+  XCTAssertTrue(node.didReceiveAccessibilityDecrement);
+  [view accessibilityScroll:UIAccessibilityScrollDirectionDown];
+  XCTAssertTrue(node.didReceiveAccessibilityScroll);
+  [view accessibilityPerformEscape];
+  XCTAssertTrue(node.didReceiveAccessibilityPerformEscape);
+  [view accessibilityPerformMagicTap];
+  XCTAssertTrue(node.didReceiveAccessibilityPerformMagicTap);
 }
 
 @end
