@@ -18,27 +18,22 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  ASDN::Mutex _nodeLock;
+  ASDN::RecursiveMutex __instanceLock__;
 }
 
-- (ASDisplayNode *)createNode
+- (void)loadNode
 {
-  return [[ASDisplayNode alloc] init];
+  ASLockScopeSelf();
+  self.node = [[ASDisplayNode alloc] init];
 }
 
 - (ASDisplayNode *)node
 {
-  ASDN::MutexLocker l(_nodeLock);
-  ASDisplayNode *node = _node;
-  if (!node) {
-    node = [self createNode];
-    if (!node) {
-      ASDisplayNodeCFailAssert(@"Returned nil from -createNode.");
-      node = [[ASDisplayNode alloc] init];
-    }
-    [self setupReferencesWithNode:node];
+  ASLockScopeSelf();
+  if (_node == nil) {
+    [self loadNode];
   }
-  return node;
+  return _node;
 }
 
 - (void)setupReferencesWithNode:(ASDisplayNode *)node
@@ -56,6 +51,12 @@
 
   [node __setNodeController:self];
   [node addInterfaceStateDelegate:self];
+}
+
+- (void)setNode:(ASDisplayNode *)node
+{
+  ASLockScopeSelf();
+  [self setupReferencesWithNode:node];
 }
 
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
@@ -92,19 +93,12 @@
 
 - (void)lock
 {
-  [self.node lock];
+  __instanceLock__.lock();
 }
 
 - (void)unlock
 {
-  // Since the node was already locked on this thread, we don't need to call our accessor or take our lock.
-  ASDisplayNodeAssertNotNil(_node, @"Node deallocated while locked.");
-  [_node unlock];
-}
-
-- (BOOL)tryLock
-{
-  return [self.node tryLock];
+  __instanceLock__.unlock();
 }
 
 @end
