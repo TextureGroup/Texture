@@ -9,6 +9,7 @@
 
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 
+#import <Foundation/NSURLSession.h>
 #import <objc/runtime.h>
 
 #import <AsyncDisplayKit/ASBasicImageDownloaderInternal.h>
@@ -25,7 +26,7 @@ NSString * const kASBasicImageDownloaderContextCallbackQueue = @"kASBasicImageDo
 NSString * const kASBasicImageDownloaderContextProgressBlock = @"kASBasicImageDownloaderContextProgressBlock";
 NSString * const kASBasicImageDownloaderContextCompletionBlock = @"kASBasicImageDownloaderContextCompletionBlock";
 
-static inline NSURLSessionTaskPriority NSURLSessionTaskPriorityWithImageDownloaderPriority(ASImageDownloaderPriority priority) {
+static inline float NSURLSessionTaskPriorityWithImageDownloaderPriority(ASImageDownloaderPriority priority) {
   switch (priority) {
     case ASImageDownloaderPriorityPreload:
       return NSURLSessionTaskPriorityLow;
