@@ -340,14 +340,10 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
   id<ASNetworkImageNodeDelegate> delegate;
   BOOL notifyDelegate;
-  ASInterfaceState interfaceState;
-  id downloadIdentifier;
   {
     ASLockScopeSelf();
     notifyDelegate = _delegateFlags.delegateWillStartDisplayAsynchronously;
     delegate = _delegate;
-    downloadIdentifier = _downloaderFlags.downloaderImplementsSetPriority ? _downloadIdentifier : nil;
-    interfaceState = _interfaceState;
   }
   if (notifyDelegate) {
     [delegate imageNodeWillStartDisplayAsynchronously:self];
@@ -377,13 +373,8 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     }
   }
 
-  if (self.image == nil && downloadIdentifier != nil) {
-    ASImageDownloaderPriority priority = ASImageDownloaderPriorityImminent;
-    if (_isInImageDownloaderPriorityExperiment) {
-      priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-    }
-
-    [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+  if (self.image == nil) {
+    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityImminent];
   }
 }
 
@@ -392,72 +383,22 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)didEnterVisibleState
 {
   [super didEnterVisibleState];
-
-  if (_downloaderFlags.downloaderImplementsSetPriority) {
-    id downloadIdentifier;
-    ASInterfaceState interfaceState;
-    {
-      ASLockScopeSelf();
-      downloadIdentifier = _downloadIdentifier;
-      interfaceState = _interfaceState;
-    }
-
-    if (downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = ASImageDownloaderPriorityVisible;
-      if (_isInImageDownloaderPriorityExperiment) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-      }
-
-      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
-    }
-  }
-
+  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityVisible];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitVisibleState
 {
   [super didExitVisibleState];
-
-  if (_downloaderFlags.downloaderImplementsSetPriority) {
-    id downloadIdentifier;
-    ASInterfaceState interfaceState;
-    {
-      ASLockScopeSelf();
-      downloadIdentifier = _downloadIdentifier;
-      interfaceState = _interfaceState;
-    }
-
-    if (downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = ASImageDownloaderPriorityPreload;
-      if (_isInImageDownloaderPriorityExperiment) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-      }
-
-      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
-    }
-  }
-
+  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-
-  if (_downloaderFlags.downloaderImplementsSetPriority && _isInImageDownloaderPriorityExperiment) {
-    id downloadIdentifier;
-    ASInterfaceState interfaceState;
-    {
-      ASLockScopeSelf();
-      downloadIdentifier = _downloadIdentifier;
-      interfaceState = _interfaceState;
-    }
-
-    if (downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
-    }
+  if (_isInImageDownloaderPriorityExperiment) {
+    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
   }
 }
 
@@ -505,6 +446,28 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   as_log_verbose(ASImageLoadingLog(), "Received progress image for %@ q: %.2g id: %@", self, progress, progressImage);
   [self _setCurrentImageQuality:progress];
   [self _locked__setImage:progressImage];
+}
+
+- (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
+{
+  if (_downloaderFlags.downloaderImplementsSetPriority) {
+    id downloadIdentifier;
+    ASInterfaceState interfaceState;
+    {
+      ASLockScopeSelf();
+      downloadIdentifier = _downloadIdentifier;
+      interfaceState = _interfaceState;
+    }
+
+    if (downloadIdentifier != nil) {
+      ASImageDownloaderPriority priority = defaultPriority;
+      if (_isInImageDownloaderPriorityExperiment) {
+        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+      }
+
+      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+    }
+  }
 }
 
 - (void)_updateProgressImageBlockOnDownloaderIfNeeded
