@@ -440,7 +440,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
   _internalQueue.swap(_batchBuffer);
   CFSetRemoveAllValues(_internalQueueHashSet);
   
-  // Unlock early. We are done with internal queue, and reusable queue is main-thread-only.
+  // Unlock early. We are done with internal queue, and batch buffer is main-thread-only so no lock.
   l.release();
   
   for (const id<ASCATransactionQueueObserving> &value : _batchBuffer) {
