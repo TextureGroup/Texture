@@ -8,6 +8,7 @@
 //
 
 #import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 
@@ -63,31 +64,40 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
 
 NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
-  NSMutableArray *result = [[NSMutableArray alloc] init];
-  NSInteger section = 0;
+  NSInteger sectionCount = twoDimensionalArray.count;
+  NSInteger counts[sectionCount];
+  NSInteger totalCount = 0;
   NSInteger i = 0;
   for (NSArray *subarray in twoDimensionalArray) {
-    ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    NSInteger itemCount = subarray.count;
-    for (NSInteger item = 0; item < itemCount; item++) {
-      result[i++] = [NSIndexPath indexPathForItem:item inSection:section];
-    }
-    section++;
+    NSInteger count = subarray.count;
+    counts[i++] = count;
+    totalCount += count;
   }
-  return result;
+  
+  NSIndexPath *indexPaths[totalCount];
+  for (NSInteger k = 0, i = 0; i < sectionCount; i++) {
+    for (NSInteger j = 0; j < counts[i]; j++, k++) {
+      indexPaths[k] = [NSIndexPath indexPathForItem:j inSection:i];
+    }
+  }
+  return [NSArray arrayByTransferring:indexPaths count:totalCount];
 }
 
 NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
 {
-  NSMutableArray *result = [[NSMutableArray alloc] init];
-  NSInteger i = 0;
+  NSInteger totalCount = 0;
   for (NSArray *subarray in twoDimensionalArray) {
-    ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
-    for (id element in subarray) {
-      result[i++] = element;
+    totalCount += subarray.count;
+  }
+  
+  id elements[totalCount];
+  NSInteger k = 0;
+  for (NSArray *subarray in twoDimensionalArray) {
+    for (id object in subarray) {
+      elements[k++] = object;
     }
   }
-  return result;
+  return [NSArray arrayByTransferring:elements count:totalCount];
 }
 
 id ASGetElementInTwoDimensionalArray(NSArray *array, NSIndexPath *indexPath)
