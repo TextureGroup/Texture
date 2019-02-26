@@ -91,10 +91,10 @@ NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArra
   }
   
   id elements[totalCount];
-  NSInteger k = 0;
+  NSInteger i = 0;
   for (NSArray *subarray in twoDimensionalArray) {
     for (id object in subarray) {
-      elements[k++] = object;
+      elements[i++] = object;
     }
   }
   return [NSArray arrayByTransferring:elements count:totalCount];
