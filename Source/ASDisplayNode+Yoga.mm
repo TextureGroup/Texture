@@ -95,8 +95,8 @@
 
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
 {
-  ASLockScope(self.yogaRoot);
   ASScopedLockSelfOrToRoot();
+  [self _locked_insertYogaChild:child atIndex:index];
 }
 
 - (void)_locked_insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
