@@ -46,7 +46,7 @@
 
 - (void)setYogaChildren:(NSArray *)yogaChildren
 {
-  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
+  ASScopedLockSelfOrToRoot();
   for (ASDisplayNode *child in [_yogaChildren copy]) {
     // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
     // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
@@ -66,7 +66,7 @@
 
 - (void)addYogaChild:(ASDisplayNode *)child
 {
-  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
+  ASScopedLockSelfOrToRoot();
   [self _locked_addYogaChild:child];
 }
 
@@ -77,7 +77,7 @@
 
 - (void)removeYogaChild:(ASDisplayNode *)child
 {
-  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
+  ASScopedLockSelfOrToRoot();
   [self _locked_removeYogaChild:child];
 }
 
@@ -96,7 +96,7 @@
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
 {
   ASLockScope(self.yogaRoot);
-  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
+  ASScopedLockSelfOrToRoot();
 }
 
 - (void)_locked_insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
@@ -185,7 +185,7 @@
 
 - (void)setupYogaCalculatedLayout
 {
-  ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
+  ASScopedLockSelfOrToRoot();
 
   YGNodeRef yogaNode = self.style.yogaNode;
   uint32_t childCount = YGNodeGetChildCount(yogaNode);

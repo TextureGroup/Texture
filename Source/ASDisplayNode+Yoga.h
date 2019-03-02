@@ -90,4 +90,9 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 NS_ASSUME_NONNULL_END
 
+// When Yoga is enabled, there are several points where we want to lock the tree to the root but otherwise (without Yoga)
+// will want to simply lock self.
+#define ASScopedLockSelfOrToRoot() ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout]
+#else
+#define ASScopedLockSelfOrToRoot() ASLockScopeSelf()
 #endif
