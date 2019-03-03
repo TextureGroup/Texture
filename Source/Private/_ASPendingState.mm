@@ -16,9 +16,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-#define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
-  || (flags.setOpaque && opaque != (layer).opaque)\
-  || (flags.setBackgroundColor && !CGColorEqualToColor(backgroundColor, (layer).backgroundColor)))
+NS_INLINE BOOL ASPendingStateShouldSetNeedsDisplay(_ASPendingState *state, CALayer *layer);
 
 typedef struct {
   // Properties
@@ -92,6 +90,7 @@ typedef struct {
 {
   @package //Expose all ivars for ASDisplayNode to bypass getters for efficiency
 
+  BOOL opaque;
   UIViewAutoresizing autoresizingMask;
   unsigned int edgeAntialiasingMask;
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
@@ -826,7 +825,7 @@ static UIColor *defaultTintColor = nil;
 {
   ASPendingStateFlags flags = _flags;
 
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (ASPendingStateShouldSetNeedsDisplay(self, layer)) {
     [layer setNeedsDisplay];
   }
 
@@ -939,7 +938,7 @@ static UIColor *defaultTintColor = nil;
   CALayer *layer = view.layer;
 
   ASPendingStateFlags flags = _flags;
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (ASPendingStateShouldSetNeedsDisplay(self, layer)) {
     [view setNeedsDisplay];
   }
 
@@ -1366,3 +1365,10 @@ static UIColor *defaultTintColor = nil;
 }
 
 @end
+
+NS_INLINE BOOL ASPendingStateShouldSetNeedsDisplay(_ASPendingState *state, CALayer *layer) {
+  ASPendingStateFlags *flags = &state->_flags;
+  return (flags->needsDisplay 
+   || (flags->setOpaque && state->opaque != layer.opaque)
+          || (flags->setBackgroundColor && !CGColorEqualToColor(state->backgroundColor, layer.backgroundColor)));
+}

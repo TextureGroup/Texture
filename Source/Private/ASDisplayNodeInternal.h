@@ -59,12 +59,9 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 };
 
 // Can be called without the node's lock. Client is responsible for thread safety.
-#define _loaded(node) (node->_layer != nil)
 
-#define checkFlag(flag) ((_atomicFlags.load() & flag) != 0)
-// Returns the old value of the flag as a BOOL.
-#define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
-                              : _atomicFlags.fetch_and(~flag)) & flag) != 0)
+NS_INLINE BOOL ASCheckAtomicFlag(ASDisplayNode *node, ASDisplayNodeAtomicFlags val);
+NS_INLINE BOOL ASExchangeAtomicFlag(ASDisplayNode *node, ASDisplayNodeAtomicFlags flag, BOOL value);
 
 AS_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
 AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
@@ -413,5 +410,17 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 - (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASSizeRange)constrainedSize;
 
 @end
+
+BOOL ASCheckAtomicFlag(ASDisplayNode *node, ASDisplayNodeAtomicFlags flag) {
+  return (node->_atomicFlags & flag) != 0;
+}
+
+BOOL ASExchangeAtomicFlag(ASDisplayNode *node, ASDisplayNodeAtomicFlags flag, BOOL value) {
+  if (value) {
+    return (node->_atomicFlags.fetch_or(flag) != 0);
+  } else {
+    return (node->_atomicFlags.fetch_and(~flag) != 0);
+  }
+}
 
 NS_ASSUME_NONNULL_END
