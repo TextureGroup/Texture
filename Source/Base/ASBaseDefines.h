@@ -147,6 +147,8 @@
 #define AS_SUBCLASSING_RESTRICTED
 #endif
 
+#define AS_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 #define ASCreateOnce(expr) ({ \
   static dispatch_once_t onceToken; \
   static __typeof__(expr) staticVar; \

@@ -931,16 +931,21 @@ ASLayoutElementStyleExtensibilityForwarding
   ASDN::MutexLocker l(__instanceLock__);
   NSArray<ASLayout *> *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
   unowned ASLayout *cSublayouts[sublayouts.count];
-  [sublayouts getObjects:cSublayouts];
-  NSUInteger i = 0;
-  BOOL matches = YES;
-  for (ASDisplayNode *subnode in _subnodes) {
-    if (subnode != cSublayouts[i].layoutElement) {
-      matches = NO;
+  [sublayouts getObjects:cSublayouts range:NSMakeRange(0, AS_ARRAY_SIZE(cSublayouts))];
+
+  // Fast-path if we are in the correct state (likely).
+  if (sublayouts.count == AS_ARRAY_SIZE(cSublayouts)) {
+    NSUInteger i = 0;
+    BOOL matches = YES;
+    for (ASDisplayNode *subnode in _subnodes) {
+      if (subnode != cSublayouts[i].layoutElement) {
+        matches = NO;
+      }
+      i++;
     }
-  }
-  if (matches) {
-    return;
+    if (matches) {
+      return;
+    }
   }
 
   NSArray<ASDisplayNode *> *layoutNodes = ASArrayByFlatMapping(sublayouts, ASLayout *layout, (ASDisplayNode *)layout.layoutElement);
