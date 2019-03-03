@@ -12,6 +12,8 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 
+#import <vector>
+
 // Import UIKit to get [NSIndexPath indexPathForItem:inSection:] which uses
 // tagged pointers.
 #import <UIKit/UIKit.h>
@@ -74,13 +76,15 @@ NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* 
     totalCount += count;
   }
   
-  NSIndexPath *indexPaths[totalCount];
-  for (NSInteger k = 0, i = 0; i < sectionCount; i++) {
-    for (NSInteger j = 0; j < counts[i]; j++, k++) {
-      indexPaths[k] = [NSIndexPath indexPathForItem:j inSection:i];
+  // Count could be huge. Use a reserved vector rather than VLA (stack.)
+  std::vector<NSIndexPath *> indexPaths;
+  indexPaths.reserve(totalCount);
+  for (NSInteger i = 0; i < sectionCount; i++) {
+    for (NSInteger j = 0; j < counts[i]; j++) {
+      indexPaths.push_back([NSIndexPath indexPathForItem:j inSection:i]);
     }
   }
-  return [NSArray arrayByTransferring:indexPaths count:totalCount];
+  return [NSArray arrayByTransferring:indexPaths.data() count:totalCount];
 }
 
 NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
@@ -90,14 +94,14 @@ NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArra
     totalCount += subarray.count;
   }
   
-  id elements[totalCount];
-  NSInteger i = 0;
+  std::vector<id> elements;
+  elements.reserve(totalCount);
   for (NSArray *subarray in twoDimensionalArray) {
     for (id object in subarray) {
-      elements[i++] = object;
+      elements.push_back(object);
     }
   }
-  return [NSArray arrayByTransferring:elements count:totalCount];
+  return [NSArray arrayByTransferring:elements.data() count:totalCount];
 }
 
 id ASGetElementInTwoDimensionalArray(NSArray *array, NSIndexPath *indexPath)
