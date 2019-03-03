@@ -934,7 +934,7 @@ ASLayoutElementStyleExtensibilityForwarding
   [sublayouts getObjects:cSublayouts range:NSMakeRange(0, AS_ARRAY_SIZE(cSublayouts))];
 
   // Fast-path if we are in the correct state (likely).
-  if (sublayouts.count == AS_ARRAY_SIZE(cSublayouts)) {
+  if (_subnodes.count == AS_ARRAY_SIZE(cSublayouts)) {
     NSUInteger i = 0;
     BOOL matches = YES;
     for (ASDisplayNode *subnode in _subnodes) {
