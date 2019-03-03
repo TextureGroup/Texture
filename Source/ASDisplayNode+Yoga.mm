@@ -46,7 +46,7 @@
 
 - (void)setYogaChildren:(NSArray *)yogaChildren
 {
-  ASLockScope(self.yogaRoot);
+  ASScopedLockSelfOrToRoot();
   for (ASDisplayNode *child in [_yogaChildren copy]) {
     // Make sure to un-associate the YGNodeRef tree before replacing _yogaChildren
     // If this becomes a performance bottleneck, it can be optimized by not doing the NSArray removals here.
@@ -66,7 +66,7 @@
 
 - (void)addYogaChild:(ASDisplayNode *)child
 {
-  ASLockScope(self.yogaRoot);
+  ASScopedLockSelfOrToRoot();
   [self _locked_addYogaChild:child];
 }
 
@@ -77,7 +77,7 @@
 
 - (void)removeYogaChild:(ASDisplayNode *)child
 {
-  ASLockScope(self.yogaRoot);
+  ASScopedLockSelfOrToRoot();
   [self _locked_removeYogaChild:child];
 }
 
@@ -95,7 +95,7 @@
 
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
 {
-  ASLockScope(self.yogaRoot);
+  ASScopedLockSelfOrToRoot();
   [self _locked_insertYogaChild:child atIndex:index];
 }
 
@@ -129,6 +129,7 @@
 
 - (void)setYogaParent:(ASDisplayNode *)yogaParent
 {
+  ASLockScopeSelf();
   if (_yogaParent == yogaParent) {
     return;
   }
@@ -184,7 +185,7 @@
 
 - (void)setupYogaCalculatedLayout
 {
-  ASLockScopeSelf();
+  ASScopedLockSelfOrToRoot();
 
   YGNodeRef yogaNode = self.style.yogaNode;
   uint32_t childCount = YGNodeGetChildCount(yogaNode);
@@ -194,7 +195,7 @@
 
   ASLayout *rawSublayouts[childCount];
   int i = 0;
-  for (ASDisplayNode *subnode in self.yogaChildren) {
+  for (ASDisplayNode *subnode in _yogaChildren) {
     rawSublayouts[i++] = [subnode layoutForYogaNode];
   }
   const auto sublayouts = [NSArray<ASLayout *> arrayByTransferring:rawSublayouts count:childCount];
@@ -251,10 +252,11 @@
 
 - (BOOL)shouldHaveYogaMeasureFunc
 {
+  ASLockScopeSelf();
   // Size calculation via calculateSizeThatFits: or layoutSpecThatFits:
   // For these nodes, we assume they may need custom Baseline calculation too.
   // This will be used for ASTextNode, as well as any other node that has no Yoga children
-  BOOL isLeafNode = (self.yogaChildren.count == 0);
+  BOOL isLeafNode = (_yogaChildren.count == 0);
   BOOL definesCustomLayout = [self implementsLayoutMethod];
   return (isLeafNode && definesCustomLayout);
 }
@@ -296,31 +298,24 @@
   // - This node is a Yoga tree root: it has no yogaParent, but has yogaChildren.
   // - This node is a Yoga tree node: it has both a yogaParent and yogaChildren.
   // - This node is a Yoga tree leaf: it has a yogaParent, but no yogaChidlren.
-  YGNodeRef yogaNode = _style.yogaNode;
-  BOOL hasYogaParent = (_yogaParent != nil);
-  BOOL hasYogaChildren = (_yogaChildren.count > 0);
-  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
-  if (usesYoga) {
-    // This node has some connection to a Yoga tree.
-    if ([self shouldHaveYogaMeasureFunc] == NO) {
-      // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
-      // initiate a new Yoga calculation pass from root.
-
-      as_activity_create_for_scope("Yoga layout calculation");
-      if (self.yogaLayoutInProgress == NO) {
-        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
-        l.unlock();
-        [self calculateLayoutFromYogaRoot:constrainedSize];
-        l.lock();
-      } else {
-        ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
-      }
-      ASDisplayNodeAssert(_yogaCalculatedLayout, @"Yoga node should have a non-nil layout at this stage: %@", self);
-      return _yogaCalculatedLayout;
+  if ([self locked_shouldLayoutFromYogaRoot]) {
+    // If we're a yoga root, tree node, or leaf with no measure func (e.g. spacer), then
+    // initiate a new Yoga calculation pass from root.
+    as_activity_create_for_scope("Yoga layout calculation");
+    if (self.yogaLayoutInProgress == NO) {
+      ASYogaLog("Calculating yoga layout from root %@, %@", self,
+              NSStringFromASSizeRange(constrainedSize));
+      [self calculateLayoutFromYogaRoot:constrainedSize];
     } else {
-      // If we're a yoga leaf node with custom measurement function, proceed with normal layout so layoutSpecs can run (e.g. ASButtonNode).
-      ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
+      ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
     }
+    ASDisplayNodeAssert(_yogaCalculatedLayout,
+            @"Yoga node should have a non-nil layout at this stage: %@", self);
+    return _yogaCalculatedLayout;
+  } else {
+    // If we're a yoga leaf node with custom measurement function, proceed with normal layout so
+    // layoutSpecs can run (e.g. ASButtonNode).
+    ASYogaLog("PROCEEDING past Yoga check to calculate ASLayout for: %@", self);
   }
 
   // Delegate to layout spec layout for nodes that do not support Yoga
@@ -345,7 +340,6 @@
     }
   }];
 
-  ASLockScopeSelf();
 
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode *_Nonnull node) {

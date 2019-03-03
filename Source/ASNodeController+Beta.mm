@@ -89,6 +89,20 @@
 
 - (void)hierarchyDisplayDidFinish {}
 
+- (ASLockSet)lockPair {
+  ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {
+    if (!addLock(_node)) {
+      return NO;
+    }
+    if (!addLock(self)) {
+      return NO;
+    }
+    return YES;
+  });
+
+  return lockSet;
+}
+
 #pragma mark NSLocking
 
 - (void)lock
@@ -99,6 +113,11 @@
 - (void)unlock
 {
   __instanceLock__.unlock();
+}
+
+- (BOOL)tryLock
+{
+  return __instanceLock__.try_lock();
 }
 
 @end

@@ -12,7 +12,7 @@
 
 /* ASNodeController is currently beta and open to change in the future */
 @interface ASNodeController<__covariant DisplayNodeType : ASDisplayNode *>
-    : NSObject <ASInterfaceStateDelegate, NSLocking>
+    : NSObject <ASInterfaceStateDelegate, ASLocking>
 
 @property (nonatomic, strong /* may be weak! */) DisplayNodeType node;
 
@@ -43,6 +43,12 @@
                       fromState:(ASInterfaceState)oldState ASDISPLAYNODE_REQUIRES_SUPER;
 
 - (void)hierarchyDisplayDidFinish ASDISPLAYNODE_REQUIRES_SUPER;
+
+/**
+ * @discussion Attempts (via ASLockSequence, a backing-off spinlock similar to
+ * std::lock()) to lock both the node and its ASNodeController, if one exists.
+ */
+- (ASLockSet)lockPair;
 
 @end
 
