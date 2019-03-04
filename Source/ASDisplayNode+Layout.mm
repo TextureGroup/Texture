@@ -19,6 +19,19 @@
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 
+@interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
+@end
+
+@implementation ASDisplayNode (ASLayoutElementStyleDelegate)
+
+#pragma mark <ASLayoutElementStyleDelegate>
+
+- (void)style:(ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName {
+  [self setNeedsLayout];
+}
+
+@end
+
 #pragma mark - ASDisplayNode (ASLayoutElement)
 
 @implementation ASDisplayNode (ASLayoutElement)
@@ -42,8 +55,9 @@
 
 - (ASLayoutElementStyle *)_locked_style
 {
+  ASAssertLocked(__instanceLock__);
   if (_style == nil) {
-    _style = [[ASLayoutElementStyle alloc] init];
+    _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
   }
   return _style;
 }
