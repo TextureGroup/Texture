@@ -152,15 +152,6 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 ///=============================================================================
 
 /**
- Generate a layout with the given container size and text.
- 
- @param size The text container's size
- @param text The text (if nil, returns nil).
- @return A new layout, or nil when an error occurs.
- */
-+ (nullable ASTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text;
-
-/**
  Generate a layout with the given container and text.
  
  @param container The text container (if nil, returns nil).

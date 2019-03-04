@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <pthread.h>
+#import <vector>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -332,46 +333,10 @@ dispatch_semaphore_signal(_lock);
 #undef Setter
 @end
 
-
-
-
-@interface ASTextLayout ()
-
-@property (nonatomic) ASTextContainer *container;
-@property (nonatomic) NSAttributedString *text;
-@property (nonatomic) NSRange range;
-
-@property (nonatomic) CTFrameRef frame;
-@property (nonatomic) NSArray *lines;
-@property (nonatomic) ASTextLine *truncatedLine;
-@property (nonatomic) NSArray *attachments;
-@property (nonatomic) NSArray *attachmentRanges;
-@property (nonatomic) NSArray *attachmentRects;
-@property (nonatomic) NSSet *attachmentContentsSet;
-@property (nonatomic) NSUInteger rowCount;
-@property (nonatomic) NSRange visibleRange;
-@property (nonatomic) CGRect textBoundingRect;
-@property (nonatomic) CGSize textBoundingSize;
-
-@property (nonatomic) BOOL containsHighlight;
-@property (nonatomic) BOOL needDrawBlockBorder;
-@property (nonatomic) BOOL needDrawBackgroundBorder;
-@property (nonatomic) BOOL needDrawShadow;
-@property (nonatomic) BOOL needDrawUnderline;
-@property (nonatomic) BOOL needDrawText;
-@property (nonatomic) BOOL needDrawAttachment;
-@property (nonatomic) BOOL needDrawInnerShadow;
-@property (nonatomic) BOOL needDrawStrikethrough;
-@property (nonatomic) BOOL needDrawBorder;
-
-@property (nonatomic) NSUInteger *lineRowsIndex;
-@property (nonatomic) ASRowEdge *lineRowsEdge; ///< top-left origin
-
-@end
-
-
-
-@implementation ASTextLayout
+@implementation ASTextLayout  {
+  std::vector<NSUInteger> _lineRowsIndex;
+  std::vector<ASRowEdge> _lineRowsEdge;
+}
 
 #pragma mark - Layout
 
@@ -388,17 +353,12 @@ dispatch_semaphore_signal(_lock);
                                     NSStringFromCGRect(self.textBoundingRect)];
 }
 
-+ (ASTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
-  ASTextContainer *container = [ASTextContainer containerWithSize:size];
-  return [self layoutWithContainer:container text:text];
-}
-
 + (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text {
   return [self layoutWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
 + (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
-  ASTextLayout *layout = NULL;
+  ASTextLayout *layout = nil;
   CGPathRef cgPath = nil;
   CGRect cgPathBox = {0};
   BOOL isVerticalForm = NO;
@@ -407,18 +367,15 @@ dispatch_semaphore_signal(_lock);
   CTFramesetterRef ctSetter = NULL;
   CTFrameRef ctFrame = NULL;
   CFArrayRef ctLines = nil;
-  CGPoint *lineOrigins = NULL;
   NSUInteger lineCount = 0;
-  NSMutableArray *lines = nil;
-  NSMutableArray *attachments = nil;
-  NSMutableArray *attachmentRanges = nil;
-  NSMutableArray *attachmentRects = nil;
-  NSMutableSet *attachmentContentsSet = nil;
+  NSMutableArray<ASTextLine *> *lines = nil;
+  NSMutableArray<ASTextAttachment *> *attachments = nil;
+  NSMutableArray<NSValue *> *attachmentRanges = nil;
+  NSMutableArray<NSValue *> *attachmentRects = nil;
+  NSMutableSet<id> *attachmentContentsSet = nil;
   BOOL needTruncation = NO;
   NSAttributedString *truncationToken = nil;
   ASTextLine *truncatedLine = nil;
-  ASRowEdge *lineRowsEdge = NULL;
-  NSUInteger *lineRowsIndex = NULL;
   NSRange visibleRange;
   NSUInteger maximumNumberOfRows = 0;
   BOOL constraintSizeIsExtended = NO;
@@ -427,14 +384,12 @@ dispatch_semaphore_signal(_lock);
   if (cgPath) CFRelease(cgPath); \
   if (ctSetter) CFRelease(ctSetter); \
   if (ctFrame) CFRelease(ctFrame); \
-  if (lineOrigins) free(lineOrigins); \
-  if (lineRowsEdge) free(lineRowsEdge); \
-  if (lineRowsIndex) free(lineRowsIndex); \
   return nil; }
   
+  text = [text copy];
+  if (NSMaxRange(range) > text.length) return nil;
   container = [container copy];
   if (!text || !container) return nil;
-  if (range.location + range.length > text.length) return nil;
   [container makeImmutable];
   maximumNumberOfRows = container.maximumNumberOfRows;
   
@@ -443,13 +398,13 @@ dispatch_semaphore_signal(_lock);
   BOOL needFixLayoutSizeBug = AS_AT_LEAST_IOS10;
 
   layout = [[ASTextLayout alloc] _init];
-  layout.text = text;
-  layout.container = container;
-  layout.range = range;
-  isVerticalForm = container.verticalForm;
+  layout->_text = text;
+  layout->_container = container;
+  layout->_range = range;
+  isVerticalForm = container->_verticalForm;
   
   // set cgPath and cgPathBox
-  if (container.path == nil && container.exclusionPaths.count == 0) {
+  if (container->_path == nil && container->_exclusionPaths.count == 0) {
     if (container.size.width <= 0 || container.size.height <= 0) FAIL_AND_RETURN
     CGRect rect = (CGRect) {CGPointZero, container.size };
     if (needFixLayoutSizeBug) {
@@ -467,14 +422,14 @@ dispatch_semaphore_signal(_lock);
     cgPathBox = rect;
     rect = CGRectApplyAffineTransform(rect, CGAffineTransformMakeScale(1, -1));
     cgPath = CGPathCreateWithRect(rect, NULL); // let CGPathIsRect() returns true
-  } else if (container.path && CGPathIsRect(container.path.CGPath, &cgPathBox) && container.exclusionPaths.count == 0) {
+  } else if (container->_path && CGPathIsRect(container->_path.CGPath, &cgPathBox) && container->_exclusionPaths.count == 0) {
     CGRect rect = CGRectApplyAffineTransform(cgPathBox, CGAffineTransformMakeScale(1, -1));
     cgPath = CGPathCreateWithRect(rect, NULL); // let CGPathIsRect() returns true
   } else {
     rowMaySeparated = YES;
     CGMutablePathRef path = NULL;
     if (container.path) {
-      path = CGPathCreateMutableCopy(container.path.CGPath);
+      path = CGPathCreateMutableCopy(container->_path.CGPath);
     } else {
       CGRect rect = (CGRect) {CGPointZero, container.size };
       rect = UIEdgeInsetsInsetRect(rect, container.insets);
@@ -485,9 +440,9 @@ dispatch_semaphore_signal(_lock);
       }
     }
     if (path) {
-      [layout.container.exclusionPaths enumerateObjectsUsingBlock: ^(UIBezierPath *onePath, NSUInteger idx, BOOL *stop) {
+      for (UIBezierPath *onePath in container->_exclusionPaths) {
         CGPathAddPath(path, NULL, onePath.CGPath);
-      }];
+      }
       
       cgPathBox = CGPathGetPathBoundingBox(path);
       CGAffineTransform trans = CGAffineTransformMakeScale(1, -1);
@@ -500,14 +455,16 @@ dispatch_semaphore_signal(_lock);
   if (!cgPath) FAIL_AND_RETURN
   
   // frame setter config
-  frameAttrs = [[NSMutableDictionary alloc] init];
   if (container.isPathFillEvenOdd == NO) {
+    if (!frameAttrs) frameAttrs = [[NSMutableDictionary alloc] init];
     frameAttrs[(id)kCTFramePathFillRuleAttributeName] = @(kCTFramePathFillWindingNumber);
   }
   if (container.pathLineWidth > 0) {
+    if (!frameAttrs) frameAttrs = [[NSMutableDictionary alloc] init];
     frameAttrs[(id)kCTFramePathWidthAttributeName] = @(container.pathLineWidth);
   }
   if (container.isVerticalForm == YES) {
+    if (!frameAttrs) frameAttrs = [[NSMutableDictionary alloc] init];
     frameAttrs[(id)kCTFrameProgressionAttributeName] = @(kCTFrameProgressionRightToLeft);
   }
   
@@ -577,14 +534,11 @@ dispatch_semaphore_signal(_lock);
   }
 
   if (!ctFrame) FAIL_AND_RETURN
-  lines = [NSMutableArray new];
   ctLines = CTFrameGetLines(ctFrame);
   lineCount = CFArrayGetCount(ctLines);
-  if (lineCount > 0) {
-    lineOrigins = (CGPoint *)malloc(lineCount * sizeof(CGPoint));
-    if (lineOrigins == NULL) FAIL_AND_RETURN
-    CTFrameGetLineOrigins(ctFrame, CFRangeMake(0, lineCount), lineOrigins);
-  }
+  lines = [[NSMutableArray alloc] initWithCapacity:lineCount];
+  CGPoint lineOrigins[lineCount];
+  CTFrameGetLineOrigins(ctFrame, CFRangeMake(0, lineCount), lineOrigins);
   
   CGRect textBoundingRect = CGRectZero;
   CGSize textBoundingSize = CGSizeZero;
@@ -600,10 +554,13 @@ dispatch_semaphore_signal(_lock);
   // calculate line frame
   NSUInteger lineCurrentIdx = 0;
   BOOL measuringBeyondConstraints = NO;
-  for (NSUInteger i = 0; i < lineCount; i++) {
-    CTLineRef ctLine = (CTLineRef)CFArrayGetValueAtIndex(ctLines, i);
-    CFArrayRef ctRuns = CTLineGetGlyphRuns(ctLine);
-    if (!ctRuns || CFArrayGetCount(ctRuns) == 0) continue;
+  NSUInteger i = 0;
+  for (id ctLine in (__bridge NSArray *)ctLines) {
+    CFArrayRef ctRuns = CTLineGetGlyphRuns((__bridge CTLineRef)ctLine);
+    if (!ctRuns || CFArrayGetCount(ctRuns) == 0) {
+      i++;
+      continue;
+    }
     
     // CoreText coordinate system
     CGPoint ctLineOrigin = lineOrigins[i];
@@ -613,13 +570,13 @@ dispatch_semaphore_signal(_lock);
     position.x = cgPathBox.origin.x + ctLineOrigin.x;
     position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
     
-    ASTextLine *line = [ASTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
-    
+    ASTextLine *line = [ASTextLine lineWithCTLine:(__bridge CTLineRef)ctLine position:position vertical:isVerticalForm];
     [lines addObject:line];
+    i++;
   }
   
   // Give user a chance to modify the line's position.
-  [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
+  [container->_linePositionModifier modifyLines:lines fromText:text inContainer:container];
   
   BOOL first = YES;
   for (ASTextLine *line in lines) {
@@ -679,40 +636,43 @@ dispatch_semaphore_signal(_lock);
   }
 
   {
-    NSMutableArray<ASTextLine *> *removedLines = [NSMutableArray new];
+    NSMutableArray<ASTextLine *> *removedLines;
     if (rowCount > 0) {
       if (maximumNumberOfRows > 0) {
         if (rowCount > maximumNumberOfRows) {
           needTruncation = YES;
           rowCount = maximumNumberOfRows;
           do {
-            ASTextLine *line = lines.lastObject;
+            unowned ASTextLine *line = lines.lastObject;
             if (!line) break;
             if (line.row < rowCount) break; // we have removed down to an allowed # of lines now
-            [lines removeLastObject];
+            if (!removedLines) removedLines = [[NSMutableArray alloc] init];
             [removedLines addObject:line];
+            [lines removeLastObject];
           } while (1);
         }
       }
-      ASTextLine *lastLine = rowCount < lines.count ? lines[rowCount - 1] : lines.lastObject;
-      if (!needTruncation && lastLine.range.location + lastLine.range.length < text.length) {
+      unowned ASTextLine *lastLine = rowCount < lines.count ? lines[rowCount - 1] : lines.lastObject;
+      if (!needTruncation && NSMaxRange(lastLine.range) < text.length) {
         needTruncation = YES;
-        while (lines.count > rowCount) {
-          ASTextLine *line = lines.lastObject;
-          [lines removeLastObject];
-          [removedLines addObject:line];
+        NSRange removeRange = NSMakeRange(rowCount, lines.count - rowCount);
+        unowned ASTextLine *linesToRemove[removeRange.length];
+        [lines getObjects:linesToRemove range:removeRange];
+        for (NSUInteger i = removeRange.location; i < NSMaxRange(removeRange); i++) {
+          [removedLines addObject:linesToRemove[i]];
         }
+        [lines removeObjectsInRange:removeRange];
       }
 
-      lineRowsEdge = (ASRowEdge *) calloc(rowCount, sizeof(ASRowEdge));
-      if (lineRowsEdge == NULL) FAIL_AND_RETURN
-      lineRowsIndex = (NSUInteger *) calloc(rowCount, sizeof(NSUInteger));
-      if (lineRowsIndex == NULL) FAIL_AND_RETURN
+      std::vector<ASRowEdge> &lineRowsEdge = layout->_lineRowsEdge;
+      std::vector<NSUInteger> &lineRowsIndex = layout->_lineRowsIndex;
+      lineRowsEdge.reserve(rowCount);
+      lineRowsIndex.reserve(rowCount);
       NSInteger lastRowIdx = -1;
       CGFloat lastHead = 0;
       CGFloat lastFoot = 0;
-      for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-        ASTextLine *line = lines[i];
+      i = 0;
+      for (ASTextLine *line in lines) {
         CGRect rect = line.bounds;
         if ((NSInteger) line.row != lastRowIdx) {
           if (lastRowIdx >= 0) {
@@ -736,6 +696,7 @@ dispatch_semaphore_signal(_lock);
             lastFoot = MAX(lastFoot, rect.origin.y + rect.size.height);
           }
         }
+        i++;
       }
       lineRowsEdge[lastRowIdx] = (ASRowEdge) {.head = lastHead, .foot = lastFoot};
 
@@ -773,15 +734,14 @@ dispatch_semaphore_signal(_lock);
 
     visibleRange = ASTextNSRangeFromCFRange(CTFrameGetVisibleStringRange(ctFrame));
     if (needTruncation) {
-      ASTextLine *lastLine = lines.lastObject;
-      NSRange lastRange = lastLine.range;
-      visibleRange.length = lastRange.location + lastRange.length - visibleRange.location;
+      unowned ASTextLine *lastLine = lines.lastObject;
+      visibleRange.length = NSMaxRange(lastLine.range) - visibleRange.location;
 
       // create truncated line
-      if (container.truncationType != ASTextTruncationTypeNone) {
+      if (container->_truncationType != ASTextTruncationTypeNone) {
         CTLineRef truncationTokenLine = NULL;
-        if (container.truncationToken) {
-          truncationToken = container.truncationToken;
+        if (container->_truncationToken) {
+          truncationToken = container->_truncationToken;
           truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
         } else {
           CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
@@ -790,7 +750,7 @@ dispatch_semaphore_signal(_lock);
           if (runCount > 0) {
             CTRunRef run = (CTRunRef) CFArrayGetValueAtIndex(runs, runCount - 1);
             attrs = (id) CTRunGetAttributes(run);
-            attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+            attrs = attrs ? [attrs mutableCopy] : [NSMutableDictionary new];
             [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
             CTFontRef font = (__bridge CTFontRef) attrs[(id) kCTFontAttributeName];
             CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
@@ -810,7 +770,6 @@ dispatch_semaphore_signal(_lock);
               // ignore clear color
               [attrs removeObjectForKey:(id) kCTForegroundColorAttributeName];
             }
-            if (!attrs) attrs = [NSMutableDictionary new];
           }
           truncationToken = [[NSAttributedString alloc] initWithString:ASTextTruncationToken attributes:attrs];
           truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
@@ -822,7 +781,7 @@ dispatch_semaphore_signal(_lock);
           } else if (container.truncationType == ASTextTruncationTypeMiddle) {
             type = kCTLineTruncationMiddle;
           }
-          NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+          NSMutableAttributedString *lastLineText = [[text attributedSubstringFromRange:lastLine.range] mutableCopy];
           CGFloat truncatedWidth = lastLine.width;
           CGFloat atLeastOneLine = lastLine.width;
           CGRect cgPathRect = CGRectZero;
@@ -948,18 +907,19 @@ dispatch_semaphore_signal(_lock);
   }
   
   if (visibleRange.length > 0) {
-    layout.needDrawText = YES;
+    layout->_needDrawText = YES;
     
+    unowned ASTextLayout *uLayout = layout;
     void (^block)(NSDictionary *attrs, NSRange range, BOOL *stop) = ^(NSDictionary *attrs, NSRange range, BOOL *stop) {
-      if (attrs[ASTextHighlightAttributeName]) layout.containsHighlight = YES;
-      if (attrs[ASTextBlockBorderAttributeName]) layout.needDrawBlockBorder = YES;
-      if (attrs[ASTextBackgroundBorderAttributeName]) layout.needDrawBackgroundBorder = YES;
-      if (attrs[ASTextShadowAttributeName] || attrs[NSShadowAttributeName]) layout.needDrawShadow = YES;
-      if (attrs[ASTextUnderlineAttributeName]) layout.needDrawUnderline = YES;
-      if (attrs[ASTextAttachmentAttributeName]) layout.needDrawAttachment = YES;
-      if (attrs[ASTextInnerShadowAttributeName]) layout.needDrawInnerShadow = YES;
-      if (attrs[ASTextStrikethroughAttributeName]) layout.needDrawStrikethrough = YES;
-      if (attrs[ASTextBorderAttributeName]) layout.needDrawBorder = YES;
+      if (attrs[ASTextHighlightAttributeName]) uLayout->_containsHighlight = YES;
+      if (attrs[ASTextBlockBorderAttributeName]) uLayout->_needDrawBlockBorder = YES;
+      if (attrs[ASTextBackgroundBorderAttributeName]) uLayout->_needDrawBackgroundBorder = YES;
+      if (attrs[ASTextShadowAttributeName] || attrs[NSShadowAttributeName]) uLayout->_needDrawShadow = YES;
+      if (attrs[ASTextUnderlineAttributeName]) uLayout->_needDrawUnderline = YES;
+      if (attrs[ASTextAttachmentAttributeName]) uLayout->_needDrawAttachment = YES;
+      if (attrs[ASTextInnerShadowAttributeName]) uLayout->_needDrawInnerShadow = YES;
+      if (attrs[ASTextStrikethroughAttributeName]) uLayout->_needDrawStrikethrough = YES;
+      if (attrs[ASTextBorderAttributeName]) uLayout->_needDrawBorder = YES;
     };
     
     [layout.text enumerateAttributesInRange:visibleRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
@@ -968,14 +928,15 @@ dispatch_semaphore_signal(_lock);
     }
   }
   
-  attachments = [NSMutableArray new];
-  attachmentRanges = [NSMutableArray new];
-  attachmentRects = [NSMutableArray new];
-  attachmentContentsSet = [NSMutableSet new];
-  for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-    ASTextLine *line = lines[i];
+  for (unowned ASTextLine *line in lines) {
     if (truncatedLine && line.index == truncatedLine.index) line = truncatedLine;
     if (line.attachments.count > 0) {
+      if (!attachments) {
+        attachments = [[NSMutableArray alloc] init];
+        attachmentRanges = [[NSMutableArray alloc] init];
+        attachmentRects = [[NSMutableArray alloc] init];
+        attachmentContentsSet = [[NSMutableSet alloc] init];
+      }
       [attachments addObjectsFromArray:line.attachments];
       [attachmentRanges addObjectsFromArray:line.attachmentRanges];
       [attachmentRects addObjectsFromArray:line.attachmentRects];
@@ -986,27 +947,20 @@ dispatch_semaphore_signal(_lock);
       }
     }
   }
-  if (attachments.count == 0) {
-    attachments = attachmentRanges = attachmentRects = nil;
-  }
 
-  layout.frame = ctFrame;
-  layout.lines = lines;
-  layout.truncatedLine = truncatedLine;
-  layout.attachments = attachments;
-  layout.attachmentRanges = attachmentRanges;
-  layout.attachmentRects = attachmentRects;
-  layout.attachmentContentsSet = attachmentContentsSet;
-  layout.rowCount = rowCount;
-  layout.visibleRange = visibleRange;
-  layout.textBoundingRect = textBoundingRect;
-  layout.textBoundingSize = textBoundingSize;
-  layout.lineRowsEdge = lineRowsEdge;
-  layout.lineRowsIndex = lineRowsIndex;
+  layout->_frame = ctFrame;
+  layout->_lines = lines;
+  layout->_truncatedLine = truncatedLine;
+  layout->_attachments = attachments;
+  layout->_attachmentRanges = attachmentRanges;
+  layout->_attachmentRects = attachmentRects;
+  layout->_attachmentContentsSet = attachmentContentsSet;
+  layout->_rowCount = rowCount;
+  layout->_visibleRange = visibleRange;
+  layout->_textBoundingRect = textBoundingRect;
+  layout->_textBoundingSize = textBoundingSize;
   CFRelease(cgPath);
   CFRelease(ctSetter);
-  CFRelease(ctFrame);
-  if (lineOrigins) free(lineOrigins);
   return layout;
 }
 
@@ -1034,18 +988,8 @@ dispatch_semaphore_signal(_lock);
   return layouts;
 }
 
-- (void)setFrame:(CTFrameRef)frame {
-  if (_frame != frame) {
-    if (frame) CFRetain(frame);
-    if (_frame) CFRelease(_frame);
-    _frame = frame;
-  }
-}
-
 - (void)dealloc {
   if (_frame) CFRelease(_frame);
-  if (_lineRowsIndex) free(_lineRowsIndex);
-  if (_lineRowsEdge) free(_lineRowsEdge);
 }
 
 #pragma mark - Copying
@@ -2695,19 +2639,18 @@ static void ASTextDrawText(ASTextLayout *layout, CGContextRef context, CGSize si
     BOOL isVertical = layout.container.verticalForm;
     CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
     
-    NSArray *lines = layout.lines;
-    for (NSUInteger l = 0, lMax = lines.count; l < lMax; l++) {
-      ASTextLine *line = lines[l];
+    for (unowned ASTextLine *line in layout.lines) {
       if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
       NSArray *lineRunRanges = line.verticalRotateRange;
       CGFloat posX = line.position.x + verticalOffset;
       CGFloat posY = size.height - line.position.y;
       CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
-      for (NSUInteger r = 0, rMax = CFArrayGetCount(runs); r < rMax; r++) {
-        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
+      NSUInteger r = 0;
+      for (id run in (__bridge NSArray *)runs) {
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextSetTextPosition(context, posX, posY);
-        ASTextDrawRun(line, run, context, size, isVertical, lineRunRanges[r], verticalOffset);
+        ASTextDrawRun(line, (__bridge CTRunRef)run, context, size, isVertical, lineRunRanges[r], verticalOffset);
+        r++;
       }
       if (cancel && cancel()) break;
     }
