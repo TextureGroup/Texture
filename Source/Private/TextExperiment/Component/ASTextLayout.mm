@@ -2283,7 +2283,7 @@ static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, 
     
     CGColorRef fillColor = (CGColorRef)CFDictionaryGetValue(runAttrs, kCTForegroundColorAttributeName);
     fillColor = ASTextGetCGColor(fillColor);
-    NSNumber *strokeWidth = (NSNumber *)CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
+    unowned NSNumber *strokeWidth = (NSNumber *)CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
     
     CGContextSaveGState(context); {
       CGContextSetFillColorWithColor(context, fillColor);
@@ -2636,17 +2636,16 @@ static void ASTextDrawText(ASTextLayout *layout, CGContextRef context, CGSize si
     CGContextTranslateCTM(context, 0, size.height);
     CGContextScaleCTM(context, 1, -1);
     
-    BOOL isVertical = layout.container.verticalForm;
-    CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+    BOOL isVertical = layout->_container->_verticalForm;
+    CGFloat verticalOffset = isVertical ? (size.width - layout->_container->_size.width) : 0;
     
-    for (unowned ASTextLine *line in layout.lines) {
-      if (layout.truncatedLine && layout.truncatedLine.index == line.index) line = layout.truncatedLine;
-      NSArray *lineRunRanges = line.verticalRotateRange;
+    for (unowned ASTextLine *line in layout->_lines) {
+      if (layout->_truncatedLine && layout->_truncatedLine.index == line.index) line = layout->_truncatedLine;
+      unowned NSArray *lineRunRanges = line.verticalRotateRange;
       CGFloat posX = line.position.x + verticalOffset;
       CGFloat posY = size.height - line.position.y;
-      CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
       NSUInteger r = 0;
-      for (id run in (__bridge NSArray *)runs) {
+      for (id run in (__bridge NSArray *)CTLineGetGlyphRuns(line.CTLine)) {
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextSetTextPosition(context, posX, posY);
         ASTextDrawRun(line, (__bridge CTRunRef)run, context, size, isVertical, lineRunRanges[r], verticalOffset);

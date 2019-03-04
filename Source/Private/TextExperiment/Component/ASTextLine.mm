@@ -72,15 +72,12 @@
   _attachmentRanges = nil;
   _attachmentRects = nil;
   if (!_CTLine) return;
-  CFArrayRef runs = CTLineGetGlyphRuns(_CTLine);
-  NSUInteger runCount = CFArrayGetCount(runs);
-  if (runCount == 0) return;
   
-  NSMutableArray *attachments = [NSMutableArray new];
-  NSMutableArray *attachmentRanges = [NSMutableArray new];
-  NSMutableArray *attachmentRects = [NSMutableArray new];
-  for (NSUInteger r = 0; r < runCount; r++) {
-    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
+  NSMutableArray *attachments;
+  NSMutableArray *attachmentRanges;
+  NSMutableArray *attachmentRects;
+  for (id nsRun in (__bridge NSArray *)CTLineGetGlyphRuns(_CTLine)) {
+    CTRunRef run = (__bridge CTRunRef)nsRun;
     CFIndex glyphCount = CTRunGetGlyphCount(run);
     if (glyphCount == 0) continue;
     NSDictionary *attrs = (id)CTRunGetAttributes(run);
@@ -104,14 +101,19 @@
       }
       
       NSRange runRange = ASTextNSRangeFromCFRange(CTRunGetStringRange(run));
+      if (!attachments) {
+        attachments = [[NSMutableArray alloc] init];
+        attachmentRanges = [[NSMutableArray alloc] init];
+        attachmentRects = [[NSMutableArray alloc] init];
+      }
       [attachments addObject:attachment];
       [attachmentRanges addObject:[NSValue valueWithRange:runRange]];
       [attachmentRects addObject:[NSValue valueWithCGRect:runTypoBounds]];
     }
   }
-  _attachments = attachments.count ? attachments : nil;
-  _attachmentRanges = attachmentRanges.count ? attachmentRanges : nil;
-  _attachmentRects = attachmentRects.count ? attachmentRects : nil;
+  _attachments = attachments;
+  _attachmentRanges = attachmentRanges;
+  _attachmentRects = attachmentRects;
 }
 
 - (CGSize)size {
