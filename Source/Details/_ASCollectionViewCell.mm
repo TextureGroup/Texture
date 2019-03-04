@@ -110,12 +110,12 @@
     return nil;
   }
 
-  return [self.node hitTest:point withEvent:event];
+  return [super hitTest:point withEvent:event];
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(nullable UIEvent *)event
 {
-  return [self.node pointInside:point withEvent:event];
+  return [super pointInside:point withEvent:event];
 }
 
 @end
