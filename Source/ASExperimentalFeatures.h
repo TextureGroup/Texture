@@ -32,6 +32,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalSkipAccessibilityWait = 1 << 11,            // exp_skip_a11y_wait
   ASExperimentalNewDefaultCellLayoutMode = 1 << 12,         // exp_new_default_cell_layout_mode
   ASExperimentalDispatchApply = 1 << 13,                    // exp_dispatch_apply
+  ASExperimentalDynamicHosting = 1 << 14,                   // exp_dynamic_hosting
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

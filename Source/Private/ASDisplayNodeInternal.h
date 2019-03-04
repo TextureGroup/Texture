@@ -84,6 +84,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   _ASPendingState *_pendingViewState;
   ASInterfaceState _pendingInterfaceState;
   ASInterfaceState _preExitingInterfaceState;
+  ASDisplayNodeHosting _currentHosting;
+  ASDisplayNodeHosting _preferredHosting;
   
   UIView *_view;
   CALayer *_layer;
@@ -124,6 +126,13 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
     unsigned isInHierarchy:1;
     unsigned visibilityNotificationsDisabled:VISIBILITY_NOTIFICATIONS_DISABLED_BITS;
     unsigned isDeallocating:1;
+    
+    // hosting
+    unsigned needsHostingUpdate:1;
+    
+    // The number of nodes between self and direct subnodes that need view hosting.
+    unsigned countOfNodesThatNeedViewHosting:4;
+    
   } _flags;
   
 @protected
@@ -389,6 +398,13 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
 // Recalculates fallbackSafeAreaInsets for the subnodes
 - (void)_fallbackUpdateSafeAreaOnChildren;
+
+/**
+ * Must be called on the main thread, on the root node, with the root node locked.
+ *
+ * Walks down the tree, updating the hosting for any node that needs it.
+ */
+- (void)locked_main_root_recursivelyUpdateHostingIfNeeded;
 
 @end
 

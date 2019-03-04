@@ -1101,6 +1101,211 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   [self layoutDidFinish];
 }
 
+- (void)unlocked_invalidatePreferredHosting
+{
+  ASAssertUnlocked(__instanceLock__);
+
+  // Lock to root safely.
+  unowned ASDisplayNode *uSelf = self;
+  ASScopedLockSet lockSet = ASLockSequence(^(ASAddLockBlock addLock) {
+    unowned ASDisplayNode *node = uSelf;
+    do {
+      if (!addLock(node)) return NO;
+    } while ((node = node->_supernode));
+    return YES;
+  });
+
+  // Ignore if preference didn't change.
+  if (!ASCompareAssign(_preferredHosting, [self locked_preferredHosting])) {
+    return;
+  }
+  _flags.needsHostingUpdate = 1;
+  if (_preferredHosting == ASDisplayNodeHostingUIView) {
+    _flags.countOfNodesThatNeedViewHosting += 1;
+  }
+  
+  // Walk up the tree, marking everything as needing a hosting update.
+  unowned ASDisplayNode *lastNode = self;
+  unowned ASDisplayNode *node = _supernode;
+  do {
+    // If we marked the previous node as needing view from below, then we keep propagating up.
+    // Otherwise, we stop because some other node was already forcing a view upwards.
+    if (lastNode->_flags.countOfNodesThatNeedViewHosting == 1) {
+      node->_flags.countOfNodesThatNeedViewHosting += 1;
+      node->_flags.needsHostingUpdate = 1;
+    } else {
+      break;
+    }
+    lastNode = node;
+  } while ((node = node->_supernode));
+}
+
+- (void)locked_main_executeHostingChangeViewToLayer
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert(_view.subviews.count == 0, nil);
+  
+  // _layer is already set. We just need to update our flags and pointers.
+  CALayer *superlayer = _view.superview.layer;
+  NSUInteger layerIndex = [superlayer.sublayers indexOfObjectIdenticalTo:_layer];
+  [_view removeFromSuperview];
+  _layer.delegate = self;
+  _flags.layerBacked = 1;
+  [superlayer insertSublayer:_layer atIndex:(unsigned)layerIndex];
+  _currentHosting = ASDisplayNodeHostingCALayer;
+}
+
+- (void)locked_main_executeHostingChangeLayerToView
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+  
+  UIView *superview;
+  NSInteger layerIndex = 0;
+  if (unowned CALayer *superlayer = _layer.superlayer) {
+    layerIndex = [superlayer.sublayers indexOfObjectIdenticalTo:_layer];
+    ASDisplayNodeAssert(layerIndex != NSNotFound, @"Couldn't find self in superlayer's sublayers.");
+    superview = ASDynamicCast(superlayer.delegate, UIView);
+    ASDisplayNodeAssert(superview, @"If we have a superlayer, it needs to be a view. Can't have breaks in the view tree.");
+  }
+  [_layer removeFromSuperlayer];
+
+  _flags.layerBacked = 0;
+  _view = [self _locked_viewToLoad];
+  _layer = _view.layer;
+  
+  [superview insertSubview:_view atIndex:layerIndex];
+  _currentHosting = ASDisplayNodeHostingUIView;
+}
+
+- (void)locked_main_executeHostingChangeLayerToVirtual
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+
+  unowned CALayer *superlayer = _layer.superlayer;
+  NSUInteger i = [superlayer.sublayers indexOfObjectIdenticalTo:_layer];
+  [_layer removeFromSuperlayer];
+  for (CALayer *sublayer in _layer.sublayers) {
+    [superlayer insertSublayer:sublayer atIndex:(unsigned)i];
+    i++;
+  }
+  _layer = nil;
+  _currentHosting = ASDisplayNodeHostingVirtual;
+}
+
+- (void)locked_main_executeHostingChangeViewToVirtual
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+  
+  unowned UIView *superview = _view.superview;
+  NSUInteger i = [superview.subviews indexOfObjectIdenticalTo:_view];
+  [_view removeFromSuperview];
+  for (UIView *view in _view.subviews) {
+    [superview insertSubview:view atIndex:i];
+  }
+  _view = nil;
+  _layer = nil;
+  _currentHosting = ASDisplayNodeHostingVirtual;
+}
+
+- (void)locked_main_executeHostingChangeVirtualToLayer
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+}
+
+- (void)locked_main_executeHostingChangeVirtualToView
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+}
+
+- (void)locked_main_root_recursivelyUpdateHostingIfNeeded
+{
+  ASAssertLocked(__instanceLock__);
+  ASDisplayNodeAssertMainThread();
+  ASDisplayNodeAssert(_supernode == nil, @"Must be called on root node.");
+  ASDisplayNodeAssert(ASActivateExperimentalFeature(ASExperimentalDynamicHosting), nil);
+  // If we have no layer, then the tree is unhosted so we bail.
+  if (!_layer) {
+    return;
+  }
+  
+  ASDisplayNodePerformBlockOnEveryNode(_layer, self, NO, ^(ASDisplayNode *node) {
+    ASDN::MutexLocker l(node->__instanceLock__);
+    if (!ASCompareAssign(node->_flags.needsHostingUpdate, 0)) {
+      return;
+    }
+    
+    // Enforce the rule that we only get our preference if a descendent doesn't need a UIView.
+    ASDisplayNodeHosting newHosting = node->_preferredHosting;
+    if (_flags.countOfNodesThatNeedViewHosting) {
+      newHosting = ASDisplayNodeHostingUIView;
+    }
+    
+    // No hosting change, we're done. 
+    if (newHosting == node->_currentHosting) {
+      return;
+    }
+    
+    // Execute hosting change.
+    switch (node->_currentHosting) {
+      case ASDisplayNodeHostingCALayer: {
+        switch (newHosting) {
+          case ASDisplayNodeHostingUIView:
+            // Layer -> View
+            break;
+          case ASDisplayNodeHostingVirtual:
+            // Layer -> Virtual
+            break;
+          default:
+            break;
+        }
+        break;        
+      }
+      case ASDisplayNodeHostingUIView: {
+        switch (newHosting) {
+          case ASDisplayNodeHostingCALayer:
+            // View -> Layer
+            [node locked_executeHostingChangeViewToLayer];
+            break;
+          case ASDisplayNodeHostingVirtual:
+            // View -> Virtual
+            [node locked_executeHostingChangeViewToVirtual];
+            break;
+          default:
+            break;
+        }
+        break;
+      }
+      case ASDisplayNodeHostingVirtual: {
+        switch (newHosting) {
+          case ASDisplayNodeHostingUIView:
+            // Virtual -> View
+            [node locked_executeHostingChangeViewToLayer];
+            break;
+          case ASDisplayNodeHostingCALayer:
+            // Virtual -> Layer
+            [node locked_executeHostingChangeViewToVirtual];
+            break;
+          default:
+            break;
+        }
+        break;
+      }
+         
+        break;
+        
+      default:
+        break;
+    }
+    [node locked_executeHostingChangeTo:newHosting];
+  });
+}
+
 #pragma mark Calculation
 
 - (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
@@ -2157,6 +2362,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     }
     [_subnodes insertObject:subnode atIndex:subnodeIndex];
     _cachedSubnodes = nil;
+    if (subnode->_flags.countOfNodesThatNeedViewHosting) {
+      _flags.countOfNodesThatNeedViewHosting += 1;
+    }
   __instanceLock__.unlock();
 
   // This call will apply our .hierarchyState to the new subnode.
@@ -2495,6 +2703,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   __instanceLock__.lock();
     [_subnodes removeObjectIdenticalTo:subnode];
     _cachedSubnodes = nil;
+    if (subnode->_flags.countOfNodesThatNeedViewHosting) {
+      _flags.countOfNodesThatNeedViewHosting -= 1;
+    }
   __instanceLock__.unlock();
 
   [subnode _setSupernode:nil];

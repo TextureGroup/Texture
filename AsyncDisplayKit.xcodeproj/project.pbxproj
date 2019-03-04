@@ -407,6 +407,7 @@
 		CCA282D01E9EBF6C0037E8B7 /* ASTipsWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */; };
 		CCA282D11E9EBF6C0037E8B7 /* ASTipsWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.mm */; };
 		CCA5F62E1EECC2A80060C137 /* ASAssert.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCA5F62D1EECC2A80060C137 /* ASAssert.mm */; };
+		CCA730B5222CAE1100FC62C3 /* ASDynamicHostingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCA730B4222CAE1100FC62C3 /* ASDynamicHostingTests.mm */; };
 		CCAA0B7F206ADBF30057B336 /* ASRecursiveUnfairLock.h in Headers */ = {isa = PBXBuildFile; fileRef = CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CCAA0B80206ADBF30057B336 /* ASRecursiveUnfairLock.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCAA0B7E206ADBF30057B336 /* ASRecursiveUnfairLock.mm */; };
 		CCAA0B82206ADECB0057B336 /* ASRecursiveUnfairLockTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCAA0B81206ADECB0057B336 /* ASRecursiveUnfairLockTests.mm */; };
@@ -938,6 +939,7 @@
 		CCA282CE1E9EBF6C0037E8B7 /* ASTipsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTipsWindow.h; sourceTree = "<group>"; };
 		CCA282CF1E9EBF6C0037E8B7 /* ASTipsWindow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTipsWindow.mm; sourceTree = "<group>"; };
 		CCA5F62D1EECC2A80060C137 /* ASAssert.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASAssert.mm; sourceTree = "<group>"; };
+		CCA730B4222CAE1100FC62C3 /* ASDynamicHostingTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDynamicHostingTests.mm; sourceTree = "<group>"; };
 		CCAA0B7D206ADBF30057B336 /* ASRecursiveUnfairLock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASRecursiveUnfairLock.h; sourceTree = "<group>"; };
 		CCAA0B7E206ADBF30057B336 /* ASRecursiveUnfairLock.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASRecursiveUnfairLock.mm; sourceTree = "<group>"; };
 		CCAA0B81206ADECB0057B336 /* ASRecursiveUnfairLockTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASRecursiveUnfairLockTests.mm; sourceTree = "<group>"; };
@@ -1298,6 +1300,7 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CCA730B4222CAE1100FC62C3 /* ASDynamicHostingTests.mm */,
 				9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */,
 				F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */,
 				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
@@ -2359,6 +2362,7 @@
 				058D0A41195D057000B7D73C /* ASTextNodeWordKernerTests.mm in Sources */,
 				DBC452DE1C5C6A6A00B16017 /* ArrayDiffingTests.mm in Sources */,
 				CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.mm in Sources */,
+				CCA730B5222CAE1100FC62C3 /* ASDynamicHostingTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

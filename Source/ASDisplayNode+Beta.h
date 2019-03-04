@@ -43,6 +43,13 @@ typedef NS_OPTIONS(NSUInteger, ASDisplayNodePerformanceMeasurementOptions) {
   ASDisplayNodePerformanceMeasurementOptionLayoutComputation = 1 << 1
 };
 
+typedef NS_ENUM(NSUInteger, ASDisplayNodeHosting) {
+  ASDisplayNodeHostingUnspecified = 0,
+  ASDisplayNodeHostingUIView,
+  ASDisplayNodeHostingCALayer,
+  ASDisplayNodeHostingVirtual
+};
+
 typedef struct {
   CFTimeInterval layoutSpecTotalTime;
   NSInteger layoutSpecNumberOfPasses;
@@ -160,6 +167,51 @@ AS_CATEGORY_IMPLEMENTABLE
  * enabling .neverShowPlaceholders on ASCellNodes so that the navigation operation is blocked on redisplay completing, etc.
  */
 + (void)setRangeModeForMemoryWarnings:(ASLayoutRangeMode)rangeMode;
+
+#pragma mark - Dynamic Hosting
+
+/**
+ * NOTE: None of these methods will do anything unless you enable ASExperimentalDynamicHosting
+ * in your configuration.
+ *
+ * Hosting rules:
+ *   - Root must be view or layer.
+ *   - No views below layers.
+ */
+
+/**
+ * Query the node's current hosting state.
+ *
+ * If the root node's layer is not loaded, the hosting is Unspecified.
+ */
+@property (readonly) ASDisplayNodeHosting currentHosting;
+
+/**
+ * Subclass override. Asks the node, at this time, what its preferred hosting is. The framework
+ * considers this a hint, and will do its best to match this but it may not always be possible. For 
+ * instance, if you are a root node you will not be allowed Virtual hosting.
+ *
+ * You do not typically call this method yourself.
+ *
+ * The default implementations of these methods vary. For instance, ASControlNode returns UIView if
+ * it has target-actions set on it. You may call super or not. 
+ */
+- (ASDisplayNodeHosting)locked_preferredHosting;
+
+/**
+ * Inform the framework that your node's hosting preference has changed and should be reconsulted.
+ * For instance, ASControlNode calls this when its first target-action pair is added to ensure
+ * that it gets UIView hosting. The hosting change is not guaranteed to be applied immediately.
+ */
+- (void)invalidatePreferredHosting;
+
+/**
+ * A way to force a hosting preference on a node on a per-instance basis. For instance, you might
+ * use this to force UIView hosting on a node so that you can add a gesture recognizer to it.
+ *
+ * The default value is ASDisplayNodeHostingUnspecified.
+ */
+@property ASDisplayNodeHosting preferredHostingOverride;
 
 /**
  * @abstract Whether to draw all descendent nodes' contents into this node's layer's backing store.
