@@ -1685,7 +1685,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   if (_leadingScreensForBatching != leadingScreensForBatching) {
     _leadingScreensForBatching = leadingScreensForBatching;
-    ASPerformBlockOnMainThread(^{
+    // Push this to the next runloop to be sure the scroll view has the right content size
+    dispatch_async(dispatch_get_main_queue(), ^{
       [self _checkForBatchFetching];
     });
   }
