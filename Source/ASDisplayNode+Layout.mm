@@ -21,6 +21,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
+using AS::MutexLocker;
+
 @interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
 @end
 
@@ -42,7 +44,7 @@
 
 - (BOOL)implementsLayoutMethod
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return (_methodOverrides & (ASDisplayNodeMethodOverrideLayoutSpecThatFits |
                               ASDisplayNodeMethodOverrideCalcLayoutThatFits |
                               ASDisplayNodeMethodOverrideCalcSizeThatFits)) != 0 || _layoutSpecBlock != nil;
@@ -51,7 +53,7 @@
 
 - (ASLayoutElementStyle *)style
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return [self _locked_style];
 }
 
@@ -165,7 +167,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (ASLayoutEngineType)layoutEngineType
 {
 #if YOGA
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   YGNodeRef yogaNode = _style.yogaNode;
   BOOL hasYogaParent = (_yogaParent != nil);
   BOOL hasYogaChildren = (_yogaChildren.count > 0);
@@ -179,13 +181,13 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASLayout *)calculatedLayout
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _calculatedDisplayNodeLayout.layout;
 }
 
 - (CGSize)calculatedSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   if (_pendingDisplayNodeLayout.isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout.layout.size;
   }
@@ -194,7 +196,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)constrainedSizeForCalculatedLayout
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return [self _locked_constrainedSizeForCalculatedLayout];
 }
 
@@ -447,7 +449,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)_constrainedSizeForLayoutPass
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return [self _locked_constrainedSizeForLayoutPass];
 }
 
@@ -487,7 +489,7 @@ ASLayoutElementStyleExtensibilityForwarding
   
   ASLayout *layout;
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    MutexLocker l(__instanceLock__);
     if (_calculatedDisplayNodeLayout.version < _layoutVersion) {
       return;
     }
@@ -517,13 +519,13 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (BOOL)automaticallyManagesSubnodes
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _automaticallyManagesSubnodes;
 }
 
 - (void)setAutomaticallyManagesSubnodes:(BOOL)automaticallyManagesSubnodes
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _automaticallyManagesSubnodes = automaticallyManagesSubnodes;
 }
 
@@ -536,7 +538,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (BOOL)_isLayoutTransitionInvalid
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return [self _locked_isLayoutTransitionInvalid];
 }
 
@@ -598,7 +600,7 @@ ASLayoutElementStyleExtensibilityForwarding
   }
     
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    MutexLocker l(__instanceLock__);
 
     // Check if we are a subnode in a layout transition.
     // In this case no measurement is needed as we're part of the layout transition.
@@ -680,7 +682,7 @@ ASLayoutElementStyleExtensibilityForwarding
       {
         // Grab __instanceLock__ here to make sure this transition isn't invalidated
         // right after it passed the validation test and before it proceeds
-        ASDN::MutexLocker l(__instanceLock__);
+        MutexLocker l(__instanceLock__);
         
         // Update calculated layout
         const auto previousLayout = _calculatedDisplayNodeLayout;
@@ -750,37 +752,37 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)setDefaultLayoutTransitionDuration:(NSTimeInterval)defaultLayoutTransitionDuration
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _defaultLayoutTransitionDuration = defaultLayoutTransitionDuration;
 }
 
 - (NSTimeInterval)defaultLayoutTransitionDuration
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _defaultLayoutTransitionDuration;
 }
 
 - (void)setDefaultLayoutTransitionDelay:(NSTimeInterval)defaultLayoutTransitionDelay
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _defaultLayoutTransitionDelay = defaultLayoutTransitionDelay;
 }
 
 - (NSTimeInterval)defaultLayoutTransitionDelay
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _defaultLayoutTransitionDelay;
 }
 
 - (void)setDefaultLayoutTransitionOptions:(UIViewAnimationOptions)defaultLayoutTransitionOptions
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _defaultLayoutTransitionOptions = defaultLayoutTransitionOptions;
 }
 
 - (UIViewAnimationOptions)defaultLayoutTransitionOptions
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _defaultLayoutTransitionOptions;
 }
 
@@ -942,7 +944,7 @@ ASLayoutElementStyleExtensibilityForwarding
     return;
   }
 
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   NSArray<ASLayout *> *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
   unowned ASLayout *cSublayouts[sublayouts.count];
   [sublayouts getObjects:cSublayouts range:NSMakeRange(0, AS_ARRAY_SIZE(cSublayouts))];
@@ -993,7 +995,7 @@ ASLayoutElementStyleExtensibilityForwarding
   [self calculatedLayoutDidChange];
 
   // Grab lock after calling out to subclass
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
 
   // We generate placeholders at -layoutThatFits: time so that a node is guaranteed to have a placeholder ready to go.
   // This is also because measurement is usually asynchronous, but placeholders need to be set up synchronously.
@@ -1027,7 +1029,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   [self _locked_setCalculatedDisplayNodeLayout:displayNodeLayout];
 }
 

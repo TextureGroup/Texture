@@ -32,6 +32,8 @@
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #endif
 
+using AS::MutexLocker;
+
 NSString *const ASMultiplexImageNodeErrorDomain = @"ASMultiplexImageNodeErrorDomain";
 
 #if AS_USE_ASSETS_LIBRARY
@@ -80,7 +82,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
   // Image flags.
   BOOL _downloadsIntermediateImages; // Defaults to NO.
-  ASDN::Mutex _imageIdentifiersLock;
+  AS::Mutex _imageIdentifiersLock;
   NSArray *_imageIdentifiers;
   id _loadedImageIdentifier;
   id _loadingImageIdentifier;
@@ -88,7 +90,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   __weak NSOperation *_phImageRequestOperation;
   
   // Networking.
-  ASDN::RecursiveMutex _downloadIdentifierLock;
+  AS::RecursiveMutex _downloadIdentifierLock;
   id _downloadIdentifier;
   
   // Properties
@@ -371,14 +373,14 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (NSArray *)imageIdentifiers
 {
-  ASDN::MutexLocker l(_imageIdentifiersLock);
+  MutexLocker l(_imageIdentifiersLock);
   return _imageIdentifiers;
 }
 
 - (void)setImageIdentifiers:(NSArray *)imageIdentifiers
 {
   {
-    ASDN::MutexLocker l(_imageIdentifiersLock);
+    MutexLocker l(_imageIdentifiersLock);
     if (ASObjectIsEqual(_imageIdentifiers, imageIdentifiers)) {
       return;
     }
@@ -429,7 +431,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (void)_setDownloadIdentifier:(id)downloadIdentifier
 {
-  ASDN::MutexLocker l(_downloadIdentifierLock);
+  MutexLocker l(_downloadIdentifierLock);
   if (ASObjectIsEqual(downloadIdentifier, _downloadIdentifier))
     return;
 
@@ -454,7 +456,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (UIImage *)_bestImmediatelyAvailableImageFromDataSource:(id *)imageIdentifierOut
 {
-  ASDN::MutexLocker l(_imageIdentifiersLock);
+  MutexLocker l(_imageIdentifiersLock);
 
   // If we don't have any identifiers to load or don't implement the image DS method, bail.
   if ([_imageIdentifiers count] == 0 || !_dataSourceFlags.image) {
@@ -510,7 +512,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   
   // Read our interface state before locking so that we don't lock super while holding our lock.
   ASInterfaceState interfaceState = self.interfaceState;
-  ASDN::MutexLocker l(_downloadIdentifierLock);
+  MutexLocker l(_downloadIdentifierLock);
   
   if (!_downloaderFlags.downloaderImplementsSetProgress || _downloadIdentifier == nil) {
     return;
@@ -525,7 +527,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
         return;
       }
       
-      ASDN::MutexLocker l(strongSelf->_downloadIdentifierLock);
+      MutexLocker l(strongSelf->_downloadIdentifierLock);
       //Getting a result back for a different download identifier, download must not have been successfully canceled
       if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
         return;
@@ -554,7 +556,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 #pragma mark -
 - (id)_nextImageIdentifierToDownload
 {
-  ASDN::MutexLocker l(_imageIdentifiersLock);
+  MutexLocker l(_imageIdentifiersLock);
 
   // If we've already loaded the best identifier, we've got nothing else to do.
   id bestImageIdentifier = _imageIdentifiers.firstObject;

@@ -305,7 +305,7 @@
 
 - (ASLayout *)calculateLayoutYoga:(ASSizeRange)constrainedSize
 {
-  ASDN::UniqueLock l(__instanceLock__);
+  AS::UniqueLock l(__instanceLock__);
 
   // There are several cases where Yoga could arrive here:
   // - This node is not in a Yoga tree: it has neither a yogaParent nor yogaChildren.
