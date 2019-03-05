@@ -441,7 +441,7 @@ static int const kASASCATransactionQueueOrder = 1000000;
   CFSetRemoveAllValues(_internalQueueHashSet);
   
   // Unlock early. We are done with internal queue, and batch buffer is main-thread-only so no lock.
-  l.release();
+  l.unlock();
   
   for (const id<ASCATransactionQueueObserving> &value : _batchBuffer) {
     [value prepareForCATransactionCommit];
