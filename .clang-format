@@ -1,0 +1,16 @@
+BasedOnStyle:  Google
+
+# Objc allows 120 instead of the traditional 80.
+ColumnLimit: 120
+
+# If false, a function call’s or function definition’s parameters will either
+# all be on the same line or will have one line each.
+BinPackParameters: false
+
+# Allow putting all parameters of a function declaration onto the next line even
+# if BinPackParameters is false.
+# For example this should be ok:
+# someFunction(foo,
+#             bar,
+#             baz);
+AllowAllParametersOfDeclarationOnNextLine: true
