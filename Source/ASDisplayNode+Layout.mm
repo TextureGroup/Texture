@@ -8,6 +8,7 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -18,6 +19,7 @@
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
+#import <AsyncDisplayKit/NSArray+Diffing.h>
 
 @interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
 @end
@@ -940,35 +942,40 @@ ASLayoutElementStyleExtensibilityForwarding
     return;
   }
 
-  NSArray *subnodes = [self subnodes];
-  NSArray *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
+  ASDN::MutexLocker l(__instanceLock__);
+  NSArray<ASLayout *> *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
+  unowned ASLayout *cSublayouts[sublayouts.count];
+  [sublayouts getObjects:cSublayouts range:NSMakeRange(0, AS_ARRAY_SIZE(cSublayouts))];
 
-  const auto currentSubnodes = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
-                                                     capacity:subnodes.count];
-  const auto layoutSubnodes  = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
-                                                     capacity:sublayouts.count];;
-  for (ASDisplayNode *subnode in subnodes) {
-    [currentSubnodes addObject:subnode];
+  // Fast-path if we are in the correct state (likely).
+  if (_subnodes.count == AS_ARRAY_SIZE(cSublayouts)) {
+    NSUInteger i = 0;
+    BOOL matches = YES;
+    for (ASDisplayNode *subnode in _subnodes) {
+      if (subnode != cSublayouts[i].layoutElement) {
+        matches = NO;
+      }
+      i++;
+    }
+    if (matches) {
+      return;
+    }
   }
 
-  for (ASLayout *sublayout in sublayouts) {
-    id <ASLayoutElement> layoutElement = sublayout.layoutElement;
-    ASDisplayNodeAssert([layoutElement isKindOfClass:[ASDisplayNode class]],
-                        @"All calculatedLayouts should be flattened and only contain nodes!");
-    [layoutSubnodes addObject:(ASDisplayNode *)layoutElement];
+  NSArray<ASDisplayNode *> *layoutNodes = ASArrayByFlatMapping(sublayouts, ASLayout *layout, (ASDisplayNode *)layout.layoutElement);
+  NSIndexSet *insertions, *deletions;
+  [_subnodes asdk_diffWithArray:layoutNodes insertions:&insertions deletions:&deletions];
+  if (insertions.count > 0) {
+    NSLog(@"Warning: node's layout includes subnode that has not been added: node = %@, subnodes = %@, subnodes in layout = %@", self, _subnodes, layoutNodes);
   }
 
-  // Verify that all subnodes that occur in the current ASLayout tree are present in .subnodes array.
-  if ([layoutSubnodes isSubsetOfHashTable:currentSubnodes] == NO) {
-    // Note: This should be converted to an assertion after confirming it is rare.
-    NSLog(@"Warning: node's layout includes subnodes that have not been added: node = %@, subnodes = %@, subnodes in layout = %@", self, currentSubnodes, layoutSubnodes);
-  }
-
-  // Verify that everything in the .subnodes array is present in the ASLayout tree (and correct it if not).
-  [currentSubnodes minusHashTable:layoutSubnodes];
-  for (ASDisplayNode *orphanedSubnode in currentSubnodes) {
-    NSLog(@"Automatically removing orphaned subnode %@, from parent %@", orphanedSubnode, self);
-    [orphanedSubnode removeFromSupernode];
+  // Remove any nodes that are in the tree but should not be.
+  // Go in reverse order so we don't shift our indexes.
+  if (deletions) {
+    for (NSUInteger i = deletions.lastIndex; i != NSNotFound; i = [deletions indexLessThanIndex:i]) {
+      NSLog(@"Automatically removing orphaned subnode %@, from parent %@", _subnodes[i], self);
+      [_subnodes[i] removeFromSupernode];
+    }
   }
 }
 
