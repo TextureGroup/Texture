@@ -12,6 +12,7 @@
 #import <UIKit/UIViewController.h>
 
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASResponderChainEnumerator.h>
 
 @implementation ASDisplayNode (Convenience)
@@ -29,8 +30,7 @@
   UIView *view = ASFindClosestViewOfLayer(self.layer);
   // Travel up the responder chain to find a view controller.
   for (UIResponder *responder in [view asdk_responderChainEnumerator]) {
-    UIViewController *vc = ASDynamicCast(responder, UIViewController);
-    if (vc != nil) {
+    if (UIViewController *vc = AS::DynamicCast<UIViewController>(responder)) {
       return vc;
     }
   }

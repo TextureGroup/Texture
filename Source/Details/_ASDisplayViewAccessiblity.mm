@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 
 #import <queue>
@@ -211,8 +212,8 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
 
   BOOL anySubNodeIsCollection = (nil != ASDisplayNodeFindFirstNode(node,
       ^BOOL(ASDisplayNode *nodeToCheck) {
-    return ASDynamicCast(nodeToCheck, ASCollectionNode) != nil ||
-           ASDynamicCast(nodeToCheck, ASTableNode) != nil;
+    return AS::DynamicCast<ASCollectionNode>(nodeToCheck) != nil ||
+           AS::DynamicCast<ASTableNode>(nodeToCheck) != nil;
   }));
 
   if (node.isAccessibilityContainer && !anySubNodeIsCollection) {

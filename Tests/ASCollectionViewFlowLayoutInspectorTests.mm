@@ -17,6 +17,9 @@
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
+
+using AS::DynamicCast;
 
 @interface ASCollectionView (Private)
 
@@ -142,7 +145,7 @@
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
 
@@ -165,7 +168,7 @@
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
@@ -188,7 +191,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
@@ -209,7 +212,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  ASCollectionViewFlowLayoutInspector *inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
@@ -233,7 +236,7 @@
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  ASCollectionViewFlowLayoutInspector *inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
@@ -255,7 +258,7 @@
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
@@ -278,7 +281,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  ASCollectionViewFlowLayoutInspector *inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.width));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
@@ -299,7 +302,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:rect collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = AS::DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
   ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
@@ -316,7 +319,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  ASCollectionViewFlowLayoutInspector *inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeZero, CGSizeZero);
   XCTAssert(CGSizeEqualToSize(size.min, sizeCompare.min) && CGSizeEqualToSize(size.max, sizeCompare.max), @"should have a zero size");
@@ -335,7 +338,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   NSUInteger count = [inspector collectionView:collectionView supplementaryNodesOfKind:UICollectionElementKindSectionHeader inSection:0];
   XCTAssert(count == 1, @"should have a header supplementary view");
   
@@ -352,7 +355,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   NSUInteger count = [inspector collectionView:collectionView supplementaryNodesOfKind:UICollectionElementKindSectionFooter inSection:0];
   XCTAssert(count == 1, @"should have a footer supplementary view");
   
@@ -368,7 +371,7 @@
   ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
-  ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
+  auto inspector = DynamicCast<ASCollectionViewFlowLayoutInspector>(collectionView.layoutInspector);
   NSUInteger count = [inspector collectionView:collectionView supplementaryNodesOfKind:UICollectionElementKindSectionFooter inSection:0];
   XCTAssert(count == 0, @"should not have a footer supplementary view");
   

@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASDispatch.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASSignpost.h>
@@ -550,13 +551,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   
   if (changeSet.includesReloadData) {
     if (_initialReloadDataHasBeenCalled) {
-      as_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      as_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(AS::DynamicCast<UIView>(self.dataSource)));
     } else {
-      as_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      as_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(AS::DynamicCast<UIView>(self.dataSource)));
       _initialReloadDataHasBeenCalled = YES;
     }
   } else {
-    as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
+    as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(AS::DynamicCast<UIView>(self.dataSource)), changeSet);
   }
   
   NSTimeInterval transactionQueueFlushDuration = 0.0f;

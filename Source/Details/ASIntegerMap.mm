@@ -11,6 +11,7 @@
 #import <unordered_map>
 #import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 /**
  * This is just a friendly Objective-C interface to unordered_map<NSInteger, NSInteger>
@@ -176,7 +177,7 @@
     return YES;
   }
 
-  if (ASIntegerMap *otherMap = ASDynamicCast(object, ASIntegerMap)) {
+  if (ASIntegerMap *otherMap = AS::DynamicCast<ASIntegerMap>(object)) {
     return otherMap->_map == _map;
   }
   return NO;

@@ -3616,7 +3616,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // and run up the chain ourselves.
   if (_view != nil) {
     for (UIResponder *responder in [_view asdk_responderChainEnumerator]) {
-      UIViewController *vc = ASDynamicCast(responder, UIViewController);
+      UIViewController *vc = AS::DynamicCast<UIViewController>(responder);
       if (vc) {
         [result addObject:@{ @"viewController" : ASObjectDescriptionMakeTiny(vc) }];
         break;

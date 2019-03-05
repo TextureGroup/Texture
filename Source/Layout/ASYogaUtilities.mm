@@ -186,7 +186,7 @@ float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, con
   ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)],
                        @"Yoga context must be <ASLayoutElement>");
 
-  ASDisplayNode *displayNode = ASDynamicCast(layoutElement, ASDisplayNode);
+  ASDisplayNode *displayNode = AS::DynamicCast(layoutElement, ASDisplayNode);
 
   switch (displayNode.style.parentAlignStyle) {
     case ASStackLayoutAlignItemsBaselineFirst:

@@ -12,12 +12,13 @@
 #import <UIKit/UICollectionViewFlowLayout.h>
 
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation UICollectionViewLayout (ASLayoutInspectorProviding)
 
 - (id<ASCollectionViewLayoutInspecting>)asdk_layoutInspector
 {
-  UICollectionViewFlowLayout *flow = ASDynamicCast(self, UICollectionViewFlowLayout);
+  UICollectionViewFlowLayout *flow = AS::DynamicCast<UICollectionViewFlowLayout>(self);
   if (flow != nil) {
     return [[ASCollectionViewFlowLayoutInspector alloc] initWithFlowLayout:flow];
   } else {

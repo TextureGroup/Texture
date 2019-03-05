@@ -209,7 +209,7 @@
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
   // Assert that the sublayout is already flattened.
   for (ASLayout *sublayout in layout.sublayouts) {
-    if (sublayout.sublayouts.count > 0 || ASDynamicCast(sublayout.layoutElement, ASDisplayNode) == nil) {
+    if (sublayout.sublayouts.count > 0 || AS::DynamicCast(sublayout.layoutElement, ASDisplayNode) == nil) {
       ASDisplayNodeAssert(NO, @"Yoga sublayout is not flattened! %@, %@", self, sublayout);
     }
   }

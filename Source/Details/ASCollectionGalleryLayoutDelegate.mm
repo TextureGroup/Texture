@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutRangeType.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
@@ -93,7 +94,7 @@
   CGSize pageSize = context.viewportSize;
   ASScrollDirection scrollableDirections = context.scrollableDirections;
 
-  _ASCollectionGalleryLayoutInfo *info = ASDynamicCast(context.additionalInfo, _ASCollectionGalleryLayoutInfo);
+  _ASCollectionGalleryLayoutInfo *info = AS::DynamicCast<_ASCollectionGalleryLayoutInfo>(context.additionalInfo);
   CGSize itemSize = info.itemSize;
   if (info == nil || CGSizeEqualToSize(CGSizeZero, itemSize)) {
     return [[ASCollectionLayoutState alloc] initWithContext:context];
@@ -129,7 +130,7 @@
   ASLayout *layout = [finalSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections)];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {
-    _ASGalleryLayoutItem *item = ASDynamicCast(sublayout.layoutElement, _ASGalleryLayoutItem);
+    _ASGalleryLayoutItem *item = AS::DynamicCast<_ASGalleryLayoutItem>(sublayout.layoutElement);
     return item ? item.collectionElement : nil;
   }];
 }

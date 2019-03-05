@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_SUBCLASSING_RESTRICTED // Note: ASDynamicCastStrict is used on instances of this class based on this restriction.
+AS_SUBCLASSING_RESTRICTED // Note: DynamicCastStrict is used on instances of this class based on this restriction.
 @interface _ASCollectionReusableView : UICollectionReusableView
 
 @property (nullable, nonatomic, readonly) ASCellNode *node;

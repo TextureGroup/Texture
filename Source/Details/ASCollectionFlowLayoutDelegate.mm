@@ -16,6 +16,7 @@
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 
@@ -70,7 +71,7 @@
   ASLayout *layout = [stackSpec layoutThatFits:sizeRange];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {
-    ASCellNode *node = ASDynamicCast(sublayout.layoutElement, ASCellNode);
+    ASCellNode *node = AS::DynamicCast<ASCellNode>(sublayout.layoutElement);
     return node ? node.collectionElement : nil;
   }];
 }

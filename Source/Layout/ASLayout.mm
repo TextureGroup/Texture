@@ -256,7 +256,7 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 {
   if (self == object) return YES;
 
-  ASLayout *layout = ASDynamicCast(object, ASLayout);
+  ASLayout *layout = AS::DynamicCast<ASLayout>(object);
   if (layout == nil) {
     return NO;
   }

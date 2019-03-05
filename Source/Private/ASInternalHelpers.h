@@ -9,8 +9,10 @@
 
 #import "ASAvailability.h"
 
+#import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 
+#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -98,6 +100,48 @@ ASDISPLAYNODE_INLINE UIEdgeInsets ASConcatInsets(UIEdgeInsets insetsA, UIEdgeIns
 @interface NSIndexPath (ASInverseComparison)
 - (NSComparisonResult)asdk_inverseCompare:(NSIndexPath *)otherIndexPath;
 @end
+
+#ifndef __cplusplus
+#error "Private header should be compiled in C++"
+#else
+
+namespace AS {
+
+template <typename T>
+AS_WARN_UNUSED_RESULT NS_INLINE
+T *_Nullable DynamicCast(id _Nullable value, bool failable = true)
+{
+  if (!value) {
+    return nil;
+  }
+  
+  Class t = [T class];
+  for (Class c = object_getClass(value); c != Nil; c = class_getSuperclass(c)) {
+    if (c == t) {
+      return value;
+    }
+  }
+  ASDisplayNodeCAssert(failable, @"Dynamic cast failed: %@ vs %@", value, t);
+  return nil;
+}
+
+template <typename T>
+AS_WARN_UNUSED_RESULT NS_INLINE
+T *_Nullable DynamicCastStrict(id _Nullable value, bool failable = true)
+{
+  if (!value) {
+    return nil;
+  }
+  if ([T class] == object_getClass(value)) {
+    return value;
+  }
+  ASDisplayNodeCAssert(failable, @"Strict dynamic cast failed: %@ vs %@", value, [T class]);
+  return nil;
+}
+
+}  // namespace AS
+
+#endif  // __cplusplus
 
 NS_ASSUME_NONNULL_END
 

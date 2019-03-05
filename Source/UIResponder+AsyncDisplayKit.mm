@@ -12,6 +12,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASResponderChainEnumerator.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation UIResponder (AsyncDisplayKit)
 
@@ -20,7 +21,7 @@
   ASDisplayNodeAssertMainThread();
   
   for (UIResponder *responder in [self asdk_responderChainEnumerator]) {
-    UIViewController *vc = ASDynamicCast(responder, UIViewController);
+    UIViewController *vc = AS::DynamicCast<UIViewController>(responder);
     if (vc) {
       return vc;
     }

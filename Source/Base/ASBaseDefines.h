@@ -158,18 +158,6 @@
   staticVar; \
 })
 
-/// Ensure that class is of certain kind
-#define ASDynamicCast(x, c) ({ \
-  id __val = x;\
-  ((c *) ([__val isKindOfClass:[c class]] ? __val : nil));\
-})
-
-/// Ensure that class is of certain kind, assuming it is subclass restricted
-#define ASDynamicCastStrict(x, c) ({ \
-  id __val = x;\
-  ((c *) ([__val class] == [c class] ? __val : nil));\
-})
-
 // Compare two primitives, assign if different. Returns whether the assignment happened.
 #define ASCompareAssign(lvalue, newValue) ({  \
   BOOL result = (lvalue != newValue);         \

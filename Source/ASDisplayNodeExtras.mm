@@ -11,6 +11,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #import <queue>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
@@ -257,7 +258,7 @@ static inline BOOL _ASDisplayNodeIsAncestorOfDisplayNode(ASDisplayNode *possible
 UIWindow * _Nullable ASFindWindowOfLayer(CALayer *layer)
 {
   UIView *view = ASFindClosestViewOfLayer(layer);
-  if (UIWindow *window = ASDynamicCast(view, UIWindow)) {
+  if (UIWindow *window = AS::DynamicCast<UIWindow>(view)) {
     return window;
   } else {
     return view.window;
@@ -267,7 +268,7 @@ UIWindow * _Nullable ASFindWindowOfLayer(CALayer *layer)
 UIView * _Nullable ASFindClosestViewOfLayer(CALayer *layer)
 {
   while (layer != nil) {
-    if (UIView *view = ASDynamicCast(layer.delegate, UIView)) {
+    if (UIView *view = AS::DynamicCast<UIView>(layer.delegate)) {
       return view;
     }
     layer = layer.superlayer;

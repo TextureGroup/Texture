@@ -38,6 +38,9 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+using AS::DynamicCast;
+using AS::DynamicCastStrict;
+
 /**
  * A macro to get self.collectionNode and assign it to a local variable, or return
  * the given value if nil.
@@ -59,7 +62,7 @@
 
 #define ASFlowLayoutDefault(layout, property, default)                                        \
 ({                                                                                            \
-  UICollectionViewFlowLayout *flowLayout = ASDynamicCast(layout, UICollectionViewFlowLayout); \
+  UICollectionViewFlowLayout *flowLayout = DynamicCast<UICollectionViewFlowLayout>(layout); \
   flowLayout ? flowLayout.property : default;                                                 \
 })
 
@@ -1161,7 +1164,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     view = [self dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
   }
   
-  if (_ASCollectionReusableView *reusableView = ASDynamicCastStrict(view, _ASCollectionReusableView)) {
+  if (_ASCollectionReusableView *reusableView = DynamicCastStrict<_ASCollectionReusableView>(view)) {
     reusableView.element = element;
   }
   
@@ -1191,7 +1194,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASDisplayNodeAssert(element != nil, @"Element should exist. indexPath = %@, collectionDataSource = %@", indexPath, self);
   ASDisplayNodeAssert(cell != nil, @"UICollectionViewCell must not be nil. indexPath = %@, collectionDataSource = %@", indexPath, self);
 
-  if (_ASCollectionViewCell *asCell = ASDynamicCastStrict(cell, _ASCollectionViewCell)) {
+  if (_ASCollectionViewCell *asCell = DynamicCastStrict<_ASCollectionViewCell>(cell)) {
     asCell.element = element;
     [_rangeController configureContentView:cell.contentView forCellNode:node];
   }
@@ -1208,7 +1211,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
   }
 
-  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
+  _ASCollectionViewCell *cell = DynamicCastStrict<_ASCollectionViewCell>(rawCell);
   if (cell == nil) {
     [_rangeController setNeedsUpdate];
     return;
@@ -1269,7 +1272,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
   }
 
-  _ASCollectionViewCell *cell = ASDynamicCastStrict(rawCell, _ASCollectionViewCell);
+  _ASCollectionViewCell *cell = DynamicCastStrict<_ASCollectionViewCell>(rawCell);
   if (cell == nil) {
     [_rangeController setNeedsUpdate];
     return;
@@ -1314,7 +1317,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
   }
 
-  _ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView);
+  _ASCollectionReusableView *view = DynamicCastStrict<_ASCollectionReusableView>(rawView);
   if (view == nil) {
     return;
   }
@@ -1354,7 +1357,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
   }
 
-  _ASCollectionReusableView *view = ASDynamicCastStrict(rawView, _ASCollectionReusableView);
+  _ASCollectionReusableView *view = DynamicCastStrict<_ASCollectionReusableView>(rawView);
   if (view == nil) {
     return;
   }
@@ -1943,7 +1946,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 #pragma clang diagnostic pop
 
   if (block == nil) {
-    if (cell == nil || ASDynamicCast(cell, ASCellNode) == nil) {
+    if (cell == nil || DynamicCast<ASCellNode>(cell) == nil) {
       // In this case, either the client is expecting a UIKit passthrough cell to be created automatically,
       // or it is an error.
       if (_asyncDataSourceFlags.interop) {
@@ -2044,7 +2047,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 
   if (block == nil) {
-    if (cell == nil || ASDynamicCast(cell, ASCellNode) == nil) {
+    if (cell == nil || DynamicCast<ASCellNode>(cell) == nil) {
       // In this case, the app code returned nil for the node and the nodeBlock.
       // If the UIKit method is implemented, then we should use a passthrough cell.
       // Otherwise the CGSizeZero default will cause UIKit to not show it (so this isn't an error like the cellForItem case).
