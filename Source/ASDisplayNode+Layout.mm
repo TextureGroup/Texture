@@ -1055,12 +1055,12 @@ ASLayoutElementStyleExtensibilityForwarding
     if (!addLock(self)) {
       return NO;
     }
-    if (self.nodeController && !addLock(self.nodeController)) {
-      return NO;
-    }
 #if YOGA
     if (![self locked_shouldLayoutFromYogaRoot]) {
       return YES;
+    }
+    if (self.nodeController && !addLock(self.nodeController)) {
+      return NO;
     }
     ASDisplayNode *parent = _supernode;
     while (parent) {
