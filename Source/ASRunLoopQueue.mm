@@ -359,8 +359,9 @@ static int const kASASCATransactionQueueOrder = 1000000;
     
     // This is going to be a very busy queue – every node in the preload range will enter this queue.
     // Save some time on first render by reserving space up front.
-    _internalQueue.reserve(64);
-    _batchBuffer.reserve(64);
+    static constexpr int kInternalQueueInitialCapacity = 64;
+    _internalQueue.reserve(kInternalQueueInitialCapacity);
+    _batchBuffer.reserve(kInternalQueueInitialCapacity);
 
     // We don't want to pollute the top-level app activities with run loop batches, so we create one top-level
     // activity per queue, and each batch activity joins that one instead.
