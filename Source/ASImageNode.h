@@ -25,11 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 
 /**
- *  Weakly reference the cached, processed image.
- */
-typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
-
-/**
  *  @abstract Specific description of draw parameters only for image nodes.
  *
  *  @discussion The `_contentsScale` is exposed here so that consumers of Texture
