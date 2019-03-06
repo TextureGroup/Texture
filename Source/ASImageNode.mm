@@ -34,14 +34,11 @@
 
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
-typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
-
-@interface ASImageNodeDrawParameters : NSObject {
+@interface ASImageNodeDrawParameters () {
 @package
   UIImage *_image;
   BOOL _opaque;
   CGRect _bounds;
-  CGFloat _contentsScale;
   UIColor *_backgroundColor;
   UIViewContentMode _contentMode;
   BOOL _cropEnabled;
