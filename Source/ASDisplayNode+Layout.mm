@@ -1046,10 +1046,7 @@ ASLayoutElementStyleExtensibilityForwarding
 #pragma mark -
 #pragma mark - ASDisplayNode (YogaLayout)
 
-@implementation ASDisplayNode (YogaInternal)
-
-#pragma mark -
-#pragma mark - ASDisplayNode (Yoga)
+@implementation ASDisplayNode (YogaLayout)
 
 - (BOOL)locked_shouldLayoutFromYogaRoot {
 #if YOGA
@@ -1069,34 +1066,6 @@ ASLayoutElementStyleExtensibilityForwarding
 #else
   return NO;
 #endif
-}
-
-- (ASLockSet)lockToRootIfNeededForLayout {
-  ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {
-    if (!addLock(self)) {
-      return NO;
-    }
-#if YOGA
-    if (![self locked_shouldLayoutFromYogaRoot]) {
-      return YES;
-    }
-    if (self.nodeController && !addLock(self.nodeController)) {
-      return NO;
-    }
-    ASDisplayNode *parent = _supernode;
-    while (parent) {
-      if (!addLock(parent)) {
-        return NO;
-      }
-      if (parent.nodeController && !addLock(parent.nodeController)) {
-        return NO;
-      }
-      parent = parent->_supernode;
-    }
-#endif
-    return true;
-  });
-  return lockSet;
 }
 
 @end
