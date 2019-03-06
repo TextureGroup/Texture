@@ -834,8 +834,7 @@ dispatch_semaphore_signal(_lock);
             }
           }
           int i = 0;
-          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants to collect some text (at least one line's
-              // worth) preceding the truncated content, with which to construct a "truncated line".
+          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content.
             i = (int)removedLines.count - 1;
             while (atLeastOneLine < truncatedWidth && i >= 0) {
               if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
@@ -847,8 +846,7 @@ dispatch_semaphore_signal(_lock);
             }
             [lastLineText appendAttributedString:truncationToken];
           }
-          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants to collect some
-              // text following the truncated content.
+          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants text following truncated content.
             i = 0;
             atLeastOneLine = removedLines[i].width;
             while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
@@ -862,9 +860,7 @@ dispatch_semaphore_signal(_lock);
                 [lastLineText appendAttributedString:nextLine];
               }
             }
-            if (type == kCTLineTruncationStart) {
-              [lastLineText insertAttributedString:truncationToken atIndex:0];
-            }
+            [lastLineText insertAttributedString:truncationToken atIndex:0];
           }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
