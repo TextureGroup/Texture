@@ -601,34 +601,49 @@ static NSArray *DefaultLinkAttributeNames() {
 
   NSRange visibleRange = layout.visibleRange;
   NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
-  ASTextRange *range = [layout closestTextRangeAtPoint:point];
-  NSRange effectiveRange = NSMakeRange(0, 0);
-  for (__strong NSString *attributeName in self.linkAttributeNames) {
-    id value = [self.attributedText attribute:attributeName atIndex:range.start.offset longestEffectiveRange:&effectiveRange inRange:clampedRange];
-    if (value == nil) {
-      // Didn't find any links specified with this attribute.
-      continue;
-    }
+  
+  // Search the 9 points of a 44x44 square around the touch until we find a link.
+  // Start from center, then do sides, then do top/bottom, then do corners.
+  static constexpr CGSize kRectOffsets[9] = {
+    { 0, 0 },
+    { -22, 0 }, { 22, 0 },
+    { 0, -22 } , { 0, 22 },
+    { -22, -22 }, { -22, 22 },
+    { 22, -22 }, { 22, 22 }
+  };
 
-    // If highlighting, check with delegate first. If not implemented, assume YES.
-    id<ASTextNodeDelegate> delegate = self.delegate;
-    if (highlighting
-        && [delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-        && ![delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName value:value atPoint:point]) {
-      value = nil;
-      attributeName = nil;
-    }
-
-    if (value != nil || attributeName != nil) {
+  for (const CGSize &offset : kRectOffsets) {
+    const CGPoint testPoint = CGPointMake(point.x + offset.width,
+                                          point.y + offset.height);
+    
+    ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
+    for (NSString *attributeName in _linkAttributeNames) {
+      NSRange effectiveRange = NSMakeRange(0, 0);
+      id value = [_attributedText attribute:attributeName atIndex:pos.offset
+                      longestEffectiveRange:&effectiveRange inRange:clampedRange];
+      if (value == nil) {
+        // Didn't find any links specified with this attribute.
+        continue;
+      }
+      
+      // If highlighting, check with delegate first. If not implemented, assume YES.
+      if (highlighting
+          && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+          && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName
+                            value:value atPoint:point]) {
+        continue;
+      }
+      
       *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
-
+      
       if (attributeNameOut != NULL) {
         *attributeNameOut = attributeName;
       }
-
+      
       return value;
     }
   }
+  
 
   return nil;
 }
