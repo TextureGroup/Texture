@@ -17,49 +17,7 @@
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
-
-@interface ASAccessiblityForwardingTestDisplayNode : ASDisplayNode
-
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityActivate;
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityIncrement;
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityDecrement;
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityScroll;
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityPerformEscape;
-@property (nonatomic, readonly) BOOL didReceiveAccessibilityPerformMagicTap;
-
-@end
-
-@implementation ASAccessiblityForwardingTestDisplayNode
-
-- (BOOL)accessibilityActivate {
-  _didReceiveAccessibilityActivate = YES;
-  return YES;
-}
-
-- (void)accessibilityIncrement {
-  _didReceiveAccessibilityIncrement = YES;
-}
-
-- (void)accessibilityDecrement {
-  _didReceiveAccessibilityDecrement = YES;
-}
-
-- (BOOL)accessibilityScroll:(UIAccessibilityScrollDirection)direction {
-  _didReceiveAccessibilityScroll = YES;
-  return YES;
-}
-
-- (BOOL)accessibilityPerformEscape {
-  _didReceiveAccessibilityPerformEscape = YES;
-  return YES;
-}
-
-- (BOOL)accessibilityPerformMagicTap {
-  _didReceiveAccessibilityPerformMagicTap = YES;
-  return YES;
-}
-
-@end
+#import <OCMock/OCMock.h>
 
 @interface ASDisplayViewAccessibilityTests : XCTestCase
 @end
@@ -316,21 +274,30 @@
 #pragma mark UIAccessibilityAction Forwarding
 
 - (void)testActionForwarding {
-  ASAccessiblityForwardingTestDisplayNode *node = [ASAccessiblityForwardingTestDisplayNode new];
+  ASDisplayNode *node = [ASDisplayNode new];
   UIView *view = node.view;
   
+  id mockNode = OCMPartialMock(node);
+  
+  OCMExpect([mockNode accessibilityActivate]);
   [view accessibilityActivate];
-  XCTAssertTrue(node.didReceiveAccessibilityActivate);
+  
+  OCMExpect([mockNode accessibilityIncrement]);
   [view accessibilityIncrement];
-  XCTAssertTrue(node.didReceiveAccessibilityIncrement);
+
+  OCMExpect([mockNode accessibilityDecrement]);
   [view accessibilityDecrement];
-  XCTAssertTrue(node.didReceiveAccessibilityDecrement);
+
+  OCMExpect([mockNode accessibilityScroll:UIAccessibilityScrollDirectionDown]);
   [view accessibilityScroll:UIAccessibilityScrollDirectionDown];
-  XCTAssertTrue(node.didReceiveAccessibilityScroll);
+
+  OCMExpect([mockNode accessibilityPerformEscape]);
   [view accessibilityPerformEscape];
-  XCTAssertTrue(node.didReceiveAccessibilityPerformEscape);
+
+  OCMExpect([mockNode accessibilityPerformMagicTap]);
   [view accessibilityPerformMagicTap];
-  XCTAssertTrue(node.didReceiveAccessibilityPerformMagicTap);
+
+  OCMVerifyAll(mockNode);
 }
 
 @end
