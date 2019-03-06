@@ -33,6 +33,10 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 // Will walk up the Yoga tree and returns the root node
 - (ASDisplayNode *)yogaRoot;
 
+
+@end
+
+@interface ASDisplayNode (YogaLocking)
 /**
  * @discussion Attempts(spinning) to lock all node up to root node when yoga is enabled.
  * This will lock self when yoga is not enabled;

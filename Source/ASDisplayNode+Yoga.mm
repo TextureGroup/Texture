@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
+#import <AsyncDisplayKit/ASNodeController+Beta.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
 
@@ -27,7 +28,7 @@
 
 #pragma mark - ASDisplayNode+Yoga
 
-@interface ASDisplayNode (YogaInternal)
+@interface ASDisplayNode (YogaPrivate)
 @property (nonatomic, weak) ASDisplayNode *yogaParent;
 - (ASSizeRange)_locked_constrainedSizeForLayoutPass;
 @end
@@ -405,6 +406,40 @@
     });
   }
 #endif /* YOGA_LAYOUT_LOGGING */
+}
+
+@end
+
+#pragma mark - ASDisplayNode (YogaLocking)
+
+@implementation ASDisplayNode (YogaLocking)
+
+- (ASLockSet)lockToRootIfNeededForLayout {
+  ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {
+    if (!addLock(self)) {
+      return NO;
+    }
+#if YOGA
+    if (![self locked_shouldLayoutFromYogaRoot]) {
+      return YES;
+    }
+    if (self.nodeController && !addLock(self.nodeController)) {
+      return NO;
+    }
+    ASDisplayNode *parent = _supernode;
+    while (parent) {
+      if (!addLock(parent)) {
+        return NO;
+      }
+      if (parent.nodeController && !addLock(parent.nodeController)) {
+        return NO;
+      }
+      parent = parent->_supernode;
+    }
+#endif
+    return true;
+  });
+  return lockSet;
 }
 
 @end
