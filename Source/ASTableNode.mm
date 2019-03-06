@@ -175,11 +175,11 @@
       [view setContentOffset:contentOffset animated:pendingState.animatesContentOffset];
     }
       
-    let tuningParametersVector = pendingState->_tuningParameters;
-    let tuningParametersVectorSize = tuningParametersVector.size();
+    const auto tuningParametersVector = pendingState->_tuningParameters;
+    const auto tuningParametersVectorSize = tuningParametersVector.size();
     for (NSInteger rangeMode = 0; rangeMode < tuningParametersVectorSize; rangeMode++) {
-      let tuningparametersRangeModeVector = tuningParametersVector[rangeMode];
-      let tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
+      const auto tuningparametersRangeModeVector = tuningParametersVector[rangeMode];
+      const auto tuningParametersVectorRangeModeSize = tuningparametersRangeModeVector.size();
       for (NSInteger rangeType = 0; rangeType < tuningParametersVectorRangeModeSize; rangeType++) {
         ASRangeTuningParameters tuningParameters = tuningparametersRangeModeVector[rangeType];
         [_rangeController setTuningParameters:tuningParameters
@@ -847,10 +847,13 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)waitUntilAllUpdatesAreCommitted
 {
   [self waitUntilAllUpdatesAreProcessed];
 }
+#pragma clang diagnostic pop
 
 #pragma mark - Debugging (Private)
 

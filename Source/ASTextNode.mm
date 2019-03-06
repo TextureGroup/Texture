@@ -494,7 +494,7 @@ static NSArray *DefaultLinkAttributeNames() {
   [self setNeedsDisplay];
   
   // Accessiblity
-  let currentAttributedText = self.attributedText; // Grab attributed string again in case it changed in the meantime
+  const auto currentAttributedText = self.attributedText; // Grab attributed string again in case it changed in the meantime
   self.accessibilityLabel = self.defaultAccessibilityLabel;
   self.isAccessibilityElement = (currentAttributedText.length != 0); // We're an accessibility element by default if there is a string.
 
@@ -883,7 +883,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   ASLockScopeSelf();
   
   NSArray *rects = [[self _locked_renderer] rectsForTextRange:textRange measureOption:measureOption];
-  let adjustedRects = [[NSMutableArray<NSValue *> alloc] init];
+  const auto adjustedRects = [[NSMutableArray<NSValue *> alloc] init];
 
   for (NSValue *rectValue in rects) {
     CGRect rect = [rectValue CGRectValue];

@@ -14,7 +14,6 @@
 #import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 
@@ -294,6 +293,34 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
   CollectAccessibilityElementsForView(self.view, accessibilityElements);
   SortAccessibilityElements(accessibilityElements);
   return accessibilityElements;
+}
+
+@end
+
+@implementation _ASDisplayView (UIAccessibilityAction)
+
+- (BOOL)accessibilityActivate {
+  return [self.asyncdisplaykit_node accessibilityActivate];
+}
+
+- (void)accessibilityIncrement {
+  [self.asyncdisplaykit_node accessibilityIncrement];
+}
+
+- (void)accessibilityDecrement {
+  [self.asyncdisplaykit_node accessibilityDecrement];
+}
+
+- (BOOL)accessibilityScroll:(UIAccessibilityScrollDirection)direction {
+  return [self.asyncdisplaykit_node accessibilityScroll:direction];
+}
+
+- (BOOL)accessibilityPerformEscape {
+  return [self.asyncdisplaykit_node accessibilityPerformEscape];
+}
+
+- (BOOL)accessibilityPerformMagicTap {
+  return [self.asyncdisplaykit_node accessibilityPerformMagicTap];
 }
 
 @end

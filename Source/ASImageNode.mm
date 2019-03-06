@@ -17,7 +17,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
@@ -217,7 +216,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
-  let image = ASLockedSelf(_image);
+  const auto image = ASLockedSelf(_image);
 
   if (image == nil) {
     return [super calculateSizeThatFits:constrainedSize];

@@ -15,6 +15,7 @@
 #if YOGA
   #import YOGA_HEADER_PATH
   #import <AsyncDisplayKit/ASYogaUtilities.h>
+  #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -142,7 +143,14 @@ typedef struct {
  * this hook could be called up to 1 + (pJPEGcount * pJPEGrenderCount) times. The render count depends on how many times the downloader calls the
  * progressImage block.
  */
-- (void)hierarchyDisplayDidFinish;
+AS_CATEGORY_IMPLEMENTABLE
+- (void)hierarchyDisplayDidFinish NS_REQUIRES_SUPER;
+
+/**
+ * Only called on the root during yoga layout.
+ */
+AS_CATEGORY_IMPLEMENTABLE
+- (void)willCalculateLayout:(ASSizeRange)constrainedSize NS_REQUIRES_SUPER;
 
 /**
  * Only ASLayoutRangeModeVisibleOnly or ASLayoutRangeModeLowMemory are recommended.  Default is ASLayoutRangeModeVisibleOnly,
@@ -179,64 +187,5 @@ typedef struct {
 - (void)enableSubtreeRasterization;
 
 @end
-
-#pragma mark - Yoga Layout Support
-
-#if YOGA
-
-AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
-
-@interface ASDisplayNode (Yoga)
-
-@property (copy) NSArray *yogaChildren;
-
-- (void)addYogaChild:(ASDisplayNode *)child;
-- (void)removeYogaChild:(ASDisplayNode *)child;
-- (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index;
-
-- (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
-
-@property BOOL yogaLayoutInProgress;
-// TODO: Make this atomic (lock).
-@property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
-
-// Will walk up the Yoga tree and returns the root node
-- (ASDisplayNode *)yogaRoot;
-
-// These methods are intended to be used internally to Texture, and should not be called directly.
-- (BOOL)shouldHaveYogaMeasureFunc;
-- (void)invalidateCalculatedYogaLayout;
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
-
-@end
-
-@interface ASDisplayNode (YogaDebugging)
-
-- (NSString *)yogaTreeDescription;
-
-@end
-
-@interface ASLayoutElementStyle (Yoga)
-
-- (YGNodeRef)yogaNodeCreateIfNeeded;
-- (void)destroyYogaNode;
-
-@property (readonly) YGNodeRef yogaNode;
-
-@property ASStackLayoutDirection flexDirection;
-@property YGDirection direction;
-@property ASStackLayoutJustifyContent justifyContent;
-@property ASStackLayoutAlignItems alignItems;
-@property YGPositionType positionType;
-@property ASEdgeInsets position;
-@property ASEdgeInsets margin;
-@property ASEdgeInsets padding;
-@property ASEdgeInsets border;
-@property CGFloat aspectRatio;
-@property YGWrap flexWrap;
-
-@end
-
-#endif
 
 NS_ASSUME_NONNULL_END

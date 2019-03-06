@@ -94,7 +94,15 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : NSObject <ASLocking>
+@interface ASDisplayNode : NSObject <ASLocking> {
+@public
+  /**
+   * The _context ivar is unused by Texture, but provided to enable advanced clients to make powerful extensions to base class functionality.
+   * For example, _context can be used to implement category methods on ASDisplayNode that add functionality to all node subclass types.
+   * Code demonstrating this technique can be found in the CatDealsCollectionView example.
+   */
+  void *_context;
+}
 
 /** @name Initializing a node object */
 
@@ -817,27 +825,19 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
+  ASLayoutEngineTypeLayoutSpec,
+  ASLayoutEngineTypeYoga
+};
+
 @interface ASDisplayNode (ASLayout)
 
-/** @name Managing dimensions */
+/**
+ * @abstract Returns the current layout type the node uses for layout the subtree.
+ */
+@property (readonly) ASLayoutEngineType layoutEngineType;
 
 /**
- * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
- * implement layoutSpecThatFits:
- *
- * @return A block that takes a constrainedSize ASSizeRange argument, and must return an ASLayoutSpec that includes all
- * of the subnodes to position in the layout. This input-output relationship is identical to the subclass override
- * method -layoutSpecThatFits:
- *
- * @warning Subclasses that implement -layoutSpecThatFits: must not also use .layoutSpecBlock. Doing so will trigger
- * an exception. A future version of the framework may support using both, calling them serially, with the
- * .layoutSpecBlock superseding any values set by the method override.
- *
- * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
- */
-@property (nullable) ASLayoutSpecBlock layoutSpecBlock;
-
-/** 
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
@@ -855,7 +855,6 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
  */
 @property (readonly) ASSizeRange constrainedSizeForCalculatedLayout;
-
 
 @end
 
