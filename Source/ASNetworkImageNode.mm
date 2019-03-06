@@ -125,16 +125,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
 - (dispatch_queue_t)callbackQueue
 {
-    static dispatch_once_t onceToken;
-    static dispatch_queue_t callbackQueue;
-    dispatch_once(&onceToken, ^{
-        if (ASActivateExperimentalFeature(ASExperimentalNetworkImageQueue)) {
-            callbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        } else {
-            callbackQueue = dispatch_get_main_queue();
-        }
-    });
-    return callbackQueue;
+  return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 }
 
 #pragma mark - Public methods -- must lock

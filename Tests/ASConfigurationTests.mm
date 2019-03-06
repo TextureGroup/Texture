@@ -23,7 +23,6 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalInterfaceStateCoalescing,
   ASExperimentalUnfairLock,
   ASExperimentalLayerDefaults,
-  ASExperimentalNetworkImageQueue,
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
