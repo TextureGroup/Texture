@@ -615,7 +615,6 @@ static NSArray *DefaultLinkAttributeNames() {
   for (const CGSize &offset : kRectOffsets) {
     const CGPoint testPoint = CGPointMake(point.x + offset.width,
                                           point.y + offset.height);
-    
     ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
     for (NSString *attributeName in _linkAttributeNames) {
       NSRange effectiveRange = NSMakeRange(0, 0);
@@ -625,7 +624,7 @@ static NSArray *DefaultLinkAttributeNames() {
         // Didn't find any links specified with this attribute.
         continue;
       }
-      
+
       // If highlighting, check with delegate first. If not implemented, assume YES.
       if (highlighting
           && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
@@ -633,13 +632,13 @@ static NSArray *DefaultLinkAttributeNames() {
                             value:value atPoint:point]) {
         continue;
       }
-      
+
       *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
-      
+
       if (attributeNameOut != NULL) {
         *attributeNameOut = attributeName;
       }
-      
+
       return value;
     }
   }
