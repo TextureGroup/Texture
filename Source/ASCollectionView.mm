@@ -826,9 +826,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (nullable NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view {
     if (_asyncDataSourceFlags.modelIdentifierMethods) {
         GET_COLLECTIONNODE_OR_RETURN(collectionNode, nil);
-        NSIndexPath *result = [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:collectionNode];
-        result = [self convertIndexPathToCollectionNode:result];
-        return result;
+        return [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:collectionNode];
     } else {
         return nil;
     }

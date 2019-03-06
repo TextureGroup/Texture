@@ -980,10 +980,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (nullable NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view {
     if (_asyncDataSourceFlags.modelIdentifierMethods) {
         GET_TABLENODE_OR_RETURN(tableNode, nil);
-        NSIndexPath *result = [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:tableNode];
-        result = [self convertIndexPathFromTableNode:result waitingIfNeeded:YES];
-        return result;
-    } else {
+        return  [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:tableNode];
+      } else {
         return nil;
     }
 }
