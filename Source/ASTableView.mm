@@ -1678,20 +1678,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
-  if (ASActivateExperimentalFeature(ASExperimentalNewDefaultCellLayoutMode)) {
-    // Reload data is expensive, don't block main while doing so.
-    if (changeSet.includesReloadData) {
-      return NO;
-    }
-    // For more details on this method, see the comment in the ASCollectionView implementation.
-    if (changeSet.countForAsyncLayout < 2) {
-      return YES;
-    }
-    CGSize contentSize = self.contentSize;
-    CGSize boundsSize = self.bounds.size;
-    if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
-      return YES;
-    }
+  // For more details on this method, see the comment in the ASCollectionView implementation.
+  if (changeSet.countForAsyncLayout < 2) {
+    return YES;
+  }
+  CGSize contentSize = self.contentSize;
+  CGSize boundsSize = self.bounds.size;
+  if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
+    return YES;
   }
   return NO;
 }
@@ -2011,9 +2005,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray *)accessibilityElements
 {
-  if (!ASActivateExperimentalFeature(ASExperimentalSkipAccessibilityWait)) {
-    [self waitUntilAllUpdatesAreCommitted];
-  }
+  [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
 }
 

@@ -317,12 +317,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   [self _configureCollectionViewLayout:layout];
   
-  if (ASActivateExperimentalFeature(ASExperimentalNewDefaultCellLayoutMode)) {
-    _cellLayoutMode = ASCellLayoutModeSyncForSmallContent;
-  } else {
-    _cellLayoutMode = ASCellLayoutModeNone;
-  }
-  
+  _cellLayoutMode = ASCellLayoutModeSyncForSmallContent;
   return self;
 }
 
@@ -1886,10 +1881,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     return NO;
   }
   if (ASCellLayoutModeIncludes(ASCellLayoutModeSyncForSmallContent)) {
-    // Reload data is expensive, don't block main while doing so.
-    if (changeSet.includesReloadData) {
-      return NO;
-    }
     // If we have very few ASCellNodes (besides UIKit passthrough ones), match UIKit by blocking.
     if (changeSet.countForAsyncLayout < 2) {
       return YES;
@@ -2487,9 +2478,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (NSArray *)accessibilityElements
 {
-  if (!ASActivateExperimentalFeature(ASExperimentalSkipAccessibilityWait)) {
-    [self waitUntilAllUpdatesAreCommitted];
-  }
+  [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
 }
 
