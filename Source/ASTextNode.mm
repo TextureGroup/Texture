@@ -18,6 +18,7 @@
 #import <mutex>
 #import <tgmath.h>
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -553,26 +554,33 @@ static NSArray *DefaultLinkAttributeNames() {
   UIColor *backgroundColor = drawParameter->_backgroundColor;
   UIEdgeInsets textContainerInsets = drawParameter ? drawParameter->_textContainerInsets : UIEdgeInsetsZero;
   ASTextKitRenderer *renderer = [drawParameter rendererForBounds:drawParameter->_bounds];
-  if (ASActivateExperimentalFeature(ASExperimentalTextDrawing)) {
-    UIGraphicsImageRenderer *graphicsRenderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height)];
-    result = [graphicsRenderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
-      CGContextRef context = rendererContext.CGContext;
-      ASDisplayNodeAssert(context, @"This is no good without a context.");
-      
-      CGContextSaveGState(context);
-      CGContextTranslateCTM(context, textContainerInsets.left, textContainerInsets.top);
-      
-      // Fill background
-      if (backgroundColor != nil) {
-        [backgroundColor setFill];
-        UIRectFillUsingBlendMode(CGContextGetClipBoundingBox(context), kCGBlendModeCopy);
-      }
-      
-      // Draw text
-      [renderer drawInContext:context bounds:drawParameter->_bounds];
-      CGContextRestoreGState(context);
-    }];
-  } else {
+  BOOL renderedWithGraphicsRenderer = NO;
+  
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+    if (ASActivateExperimentalFeature(ASExperimentalTextDrawing)) {
+      renderedWithGraphicsRenderer = YES;
+      UIGraphicsImageRenderer *graphicsRenderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height)];
+      result = [graphicsRenderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        CGContextRef context = rendererContext.CGContext;
+        ASDisplayNodeAssert(context, @"This is no good without a context.");
+        
+        CGContextSaveGState(context);
+        CGContextTranslateCTM(context, textContainerInsets.left, textContainerInsets.top);
+        
+        // Fill background
+        if (backgroundColor != nil) {
+          [backgroundColor setFill];
+          UIRectFillUsingBlendMode(CGContextGetClipBoundingBox(context), kCGBlendModeCopy);
+        }
+        
+        // Draw text
+        [renderer drawInContext:context bounds:drawParameter->_bounds];
+        CGContextRestoreGState(context);
+      }];
+    }
+  }
+  
+  if (!renderedWithGraphicsRenderer) {
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale);
       
     CGContextRef context = UIGraphicsGetCurrentContext();
