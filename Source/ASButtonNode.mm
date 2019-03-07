@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#if YOGA
 static void ASButtonNodeResolveHorizontalAlignmentForStyle(ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASHorizontalAlignment _horizontalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
   if (_direction == ASStackLayoutDirectionHorizontal) {
     style.justifyContent = justifyContent(_horizontalAlignment, _justifyContent);
@@ -36,6 +37,7 @@ static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *s
     style.justifyContent = justifyContent(_verticalAlignment, _justifyContent);
   }
 }
+#endif
 
 @interface ASButtonNode ()
 {
