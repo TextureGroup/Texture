@@ -138,8 +138,6 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
   std::atomic_uint _displaySentinel;
 
-  // This is the desired contentsScale, not the scale at which the layer's contents should be displayed
-  CGFloat _contentsScaleForDisplay;
   ASDisplayNodeMethodOverrides _methodOverrides;
 
   UIEdgeInsets _hitTestSlop;

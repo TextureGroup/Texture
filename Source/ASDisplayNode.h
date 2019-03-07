@@ -102,6 +102,17 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
    * Code demonstrating this technique can be found in the CatDealsCollectionView example.
    */
   void *_context;
+
+@protected
+  /**
+   * This is the desired contentsScale, not the scale at which the layer's contents should be displayed.
+   * This is used to define the screen scale for rendering operations of the node using `ASGraphicsBeginImageContextWithOptions`.
+   *
+   * This value is initialized to `ASScreenScale()`
+   *
+   * @see `init` for `ASDisplayNode`
+   */
+  CGFloat _contentsScaleForDisplay;
 }
 
 /** @name Initializing a node object */
