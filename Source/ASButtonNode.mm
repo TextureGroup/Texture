@@ -21,7 +21,7 @@
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-static void ASButtonNodeResolveHorizontalAlignmentForStyle(unowned ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASHorizontalAlignment _horizontalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
+static void ASButtonNodeResolveHorizontalAlignmentForStyle(ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASHorizontalAlignment _horizontalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
   if (_direction == ASStackLayoutDirectionHorizontal) {
     style.justifyContent = justifyContent(_horizontalAlignment, _justifyContent);
   } else {
@@ -29,7 +29,7 @@ static void ASButtonNodeResolveHorizontalAlignmentForStyle(unowned ASLayoutEleme
   }
 }
 
-static void ASButtonNodeResolveVerticalAlignmentForStyle(unowned ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASVerticalAlignment _verticalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
+static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASVerticalAlignment _verticalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
   if (_direction == ASStackLayoutDirectionHorizontal) {
     style.alignItems = alignment(_verticalAlignment, _alignItems);
   } else {
