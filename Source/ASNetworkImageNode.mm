@@ -47,7 +47,6 @@
   CGFloat _currentImageQuality;
   CGFloat _renderedImageQuality;
   BOOL _shouldRenderProgressImages;
-  BOOL _isInImageDownloaderPriorityExperiment;
 
   struct {
     unsigned int delegateWillStartDisplayAsynchronously:1;
@@ -107,7 +106,6 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
   _shouldCacheImage = YES;
   _shouldRenderProgressImages = YES;
-  _isInImageDownloaderPriorityExperiment = ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority);
   self.shouldBypassEnsureDisplay = YES;
 
   return self;
@@ -397,7 +395,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-  if (_isInImageDownloaderPriorityExperiment) {
+  if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
     [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
   }
 }
@@ -451,21 +449,15 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
 {
   if (_downloaderFlags.downloaderImplementsSetPriority) {
-    id downloadIdentifier;
-    ASInterfaceState interfaceState;
-    {
-      ASLockScopeSelf();
-      downloadIdentifier = _downloadIdentifier;
-      interfaceState = _interfaceState;
-    }
+    ASLockScopeSelf();
 
-    if (downloadIdentifier != nil) {
+    if (_downloadIdentifier != nil) {
       ASImageDownloaderPriority priority = defaultPriority;
-      if (_isInImageDownloaderPriorityExperiment) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
+      if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
+        priority = ASImageDownloaderPriorityWithInterfaceState(_interfaceState);
       }
 
-      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+      [_downloader setPriority:priority withDownloadIdentifier:_downloadIdentifier];
     }
   }
 }
@@ -607,7 +599,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     };
 
     if (self->_downloaderFlags.downloaderImplementsDownloadWithPriority
-        && self->_isInImageDownloaderPriorityExperiment) {
+        && ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
       /*
         Decide a priority based on the current interface state of this node.
         It can happen that this method was called when the node entered preload state

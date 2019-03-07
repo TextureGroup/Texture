@@ -96,7 +96,6 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   
   //set on init only
   BOOL _cacheSupportsClearing;
-  BOOL _isInImageDownloaderPriorityExperiment;
 }
 
 //! @abstract Read-write redeclaration of property declared in ASMultiplexImageNode.h.
@@ -184,8 +183,6 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   
   _shouldRenderProgressImages = YES;
 
-  _isInImageDownloaderPriorityExperiment = ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority);
-  
   self.shouldBypassEnsureDisplay = YES;
 
   return self;
@@ -302,7 +299,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-  if (_isInImageDownloaderPriorityExperiment) {
+  if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
     [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
   }
 }
@@ -488,20 +485,19 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
 {
   ASAssertUnlocked(_downloadIdentifierLock);
-  if (_downloaderFlags.downloaderImplementsSetPriority) {
-    id downloadIdentifier;
-    {
-      ASDN::MutexLocker l(_downloadIdentifierLock);
-      downloadIdentifier = _downloadIdentifier;
-    }
 
-    if (downloadIdentifier != nil) {
+  if (_downloaderFlags.downloaderImplementsSetPriority) {
+    // Read our interface state before locking so that we don't lock super while holding our lock.
+    ASInterfaceState interfaceState = self.interfaceState;
+    ASDN::MutexLocker l(_downloadIdentifierLock);
+
+    if (_downloadIdentifier != nil) {
       ASImageDownloaderPriority priority = defaultPriority;
-      if (_isInImageDownloaderPriorityExperiment) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(self.interfaceState);
+      if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
+        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
       }
 
-      [_downloader setPriority:priority withDownloadIdentifier:downloadIdentifier];
+      [_downloader setPriority:priority withDownloadIdentifier:_downloadIdentifier];
     }
   }
 }
@@ -875,7 +871,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
     id downloadIdentifier;
     if (strongSelf->_downloaderFlags.downloaderImplementsDownloadWithPriority
-        && strongSelf->_isInImageDownloaderPriorityExperiment) {
+        && ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
 
       /*
        Decide a priority based on the current interface state of this node.
