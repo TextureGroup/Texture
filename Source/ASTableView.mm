@@ -1678,6 +1678,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
 {
+  // Reload data is expensive, don't block main while doing so.
+  if (changeSet.includesReloadData) {
+    return NO;
+  }
   // For more details on this method, see the comment in the ASCollectionView implementation.
   if (changeSet.countForAsyncLayout < 2) {
     return YES;
