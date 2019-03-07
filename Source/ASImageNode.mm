@@ -34,11 +34,6 @@
 
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
-/**
- *  Weakly reference the cached, processed image.
- */
-typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
-
 @interface ASImageNodeDrawParameters () {
 @package
   UIImage *_image;
