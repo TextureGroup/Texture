@@ -607,7 +607,7 @@ static NSArray *DefaultLinkAttributeNames() {
   static constexpr CGSize kRectOffsets[9] = {
     { 0, 0 },
     { -22, 0 }, { 22, 0 },
-    { 0, -22 } , { 0, 22 },
+    { 0, -22 }, { 0, 22 },
     { -22, -22 }, { -22, 22 },
     { 22, -22 }, { 22, 22 }
   };
@@ -616,6 +616,9 @@ static NSArray *DefaultLinkAttributeNames() {
     const CGPoint testPoint = CGPointMake(point.x + offset.width,
                                           point.y + offset.height);
     ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
+    if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
+      continue;
+    }
     for (NSString *attributeName in _linkAttributeNames) {
       NSRange effectiveRange = NSMakeRange(0, 0);
       id value = [_attributedText attribute:attributeName atIndex:pos.offset
@@ -642,7 +645,6 @@ static NSArray *DefaultLinkAttributeNames() {
       return value;
     }
   }
-  
 
   return nil;
 }
