@@ -8,6 +8,7 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -16,6 +17,22 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASNodeController+Beta.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
+#import <AsyncDisplayKit/NSArray+Diffing.h>
+
+@interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
+@end
+
+@implementation ASDisplayNode (ASLayoutElementStyleDelegate)
+
+#pragma mark <ASLayoutElementStyleDelegate>
+
+- (void)style:(ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName {
+  [self setNeedsLayout];
+}
+
+@end
 
 #pragma mark - ASDisplayNode (ASLayoutElement)
 
@@ -40,8 +57,9 @@
 
 - (ASLayoutElementStyle *)_locked_style
 {
+  ASAssertLocked(__instanceLock__);
   if (_style == nil) {
-    _style = [[ASLayoutElementStyle alloc] init];
+    _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
   }
   return _style;
 }
@@ -65,7 +83,7 @@
 
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  ASScopedLockSelfOrToRoot();
 
   // If one or multiple layout transitions are in flight it still can happen that layout information is requested
   // on other threads. As the pending and calculated layout to be updated in the layout transition in here just a
@@ -240,11 +258,11 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
+// TODO It would be easier to work with if we could `ASAssertUnlocked` here, but we
+// cannot due to locking to root in `_u_measureNodeWithBoundsIfNecessary`.
 - (void)_rootNodeDidInvalidateSize
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
-  
   __instanceLock__.lock();
   
   // We are the root node and need to re-flow the layout; at least one child needs a new size.
@@ -270,11 +288,21 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
+// TODO
+// We should remove this logic, which is relatively new, and instead
+// rely on the parent / host of the root node to do this size change. That's always been the
+// expectation with other node containers like ASTableView, ASCollectionView, ASViewController, etc.
+// E.g. in ASCellNode the _interactionDelegate is a Table or Collection that will resize in this
+// case. By resizing without participating with the parent, we could get cases where our parent size
+// does not match, especially if there is a size constraint that is applied at that level.
+//
+// In general a node should never need to set its own size, instead allowing its parent to do so -
+// even in the root case. Anyhow this is a separate / pre-existing issue, but I think it could be
+// causing real issues in cases of resizing nodes.
 - (void)displayNodeDidInvalidateSizeNewSize:(CGSize)size
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
-  
+
   // The default implementation of display node changes the size of itself to the new size
   CGRect oldBounds = self.bounds;
   CGSize oldSize = oldBounds.size;
@@ -295,9 +323,9 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
-  ASAssertUnlocked(__instanceLock__);
-  
-  ASDN::MutexLocker l(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
+  ASScopedLockSelfOrToRoot();
+
   // Check if we are a subnode in a layout transition.
   // In this case no measurement is needed as it's part of the layout transition
   if ([self _locked_isLayoutTransitionInvalid]) {
@@ -455,7 +483,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_layoutSublayouts
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   
   ASLayout *layout;
   {
@@ -620,7 +648,7 @@ ASLayoutElementStyleExtensibilityForwarding
     NSUInteger newLayoutVersion = _layoutVersion;
     ASLayout *newLayout;
     {
-      ASDN::MutexLocker l(__instanceLock__);
+      ASScopedLockSelfOrToRoot();
 
       ASLayoutElementContext *ctx = [[ASLayoutElementContext alloc] init];
       ctx.transitionID = transitionID;
@@ -914,35 +942,40 @@ ASLayoutElementStyleExtensibilityForwarding
     return;
   }
 
-  NSArray *subnodes = [self subnodes];
-  NSArray *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
+  ASDN::MutexLocker l(__instanceLock__);
+  NSArray<ASLayout *> *sublayouts = _calculatedDisplayNodeLayout.layout.sublayouts;
+  unowned ASLayout *cSublayouts[sublayouts.count];
+  [sublayouts getObjects:cSublayouts range:NSMakeRange(0, AS_ARRAY_SIZE(cSublayouts))];
 
-  const auto currentSubnodes = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
-                                                     capacity:subnodes.count];
-  const auto layoutSubnodes  = [[NSHashTable alloc] initWithOptions:NSHashTableObjectPointerPersonality
-                                                     capacity:sublayouts.count];;
-  for (ASDisplayNode *subnode in subnodes) {
-    [currentSubnodes addObject:subnode];
+  // Fast-path if we are in the correct state (likely).
+  if (_subnodes.count == AS_ARRAY_SIZE(cSublayouts)) {
+    NSUInteger i = 0;
+    BOOL matches = YES;
+    for (ASDisplayNode *subnode in _subnodes) {
+      if (subnode != cSublayouts[i].layoutElement) {
+        matches = NO;
+      }
+      i++;
+    }
+    if (matches) {
+      return;
+    }
   }
 
-  for (ASLayout *sublayout in sublayouts) {
-    id <ASLayoutElement> layoutElement = sublayout.layoutElement;
-    ASDisplayNodeAssert([layoutElement isKindOfClass:[ASDisplayNode class]],
-                        @"All calculatedLayouts should be flattened and only contain nodes!");
-    [layoutSubnodes addObject:(ASDisplayNode *)layoutElement];
+  NSArray<ASDisplayNode *> *layoutNodes = ASArrayByFlatMapping(sublayouts, ASLayout *layout, (ASDisplayNode *)layout.layoutElement);
+  NSIndexSet *insertions, *deletions;
+  [_subnodes asdk_diffWithArray:layoutNodes insertions:&insertions deletions:&deletions];
+  if (insertions.count > 0) {
+    NSLog(@"Warning: node's layout includes subnode that has not been added: node = %@, subnodes = %@, subnodes in layout = %@", self, _subnodes, layoutNodes);
   }
 
-  // Verify that all subnodes that occur in the current ASLayout tree are present in .subnodes array.
-  if ([layoutSubnodes isSubsetOfHashTable:currentSubnodes] == NO) {
-    // Note: This should be converted to an assertion after confirming it is rare.
-    NSLog(@"Warning: node's layout includes subnodes that have not been added: node = %@, subnodes = %@, subnodes in layout = %@", self, currentSubnodes, layoutSubnodes);
-  }
-
-  // Verify that everything in the .subnodes array is present in the ASLayout tree (and correct it if not).
-  [currentSubnodes minusHashTable:layoutSubnodes];
-  for (ASDisplayNode *orphanedSubnode in currentSubnodes) {
-    NSLog(@"Automatically removing orphaned subnode %@, from parent %@", orphanedSubnode, self);
-    [orphanedSubnode removeFromSupernode];
+  // Remove any nodes that are in the tree but should not be.
+  // Go in reverse order so we don't shift our indexes.
+  if (deletions) {
+    for (NSUInteger i = deletions.lastIndex; i != NSNotFound; i = [deletions indexLessThanIndex:i]) {
+      NSLog(@"Automatically removing orphaned subnode %@, from parent %@", _subnodes[i], self);
+      [_subnodes[i] removeFromSupernode];
+    }
   }
 }
 
@@ -1006,6 +1039,33 @@ ASLayoutElementStyleExtensibilityForwarding
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);
   
   _calculatedDisplayNodeLayout = displayNodeLayout;
+}
+
+@end
+
+#pragma mark -
+#pragma mark - ASDisplayNode (YogaLayout)
+
+@implementation ASDisplayNode (YogaLayout)
+
+- (BOOL)locked_shouldLayoutFromYogaRoot {
+#if YOGA
+  YGNodeRef yogaNode = _style.yogaNode;
+  BOOL hasYogaParent = (_yogaParent != nil);
+  BOOL hasYogaChildren = (_yogaChildren.count > 0);
+  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
+  if (usesYoga) {
+    if ([self shouldHaveYogaMeasureFunc] == NO) {
+      return YES;
+    } else {
+      return NO;
+    }
+  } else {
+    return NO;
+  }
+#else
+  return NO;
+#endif
 }
 
 @end

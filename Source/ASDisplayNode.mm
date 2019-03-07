@@ -1046,7 +1046,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)__layout
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   
   BOOL loaded = NO;
   {
@@ -1096,7 +1096,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)_layoutDidFinish
 {
   ASDisplayNodeAssertMainThread();
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
   [self layoutDidFinish];
 }
@@ -1169,7 +1169,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   // Hook for subclasses
   ASDisplayNodeAssertMainThread();
-  ASAssertUnlocked(__instanceLock__);
+  // ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeAssertTrue(self.isNodeLoaded);
   [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> del) {
     [del nodeDidLayout];
@@ -2684,7 +2684,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isEnteringHierarchy, @"Should not cause recursive __enterHierarchy");
-  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"enterHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
@@ -2733,7 +2732,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isExitingHierarchy, @"Should not cause recursive __exitHierarchy");
-  ASAssertUnlocked(__instanceLock__);
   ASDisplayNodeLogEvent(self, @"exitHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
@@ -2842,7 +2840,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   
   if (![self supportsRangeManagedInterfaceState]) {
     self.interfaceState = ASInterfaceStateInHierarchy;
-  } else if (ASCATransactionQueue.sharedQueue.isEnabled) {
+  } else if (ASCATransactionQueueGet().enabled) {
     __instanceLock__.lock();
     ASInterfaceState state = _preExitingInterfaceState;
     _preExitingInterfaceState = ASInterfaceStateNone;
@@ -2902,7 +2900,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       }
     };
 
-    if (!ASCATransactionQueue.sharedQueue.enabled) {
+    if (!ASCATransactionQueueGet().enabled) {
       dispatch_async(dispatch_get_main_queue(), exitVisibleInterfaceState);
     } else {
       exitVisibleInterfaceState();
@@ -2967,13 +2965,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)setInterfaceState:(ASInterfaceState)newState
 {
-  if (!ASCATransactionQueue.sharedQueue.enabled) {
+  if (!ASCATransactionQueueGet().enabled) {
     [self applyPendingInterfaceState:newState];
   } else {
     ASDN::MutexLocker l(__instanceLock__);
     if (_pendingInterfaceState != newState) {
       _pendingInterfaceState = newState;
-      [[ASCATransactionQueue sharedQueue] enqueue:self];
+      [ASCATransactionQueueGet() enqueue:self];
     }
   }
 }
@@ -2999,7 +2997,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDN::MutexLocker l(__instanceLock__);
     // newPendingState will not be used when ASCATransactionQueue is enabled
     // and use _pendingInterfaceState instead for interfaceState update.
-    if (!ASCATransactionQueue.sharedQueue.enabled) {
+    if (!ASCATransactionQueueGet().enabled) {
       _pendingInterfaceState = newPendingState;
     }
     oldState = _interfaceState;

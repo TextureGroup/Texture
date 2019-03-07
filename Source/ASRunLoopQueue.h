@@ -48,12 +48,7 @@ AS_SUBCLASSING_RESTRICTED
 
 @end
 
-AS_SUBCLASSING_RESTRICTED
-@interface ASCATransactionQueue : ASAbstractRunLoopQueue
 
-@property (readonly) BOOL isEmpty;
-
-@property (readonly, getter=isEnabled) BOOL enabled;
 
 /**
  * The queue to run on main run loop before CATransaction commit.
@@ -62,12 +57,25 @@ AS_SUBCLASSING_RESTRICTED
  * to get last chance of updating/coalesce info like interface state.
  * Each node will only be called once per transaction commit to reflect interface change.
  */
-@property (class, readonly) ASCATransactionQueue *sharedQueue;
-+ (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
+AS_SUBCLASSING_RESTRICTED
+@interface ASCATransactionQueue : ASAbstractRunLoopQueue
+
+@property (readonly) BOOL isEmpty;
+
+@property (readonly, getter=isEnabled) BOOL enabled;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
 
 @end
+
+NS_INLINE ASCATransactionQueue *ASCATransactionQueueGet(void) {
+  static ASCATransactionQueue *q;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    q = [[ASCATransactionQueue alloc] init];
+  });
+  return q;
+}
 
 @interface ASDeallocQueue : NSObject
 
