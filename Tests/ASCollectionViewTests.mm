@@ -163,7 +163,6 @@
 @interface ASCollectionView (InternalTesting)
 
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections;
-- (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet;
 
 @end
 
@@ -1047,15 +1046,24 @@
 
 - (void)testInitialRangeBounds
 {
-  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeNone];
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeNone
+           shouldWaitUntilAllUpdatesAreProcessed:YES];
+}
+
+- (void)testInitialRangeBoundsCellLayoutModeSyncForSmallContent
+{
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeSyncForSmallContent
+           shouldWaitUntilAllUpdatesAreProcessed:YES]; // Need to wait because the first initial data load is always async
 }
 
 - (void)testInitialRangeBoundsCellLayoutModeAlwaysAsync
 {
-  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeAlwaysAsync];
+  [self testInitialRangeBoundsWithCellLayoutMode:ASCellLayoutModeAlwaysAsync
+           shouldWaitUntilAllUpdatesAreProcessed:YES];
 }
 
 - (void)testInitialRangeBoundsWithCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
+           shouldWaitUntilAllUpdatesAreProcessed:(BOOL)shouldWait
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];
@@ -1071,9 +1079,7 @@
   // Trigger the initial reload to start 
   [window layoutIfNeeded];
 
-  // Test the APIs that monitor ASCollectionNode update handling if collection node should
-  // layout asynchronously
-  if (![cn.view dataController:nil shouldSynchronouslyProcessChangeSet:nil]) {
+  if (shouldWait) {
     XCTAssertTrue(cn.isProcessingUpdates, @"ASCollectionNode should still be processing updates after initial layoutIfNeeded call (reloadData)");
 
     [cn onDidFinishProcessingUpdates:^{

@@ -125,16 +125,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
 - (dispatch_queue_t)callbackQueue
 {
-    static dispatch_once_t onceToken;
-    static dispatch_queue_t callbackQueue;
-    dispatch_once(&onceToken, ^{
-        if (ASActivateExperimentalFeature(ASExperimentalNetworkImageQueue)) {
-            callbackQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        } else {
-            callbackQueue = dispatch_get_main_queue();
-        }
-    });
-    return callbackQueue;
+  return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 }
 
 #pragma mark - Public methods -- must lock
@@ -368,7 +359,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         // Call out to the delegate.
         if (_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
+          const auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:url sourceType:ASNetworkImageSourceSynchronousCache downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:result info:info];
         } else if (_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -662,7 +653,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         } else {
           // First try to load the path directly, for efficiency assuming a developer who
           // doesn't want caching is trying to be as minimal as possible.
-          var nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:URL.path];
+          auto nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:URL.path];
           if (nonAnimatedImage == nil) {
             // If we couldn't find it, execute an -imageNamed:-like search so we can find resources even if the
             // extension is not provided in the path.  This allows the same path to work regardless of shouldCacheImage.
@@ -675,7 +666,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           // If the file may be an animated gif and then created an animated image.
           id<ASAnimatedImageProtocol> animatedImage = nil;
           if (self->_downloaderFlags.downloaderImplementsAnimatedImage) {
-            let data = [[NSData alloc] initWithContentsOfURL:URL];
+            const auto data = [[NSData alloc] initWithContentsOfURL:URL];
             if (data != nil) {
               animatedImage = [self->_downloader animatedImageWithData:data];
 
@@ -698,7 +689,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
         if (self->_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
-          let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
+          const auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:ASNetworkImageSourceFileURL downloadIdentifier:nil userInfo:nil];
           [delegate imageNode:self didLoadImage:self.image info:info];
         } else if (self->_delegateFlags.delegateDidLoadImage) {
           ASUnlockScope(self);
@@ -707,7 +698,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
       });
     } else {
       __weak __typeof__(self) weakSelf = self;
-      let finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSourceType imageSource, id userInfo) {
+      const auto finished = ^(id <ASImageContainerProtocol>imageContainer, NSError *error, id downloadIdentifier, ASNetworkImageSourceType imageSource, id userInfo) {
         ASPerformBlockOnBackgroundThread(^{
           __typeof__(self) strongSelf = weakSelf;
           if (strongSelf == nil) {
@@ -753,7 +744,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           if (newImage) {
             if (strongSelf->_delegateFlags.delegateDidLoadImageWithInfo) {
               calloutBlock = ^(ASNetworkImageNode *strongSelf) {
-                let info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
+                const auto info = [[ASNetworkImageLoadInfo alloc] initWithURL:URL sourceType:imageSource downloadIdentifier:downloadIdentifier userInfo:userInfo];
                 [delegate imageNode:strongSelf didLoadImage:newImage info:info];
               };
             } else if (strongSelf->_delegateFlags.delegateDidLoadImage) {

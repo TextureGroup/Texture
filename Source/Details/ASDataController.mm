@@ -206,7 +206,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     return @[];
   }
   
-  let indexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
+  const auto indexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
     std::vector<NSInteger> counts = [self itemCountsFromDataSource];
     [sections enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
@@ -645,7 +645,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     if (canDelegate) {
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
     } else {
-      let elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
+      const auto elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
       for (ASCollectionElement *element in newMap) {
         ASCellNode *nodeIfAllocated = element.nodeIfAllocated;
         if (nodeIfAllocated.shouldUseUIKitCell) {
@@ -824,10 +824,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   }
   
   id<ASDataControllerSource> dataSource = self.dataSource;
-  let visibleMap = self.visibleMap;
-  let pendingMap = self.pendingMap;
+  const auto visibleMap = self.visibleMap;
+  const auto pendingMap = self.pendingMap;
   for (ASCellNode *node in nodes) {
-    let element = node.collectionElement;
+    const auto element = node.collectionElement;
     NSIndexPath *indexPathInPendingMap = [pendingMap indexPathForElement:element];
     // Ensure the element is present in both maps or skip it. If it's not in the visible map,
     // then we can't check the presented size. If it's not in the pending map, we can't get the constrained size.
