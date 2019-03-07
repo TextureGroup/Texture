@@ -96,7 +96,7 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
 
 _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
 {
-  ASLockScope(node);
+  ASDN::MutexLocker l(node->__instanceLock__);
   _ASPendingState *result = node->_pendingViewState;
   if (result == nil) {
     result = [[_ASPendingState alloc] init];
@@ -3532,13 +3532,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
 {
   ASDN::MutexLocker l(__instanceLock__);
-  _isAccessibilityContainer = isAccessibilityContainer;
+  _flags.isAccessibilityContainer = isAccessibilityContainer;
 }
 
 - (BOOL)isAccessibilityContainer
 {
   ASDN::MutexLocker l(__instanceLock__);
-  return _isAccessibilityContainer;
+  return _flags.isAccessibilityContainer;
 }
 
 - (NSString *)defaultAccessibilityLabel

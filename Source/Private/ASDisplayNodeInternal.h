@@ -99,6 +99,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
     unsigned shouldBypassEnsureDisplay:1;
     unsigned displaySuspended:1;
     unsigned shouldAnimateSizeChanges:1;
+    unsigned isAccessibilityContainer:1;
     
     // Wrapped view handling
     
@@ -218,29 +219,6 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
-
-
-  // Accessibility support
-  BOOL _isAccessibilityElement;
-  NSString *_accessibilityLabel;
-  NSAttributedString *_accessibilityAttributedLabel;
-  NSString *_accessibilityHint;
-  NSAttributedString *_accessibilityAttributedHint;
-  NSString *_accessibilityValue;
-  NSAttributedString *_accessibilityAttributedValue;
-  UIAccessibilityTraits _accessibilityTraits;
-  CGRect _accessibilityFrame;
-  NSString *_accessibilityLanguage;
-  BOOL _accessibilityElementsHidden;
-  BOOL _accessibilityViewIsModal;
-  BOOL _shouldGroupAccessibilityChildren;
-  NSString *_accessibilityIdentifier;
-  UIAccessibilityNavigationStyle _accessibilityNavigationStyle;
-  NSArray *_accessibilityHeaderElements;
-  CGPoint _accessibilityActivationPoint;
-  UIBezierPath *_accessibilityPath;
-  BOOL _isAccessibilityContainer;
-
 
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
