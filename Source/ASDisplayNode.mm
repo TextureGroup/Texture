@@ -314,6 +314,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   _eventLog = [[ASEventLog alloc] initWithObject:self];
 #endif
   
+  _rootNode = self;
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
   BOOL isSynchronous = ![_viewClass isSubclassOfClass:[_ASDisplayView class]]
@@ -2003,6 +2004,26 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _supernode;
 }
 
+// Repeatedly: try lock self, try lock root node, unlock self,
+// return the lock on root node. If self is root once we've locked it,
+// we'll return the lock on self.
+- (ASDN::UniqueLock)acquireRootLock {
+  for (;; std::this_thread::yield()) {
+    ASDN::UniqueLock selfLock(__instanceLock__, std::try_to_lock);
+    if (!selfLock.owns_lock()) {
+      continue;
+    }
+    if (_rootNode == self) {
+      return selfLock;
+    }
+    ASDN::UniqueLock rootLock(_rootNode->__instanceLock__, std::try_to_lock);
+    if (!rootLock.owns_lock()) {
+      continue;
+    }
+    return rootLock;
+  }
+}
+
 - (void)_setSupernode:(ASDisplayNode *)newSupernode
 {
   BOOL supernodeDidChange = NO;
@@ -2014,6 +2035,20 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
                                   // in case supernode implementation must access one of our properties.
       _supernode = newSupernode;
       supernodeDidChange = YES;
+      
+      // It is safe to access the rootNode ivar because all children
+      // are synchronously removed from a node during deallocation
+      // i.e. _setSupernode:nil.
+      unowned auto newRoot = newSupernode ? newSupernode->_rootNode : self;
+      _rootNode = newRoot;
+
+      // Push new root node ref down while holding self.
+      // In the future, tree modifications could require the root node to be locked and thus
+      // we could guarantee a stable view of a tree on-demand.
+      ASDisplayNodePerformBlockOnEverySubnode(self, NO, ^(ASDisplayNode *node) {
+        ASDN::MutexLocker l(node->__instanceLock__);
+        node->_rootNode = newRoot;
+      });
     }
   }
   

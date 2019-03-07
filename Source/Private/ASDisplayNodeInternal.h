@@ -78,7 +78,9 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
-@package
+@public
+  // Note: These ivars are declared public only for testing. Don't access them from outside please!
+  
   ASDN::RecursiveMutex __instanceLock__;
 
   _ASPendingState *_pendingViewState;
@@ -126,7 +128,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
     unsigned isDeallocating:1;
   } _flags;
   
-@protected
+  unowned ASDisplayNode *_rootNode;
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
 

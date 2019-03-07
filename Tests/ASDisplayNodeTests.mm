@@ -2697,4 +2697,22 @@ static bool stringContainsPointer(NSString *description, id p) {
   }
 }
 
+- (void)testRootNodePropagation
+{
+  // [A [B [C, D]]
+  ASDisplayNode *a = [ASDisplayNode new];
+  XCTAssertEqual(a->_rootNode, a);
+  ASDisplayNode *b = [ASDisplayNode new];
+  [a addSubnode:b];
+  XCTAssertEqual(b->_rootNode, a);
+  ASDisplayNode *c = [ASDisplayNode new];
+  [b addSubnode:c];
+  ASDisplayNode *d = [ASDisplayNode new];
+  [b addSubnode:d];
+  XCTAssertEqual(d->_rootNode, a);
+  [b removeFromSupernode];
+  XCTAssertEqual(b->_rootNode, b);
+  XCTAssertEqual(c->_rootNode, b);
+}
+
 @end
