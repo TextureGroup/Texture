@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
@@ -183,6 +184,13 @@
   CGSize  size     = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
   CGPoint position = CGPointMake(YGNodeLayoutGetLeft(yogaNode), YGNodeLayoutGetTop(yogaNode));
 
+  if (!ASIsCGSizeValidForSize(size)) {
+    size = CGSizeZero;
+  }
+
+  if (!ASIsCGPositionValidForLayout(position)) {
+    position = CGPointZero;
+  }
   return [ASLayout layoutWithLayoutElement:self size:size position:position sublayouts:nil];
 }
 
@@ -205,6 +213,9 @@
 
   // The layout for self should have position CGPointNull, but include the calculated size.
   CGSize size = CGSizeMake(YGNodeLayoutGetWidth(yogaNode), YGNodeLayoutGetHeight(yogaNode));
+  if (!ASIsCGSizeValidForSize(size)) {
+    size = CGSizeZero;
+  }
   ASLayout *layout = [ASLayout layoutWithLayoutElement:self size:size sublayouts:sublayouts];
 
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
@@ -398,11 +409,10 @@
     NSLog(@"******************** STARTING YOGA -> ASLAYOUT CREATION ********************");
     NSLog(@"****************************************************************************");
     ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
-      NSLog(@" "); // Newline
       NSLog(@"node = %@", node);
-      NSLog(@"style = %@", node.style);
-      NSLog(@"layout = %@", node.yogaCalculatedLayout);
-      YGNodePrint(node.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
+      YGNodePrint(node.style.yogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
+      NSCAssert(ASIsCGSizeValidForSize(node.yogaCalculatedLayout.size), @"Yoga layout returned an invalid size");
+      NSLog(@" "); // Newline
     });
   }
 #endif /* YOGA_LAYOUT_LOGGING */
