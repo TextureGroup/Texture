@@ -31,6 +31,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalSkipAccessibilityWait = 1 << 10,            // exp_skip_a11y_wait
   ASExperimentalNewDefaultCellLayoutMode = 1 << 11,         // exp_new_default_cell_layout_mode
   ASExperimentalDispatchApply = 1 << 12,                    // exp_dispatch_apply
+  ASExperimentalImageDownloaderPriority = 1 << 13,          // exp_image_downloader_priority
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
