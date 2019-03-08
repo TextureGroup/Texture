@@ -212,7 +212,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @warning The first access to it must be on the main thread, and should only be used on the main thread thereafter as 
  * well.
  */
-@property (readonly) UIView *view;
+@property (readonly, nullable) UIView *view;
 
 /** 
  * @abstract Returns whether a node's backing view or layer is loaded.
@@ -237,7 +237,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @warning The first access to it must be on the main thread, and should only be used on the main thread thereafter as 
  * well.
  */
-@property (readonly) CALayer * layer;
+@property (readonly, nullable) CALayer * layer;
 
 /**
  * Returns YES if the node is – at least partially – visible in a window.
