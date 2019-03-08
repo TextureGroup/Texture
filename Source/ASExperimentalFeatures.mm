@@ -25,8 +25,9 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_disable_a11y_cache",
                                       @"exp_skip_a11y_wait",
                                       @"exp_new_default_cell_layout_mode",
-                                      @"exp_dispatch_apply"]));
-  
+                                      @"exp_dispatch_apply",
+                                      @"exp_image_downloader_priority"]));
+
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
