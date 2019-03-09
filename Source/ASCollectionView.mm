@@ -2009,7 +2009,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     ASDisplayNodeFailAssert(@"Data controller should not ask for presented size for element that is not presented.");
     return YES;
   }
-  UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+
+  UICollectionViewLayoutAttributes *attributes;
+  if (element.supplementaryElementKind == nil) {
+    attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+  } else {
+    attributes = [self layoutAttributesForSupplementaryElementOfKind:element.supplementaryElementKind atIndexPath:indexPath];
+  }
   return CGSizeEqualToSizeWithIn(attributes.size, size, FLT_EPSILON);
 }
 

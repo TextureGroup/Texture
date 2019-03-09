@@ -50,13 +50,16 @@
   }
 
   [node __setNodeController:self];
-  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setNode:(ASDisplayNode *)node
 {
   ASLockScopeSelf();
+  if (node == _node) {
+    return;
+  }
   [self setupReferencesWithNode:node];
+  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference

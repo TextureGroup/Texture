@@ -29,6 +29,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 8,      // exp_did_enter_preload_skip_asm_layout
   ASExperimentalDisableAccessibilityCache = 1 << 9,        // exp_disable_a11y_cache
   ASExperimentalDispatchApply = 1 << 12,                    // exp_dispatch_apply
+  ASExperimentalImageDownloaderPriority = 1 << 13,          // exp_image_downloader_priority
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
