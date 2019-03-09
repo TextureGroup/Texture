@@ -17,6 +17,8 @@
 
 #import <atomic>
 
+using AS::MutexLocker;
+
 #if YOGA
   #import YOGA_HEADER_PATH
   #import <AsyncDisplayKit/ASYogaUtilities.h>
@@ -160,7 +162,7 @@ do {\
 } while(0)
 
 @implementation ASLayoutElementStyle {
-  ASDN::RecursiveMutex __instanceLock__;
+  AS::RecursiveMutex __instanceLock__;
   ASLayoutElementStyleExtensions _extensions;
 
   std::atomic<ASLayoutElementSize> _size;
@@ -545,7 +547,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementBoolExtensions, @"Setting index outside of max bool extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _extensions.boolExtensions[idx] = value;
 }
 
@@ -553,7 +555,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementBoolExtensions, @"Accessing index outside of max bool extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _extensions.boolExtensions[idx];
 }
 
@@ -561,7 +563,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementStateIntegerExtensions, @"Setting index outside of max integer extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _extensions.integerExtensions[idx] = value;
 }
 
@@ -569,7 +571,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementStateIntegerExtensions, @"Accessing index outside of max integer extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _extensions.integerExtensions[idx];
 }
 
@@ -577,7 +579,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementStateEdgeInsetExtensions, @"Setting index outside of max edge insets extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _extensions.edgeInsetsExtensions[idx] = value;
 }
 
@@ -585,7 +587,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   NSCAssert(idx < kMaxLayoutElementStateEdgeInsetExtensions, @"Accessing index outside of max edge insets extensions space");
   
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _extensions.edgeInsetsExtensions[idx];
 }
 

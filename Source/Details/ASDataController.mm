@@ -567,7 +567,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   
   NSTimeInterval transactionQueueFlushDuration = 0.0f;
   {
-    ASDN::ScopeTimer t(transactionQueueFlushDuration);
+    AS::ScopeTimer t(transactionQueueFlushDuration);
     dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
   }
   

@@ -18,7 +18,7 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  ASDN::RecursiveMutex __instanceLock__;
+  AS::RecursiveMutex __instanceLock__;
 }
 
 - (void)loadNode
