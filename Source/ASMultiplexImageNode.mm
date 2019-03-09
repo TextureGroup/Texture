@@ -491,7 +491,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   if (_downloaderFlags.downloaderImplementsSetPriority) {
     // Read our interface state before locking so that we don't lock super while holding our lock.
     ASInterfaceState interfaceState = self.interfaceState;
-    ASDN::MutexLocker l(_downloadIdentifierLock);
+    MutexLocker l(_downloadIdentifierLock);
 
     if (_downloadIdentifier != nil) {
       ASImageDownloaderPriority priority = defaultPriority;
@@ -850,7 +850,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     if (!strongSelf)
       return;
 
-    ASDN::MutexLocker l(strongSelf->_downloadIdentifierLock);
+    MutexLocker l(strongSelf->_downloadIdentifierLock);
     //Getting a result back for a different download identifier, download must not have been successfully canceled
     if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
       return;
