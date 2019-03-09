@@ -25,8 +25,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_skip_a11y_wait",
                                       @"exp_new_default_cell_layout_mode",
                                       @"exp_dispatch_apply",
-                                      @"exp_image_downloader_priority"]));
-
+                                      @"exp_image_downloader_priority",
+                                      @"exp_text_drawing"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
