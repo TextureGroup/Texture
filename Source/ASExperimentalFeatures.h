@@ -32,6 +32,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalNewDefaultCellLayoutMode = 1 << 11,         // exp_new_default_cell_layout_mode
   ASExperimentalDispatchApply = 1 << 12,                    // exp_dispatch_apply
   ASExperimentalImageDownloaderPriority = 1 << 13,          // exp_image_downloader_priority
+  ASExperimentalTextDrawing = 1 << 14,                      // exp_text_drawing
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
