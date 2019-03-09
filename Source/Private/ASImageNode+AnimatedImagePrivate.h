@@ -13,7 +13,7 @@
 
 @interface ASImageNode ()
 {
-  ASDN::Mutex _displayLinkLock;
+  AS::Mutex _displayLinkLock;
   id <ASAnimatedImageProtocol> _animatedImage;
   BOOL _animatedImagePaused;
   NSString *_animatedImageRunLoopMode;
