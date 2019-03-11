@@ -86,6 +86,7 @@ typedef struct {
   int setLayoutMargins:1;
   int setPreservesSuperviewLayoutMargins:1;
   int setInsetsLayoutMarginsFromSafeArea:1;
+  int setActions:1;
 } ASPendingStateFlags;
 
 @implementation _ASPendingState
@@ -140,6 +141,7 @@ typedef struct {
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
   UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
+  NSDictionary<NSString *, id<CAAction>> *actions;
 
   ASPendingStateFlags _flags;
 }
@@ -209,6 +211,7 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize layoutMargins=layoutMargins;
 @synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
 @synthesize insetsLayoutMarginsFromSafeArea=insetsLayoutMarginsFromSafeArea;
+@synthesize actions=actions;
 
 static CGColorRef blackColorRef = NULL;
 static UIColor *defaultTintColor = nil;
@@ -586,6 +589,12 @@ static UIColor *defaultTintColor = nil;
   _flags.setSemanticContentAttribute = YES;
 }
 
+- (void)setActions:(NSDictionary<NSString *,id<CAAction>> *)actionsArg
+{
+  actions = [actionsArg copy];
+  _flags.setActions = YES;
+}
+
 - (BOOL)isAccessibilityElement
 {
   return isAccessibilityElement;
@@ -916,6 +925,9 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setOpaque)
     ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
+
+  if (flags.setActions)
+    layer.actions = actions;
 
   ASPendingStateApplyMetricsToLayer(self, layer);
   
