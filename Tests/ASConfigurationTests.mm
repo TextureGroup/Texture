@@ -29,7 +29,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDidEnterPreloadSkipASMLayout,
   ASExperimentalDisableAccessibilityCache,
   ASExperimentalDispatchApply,
-  ASExperimentalImageDownloaderPriority
+  ASExperimentalImageDownloaderPriority,
+  ASExperimentalTextDrawing
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -53,7 +54,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_did_enter_preload_skip_asm_layout",
     @"exp_disable_a11y_cache",
     @"exp_dispatch_apply",
-    @"exp_image_downloader_priority"
+    @"exp_image_downloader_priority",
+    @"exp_text_drawing"
   ];
 }
 

@@ -32,7 +32,7 @@
 
 @interface ASTextCacheValue : NSObject {
   @package
-  ASDN::Mutex _m;
+  AS::Mutex _m;
   std::deque<std::tuple<CGSize, ASTextLayout *>> _layouts;
 }
 @end
@@ -55,10 +55,10 @@
  */
 static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainerAndText(ASTextContainer *container, NSAttributedString *text)  {
   static dispatch_once_t onceToken;
-  static ASDN::Mutex *layoutCacheLock;
+  static AS::Mutex *layoutCacheLock;
   static NSCache<NSAttributedString *, ASTextCacheValue *> *textLayoutCache;
   dispatch_once(&onceToken, ^{
-    layoutCacheLock = new ASDN::Mutex();
+    layoutCacheLock = new AS::Mutex();
     textLayoutCache = [[NSCache alloc] init];
   });
 
@@ -71,7 +71,7 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
   }
 
   // Lock the cache item for the rest of the method. Only after acquiring can we release the NSCache.
-  ASDN::MutexLocker lock(cacheValue->_m);
+  AS::MutexLocker lock(cacheValue->_m);
   layoutCacheLock->unlock();
 
   CGRect containerBounds = (CGRect){ .size = container.size };

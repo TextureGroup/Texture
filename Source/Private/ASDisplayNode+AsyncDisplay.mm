@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
+using AS::MutexLocker;
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -467,25 +468,25 @@
 
 - (ASDisplayNodeContextModifier)willDisplayNodeContentWithRenderingContext
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _willDisplayNodeContentWithRenderingContext;
 }
 
 - (ASDisplayNodeContextModifier)didDisplayNodeContentWithRenderingContext
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _didDisplayNodeContentWithRenderingContext;
 }
 
 - (void)setWillDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _willDisplayNodeContentWithRenderingContext = contextModifier;
 }
 
 - (void)setDidDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier;
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _didDisplayNodeContentWithRenderingContext = contextModifier;
 }
 

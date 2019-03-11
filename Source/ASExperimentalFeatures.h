@@ -30,6 +30,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDisableAccessibilityCache = 1 << 9,        // exp_disable_a11y_cache
   ASExperimentalDispatchApply = 1 << 12,                    // exp_dispatch_apply
   ASExperimentalImageDownloaderPriority = 1 << 13,          // exp_image_downloader_priority
+  ASExperimentalTextDrawing = 1 << 14,                      // exp_text_drawing
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

@@ -230,6 +230,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int interopAlwaysDequeue:1;
     // Whether this interop data source implements viewForSupplementaryElementOfKind:
     unsigned int interopViewForSupplementaryElement:1;
+    unsigned int modelIdentifierMethods:1; // if both modelIdentifierForElementAtIndexPath and indexPathForElementWithModelIdentifier are implemented
   } _asyncDataSourceFlags;
   
   struct {
@@ -479,6 +480,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       _asyncDataSourceFlags.interopAlwaysDequeue = [[interopDataSource class] respondsToSelector:@selector(dequeuesCellsForNodeBackedItems)] && [[interopDataSource class] dequeuesCellsForNodeBackedItems];
       _asyncDataSourceFlags.interopViewForSupplementaryElement = [interopDataSource respondsToSelector:@selector(collectionView:viewForSupplementaryElementOfKind:atIndexPath:)];
     }
+
+    _asyncDataSourceFlags.modelIdentifierMethods = [_asyncDataSource respondsToSelector:@selector(modelIdentifierForElementAtIndexPath:inNode:)] && [_asyncDataSource respondsToSelector:@selector(indexPathForElementWithModelIdentifier:inNode:)];
+
 
     ASDisplayNodeAssert(_asyncDataSourceFlags.collectionNodeNumberOfItemsInSection || _asyncDataSourceFlags.collectionViewNumberOfItemsInSection, @"Data source must implement collectionNode:numberOfItemsInSection:");
     ASDisplayNodeAssert(_asyncDataSourceFlags.collectionNodeNodeBlockForItem
@@ -797,6 +801,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)invalidateFlowLayoutDelegateMetrics
 {
   // Subclass hook
+}
+
+- (nullable NSString *)modelIdentifierForElementAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view {
+    if (_asyncDataSourceFlags.modelIdentifierMethods) {
+        GET_COLLECTIONNODE_OR_RETURN(collectionNode, nil);
+        NSIndexPath *convertedPath = [self convertIndexPathToCollectionNode:indexPath];
+        if (convertedPath == nil) {
+            return nil;
+        } else {
+            return [_asyncDataSource modelIdentifierForElementAtIndexPath:convertedPath inNode:collectionNode];
+        }
+    } else {
+        return nil;
+    }
+}
+
+- (nullable NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view {
+    if (_asyncDataSourceFlags.modelIdentifierMethods) {
+        GET_COLLECTIONNODE_OR_RETURN(collectionNode, nil);
+        return [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:collectionNode];
+    } else {
+        return nil;
+    }
 }
 
 #pragma mark Internal
