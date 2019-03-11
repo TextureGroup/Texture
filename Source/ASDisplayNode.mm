@@ -1155,7 +1155,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
       break;
   }
 #else
+#if YOGA
   return [self calculateLayoutYoga:constrainedSize];
+#endif // YOGA
 #endif // AS_ENABLE_LAYOUTSPECS
 
   // If this case is reached a layout type engine was defined for a node that is currently

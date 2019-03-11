@@ -7,6 +7,9 @@
 //
 
 #import <AsyncDisplayKit/ASAvailability.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import "ASButtonNode+Yoga.h"
 #import <AsyncDisplayKit/ASButtonNode+Private.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
@@ -104,3 +107,5 @@ static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *s
 @end
 
 #endif
+
+#endif // AS_ENABLE_LAYOUTSPECS

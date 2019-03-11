@@ -6,8 +6,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASButtonNode.h>
+
+#if AS_ENABLE_LAYOUTSPECS
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,3 +19,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

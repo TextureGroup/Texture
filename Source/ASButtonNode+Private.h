@@ -7,6 +7,9 @@
 //
 
 #import <AsyncDisplayKit/ASButtonNode.h>
+
+#if AS_ENABLE_LAYOUTSPECS
+
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASStackLayoutDefines.h>
@@ -42,3 +45,5 @@
 }
 
 @end
+
+#endif
