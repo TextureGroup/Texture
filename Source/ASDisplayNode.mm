@@ -3465,7 +3465,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   // and table views. This needs to be weighed against the cost of
   // reallocing a _ASPendingState. So in range managed nodes we
   // delete the pending state, otherwise we just clear it.
-  if (ASHierarchyStateIncludesRangeManaged(_hierarchyState)) {
+  if (ASHierarchyStateIncludesRangeManaged(_hierarchyState) || ASActivateExperimentalFeature(ASExperimentalReleasePendingState)) {
     _pendingViewState = nil;
   } else {
     [_pendingViewState clearChanges];
