@@ -92,7 +92,7 @@ NS_INLINE ASConfigurationManager *ASConfigurationManagerGet() {
 // Define this even when !DEBUG, since we may run our tests in release mode.
 + (void)test_resetWithConfiguration:(ASConfiguration *)configuration
 {
-  ASConfigurationManager *inst = ASGetSharedConfigMgr();
+  ASConfigurationManager *inst = ASConfigurationManagerGet();
   inst->_config = configuration ?: [self defaultConfiguration];
   atomic_store(&inst->_activatedExperiments, 0);
 }
