@@ -648,7 +648,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * more efficient than CALayer. The only limitation of this approach is that it cannot clip children, and
  * thus works best for ASImageNodes or containers showing a background around their children.
  *
- * - ASCornerRoundingTypeClipping: overlays 4 seperate opaque corners on top of the content that needs
+ * - ASCornerRoundingTypeClipping: overlays 4 separate opaque corners on top of the content that needs
  * corner rounding. Requires .backgroundColor and .cornerRadius to be set. Use clip corners in situations 
  * in which is movement through the corner, with an opaque background (no movement underneath the corner).
  * Clipped corners are ideal for animating / resizing views, and still outperform CALayer.
