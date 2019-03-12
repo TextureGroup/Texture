@@ -89,6 +89,9 @@ typedef struct {
   int setActions:1;
 } ASPendingStateFlags;
 
+
+static constexpr ASPendingStateFlags kZeroFlags = {0};
+
 @implementation _ASPendingState
 {
   @package //Expose all ivars for ASDisplayNode to bypass getters for efficiency
@@ -948,7 +951,7 @@ static UIColor *defaultTintColor = nil;
    because a different setter would be called.
    */
 
-  CALayer *layer = view.layer;
+  unowned CALayer *layer = view.layer;
 
   ASPendingStateFlags flags = _flags;
   if (__shouldSetNeedsDisplay(layer)) {
@@ -990,6 +993,9 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setRasterizationScale)
     layer.rasterizationScale = rasterizationScale;
+
+  if (flags.setActions)
+    layer.actions = actions;
 
   if (flags.setClipsToBounds)
     view.clipsToBounds = clipsToBounds;
@@ -1284,7 +1290,7 @@ static UIColor *defaultTintColor = nil;
 
 - (void)clearChanges
 {
-  _flags = (ASPendingStateFlags){ 0 };
+  _flags = kZeroFlags;
 }
 
 - (BOOL)hasSetNeedsLayout
@@ -1299,69 +1305,7 @@ static UIColor *defaultTintColor = nil;
 
 - (BOOL)hasChanges
 {
-  ASPendingStateFlags flags = _flags;
-
-  return (flags.setAnchorPoint
-  || flags.setPosition
-  || flags.setZPosition
-  || flags.setFrame
-  || flags.setBounds
-  || flags.setPosition
-  || flags.setTransform
-  || flags.setSublayerTransform
-  || flags.setContents
-  || flags.setContentsGravity
-  || flags.setContentsRect
-  || flags.setContentsCenter
-  || flags.setContentsScale
-  || flags.setRasterizationScale
-  || flags.setClipsToBounds
-  || flags.setBackgroundColor
-  || flags.setTintColor
-  || flags.setHidden
-  || flags.setAlpha
-  || flags.setCornerRadius
-  || flags.setContentMode
-  || flags.setUserInteractionEnabled
-  || flags.setExclusiveTouch
-  || flags.setShadowOpacity
-  || flags.setShadowOffset
-  || flags.setShadowRadius
-  || flags.setShadowColor
-  || flags.setBorderWidth
-  || flags.setBorderColor
-  || flags.setAutoresizingMask
-  || flags.setAutoresizesSubviews
-  || flags.setNeedsDisplayOnBoundsChange
-  || flags.setAllowsGroupOpacity
-  || flags.setAllowsEdgeAntialiasing
-  || flags.setEdgeAntialiasingMask
-  || flags.needsDisplay
-  || flags.needsLayout
-  || flags.setAsyncTransactionContainer
-  || flags.setOpaque
-  || flags.setSemanticContentAttribute
-  || flags.setLayoutMargins
-  || flags.setPreservesSuperviewLayoutMargins
-  || flags.setInsetsLayoutMarginsFromSafeArea
-  || flags.setIsAccessibilityElement
-  || flags.setAccessibilityLabel
-  || flags.setAccessibilityAttributedLabel
-  || flags.setAccessibilityHint
-  || flags.setAccessibilityAttributedHint
-  || flags.setAccessibilityValue
-  || flags.setAccessibilityAttributedValue
-  || flags.setAccessibilityTraits
-  || flags.setAccessibilityFrame
-  || flags.setAccessibilityLanguage
-  || flags.setAccessibilityElementsHidden
-  || flags.setAccessibilityViewIsModal
-  || flags.setShouldGroupAccessibilityChildren
-  || flags.setAccessibilityIdentifier
-  || flags.setAccessibilityNavigationStyle
-  || flags.setAccessibilityHeaderElements
-  || flags.setAccessibilityActivationPoint
-  || flags.setAccessibilityPath);
+  return !memcmp(&_flags, &kZeroFlags, sizeof(ASPendingStateFlags));
 }
 
 - (void)dealloc
