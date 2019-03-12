@@ -97,11 +97,11 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @interface ASDisplayNode : NSObject <ASLocking> {
 @public
   /**
-   * The _context ivar is unused by Texture, but provided to enable advanced clients to make powerful extensions to base class functionality.
-   * For example, _context can be used to implement category methods on ASDisplayNode that add functionality to all node subclass types.
+   * The _displayNodeContext ivar is unused by Texture, but provided to enable advanced clients to make powerful extensions to base class functionality.
+   * For example, _displayNodeContext can be used to implement category methods on ASDisplayNode that add functionality to all node subclass types.
    * Code demonstrating this technique can be found in the CatDealsCollectionView example.
    */
-  void *_context;
+  void *_displayNodeContext;
 }
 
 /** @name Initializing a node object */
