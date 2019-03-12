@@ -7,7 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
 #import <FBSnapshotTestCase/FBSnapshotTestCase.h>
+#pragma clang diagnostic pop
+
 #import "ASDisplayNodeTestsHelper.h"
 
 @class ASDisplayNode;
