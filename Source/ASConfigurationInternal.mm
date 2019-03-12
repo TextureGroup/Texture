@@ -12,13 +12,14 @@
 #import <AsyncDisplayKit/ASConfigurationDelegate.h>
 #import <stdatomic.h>
 
+static ASConfigurationManager *ASSharedConfigurationManager;
+static dispatch_once_t ASSharedConfigurationManagerOnceToken;
+
 NS_INLINE ASConfigurationManager *ASConfigurationManagerGet() {
-  static ASConfigurationManager *inst;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    inst = [[ASConfigurationManager alloc] init];
+  dispatch_once(&ASSharedConfigurationManagerOnceToken, ^{
+    ASSharedConfigurationManager = [[ASConfigurationManager alloc] init];
   });
-  return inst;
+  return ASSharedConfigurationManager;
 }
 
 @implementation ASConfigurationManager {
