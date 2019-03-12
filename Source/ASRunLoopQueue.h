@@ -68,13 +68,14 @@ AS_SUBCLASSING_RESTRICTED
 
 @end
 
+extern ASCATransactionQueue *_ASSharedCATransactionQueue;
+extern dispatch_once_t _ASSharedCATransactionQueueOnceToken;
+
 NS_INLINE ASCATransactionQueue *ASCATransactionQueueGet(void) {
-  static ASCATransactionQueue *q;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    q = [[ASCATransactionQueue alloc] init];
+  dispatch_once(&_ASSharedCATransactionQueueOnceToken, ^{
+    _ASSharedCATransactionQueue = [[ASCATransactionQueue alloc] init];
   });
-  return q;
+  return _ASSharedCATransactionQueue;
 }
 
 @interface ASDeallocQueue : NSObject

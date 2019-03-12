@@ -354,6 +354,9 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 // but after most other scheduled work on the runloop has processed.
 static int const kASASCATransactionQueueOrder = 1000000;
 
+ASCATransactionQueue *_ASSharedCATransactionQueue;
+dispatch_once_t _ASSharedCATransactionQueueOnceToken;
+
 - (instancetype)init
 {
   if (self = [super init]) {
