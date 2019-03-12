@@ -953,7 +953,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (void)setActions:(NSDictionary<NSString *,id<CAAction>> *)actions
 {
   _bridge_prologue_write;
-  _setToLayer(actions, [actions copy]);
+  _setToLayer(actions, actions);
 }
 
 - (void)safeAreaInsetsDidChange
