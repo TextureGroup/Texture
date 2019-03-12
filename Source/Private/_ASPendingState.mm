@@ -1305,7 +1305,7 @@ static UIColor *defaultTintColor = nil;
 
 - (BOOL)hasChanges
 {
-  return !memcmp(&_flags, &kZeroFlags, sizeof(ASPendingStateFlags));
+  return memcmp(&_flags, &kZeroFlags, sizeof(ASPendingStateFlags));
 }
 
 - (void)dealloc
