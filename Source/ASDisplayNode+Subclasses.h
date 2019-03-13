@@ -376,6 +376,13 @@ AS_CATEGORY_IMPLEMENTABLE
  */
 @property (readonly) CGFloat contentsScaleForDisplay;
 
+/**
+ * Called as part of actionForLayer:forKey:. Gives the node a chance to provide a custom action for its layer.
+ *
+ * The default implementation returns NSNull, indicating that no action should be taken.
+ */
+AS_CATEGORY_IMPLEMENTABLE
+- (nullable id<CAAction>)layerActionForKey:(NSString *)event;
 
 #pragma mark - Touch handling
 /** @name Touch handling */

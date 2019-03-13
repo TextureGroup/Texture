@@ -686,6 +686,8 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property (getter=isExclusiveTouch) BOOL exclusiveTouch;      // default=NO
 #endif
 
+@property (nullable, copy) NSDictionary<NSString *, id<CAAction>> *actions; // default = nil
+
 /**
  * @abstract The node view's background color.
  *

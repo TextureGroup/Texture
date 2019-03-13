@@ -9,6 +9,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <XCTest/XCTest.h>
+#import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
@@ -2695,6 +2696,19 @@ static bool stringContainsPointer(NSString *description, id p) {
     CALayer *cornerLayer = (*l)[i];
     XCTAssertTrue([cornerLayer.delegate isKindOfClass:[ASDisplayNodeCornerLayerDelegate class]], @"");
   }
+}
+
+- (void)testLayerActionForKeyIsCalled
+{
+  UIWindow *window = [[UIWindow alloc] init];
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+
+  id mockNode = OCMPartialMock(node);
+  OCMExpect([mockNode layerActionForKey:kCAOnOrderIn]);
+  [window.layer addSublayer:node.layer];
+  OCMExpect([mockNode layerActionForKey:@"position"]);
+  node.layer.position = CGPointMake(10, 10);
+  OCMVerifyAll(mockNode);
 }
 
 @end

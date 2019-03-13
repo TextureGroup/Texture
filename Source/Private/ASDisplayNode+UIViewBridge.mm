@@ -944,6 +944,18 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   }
 }
 
+- (NSDictionary<NSString *,id<CAAction>> *)actions
+{
+  _bridge_prologue_read;
+  return _getFromLayer(actions);
+}
+
+- (void)setActions:(NSDictionary<NSString *,id<CAAction>> *)actions
+{
+  _bridge_prologue_write;
+  _setToLayer(actions, actions);
+}
+
 - (void)safeAreaInsetsDidChange
 {
   ASDisplayNodeAssertMainThread();

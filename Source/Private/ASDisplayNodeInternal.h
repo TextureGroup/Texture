@@ -76,7 +76,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 
 #define NUM_CLIP_CORNER_LAYERS 4
 
-@interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
+@interface ASDisplayNode () <_ASTransitionContextCompletionDelegate, CALayerDelegate>
 {
 @package
   AS::RecursiveMutex __instanceLock__;
