@@ -159,10 +159,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 
   // Even though the UIKit action will take precedence, we still unconditionally forward to the node so that it can
   // track events like kCAOnOrderIn.
-  id<CAAction> nodeAction = (id)kCFNull;
-  if (ASDisplayNode *node = _asyncdisplaykit_node) {
-    nodeAction = [node actionForLayer:layer forKey:event];
-  }
+  id<CAAction> nodeAction = [_asyncdisplaykit_node actionForLayer:layer forKey:event];
 
   // If UIKit specifies an action, that takes precedence. That's an animation block so it's explicit.
   if (uikitAction && uikitAction != (id)kCFNull) {
