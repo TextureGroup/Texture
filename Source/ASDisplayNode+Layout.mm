@@ -23,19 +23,6 @@
 
 using AS::MutexLocker;
 
-@interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
-@end
-
-@implementation ASDisplayNode (ASLayoutElementStyleDelegate)
-
-#pragma mark <ASLayoutElementStyleDelegate>
-
-- (void)style:(ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName {
-  [self setNeedsLayout];
-}
-
-@end
-
 #pragma mark - ASDisplayNode (ASLayoutElement)
 
 @implementation ASDisplayNode (ASLayoutElement)
@@ -59,9 +46,8 @@ using AS::MutexLocker;
 
 - (ASLayoutElementStyle *)_locked_style
 {
-  ASAssertLocked(__instanceLock__);
   if (_style == nil) {
-    _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
+    _style = [[ASLayoutElementStyle alloc] init];
   }
   return _style;
 }

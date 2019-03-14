@@ -93,7 +93,6 @@
 
   // YGNodeRef removal is done in setParent:
   child.yogaParent = nil;
-  [self setNeedsLayout];
 }
 
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index
@@ -118,7 +117,6 @@
 
   // YGNodeRef insertion is done in setParent:
   child.yogaParent = self;
-  [self setNeedsLayout];
 }
 
 #pragma mark - Subclass Hooks
