@@ -166,6 +166,14 @@
   return _yogaCalculatedLayout;
 }
 
+- (BOOL)willApplyNextYogaCalculatedLayout {
+  return _willApplyNextYogaCalculatedLayout;
+}
+
+- (void)setWillApplyNextYogaCalculatedLayout:(BOOL)willApplyNextYogaCalculatedLayout {
+  _willApplyNextYogaCalculatedLayout = willApplyNextYogaCalculatedLayout;
+}
+
 - (void)setYogaLayoutInProgress:(BOOL)yogaLayoutInProgress
 {
   setFlag(YogaLayoutInProgress, yogaLayoutInProgress);
@@ -194,7 +202,7 @@
   return [ASLayout layoutWithLayoutElement:self size:size position:position sublayouts:nil];
 }
 
-- (void)setupYogaCalculatedLayout
+- (void)setupYogaCalculatedLayoutAndSetNeedsLayoutForChangedNodes:(BOOL)setNeedsLayoutForChangedNodes
 {
   ASScopedLockSelfOrToRoot();
 
@@ -231,6 +239,13 @@
   layout = [layout filteredNodeLayoutTree];
 
   if ([self.yogaCalculatedLayout isEqual:layout] == NO) {
+    if (setNeedsLayoutForChangedNodes && !self.willApplyNextYogaCalculatedLayout) {
+      // This flag will be set when this layout is intended for immediate display. In this case, we
+      // want to ensure that we call setNeedsLayout on any other nodes. Note that we skip any nodes
+      // whose willApplyNextYogaCalculatedLayout flags are set, as those are the nodes that are
+      // already being laid out.
+      [self setNeedsLayout];
+    }
     self.yogaCalculatedLayout = layout;
   } else {
     layout = self.yogaCalculatedLayout;
@@ -320,7 +335,7 @@
     if (self.yogaLayoutInProgress == NO) {
       ASYogaLog("Calculating yoga layout from root %@, %@", self,
               NSStringFromASSizeRange(constrainedSize));
-      [self calculateLayoutFromYogaRoot:constrainedSize];
+      [self calculateLayoutFromYogaRoot:constrainedSize willApply:self.willApplyNextYogaCalculatedLayout];
     } else {
       ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
     }
@@ -337,7 +352,7 @@
   return [self calculateLayoutLayoutSpec:constrainedSize];
 }
 
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
+- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize willApply:(BOOL)willApply
 {
   ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout];
   ASDisplayNode *yogaRoot = self.yogaRoot;
@@ -345,7 +360,7 @@
   if (self != yogaRoot) {
     ASYogaLog("ESCALATING to Yoga root: %@", self);
     // TODO(appleguy): Consider how to get the constrainedSize for the yogaRoot when escalating manually.
-    [yogaRoot calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained];
+    [yogaRoot calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained willApply:willApply];
     return;
   }
 
@@ -398,7 +413,7 @@
   });
 
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode * _Nonnull node) {
-    [node setupYogaCalculatedLayout];
+    [node setupYogaCalculatedLayoutAndSetNeedsLayoutForChangedNodes:willApply];
     node.yogaLayoutInProgress = NO;
   });
 
