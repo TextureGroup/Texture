@@ -40,14 +40,12 @@
 
 - (void)performBlockOnMainThread:(dispatch_block_t)block
 {
-
-  AS::UniqueLock l(_serialQueueLock);
-  [_blocks addObject:block];
   {
-    l.unlock();
-    [self runBlocks];
-    l.lock();
+    AS::MutexLocker l(_serialQueueLock);
+    [_blocks addObject:block];
   }
+
+  [self runBlocks];
 }
 
 - (void)runBlocks
