@@ -14,8 +14,8 @@ typedef NS_ENUM(NSUInteger, ASStackLayoutDirection) {
   /** Children are stacked vertically */
   ASStackLayoutDirectionVertical,
   /** Children are stacked horizontally */
-#if YOGA
   ASStackLayoutDirectionHorizontal,
+#if YOGA
   /** Children are stacked vertically, but in reverse. Only used by Yoga spec. */
   ASStackLayoutDirectionVerticalReverse,
   /** Children are stacked horizontally, but in reverse. Only used by Yoga spec. */
