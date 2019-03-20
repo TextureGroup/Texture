@@ -15,6 +15,12 @@ typedef NS_ENUM(NSUInteger, ASStackLayoutDirection) {
   ASStackLayoutDirectionVertical,
   /** Children are stacked horizontally */
   ASStackLayoutDirectionHorizontal,
+#if YOGA
+  /** Children are stacked vertically, but in reverse. Only used by Yoga spec. */
+  ASStackLayoutDirectionVerticalReverse,
+  /** Children are stacked horizontally, but in reverse. Only used by Yoga spec. */
+  ASStackLayoutDirectionHorizontalReverse,
+#endif
 };
 
 /** If no children are flexible, how should this spec justify its children in the available space? */
