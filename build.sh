@@ -69,11 +69,11 @@ if type xcpretty-travis-formatter &> /dev/null; then
 fi
 
 if [ "$MODE" = "tests" -o "$MODE" = "all" ]; then
-    echo "Building & testing AsyncDisplayKit."
+    echo "Building & testing Texture."
     pod install
     set -o pipefail && xcodebuild \
-        -workspace AsyncDisplayKit.xcworkspace \
-        -scheme AsyncDisplayKit \
+        -workspace Texture.xcworkspace \
+        -scheme Texture \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
         build-for-testing test | xcpretty $FORMATTER
@@ -93,7 +93,7 @@ if [ "$MODE" = "tests_listkit" ]; then
 fi
 
 if [ "$MODE" = "examples" -o "$MODE" = "all" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -106,7 +106,7 @@ if [ "$MODE" = "examples" -o "$MODE" = "all" ]; then
 fi
 
 if [ "$MODE" = "examples-pt1" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -119,7 +119,7 @@ if [ "$MODE" = "examples-pt1" ]; then
 fi
 
 if [ "$MODE" = "examples-pt2" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -132,7 +132,7 @@ if [ "$MODE" = "examples-pt2" ]; then
 fi
 
 if [ "$MODE" = "examples-pt3" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -145,7 +145,7 @@ if [ "$MODE" = "examples-pt3" ]; then
 fi
 
 if [ "$MODE" = "examples-extra" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -159,7 +159,7 @@ fi
 
 # Support building a specific example: sh build.sh example examples/ASDKLayoutTransition
 if [ "$MODE" = "example" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying that all Texture examples compile."
     #Update cocoapods repo
     pod repo update master
 
@@ -168,7 +168,7 @@ if [ "$MODE" = "example" ]; then
 fi
 
 if [ "$MODE" = "life-without-cocoapods" -o "$MODE" = "all" ]; then
-    echo "Verifying that AsyncDisplayKit functions as a static library."
+    echo "Verifying that Texture functions as a static library."
 
     set -o pipefail && xcodebuild \
         -workspace "smoke-tests/Life Without CocoaPods/Life Without CocoaPods.xcworkspace" \
@@ -180,7 +180,7 @@ if [ "$MODE" = "life-without-cocoapods" -o "$MODE" = "all" ]; then
 fi
 
 if [ "$MODE" = "framework" -o "$MODE" = "all" ]; then
-    echo "Verifying that AsyncDisplayKit functions as a dynamic framework (for Swift/Carthage users)."
+    echo "Verifying that Texture functions as a dynamic framework (for Swift/Carthage users)."
 
     set -o pipefail && xcodebuild \
         -project "smoke-tests/Framework/Sample.xcodeproj" \
