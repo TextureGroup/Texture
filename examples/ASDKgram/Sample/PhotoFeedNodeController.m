@@ -8,7 +8,7 @@
 //
 
 #import "PhotoFeedNodeController.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "Utilities.h"
 #import "PhotoModel.h"
 #import "PhotoCellNode.h"

@@ -7,7 +7,7 @@
 //
 
 #import "ASCollectionSectionController.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface ASCollectionSectionController ()
 @property (nonatomic, strong, readonly) dispatch_queue_t diffingQueue;

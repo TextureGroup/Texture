@@ -9,9 +9,9 @@
 
 #import "SupplementaryNode.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASCenterLayoutSpec.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASInsetLayoutSpec.h>
+#import <Texture/ASCenterLayoutSpec.h>
 
 static CGFloat kInsets = 15.0;
 

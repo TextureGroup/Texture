@@ -10,7 +10,7 @@
 #import "MapHandlerNode.h"
 #import "CustomMapAnnotation.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
 
 @interface MapHandlerNode () <ASEditableTextNodeDelegate, MKMapViewDelegate>

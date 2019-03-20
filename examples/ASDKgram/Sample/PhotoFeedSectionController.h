@@ -7,7 +7,7 @@
 //
 
 #import <IGListKit/IGListKit.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "RefreshingSectionControllerType.h"
 #import "ASCollectionSectionController.h"
 

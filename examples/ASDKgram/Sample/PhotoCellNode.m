@@ -9,8 +9,8 @@
 
 #import "PhotoCellNode.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDisplayNode+Beta.h>
 
 #import "Availability.h"
 #import "PINImageView+PINRemoteImage.h"

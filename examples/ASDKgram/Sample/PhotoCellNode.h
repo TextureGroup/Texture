@@ -8,7 +8,7 @@
 //
 
 #import "PhotoModel.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "PhotoTableViewCell.h"   // PhotoTableViewCellProtocol
 
 
