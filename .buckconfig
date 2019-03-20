@@ -8,7 +8,7 @@
   xctool_default_destination_specifier = platform=iOS Simulator, name=iPhone 6, OS=10.2
 
 [alias]
-  lib = //:AsyncDisplayKit
+  lib = //:Texture
   tests = //:Tests
 
 [httpserver]

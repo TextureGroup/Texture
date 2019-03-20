@@ -16,7 +16,7 @@ COMMON_LANG_PREPROCESSOR_FLAGS = {
 
 COMMON_LINKER_FLAGS = ['-ObjC++']
 
-ASYNCDISPLAYKIT_EXPORTED_HEADERS = glob([
+TEXTURE_EXPORTED_HEADERS = glob([
   'Source/*.h',
   'Source/Details/**/*.h',
   'Source/Layout/*.h',
@@ -30,10 +30,10 @@ ASYNCDISPLAYKIT_EXPORTED_HEADERS = glob([
   'Source/TextKit/ASTextKitComponents.h'
 ])
 
-ASYNCDISPLAYKIT_PRIVATE_HEADERS = glob([
+TEXTURE_PRIVATE_HEADERS = glob([
     'Source/**/*.h'
   ],
-  excludes = ASYNCDISPLAYKIT_EXPORTED_HEADERS,
+  excludes = TEXTURE_EXPORTED_HEADERS,
 )
 
 def asyncdisplaykit_library(
@@ -44,10 +44,10 @@ def asyncdisplaykit_library(
 
   apple_library(
     name = name,
-    prefix_header = 'Source/AsyncDisplayKit-Prefix.pch',
-    header_path_prefix = 'AsyncDisplayKit',
-    exported_headers = ASYNCDISPLAYKIT_EXPORTED_HEADERS,
-    headers = ASYNCDISPLAYKIT_PRIVATE_HEADERS,
+    prefix_header = 'Source/Texture-Prefix.pch',
+    header_path_prefix = 'Texture',
+    exported_headers = TEXTURE_EXPORTED_HEADERS,
+    headers = TEXTURE_PRIVATE_HEADERS,
     srcs = glob([
       'Source/**/*.m',
       'Source/**/*.mm',
@@ -80,14 +80,14 @@ def asyncdisplaykit_library(
   )
 
 #####################################
-# AsyncDisplayKit targets
+# Texture targets
 #####################################
 asyncdisplaykit_library(
   name = 'AsyncDisplayKit-Core',
 )
 
-# (Default) AsyncDisplayKit and AsyncDisplayKit-PINRemoteImage targets are basically the same library with different names
-for name in ['AsyncDisplayKit', 'AsyncDisplayKit-PINRemoteImage']:
+# (Default) Texture and AsyncDisplayKit-PINRemoteImage targets are basically the same library with different names
+for name in ['Texture', 'AsyncDisplayKit-PINRemoteImage']:
   asyncdisplaykit_library(
     name = name,
     deps = [
@@ -102,10 +102,10 @@ for name in ['AsyncDisplayKit', 'AsyncDisplayKit-PINRemoteImage']:
 # Test Host
 # TODO: Split to smaller BUCK files and parse in parallel
 #####################################
-apple_resource(		
-  name = 'TestHostResources',		
-  files = ['Tests/TestHost/Default-568h@2x.png'],		
-  dirs = [],		
+apple_resource(
+  name = 'TestHostResources',
+  files = ['Tests/TestHost/Default-568h@2x.png'],
+  dirs = [],
  )
 
 apple_bundle(
@@ -152,14 +152,14 @@ apple_resource(
 apple_test(
   name = 'Tests',
   test_host_app = ':TestHost',
-  info_plist = 'Tests/AsyncDisplayKitTests-Info.plist',
+  info_plist = 'Tests/TextureTests-Info.plist',
   info_plist_substitutions = {
     'PRODUCT_BUNDLE_IDENTIFIER': 'com.facebook.AsyncDisplayKitTests',
   },
-  prefix_header = 'Tests/AsyncDisplayKitTests-Prefix.pch',
-  header_path_prefix = 'AsyncDisplayKit',
+  prefix_header = 'Tests/TextureTests-Prefix.pch',
+  header_path_prefix = 'Texture',
   # Expose all ASDK headers to tests
-  headers = ASYNCDISPLAYKIT_EXPORTED_HEADERS + ASYNCDISPLAYKIT_PRIVATE_HEADERS + glob(['Tests/*.h']),
+  headers = TEXTURE_EXPORTED_HEADERS + TEXTURE_PRIVATE_HEADERS + glob(['Tests/*.h']),
   srcs = glob([
       'Tests/*.m',
       'Tests/*.mm'
