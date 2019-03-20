@@ -1527,9 +1527,6 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
 - (void)_layoutClipCornersIfNeeded
 {
   ASDisplayNodeAssertMainThread();
-  if (!_layer) {
-    return;
-  }
   if (_clipCornerLayers[0] == nil && _clipCornerLayers[1] == nil && _clipCornerLayers[2] == nil &&
       _clipCornerLayers[3] == nil) {
     return;
@@ -1549,18 +1546,6 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
 - (void)_updateClipCornerLayerContentsWithRadius:(CGFloat)radius backgroundColor:(UIColor *)backgroundColor
 {
   ASPerformBlockOnMainThread(^{
-    /// Cache the last path that was used.
-    static UIBezierPath *lastRoundedRect;
-    UIBezierPath *roundedRect;
-    if (lastRoundedRect.bounds.size.width == radius * 2) {
-      roundedRect = lastRoundedRect;
-    } else {
-      roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
-      [roundedRect setUsesEvenOddFillRule:YES];
-      [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
-      lastRoundedRect = roundedRect;
-    }
-
     for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
       // Skip corners that aren't clipped (we have already set up & torn down layers based on maskedCorners.)
       if (_clipCornerLayers[idx] == nil) {
@@ -1569,7 +1554,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
 
       // Layers are, in order: Top Left, Top Right, Bottom Left, Bottom Right, which mirrors CACornerMask.
       // anchorPoint is Bottom Left at 0,0 and Top Right at 1,1.
-      BOOL isTop = (idx == 0 || idx == 1);
+      BOOL isTop   = (idx == 0 || idx == 1);
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
@@ -1583,6 +1568,9 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
         CGContextTranslateCTM(ctx, 0, -radius + 1);
       }
 
+      UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
+      [roundedRect setUsesEvenOddFillRule:YES];
+      [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
       [backgroundColor setFill];
       [roundedRect fill];
 
@@ -1633,14 +1621,6 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
     _cornerRoundingType = newRoundingType;
     _maskedCorners = newMaskedCorners;
   __instanceLock__.unlock();
-
-  // If we were previously not rounded, and we're still not rounded e.g. changing the rounding type during init,
-  // stop here.
-  BOOL wasNotRounded = (oldCornerRadius == 0 || oldMaskedCorners == 0);
-  BOOL isNotRounded = (newCornerRadius == 0 || newMaskedCorners == 0);
-  if (wasNotRounded && isNotRounded) {
-    return;
-  }
 
   ASPerformBlockOnMainThread(^{
     ASDisplayNodeAssertMainThread();
