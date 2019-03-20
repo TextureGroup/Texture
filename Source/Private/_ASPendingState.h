@@ -11,6 +11,25 @@
 
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 
+@protocol _ASPendingState <ASDisplayNodeViewProperties, ASDisplayProperties>
+
+// Supports all of the properties included in the ASDisplayNodeViewProperties protocol
+
+- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
+- (void)applyToLayer:(CALayer *)layer;
+
++ (id<_ASPendingState>)pendingViewStateFromLayer:(CALayer *)layer;
++ (id<_ASPendingState>)pendingViewStateFromView:(UIView *)view;
+
+@property (nonatomic, readonly) BOOL hasSetNeedsLayout;
+@property (nonatomic, readonly) BOOL hasSetNeedsDisplay;
+
+- (void)clearChanges;
+
+@property (nonatomic, readonly) BOOL hasChanges;
+
+@end
+
 /**
 
  Private header for ASDisplayNode.mm
@@ -21,21 +40,8 @@
  When you want to configure a view from this pending state information, just call -applyToView:
  */
 
-@interface _ASPendingState : NSObject <ASDisplayNodeViewProperties, ASDisplayProperties>
+@interface _ASPendingStateInflated : NSObject <_ASPendingState>
 
-// Supports all of the properties included in the ASDisplayNodeViewProperties protocol
-
-- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
-- (void)applyToLayer:(CALayer *)layer;
-
-+ (_ASPendingState *)pendingViewStateFromLayer:(CALayer *)layer;
-+ (_ASPendingState *)pendingViewStateFromView:(UIView *)view;
-
-@property (nonatomic, readonly) BOOL hasSetNeedsLayout;
-@property (nonatomic, readonly) BOOL hasSetNeedsDisplay;
-
-@property (nonatomic, readonly) BOOL hasChanges;
-
-- (void)clearChanges;
+- (NSUInteger)cost;
 
 @end

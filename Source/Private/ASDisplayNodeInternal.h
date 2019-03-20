@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutTransition.h>
+#import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/_ASTransitionContext.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
@@ -33,7 +34,7 @@ BOOL ASDisplayNodeSubclassOverridesSelector(Class subclass, SEL selector);
 BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLayerBacked);
 
 /// Get the pending view state for the node, creating one if needed.
-_ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
+id<_ASPendingState> ASDisplayNodeGetPendingState(ASDisplayNode * node);
 
 typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
 {

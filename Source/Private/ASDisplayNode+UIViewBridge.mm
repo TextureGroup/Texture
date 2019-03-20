@@ -343,7 +343,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
         // We don't have to set frame directly, but we can't read properties.
         // Store the frame in our pending state, and it'll get decomposed into
         // bounds and position when the pending state is applied.
-        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        id<_ASPendingState> pendingState = ASDisplayNodeGetPendingState(self);
         if (nodeLoaded && !pendingState.hasChanges) {
           [[ASPendingStateController sharedInstance] registerNode:self];
         }
@@ -358,7 +358,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       } else {
         // We do have to set frame directly, but either the node isn't loaded or we're on a non-main thread.
         // Set the frame on the pending state, and it'll call setFrame: when applied.
-        _ASPendingState *pendingState = ASDisplayNodeGetPendingState(self);
+        id<_ASPendingState> pendingState = ASDisplayNodeGetPendingState(self);
         if (nodeLoaded && !pendingState.hasChanges) {
           [[ASPendingStateController sharedInstance] registerNode:self];
         }

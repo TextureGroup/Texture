@@ -70,6 +70,101 @@ static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
 
 @end
 
+@interface ASPendingStateState: NSObject
+
+@property (nonatomic, assign) BOOL reset;
+
+@end
+
+@implementation ASPendingStateState
+@end
+
+@interface ASPendingStateTracker: NSObject {
+    NSMapTable <ASDisplayNode *, ASPendingStateState *> *_nodes;
+    NSLock *_lock;
+}
+
+@end
+
+@implementation ASPendingStateTracker
+
++ (instancetype)sharedTracker
+{
+    static dispatch_once_t onceToken;
+    static ASPendingStateTracker *sharedTracker;
+    dispatch_once(&onceToken, ^{
+        sharedTracker = [[ASPendingStateTracker alloc] init];
+    });
+    return sharedTracker;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _nodes = [NSMapTable weakToStrongObjectsMapTable];
+        _lock = [[NSLock alloc] init];
+    }
+    return self;
+}
+
+- (void)nodeSetPendingState:(ASDisplayNode *)node
+{
+    [_lock lock];
+    ASPendingStateState *state = [_nodes objectForKey:node];
+    if (state) {
+        state.reset = YES;
+    } else {
+        ASPendingStateState *state = [ASPendingStateState new];
+        [_nodes setObject:state forKey:node];
+    }
+    [_lock unlock];
+}
+
+- (NSString *)description
+{
+    NSUInteger clearedVisible = 0;
+    NSUInteger clearedInvisible = 0;
+    NSUInteger visibleNodes = 0;
+    NSUInteger visibleNodesReset = 0;
+    NSUInteger invisibleNodes = 0;
+    NSUInteger invisibleNodesReset = 0;
+    
+    NSUInteger invisibleCost = 0;
+    NSUInteger invisibleCostLL = 0;
+    [_lock lock];
+    for (ASDisplayNode *node in _nodes.keyEnumerator) {
+        if (node->_pendingViewState != nil) {
+            ASPendingStateState *state = [_nodes objectForKey:node];
+            if (node.isVisible) {
+                if (state.reset) {
+                    visibleNodesReset++;
+                } else {
+                    visibleNodes++;
+                }
+            } else {
+                if (state.reset) {
+                    invisibleNodesReset++;
+                } else {
+                    invisibleNodes++;
+                }
+                invisibleCost += 816;
+//                invisibleCostLL += node->_pendingViewState.cost;
+            }
+        } else {
+            if (node.isVisible) {
+                clearedVisible++;
+            } else {
+                clearedInvisible++;
+            }
+        }
+    }
+    [_lock unlock];
+    
+    return [NSString stringWithFormat:@"\nCleared visible: %d\nCleared invisible: %d\nVisible once:%d\nVisible reset:%d\nInvisible once: %d\nInvisible reset: %d\nInvisible cost: %d\nInvisible cost LL: %d", clearedVisible, clearedInvisible, visibleNodes, visibleNodesReset, invisibleNodes, invisibleNodesReset, invisibleCost, invisibleCostLL];
+}
+
+@end
+
 @implementation ASDisplayNode
 
 @dynamic layoutElementType;
@@ -91,13 +186,22 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
   return isSynchronous && !isLayerBacked;
 }
 
-_ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
+id<_ASPendingState> ASDisplayNodeGetPendingState(ASDisplayNode *node)
 {
   ASLockScope(node);
   _ASPendingState *result = node->_pendingViewState;
   if (result == nil) {
     result = [[_ASPendingState alloc] init];
     node->_pendingViewState = result;
+    [[ASPendingStateTracker sharedTracker] nodeSetPendingState:node];
+      static dispatch_once_t onceToken;
+      dispatch_once(&onceToken, ^{
+          [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+              NSLog (@"%@", [ASPendingStateTracker sharedTracker]);
+          }];
+      });
+  } else if (result.hasChanges == NO) {
+      [[ASPendingStateTracker sharedTracker] nodeSetPendingState:node];
   }
   return result;
 }

@@ -91,10 +91,9 @@ typedef struct {
   int setMaskedCorners : 1;
 } ASPendingStateFlags;
 
-
 static constexpr ASPendingStateFlags kZeroFlags = {0};
 
-@implementation _ASPendingState
+@implementation _ASPendingStateInflated
 {
   @package //Expose all ivars for ASDisplayNode to bypass getters for efficiency
 
@@ -161,7 +160,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
  * Note we can't read bounds and position in the background, so we have to keep the frame
  * value intact until application time (now).
  */
-ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *state, CALayer *layer) {
+ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingStateInflated *state, CALayer *layer) {
   ASPendingStateFlags flags = state->_flags;
   if (flags.setFrame) {
     CGRect _bounds = CGRectZero;
@@ -1206,12 +1205,12 @@ static UIColor *defaultTintColor = nil;
 }
 
 // FIXME: Make this more efficient by tracking which properties are set rather than reading everything.
-+ (_ASPendingState *)pendingViewStateFromLayer:(CALayer *)layer
++ (id<_ASPendingState>)pendingViewStateFromLayer:(CALayer *)layer
 {
   if (!layer) {
     return nil;
   }
-  _ASPendingState *pendingState = [[_ASPendingState alloc] init];
+  _ASPendingStateInflated *pendingState = [[_ASPendingStateInflated alloc] init];
   pendingState.anchorPoint = layer.anchorPoint;
   pendingState.position = layer.position;
   pendingState.zPosition = layer.zPosition;
@@ -1245,12 +1244,12 @@ static UIColor *defaultTintColor = nil;
 }
 
 // FIXME: Make this more efficient by tracking which properties are set rather than reading everything.
-+ (_ASPendingState *)pendingViewStateFromView:(UIView *)view
++ (id<_ASPendingState>)pendingViewStateFromView:(UIView *)view
 {
   if (!view) {
     return nil;
   }
-  _ASPendingState *pendingState = [[_ASPendingState alloc] init];
+  _ASPendingStateInflated *pendingState = [[_ASPendingStateInflated alloc] init];
 
   CALayer *layer = view.layer;
   pendingState.anchorPoint = layer.anchorPoint;
@@ -1352,6 +1351,76 @@ static UIColor *defaultTintColor = nil;
   if (borderColor != blackColorRef) {
     CGColorRelease(borderColor);
   }
+}
+
+- (NSUInteger)cost
+{
+    ASPendingStateFlags flags = _flags;
+    
+    NSUInteger total = 0;
+    total += flags.setAnchorPoint ? sizeof(self.anchorPoint) + sizeof(void *) : 0;
+    total += flags.setPosition ? sizeof(self.position) + sizeof(void *) : 0;
+    total += flags.setZPosition ? sizeof(self.zPosition) + sizeof(void *) : 0;
+    total += flags.setFrame ? sizeof(self.frame) + sizeof(void *) : 0;
+    total += flags.setBounds ? sizeof(self.bounds) + sizeof(void *) : 0;
+    total += flags.setPosition ? sizeof(self.position) + sizeof(void *) : 0;
+    total += flags.setTransform ? sizeof(self.transform) + sizeof(void *) : 0;
+    total += flags.setSublayerTransform ? sizeof(self.sublayerTransform) + sizeof(void *) : 0;
+    total += flags.setContents ? sizeof(self.contents) + sizeof(void *) : 0;
+    total += flags.setContentsGravity ? sizeof(self.contentsGravity) + sizeof(void *) : 0;
+    total += flags.setContentsRect ? sizeof(self.contentsRect) + sizeof(void *) : 0;
+    total += flags.setContentsCenter ? sizeof(self.contentsCenter) + sizeof(void *) : 0;
+    total += flags.setContentsScale ? sizeof(self.contentsScale) + sizeof(void *) : 0;
+    total += flags.setRasterizationScale ? sizeof(self.rasterizationScale) + sizeof(void *) : 0;
+    total += flags.setClipsToBounds ? sizeof(self.clipsToBounds) + sizeof(void *) : 0;
+    total += flags.setBackgroundColor ? sizeof(self.backgroundColor) + sizeof(void *) : 0;
+    total += flags.setTintColor ? sizeof(self.tintColor) + sizeof(void *) : 0;
+    total += flags.setHidden ? sizeof(self.hidden) + sizeof(void *) : 0;
+    total += flags.setAlpha ? sizeof(self.alpha) + sizeof(void *) : 0;
+    total += flags.setCornerRadius ? sizeof(self.cornerRadius) + sizeof(void *) : 0;
+    total += flags.setContentMode ? sizeof(self.contentMode) + sizeof(void *) : 0;
+    total += flags.setUserInteractionEnabled ? sizeof(self.userInteractionEnabled) + sizeof(void *) : 0;
+    total += flags.setExclusiveTouch ? sizeof(self.exclusiveTouch) + sizeof(void *) : 0;
+    total += flags.setShadowOpacity ? sizeof(self.shadowOpacity) + sizeof(void *) : 0;
+    total += flags.setShadowOffset ? sizeof(self.shadowOffset) + sizeof(void *) : 0;
+    total += flags.setShadowRadius ? sizeof(self.shadowRadius) + sizeof(void *) : 0;
+    total += flags.setShadowColor ? sizeof(self.shadowColor) + sizeof(void *) : 0;
+    total += flags.setBorderWidth ? sizeof(self.borderWidth) + sizeof(void *) : 0;
+    total += flags.setBorderColor ? sizeof(self.borderColor) + sizeof(void *) : 0;
+    total += flags.setAutoresizingMask ? sizeof(self.autoresizingMask) + sizeof(void *) : 0;
+    total += flags.setAutoresizesSubviews ? sizeof(self.autoresizesSubviews) + sizeof(void *) : 0;
+    total += flags.setNeedsDisplayOnBoundsChange ? sizeof(self.needsDisplayOnBoundsChange) + sizeof(void *) : 0;
+    total += flags.setAllowsGroupOpacity ? sizeof(self.allowsGroupOpacity) + sizeof(void *) : 0;
+    total += flags.setAllowsEdgeAntialiasing ? sizeof(self.allowsEdgeAntialiasing) + sizeof(void *) : 0;
+    total += flags.setEdgeAntialiasingMask ? sizeof(self.edgeAntialiasingMask) + sizeof(void *) : 0;
+    total += flags.needsDisplay ? sizeof(BOOL) + sizeof(void *) : 0;
+    total += flags.needsLayout ? sizeof(BOOL) + sizeof(void *) : 0;
+    total += flags.setAsyncTransactionContainer ? sizeof(self->asyncTransactionContainer) + sizeof(void *) : 0;
+    total += flags.setOpaque ? sizeof(self.opaque) + sizeof(void *) : 0;
+    total += flags.setSemanticContentAttribute ? sizeof(self.semanticContentAttribute) + sizeof(void *) : 0;
+    total += flags.setLayoutMargins ? sizeof(self.layoutMargins) + sizeof(void *) : 0;
+    total += flags.setPreservesSuperviewLayoutMargins ? sizeof(self.preservesSuperviewLayoutMargins) + sizeof(void *) : 0;
+    total += flags.setInsetsLayoutMarginsFromSafeArea ? sizeof(self.insetsLayoutMarginsFromSafeArea) + sizeof(void *) : 0;
+    total += flags.setIsAccessibilityElement ? sizeof(self.isAccessibilityElement) + sizeof(void *) : 0;
+    total += flags.setAccessibilityLabel ? sizeof(self.accessibilityLabel) + sizeof(void *) : 0;
+    total += flags.setAccessibilityAttributedLabel ? sizeof(self.accessibilityAttributedLabel) + sizeof(void *) : 0;
+    total += flags.setAccessibilityHint ? sizeof(self.accessibilityHint) + sizeof(void *) : 0;
+    total += flags.setAccessibilityAttributedHint ? sizeof(self.accessibilityAttributedHint) + sizeof(void *) : 0;
+    total += flags.setAccessibilityValue ? sizeof(self.accessibilityValue) + sizeof(void *) : 0;
+    total += flags.setAccessibilityAttributedValue ? sizeof(self.accessibilityAttributedValue) + sizeof(void *) : 0;
+    total += flags.setAccessibilityTraits ? sizeof(self.accessibilityTraits) + sizeof(void *) : 0;
+    total += flags.setAccessibilityFrame ? sizeof(self.accessibilityFrame) + sizeof(void *) : 0;
+    total += flags.setAccessibilityLanguage ? sizeof(self.accessibilityLanguage) + sizeof(void *) : 0;
+    total += flags.setAccessibilityElementsHidden ? sizeof(self.accessibilityElementsHidden) + sizeof(void *) : 0;
+    total += flags.setAccessibilityViewIsModal ? sizeof(self.accessibilityViewIsModal) + sizeof(void *) : 0;
+    total += flags.setShouldGroupAccessibilityChildren ? sizeof(self.shouldGroupAccessibilityChildren) + sizeof(void *) : 0;
+    total += flags.setAccessibilityIdentifier ? sizeof(self.accessibilityIdentifier) + sizeof(void *) : 0;
+    total += flags.setAccessibilityNavigationStyle ? sizeof(self.accessibilityNavigationStyle) + sizeof(void *) : 0;
+    total += flags.setAccessibilityHeaderElements ? sizeof(self->accessibilityHeaderElements) + sizeof(void *) : 0;
+    total += flags.setAccessibilityActivationPoint ? sizeof(self.accessibilityActivationPoint) + sizeof(void *) : 0;
+    total += flags.setAccessibilityPath ? sizeof(self.accessibilityPath) + sizeof(void *) : 0;
+    
+    return total;
 }
 
 @end
