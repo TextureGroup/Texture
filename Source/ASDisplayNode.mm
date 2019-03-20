@@ -1590,7 +1590,9 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
     ASDisplayNodeAssertMainThread();
     for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
       BOOL visible = (0 != (visibleCornerLayers & (1 << idx)));
-      if (visible && _clipCornerLayers[idx] == nil) {
+      if (visible == (_clipCornerLayers[idx] != nil)) {
+        continue;
+      } else if (visible) {
         static ASDisplayNodeCornerLayerDelegate *clipCornerLayers;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
@@ -1625,7 +1627,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   ASPerformBlockOnMainThread(^{
     ASDisplayNodeAssertMainThread();
     
-    if (oldRoundingType != newRoundingType || oldCornerRadius != newCornerRadius) {
+    if (oldRoundingType != newRoundingType || oldCornerRadius != newCornerRadius || oldMaskedCorners != newMaskedCorners) {
       if (oldRoundingType == ASCornerRoundingTypeDefaultSlowCALayer) {
         if (newRoundingType == ASCornerRoundingTypePrecomposited) {
           self.layerCornerRadius = 0.0;

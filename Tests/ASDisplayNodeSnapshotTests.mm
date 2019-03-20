@@ -8,6 +8,7 @@
 
 #import "ASSnapshotTestCase.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 @interface ASDisplayNodeSnapshotTests : ASSnapshotTestCase
 
@@ -45,7 +46,7 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
 
 - (void)testPrecompositedCornerRounding
 {
-  for (CACornerMask c = 1; c <= 0xf; c |= (c << 1)) {
+  for (CACornerMask c = 1; c <= kASCACornerAllCorners; c |= (c << 1)) {
     auto node = [[ASImageNode alloc] init];
     auto bounds = CGRectMake(0, 0, 100, 100);
     node.image = BlueImageMake(bounds);
@@ -60,7 +61,7 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
 
 - (void)testClippingCornerRounding
 {
-  for (CACornerMask c = 1; c <= 0xf; c |= (c << 1)) {
+  for (CACornerMask c = 1; c <= kASCACornerAllCorners; c |= (c << 1)) {
     auto node = [[ASImageNode alloc] init];
     auto bounds = CGRectMake(0, 0, 100, 100);
     node.image = BlueImageMake(bounds);
