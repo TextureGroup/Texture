@@ -193,6 +193,13 @@
     case ASStackLayoutDirectionHorizontal:
       [result insertObject:@{ (id)kCFNull: @"horizontal" } atIndex:0];
       break;
+#if YOGA
+    case ASStackLayoutDirectionVerticalReverse:
+    case ASStackLayoutDirectionHorizontalReverse:
+      // Currently not handled.
+      ASDisplayNodeFailAssert(@"Reverse directions not implemented.");
+      break;
+#endif
   }
 
   return result;
