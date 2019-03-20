@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASViewController.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASViewController.h>
+#import <Texture/ASBaseDefines.h>
 
 #if AS_ENABLE_TIPS
 

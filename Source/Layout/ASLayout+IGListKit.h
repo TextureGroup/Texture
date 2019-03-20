@@ -7,7 +7,7 @@
 //
 
 #if AS_IG_LIST_KIT
-#import <AsyncDisplayKit/ASLayout.h>
+#import <Texture/ASLayout.h>
 #import <IGListKit/IGListKit.h>
 @interface ASLayout(IGListKit) <IGListDiffable>
 @end

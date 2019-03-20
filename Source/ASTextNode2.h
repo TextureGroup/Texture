@@ -6,9 +6,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASTextNodeCommon.h>
+#import <Texture/ASControlNode.h>
+#import <Texture/ASDisplayNode+Beta.h>
+#import <Texture/ASTextNodeCommon.h>
 
 @protocol ASTextLinePositionModifier;
 

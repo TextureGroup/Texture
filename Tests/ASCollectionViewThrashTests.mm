@@ -8,8 +8,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASCollectionView.h>
+#import <Texture/Texture.h>
+#import <Texture/ASCollectionView.h>
 #import <stdatomic.h>
 
 #import "ASThrashUtility.h"

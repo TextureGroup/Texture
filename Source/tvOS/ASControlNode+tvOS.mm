@@ -9,8 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #if TARGET_OS_TV
-#import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASControlNode+Private.h>
+#import <Texture/ASControlNode.h>
+#import <Texture/ASControlNode+Private.h>
 
 @implementation ASControlNode (tvOS)
 

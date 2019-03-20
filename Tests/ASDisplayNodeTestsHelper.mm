@@ -8,9 +8,9 @@
 //
 
 #import "ASDisplayNodeTestsHelper.h"
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASRunLoopQueue.h>
 
 #import <QuartzCore/QuartzCore.h>
 

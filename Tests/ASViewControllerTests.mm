@@ -11,7 +11,7 @@
 
 #import <OCMock/OCMock.h>
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 #import "NSInvocation+ASTestHelpers.h"
 

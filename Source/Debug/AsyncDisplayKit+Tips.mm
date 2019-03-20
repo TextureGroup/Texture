@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/AsyncDisplayKit+Tips.h>
-#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
+#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/ASDisplayNode+Ancestry.h>
 
 @implementation ASDisplayNode (Tips)
 

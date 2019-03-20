@@ -8,7 +8,7 @@
 
 #import "ASTestCase.h"
 
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <Texture/ASRunLoopQueue.h>
 
 #import "ASDisplayNodeTestsHelper.h"
 

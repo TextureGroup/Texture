@@ -8,7 +8,7 @@
 //
 
 #import "ASTipProvider.h"
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 #if AS_ENABLE_TIPS
 

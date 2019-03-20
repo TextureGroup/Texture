@@ -6,13 +6,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
+#import <Texture/_ASCollectionGalleryLayoutItem.h>
 
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutElementPrivate.h>
-#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
+#import <Texture/ASCollectionElement.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASLayoutElementPrivate.h>
+#import <Texture/ASLayoutElementStylePrivate.h>
+#import <Texture/ASLayoutSpec.h>
 
 @implementation _ASGalleryLayoutItem {
   std::atomic<ASPrimitiveTraitCollection> _primitiveTraitCollection;

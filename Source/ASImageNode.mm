@@ -7,30 +7,30 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASImageNode.h>
+#import <Texture/ASImageNode.h>
 
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASTextNode.h>
-#import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
-#import <AsyncDisplayKit/ASImageNode+CGExtras.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASHashing.h>
-#import <AsyncDisplayKit/ASWeakMap.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <Texture/_ASDisplayLayer.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASDimension.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASGraphicsContext.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASTextNode.h>
+#import <Texture/ASImageNode+AnimatedImagePrivate.h>
+#import <Texture/ASImageNode+CGExtras.h>
+#import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASHashing.h>
+#import <Texture/ASWeakMap.h>
+#import <Texture/CoreGraphics+ASConvenience.h>
 
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <Texture/ASDisplayNodeInternal.h>
 
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 

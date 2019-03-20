@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCollections.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASCollections.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASTwoDimensionalArrayUtils.h>
 
 #import <vector>
 

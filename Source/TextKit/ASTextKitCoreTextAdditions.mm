@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitCoreTextAdditions.h>
+#import <Texture/ASTextKitCoreTextAdditions.h>
 
 #if AS_ENABLE_TEXTNODE
 
 #import <CoreText/CTFont.h>
 #import <CoreText/CTStringAttributes.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 
 #pragma mark - Public
 BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attributeName)

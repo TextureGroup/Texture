@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASCollectionReusableView.h>
+#import <Texture/_ASCollectionReusableView.h>
 
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
+#import <Texture/ASCellNode+Internal.h>
+#import <Texture/ASCollectionElement.h>
 
 @implementation _ASCollectionReusableView
 

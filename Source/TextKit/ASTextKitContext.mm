@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitContext.h>
+#import <Texture/ASTextKitContext.h>
 
 #if AS_ENABLE_TEXTNODE
 
-#import <AsyncDisplayKit/ASLayoutManager.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASLayoutManager.h>
+#import <Texture/ASThread.h>
 
 #include <memory>
 

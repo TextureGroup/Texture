@@ -9,7 +9,7 @@
 
 #import "ASTestCase.h"
 #import "ASSnapshotTestCase.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface ASTextNode2SnapshotTests : ASSnapshotTestCase
 

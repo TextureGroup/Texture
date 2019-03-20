@@ -7,8 +7,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDisplayNodeExtras.h>
 
 @interface ASDisplayNodeExtrasTests : XCTestCase
 

@@ -8,8 +8,8 @@
 //
 
 #import "ASXCTExtensions.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <stdatomic.h>
 
 #import "ASLayoutSpecSnapshotTestsHelper.h"

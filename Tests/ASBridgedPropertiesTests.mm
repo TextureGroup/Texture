@@ -8,12 +8,12 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASPendingStateController.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/_ASPendingState.h>
-#import <AsyncDisplayKit/ASCellNode.h>
+#import <Texture/ASPendingStateController.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASThread.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/_ASPendingState.h>
+#import <Texture/ASCellNode.h>
 
 @interface ASPendingStateController (Testing)
 - (BOOL)test_isFlushScheduled;

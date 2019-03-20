@@ -8,10 +8,10 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
-#import <AsyncDisplayKit/ASConfigurationDelegate.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASConfiguration.h>
+#import <Texture/ASConfigurationDelegate.h>
+#import <Texture/ASConfigurationInternal.h>
 
 #import "ASTestCase.h"
 

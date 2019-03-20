@@ -7,16 +7,16 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTipsController.h>
+#import <Texture/ASTipsController.h>
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASDisplayNodeTipState.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Tips.h>
-#import <AsyncDisplayKit/ASTipNode.h>
-#import <AsyncDisplayKit/ASTipProvider.h>
-#import <AsyncDisplayKit/ASTipsWindow.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeTipState.h>
+#import <Texture/AsyncDisplayKit+Tips.h>
+#import <Texture/ASTipNode.h>
+#import <Texture/ASTipProvider.h>
+#import <Texture/ASTipsWindow.h>
+#import <Texture/ASDisplayNodeExtras.h>
 
 @interface ASTipsController ()
 

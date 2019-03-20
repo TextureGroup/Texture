@@ -8,8 +8,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBlockTypes.h>
-#import <AsyncDisplayKit/ASDimension.h>
+#import <Texture/ASBlockTypes.h>
+#import <Texture/ASDimension.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

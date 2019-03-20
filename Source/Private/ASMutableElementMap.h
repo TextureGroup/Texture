@@ -8,9 +8,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASIntegerMap.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASElementMap.h>
+#import <Texture/ASIntegerMap.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

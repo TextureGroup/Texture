@@ -11,9 +11,9 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASImageProtocols.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASImageProtocols.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

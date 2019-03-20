@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextLayout.h>
+#import <Texture/ASTextLayout.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASConfigurationInternal.h>
+#import <Texture/ASTextUtilities.h>
+#import <Texture/ASTextAttribute.h>
+#import <Texture/NSAttributedString+ASText.h>
+#import <Texture/ASInternalHelpers.h>
 
 #import <pthread.h>
 

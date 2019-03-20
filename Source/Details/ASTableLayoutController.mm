@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTableLayoutController.h>
+#import <Texture/ASTableLayoutController.h>
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASElementMap.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASElementMap.h>
 
 @interface ASTableLayoutController()
 @end

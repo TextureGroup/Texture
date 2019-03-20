@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitFontSizeAdjuster.h>
+#import <Texture/ASTextKitFontSizeAdjuster.h>
 #import <XCTest/XCTest.h>
 
 #if AS_ENABLE_TEXTNODE

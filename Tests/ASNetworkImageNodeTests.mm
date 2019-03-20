@@ -8,8 +8,8 @@
 
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 
 @interface ASNetworkImageNodeTests : XCTestCase
 

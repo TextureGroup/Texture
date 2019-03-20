@@ -8,14 +8,14 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
-#import <AsyncDisplayKit/ASDataController.h>
-#import <AsyncDisplayKit/ASSectionContext.h>
+#import <Texture/Texture.h>
+#import <Texture/ASCollectionViewFlowLayoutInspector.h>
+#import <Texture/ASDataController.h>
+#import <Texture/ASSectionContext.h>
 #import <vector>
 #import <OCMock/OCMock.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import "ASDisplayNodeTestsHelper.h"
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode

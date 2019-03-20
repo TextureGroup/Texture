@@ -9,7 +9,7 @@
 
 #import "ASPerformanceTestContext.h"
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/CABase.h>

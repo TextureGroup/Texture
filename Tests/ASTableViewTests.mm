@@ -13,14 +13,14 @@
 #import <JGMethodSwizzler/JGMethodSwizzler.h>
 #pragma clang diagnostic pop
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASTableView.h>
-#import <AsyncDisplayKit/ASTableViewInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/Texture.h>
+#import <Texture/ASTableView.h>
+#import <Texture/ASTableViewInternal.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASCellNode.h>
+#import <Texture/ASTableNode.h>
+#import <Texture/ASTableView+Undeprecated.h>
+#import <Texture/ASInternalHelpers.h>
 
 #import "ASXCTExtensions.h"
 

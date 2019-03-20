@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBlockTypes.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
+#import <Texture/ASBlockTypes.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASDisplayNode+LayoutSpec.h>
 
 @class ASLayoutSpec, _ASDisplayLayer;
 

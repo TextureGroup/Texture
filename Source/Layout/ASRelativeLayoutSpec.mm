@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASRelativeLayoutSpec.h>
+#import <Texture/ASRelativeLayoutSpec.h>
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <Texture/ASInternalHelpers.h>
 
 @implementation ASRelativeLayoutSpec
 

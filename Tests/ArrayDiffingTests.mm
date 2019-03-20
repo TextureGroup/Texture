@@ -9,7 +9,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/NSArray+Diffing.h>
+#import <Texture/NSArray+Diffing.h>
 
 @interface NSArray (ArrayDiffingTests)
 - (NSIndexSet *)_asdk_commonIndexesWithArray:(NSArray *)array compareBlock:(BOOL (^)(id lhs, id rhs))comparison;

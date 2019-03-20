@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDimension.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASDimension.h>
 
 @class ASLayout;
 

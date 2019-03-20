@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASBaseDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

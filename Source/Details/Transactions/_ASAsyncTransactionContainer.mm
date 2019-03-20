@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
+#import <Texture/_ASAsyncTransactionContainer.h>
+#import <Texture/_ASAsyncTransactionContainer+Private.h>
 
-#import <AsyncDisplayKit/_ASAsyncTransaction.h>
-#import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
+#import <Texture/_ASAsyncTransaction.h>
+#import <Texture/_ASAsyncTransactionGroup.h>
 
 @implementation CALayer (ASAsyncTransactionContainerTransactions)
 @dynamic asyncdisplaykit_asyncLayerTransactions;

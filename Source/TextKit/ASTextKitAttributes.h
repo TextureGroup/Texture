@@ -11,11 +11,11 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAvailability.h>
 
 #if AS_ENABLE_TEXTNODE
 
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
+#import <Texture/ASEqualityHelpers.h>
 
 AS_EXTERN NSString *const ASTextKitTruncationAttributeName;
 /**

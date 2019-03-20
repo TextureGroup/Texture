@@ -8,9 +8,9 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASTableViewInternal.h>
-#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
+#import <Texture/Texture.h>
+#import <Texture/ASTableViewInternal.h>
+#import <Texture/ASTableView+Undeprecated.h>
 #import <stdatomic.h>
 
 #import "ASThrashUtility.h"

@@ -7,17 +7,17 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
+#import <Texture/ASTextKitRenderer+Positioning.h>
 
 #if AS_ENABLE_TEXTNODE
 
 #import <CoreText/CoreText.h>
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/ASAssert.h>
 
-#import <AsyncDisplayKit/ASTextKitContext.h>
-#import <AsyncDisplayKit/ASTextKitShadower.h>
+#import <Texture/ASTextKitContext.h>
+#import <Texture/ASTextKitShadower.h>
 
 static const CGFloat ASTextKitRendererGlyphTouchHitSlop = 5.0;
 static const CGFloat ASTextKitRendererTextCapHeightPadding = 1.3;

@@ -11,8 +11,8 @@
 
 #import <UIKit/UIViewController.h>
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASResponderChainEnumerator.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASResponderChainEnumerator.h>
 
 @implementation ASDisplayNode (Convenience)
 

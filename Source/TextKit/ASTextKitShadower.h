@@ -9,11 +9,11 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import <Texture/ASAvailability.h>
 
 #if AS_ENABLE_TEXTNODE
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <Texture/ASBaseDefines.h>
 
 /**
  * @abstract an immutable class for calculating shadow padding drawing a shadowed background for text

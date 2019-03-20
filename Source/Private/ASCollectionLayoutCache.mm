@@ -6,12 +6,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionLayoutCache.h>
+#import <Texture/ASCollectionLayoutCache.h>
 
-#import <AsyncDisplayKit/ASCollectionLayoutContext.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASCollectionLayoutContext.h>
+#import <Texture/ASCollectionLayoutState.h>
+#import <Texture/ASElementMap.h>
+#import <Texture/ASThread.h>
 
 using AS::MutexLocker;
 

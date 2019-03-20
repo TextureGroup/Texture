@@ -7,29 +7,29 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASMultiplexImageNode.h>
+#import <Texture/ASMultiplexImageNode.h>
 
 #if TARGET_OS_IOS && AS_USE_ASSETS_LIBRARY
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+FrameworkPrivate.h>
+#import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASLog.h>
+#import <Texture/ASThread.h>
 
 #if AS_USE_PHOTOS
-#import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
+#import <Texture/ASPhotosFrameworkImageRequest.h>
 #endif
 
 #if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
+#import <Texture/ASPINRemoteImageDownloader.h>
 #else
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
+#import <Texture/ASBasicImageDownloader.h>
 #endif
 
 using AS::MutexLocker;

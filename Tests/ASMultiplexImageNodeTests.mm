@@ -10,9 +10,9 @@
 #import <OCMock/OCMock.h>
 #import "NSInvocation+ASTestHelpers.h"
 
-#import <AsyncDisplayKit/ASImageProtocols.h>
-#import <AsyncDisplayKit/ASMultiplexImageNode.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
+#import <Texture/ASImageProtocols.h>
+#import <Texture/ASMultiplexImageNode.h>
+#import <Texture/ASImageContainerProtocolCategories.h>
 
 #import <XCTest/XCTest.h>
 

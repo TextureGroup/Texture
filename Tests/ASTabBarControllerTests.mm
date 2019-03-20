@@ -7,8 +7,8 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASTabBarController.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <Texture/ASTabBarController.h>
+#import <Texture/ASViewController.h>
 
 @interface ASTabBarControllerTests: XCTestCase
 

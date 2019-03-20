@@ -9,8 +9,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASBatchFetching.h>
+#import <Texture/Texture.h>
+#import <Texture/ASBatchFetching.h>
 
 @interface ASBatchFetchingTests : XCTestCase
 

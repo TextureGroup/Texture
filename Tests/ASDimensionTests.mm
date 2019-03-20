@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASDimension.h>
+#import <Texture/ASDimension.h>
 
 #import "ASXCTExtensions.h"
 

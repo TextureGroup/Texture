@@ -7,7 +7,7 @@
 //
 
 #import "ASTestCase.h"
-#import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
+#import <Texture/ASRecursiveUnfairLock.h>
 #import <stdatomic.h>
 #import <os/lock.h>
 

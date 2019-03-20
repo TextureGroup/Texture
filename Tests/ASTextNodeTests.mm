@@ -12,11 +12,11 @@
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASTextNode.h>
-#import <AsyncDisplayKit/ASTextNode+Beta.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASLayout.h>
+#import <Texture/ASTextNode.h>
+#import <Texture/ASTextNode+Beta.h>
+#import <Texture/CoreGraphics+ASConvenience.h>
 
 #import "ASTestCase.h"
 

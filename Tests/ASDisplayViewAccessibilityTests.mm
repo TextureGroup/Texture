@@ -12,11 +12,11 @@
 
 #import <XCTest/XCTest.h>
 
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASTextNode.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <Texture/ASDisplayNode.h>
+#import <Texture/ASDisplayNode+Beta.h>
+#import <Texture/ASTextNode.h>
+#import <Texture/ASConfiguration.h>
+#import <Texture/ASConfigurationInternal.h>
 #import <OCMock/OCMock.h>
 
 @interface ASDisplayViewAccessibilityTests : XCTestCase

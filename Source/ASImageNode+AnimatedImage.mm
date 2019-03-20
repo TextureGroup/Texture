@@ -7,21 +7,21 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASImageNode.h>
+#import <Texture/ASImageNode.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASImageNode+Private.h>
-#import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
-#import <AsyncDisplayKit/ASImageProtocols.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASNetworkImageNode.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASWeakProxy.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeInternal.h>
+#import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASImageNode+Private.h>
+#import <Texture/ASImageNode+AnimatedImagePrivate.h>
+#import <Texture/ASImageProtocols.h>
+#import <Texture/ASInternalHelpers.h>
+#import <Texture/ASNetworkImageNode.h>
+#import <Texture/ASThread.h>
+#import <Texture/ASWeakProxy.h>
 
 #define ASAnimatedImageDebug  0
 

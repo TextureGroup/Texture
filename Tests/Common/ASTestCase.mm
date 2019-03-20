@@ -9,7 +9,7 @@
 
 #import "ASTestCase.h"
 #import <objc/runtime.h>
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import <OCMock/OCMock.h>
 #import "OCMockObject+ASAdditions.h"
 

@@ -6,15 +6,15 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionLayoutContext.h>
-#import <AsyncDisplayKit/ASCollectionLayoutContext+Private.h>
+#import <Texture/ASCollectionLayoutContext.h>
+#import <Texture/ASCollectionLayoutContext+Private.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCollectionLayoutDelegate.h>
-#import <AsyncDisplayKit/ASCollectionLayoutCache.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASHashing.h>
+#import <Texture/ASAssert.h>
+#import <Texture/ASCollectionLayoutDelegate.h>
+#import <Texture/ASCollectionLayoutCache.h>
+#import <Texture/ASElementMap.h>
+#import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASHashing.h>
 
 @implementation ASCollectionLayoutContext {
   Class<ASCollectionLayoutDelegate> _layoutDelegateClass;

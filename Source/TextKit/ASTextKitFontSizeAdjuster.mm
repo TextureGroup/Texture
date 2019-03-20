@@ -8,16 +8,16 @@
 //
 
 
-#import <AsyncDisplayKit/ASTextKitFontSizeAdjuster.h>
+#import <Texture/ASTextKitFontSizeAdjuster.h>
 
 #if AS_ENABLE_TEXTNODE
 
 #import <tgmath.h>
 #import <mutex>
 
-#import <AsyncDisplayKit/ASLayoutManager.h>
-#import <AsyncDisplayKit/ASTextKitContext.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASLayoutManager.h>
+#import <Texture/ASTextKitContext.h>
+#import <Texture/ASThread.h>
 
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)

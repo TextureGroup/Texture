@@ -9,8 +9,8 @@
 
 #pragma once
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASLayoutElement.h>
+#import <Texture/ASDimension.h>
+#import <Texture/ASLayoutElement.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

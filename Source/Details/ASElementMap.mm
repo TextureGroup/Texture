@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASElementMap.h>
+#import <Texture/ASElementMap.h>
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
-#import <AsyncDisplayKit/ASMutableElementMap.h>
-#import <AsyncDisplayKit/ASSection.h>
-#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <Texture/ASCollectionElement.h>
+#import <Texture/ASTwoDimensionalArrayUtils.h>
+#import <Texture/ASMutableElementMap.h>
+#import <Texture/ASSection.h>
+#import <Texture/NSIndexSet+ASHelpers.h>
+#import <Texture/ASObjectDescriptionHelpers.h>
 
 @interface ASElementMap () <ASDescriptionProvider>
 

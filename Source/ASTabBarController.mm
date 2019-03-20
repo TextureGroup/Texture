@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTabBarController.h>
-#import <AsyncDisplayKit/ASLog.h>
+#import <Texture/ASTabBarController.h>
+#import <Texture/ASLog.h>
 
 @implementation ASTabBarController
 {

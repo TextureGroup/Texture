@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASImageNode.h>
-#import <AsyncDisplayKit/ASImageProtocols.h>
+#import <Texture/ASImageNode.h>
+#import <Texture/ASImageProtocols.h>
 #import <Photos/Photos.h>
 
 NS_ASSUME_NONNULL_BEGIN
