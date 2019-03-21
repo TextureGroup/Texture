@@ -61,7 +61,12 @@ using AS::MutexLocker;
 {
   ASAssertLocked(__instanceLock__);
   if (_style == nil) {
+#if YOGA
+    // In Yoga mode we use the delegate to inform the tree if properties changes
     _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
+#else
+    _style = [[ASLayoutElementStyle alloc] init];
+#endif
   }
   return _style;
 }
