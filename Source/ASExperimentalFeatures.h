@@ -31,6 +31,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDispatchApply = 1 << 10,                    // exp_dispatch_apply
   ASExperimentalImageDownloaderPriority = 1 << 11,          // exp_image_downloader_priority
   ASExperimentalTextDrawing = 1 << 12,                      // exp_text_drawing
+  ASExperimentalFixRangeController = 1 << 13,               // exp_fix_range_controller
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
