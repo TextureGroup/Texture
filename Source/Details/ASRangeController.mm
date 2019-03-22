@@ -351,25 +351,34 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
     } else {
       // If selfInterfaceState isn't visible, then visibleIndexPaths represents either what /will/ be immediately visible at the
       // instant we come onscreen, or what /will/ no longer be visible at the instant we come offscreen.
-      // So, preload and display all of those things, but don't waste resources preloading others.
-      // We handle this as a separate case to minimize set operations, including -containsObject:.
+      // So, preload and display all of those things, but don't waste resources displaying others.
       //
       // DO NOT set Visible: even though these elements are in the visible range / "viewport",
       // our overall container object is itself not yet, or no longer, visible.
       // The moment it becomes visible, we will run the condition above.
 
-      BOOL shouldUpdateInterfaceState = NO;
-      if (ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
-        shouldUpdateInterfaceState = [visibleIndexPaths containsObject:indexPath];
-      } else {
-        shouldUpdateInterfaceState = [allCurrentIndexPaths containsObject:indexPath];
-      }
-      
-      if (shouldUpdateInterfaceState) {
-        interfaceState |= ASInterfaceStatePreload;
+      ASInterfaceState interfaceStateBeforeFix = interfaceState;
+      if ([allCurrentIndexPaths containsObject:indexPath]) {
+        interfaceStateBeforeFix |= ASInterfaceStatePreload;
         if (rangeMode != ASLayoutRangeModeLowMemory) {
-          interfaceState |= ASInterfaceStateDisplay;
+          interfaceStateBeforeFix |= ASInterfaceStateDisplay;
         }
+      }
+
+      ASInterfaceState interfaceStateAfterFix = interfaceState;
+      if ([visibleIndexPaths containsObject:indexPath]) {
+        interfaceStateAfterFix |= ASInterfaceStatePreload;
+        if (rangeMode != ASLayoutRangeModeLowMemory) {
+          interfaceStateAfterFix |= ASInterfaceStateDisplay;
+        }
+      } else if ([displayIndexPaths containsObject:indexPath]) {
+        interfaceStateAfterFix |= ASInterfaceStatePreload;
+      }
+
+      if (interfaceStateBeforeFix != interfaceStateAfterFix && ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
+        interfaceState = interfaceStateAfterFix;
+      } else {
+        interfaceState = interfaceStateBeforeFix;
       }
     }
 
