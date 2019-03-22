@@ -30,7 +30,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDisableAccessibilityCache,
   ASExperimentalDispatchApply,
   ASExperimentalImageDownloaderPriority,
-  ASExperimentalTextDrawing
+  ASExperimentalTextDrawing,
+  ASExperimentalFixRangeController
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -55,7 +56,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_disable_a11y_cache",
     @"exp_dispatch_apply",
     @"exp_image_downloader_priority",
-    @"exp_text_drawing"
+    @"exp_text_drawing",
+    @"exp_fix_range_controller"
   ];
 }
 

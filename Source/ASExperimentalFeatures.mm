@@ -24,7 +24,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_disable_a11y_cache",
                                       @"exp_dispatch_apply",
                                       @"exp_image_downloader_priority",
-                                      @"exp_text_drawing"]));
+                                      @"exp_text_drawing",
+                                      @"exp_fix_range_controller"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
