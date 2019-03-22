@@ -164,6 +164,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
   __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
+  BOOL _willApplyNextYogaCalculatedLayout;
 #endif
 
   // Automatically manages subnodes

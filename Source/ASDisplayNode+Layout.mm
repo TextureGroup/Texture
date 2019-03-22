@@ -402,9 +402,19 @@ ASLayoutElementStyleExtensibilityForwarding
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
     NSUInteger version = _layoutVersion;
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
+#if YOGA
+    // This flag indicates to the Texture+Yoga code that this next layout is intended to be
+    // displayed (vs. just for measurement). This will cause it to call setNeedsLayout on any nodes
+    // whose layout changes as a result of the Yoga recalculation. This is necessary because a
+    // change in one Yoga node can change the layout for any other node in the tree.
+    self.willApplyNextYogaCalculatedLayout = YES;
+#endif
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
+#if YOGA
+    self.willApplyNextYogaCalculatedLayout = NO;
+#endif
     nextLayout = ASDisplayNodeLayout(layout, constrainedSize, boundsSizeForLayout, version);
     // Now that the constrained size of pending layout might have been reused, the layout is useless
     // Release it and any orphaned subnodes it retains
