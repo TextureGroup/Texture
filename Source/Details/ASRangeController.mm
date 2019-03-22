@@ -357,22 +357,28 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       // our overall container object is itself not yet, or no longer, visible.
       // The moment it becomes visible, we will run the condition above.
 
-      if (ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
-        if ([visibleIndexPaths containsObject:indexPath]) {
-          interfaceState |= ASInterfaceStatePreload;
-          if (rangeMode != ASLayoutRangeModeLowMemory) {
-            interfaceState |= ASInterfaceStateDisplay;
-          }
-        } else if ([displayIndexPaths containsObject:indexPath]) {
-          interfaceState |= ASInterfaceStatePreload;
+      ASInterfaceState interfaceStateBeforeFix = interfaceState;
+      if ([allCurrentIndexPaths containsObject:indexPath]) {
+        interfaceStateBeforeFix |= ASInterfaceStatePreload;
+        if (rangeMode != ASLayoutRangeModeLowMemory) {
+          interfaceStateBeforeFix |= ASInterfaceStateDisplay;
         }
+      }
+
+      ASInterfaceState interfaceStateAfterFix = interfaceState;
+      if ([visibleIndexPaths containsObject:indexPath]) {
+        interfaceStateAfterFix |= ASInterfaceStatePreload;
+        if (rangeMode != ASLayoutRangeModeLowMemory) {
+          interfaceStateAfterFix |= ASInterfaceStateDisplay;
+        }
+      } else if ([displayIndexPaths containsObject:indexPath]) {
+        interfaceStateAfterFix |= ASInterfaceStatePreload;
+      }
+
+      if (interfaceStateBeforeFix != interfaceStateAfterFix && ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
+        interfaceState = interfaceStateAfterFix;
       } else {
-        if ([allCurrentIndexPaths containsObject:indexPath]) {
-          interfaceState |= ASInterfaceStatePreload;
-          if (rangeMode != ASLayoutRangeModeLowMemory) {
-            interfaceState |= ASInterfaceStateDisplay;
-          }
-        }
+        interfaceState = interfaceStateBeforeFix;
       }
     }
 
