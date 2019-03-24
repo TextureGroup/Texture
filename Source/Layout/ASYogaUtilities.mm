@@ -49,7 +49,9 @@ void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)
     return;
   }
   block(node);
-  for (ASDisplayNode *child in [node yogaChildren]) {
+  // We use the accessor here despite the copy, because the block may modify the yoga tree e.g.
+  // replacing a node.
+  for (ASDisplayNode *child in node.yogaChildren) {
     ASDisplayNodePerformBlockOnEveryYogaChild(child, block);
   }
 }
@@ -94,7 +96,16 @@ YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf)
 
 YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction)
 {
-  return direction == ASStackLayoutDirectionVertical ? YGFlexDirectionColumn : YGFlexDirectionRow;
+  switch (direction) {
+    case ASStackLayoutDirectionVertical:
+      return YGFlexDirectionColumn;
+    case ASStackLayoutDirectionVerticalReverse:
+      return YGFlexDirectionColumnReverse;
+    case ASStackLayoutDirectionHorizontal:
+      return YGFlexDirectionRow;
+    case ASStackLayoutDirectionHorizontalReverse:
+      return YGFlexDirectionRowReverse;
+  }
 }
 
 float yogaFloatForCGFloat(CGFloat value)

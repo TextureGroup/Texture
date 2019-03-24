@@ -34,6 +34,19 @@
 #import <PINRemoteImage/NSData+ImageDetectors.h>
 #import <PINRemoteImage/PINRemoteImageCaching.h>
 
+static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASImageDownloaderPriority(ASImageDownloaderPriority priority) {
+  switch (priority) {
+    case ASImageDownloaderPriorityPreload:
+      return PINRemoteImageManagerPriorityLow;
+
+    case ASImageDownloaderPriorityImminent:
+      return PINRemoteImageManagerPriorityDefault;
+
+    case ASImageDownloaderPriorityVisible:
+      return PINRemoteImageManagerPriorityHigh;
+  }
+}
+
 #if PIN_ANIMATED_AVAILABLE
 
 @interface ASPINRemoteImageDownloader () <PINRemoteImageManagerAlternateRepresentationProvider>
@@ -115,6 +128,7 @@ static PINRemoteImageManager *sharedPINRemoteImageManager = nil;
 
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration
 {
+  NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
   PINRemoteImageManager *sharedManager = [self PINRemoteImageManagerWithConfiguration:configuration imageCache:nil];
   [self setSharedPreconfiguredRemoteImageManager:sharedManager];
 }
@@ -122,6 +136,7 @@ static PINRemoteImageManager *sharedPINRemoteImageManager = nil;
 + (void)setSharedImageManagerWithConfiguration:(nullable NSURLSessionConfiguration *)configuration
                                     imageCache:(nullable id<PINRemoteImageCaching>)imageCache
 {
+  NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
   PINRemoteImageManager *sharedManager = [self PINRemoteImageManagerWithConfiguration:configuration imageCache:imageCache];
   [self setSharedPreconfiguredRemoteImageManager:sharedManager];
 }
@@ -131,7 +146,6 @@ static dispatch_once_t shared_init_predicate;
 + (void)setSharedPreconfiguredRemoteImageManager:(PINRemoteImageManager *)preconfiguredPINRemoteImageManager
 {
   NSAssert(preconfiguredPINRemoteImageManager != nil, @"setSharedPreconfiguredRemoteImageManager requires a non-nil parameter");
-  NSAssert(sharedDownloader == nil, @"Singleton has been created and session can no longer be configured.");
   NSAssert1(sharedPINRemoteImageManager == nil, @"An instance of %@ has been set. Either configuration or preconfigured image manager can be set at a time and only once.", [[sharedPINRemoteImageManager class] description]);
 
   dispatch_once(&shared_init_predicate, ^{
@@ -244,6 +258,21 @@ static dispatch_once_t shared_init_predicate;
                    downloadProgress:(ASImageDownloaderProgress)downloadProgress
                          completion:(ASImageDownloaderCompletion)completion;
 {
+  return [self downloadImageWithURL:URL
+                           priority:ASImageDownloaderPriorityImminent // maps to default priority
+                      callbackQueue:callbackQueue
+                   downloadProgress:downloadProgress
+                         completion:completion];
+}
+
+- (nullable id)downloadImageWithURL:(NSURL *)URL
+                           priority:(ASImageDownloaderPriority)priority
+                      callbackQueue:(dispatch_queue_t)callbackQueue
+                   downloadProgress:(ASImageDownloaderProgress)downloadProgress
+                         completion:(ASImageDownloaderCompletion)completion
+{
+  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityWithASImageDownloaderPriority(priority);
+
   PINRemoteImageManagerProgressDownload progressDownload = ^(int64_t completedBytes, int64_t totalBytes) {
     if (downloadProgress == nil) { return; }
 
@@ -273,6 +302,7 @@ static dispatch_once_t shared_init_predicate;
   // check the cache as part of this download.
   return [[self sharedPINRemoteImageManager] downloadImageWithURL:URL
                                                           options:PINRemoteImageManagerDownloadOptionsSkipDecode | PINRemoteImageManagerDownloadOptionsIgnoreCache
+                                                         priority:pi_priority
                                                     progressImage:nil
                                                  progressDownload:progressDownload
                                                        completion:imageCompletion];
@@ -309,20 +339,7 @@ static dispatch_once_t shared_init_predicate;
 {
   ASDisplayNodeAssert([downloadIdentifier isKindOfClass:[NSUUID class]], @"downloadIdentifier must be NSUUID");
 
-  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityDefault;
-  switch (priority) {
-    case ASImageDownloaderPriorityPreload:
-      pi_priority = PINRemoteImageManagerPriorityLow;
-      break;
-
-    case ASImageDownloaderPriorityImminent:
-      pi_priority = PINRemoteImageManagerPriorityDefault;
-      break;
-
-    case ASImageDownloaderPriorityVisible:
-      pi_priority = PINRemoteImageManagerPriorityHigh;
-      break;
-  }
+  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityWithASImageDownloaderPriority(priority);
   [[self sharedPINRemoteImageManager] setPriority:pi_priority ofTaskWithUUID:downloadIdentifier];
 }
 
@@ -331,7 +348,7 @@ static dispatch_once_t shared_init_predicate;
 - (id)alternateRepresentationWithData:(NSData *)data options:(PINRemoteImageManagerDownloadOptions)options
 {
 #if PIN_ANIMATED_AVAILABLE
-  if ([data pin_isGIF]) {
+  if ([data pin_isAnimatedGIF]) {
     return data;
   }
 #if PIN_WEBP_AVAILABLE

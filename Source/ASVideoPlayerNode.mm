@@ -286,7 +286,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
       
       {
         ASUnlockScope(self);
-        for (var subnode : subnodes) {
+        for (ASDisplayNode *subnode : subnodes) {
           [self addSubnode:subnode];
         }
       }
@@ -661,7 +661,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     }];
     _spinnerNode.style.preferredSize = CGSizeMake(44.0, 44.0);
     
-    let spinnerNode = _spinnerNode;
+    const auto spinnerNode = _spinnerNode;
     {
       ASUnlockScope(self);
       [self addSubnode:spinnerNode];

@@ -12,15 +12,6 @@
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
-// TODO: Remove these now that we're all-C++.
-#if defined(__cplusplus)
-# define var auto
-# define let const auto
-#else
-# define var __auto_type
-# define let const __auto_type
-#endif
-
 /**
  * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
  * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that
@@ -32,6 +23,12 @@
 #else
 #define AS_BUILD_UIUSERINTERFACESTYLE 0
 #endif
+
+/**
+ * Decorates methods that clients can implement in categories on our base class. These methods
+ * will be stubbed with an empty implementation if no implementation is provided.
+ */
+#define AS_CATEGORY_IMPLEMENTABLE
 
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
@@ -150,6 +147,8 @@
 #define AS_SUBCLASSING_RESTRICTED
 #endif
 
+#define AS_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 #define ASCreateOnce(expr) ({ \
   static dispatch_once_t onceToken; \
   static __typeof__(expr) staticVar; \
@@ -246,7 +245,7 @@
 /**
  * Capture-and-clear a strong reference without the intervening retain/release pair.
  *
- * E.g. let localVar = ASTransferStrong(_myIvar);
+ * E.g. const auto localVar = ASTransferStrong(_myIvar);
  * Post-condition: localVar has the strong value from _myIvar and _myIvar is nil.
  * No retain/release is emitted when the optimizer is on.
  */

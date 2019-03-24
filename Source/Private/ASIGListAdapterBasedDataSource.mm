@@ -38,6 +38,7 @@ typedef struct {
 @property (nonatomic, weak, readonly) IGListAdapter *listAdapter;
 @property (nonatomic, readonly) id<UICollectionViewDelegateFlowLayout> delegate;
 @property (nonatomic, readonly) id<UICollectionViewDataSource> dataSource;
+@property (nonatomic, weak, readonly) id<ASCollectionDelegate> collectionDelegate;
 
 /**
  * The section controller that we will forward beginBatchFetchWithContext: to.
@@ -52,7 +53,7 @@ typedef struct {
 
 @implementation ASIGListAdapterBasedDataSource
 
-- (instancetype)initWithListAdapter:(IGListAdapter *)listAdapter
+- (instancetype)initWithListAdapter:(IGListAdapter *)listAdapter collectionDelegate:(nullable id<ASCollectionDelegate>)collectionDelegate
 {
   if (self = [super init]) {
 #if IG_LIST_COLLECTION_VIEW
@@ -63,6 +64,7 @@ typedef struct {
     ASDisplayNodeAssert([listAdapter conformsToProtocol:@protocol(UICollectionViewDataSource)], @"Expected IGListAdapter to conform to UICollectionViewDataSource.");
     ASDisplayNodeAssert([listAdapter conformsToProtocol:@protocol(UICollectionViewDelegateFlowLayout)], @"Expected IGListAdapter to conform to UICollectionViewDelegateFlowLayout.");
     _listAdapter = listAdapter;
+    _collectionDelegate = collectionDelegate;
   }
   return self;
 }
@@ -114,6 +116,10 @@ typedef struct {
 
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode
 {
+  if ([_collectionDelegate respondsToSelector:@selector(shouldBatchFetchForCollectionNode:)]) {
+    return [_collectionDelegate shouldBatchFetchForCollectionNode:collectionNode];
+  }
+
   NSInteger sectionCount = [self numberOfSectionsInCollectionNode:collectionNode];
   if (sectionCount == 0) {
     return NO;
@@ -131,6 +137,11 @@ typedef struct {
 
 - (void)collectionNode:(ASCollectionNode *)collectionNode willBeginBatchFetchWithContext:(ASBatchContext *)context
 {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:willBeginBatchFetchWithContext:)]) {
+    [_collectionDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:context];
+    return;
+  }
+  
   ASIGSectionController *ctrl = self.sectionControllerForBatchFetching;
   self.sectionControllerForBatchFetching = nil;
   [ctrl beginBatchFetchWithContext:context];
@@ -204,7 +215,16 @@ typedef struct {
 
 - (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  return [[self sectionControllerForSection:indexPath.section] nodeBlockForItemAtIndex:indexPath.item];
+  ASIGSectionController *ctrl = [self sectionControllerForSection:indexPath.section];
+  ASDisplayNodeAssert([ctrl respondsToSelector:@selector(nodeBlockForItemAtIndex:)], @"Expected section controller to respond to to %@. Controller: %@", NSStringFromSelector(@selector(nodeBlockForItemAtIndex:)), ctrl);
+  return [ctrl nodeBlockForItemAtIndex:indexPath.item];
+}
+
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASIGSectionController *ctrl = [self sectionControllerForSection:indexPath.section];
+  ASDisplayNodeAssert([ctrl respondsToSelector:@selector(nodeForItemAtIndex:)], @"Expected section controller to respond to to %@. Controller: %@", NSStringFromSelector(@selector(nodeForItemAtIndex:)), ctrl);
+  return [ctrl nodeForItemAtIndex:indexPath.item];
 }
 
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -219,7 +239,16 @@ typedef struct {
 
 - (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-  return [[self supplementaryElementSourceForSection:indexPath.section] nodeBlockForSupplementaryElementOfKind:kind atIndex:indexPath.item];
+  id<ASSupplementaryNodeSource> ctrl = [self supplementaryElementSourceForSection:indexPath.section];
+  ASDisplayNodeAssert([ctrl respondsToSelector:@selector(nodeBlockForSupplementaryElementOfKind:atIndex:)], @"Expected section controller to respond to to %@. Controller: %@", NSStringFromSelector(@selector(nodeBlockForSupplementaryElementOfKind:atIndex:)), ctrl);
+  return [ctrl nodeBlockForSupplementaryElementOfKind:kind atIndex:indexPath.item];
+}
+
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+  id<ASSupplementaryNodeSource> ctrl = [self supplementaryElementSourceForSection:indexPath.section];
+  ASDisplayNodeAssert([ctrl respondsToSelector:@selector(nodeForSupplementaryElementOfKind:atIndex:)], @"Expected section controller to respond to to %@. Controller: %@", NSStringFromSelector(@selector(nodeForSupplementaryElementOfKind:atIndex:)), ctrl);
+  return [ctrl nodeForSupplementaryElementOfKind:kind atIndex:indexPath.item];
 }
 
 - (NSArray<NSString *> *)collectionNode:(ASCollectionNode *)collectionNode supplementaryElementKindsInSection:(NSInteger)section

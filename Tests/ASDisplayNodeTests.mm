@@ -8,9 +8,8 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-
-#import "ASXCTExtensions.h"
 #import <XCTest/XCTest.h>
+#import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
@@ -19,7 +18,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
-#import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASEditableTextNode.h>
@@ -31,8 +29,10 @@
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASViewController.h>
+
+#import "ASXCTExtensions.h"
+#import "ASDisplayNodeTestsHelper.h"
 
 // Conveniences for making nodes named a certain way
 #define DeclareNodeNamed(n) ASDisplayNode *n = [[ASDisplayNode alloc] init]; n.debugName = @#n
@@ -2696,6 +2696,19 @@ static bool stringContainsPointer(NSString *description, id p) {
     CALayer *cornerLayer = (*l)[i];
     XCTAssertTrue([cornerLayer.delegate isKindOfClass:[ASDisplayNodeCornerLayerDelegate class]], @"");
   }
+}
+
+- (void)testLayerActionForKeyIsCalled
+{
+  UIWindow *window = [[UIWindow alloc] init];
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+
+  id mockNode = OCMPartialMock(node);
+  OCMExpect([mockNode layerActionForKey:kCAOnOrderIn]);
+  [window.layer addSublayer:node.layer];
+  OCMExpect([mockNode layerActionForKey:@"position"]);
+  node.layer.position = CGPointMake(10, 10);
+  OCMVerifyAll(mockNode);
 }
 
 @end

@@ -109,6 +109,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (node) {
     self.backgroundColor = node.backgroundColor;
     self.selectedBackgroundView = node.selectedBackgroundView;
+    self.backgroundView = node.backgroundView;
 #if TARGET_OS_IOS
     self.separatorInset = node.separatorInset;
 #endif
@@ -270,6 +271,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableViewMoveRow:1;
     unsigned int tableNodeMoveRow:1;
     unsigned int sectionIndexMethods:1; // if both section index methods are implemented
+    unsigned int modelIdentifierMethods:1; // if both modelIdentifierForElementAtIndexPath and indexPathForElementWithModelIdentifier are implemented
   } _asyncDataSourceFlags;
 }
 
@@ -426,6 +428,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDataSourceFlags.tableViewCanMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:canMoveRowAtIndexPath:)];
     _asyncDataSourceFlags.tableViewMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)];
     _asyncDataSourceFlags.sectionIndexMethods = [_asyncDataSource respondsToSelector:@selector(sectionIndexTitlesForTableView:)] && [_asyncDataSource respondsToSelector:@selector(tableView:sectionForSectionIndexTitle:atIndex:)];
+    _asyncDataSourceFlags.modelIdentifierMethods = [_asyncDataSource respondsToSelector:@selector(modelIdentifierForElementAtIndexPath:inNode:)] && [_asyncDataSource respondsToSelector:@selector(indexPathForElementWithModelIdentifier:inNode:)];
     
     ASDisplayNodeAssert(_asyncDataSourceFlags.tableViewNodeBlockForRow
                         || _asyncDataSourceFlags.tableViewNodeForRow
@@ -514,14 +517,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   ASDisplayNodeAssertMainThread();
  
-  if (_asyncDataSource == nil && _asyncDelegate == nil) {
-    if (ASActivateExperimentalFeature(ASExperimentalClearDataDuringDeallocation)) {
-      if (_isDeallocating) {
-        [_dataController clearData];          
-      }
-    } else {
-      [_dataController clearData];
-    }
+  if (_asyncDataSource == nil && _asyncDelegate == nil && !ASActivateExperimentalFeature(ASExperimentalSkipClearData)) {
+    [_dataController clearData];
   }
 }
 
@@ -685,7 +682,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray<ASCellNode *> *)visibleNodes
 {
-  let elements = [self visibleElementsForRangeController:_rangeController];
+  const auto elements = [self visibleElementsForRangeController:_rangeController];
   return ASArrayByFlatMapping(elements, ASCollectionElement *e, e.node);
 }
 
@@ -771,7 +768,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
       NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
       [_cellsForLayoutUpdates removeAllObjects];
 
-      let nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
+      const auto nodesSizeChanged = [[NSMutableArray<ASCellNode *> alloc] init];
       [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
       if (nodesSizeChanged.count > 0) {
         [self requeryNodeHeights];
@@ -964,6 +961,29 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return [_dataController.visibleMap numberOfItemsInSection:section];
+}
+
+- (nullable NSString *)modelIdentifierForElementAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view {
+    if (_asyncDataSourceFlags.modelIdentifierMethods) {
+        GET_TABLENODE_OR_RETURN(tableNode, nil);
+        NSIndexPath *convertedPath = [self convertIndexPathToTableNode:indexPath];
+        if (convertedPath == nil) {
+            return nil;
+        } else {
+            return [_asyncDataSource modelIdentifierForElementAtIndexPath:convertedPath inNode:tableNode];
+        }
+    } else {
+        return nil;
+    }
+}
+
+- (nullable NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view {
+    if (_asyncDataSourceFlags.modelIdentifierMethods) {
+        GET_TABLENODE_OR_RETURN(tableNode, nil);
+        return  [_asyncDataSource indexPathForElementWithModelIdentifier:identifier inNode:tableNode];
+      } else {
+        return nil;
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
@@ -1519,6 +1539,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - ASRangeControllerDelegate
 
+- (BOOL)rangeControllerShouldUpdateRanges:(ASRangeController *)rangeController
+{
+  return YES;
+}
+
 - (void)rangeController:(ASRangeController *)rangeController updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet updates:(dispatch_block_t)updates
 {
   ASDisplayNodeAssertMainThread();
@@ -1666,13 +1691,47 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 #pragma mark - ASDataControllerSource
 
+- (BOOL)dataController:(ASDataController *)dataController shouldEagerlyLayoutNode:(ASCellNode *)node
+{
+  return YES;
+}
+
+- (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController
+{
+  return NO;
+}
+
+- (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet
+{
+  // Reload data is expensive, don't block main while doing so.
+  if (changeSet.includesReloadData) {
+    return NO;
+  }
+  // For more details on this method, see the comment in the ASCollectionView implementation.
+  if (changeSet.countForAsyncLayout < 2) {
+    return YES;
+  }
+  CGSize contentSize = self.contentSize;
+  CGSize boundsSize = self.bounds.size;
+  if (contentSize.height <= boundsSize.height && contentSize.width <= boundsSize.width) {
+    return YES;
+  }
+  return NO;
+}
+
+- (void)dataControllerDidFinishWaiting:(ASDataController *)dataController
+{
+  // ASCellLayoutMode is not currently supported on ASTableView (see ASCollectionView for details).
+}
+
 - (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   // Not currently supported for tables. Will be added when the collection API stabilizes.
   return nil;
 }
 
-- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNodeBlock)dataController:(ASDataController *)dataController nodeBlockAtIndexPath:(NSIndexPath *)indexPath shouldAsyncLayout:(BOOL *)shouldAsyncLayout
+{
   ASCellNodeBlock block = nil;
 
   if (_asyncDataSourceFlags.tableNodeNodeBlockForRow) {
@@ -1720,6 +1779,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return ^{
     __typeof__(self) strongSelf = weakSelf;
     ASCellNode *node = (block != nil ? block() : [[ASCellNode alloc] init]);
+    ASDisplayNodeAssert([node isKindOfClass:[ASCellNode class]], @"ASTableNode provided a non-ASCellNode! %@, %@", node, strongSelf);
+
     [node enterHierarchyState:ASHierarchyStateRangeManaged];
     if (node.interactionDelegate == nil) {
       node.interactionDelegate = strongSelf;

@@ -15,6 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASSupplementaryNodeSource <NSObject>
 
+@optional
+
 /**
  * A method to provide the node-block for the supplementary element.
  *
@@ -25,7 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (ASCellNodeBlock)nodeBlockForSupplementaryElementOfKind:(NSString *)elementKind atIndex:(NSInteger)index;
 
-@optional
+/**
+ * Asks the controller to provide a node to display for the given supplementary element.
+ *
+ * @param kind The kind of supplementary element.
+ * @param index The index of the item.
+ */
+- (ASCellNode *)nodeForSupplementaryElementOfKind:(NSString *)kind atIndex:(NSInteger)index;
 
 /**
  * A method to provide the size range used for measuring the supplementary
