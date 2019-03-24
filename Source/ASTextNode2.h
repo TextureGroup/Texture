@@ -7,6 +7,7 @@
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNodeCommon.h>
 
 @protocol ASTextLinePositionModifier;
