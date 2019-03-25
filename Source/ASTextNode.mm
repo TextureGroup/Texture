@@ -486,6 +486,9 @@ static NSArray *DefaultLinkAttributeNames() {
     [self _locked_invalidateTruncationText];
 
     NSUInteger length = cleanedAttributedString.length;
+    if (self.isNodeLoaded) {
+      [self invalidateAccessibleElementsIfNeeded];
+    }
     if (length > 0) {
       // Updating ascender and descender in one transaction while holding the lock.
       ASLayoutElementStyle *style = [self _locked_style];

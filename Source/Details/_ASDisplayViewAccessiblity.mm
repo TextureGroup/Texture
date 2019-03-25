@@ -14,14 +14,11 @@
 #import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 
 #import <queue>
-
-NS_INLINE UIAccessibilityTraits InteractiveAccessibilityTraitsMask() {
-  return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
-}
 
 #pragma mark - UIAccessibilityElement
 
@@ -59,19 +56,17 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 @interface ASAccessibilityElement : UIAccessibilityElement<ASAccessibilityElementPositioning>
 
 @property (nonatomic) ASDisplayNode *node;
-@property (nonatomic) ASDisplayNode *containerNode;
 
-+ (ASAccessibilityElement *)accessibilityElementWithContainer:(UIView *)container node:(ASDisplayNode *)node containerNode:(ASDisplayNode *)containerNode;
++ (ASAccessibilityElement *)accessibilityElementWithContainer:(UIView *)container node:(ASDisplayNode *)node;
 
 @end
 
 @implementation ASAccessibilityElement
 
-+ (ASAccessibilityElement *)accessibilityElementWithContainer:(UIView *)container node:(ASDisplayNode *)node containerNode:(ASDisplayNode *)containerNode
++ (ASAccessibilityElement *)accessibilityElementWithContainer:(UIView *)container node:(ASDisplayNode *)node
 {
   ASAccessibilityElement *accessibilityElement = [[ASAccessibilityElement alloc] initWithAccessibilityContainer:container];
   accessibilityElement.node = node;
-  accessibilityElement.containerNode = containerNode;
   accessibilityElement.accessibilityIdentifier = node.accessibilityIdentifier;
   accessibilityElement.accessibilityLabel = node.accessibilityLabel;
   accessibilityElement.accessibilityHint = node.accessibilityHint;
@@ -89,9 +84,9 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 
 - (CGRect)accessibilityFrame
 {
-  CGRect accessibilityFrame = [self.containerNode convertRect:self.node.bounds fromNode:self.node];
-  accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.accessibilityContainer);
-  return accessibilityFrame;
+  ASDisplayNode *supernode = [self.node firstNonLayerNode];
+  ASDisplayNodeAssert(!supernode.isLayerBacked, @"No non-layerbacked node found.");
+  return [self.node.layer convertRect:self.node.bounds toLayer:ASFindWindowOfLayer(self.node.layer).layer];
 }
 
 @end
@@ -100,9 +95,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 
 @interface ASAccessibilityCustomAction : UIAccessibilityCustomAction<ASAccessibilityElementPositioning>
 
-@property (nonatomic) UIView *container;
 @property (nonatomic) ASDisplayNode *node;
-@property (nonatomic) ASDisplayNode *containerNode;
 
 @end
 
@@ -110,9 +103,9 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 
 - (CGRect)accessibilityFrame
 {
-  CGRect accessibilityFrame = [self.containerNode convertRect:self.node.bounds fromNode:self.node];
-  accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.container);
-  return accessibilityFrame;
+  ASDisplayNode *supernode = [self.node firstNonLayerNode];
+  ASDisplayNodeAssert(!supernode.isLayerBacked, @"No non-layerbacked node found.");
+  return [self.node.layer convertRect:self.node.bounds toLayer:ASFindWindowOfLayer(self.node.layer).layer];
 }
 
 @end
@@ -126,14 +119,17 @@ static void CollectUIAccessibilityElementsForNode(ASDisplayNode *node, ASDisplay
     // For every subnode that is layer backed or it's supernode has subtree rasterization enabled
     // we have to create a UIAccessibilityElement as no view for this node exists
     if (currentNode != containerNode && currentNode.isAccessibilityElement) {
-      UIAccessibilityElement *accessibilityElement = [ASAccessibilityElement accessibilityElementWithContainer:container node:currentNode containerNode:containerNode];
+      UIAccessibilityElement *accessibilityElement = [ASAccessibilityElement accessibilityElementWithContainer:container node:currentNode];
       [elements addObject:accessibilityElement];
     }
   });
 }
 
-static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, UIView *view, NSMutableArray *elements) {
-  UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:container containerNode:container];
+static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, UIView *view,
+                                                     NSMutableArray *elements) {
+  UIAccessibilityElement *accessiblityElement =
+  [ASAccessibilityElement accessibilityElementWithContainer:view
+                                                       node:container];
 
   NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
   NSMutableArray<ASAccessibilityCustomAction *> *actions = [[NSMutableArray alloc] init];
@@ -153,7 +149,7 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
     queue.pop();
 
     if (node != container && node.isAccessibilityContainer) {
-      CollectAccessibilityElementsForContainer(node, view, elements);
+      CollectAccessibilityElementsForContainer(node, [node view], elements);
       continue;
     }
 
@@ -161,12 +157,11 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
       if (node.accessibilityTraits & InteractiveAccessibilityTraitsMask()) {
         ASAccessibilityCustomAction *action = [[ASAccessibilityCustomAction alloc] initWithName:node.accessibilityLabel target:node selector:@selector(performAccessibilityCustomAction:)];
         action.node = node;
-        action.containerNode = node.supernode;
-        action.container = node.supernode.view;
+        node.acessibilityCustomAction = action;
         [actions addObject:action];
       } else if (node == container || shouldAggregateSubnodeLabels) {
         // Even though not surfaced to UIKit, create a non-interactive element for purposes of building sorted aggregated label.
-        ASAccessibilityElement *nonInteractiveElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:node containerNode:container];
+        ASAccessibilityElement *nonInteractiveElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:node];
         [labeledNodes addObject:nonInteractiveElement];
       }
     }
@@ -232,7 +227,7 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
       // An accessiblityElement can either be a UIView or a UIAccessibilityElement
       if (subnode.isLayerBacked) {
         // No view for layer backed nodes exist. It's necessary to create a UIAccessibilityElement that represents this node
-        UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:subnode containerNode:node];
+        UIAccessibilityElement *accessiblityElement = [ASAccessibilityElement accessibilityElementWithContainer:view node:subnode];
         [elements addObject:accessiblityElement];
       } else {
         // Accessiblity element is not layer backed just add the view as accessibility element

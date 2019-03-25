@@ -87,4 +87,13 @@ AS_SUBCLASSING_RESTRICTED
   return strings.description;
 }
 
+- (ASDisplayNode *)firstNonLayerNode {
+  for (ASDisplayNode *node in self.supernodesIncludingSelf) {
+    if (!node.isLayerBacked) {
+      return node;
+    }
+  }
+  return nil;
+}
+
 @end

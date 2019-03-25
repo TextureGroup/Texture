@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 
 #import <objc/runtime.h>
 #include <string>
@@ -2167,10 +2168,16 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (isRasterized) {
     if (self.inHierarchy) {
       [subnode __enterHierarchy];
+      if (ASInterfaceStateIncludesVisible(self.interfaceState)) {
+        [subnode invalidateAccessibleElementsIfNeeded];
+      }
     }
   } else if (self.nodeLoaded) {
     // If not rasterizing, and node is loaded insert the subview/sublayer now.
     [self _insertSubnodeSubviewOrSublayer:subnode atIndex:sublayerIndex];
+    if (ASInterfaceStateIncludesVisible(self.interfaceState)) {
+      [subnode invalidateAccessibleElementsIfNeeded];
+    }
   } // Otherwise we will insert subview/sublayer when we get loaded
 
   ASDisplayNodeAssert(disableNotifications == shouldDisableNotificationsForMovingBetweenParents(oldParent, self), @"Invariant violated");
@@ -2559,6 +2566,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [view removeFromSuperview];
   } else if (layer != nil) {
     [layer removeFromSuperlayer];
+    if (ASInterfaceStateIncludesVisible(self.interfaceState)) {
+      [self invalidateAccessibleElementsIfNeeded];
+    }
   }
 }
 
@@ -3563,6 +3573,43 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (UIAccessibilityTraits)defaultAccessibilityTraits
 {
   return UIAccessibilityTraitNone;
+}
+
+- (void)invalidateAccessibleElementsIfNeeded {
+  if (!ASAccessibilityIsEnabled()) {
+    return;
+  }
+  ASDisplayNode *firstNonLayerbackedNode = nil;
+  BOOL containerInvalidated = [self invalidateUpToContainer:&firstNonLayerbackedNode];
+  if (!self.isLayerBacked) {
+    return;
+  }
+  if (!containerInvalidated) {
+    [firstNonLayerbackedNode invalidateAccessibleElements];
+  }
+}
+
+// Walk up the tree and invalidate a11y-elements for the first a11y-container found.
+// Also find the firstNonLayerbackedNode that will be invalidated incase no a11y-container found.
+- (BOOL)invalidateUpToContainer:(ASDisplayNode **)firstNonLayerbackedNode {
+  ASDisplayNode *supernode = self.supernode;
+  if (supernode.isAccessibilityContainer) {
+    if (supernode.isNodeLoaded) {
+      [supernode invalidateAccessibleElements];
+      return YES;
+    }
+  }
+  if (*firstNonLayerbackedNode == nil && !self.isLayerBacked) {
+    *firstNonLayerbackedNode = self;
+  }
+  if (!supernode) {
+    return NO;
+  }
+  return [self.supernode invalidateUpToContainer:firstNonLayerbackedNode];
+}
+
+- (void)invalidateAccessibleElements {
+  [self setAccessibilityElements:nil];
 }
 
 #pragma mark - Debugging (Private)
