@@ -59,7 +59,7 @@
       if (self == nil) {
         return;
       }
-      [transactions removeObject:completedTransaction];
+      [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
       [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
     }];
     [transactions addObject:transaction];
