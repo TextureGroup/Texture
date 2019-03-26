@@ -16,6 +16,8 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#include <forward_list>
+
 #define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
   || (flags.setOpaque && opaque != (layer).opaque)\
   || (flags.setBackgroundColor && !CGColorEqualToColor(backgroundColor, (layer).backgroundColor)))
@@ -95,8 +97,6 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
 
 @implementation _ASPendingStateInflated
 {
-  @package //Expose all ivars for ASDisplayNode to bypass getters for efficiency
-
   UIViewAutoresizing autoresizingMask;
   unsigned int edgeAntialiasingMask;
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
@@ -369,13 +369,16 @@ static UIColor *defaultTintColor = nil;
   _flags.setFrame = YES;
 }
 
+#define validate_bounds(newBounds)\
+ASDisplayNodeAssert(!isnan(newBounds.size.width) && !isnan(newBounds.size.height), @"Invalid bounds %@ provided to %@", NSStringFromCGRect(newBounds), self);\
+if (isnan(newBounds.size.width))      \
+  newBounds.size.width = 0.0;         \
+if (isnan(newBounds.size.height))     \
+  newBounds.size.height = 0.0;        \
+
 - (void)setBounds:(CGRect)newBounds
 {
-  ASDisplayNodeAssert(!isnan(newBounds.size.width) && !isnan(newBounds.size.height), @"Invalid bounds %@ provided to %@", NSStringFromCGRect(newBounds), self);
-  if (isnan(newBounds.size.width))
-    newBounds.size.width = 0.0;
-  if (isnan(newBounds.size.height))
-    newBounds.size.height = 0.0;
+  validate_bounds(newBounds);
   bounds = newBounds;
   _flags.setBounds = YES;
 }
@@ -438,13 +441,16 @@ static UIColor *defaultTintColor = nil;
   _flags.setAnchorPoint = YES;
 }
 
+#define validate_position(newPosition)\
+ASDisplayNodeAssert(!isnan(newPosition.x) && !isnan(newPosition.y), @"Invalid position %@ provided to %@", NSStringFromCGPoint(newPosition), self);\
+if (isnan(newPosition.x))   \
+  newPosition.x = 0.0;      \
+if (isnan(newPosition.y))   \
+  newPosition.y = 0.0;      \
+
 - (void)setPosition:(CGPoint)newPosition
 {
-  ASDisplayNodeAssert(!isnan(newPosition.x) && !isnan(newPosition.y), @"Invalid position %@ provided to %@", NSStringFromCGPoint(newPosition), self);
-  if (isnan(newPosition.x))
-    newPosition.x = 0.0;
-  if (isnan(newPosition.y))
-    newPosition.y = 0.0;
+  validate_position(newPosition);
   position = newPosition;
   _flags.setPosition = YES;
 }
@@ -1363,7 +1369,6 @@ static UIColor *defaultTintColor = nil;
     total += flags.setZPosition ? sizeof(self.zPosition) + sizeof(void *) : 0;
     total += flags.setFrame ? sizeof(self.frame) + sizeof(void *) : 0;
     total += flags.setBounds ? sizeof(self.bounds) + sizeof(void *) : 0;
-    total += flags.setPosition ? sizeof(self.position) + sizeof(void *) : 0;
     total += flags.setTransform ? sizeof(self.transform) + sizeof(void *) : 0;
     total += flags.setSublayerTransform ? sizeof(self.sublayerTransform) + sizeof(void *) : 0;
     total += flags.setContents ? sizeof(self.contents) + sizeof(void *) : 0;
@@ -1422,5 +1427,447 @@ static UIColor *defaultTintColor = nil;
     
     return total;
 }
+
+@end
+
+typedef NS_ENUM(NSUInteger, ASPendingStateType) {
+  ASPendingStateTypeNone = 0,
+  ASPendingStateTypeAnchorPoint,
+  ASPendingStateTypePosition,
+  ASPendingStateTypeZPosition,
+  ASPendingStateTypeFrame,
+  ASPendingStateTypeBounds,
+  ASPendingStateTypeTransform,
+  ASPendingStateTypeSublayerTransform,
+  ASPendingStateTypeContents,
+  ASPendingStateTypeContentsGravity,
+  ASPendingStateTypeContentsRect,
+  ASPendingStateTypeContentsCenter,
+  ASPendingStateTypeContentsScale,
+  ASPendingStateTypeRasterizationScale,
+  ASPendingStateTypeClipsToBounds,
+  ASPendingStateTypeBackgroundColor,
+  ASPendingStateTypeTintColor,
+  ASPendingStateTypeHidden,
+  ASPendingStateTypeAlpha,
+  ASPendingStateTypeCornerRadius,
+  ASPendingStateTypeContentMode,
+  ASPendingStateTypeUserInteractionEnabled,
+  ASPendingStateTypeExclusiveTouch,
+  ASPendingStateTypeShadowOpacity,
+  ASPendingStateTypeShadowOffset,
+  ASPendingStateTypeShadowRadius,
+  ASPendingStateTypeShadowColor,
+  ASPendingStateTypeBorderWidth,
+  ASPendingStateTypeBorderColor,
+  ASPendingStateTypeAutoresizingMask,
+  ASPendingStateTypeAutoresizesSubviews,
+  ASPendingStateTypeNeedsDisplayOnBoundsChange,
+  ASPendingStateTypeAllowsGroupOpacity,
+  ASPendingStateTypeAllowsEdgeAntialiasing,
+  ASPendingStateTypeEdgeAntialiasingMask,
+  ASPendingStateTypeNeedsDisplay,
+  ASPendingStateTypeNeedsLayout,
+  ASPendingStateTypeAsyncTransactionContainer,
+  ASPendingStateTypeOpaque,
+  ASPendingStateTypeSemanticContentAttribute,
+  ASPendingStateTypeLayoutMargins,
+  ASPendingStateTypePreservesSuperviewLayoutMargins,
+  ASPendingStateTypeInsetsLayoutMarginsFromSafeArea,
+  ASPendingStateTypeIsAccessibilityElement,
+  ASPendingStateTypeAccessibilityLabel,
+  ASPendingStateTypeAccessibilityAttributedLabel,
+  ASPendingStateTypeAccessibilityHint,
+  ASPendingStateTypeAccessibilityAttributedHint,
+  ASPendingStateTypeAccessibilityValue,
+  ASPendingStateTypeAccessibilityAttributedValue,
+  ASPendingStateTypeAccessibilityTraits,
+  ASPendingStateTypeAccessibilityFrame,
+  ASPendingStateTypeAccessibilityLanguage,
+  ASPendingStateTypeAccessibilityElementsHidden,
+  ASPendingStateTypeAccessibilityViewIsModal,
+  ASPendingStateTypeShouldGroupAccessibilityChildren,
+  ASPendingStateTypeAccessibilityIdentifier,
+  ASPendingStateTypeAccessibilityNavigationStyle,
+  ASPendingStateTypeAccessibilityHeaderElements,
+  ASPendingStateTypeAccessibilityActivationPoint,
+  ASPendingStateTypeAccessibilityPath,
+};
+
+@interface _ASPendingStateCompressedNode : NSObject
+{
+    @package
+    ASPendingStateType _type;
+}
+- (instancetype)initWithType:(ASPendingStateType)type NS_DESIGNATED_INITIALIZER;
+@end
+
+@implementation _ASPendingStateCompressedNode
+
+- (instancetype)initWithType:(ASPendingStateType)type
+{
+  if (self = [super init]) {
+    _type = type;
+  }
+  return self;
+}
+
+- (ASPendingStateType)type
+{
+    return _type;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeObject : _ASPendingStateCompressedNode {
+    @package
+    id _object;
+}
+@end
+
+@implementation _ASPendingStateCompressedNodeObject
+
+- (instancetype)initWithType:(ASPendingStateType)type object:(id)object
+{
+    if (self = [super initWithType:type]) {
+        _object = object;
+    }
+    return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeCGPoint : _ASPendingStateCompressedNode {
+    @package
+    CGPoint _cgPoint;
+}
+@end
+
+@implementation _ASPendingStateCompressedNodeCGPoint
+
+- (instancetype)initWithType:(ASPendingStateType)type cgPoint:(CGPoint)cgPoint
+{
+  if (self = [super initWithType:type]) {
+    _cgPoint = cgPoint;
+  }
+  return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeCGRect : _ASPendingStateCompressedNode {
+  @package
+  CGRect _cgRect;
+}
+@end
+
+@implementation _ASPendingStateCompressedNodeCGRect
+
+- (instancetype)initWithType:(ASPendingStateType)type cgRect:(CGRect)cgRect
+{
+  if (self = [super initWithType:type]) {
+    _cgRect = cgRect;
+  }
+  return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeInteger : _ASPendingStateCompressedNode {
+  @package
+  NSInteger _int;
+}
+
+@end
+
+@implementation _ASPendingStateCompressedNodeInteger
+
+- (instancetype)initWithType:(ASPendingStateType)type integer:(NSInteger)integer
+{
+  if (self = [super initWithType:type]) {
+    _int = integer;
+  }
+  return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeCGFloat: _ASPendingStateCompressedNode {
+  @package
+  CGFloat _cgFloat;
+}
+
+@end
+
+@implementation _ASPendingStateCompressedNodeCGFloat
+
+- (instancetype)initWithType:(ASPendingStateType)type cgFloat:(CGFloat)cgFloat {
+  if (self = [super initWithType:type]) {
+    _cgFloat = cgFloat;
+  }
+  return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeBOOL: _ASPendingStateCompressedNode {
+  @package
+  BOOL _bool;
+}
+
+@end
+
+@implementation _ASPendingStateCompressedNodeBOOL
+
+- (instancetype)initWithType:(ASPendingStateType)type bool:(BOOL)newBool {
+    if (self = [super initWithType:type]) {
+        _bool = newBool;
+    }
+    return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeAutoresizing : _ASPendingStateCompressedNode {
+    UIViewAutoresizing _viewAutoresizing;
+}
+@end
+
+@implementation _ASPendingStateCompressedNodeAutoresizing
+
+- (instancetype)initWithType:(ASPendingStateType)type viewAutoresizing:(UIViewAutoresizing)viewAutoresizing
+{
+    if (self = [super initWithType:type]) {
+        _viewAutoresizing = viewAutoresizing;
+    }
+    return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressedNodeCGSize: _ASPendingStateCompressedNode {
+  @package
+  CGSize _cgSize;
+}
+
+@end
+
+@implementation _ASPendingStateCompressedNodeCGSize
+
+- (instancetype)initWithType:(ASPendingStateType)type cgSize:(CGSize)cgSize {
+    if (self = [super initWithType:type]) {
+        _cgSize = cgSize;
+    }
+    return self;
+}
+
+@end
+
+@interface _ASPendingStateCompressed () {
+    std::forward_list<_ASPendingStateCompressedNode *> _list;
+}
+@end
+
+@implementation _ASPendingStateCompressed
+
+- (_ASPendingStateCompressedNode *)nodeOfType:(ASPendingStateType)type
+{
+    for (auto node = _list.begin(); node != _list.end(); ++node) {
+        if ((*node)->_type == type) {
+            return *node;
+        }
+    }
+    return nil;
+}
+
+- (_ASPendingStateInflated *)defaultState
+{
+    static dispatch_once_t onceToken;
+    static _ASPendingStateInflated *defaultState;
+    dispatch_once(&onceToken, ^{
+        defaultState = [[_ASPendingStateInflated alloc] init];
+    });
+    return defaultState;
+}
+
+- (BOOL)hasChanges
+{
+    return !_list.empty();
+}
+
+#define SET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, nodeType, name, bridged) \
+- (void)set##property:(var)property \
+{ \
+  _list.push_front([[_ASPendingStateCompressedNode##nodeType alloc] initWithType:type name:bridged(property)]); \
+} \
+
+#define SET_PENDING_STATE_GENERAL(property, type, var, name) \
+SET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, var, name, ) \
+
+#define GET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, nodeType, name, bridged) \
+- (var)property \
+{ \
+  if (_ASPendingStateCompressedNode##nodeType *node = [self nodeOfType:type]) { \
+    return bridged(node->_##name); \
+  } \
+  return [self defaultState].property; \
+} \
+
+#define GET_PENDING_STATE_GENERAL(property, type, var, name) \
+GET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, var, name, ) \
+
+#define GET_AND_SET_PENDING_STATE_FLOAT(lower, upper, type) \
+SET_PENDING_STATE_GENERAL(upper, type, CGFloat, cgFloat) \
+GET_PENDING_STATE_GENERAL(lower, type, CGFloat, cgFloat) \
+
+#define GET_AND_SET_PENDING_STATE_POINT(lower, upper, type) \
+SET_PENDING_STATE_GENERAL(upper, type, CGPoint, cgPoint) \
+GET_PENDING_STATE_GENERAL(lower, type, CGPoint, cgPoint) \
+
+#define GET_AND_SET_PENDING_STATE_SIZE(lower, upper, type) \
+SET_PENDING_STATE_GENERAL(upper, type, CGSize, cgSize) \
+GET_PENDING_STATE_GENERAL(lower, type, CGSize, cgSize) \
+
+#define GET_AND_SET_PENDING_STATE_RECT(lower, upper, type) \
+SET_PENDING_STATE_GENERAL(upper, type, CGRect, cgRect) \
+GET_PENDING_STATE_GENERAL(lower, type, CGRect, cgRect) \
+
+#define GET_AND_SET_PENDING_STATE_BOOL(lower, upper, type) \
+SET_PENDING_STATE_GENERAL(upper, type, BOOL, bool) \
+GET_PENDING_STATE_GENERAL(lower, type, BOOL, bool) \
+
+#define GET_AND_SET_PENDING_STATE_OBJECT(lower, upper, type, refType) \
+SET_PENDING_STATE_GENERAL_BRIDGED(upper, type, refType, Object, object, ) \
+GET_PENDING_STATE_GENERAL_BRIDGED(lower, type, refType, Object, object, ) \
+
+#define GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(lower, upper, type, refType) \
+SET_PENDING_STATE_GENERAL_BRIDGED(upper, type, refType, Object, object, (__bridge id)) \
+GET_PENDING_STATE_GENERAL_BRIDGED(lower, type, refType, Object, object, (__bridge refType)) \
+
+GET_AND_SET_PENDING_STATE_POINT(anchorPoint, AnchorPoint, ASPendingStateTypeAnchorPoint)
+GET_AND_SET_PENDING_STATE_POINT(position, Position, ASPendingStateTypePosition)
+GET_AND_SET_PENDING_STATE_FLOAT(zPosition, ZPosition, ASPendingStateTypeZPosition)
+GET_AND_SET_PENDING_STATE_RECT(frame, Frame, ASPendingStateTypeFrame)
+
+// TODO getter
+- (void)setBounds:(CGRect)bounds
+{
+  validate_bounds(bounds);
+  _list.push_front([[_ASPendingStateCompressedNodeCGRect alloc] initWithType:ASPendingStateTypeFrame cgRect:bounds]);
+}
+
+//total += flags.setTransform ? sizeof(self.transform) + sizeof(void *) : 0;
+//total += flags.setSublayerTransform ? sizeof(self.sublayerTransform) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_OBJECT(contents, Contents, ASPendingStateTypeContents, id)
+//total += flags.setContents ? sizeof(self.contents) + sizeof(void *) : 0;
+//total += flags.setContentsGravity ? sizeof(self.contentsGravity) + sizeof(void *) : 0;
+//total += flags.setContentsRect ? sizeof(self.contentsRect) + sizeof(void *) : 0;
+//total += flags.setContentsCenter ? sizeof(self.contentsCenter) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_FLOAT(contentsScale, ContentsScale, ASPendingStateTypeContentsScale)
+GET_AND_SET_PENDING_STATE_FLOAT(rasterizationScale, RasterizationScale, ASPendingStateTypeRasterizationScale)
+GET_AND_SET_PENDING_STATE_BOOL(clipsToBounds, ClipsToBounds, ASPendingStateTypeClipsToBounds)
+
+GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(backgroundColor, BackgroundColor, ASPendingStateTypeBackgroundColor, CGColorRef)
+//- (void)setBackgroundColor:(CGColorRef)backgroundColor
+//{
+//    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeBackgroundColor object:(__bridge id)backgroundColor]);
+//}
+
+- (void)setTintColor:(UIColor *)tintColor
+{
+    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeTintColor object:tintColor]);
+}
+
+GET_AND_SET_PENDING_STATE_BOOL(isHidden, Hidden, ASPendingStateTypeHidden)
+GET_AND_SET_PENDING_STATE_FLOAT(alpha, Alpha, ASPendingStateTypeAlpha)
+GET_AND_SET_PENDING_STATE_FLOAT(cornerRadius, CornerRadius, ASPendingStateTypeCornerRadius)
+
+- (void)setContentMode:(UIViewContentMode)contentMode
+{
+  _list.push_front([[_ASPendingStateCompressedNodeInteger alloc] initWithType:ASPendingStateTypeContentMode integer:contentMode]);
+}
+
+GET_AND_SET_PENDING_STATE_BOOL(isUserInteractionEnabled, UserInteractionEnabled, ASPendingStateTypeUserInteractionEnabled)
+GET_AND_SET_PENDING_STATE_BOOL(isExclusiveTouch, ExclusiveTouch, ASPendingStateTypeExclusiveTouch)
+GET_AND_SET_PENDING_STATE_FLOAT(shadowOpacity, ShadowOpacity, ASPendingStateTypeShadowOpacity)
+GET_AND_SET_PENDING_STATE_SIZE(shadowOffset, ShadowOffset, ASPendingStateTypeShadowOffset)
+GET_AND_SET_PENDING_STATE_FLOAT(shadowRadius, ShadowRadius, ASPendingStateTypeShadowRadius)
+
+- (void)setShadowColor:(CGColorRef)shadowColor
+{
+    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeShadowColor object:(__bridge id)shadowColor]);
+}
+
+- (CGColorRef)shadowColor
+{
+    if (_ASPendingStateCompressedNodeObject *node = [self nodeOfType:ASPendingStateTypeShadowColor]) {
+        return (__bridge CGColorRef)node->_object;
+    }
+    return [self defaultState].shadowColor;
+}
+
+//total += flags.setBorderWidth ? sizeof(self.borderWidth) + sizeof(void *) : 0;
+- (void)setBorderColor:(CGColorRef)borderColor
+{
+    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeBorderColor object:(__bridge id)borderColor]);
+}
+
+- (void)setAutoresizingMask:(UIViewAutoresizing)autoresizingMask
+{
+    _list.push_front([[_ASPendingStateCompressedNodeAutoresizing alloc] initWithType:ASPendingStateTypeAutoresizingMask viewAutoresizing:autoresizingMask]);
+}
+
+GET_AND_SET_PENDING_STATE_BOOL(autoresizesSubviews, AutoresizesSubviews, ASPendingStateTypeAutoresizesSubviews)
+GET_AND_SET_PENDING_STATE_BOOL(needsDisplayOnBoundsChange, NeedsDisplayOnBoundsChange, ASPendingStateTypeNeedsDisplayOnBoundsChange)
+GET_AND_SET_PENDING_STATE_BOOL(allowsGroupOpacity, AllowsGroupOpacity, ASPendingStateTypeAllowsGroupOpacity)
+GET_AND_SET_PENDING_STATE_BOOL(allowsEdgeAntialiasing, AllowsEdgeAntialiasing, ASPendingStateTypeAllowsEdgeAntialiasing)
+
+//total += flags.setEdgeAntialiasingMask ? sizeof(self.edgeAntialiasingMask) + sizeof(void *) : 0;
+
+
+
+- (void)setNeedsDisplay
+{
+    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithType:ASPendingStateTypeNeedsDisplay]);
+}
+
+- (void)setNeedsLayout
+{
+    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithType:ASPendingStateTypeNeedsLayout]);
+}
+//total += flags.setAsyncTransactionContainer ? sizeof(self->asyncTransactionContainer) + sizeof(void *) : 0;
+
+GET_AND_SET_PENDING_STATE_BOOL(isOpaque, Opaque, ASPendingStateTypeOpaque)
+
+//total += flags.setSemanticContentAttribute ? sizeof(self.semanticContentAttribute) + sizeof(void *) : 0;
+//total += flags.setLayoutMargins ? sizeof(self.layoutMargins) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_BOOL(preservesSuperviewLayoutMargins, PreservesSuperviewLayoutMargins, ASPendingStateTypePreservesSuperviewLayoutMargins)
+
+//total += flags.setInsetsLayoutMarginsFromSafeArea ? sizeof(self.insetsLayoutMarginsFromSafeArea) + sizeof(void *) : 0;
+
+GET_AND_SET_PENDING_STATE_BOOL(isAccessibilityElement, IsAccessibilityElement, ASPendingStateTypeIsAccessibilityElement)
+
+//total += flags.setAccessibilityLabel ? sizeof(self.accessibilityLabel) + sizeof(void *) : 0;
+//total += flags.setAccessibilityAttributedLabel ? sizeof(self.accessibilityAttributedLabel) + sizeof(void *) : 0;
+//total += flags.setAccessibilityHint ? sizeof(self.accessibilityHint) + sizeof(void *) : 0;
+//total += flags.setAccessibilityAttributedHint ? sizeof(self.accessibilityAttributedHint) + sizeof(void *) : 0;
+//total += flags.setAccessibilityValue ? sizeof(self.accessibilityValue) + sizeof(void *) : 0;
+//total += flags.setAccessibilityAttributedValue ? sizeof(self.accessibilityAttributedValue) + sizeof(void *) : 0;
+//total += flags.setAccessibilityTraits ? sizeof(self.accessibilityTraits) + sizeof(void *) : 0;
+//total += flags.setAccessibilityFrame ? sizeof(self.accessibilityFrame) + sizeof(void *) : 0;
+//total += flags.setAccessibilityLanguage ? sizeof(self.accessibilityLanguage) + sizeof(void *) : 0;
+
+GET_AND_SET_PENDING_STATE_BOOL(accessibilityElementsHidden, AccessibilityElementsHidden, ASPendingStateTypeAccessibilityElementsHidden)
+
+//total += flags.setAccessibilityViewIsModal ? sizeof(self.accessibilityViewIsModal) + sizeof(void *) : 0;
+
+GET_AND_SET_PENDING_STATE_BOOL(shouldGroupAccessibilityChildren, ShouldGroupAccessibilityChildren, ASPendingStateTypeShouldGroupAccessibilityChildren)
+
+//total += flags.setAccessibilityIdentifier ? sizeof(self.accessibilityIdentifier) + sizeof(void *) : 0;
+//total += flags.setAccessibilityNavigationStyle ? sizeof(self.accessibilityNavigationStyle) + sizeof(void *) : 0;
+//total += flags.setAccessibilityHeaderElements ? sizeof(self->accessibilityHeaderElements) + sizeof(void *) : 0;
+//total += flags.setAccessibilityActivationPoint ? sizeof(self.accessibilityActivationPoint) + sizeof(void *) : 0;
+//total += flags.setAccessibilityPath ? sizeof(self.accessibilityPath) + sizeof(void *) : 0;
+
 
 @end

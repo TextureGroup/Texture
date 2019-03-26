@@ -18,8 +18,8 @@
 - (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
 - (void)applyToLayer:(CALayer *)layer;
 
-+ (id<_ASPendingState>)pendingViewStateFromLayer:(CALayer *)layer;
-+ (id<_ASPendingState>)pendingViewStateFromView:(UIView *)view;
++ (NSObject <_ASPendingState> *)pendingViewStateFromLayer:(CALayer *)layer;
++ (NSObject <_ASPendingState> *)pendingViewStateFromView:(UIView *)view;
 
 @property (nonatomic, readonly) BOOL hasSetNeedsLayout;
 @property (nonatomic, readonly) BOOL hasSetNeedsDisplay;
@@ -43,5 +43,9 @@
 @interface _ASPendingStateInflated : NSObject <_ASPendingState>
 
 - (NSUInteger)cost;
+
+@end
+
+@interface _ASPendingStateCompressed: NSObject <_ASPendingState>
 
 @end

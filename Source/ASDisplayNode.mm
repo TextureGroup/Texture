@@ -160,7 +160,7 @@ static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
     }
     [_lock unlock];
     
-    return [NSString stringWithFormat:@"\nCleared visible: %d\nCleared invisible: %d\nVisible once:%d\nVisible reset:%d\nInvisible once: %d\nInvisible reset: %d\nInvisible cost: %d\nInvisible cost LL: %d", clearedVisible, clearedInvisible, visibleNodes, visibleNodesReset, invisibleNodes, invisibleNodesReset, invisibleCost, invisibleCostLL];
+  return [NSString stringWithFormat:@"\nCleared visible: %lu\nCleared invisible: %d\nVisible once:%d\nVisible reset:%d\nInvisible once: %d\nInvisible reset: %d\nInvisible cost: %d\nInvisible cost LL: %d", (unsigned long)clearedVisible, clearedInvisible, visibleNodes, visibleNodesReset, invisibleNodes, invisibleNodesReset, invisibleCost, invisibleCostLL];
 }
 
 @end
@@ -186,12 +186,12 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
   return isSynchronous && !isLayerBacked;
 }
 
-id<_ASPendingState> ASDisplayNodeGetPendingState(ASDisplayNode *node)
+NSObject<_ASPendingState> *ASDisplayNodeGetPendingState(ASDisplayNode *node)
 {
   ASLockScope(node);
-  _ASPendingState *result = node->_pendingViewState;
+  NSObject<_ASPendingState> *result = node->_pendingViewState;
   if (result == nil) {
-    result = [[_ASPendingState alloc] init];
+    result = [[_ASPendingStateCompressed alloc] init];
     node->_pendingViewState = result;
     [[ASPendingStateTracker sharedTracker] nodeSetPendingState:node];
       static dispatch_once_t onceToken;
