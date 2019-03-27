@@ -111,6 +111,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
 
 @implementation _ASPendingStateInflated
 {
+  @package
   UIViewAutoresizing autoresizingMask;
   unsigned int edgeAntialiasingMask;
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
@@ -1592,109 +1593,144 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
 {
     _ASPendingStateInflated *inflated = [[_ASPendingStateInflated alloc] init];
     
+    // Since this is a forward list we need to keep track of which elements we've set and skip any we already have. This will allow the latest
     for (auto node = _list.begin(); node != _list.end(); ++node) {
         _ASPendingStateCompressedNode *compressedNode = *node;
         switch(compressedNode->_pendingStateType) {
             case ASPendingStateTypeAnchorPoint:
+                if (inflated->_flags.setAnchorPoint) continue;
                 [inflated setAnchorPoint:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
                 break;
             case ASPendingStateTypePosition:
+                if (inflated->_flags.setPosition) continue;
                 [inflated setPosition:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
                 break;
             case ASPendingStateTypeZPosition:
+                if (inflated->_flags.setZPosition) continue;
                 [inflated setZPosition:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeFrame:
+                if (inflated->_flags.setFrame) continue;
                 [inflated setFrame:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
                 break;
             case ASPendingStateTypeBounds:
+                if (inflated->_flags.setBounds) continue;
                 [inflated setBounds:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
                 break;
             case ASPendingStateTypeTransform:
+                if (inflated->_flags.setTransform) continue;
                 [inflated setTransform:((_ASPendingStateCompressedNodeCATransform3D *)compressedNode)->_caTransform3D];
                 break;
             case ASPendingStateTypeSublayerTransform:
+                if (inflated->_flags.setSublayerTransform) continue;
                 [inflated setSublayerTransform:((_ASPendingStateCompressedNodeCATransform3D *)compressedNode)->_caTransform3D];
                 break;
             case ASPendingStateTypeContents:
+                if (inflated->_flags.setContents) continue;
                 [inflated setContents:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeContentsGravity:
+                if (inflated->_flags.setContentsGravity) continue;
                 [inflated setContentsGravity:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeContentsRect:
+                if (inflated->_flags.setContentsRect) continue;
                 [inflated setContentsRect:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
                 break;
             case ASPendingStateTypeContentsCenter:
+                if (inflated->_flags.setContentsCenter) continue;
                 [inflated setContentsCenter:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
                 break;
             case ASPendingStateTypeContentsScale:
+                if (inflated->_flags.setContentsScale) continue;
                 [inflated setContentsScale:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeRasterizationScale:
+                if (inflated->_flags.setRasterizationScale) continue;
                 [inflated setRasterizationScale:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeClipsToBounds:
+                if (inflated->_flags.setClipsToBounds) continue;
                 [inflated setClipsToBounds:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeBackgroundColor:
+                if (inflated->_flags.setBackgroundColor) continue;
                 [inflated setBackgroundColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeTintColor:
+                if (inflated->_flags.setTintColor) continue;
                 [inflated setTintColor:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeHidden:
+                if (inflated->_flags.setHidden) continue;
                 [inflated setHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAlpha:
+                if (inflated->_flags.setAlpha) continue;
                 [inflated setAlpha:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeCornerRadius:
+                if (inflated->_flags.setCornerRadius) continue;
                 [inflated setCornerRadius:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeContentMode:
+                if (inflated->_flags.setContentMode) continue;
                 [inflated setContentMode:((_ASPendingStateCompressedNodeUIViewContentMode *)compressedNode)->_uiViewContentMode];
                 break;
             case ASPendingStateTypeUserInteractionEnabled:
+                if (inflated->_flags.setUserInteractionEnabled) continue;
                 [inflated setUserInteractionEnabled:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeExclusiveTouch:
+                if (inflated->_flags.setExclusiveTouch) continue;
                 [inflated setExclusiveTouch:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeShadowOpacity:
+                if (inflated->_flags.setShadowOpacity) continue;
                 [inflated setShadowOpacity:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeShadowOffset:
+                if (inflated->_flags.setShadowOffset) continue;
                 [inflated setShadowOpacity:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeShadowRadius:
+                if (inflated->_flags.setShadowRadius) continue;
                 [inflated setShadowRadius:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeShadowColor:
+                if (inflated->_flags.setShadowColor) continue;
                 [inflated setShadowColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeBorderWidth:
+                if (inflated->_flags.setBorderWidth) continue;
                 [inflated setBorderWidth:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
                 break;
             case ASPendingStateTypeBorderColor:
+                if (inflated->_flags.setBorderColor) continue;
                 [inflated setBorderColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAutoresizingMask:
+                if (inflated->_flags.setAutoresizingMask) continue;
                 [inflated setAutoresizingMask:((_ASPendingStateCompressedNodeUIViewAutoresizing *)compressedNode)->_uiViewAutoresizing];
                 break;
             case ASPendingStateTypeAutoresizesSubviews:
+                if (inflated->_flags.setAutoresizesSubviews) continue;
                 [inflated setAutoresizesSubviews:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeNeedsDisplayOnBoundsChange:
+                if (inflated->_flags.setNeedsDisplayOnBoundsChange) continue;
                 [inflated setNeedsDisplayOnBoundsChange:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAllowsGroupOpacity:
+                if (inflated->_flags.setAllowsGroupOpacity) continue;
                 [inflated setAllowsGroupOpacity:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAllowsEdgeAntialiasing:
+                if (inflated->_flags.setAllowsEdgeAntialiasing) continue;
                 [inflated setAllowsEdgeAntialiasing:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeEdgeAntialiasingMask:
+                if (inflated->_flags.setEdgeAntialiasingMask) continue;
                 [inflated setEdgeAntialiasingMask:((_ASPendingStateCompressedNodeUInt *)compressedNode)->_uInt];
                 break;
             case ASPendingStateTypeNeedsDisplay:
@@ -1704,76 +1740,103 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
                 [inflated setNeedsLayout];
                 break;
             case ASPendingStateTypeAsyncTransactionContainer:
+                if (inflated->_flags.setAsyncTransactionContainer) continue;
                 [inflated asyncdisplaykit_setAsyncTransactionContainer:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeOpaque:
+                if (inflated->_flags.setOpaque) continue;
                 [inflated setOpaque:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeSemanticContentAttribute:
+                if (inflated->_flags.setSemanticContentAttribute) continue;
                 [inflated setSemanticContentAttribute:((_ASPendingStateCompressedNodeUISemanticContentAttribute *)compressedNode)->_uiSemanticContentAttribute];
                 break;
             case ASPendingStateTypeLayoutMargins:
+                if (inflated->_flags.setLayoutMargins) continue;
                 [inflated setLayoutMargins:((_ASPendingStateCompressedNodeUIEdgeInsets *)compressedNode)->_uiEdgeInsets];
                 break;
             case ASPendingStateTypePreservesSuperviewLayoutMargins:
+                if (inflated->_flags.setPreservesSuperviewLayoutMargins) continue;
                 [inflated setPreservesSuperviewLayoutMargins:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeInsetsLayoutMarginsFromSafeArea:
+                if (inflated->_flags.setInsetsLayoutMarginsFromSafeArea) continue;
                 [inflated setInsetsLayoutMarginsFromSafeArea:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeIsAccessibilityElement:
+                if (inflated->_flags.setIsAccessibilityElement) continue;
                 [inflated setIsAccessibilityElement:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAccessibilityLabel:
+                if (inflated->_flags.setAccessibilityLabel) continue;
                 [inflated setAccessibilityLabel:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityAttributedLabel:
+                if (inflated->_flags.setAccessibilityAttributedLabel) continue;
                 [inflated setAccessibilityAttributedLabel:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityHint:
+                if (inflated->_flags.setAccessibilityHint) continue;
                 [inflated setAccessibilityHint:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityAttributedHint:
+                if (inflated->_flags.setAccessibilityAttributedHint) continue;
                 [inflated setAccessibilityAttributedHint:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityValue:
+                if (inflated->_flags.setAccessibilityValue) continue;
                 [inflated setAccessibilityValue:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityAttributedValue:
+                if (inflated->_flags.setAccessibilityAttributedValue) continue;
                 [inflated setAccessibilityAttributedValue:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityTraits:
+                if (inflated->_flags.setAccessibilityTraits) continue;
                 [inflated setAccessibilityTraits:((_ASPendingStateCompressedNodeUIAccessibilityTraits *)compressedNode)->_uiAccessibilityTraits];
                 break;
             case ASPendingStateTypeAccessibilityFrame:
+                if (inflated->_flags.setAccessibilityFrame) continue;
                 [inflated setAccessibilityFrame:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
                 break;
             case ASPendingStateTypeAccessibilityLanguage:
+                if (inflated->_flags.setAccessibilityLanguage) continue;
                 [inflated setAccessibilityLanguage:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityElementsHidden:
+                if (inflated->_flags.setAccessibilityElementsHidden) continue;
                 [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAccessibilityViewIsModal:
+                if (inflated->_flags.setAccessibilityViewIsModal) continue;
                 [inflated setAccessibilityViewIsModal:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeShouldGroupAccessibilityChildren:
+                if (inflated->_flags.setShouldGroupAccessibilityChildren) continue;
                 [inflated setShouldGroupAccessibilityChildren:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAccessibilityIdentifier:
+                if (inflated->_flags.setAccessibilityIdentifier) continue;
                 [inflated setAccessibilityIdentifier:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
                 break;
             case ASPendingStateTypeAccessibilityNavigationStyle:
+                if (inflated->_flags.setAccessibilityNavigationStyle) continue;
                 [inflated setAccessibilityNavigationStyle:((_ASPendingStateCompressedNodeUIAccessibilityNavigationStyle *)compressedNode)->_uiAccessibilityNavigationStyle];
                 break;
             case ASPendingStateTypeAccessibilityHeaderElements:
+                if (inflated->_flags.setAccessibilityHeaderElements) continue;
                 [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
             case ASPendingStateTypeAccessibilityActivationPoint:
+                if (inflated->_flags.setAccessibilityActivationPoint) continue;
                 [inflated setAccessibilityActivationPoint:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
                 break;
             case ASPendingStateTypeAccessibilityPath:
+                if (inflated->_flags.setAccessibilityPath) continue;
                 [inflated setAccessibilityPath:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            default:
+                ASDisplayNodeAssert(YES, @"unhandled pending node state type");
                 break;
                 
         }
@@ -1914,7 +1977,14 @@ GET_AND_SET_PENDING_STATE_BOOL(isHidden, Hidden, ASPendingStateTypeHidden)
 GET_AND_SET_PENDING_STATE_FLOAT(alpha, Alpha, ASPendingStateTypeAlpha)
 GET_AND_SET_PENDING_STATE_FLOAT(cornerRadius, CornerRadius, ASPendingStateTypeCornerRadius)
 GET_AND_SET_PENDING_STATE_CONTENT_MODE(contentMode, ContentMode, ASPendingStateTypeContentMode)
+
+//SET_PENDING_STATE_GENERAL(UserInteractionEnabled, ASPendingStateTypeUserInteractionEnabled, BOOL, bool)
+//- (BOOL)isUserInteractionEnabled
+//{
+//
+//}
 GET_AND_SET_PENDING_STATE_BOOL(isUserInteractionEnabled, UserInteractionEnabled, ASPendingStateTypeUserInteractionEnabled)
+
 GET_AND_SET_PENDING_STATE_BOOL(isExclusiveTouch, ExclusiveTouch, ASPendingStateTypeExclusiveTouch)
 GET_AND_SET_PENDING_STATE_FLOAT(shadowOpacity, ShadowOpacity, ASPendingStateTypeShadowOpacity)
 GET_AND_SET_PENDING_STATE_SIZE(shadowOffset, ShadowOffset, ASPendingStateTypeShadowOffset)
