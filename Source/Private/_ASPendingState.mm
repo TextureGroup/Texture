@@ -18,9 +18,9 @@
 
 #include <forward_list>
 
-#define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
-  || (flags.setOpaque && opaque != (layer).opaque)\
-  || (flags.setBackgroundColor && !CGColorEqualToColor(backgroundColor, (layer).backgroundColor)))
+BOOL __shouldSetNeedsDisplay(CALayer *layer, BOOL needsDisplay, BOOL setOpaque, BOOL opaque, BOOL setBackgroundColor, CGColorRef backgroundColor) {
+    return needsDisplay || (setOpaque && opaque != layer.opaque) || (setBackgroundColor && !CGColorEqualToColor(backgroundColor, layer.backgroundColor));
+}
 
 typedef struct {
   // Properties
@@ -867,7 +867,7 @@ if (isnan(newPosition.y))   \
 {
   ASPendingStateFlags flags = _flags;
 
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (__shouldSetNeedsDisplay(layer, flags.needsDisplay, flags.setOpaque, opaque, flags.setBackgroundColor, backgroundColor)) {
     [layer setNeedsDisplay];
   }
 
@@ -989,7 +989,7 @@ if (isnan(newPosition.y))   \
   unowned CALayer *layer = view.layer;
 
   ASPendingStateFlags flags = _flags;
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (__shouldSetNeedsDisplay(layer, flags.needsDisplay, flags.setOpaque, opaque, flags.setBackgroundColor, backgroundColor)) {
     [view setNeedsDisplay];
   }
 
@@ -1497,171 +1497,64 @@ typedef NS_ENUM(NSUInteger, ASPendingStateType) {
 @interface _ASPendingStateCompressedNode : NSObject
 {
     @package
-    ASPendingStateType _type;
+    ASPendingStateType _pendingStateType;
 }
-- (instancetype)initWithType:(ASPendingStateType)type NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPendingStateType:(ASPendingStateType)pendingStateType NS_DESIGNATED_INITIALIZER;
 @end
 
 @implementation _ASPendingStateCompressedNode
 
-- (instancetype)initWithType:(ASPendingStateType)type
+- (instancetype)initWithPendingStateType:(ASPendingStateType)pendingStateType
 {
   if (self = [super init]) {
-    _type = type;
+    _pendingStateType = pendingStateType;
   }
   return self;
 }
 
-- (ASPendingStateType)type
+- (ASPendingStateType)pendingStateType
 {
-    return _type;
+    return _pendingStateType;
 }
 
 @end
 
-@interface _ASPendingStateCompressedNodeObject : _ASPendingStateCompressedNode {
-    @package
-    id _object;
-}
-@end
+#define TYPE_NODE_INTERFACE_AND_IMP_UPPER(type, Type, typeName) \
+@interface _ASPendingStateCompressedNode##Type: _ASPendingStateCompressedNode { \
+@package \
+  type _##typeName; \
+} \
+\
+@end \
+\
+@implementation _ASPendingStateCompressedNode##Type \
+\
+- (instancetype)initWithPendingStateType:(ASPendingStateType)pendingStateType typeName:(type)new##typeName { \
+  if (self = [super initWithPendingStateType:pendingStateType]) { \
+    _##typeName = new##typeName; \
+  } \
+  return self; \
+} \
+\
+@end \
 
-@implementation _ASPendingStateCompressedNodeObject
+#define TYPE_NODE_INTERFACE_AND_IMP(type, typeName) \
+TYPE_NODE_INTERFACE_AND_IMP_UPPER(type, type, typeName)
 
-- (instancetype)initWithType:(ASPendingStateType)type object:(id)object
-{
-    if (self = [super initWithType:type]) {
-        _object = object;
-    }
-    return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeCGPoint : _ASPendingStateCompressedNode {
-    @package
-    CGPoint _cgPoint;
-}
-@end
-
-@implementation _ASPendingStateCompressedNodeCGPoint
-
-- (instancetype)initWithType:(ASPendingStateType)type cgPoint:(CGPoint)cgPoint
-{
-  if (self = [super initWithType:type]) {
-    _cgPoint = cgPoint;
-  }
-  return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeCGRect : _ASPendingStateCompressedNode {
-  @package
-  CGRect _cgRect;
-}
-@end
-
-@implementation _ASPendingStateCompressedNodeCGRect
-
-- (instancetype)initWithType:(ASPendingStateType)type cgRect:(CGRect)cgRect
-{
-  if (self = [super initWithType:type]) {
-    _cgRect = cgRect;
-  }
-  return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeInteger : _ASPendingStateCompressedNode {
-  @package
-  NSInteger _int;
-}
-
-@end
-
-@implementation _ASPendingStateCompressedNodeInteger
-
-- (instancetype)initWithType:(ASPendingStateType)type integer:(NSInteger)integer
-{
-  if (self = [super initWithType:type]) {
-    _int = integer;
-  }
-  return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeCGFloat: _ASPendingStateCompressedNode {
-  @package
-  CGFloat _cgFloat;
-}
-
-@end
-
-@implementation _ASPendingStateCompressedNodeCGFloat
-
-- (instancetype)initWithType:(ASPendingStateType)type cgFloat:(CGFloat)cgFloat {
-  if (self = [super initWithType:type]) {
-    _cgFloat = cgFloat;
-  }
-  return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeBOOL: _ASPendingStateCompressedNode {
-  @package
-  BOOL _bool;
-}
-
-@end
-
-@implementation _ASPendingStateCompressedNodeBOOL
-
-- (instancetype)initWithType:(ASPendingStateType)type bool:(BOOL)newBool {
-    if (self = [super initWithType:type]) {
-        _bool = newBool;
-    }
-    return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeAutoresizing : _ASPendingStateCompressedNode {
-    UIViewAutoresizing _viewAutoresizing;
-}
-@end
-
-@implementation _ASPendingStateCompressedNodeAutoresizing
-
-- (instancetype)initWithType:(ASPendingStateType)type viewAutoresizing:(UIViewAutoresizing)viewAutoresizing
-{
-    if (self = [super initWithType:type]) {
-        _viewAutoresizing = viewAutoresizing;
-    }
-    return self;
-}
-
-@end
-
-@interface _ASPendingStateCompressedNodeCGSize: _ASPendingStateCompressedNode {
-  @package
-  CGSize _cgSize;
-}
-
-@end
-
-@implementation _ASPendingStateCompressedNodeCGSize
-
-- (instancetype)initWithType:(ASPendingStateType)type cgSize:(CGSize)cgSize {
-    if (self = [super initWithType:type]) {
-        _cgSize = cgSize;
-    }
-    return self;
-}
-
-@end
+TYPE_NODE_INTERFACE_AND_IMP_UPPER(id, Object, object)
+TYPE_NODE_INTERFACE_AND_IMP_UPPER(unsigned int, UInt, uInt)
+TYPE_NODE_INTERFACE_AND_IMP(UIViewContentMode, uiViewContentMode)
+TYPE_NODE_INTERFACE_AND_IMP(BOOL, bool)
+TYPE_NODE_INTERFACE_AND_IMP(CGFloat, cgFloat)
+TYPE_NODE_INTERFACE_AND_IMP(CGSize, cgSize)
+TYPE_NODE_INTERFACE_AND_IMP(CGPoint, cgPoint)
+TYPE_NODE_INTERFACE_AND_IMP(CGRect, cgRect)
+TYPE_NODE_INTERFACE_AND_IMP(UIViewAutoresizing, uiViewAutoresizing)
+TYPE_NODE_INTERFACE_AND_IMP(CATransform3D, caTransform3D)
+TYPE_NODE_INTERFACE_AND_IMP(UIAccessibilityTraits, uiAccessibilityTraits)
+TYPE_NODE_INTERFACE_AND_IMP(UIAccessibilityNavigationStyle, uiAccessibilityNavigationStyle)
+TYPE_NODE_INTERFACE_AND_IMP(UISemanticContentAttribute, uiSemanticContentAttribute)
+TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
 
 @interface _ASPendingStateCompressed () {
     std::forward_list<_ASPendingStateCompressedNode *> _list;
@@ -1670,10 +1563,10 @@ typedef NS_ENUM(NSUInteger, ASPendingStateType) {
 
 @implementation _ASPendingStateCompressed
 
-- (_ASPendingStateCompressedNode *)nodeOfType:(ASPendingStateType)type
+- (_ASPendingStateCompressedNode *)nodeOfPendingStateType:(ASPendingStateType)pendingStateType
 {
     for (auto node = _list.begin(); node != _list.end(); ++node) {
-        if ((*node)->_type == type) {
+        if ((*node)->_pendingStateType == pendingStateType) {
             return *node;
         }
     }
@@ -1695,54 +1588,282 @@ typedef NS_ENUM(NSUInteger, ASPendingStateType) {
     return !_list.empty();
 }
 
-#define SET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, nodeType, name, bridged) \
+- (_ASPendingStateInflated *)inflatePendingState
+{
+    _ASPendingStateInflated *inflated = [[_ASPendingStateInflated alloc] init];
+    
+    for (auto node = _list.begin(); node != _list.end(); ++node) {
+        _ASPendingStateCompressedNode *compressedNode = *node;
+        switch(compressedNode->_pendingStateType) {
+            case ASPendingStateTypeAnchorPoint:
+                [inflated setAnchorPoint:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
+                break;
+            case ASPendingStateTypePosition:
+                [inflated setPosition:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
+                break;
+            case ASPendingStateTypeZPosition:
+                [inflated setZPosition:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeFrame:
+                [inflated setFrame:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
+                break;
+            case ASPendingStateTypeBounds:
+                [inflated setBounds:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
+                break;
+            case ASPendingStateTypeTransform:
+                [inflated setTransform:((_ASPendingStateCompressedNodeCATransform3D *)compressedNode)->_caTransform3D];
+                break;
+            case ASPendingStateTypeSublayerTransform:
+                [inflated setSublayerTransform:((_ASPendingStateCompressedNodeCATransform3D *)compressedNode)->_caTransform3D];
+                break;
+            case ASPendingStateTypeContents:
+                [inflated setContents:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeContentsGravity:
+                [inflated setContentsGravity:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeContentsRect:
+                [inflated setContentsRect:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
+                break;
+            case ASPendingStateTypeContentsCenter:
+                [inflated setContentsCenter:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
+                break;
+            case ASPendingStateTypeContentsScale:
+                [inflated setContentsScale:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeRasterizationScale:
+                [inflated setRasterizationScale:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeClipsToBounds:
+                [inflated setClipsToBounds:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeBackgroundColor:
+                [inflated setBackgroundColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeTintColor:
+                [inflated setTintColor:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeHidden:
+                [inflated setHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAlpha:
+                [inflated setAlpha:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeCornerRadius:
+                [inflated setCornerRadius:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeContentMode:
+                [inflated setContentMode:((_ASPendingStateCompressedNodeUIViewContentMode *)compressedNode)->_uiViewContentMode];
+                break;
+            case ASPendingStateTypeUserInteractionEnabled:
+                [inflated setUserInteractionEnabled:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeExclusiveTouch:
+                [inflated setExclusiveTouch:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeShadowOpacity:
+                [inflated setShadowOpacity:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeShadowOffset:
+                [inflated setShadowOpacity:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeShadowRadius:
+                [inflated setShadowRadius:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeShadowColor:
+                [inflated setShadowColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeBorderWidth:
+                [inflated setBorderWidth:((_ASPendingStateCompressedNodeCGFloat *)compressedNode)->_cgFloat];
+                break;
+            case ASPendingStateTypeBorderColor:
+                [inflated setBorderColor:(__bridge CGColorRef)((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAutoresizingMask:
+                [inflated setAutoresizingMask:((_ASPendingStateCompressedNodeUIViewAutoresizing *)compressedNode)->_uiViewAutoresizing];
+                break;
+            case ASPendingStateTypeAutoresizesSubviews:
+                [inflated setAutoresizesSubviews:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeNeedsDisplayOnBoundsChange:
+                [inflated setNeedsDisplayOnBoundsChange:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAllowsGroupOpacity:
+                [inflated setAllowsGroupOpacity:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAllowsEdgeAntialiasing:
+                [inflated setAllowsEdgeAntialiasing:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeEdgeAntialiasingMask:
+                [inflated setEdgeAntialiasingMask:((_ASPendingStateCompressedNodeUInt *)compressedNode)->_uInt];
+                break;
+            case ASPendingStateTypeNeedsDisplay:
+                [inflated setNeedsDisplay];
+                break;
+            case ASPendingStateTypeNeedsLayout:
+                [inflated setNeedsLayout];
+                break;
+            case ASPendingStateTypeAsyncTransactionContainer:
+                [inflated asyncdisplaykit_setAsyncTransactionContainer:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeOpaque:
+                [inflated setOpaque:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeSemanticContentAttribute:
+                [inflated setSemanticContentAttribute:((_ASPendingStateCompressedNodeUISemanticContentAttribute *)compressedNode)->_uiSemanticContentAttribute];
+                break;
+            case ASPendingStateTypeLayoutMargins:
+                [inflated setLayoutMargins:((_ASPendingStateCompressedNodeUIEdgeInsets *)compressedNode)->_uiEdgeInsets];
+                break;
+            case ASPendingStateTypePreservesSuperviewLayoutMargins:
+                [inflated setPreservesSuperviewLayoutMargins:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeInsetsLayoutMarginsFromSafeArea:
+                [inflated setInsetsLayoutMarginsFromSafeArea:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeIsAccessibilityElement:
+                [inflated setIsAccessibilityElement:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAccessibilityLabel:
+                [inflated setAccessibilityLabel:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityAttributedLabel:
+                [inflated setAccessibilityAttributedLabel:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityHint:
+                [inflated setAccessibilityHint:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityAttributedHint:
+                [inflated setAccessibilityAttributedHint:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityValue:
+                [inflated setAccessibilityValue:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityAttributedValue:
+                [inflated setAccessibilityAttributedValue:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityTraits:
+                [inflated setAccessibilityTraits:((_ASPendingStateCompressedNodeUIAccessibilityTraits *)compressedNode)->_uiAccessibilityTraits];
+                break;
+            case ASPendingStateTypeAccessibilityFrame:
+                [inflated setAccessibilityFrame:((_ASPendingStateCompressedNodeCGRect *)compressedNode)->_cgRect];
+                break;
+            case ASPendingStateTypeAccessibilityLanguage:
+                [inflated setAccessibilityLanguage:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityElementsHidden:
+                [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAccessibilityViewIsModal:
+                [inflated setAccessibilityViewIsModal:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeShouldGroupAccessibilityChildren:
+                [inflated setShouldGroupAccessibilityChildren:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+            case ASPendingStateTypeAccessibilityIdentifier:
+                [inflated setAccessibilityIdentifier:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
+            case ASPendingStateTypeAccessibilityNavigationStyle:
+                [inflated setAccessibilityNavigationStyle:((_ASPendingStateCompressedNodeUIAccessibilityNavigationStyle *)compressedNode)->_uiAccessibilityNavigationStyle];
+                break;
+            case ASPendingStateTypeAccessibilityHeaderElements:
+                [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+                break;
+
+//                ASPendingStateTypeAccessibilityHeaderElements,
+//                ASPendingStateTypeAccessibilityActivationPoint,
+//                ASPendingStateTypeAccessibilityPath,
+                
+        }
+    }
+    return inflated;
+}
+
+- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling
+{
+  [[self inflatePendingState] applyToView:view withSpecialPropertiesHandling:specialPropertiesHandling];
+}
+
+#define SET_PENDING_STATE_GENERAL_BRIDGED(property, pendingStateType, var, nodeType, name, bridged) \
 - (void)set##property:(var)property \
 { \
-  _list.push_front([[_ASPendingStateCompressedNode##nodeType alloc] initWithType:type name:bridged(property)]); \
+  _list.push_front([[_ASPendingStateCompressedNode##nodeType alloc] initWithPendingStateType:pendingStateType name:bridged(property)]); \
 } \
 
-#define SET_PENDING_STATE_GENERAL(property, type, var, name) \
-SET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, var, name, ) \
+#define SET_PENDING_STATE_GENERAL(property, pendingStateType, var, name) \
+SET_PENDING_STATE_GENERAL_BRIDGED(property, pendingStateType, var, var, name, ) \
 
-#define GET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, nodeType, name, bridged) \
+#define GET_PENDING_STATE_GENERAL_BRIDGED(property, pendingStateType, var, nodeType, name, bridged) \
 - (var)property \
 { \
-  if (_ASPendingStateCompressedNode##nodeType *node = [self nodeOfType:type]) { \
+  if (_ASPendingStateCompressedNode##nodeType *node = [self nodeOfPendingStateType:pendingStateType]) { \
     return bridged(node->_##name); \
   } \
   return [self defaultState].property; \
 } \
 
-#define GET_PENDING_STATE_GENERAL(property, type, var, name) \
-GET_PENDING_STATE_GENERAL_BRIDGED(property, type, var, var, name, ) \
+#define GET_PENDING_STATE_GENERAL(property, pendingStateType, var, name) \
+GET_PENDING_STATE_GENERAL_BRIDGED(property, pendingStateType, var, var, name, ) \
 
-#define GET_AND_SET_PENDING_STATE_FLOAT(lower, upper, type) \
-SET_PENDING_STATE_GENERAL(upper, type, CGFloat, cgFloat) \
-GET_PENDING_STATE_GENERAL(lower, type, CGFloat, cgFloat) \
+#define GET_AND_SET_PENDING_STATE_CONTENT_MODE(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIViewContentMode, uiViewContentMode) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIViewContentMode, uiViewContentMode) \
 
-#define GET_AND_SET_PENDING_STATE_POINT(lower, upper, type) \
-SET_PENDING_STATE_GENERAL(upper, type, CGPoint, cgPoint) \
-GET_PENDING_STATE_GENERAL(lower, type, CGPoint, cgPoint) \
+#define GET_AND_SET_PENDING_STATE_FLOAT(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CGFloat, cgFloat) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CGFloat, cgFloat) \
 
-#define GET_AND_SET_PENDING_STATE_SIZE(lower, upper, type) \
-SET_PENDING_STATE_GENERAL(upper, type, CGSize, cgSize) \
-GET_PENDING_STATE_GENERAL(lower, type, CGSize, cgSize) \
+#define GET_AND_SET_PENDING_STATE_POINT(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CGPoint, cgPoint) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CGPoint, cgPoint) \
 
-#define GET_AND_SET_PENDING_STATE_RECT(lower, upper, type) \
-SET_PENDING_STATE_GENERAL(upper, type, CGRect, cgRect) \
-GET_PENDING_STATE_GENERAL(lower, type, CGRect, cgRect) \
+#define GET_AND_SET_PENDING_STATE_SIZE(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CGSize, cgSize) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CGSize, cgSize) \
 
-#define GET_AND_SET_PENDING_STATE_BOOL(lower, upper, type) \
-SET_PENDING_STATE_GENERAL(upper, type, BOOL, bool) \
-GET_PENDING_STATE_GENERAL(lower, type, BOOL, bool) \
+#define GET_AND_SET_PENDING_STATE_RECT(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CGRect, cgRect) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CGRect, cgRect) \
 
-#define GET_AND_SET_PENDING_STATE_OBJECT(lower, upper, type, refType) \
-SET_PENDING_STATE_GENERAL_BRIDGED(upper, type, refType, Object, object, ) \
-GET_PENDING_STATE_GENERAL_BRIDGED(lower, type, refType, Object, object, ) \
+#define GET_AND_SET_PENDING_STATE_BOOL(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, BOOL, bool) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, BOOL, bool) \
 
-#define GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(lower, upper, type, refType) \
-SET_PENDING_STATE_GENERAL_BRIDGED(upper, type, refType, Object, object, (__bridge id)) \
-GET_PENDING_STATE_GENERAL_BRIDGED(lower, type, refType, Object, object, (__bridge refType)) \
+#define GET_AND_SET_PENDING_STATE_TRANSFORM_3D(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CATransform3D, caTransform3D) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CATransform3D, caTransform3D) \
+
+#define GET_AND_SET_PENDING_STATE_ACCESSIBILITY_TRAITS(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIAccessibilityTraits, uiAccessibilityTraits) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIAccessibilityTraits, uiAccessibilityTraits) \
+
+#define GET_AND_SET_PENDING_STATE_ACCESSIBILITY_NAVIGATION_STYLE(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIAccessibilityNavigationStyle, uiAccessibilityNavigationStyle) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIAccessibilityNavigationStyle, uiAccessibilityNavigationStyle) \
+
+#define GET_AND_SET_PENDING_STATE_AUTORESIZING(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIViewAutoresizing, uiViewAutoresizing) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIViewAutoresizing, uiViewAutoresizing) \
+
+#define GET_AND_SET_PENDING_STATE_UINT(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL_BRIDGED(upper, pendingStateType, unsigned int, UInt, uInt, ) \
+GET_PENDING_STATE_GENERAL_BRIDGED(lower, pendingStateType, unsigned int, UInt, uInt, ) \
+
+#define GET_AND_SET_PENDING_STATE_SEMANTIC_CONTENT_ATTRIBUTE(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UISemanticContentAttribute, uiSemanticContentAttribute) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UISemanticContentAttribute, uiSemanticContentAttribute) \
+
+#define GET_AND_SET_PENDING_STATE_EDGE_INSETS(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIEdgeInsets, uiEdgeInsets) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIEdgeInsets, uiEdgeInsets) \
+
+#define GET_AND_SET_PENDING_STATE_OBJECT(lower, upper, pendingStateType, refType) \
+SET_PENDING_STATE_GENERAL_BRIDGED(upper, pendingStateType, refType, Object, object, ) \
+GET_PENDING_STATE_GENERAL_BRIDGED(lower, pendingStateType, refType, Object, object, ) \
+
+#define GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(lower, upper, pendingStateType, refType) \
+SET_PENDING_STATE_GENERAL_BRIDGED(upper, pendingStateType, refType, Object, object, (__bridge id)) \
+GET_PENDING_STATE_GENERAL_BRIDGED(lower, pendingStateType, refType, Object, object, (__bridge refType)) \
 
 GET_AND_SET_PENDING_STATE_POINT(anchorPoint, AnchorPoint, ASPendingStateTypeAnchorPoint)
 GET_AND_SET_PENDING_STATE_POINT(position, Position, ASPendingStateTypePosition)
@@ -1753,121 +1874,94 @@ GET_AND_SET_PENDING_STATE_RECT(frame, Frame, ASPendingStateTypeFrame)
 - (void)setBounds:(CGRect)bounds
 {
   validate_bounds(bounds);
-  _list.push_front([[_ASPendingStateCompressedNodeCGRect alloc] initWithType:ASPendingStateTypeFrame cgRect:bounds]);
+  _list.push_front([[_ASPendingStateCompressedNodeCGRect alloc] initWithPendingStateType:ASPendingStateTypeFrame cgRect:bounds]);
 }
 
-//total += flags.setTransform ? sizeof(self.transform) + sizeof(void *) : 0;
-//total += flags.setSublayerTransform ? sizeof(self.sublayerTransform) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_TRANSFORM_3D(transform, Transform, ASPendingStateTypeTransform)
+GET_AND_SET_PENDING_STATE_TRANSFORM_3D(sublayerTransform, SublayerTransform, ASPendingStateTypeSublayerTransform)
 GET_AND_SET_PENDING_STATE_OBJECT(contents, Contents, ASPendingStateTypeContents, id)
-//total += flags.setContents ? sizeof(self.contents) + sizeof(void *) : 0;
-//total += flags.setContentsGravity ? sizeof(self.contentsGravity) + sizeof(void *) : 0;
-//total += flags.setContentsRect ? sizeof(self.contentsRect) + sizeof(void *) : 0;
-//total += flags.setContentsCenter ? sizeof(self.contentsCenter) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_OBJECT(contentsGravity, ContentsGravity, ASPendingStateTypeContentsGravity, NSString *)
+GET_AND_SET_PENDING_STATE_RECT(contentsRect, ContentsRect, ASPendingStateTypeContentsRect)
+GET_AND_SET_PENDING_STATE_RECT(contentsCenter, ContentsCenter, ASPendingStateTypeContentsCenter)
 GET_AND_SET_PENDING_STATE_FLOAT(contentsScale, ContentsScale, ASPendingStateTypeContentsScale)
 GET_AND_SET_PENDING_STATE_FLOAT(rasterizationScale, RasterizationScale, ASPendingStateTypeRasterizationScale)
 GET_AND_SET_PENDING_STATE_BOOL(clipsToBounds, ClipsToBounds, ASPendingStateTypeClipsToBounds)
-
 GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(backgroundColor, BackgroundColor, ASPendingStateTypeBackgroundColor, CGColorRef)
-//- (void)setBackgroundColor:(CGColorRef)backgroundColor
-//{
-//    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeBackgroundColor object:(__bridge id)backgroundColor]);
-//}
-
-- (void)setTintColor:(UIColor *)tintColor
-{
-    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeTintColor object:tintColor]);
-}
-
+GET_AND_SET_PENDING_STATE_OBJECT(tintColor, TintColor, ASPendingStateTypeTintColor, UIColor *)
 GET_AND_SET_PENDING_STATE_BOOL(isHidden, Hidden, ASPendingStateTypeHidden)
 GET_AND_SET_PENDING_STATE_FLOAT(alpha, Alpha, ASPendingStateTypeAlpha)
 GET_AND_SET_PENDING_STATE_FLOAT(cornerRadius, CornerRadius, ASPendingStateTypeCornerRadius)
-
-- (void)setContentMode:(UIViewContentMode)contentMode
-{
-  _list.push_front([[_ASPendingStateCompressedNodeInteger alloc] initWithType:ASPendingStateTypeContentMode integer:contentMode]);
-}
-
+GET_AND_SET_PENDING_STATE_CONTENT_MODE(contentMode, ContentMode, ASPendingStateTypeContentMode)
 GET_AND_SET_PENDING_STATE_BOOL(isUserInteractionEnabled, UserInteractionEnabled, ASPendingStateTypeUserInteractionEnabled)
 GET_AND_SET_PENDING_STATE_BOOL(isExclusiveTouch, ExclusiveTouch, ASPendingStateTypeExclusiveTouch)
 GET_AND_SET_PENDING_STATE_FLOAT(shadowOpacity, ShadowOpacity, ASPendingStateTypeShadowOpacity)
 GET_AND_SET_PENDING_STATE_SIZE(shadowOffset, ShadowOffset, ASPendingStateTypeShadowOffset)
 GET_AND_SET_PENDING_STATE_FLOAT(shadowRadius, ShadowRadius, ASPendingStateTypeShadowRadius)
-
-- (void)setShadowColor:(CGColorRef)shadowColor
-{
-    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeShadowColor object:(__bridge id)shadowColor]);
-}
-
-- (CGColorRef)shadowColor
-{
-    if (_ASPendingStateCompressedNodeObject *node = [self nodeOfType:ASPendingStateTypeShadowColor]) {
-        return (__bridge CGColorRef)node->_object;
-    }
-    return [self defaultState].shadowColor;
-}
-
-//total += flags.setBorderWidth ? sizeof(self.borderWidth) + sizeof(void *) : 0;
-- (void)setBorderColor:(CGColorRef)borderColor
-{
-    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithType:ASPendingStateTypeBorderColor object:(__bridge id)borderColor]);
-}
-
-- (void)setAutoresizingMask:(UIViewAutoresizing)autoresizingMask
-{
-    _list.push_front([[_ASPendingStateCompressedNodeAutoresizing alloc] initWithType:ASPendingStateTypeAutoresizingMask viewAutoresizing:autoresizingMask]);
-}
-
+GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(shadowColor, ShadowColor, ASPendingStateTypeShadowColor, CGColorRef)
+GET_AND_SET_PENDING_STATE_FLOAT(borderWidth, BorderWidth, ASPendingStateTypeBorderWidth)
+GET_AND_SET_PENDING_STATE_BRIDGED_OBJECT(borderColor, BorderColor, ASPendingStateTypeBorderColor, CGColorRef)
+GET_AND_SET_PENDING_STATE_AUTORESIZING(autoresizingMask, AutoresizingMask, ASPendingStateTypeAutoresizingMask)
 GET_AND_SET_PENDING_STATE_BOOL(autoresizesSubviews, AutoresizesSubviews, ASPendingStateTypeAutoresizesSubviews)
 GET_AND_SET_PENDING_STATE_BOOL(needsDisplayOnBoundsChange, NeedsDisplayOnBoundsChange, ASPendingStateTypeNeedsDisplayOnBoundsChange)
 GET_AND_SET_PENDING_STATE_BOOL(allowsGroupOpacity, AllowsGroupOpacity, ASPendingStateTypeAllowsGroupOpacity)
 GET_AND_SET_PENDING_STATE_BOOL(allowsEdgeAntialiasing, AllowsEdgeAntialiasing, ASPendingStateTypeAllowsEdgeAntialiasing)
+GET_AND_SET_PENDING_STATE_UINT(edgeAntialiasingMask, EdgeAntialiasingMask, ASPendingStateTypeEdgeAntialiasingMask)
 
-//total += flags.setEdgeAntialiasingMask ? sizeof(self.edgeAntialiasingMask) + sizeof(void *) : 0;
-
-
+- (void)hasSetNeedsDisplay
+{
+    if (_ASPendingStateCompressedNode *node = [self nodeOfPendingStateType:ASPendingStateTypeNeedsDisplay]) {
+        return YES;
+    }
+    return NO;
+}
 
 - (void)setNeedsDisplay
 {
-    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithType:ASPendingStateTypeNeedsDisplay]);
+    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithPendingStateType:ASPendingStateTypeNeedsDisplay]);
+}
+
+- (void)hasSetNeedsLayout
+{
+    if (_ASPendingStateCompressedNode *node = [self nodeOfPendingStateType:ASPendingStateTypeNeedsLayout]) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void)setNeedsLayout
 {
-    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithType:ASPendingStateTypeNeedsLayout]);
+    _list.push_front([[_ASPendingStateCompressedNode alloc] initWithPendingStateType:ASPendingStateTypeNeedsLayout]);
 }
-//total += flags.setAsyncTransactionContainer ? sizeof(self->asyncTransactionContainer) + sizeof(void *) : 0;
+
+GET_PENDING_STATE_GENERAL_BRIDGED(asyncdisplaykit_isAsyncTransactionContainer, ASPendingStateTypeAsyncTransactionContainer, BOOL, BOOL, bool, )
+- (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)asyncdisplaykit_asyncTransactionContainer
+{
+    _list.push_front([[_ASPendingStateCompressedNodeBOOL alloc] initWithPendingStateType:ASPendingStateTypeAsyncTransactionContainer bool:asyncdisplaykit_asyncTransactionContainer]);
+}
 
 GET_AND_SET_PENDING_STATE_BOOL(isOpaque, Opaque, ASPendingStateTypeOpaque)
-
-//total += flags.setSemanticContentAttribute ? sizeof(self.semanticContentAttribute) + sizeof(void *) : 0;
-//total += flags.setLayoutMargins ? sizeof(self.layoutMargins) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_SEMANTIC_CONTENT_ATTRIBUTE(semanticContentAttribute, SemanticContentAttribute, ASPendingStateTypeSemanticContentAttribute)
+GET_AND_SET_PENDING_STATE_EDGE_INSETS(layoutMargins, LayoutMargins, ASPendingStateTypeLayoutMargins)
 GET_AND_SET_PENDING_STATE_BOOL(preservesSuperviewLayoutMargins, PreservesSuperviewLayoutMargins, ASPendingStateTypePreservesSuperviewLayoutMargins)
-
-//total += flags.setInsetsLayoutMarginsFromSafeArea ? sizeof(self.insetsLayoutMarginsFromSafeArea) + sizeof(void *) : 0;
-
+GET_AND_SET_PENDING_STATE_BOOL(insetsLayoutMarginsFromSafeArea, InsetsLayoutMarginsFromSafeArea, ASPendingStateTypeInsetsLayoutMarginsFromSafeArea)
 GET_AND_SET_PENDING_STATE_BOOL(isAccessibilityElement, IsAccessibilityElement, ASPendingStateTypeIsAccessibilityElement)
-
-//total += flags.setAccessibilityLabel ? sizeof(self.accessibilityLabel) + sizeof(void *) : 0;
-//total += flags.setAccessibilityAttributedLabel ? sizeof(self.accessibilityAttributedLabel) + sizeof(void *) : 0;
-//total += flags.setAccessibilityHint ? sizeof(self.accessibilityHint) + sizeof(void *) : 0;
-//total += flags.setAccessibilityAttributedHint ? sizeof(self.accessibilityAttributedHint) + sizeof(void *) : 0;
-//total += flags.setAccessibilityValue ? sizeof(self.accessibilityValue) + sizeof(void *) : 0;
-//total += flags.setAccessibilityAttributedValue ? sizeof(self.accessibilityAttributedValue) + sizeof(void *) : 0;
-//total += flags.setAccessibilityTraits ? sizeof(self.accessibilityTraits) + sizeof(void *) : 0;
-//total += flags.setAccessibilityFrame ? sizeof(self.accessibilityFrame) + sizeof(void *) : 0;
-//total += flags.setAccessibilityLanguage ? sizeof(self.accessibilityLanguage) + sizeof(void *) : 0;
-
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityLabel, AccessibilityLabel, ASPendingStateTypeAccessibilityLabel, NSString *)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityAttributedLabel, AccessibilityAttributedLabel, ASPendingStateTypeAccessibilityAttributedLabel, NSAttributedString *)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityHint, AccessibilityHint, ASPendingStateTypeAccessibilityHint, NSString *)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityAttributedHint, AccessibilityAttributedHint, ASPendingStateTypeAccessibilityAttributedHint, NSAttributedString *)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityValue, AccessibilityValue, ASPendingStateTypeAccessibilityValue, NSString *)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityAttributedValue, AccessibilityAttributedValue, ASPendingStateTypeAccessibilityAttributedValue, NSAttributedString *)
+GET_AND_SET_PENDING_STATE_ACCESSIBILITY_TRAITS(accessibilityTraits, AccessibilityTraits, ASPendingStateTypeAccessibilityTraits)
+GET_AND_SET_PENDING_STATE_RECT(accessibilityFrame, AccessibilityFrame, ASPendingStateTypeAccessibilityFrame)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityLanguage, AccessibilityLanguage, ASPendingStateTypeAccessibilityLanguage, NSString *)
 GET_AND_SET_PENDING_STATE_BOOL(accessibilityElementsHidden, AccessibilityElementsHidden, ASPendingStateTypeAccessibilityElementsHidden)
-
-//total += flags.setAccessibilityViewIsModal ? sizeof(self.accessibilityViewIsModal) + sizeof(void *) : 0;
-
+GET_AND_SET_PENDING_STATE_BOOL(accessibilityViewIsModal, AccessibilityViewIsModal, ASPendingStateTypeAccessibilityViewIsModal)
 GET_AND_SET_PENDING_STATE_BOOL(shouldGroupAccessibilityChildren, ShouldGroupAccessibilityChildren, ASPendingStateTypeShouldGroupAccessibilityChildren)
-
-//total += flags.setAccessibilityIdentifier ? sizeof(self.accessibilityIdentifier) + sizeof(void *) : 0;
-//total += flags.setAccessibilityNavigationStyle ? sizeof(self.accessibilityNavigationStyle) + sizeof(void *) : 0;
-//total += flags.setAccessibilityHeaderElements ? sizeof(self->accessibilityHeaderElements) + sizeof(void *) : 0;
-//total += flags.setAccessibilityActivationPoint ? sizeof(self.accessibilityActivationPoint) + sizeof(void *) : 0;
-//total += flags.setAccessibilityPath ? sizeof(self.accessibilityPath) + sizeof(void *) : 0;
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityIdentifier, AccessibilityIdentifier, ASPendingStateTypeAccessibilityIdentifier, NSString *)
+GET_AND_SET_PENDING_STATE_ACCESSIBILITY_NAVIGATION_STYLE(accessibilityNavigationStyle, AccessibilityNavigationStyle, ASPendingStateTypeAccessibilityNavigationStyle)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityHeaderElements, AccessibilityHeaderElements, ASPendingStateTypeAccessibilityHeaderElements, NSArray *)
+GET_AND_SET_PENDING_STATE_POINT(accessibilityActivationPoint, AccessibilityActivationPoint, ASPendingStateTypeAccessibilityActivationPoint)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityPath, AccessibilityPath, ASPendingStateTypeAccessibilityPath, UIBezierPath *)
 
 
 @end
