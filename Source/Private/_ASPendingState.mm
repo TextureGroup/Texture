@@ -22,6 +22,20 @@ BOOL __shouldSetNeedsDisplay(CALayer *layer, BOOL needsDisplay, BOOL setOpaque, 
     return needsDisplay || (setOpaque && opaque != layer.opaque) || (setBackgroundColor && !CGColorEqualToColor(backgroundColor, layer.backgroundColor));
 }
 
+#define validate_bounds(newBounds)                                                                                                                              \
+ASDisplayNodeAssert(!isnan(newBounds.size.width) && !isnan(newBounds.size.height), @"Invalid bounds %@ provided to %@", NSStringFromCGRect(newBounds), self);   \
+if (isnan(newBounds.size.width))                                                                                                                                \
+  newBounds.size.width = 0.0;                                                                                                                                   \
+if (isnan(newBounds.size.height))                                                                                                                               \
+  newBounds.size.height = 0.0;                                                                                                                                  \
+
+#define validate_position(newPosition)                                                                                                              \
+ASDisplayNodeAssert(!isnan(newPosition.x) && !isnan(newPosition.y), @"Invalid position %@ provided to %@", NSStringFromCGPoint(newPosition), self); \
+if (isnan(newPosition.x))                                                                                                                           \
+  newPosition.x = 0.0;                                                                                                                              \
+if (isnan(newPosition.y))                                                                                                                           \
+  newPosition.y = 0.0;                                                                                                                              \
+
 typedef struct {
   // Properties
   int needsDisplay:1;
@@ -369,13 +383,6 @@ static UIColor *defaultTintColor = nil;
   _flags.setFrame = YES;
 }
 
-#define validate_bounds(newBounds)\
-ASDisplayNodeAssert(!isnan(newBounds.size.width) && !isnan(newBounds.size.height), @"Invalid bounds %@ provided to %@", NSStringFromCGRect(newBounds), self);\
-if (isnan(newBounds.size.width))      \
-  newBounds.size.width = 0.0;         \
-if (isnan(newBounds.size.height))     \
-  newBounds.size.height = 0.0;        \
-
 - (void)setBounds:(CGRect)newBounds
 {
   validate_bounds(newBounds);
@@ -440,13 +447,6 @@ if (isnan(newBounds.size.height))     \
   anchorPoint = newAnchorPoint;
   _flags.setAnchorPoint = YES;
 }
-
-#define validate_position(newPosition)\
-ASDisplayNodeAssert(!isnan(newPosition.x) && !isnan(newPosition.y), @"Invalid position %@ provided to %@", NSStringFromCGPoint(newPosition), self);\
-if (isnan(newPosition.x))   \
-  newPosition.x = 0.0;      \
-if (isnan(newPosition.y))   \
-  newPosition.y = 0.0;      \
 
 - (void)setPosition:(CGPoint)newPosition
 {
@@ -1769,10 +1769,12 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
             case ASPendingStateTypeAccessibilityHeaderElements:
                 [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
                 break;
-
-//                ASPendingStateTypeAccessibilityHeaderElements,
-//                ASPendingStateTypeAccessibilityActivationPoint,
-//                ASPendingStateTypeAccessibilityPath,
+            case ASPendingStateTypeAccessibilityActivationPoint:
+                [inflated setAccessibilityActivationPoint:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
+                break;
+            case ASPendingStateTypeAccessibilityPath:
+                [inflated setAccessibilityPath:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+                break;
                 
         }
     }
@@ -1782,6 +1784,16 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
 - (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling
 {
   [[self inflatePendingState] applyToView:view withSpecialPropertiesHandling:specialPropertiesHandling];
+}
+
+- (void)applyToLayer:(CALayer *)layer
+{
+  [[self inflatePendingState] applyToLayer:layer];
+}
+
+- (void)clearChanges
+{
+  _list.clear();
 }
 
 #define SET_PENDING_STATE_GENERAL_BRIDGED(property, pendingStateType, var, nodeType, name, bridged) \
@@ -1870,7 +1882,7 @@ GET_AND_SET_PENDING_STATE_POINT(position, Position, ASPendingStateTypePosition)
 GET_AND_SET_PENDING_STATE_FLOAT(zPosition, ZPosition, ASPendingStateTypeZPosition)
 GET_AND_SET_PENDING_STATE_RECT(frame, Frame, ASPendingStateTypeFrame)
 
-// TODO getter
+GET_PENDING_STATE_GENERAL(bounds, ASPendingStateTypeBounds, CGRect, cgRect)
 - (void)setBounds:(CGRect)bounds
 {
   validate_bounds(bounds);
@@ -1879,7 +1891,17 @@ GET_AND_SET_PENDING_STATE_RECT(frame, Frame, ASPendingStateTypeFrame)
 
 GET_AND_SET_PENDING_STATE_TRANSFORM_3D(transform, Transform, ASPendingStateTypeTransform)
 GET_AND_SET_PENDING_STATE_TRANSFORM_3D(sublayerTransform, SublayerTransform, ASPendingStateTypeSublayerTransform)
-GET_AND_SET_PENDING_STATE_OBJECT(contents, Contents, ASPendingStateTypeContents, id)
+
+GET_PENDING_STATE_GENERAL_BRIDGED(contents, ASPendingStateTypeContents, id, Object, object, )
+bool isContentsNode(_ASPendingStateCompressedNode *node) {
+    return node->_pendingStateType == ASPendingStateTypeContents;
+}
+// The thinking is it's worth iterating over the list to clear out any contents objects because they are likely large.
+- (void)setContents:(id)contents
+{
+    _list.remove_if(isContentsNode);
+    _list.push_front([[_ASPendingStateCompressedNodeObject alloc] initWithPendingStateType:ASPendingStateTypeContents object:contents]);
+}
 GET_AND_SET_PENDING_STATE_OBJECT(contentsGravity, ContentsGravity, ASPendingStateTypeContentsGravity, NSString *)
 GET_AND_SET_PENDING_STATE_RECT(contentsRect, ContentsRect, ASPendingStateTypeContentsRect)
 GET_AND_SET_PENDING_STATE_RECT(contentsCenter, ContentsCenter, ASPendingStateTypeContentsCenter)
