@@ -262,6 +262,27 @@ permalink: /showcase.html
 		<br /> 
 		<b>Wishpoke</b>
 		</td>
+		
+		</tr>
+		<tr>
+		
+		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/app/id1320454688"><img class="roundrect" src="https://is5-ssl.mzstatic.com/image/thumb/Purple128/v4/a7/ad/0f/a7ad0fc1-1516-5879-84bd-8945f622b518/source/512x512bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Bluebird</b>
+		</td>
+        
+        <td align="center" valign="top">
+        <a href="https://itunes.apple.com/bf/app/id527299553"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple124/v4/41/48/85/414885c3-f346-ed3b-8ee9-f82c9fbf2159/AppIcon-2-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg" style="width:100px;height:100px;"></a>
+        <br /> 
+        <b>App in the Air</b>
+        </td>
+		
+		<td align="center" valign="top">
+		</td>
+		
+		<td align="center" valign="top">
+		</td>
 
 		</tr>
 		</table>

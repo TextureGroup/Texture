@@ -15,6 +15,8 @@
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASExperimentalFeatures.h>
 
 @implementation ASViewController
 {
@@ -98,6 +100,9 @@
 
 - (void)dealloc
 {
+  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable)) {
+    return;
+  }
   ASPerformBackgroundDeallocation(&_node);
 }
 
@@ -344,6 +349,8 @@ ASVisibilityDepthImplementation;
   [self propagateNewTraitCollection:traitCollection];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -352,5 +359,6 @@ ASVisibilityDepthImplementation;
   traitCollection.containerSize = self.view.bounds.size;
   [self propagateNewTraitCollection:traitCollection];
 }
+#pragma clang diagnostic pop
 
 @end

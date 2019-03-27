@@ -7,11 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Foundation/Foundation.h>
-
-#if TARGET_OS_IOS
-
 #import <AsyncDisplayKit/ASVideoPlayerNode.h>
+
+#if AS_USE_VIDEO
+#if TARGET_OS_IOS
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -287,7 +286,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
       
       {
         ASUnlockScope(self);
-        for (var subnode : subnodes) {
+        for (ASDisplayNode *subnode : subnodes) {
           [self addSubnode:subnode];
         }
       }
@@ -662,7 +661,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
     }];
     _spinnerNode.style.preferredSize = CGSizeMake(44.0, 44.0);
     
-    let spinnerNode = _spinnerNode;
+    const auto spinnerNode = _spinnerNode;
     {
       ASUnlockScope(self);
       [self addSubnode:spinnerNode];
@@ -1016,3 +1015,5 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 @end
 
 #endif // TARGET_OS_IOS
+
+#endif

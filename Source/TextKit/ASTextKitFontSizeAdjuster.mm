@@ -10,6 +10,8 @@
 
 #import <AsyncDisplayKit/ASTextKitFontSizeAdjuster.h>
 
+#if AS_ENABLE_TEXTNODE
+
 #import <tgmath.h>
 #import <mutex>
 
@@ -31,7 +33,7 @@
   ASTextKitAttributes _attributes;
   BOOL _measured;
   CGFloat _scaleFactor;
-  ASDN::Mutex __instanceLock__;
+  AS::Mutex __instanceLock__;
 }
 
 @synthesize sizingLayoutManager = _sizingLayoutManager;
@@ -125,7 +127,7 @@
 
 - (NSLayoutManager *)sizingLayoutManager
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (_sizingLayoutManager == nil) {
     _sizingLayoutManager = [[ASLayoutManager alloc] init];
     _sizingLayoutManager.usesFontLeading = NO;
@@ -183,8 +185,8 @@
     
     // check to see if we may need to shrink for any of these things
     BOOL longestWordFits = [longestWordNeedingResize length] ? NO : YES;
-    BOOL maxLinesFits = _attributes.maximumNumberOfLines > 0 ? NO : YES;
-    BOOL heightFits = isinf(_constrainedSize.height) ? YES : NO;
+    BOOL maxLinesFits = self->_attributes.maximumNumberOfLines > 0 ? NO : YES;
+    BOOL heightFits = isinf(self->_constrainedSize.height) ? YES : NO;
 
     CGSize longestWordSize = CGSizeZero;
     if (longestWordFits == NO) {
@@ -204,7 +206,7 @@
       
       if (longestWordFits == NO) {
         // we need to check the longest word to make sure it fits
-        longestWordFits = std::ceil((longestWordSize.width * adjustedScale) <= _constrainedSize.width);
+        longestWordFits = std::ceil((longestWordSize.width * adjustedScale) <= self->_constrainedSize.width);
       }
       
       // if the longest word fits, go ahead and check max line and height. If it didn't fit continue to the next scale factor
@@ -216,14 +218,14 @@
         
         // check to see if this scaled string fit in the max lines
         if (maxLinesFits == NO) {
-          maxLinesFits = ([self lineCountForString:scaledString] <= _attributes.maximumNumberOfLines);
+          maxLinesFits = ([self lineCountForString:scaledString] <= self->_attributes.maximumNumberOfLines);
         }
         
         // if max lines still doesn't fit, continue without checking that we fit in the constrained height
         if (maxLinesFits == YES && heightFits == NO) {
           // max lines fit so make sure that we fit in the constrained height.
           CGSize stringSize = [self boundingBoxForString:scaledString];
-          heightFits = (stringSize.height <= _constrainedSize.height);
+          heightFits = (stringSize.height <= self->_constrainedSize.height);
         }
       }
     }
@@ -235,3 +237,5 @@
 }
 
 @end
+
+#endif

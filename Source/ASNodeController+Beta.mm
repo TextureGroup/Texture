@@ -18,7 +18,7 @@
 {
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  ASDN::RecursiveMutex __instanceLock__;
+  AS::RecursiveMutex __instanceLock__;
 }
 
 - (void)loadNode
@@ -50,13 +50,16 @@
   }
 
   [node __setNodeController:self];
-  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setNode:(ASDisplayNode *)node
 {
   ASLockScopeSelf();
+  if (node == _node) {
+    return;
+  }
   [self setupReferencesWithNode:node];
+  [node addInterfaceStateDelegate:self];
 }
 
 - (void)setShouldInvertStrongReference:(BOOL)shouldInvertStrongReference
@@ -89,6 +92,20 @@
 
 - (void)hierarchyDisplayDidFinish {}
 
+- (ASLockSet)lockPair {
+  ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {
+    if (!addLock(_node)) {
+      return NO;
+    }
+    if (!addLock(self)) {
+      return NO;
+    }
+    return YES;
+  });
+
+  return lockSet;
+}
+
 #pragma mark NSLocking
 
 - (void)lock
@@ -99,6 +116,11 @@
 - (void)unlock
 {
   __instanceLock__.unlock();
+}
+
+- (BOOL)tryLock
+{
+  return __instanceLock__.try_lock();
 }
 
 @end

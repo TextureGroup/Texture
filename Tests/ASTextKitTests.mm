@@ -10,9 +10,15 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
 #import <FBSnapshotTestCase/FBSnapshotTestController.h>
+#pragma clang diagnostic pop
 
 #import <AsyncDisplayKit/ASTextKitAttributes.h>
+
+#if AS_ENABLE_TEXTNODE
+
 #import <AsyncDisplayKit/ASTextKitComponents.h>
 #import <AsyncDisplayKit/ASTextKitEntityAttribute.h>
 #import <AsyncDisplayKit/ASTextKitRenderer.h>
@@ -221,3 +227,5 @@ static BOOL checkAttributes(const ASTextKitAttributes &attributes, const CGSize 
 }
 
 @end
+
+#endif

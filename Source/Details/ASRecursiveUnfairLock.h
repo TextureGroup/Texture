@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 OS_UNFAIR_LOCK_AVAILABILITY
 typedef struct {
-  os_unfair_lock _lock;
+  os_unfair_lock _lock OS_UNFAIR_LOCK_AVAILABILITY;
   _Atomic(pthread_t) _thread;  // Write-protected by lock
   int _count;                  // Protected by lock
 } ASRecursiveUnfairLock;

@@ -94,7 +94,15 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : NSObject <ASLocking>
+@interface ASDisplayNode : NSObject <ASLocking> {
+@public
+  /**
+   * The _displayNodeContext ivar is unused by Texture, but provided to enable advanced clients to make powerful extensions to base class functionality.
+   * For example, _displayNodeContext can be used to implement category methods on ASDisplayNode that add functionality to all node subclass types.
+   * Code demonstrating this technique can be found in the CatDealsCollectionView example.
+   */
+  void *_displayNodeContext;
+}
 
 /** @name Initializing a node object */
 
@@ -640,7 +648,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * more efficient than CALayer. The only limitation of this approach is that it cannot clip children, and
  * thus works best for ASImageNodes or containers showing a background around their children.
  *
- * - ASCornerRoundingTypeClipping: overlays 4 seperate opaque corners on top of the content that needs
+ * - ASCornerRoundingTypeClipping: overlays 4 separate opaque corners on top of the content that needs
  * corner rounding. Requires .backgroundColor and .cornerRadius to be set. Use clip corners in situations 
  * in which is movement through the corner, with an opaque background (no movement underneath the corner).
  * Clipped corners are ideal for animating / resizing views, and still outperform CALayer.
@@ -677,6 +685,8 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 #if TARGET_OS_IOS
 @property (getter=isExclusiveTouch) BOOL exclusiveTouch;      // default=NO
 #endif
+
+@property (nullable, copy) NSDictionary<NSString *, id<CAAction>> *actions; // default = nil
 
 /**
  * @abstract The node view's background color.
@@ -817,27 +827,19 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
+  ASLayoutEngineTypeLayoutSpec,
+  ASLayoutEngineTypeYoga
+};
+
 @interface ASDisplayNode (ASLayout)
 
-/** @name Managing dimensions */
+/**
+ * @abstract Returns the current layout type the node uses for layout the subtree.
+ */
+@property (readonly) ASLayoutEngineType layoutEngineType;
 
 /**
- * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
- * implement layoutSpecThatFits:
- *
- * @return A block that takes a constrainedSize ASSizeRange argument, and must return an ASLayoutSpec that includes all
- * of the subnodes to position in the layout. This input-output relationship is identical to the subclass override
- * method -layoutSpecThatFits:
- *
- * @warning Subclasses that implement -layoutSpecThatFits: must not also use .layoutSpecBlock. Doing so will trigger
- * an exception. A future version of the framework may support using both, calling them serially, with the
- * .layoutSpecBlock superseding any values set by the method override.
- *
- * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
- */
-@property (nullable) ASLayoutSpecBlock layoutSpecBlock;
-
-/** 
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
@@ -855,7 +857,6 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
  */
 @property (readonly) ASSizeRange constrainedSizeForCalculatedLayout;
-
 
 @end
 

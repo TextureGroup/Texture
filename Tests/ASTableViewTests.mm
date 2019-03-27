@@ -8,6 +8,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
+#import <JGMethodSwizzler/JGMethodSwizzler.h>
+#pragma clang diagnostic pop
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableView.h>
@@ -16,9 +20,9 @@
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
-#import <JGMethodSwizzler/JGMethodSwizzler.h>
-#import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import "ASXCTExtensions.h"
 
 #define NumberOfSections 10
 #define NumberOfReloadIterations 50
@@ -801,7 +805,7 @@
 - (void)testAutomaticallyAdjustingContentOffset
 {
   ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
-  node.view.automaticallyAdjustsContentOffset = YES;
+  node.automaticallyAdjustsContentOffset = YES;
   node.bounds = CGRectMake(0, 0, 100, 100);
   ASTableViewFilledDataSource *ds = [[ASTableViewFilledDataSource alloc] init];
   node.dataSource = ds;
