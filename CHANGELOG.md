@@ -5,7 +5,6 @@
 
 **Merged pull requests:**
 
-- [ASImageNode] Fix incorrect backing size calculation. [\#1189](https://github.com/TextureGroup/Texture/pull/1189) ([Junjie Lu](https://github.com/junjielu))
 - Remove duplicate definition of category "YogaDebugging" [\#1331](https://github.com/TextureGroup/Texture/pull/1331) ([nguyenhuy](https://github.com/nguyenhuy))
 - Add Yoga layout to ASDKGram Texture cells [\#1315](https://github.com/TextureGroup/Texture/pull/1315) ([maicki](https://github.com/maicki))
 - Remove let and var macros now that we're all-C++ [\#1312](https://github.com/TextureGroup/Texture/pull/1312) ([Adlai-Holler](https://github.com/Adlai-Holler))
