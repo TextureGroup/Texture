@@ -287,13 +287,15 @@ using AS::MutexLocker;
       ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
       CGFloat cornerRadius = _cornerRadius;
       ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
+      CACornerMask maskedCorners = _maskedCorners;
     __instanceLock__.unlock();
 
     if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0) {
       ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
       // TODO: This clip path should be removed if we are rasterizing.
       CGRect boundingBox = CGContextGetClipBoundingBox(context);
-      [[UIBezierPath bezierPathWithRoundedRect:boundingBox cornerRadius:cornerRadius] addClip];
+      CGSize radii = CGSizeMake(cornerRadius, cornerRadius);
+      [[UIBezierPath bezierPathWithRoundedRect:boundingBox byRoundingCorners:maskedCorners cornerRadii:radii] addClip];
     }
     
     if (willDisplayNodeContentWithRenderingContext) {
@@ -313,6 +315,7 @@ using AS::MutexLocker;
     CGFloat cornerRadius = _cornerRadius;
     CGFloat contentsScale = _contentsScaleForDisplay;
     ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+    CACornerMask maskedCorners = _maskedCorners;
   __instanceLock__.unlock();
   
   if (context != NULL) {
@@ -338,7 +341,10 @@ using AS::MutexLocker;
     ASDisplayNodeAssert(UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
     
     UIBezierPath *roundedHole = [UIBezierPath bezierPathWithRect:bounds];
-    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius * contentsScale]];
+    CGSize radii = CGSizeMake(cornerRadius * contentsScale, cornerRadius * contentsScale);
+    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds
+                                                  byRoundingCorners:maskedCorners
+                                                        cornerRadii:radii]];
     roundedHole.usesEvenOddFillRule = YES;
     
     UIBezierPath *roundedPath = nil;

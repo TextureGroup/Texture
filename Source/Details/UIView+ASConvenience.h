@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat zPosition;
 @property (nonatomic) CGPoint anchorPoint;
 @property (nonatomic) CGFloat cornerRadius;
+@property (nonatomic) CACornerMask maskedCorners API_AVAILABLE(ios(11), tvos(11));
 @property (nullable, nonatomic) id contents;
 @property (nonatomic, copy)   NSString *contentsGravity;
 @property (nonatomic) CGRect contentsRect;
