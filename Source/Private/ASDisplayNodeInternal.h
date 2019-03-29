@@ -73,6 +73,8 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 #define VISIBILITY_NOTIFICATIONS_DISABLED_BITS 4
 
 #define TIME_DISPLAYNODE_OPS 0 // If you're using this information frequently, try: (DEBUG || PROFILE)
+static constexpr CACornerMask kASCACornerAllCorners =
+    kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
 
 #define NUM_CLIP_CORNER_LAYERS 4
 
@@ -216,6 +218,7 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
   CGFloat _cornerRadius;
   ASCornerRoundingType _cornerRoundingType;
   CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
+  CACornerMask _maskedCorners;
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
@@ -336,8 +339,10 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 /// Display the node's view/layer immediately on the current thread, bypassing the background thread rendering. Will be deprecated.
 - (void)displayImmediately;
 
-/// Refreshes any precomposited or drawn clip corners, setting up state as required to transition radius or rounding type.
-- (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType cornerRadius:(CGFloat)newCornerRadius;
+/// Refreshes any precomposited or drawn clip corners, setting up state as required to transition corner config.
+- (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType
+                        cornerRadius:(CGFloat)newCornerRadius
+                       maskedCorners:(CACornerMask)newMaskedCorners;
 
 /// Alternative initialiser for backing with a custom view class.  Supports asynchronous display with _ASDisplayView subclasses.
 - (instancetype)initWithViewClass:(Class)viewClass;
@@ -396,6 +401,9 @@ AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimest
 @interface ASDisplayNode (InternalPropertyBridge)
 
 @property (nonatomic) CGFloat layerCornerRadius;
+
+/// NOTE: Changing this to non-default under iOS < 11 will make an assertion (for the end user to see.)
+@property (nonatomic) CACornerMask layerMaskedCorners;
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea;
 
