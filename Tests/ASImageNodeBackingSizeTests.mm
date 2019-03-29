@@ -1,10 +1,9 @@
 //
-//  ASImageNodeBackingSizeTests.m
-//  AsyncDisplayKitTests
+//  ASImageNodeBackingSizeTests.mm
+//  Texture
 //
-//  Created by 陆俊杰 on 2019/3/28.
-//  Copyright © 2019 Pinterest. All rights reserved.
-//
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/ASImageNode+CGExtras.h>
