@@ -444,6 +444,16 @@ ASLayoutElementStyleExtensibilityForwarding
       __instanceLock__.lock();
     }
 
+    // If we request that our root layout we may generate a new _pendingDisplayNodeLayout.layout which has
+    // requestedLayoutFromAbove set to NO. If the pending layout has a different constrained size than nextLayout's
+    // and the layout sizes don't change we could end up back here asking the root to layout again causing an
+    // infinite layout loop. Instead, we nil out the _pendingDisplayNodeLayout.layout here because it can be
+    // considered an undesired artifact of the layout request. nextLayout will become _calculatedDisplayNodeLayout
+    // when the pending layout transition which will be created later in this method is applied.
+    // We will use _calculatedLayout the next time around, so requestedLayoutFromAbove will be set to YES and we
+    // will break out of this layout loop.
+    _pendingDisplayNodeLayout.layout = nil;
+    
     // Update the layout's version here because _u_setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
     // Failing to do this will cause the layout to be invalid immediately
     nextLayout.version = _layoutVersion;
