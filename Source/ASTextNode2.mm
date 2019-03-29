@@ -227,12 +227,6 @@ static NSArray *DefaultLinkAttributeNames() {
 - (void)dealloc
 {
   CGColorRelease(_shadowColor);
-  
-  if (_longPressGestureRecognizer) {
-    _longPressGestureRecognizer.delegate = nil;
-    [_longPressGestureRecognizer removeTarget:nil action:NULL];
-    [self.view removeGestureRecognizer:_longPressGestureRecognizer];
-  }
 }
 
 #pragma mark - Description
