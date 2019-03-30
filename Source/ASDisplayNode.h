@@ -666,6 +666,14 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  */
 @property           CGFloat cornerRadius;                     // default=0.0
 
+/** @abstract Which corners to mask when rounding corners.
+ *
+ * @note This option cannot be changed when using iOS < 11
+ * and using ASCornerRoundingTypeDefaultSlowCALayer. Use a different corner rounding type to implement not-all-corners
+ * rounding in prior versions of iOS.
+ */
+@property           CACornerMask maskedCorners;               // default=all corners.
+
 @property           BOOL clipsToBounds;                       // default==NO
 @property (getter=isHidden)  BOOL hidden;                     // default==NO
 @property (getter=isOpaque)  BOOL opaque;                     // default==YES
