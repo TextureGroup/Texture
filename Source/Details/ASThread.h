@@ -251,9 +251,11 @@ namespace AS {
 
     void WillUnlock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
+#if ASEnableVerboseLogging
       if (!_debug_name.empty()) {
         as_log_verbose(ASLockingLog(), "unlock %s, count is %d", _debug_name.c_str(), (int)(_count - 1));
       }
+#endif
       if (--_count == 0) {
         _owner = std::thread::id();
       }
