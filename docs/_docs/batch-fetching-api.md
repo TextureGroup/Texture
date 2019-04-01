@@ -109,7 +109,7 @@ This is where you should actually fetch data, be it from a web API or some local
 <pre lang="objc" class="objcCode">
 - (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchWithContext:(ASBatchContext *)context 
 {
-  // Fetch data most of the time asynchronoulsy from an API or local database
+  // Fetch data most of the time asynchronously from an API or local database
   NSArray *newPhotos = [SomeSource getNewPhotos];
 
   // Insert data into table or collection node
@@ -124,7 +124,7 @@ This is where you should actually fetch data, be it from a web API or some local
 </pre>
 <pre lang="swift" class = "swiftCode hidden">
 func tableNode(tableNode: ASTableNode, willBeginBatchFetchWithContext context: ASBatchContext) {
-  // Fetch data most of the time asynchronoulsy from an API or local database
+  // Fetch data most of the time asynchronously from an API or local database
   let newPhotos = SomeSource.getNewPhotos()
 
   // Insert data into table or collection view
