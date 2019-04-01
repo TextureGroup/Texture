@@ -78,7 +78,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
 #define NUM_CLIP_CORNER_LAYERS 4
 
-@interface ASDisplayNode () <_ASTransitionContextCompletionDelegate, CALayerDelegate>
+@interface ASDisplayNode () <_ASTransitionContextCompletionDelegate>
 {
 @package
   AS::RecursiveMutex __instanceLock__;
