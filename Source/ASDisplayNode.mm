@@ -310,6 +310,7 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
 - (void)_initializeInstance
 {
   [self _staticInitialize];
+  __instanceLock__.SetDebugNameWithObject(self);
 
 #if ASEVENTLOG_ENABLE
   _eventLog = [[ASEventLog alloc] initWithObject:self];
