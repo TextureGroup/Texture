@@ -32,7 +32,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalImageDownloaderPriority,
   ASExperimentalTextDrawing,
   ASExperimentalFixRangeController,
-  ASExperimentalOOMBackgroundDeallocDisable
+  ASExperimentalOOMBackgroundDeallocDisable,
+  ASExperimentalTransactionOperationRetainCycle,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -59,7 +60,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_image_downloader_priority",
     @"exp_text_drawing",
     @"exp_fix_range_controller",
-    @"exp_oom_bg_dealloc_disable"
+    @"exp_oom_bg_dealloc_disable",
+    @"exp_transaction_operation_retain_cycle"
   ];
 }
 

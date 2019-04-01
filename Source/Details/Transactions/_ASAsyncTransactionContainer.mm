@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
 
@@ -54,14 +55,25 @@
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
-      __strong CALayer *self = weakSelf;
-      if (self == nil) {
-        return;
-      }
-      [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
-      [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
-    }];
+    if (ASActivateExperimentalFeature(ASExperimentalTransactionOperationRetainCycle)) {
+      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+        __strong CALayer *self = weakSelf;
+        if (self == nil) {
+          return;
+        }
+        [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
+        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
+      }];
+    } else {
+      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+        __strong CALayer *self = weakSelf;
+        if (self == nil) {
+          return;
+        }
+        [transactions removeObject:completedTransaction];
+        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
+      }];
+    }
     [transactions addObject:transaction];
     self.asyncdisplaykit_currentAsyncTransaction = transaction;
     [self asyncdisplaykit_asyncTransactionContainerWillBeginTransaction:transaction];

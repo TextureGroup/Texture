@@ -2,8 +2,8 @@
 //  ASTransactionTests.m
 //  AsyncDisplayKitTests
 //
-//  Created by Greg Bolsinga on 3/26/19.
-//  Copyright © 2019 Pinterest. All rights reserved.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASTestCase.h"
@@ -52,8 +52,41 @@
   XCTAssertNil(weakTransaction);
 }
 
+- (void)testWeakWithSingleOperation_noExperiment
+{
+  __weak _ASAsyncTransaction* weakTransaction = nil;
+  @autoreleasepool {
+    CALayer *layer = [[CALayer alloc] init];
+    _ASAsyncTransaction *transaction = layer.asyncdisplaykit_asyncTransaction;
+
+    [transaction addOperationWithBlock:^id<NSObject> _Nullable{
+      return nil;
+    } priority:1
+                                 queue:dispatch_get_main_queue()
+                            completion:^(id  _Nullable value, BOOL canceled) {
+                              ;
+                            }];
+
+    weakTransaction = transaction;
+    layer = nil;
+  }
+
+  // held by main transaction group
+  XCTAssertNotNil(weakTransaction);
+
+  // run so that transaction group drains.
+  static NSTimeInterval delay = 0.1;
+  [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:delay]];
+
+  XCTAssertNotNil(weakTransaction); // Oops! Experiment will fix this.
+}
+
 - (void)testWeakWithSingleOperation
 {
+  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
+  config.experimentalFeatures = ASExperimentalTransactionOperationRetainCycle;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+
   __weak _ASAsyncTransaction* weakTransaction = nil;
   @autoreleasepool {
     CALayer *layer = [[CALayer alloc] init];

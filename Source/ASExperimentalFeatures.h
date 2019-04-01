@@ -33,6 +33,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalTextDrawing = 1 << 12,                      // exp_text_drawing
   ASExperimentalFixRangeController = 1 << 13,               // exp_fix_range_controller
   ASExperimentalOOMBackgroundDeallocDisable = 1 << 14,      // exp_oom_bg_dealloc_disable
+  ASExperimentalTransactionOperationRetainCycle = 1 << 15,   // exp_transaction_operation_retain_cycle
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
