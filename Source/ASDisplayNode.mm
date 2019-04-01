@@ -64,7 +64,11 @@ using AS::MutexLocker;
 
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
 
-@interface ASDisplayNode () <UIGestureRecognizerDelegate, _ASDisplayLayerDelegate, ASCATransactionQueueObserving>
+// Forward declare CALayerDelegate protocol as the iOS 10 SDK moves CALayerDelegate from an informal delegate to a protocol.
+// We have to forward declare the protocol as this place otherwise it will not compile compiling with an Base SDK < iOS 10
+@protocol CALayerDelegate;
+
+@interface ASDisplayNode () <UIGestureRecognizerDelegate, CALayerDelegate, _ASDisplayLayerDelegate, ASCATransactionQueueObserving>
 /**
  * See ASDisplayNodeInternal.h for ivars
  */
@@ -103,10 +107,9 @@ _ASPendingState *ASDisplayNodeGetPendingState(ASDisplayNode *node)
   return result;
 }
 
-void StubImplementationWithNoArgs(id receiver, SEL _cmd) {}
-void StubImplementationWithSizeRange(id receiver, SEL _cmd, ASSizeRange sr) {}
-void StubImplementationWithTwoInterfaceStates(id receiver, SEL _cmd, ASInterfaceState s0, ASInterfaceState s1) {}
-id StubLayerActionImplementation(id receiver, SEL _cmd, NSString *key) { return (id)kCFNull; }
+void StubImplementationWithNoArgs(id receiver) {}
+void StubImplementationWithSizeRange(id receiver, ASSizeRange sr) {}
+void StubImplementationWithTwoInterfaceStates(id receiver, ASInterfaceState s0, ASInterfaceState s1) {}
 
 /**
  *  Returns ASDisplayNodeFlags for the given class/instance. instance MAY BE NIL.
@@ -278,8 +281,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     auto interfaceStateType = std::string(@encode(ASInterfaceState));
     auto type1 = "v@:" + interfaceStateType + interfaceStateType;
     class_addMethod(self, @selector(interfaceStateDidChange:fromState:), (IMP)StubImplementationWithTwoInterfaceStates, type1.c_str());
-
-    class_addMethod(self, @selector(layerActionForKey:), (IMP)StubLayerActionImplementation, "@@:@");
   }
 }
 
@@ -1817,6 +1818,7 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 
 #pragma mark <CALayerDelegate>
 
+// We are only the delegate for the layer when we are layer-backed, as UIView performs this function normally
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
   if (event == kCAOnOrderIn) {
@@ -1825,7 +1827,8 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
     [self __exitHierarchy];
   }
 
-  return [self layerActionForKey:event];
+  ASDisplayNodeAssert(_flags.layerBacked, @"We shouldn't get called back here unless we are layer-backed.");
+  return (id)kCFNull;
 }
 
 #pragma mark - Error Handling
