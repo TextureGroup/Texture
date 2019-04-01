@@ -87,10 +87,8 @@ typedef struct {
   int setLayoutMargins:1;
   int setPreservesSuperviewLayoutMargins:1;
   int setInsetsLayoutMarginsFromSafeArea:1;
-  int setActions:1;
   int setMaskedCorners : 1;
 } ASPendingStateFlags;
-
 
 static constexpr ASPendingStateFlags kZeroFlags = {0};
 
@@ -140,7 +138,6 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
   UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
-  NSDictionary<NSString *, id<CAAction>> *actions;
 
   ASPendingStateFlags _stateToApplyFlags;
   struct {
@@ -221,7 +218,6 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize layoutMargins=layoutMargins;
 @synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
 @synthesize insetsLayoutMarginsFromSafeArea=insetsLayoutMarginsFromSafeArea;
-@synthesize actions=actions;
 @synthesize maskedCorners = maskedCorners;
 
 static CGColorRef blackColorRef = NULL;
@@ -667,12 +663,6 @@ static UIColor *defaultTintColor = nil;
   _stateToApplyFlags.setSemanticContentAttribute = YES;
 }
 
-- (void)setActions:(NSDictionary<NSString *,id<CAAction>> *)actionsArg
-{
-  actions = [actionsArg copy];
-  _stateToApplyFlags.setActions = YES;
-}
-
 - (BOOL)isAccessibilityElement
 {
   return _flags.isAccessibilityElement;
@@ -1023,9 +1013,6 @@ static UIColor *defaultTintColor = nil;
   if (flags.setOpaque)
     ASDisplayNodeAssert(layer.opaque == _flags.opaque, @"Didn't set opaque as desired");
 
-  if (flags.setActions)
-    layer.actions = actions;
-
   ASPendingStateApplyMetricsToLayer(self, layer);
   
   if (flags.needsLayout)
@@ -1045,7 +1032,7 @@ static UIColor *defaultTintColor = nil;
    because a different setter would be called.
    */
 
-  unowned CALayer *layer = view.layer;
+  CALayer *layer = view.layer;
 
   ASPendingStateFlags flags = _stateToApplyFlags;
   if (__shouldSetNeedsDisplay(layer)) {
@@ -1087,9 +1074,6 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setRasterizationScale)
     layer.rasterizationScale = rasterizationScale;
-
-  if (flags.setActions)
-    layer.actions = actions;
 
   if (flags.setClipsToBounds)
     view.clipsToBounds = _flags.clipsToBounds;
