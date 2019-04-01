@@ -55,7 +55,7 @@
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    if (ASActivateExperimentalFeature(ASExpeimentalTransactionOperationRetainCycle)) {
+    if (ASActivateExperimentalFeature(ASExperimentalTransactionOperationRetainCycle)) {
       transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
         __strong CALayer *self = weakSelf;
         if (self == nil) {

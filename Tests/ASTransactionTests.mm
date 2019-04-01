@@ -2,8 +2,8 @@
 //  ASTransactionTests.m
 //  AsyncDisplayKitTests
 //
-//  Created by Greg Bolsinga on 3/26/19.
-//  Copyright © 2019 Pinterest. All rights reserved.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "ASTestCase.h"
@@ -84,7 +84,7 @@
 - (void)testWeakWithSingleOperation
 {
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExpeimentalTransactionOperationRetainCycle;
+  config.experimentalFeatures = ASExperimentalTransactionOperationRetainCycle;
   [ASConfigurationManager test_resetWithConfiguration:config];
 
   __weak _ASAsyncTransaction* weakTransaction = nil;

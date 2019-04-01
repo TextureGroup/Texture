@@ -33,7 +33,7 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalTextDrawing,
   ASExperimentalFixRangeController,
   ASExperimentalOOMBackgroundDeallocDisable,
-  ASExpeimentalTransactionOperationRetainCycle,
+  ASExperimentalTransactionOperationRetainCycle,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
