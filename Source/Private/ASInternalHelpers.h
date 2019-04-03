@@ -17,6 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 AS_EXTERN void ASInitializeFrameworkMainThread(void);
 
 AS_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);
@@ -63,6 +64,14 @@ ASDISPLAYNODE_INLINE BOOL ASImageAlphaInfoIsOpaque(CGImageAlphaInfo info) {
       return NO;
   }
 }
+
+/// Returns the background color of the given node that will used for display if automaticallyManagesBackgroundColor is set
+AS_EXTERN UIColor *ASDisplayNodeGetEffectiveBackgroundColor(ASDisplayNode *node);
+
+/// Returns the opaque value of the given node that will used for display if automaticallyManagesBackgroundColor is set
+AS_EXTERN BOOL ASDisplayNodeGetEffectiveOpaque(ASDisplayNode *node);
+
+AS_EXTERN void ASDisplayNodeUpdateForAutomaticBackgroundColorHandling(ASDisplayNode *node, const ASPrimitiveTraitCollection &primitiveTraitCollection);
 
 /**
  @summary Conditionally performs UIView geometry changes in the given block without animation.

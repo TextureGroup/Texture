@@ -526,7 +526,7 @@ static NSArray *DefaultLinkAttributeNames() {
   return @{
     @"container": copiedContainer,
     @"text": mutableText,
-    @"bgColor": self.backgroundColor ?: [NSNull null]
+    @"bgColor": ASDisplayNodeGetEffectiveBackgroundColor(self) ?: [NSNull null]
   };
 }
 

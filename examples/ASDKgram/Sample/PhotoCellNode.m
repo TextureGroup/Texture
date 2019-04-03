@@ -51,12 +51,14 @@
   self = [super init];
   
   if (self) {
+    // Instead of adding everything addSubnode: use automatic subnode management
+    self.automaticallyManagesSubnodes = YES;
     
     _photoModel              = photo;
     
     _userAvatarImageNode     = [[ASNetworkImageNode alloc] init];
     _userAvatarImageNode.URL = photo.ownerUserProfile.userPicURL;   // FIXME: make round
-    
+
     // FIXME: autocomplete for this line seems broken
     [_userAvatarImageNode setImageModificationBlock:^UIImage *(UIImage *image) {
       CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
@@ -79,11 +81,17 @@
     _photoLikesLabel                 = [self createLayerBackedTextNodeWithString:[photo likesAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel           = [self createLayerBackedTextNodeWithString:[photo descriptionAttributedStringWithFontSize:FONT_SIZE]];
     _photoDescriptionLabel.maximumNumberOfLines = 3;
-    
-    // instead of adding everything addSubnode:
-    self.automaticallyManagesSubnodes = YES;
 
     [self setupYogaLayoutIfNeeded];
+
+    self.backgroundColor = [UIColor whiteColor];
+
+    _userAvatarImageNode.automaticallyManagesBackgroundColor = YES;
+    _photoImageNode.automaticallyManagesBackgroundColor = YES;
+    _userNameLabel.automaticallyManagesBackgroundColor = YES;
+    _photoTimeIntervalSincePostLabel.automaticallyManagesBackgroundColor = YES;
+    _photoLikesLabel.automaticallyManagesBackgroundColor = YES;
+    _photoDescriptionLabel.automaticallyManagesBackgroundColor = YES;
     
 #if DEBUG_PHOTOCELL_LAYOUT
     _userAvatarImageNode.backgroundColor              = [UIColor greenColor];

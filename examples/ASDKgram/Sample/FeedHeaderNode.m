@@ -27,11 +27,19 @@ static UIEdgeInsets kFeedHeaderInset = { .top = 20, .bottom = 20, .left = 10, .r
     self.automaticallyManagesSubnodes = YES;
 
     _textNode = [[ASTextNode alloc] init];
+    _textNode.automaticallyManagesBackgroundColor = YES;
     _textNode.attributedText = [NSAttributedString attributedStringWithString:@"Latest Posts" fontSize:18 color:[UIColor darkGrayColor] firstWordColor:nil];
 
     [self setupYogaLayoutIfNeeded];
   }
   return self;
+}
+
+- (void)didLoad
+{
+  [super didLoad];
+
+  self.backgroundColor = [UIColor whiteColor];
 }
 
 #if !YOGA_LAYOUT

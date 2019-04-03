@@ -469,6 +469,13 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  */
 @property NSInteger drawingPriority;
 
+/**
+ * Wheter the node should automatically manages its background color drawing and opaqueness
+ *
+ * Defaults to NO.
+ */
+@property BOOL automaticallyManagesBackgroundColor;
+
 /** @name Hit Testing */
 
 

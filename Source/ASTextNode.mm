@@ -527,10 +527,10 @@ static NSArray *DefaultLinkAttributeNames() {
   ASLockScopeSelf();
   
   return [[ASTextNodeDrawParameter alloc] initWithRendererAttributes:[self _locked_rendererAttributes]
-                                                     backgroundColor:self.backgroundColor
+                                                     backgroundColor:ASDisplayNodeGetEffectiveBackgroundColor(self)
                                                  textContainerInsets:_textContainerInset
                                                         contentScale:_contentsScaleForDisplay
-                                                              opaque:self.isOpaque
+                                                              opaque:ASDisplayNodeGetEffectiveOpaque(self)
                                                               bounds:[self threadSafeBounds]];
 }
 

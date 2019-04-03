@@ -719,8 +719,10 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     } else {
         _layer.backgroundColor = newBackgroundCGColor;
     }
-      
+
     if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
+      ASTraitCollectionPropagateDown(self, self.primitiveTraitCollectionForChildren);
+
       [self setNeedsDisplay];
     }
   } else {
@@ -728,6 +730,10 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     // When the pending state is applied to the view on main, we will call `setNeedsDisplay` if
     // the new background color doesn't match the one on the layer.
     ASDisplayNodeGetPendingState(self).backgroundColor = newBackgroundCGColor;
+
+    ASTraitCollectionPropagateDown(self, self.primitiveTraitCollectionForChildren);
+    
+    [self setNeedsDisplay];
   }
 }
 

@@ -83,7 +83,7 @@
   // Manually propagate the trait collection here so that any layoutSpec children of layoutSpec will get a traitCollection
   {
     AS::SumScopeTimer t(_layoutSpecTotalTime, measureLayoutSpec);
-    ASTraitCollectionPropagateDown(layoutElement, self.primitiveTraitCollection);
+    ASTraitCollectionPropagateDown(layoutElement, self.primitiveTraitCollectionForChildren);
   }
 
   BOOL measureLayoutComputation = _measurementOptions & ASDisplayNodePerformanceMeasurementOptionLayoutComputation;

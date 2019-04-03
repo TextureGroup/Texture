@@ -43,6 +43,11 @@ ASLayoutElementStyleExtensibilityForwarding
   return nil;
 }
 
+- (ASPrimitiveTraitCollection)primitiveTraitCollectionForChildren
+{
+  return self.primitiveTraitCollection;
+}
+
 - (ASLayoutElementType)layoutElementType
 {
   return ASLayoutElementTypeLayoutSpec;

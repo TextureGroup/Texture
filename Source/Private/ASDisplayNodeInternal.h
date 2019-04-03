@@ -90,6 +90,8 @@ static constexpr CACornerMask kASCACornerAllCorners =
   UIView *_view;
   CALayer *_layer;
 
+  UIColor *_inheritedBackgroundColor;
+
   std::atomic<ASDisplayNodeAtomicFlags> _atomicFlags;
 
   struct ASDisplayNodeFlags {
@@ -154,6 +156,8 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // Layout support
   ASLayoutElementStyle *_style;
   ASPrimitiveTraitCollection _primitiveTraitCollection;
+
+  BOOL _automaticallyManagesBackgroundColor;
 
   // Layout Spec
   ASLayoutSpecBlock _layoutSpecBlock;

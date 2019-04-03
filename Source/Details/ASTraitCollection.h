@@ -48,19 +48,24 @@ typedef struct {
   unowned UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
 
   CGSize containerSize;
+
+  UIColor *backgroundColor;
 } ASPrimitiveTraitCollection;
 #pragma clang diagnostic pop
+
+#ifdef __cplusplus
 
 /**
  * Creates ASPrimitiveTraitCollection with default values.
  */
-AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault(void);
+ASPrimitiveTraitCollection _ASPrimitiveTraitCollectionMakeDefault(void);
 
 /**
  * Creates a ASPrimitiveTraitCollection from a given UITraitCollection.
  */
-AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
+ASPrimitiveTraitCollection _ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
 
+#endif
 
 /**
  * Compares two ASPrimitiveTraitCollection to determine if they are the same.

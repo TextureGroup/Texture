@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASEditableTextNode.h>
 #import <AsyncDisplayKit/ASImageNode.h>
+#import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
@@ -2709,6 +2710,35 @@ static bool stringContainsPointer(NSString *description, id p) {
   OCMExpect([mockNode layerActionForKey:@"position"]);
   node.layer.position = CGPointMake(10, 10);
   OCMVerifyAll(mockNode);
+}
+
+- (void)testAutomaticallyManagesBackgroundColor
+{
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+
+  node.backgroundColor = [UIColor whiteColor];
+
+  ASTextNode *childTextNode = [[ASTextNode alloc] init];
+  childTextNode.automaticallyManagesBackgroundColor = YES;
+  ASImageNode *childImageNode = [[ASImageNode alloc] init];
+  childImageNode.automaticallyManagesBackgroundColor = YES;
+
+  XCTAssertFalse(ASDisplayNodeGetEffectiveOpaque(childTextNode));
+  XCTAssertTrue(CGColorGetAlpha(ASDisplayNodeGetEffectiveBackgroundColor(childTextNode).CGColor) == 0);
+  XCTAssertFalse(ASDisplayNodeGetEffectiveOpaque(childImageNode));
+  XCTAssertTrue(CGColorGetAlpha(ASDisplayNodeGetEffectiveBackgroundColor(childImageNode).CGColor) == 0);
+
+  [node addSubnode:childTextNode];
+  [node addSubnode:childImageNode];
+  
+  ASDisplayNodeSizeToFitSize(node, CGSizeMake(100, 100));
+  [node.view layoutIfNeeded];
+
+  XCTAssertTrue(ASDisplayNodeGetEffectiveOpaque(childTextNode));
+  XCTAssertTrue(CGColorEqualToColor(ASDisplayNodeGetEffectiveBackgroundColor(childTextNode).CGColor, node.backgroundColor.CGColor));
+  XCTAssertTrue(ASDisplayNodeGetEffectiveOpaque(childImageNode));
+  XCTAssertTrue(CGColorEqualToColor(ASDisplayNodeGetEffectiveBackgroundColor(childImageNode).CGColor, node.backgroundColor.CGColor));
 }
 
 @end

@@ -37,7 +37,7 @@
   }
   
   _isMutable = YES;
-  _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  _primitiveTraitCollection = _ASPrimitiveTraitCollectionMakeDefault();
   _childrenArray = [[NSMutableArray alloc] init];
   
   return self;
@@ -156,6 +156,11 @@ ASLayoutElementLayoutCalculationDefaults
 {
   AS::MutexLocker l(__instanceLock__);
   _primitiveTraitCollection = traitCollection;
+}
+
+- (ASPrimitiveTraitCollection)primitiveTraitCollectionForChildren
+{
+  return self.primitiveTraitCollection;
 }
 
 #pragma mark - ASLayoutElementStyleExtensibility

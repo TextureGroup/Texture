@@ -139,6 +139,8 @@ ASLayoutElementStyleExtensibilityForwarding
     _primitiveTraitCollection = traitCollection;
     ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
 
+    ASDisplayNodeUpdateForAutomaticBackgroundColorHandling(self, traitCollection);
+
     l.unlock();
     [self asyncTraitCollectionDidChange];
   }
@@ -147,6 +149,14 @@ ASLayoutElementStyleExtensibilityForwarding
 - (ASTraitCollection *)asyncTraitCollection
 {
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
+}
+
+- (ASPrimitiveTraitCollection)primitiveTraitCollectionForChildren
+{
+  ASPrimitiveTraitCollection primitiveTraitCollection = self.primitiveTraitCollection;
+  // Update primitiveTraitCollection background color with color for further propagation
+  primitiveTraitCollection.backgroundColor = self.backgroundColor ?: _inheritedBackgroundColor;
+  return primitiveTraitCollection;
 }
 
 #pragma mark - ASLayoutElementAsciiArtProtocol

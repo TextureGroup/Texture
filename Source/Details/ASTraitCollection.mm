@@ -18,14 +18,16 @@
 void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
   if (element) {
     element.primitiveTraitCollection = traitCollection;
-  }
-  
-  for (id<ASLayoutElement> subelement in element.sublayoutElements) {
-    ASTraitCollectionPropagateDown(subelement, traitCollection);
+
+    ASPrimitiveTraitCollection traitCollectionForPropagation = element.primitiveTraitCollectionForChildren;
+
+    for (id<ASLayoutElement> subelement in element.sublayoutElements) {
+      ASTraitCollectionPropagateDown(subelement, traitCollectionForPropagation);
+    }
   }
 }
 
-ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
+ASPrimitiveTraitCollection _ASPrimitiveTraitCollectionMakeDefault() {
   ASPrimitiveTraitCollection tc = {};
   tc.userInterfaceIdiom = UIUserInterfaceIdiomUnspecified;
   tc.forceTouchCapability = UIForceTouchCapabilityUnknown;
@@ -43,11 +45,12 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
     tc.userInterfaceStyle = UIUserInterfaceStyleUnspecified;
   }
 #endif
+  tc.backgroundColor = nil;
   return tc;
 }
 
-ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection) {
-  ASPrimitiveTraitCollection environmentTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
+ASPrimitiveTraitCollection _ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection) {
+  ASPrimitiveTraitCollection environmentTraitCollection = _ASPrimitiveTraitCollectionMakeDefault();
   environmentTraitCollection.horizontalSizeClass = traitCollection.horizontalSizeClass;
   environmentTraitCollection.verticalSizeClass = traitCollection.verticalSizeClass;
   environmentTraitCollection.displayScale = traitCollection.displayScale;
@@ -65,6 +68,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
     environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
   }
 #endif
+  environmentTraitCollection.backgroundColor = nil;
   return environmentTraitCollection;
 }
 
@@ -171,6 +175,9 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
     [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
   }
   [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
+  if (traits.backgroundColor) {
+    [props addObject:@{ @"backgroundColor": traits.backgroundColor }];
+  }
   return ASObjectDescriptionMakeWithoutObject(props);
 }
 

@@ -330,7 +330,7 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
   _drawingPriority = ASDefaultTransactionPriority;
   _maskedCorners = kASCACornerAllCorners;
   
-  _primitiveTraitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  _primitiveTraitCollection = _ASPrimitiveTraitCollectionMakeDefault();
   
   _layoutVersion = 1;
   
@@ -347,6 +347,8 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
 
   _automaticallyRelayoutOnSafeAreaChanges = NO;
   _automaticallyRelayoutOnLayoutMarginsChanges = NO;
+
+  _automaticallyManagesBackgroundColor = NO;
 
   [self baseDidInit];
   ASDisplayNodeLogEvent(self, @"init");
@@ -1307,6 +1309,21 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   _contentsScaleForDisplay = contentsScaleForDisplay;
 }
 
+- (BOOL)automaticallyManagesBackgroundColor
+{
+  MutexLocker l(__instanceLock__);
+  return _automaticallyManagesBackgroundColor;
+}
+
+- (void)setAutomaticallyManagesBackgroundColor:(BOOL)automaticallyManagesBackgroundColor
+{
+  MutexLocker l(__instanceLock__);
+  if (_automaticallyManagesBackgroundColor == automaticallyManagesBackgroundColor) {
+    return;
+  }
+  _automaticallyManagesBackgroundColor = automaticallyManagesBackgroundColor;
+}
+
 - (void)displayImmediately
 {
   ASDisplayNodeAssertMainThread();
@@ -2049,7 +2066,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       
       // Now that we have a supernode, propagate its traits to self.
       // This should be done before possibly forcing self to load so we have traits in -didLoad
-      ASTraitCollectionPropagateDown(self, newSupernode.primitiveTraitCollection);
+      ASTraitCollectionPropagateDown(self, newSupernode.primitiveTraitCollectionForChildren);
       
       if (!parentWasOrIsRasterized && newSupernode.nodeLoaded) {
         // Trigger the subnode to load its layer, which will create its view if it needs one.

@@ -66,7 +66,7 @@ using AS::MutexLocker;
   }
 
   // Capture these outside the display block so they are retained.
-  UIColor *backgroundColor = self.backgroundColor;
+  UIColor *backgroundColor = ASDisplayNodeGetEffectiveBackgroundColor(self);
   CGRect bounds = self.bounds;
   CGFloat cornerRadius = self.cornerRadius;
   BOOL clipsToBounds = self.clipsToBounds;
@@ -177,10 +177,10 @@ using AS::MutexLocker;
     __instanceLock__.unlock();
     return nil;
   }
-  
-  BOOL opaque = self.opaque;
+
+  UIColor *backgroundColor = ASDisplayNodeGetEffectiveBackgroundColor(self);
+  BOOL opaque = ASDisplayNodeGetEffectiveOpaque(self);
   CGRect bounds = self.bounds;
-  UIColor *backgroundColor = self.backgroundColor;
   CGColorRef borderColor = self.borderColor;
   CGFloat borderWidth = self.borderWidth;
   CGFloat contentsScaleForDisplay = _contentsScaleForDisplay;

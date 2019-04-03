@@ -15,6 +15,7 @@
 #import <cmath>
 
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 
@@ -222,6 +223,41 @@ CGFloat ASRoundPixelValue(CGFloat f)
   CGFloat scale = ASScreenScale();
   return round(f * scale) / scale;
 }
+
+BOOL ASDisplayNodeHasNonClearBackgroundColor(ASDisplayNode *node) {
+  return CGColorGetAlpha(node.backgroundColor.CGColor) > 0.0;
+}
+
+UIColor *ASDisplayNodeGetEffectiveBackgroundColor(ASDisplayNode *node) {
+  if (!node.automaticallyManagesBackgroundColor) {
+    return node.backgroundColor;
+  }
+
+  return ASDisplayNodeHasNonClearBackgroundColor(node) ? node.backgroundColor : node->_inheritedBackgroundColor;
+}
+
+BOOL ASDisplayNodeGetEffectiveOpaque(ASDisplayNode *node) {
+  if (!node.automaticallyManagesBackgroundColor) {
+    return node.isOpaque;
+  }
+
+  UIColor *effectiveBackgroundColor = ASDisplayNodeGetEffectiveBackgroundColor(node);
+  return CGColorGetAlpha(effectiveBackgroundColor.CGColor) == 1.0;
+}
+
+void ASDisplayNodeUpdateForAutomaticBackgroundColorHandling(ASDisplayNode *node, const ASPrimitiveTraitCollection &primitiveTraitCollection) {
+  if (!node.automaticallyManagesBackgroundColor) {
+    return;
+  }
+
+  if (!CGColorEqualToColor(node->_inheritedBackgroundColor.CGColor, primitiveTraitCollection.backgroundColor.CGColor)) {
+    node->_inheritedBackgroundColor = primitiveTraitCollection.backgroundColor;
+    if (!ASDisplayNodeHasNonClearBackgroundColor(node)) {
+      [node setNeedsDisplay];
+    }
+  }
+}
+
 
 @implementation NSIndexPath (ASInverseComparison)
 

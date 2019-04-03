@@ -140,6 +140,8 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 - (BOOL)implementsLayoutMethod;
 
+@property (nonatomic, readonly) ASPrimitiveTraitCollection primitiveTraitCollectionForChildren;
+
 @end
 
 #pragma mark - ASLayoutElementStyle
