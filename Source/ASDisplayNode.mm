@@ -107,7 +107,7 @@ void StubImplementationWithNoArgs(id receiver, SEL _cmd) {}
 void StubImplementationWithSizeRange(id receiver, SEL _cmd, ASSizeRange sr) {}
 void StubImplementationWithTwoInterfaceStates(id receiver, SEL _cmd, ASInterfaceState s0, ASInterfaceState s1) {}
 
-/// Returning nil won't trigger unwanted default actions, because we override
+/// Returning nil here won't trigger unwanted default actions, because we override
 /// +defaultActionForKey: to return kCFNull.
 id StubLayerActionImplementation(id receiver, SEL _cmd, NSString *key) { return nil; }
 
