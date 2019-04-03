@@ -11,6 +11,18 @@
 #import <AsyncDisplayKit/ASBatchContext.h>
 #import <AsyncDisplayKit/ASBatchFetchingDelegate.h>
 
+BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+                                         ASBatchContext *context,
+                                         ASScrollDirection scrollDirection,
+                                         ASScrollDirection scrollableDirections,
+                                         CGRect bounds,
+                                         CGSize contentSize,
+                                         CGPoint targetOffset,
+                                         CGFloat leadingScreens,
+                                         BOOL visible,
+                                         CGPoint velocity,
+                                         id<ASBatchFetchingDelegate> delegate);
+
 BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
                                             ASScrollDirection scrollDirection,
                                             ASScrollDirection scrollableDirections,
@@ -29,10 +41,25 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
   CGFloat leadingScreens = scrollView.leadingScreensForBatching;
   id<ASBatchFetchingDelegate> delegate = scrollView.batchFetchingDelegate;
   BOOL visible = (scrollView.window != nil);
-  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate);
+  return ASDisplayShouldFetchBatchForContext(scrollView, context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate);
 }
 
 BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
+                                         ASScrollDirection scrollDirection,
+                                         ASScrollDirection scrollableDirections,
+                                         CGRect bounds,
+                                         CGSize contentSize,
+                                         CGPoint targetOffset,
+                                         CGFloat leadingScreens,
+                                         BOOL visible,
+                                         CGPoint velocity,
+                                         _Nullable id<ASBatchFetchingDelegate> delegate)
+{
+  return ASDisplayShouldFetchBatchForContext(nil, context, scrollDirection, scrollableDirections, bounds, contentSize, targetOffset, leadingScreens, visible, velocity, delegate);
+}
+
+BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+                                         ASBatchContext *context,
                                          ASScrollDirection scrollDirection,
                                          ASScrollDirection scrollableDirections,
                                          CGRect bounds,
@@ -78,15 +105,21 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
     return NO;
   }
 
-  // If they are scrolling toward the head of content, don't batch fetch.
-  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
-  if (isScrollingTowardHead) {
-    return NO;
-  }
 
   CGFloat triggerDistance = viewLength * leadingScreens;
   CGFloat remainingDistance = contentLength - viewLength - offset;
   BOOL result = remainingDistance <= triggerDistance;
+
+  // If they are scrolling toward the head of content, don't batch fetch.
+  // If they are scrolling toward the head of content, don't batch fetch.
+  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
+  if (isScrollingTowardHead) {
+    if ([scrollView canBatchFetchPrepend]) {
+      result = offset <= triggerDistance;
+    } else {
+      return NO;
+    }
+  }
 
   if (delegate != nil && velocityLength > 0.0) {
     // Don't need to get absolute value of remaining time
@@ -96,4 +129,12 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
   }
   
   return result;
+}
+
+BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection) {
+  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
+  if (isScrollingTowardHead) {
+    return YES;
+  }
+  return NO;
 }

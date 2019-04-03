@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASBatchFetchingScrollView <NSObject>
 
 - (BOOL)canBatchFetch;
+- (BOOL)canBatchFetchPrepend;
 - (ASBatchContext *)batchContext;
 - (CGFloat)leadingScreensForBatching;
 - (nullable id<ASBatchFetchingDelegate>)batchFetchingDelegate;
@@ -69,5 +70,7 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 BOOL visible,
                                                 CGPoint velocity,
                                                 _Nullable id<ASBatchFetchingDelegate> delegate);
+
+AS_EXTERN BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection);
 
 NS_ASSUME_NONNULL_END

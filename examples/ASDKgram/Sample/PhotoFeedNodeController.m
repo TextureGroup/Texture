@@ -95,6 +95,14 @@
 
 #pragma mark - ASTableDelegate methods
 
+- (BOOL)shouldBatchFetchPrependForTableNode:(ASTableNode *)tableNode {
+  return YES;
+}
+
+- (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchPrependWithContext:(nonnull ASBatchContext *)context {
+  NSLog(@"");
+}
+
 // Receive a message that the tableView is near the end of its data set and more data should be fetched if necessary.
 - (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchWithContext:(ASBatchContext *)context
 {

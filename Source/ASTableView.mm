@@ -1458,6 +1458,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
 }
 
+- (BOOL)canBatchFetchPrepend
+{
+  if ([_asyncDelegate respondsToSelector:@selector(shouldBatchFetchPrependForTableNode:)]) {
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
+    return [_asyncDelegate shouldBatchFetchPrependForTableNode:tableNode];
+  }
+
+  return NO;
+}
+
 - (id<ASBatchFetchingDelegate>)batchFetchingDelegate
 {
   return self.tableNode.batchFetchingDelegate;
@@ -1489,8 +1499,23 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity)) {
-    [self _beginBatchFetching];
+  ASScrollDirection scrollDirection = self.scrollDirection;
+  BOOL shouldFetchBatch = ASDisplayShouldFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+
+  if (shouldFetchBatch) {
+    if (ASDisplayIsScrollingTowardHead(scrollDirection)) {
+        [self _beginBatchFetchingPrepend];
+    } else {
+      [self _beginBatchFetching];
+    }
+  }
+}
+
+- (void)_beginBatchFetchingPrepend
+{
+  if ([_asyncDelegate respondsToSelector:@selector(tableNode:willBeginBatchFetchPrependWithContext:)]) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
+    [_asyncDelegate tableNode:tableNode willBeginBatchFetchPrependWithContext:_batchContext];
   }
 }
 

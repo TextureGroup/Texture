@@ -1834,6 +1834,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
+- (BOOL)canBatchFetchPrepend
+{
+  return NO;
+}
+
 - (id<ASBatchFetchingDelegate>)batchFetchingDelegate{
   return self.collectionNode.batchFetchingDelegate;
 }
