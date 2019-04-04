@@ -473,17 +473,9 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     return nil;
   }
 
-  // If the image is opaque, and the draw rect contains the bounds rect, we can use an opaque context.
-  UIImage *image = key.image;
-  const CGRect imageDrawRect = key.imageDrawRect;
-  const CGRect contextBounds = { CGPointZero, key.backingSize };
-  const BOOL imageIsOpaque = ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage));
-  const BOOL imageFillsContext = CGRectContainsRect(imageDrawRect, contextBounds);
-  const BOOL contextIsOpaque = (imageIsOpaque && imageFillsContext) || key.isOpaque;
-
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  ASGraphicsBeginImageContextWithOptions(contextBounds.size, contextIsOpaque, 1.0);
+  ASGraphicsBeginImageContextWithOptions(key.backingSize, key.isOpaque, 1.0);
   
   BOOL contextIsClean = YES;
   
@@ -511,12 +503,13 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   // upon removal of the object from the set when the operation completes.
   // Another option is to have ASDisplayNode+AsyncDisplay coordinate these cases, and share the decoded buffer.
   // Details tracked in https://github.com/facebook/AsyncDisplayKit/issues/1068
-
-  BOOL canUseCopy = (contextIsClean || imageIsOpaque);
+  
+  UIImage *image = key.image;
+  BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
   CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
   
   @synchronized(image) {
-    [image drawInRect:imageDrawRect blendMode:blendMode alpha:1];
+    [image drawInRect:key.imageDrawRect blendMode:blendMode alpha:1];
   }
   
   if (context && key.didDisplayNodeContentWithRenderingContext) {
