@@ -153,7 +153,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // Layout support
   ASLayoutElementStyle *_style;
-  std::atomic<ASPrimitiveTraitCollection> _primitiveTraitCollection;
+  ASPrimitiveTraitCollection _primitiveTraitCollection;
 
   // Layout Spec
   ASLayoutSpecBlock _layoutSpecBlock;
