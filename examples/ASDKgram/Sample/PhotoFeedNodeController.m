@@ -51,7 +51,39 @@
   self.tableNode.leadingScreensForBatching = AUTO_TAIL_LOADING_NUM_SCREENFULS;  // overriding default of 2.0
 }
 
-- (void)loadPageWithContext:(ASBatchContext *)context
+- (void)prependNewRows:(NSArray *)newPhotos
+{
+  __auto_type prevContentHeight = self.tableNode.view.contentSize.height;
+  NSInteger section = 0;
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  for (NSInteger row = 0; row < newPhotos.count; row++) {
+    NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
+    [indexPaths addObject:path];
+  }
+
+  [self.tableNode performBatchUpdates:^{
+    [self.tableNode insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  } completion:^(BOOL finished) {
+    if (finished) {
+      __auto_type presentHeight = self.tableNode.view.contentSize.height;
+      __auto_type diff = presentHeight - prevContentHeight;
+      __auto_type offset = self.tableNode.contentOffset;
+      offset.y += diff;
+      [self.tableNode setContentOffset:offset animated:NO];
+    }
+  }];
+}
+
+- (void)loadPagePrepandWithContext:(ASBatchContext *)context {
+  [self.photoFeed requestPrependPageWithCompletionBlock:^(NSArray *newPhotos) {
+    [self prependNewRows:newPhotos];
+    if (context) {
+      [context completeBatchFetching:YES];
+    }
+  } numResultsToReturn:20];
+}
+
+-(void)loadPageWithContext:(ASBatchContext *)context
 {
   [self.photoFeed requestPageWithCompletionBlock:^(NSArray *newPhotos){
 
@@ -100,7 +132,8 @@
 }
 
 - (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchPrependWithContext:(nonnull ASBatchContext *)context {
-  NSLog(@"");
+  [context beginBatchFetching];
+  [self loadPagePrepandWithContext:context];
 }
 
 // Receive a message that the tableView is near the end of its data set and more data should be fetched if necessary.

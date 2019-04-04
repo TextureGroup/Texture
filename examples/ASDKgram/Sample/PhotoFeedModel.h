@@ -32,6 +32,7 @@ typedef NS_ENUM(NSInteger, PhotoFeedModelType) {
 
 - (void)clearFeed;
 - (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults;
+- (void)requestPrependPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults;
 - (void)refreshFeedWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults;
 
 @end

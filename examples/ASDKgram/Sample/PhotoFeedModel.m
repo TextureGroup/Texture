@@ -120,14 +120,33 @@
   _task = nil;
 }
 
-- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults
+- (void)requestPrependPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults {
+  [self requestPageWithCompletionBlock:block numResultsToReturn:numResults isAppend:NO];
+}
+
+- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults {
+  [self requestPageWithCompletionBlock:block numResultsToReturn:numResults isAppend:YES];
+}
+
+- (void)requestPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults isAppend:(BOOL)isAppend
 {
   // only one fetch at a time
   if (_fetchPageInProgress) {
     return;
   } else {
     _fetchPageInProgress = YES;
-    [self fetchPageWithCompletionBlock:block numResultsToReturn:numResults];
+    [self fetchPageWithCompletionBlock:^(NSArray *newPhotos, NSArray *newIDs) {
+      if (isAppend) {
+        [_photos addObjectsFromArray:newPhotos];
+        [_ids addObjectsFromArray:newIDs];
+      } else {
+        for (int i = 0; i < newPhotos.count; ++i) {
+          [_photos insertObject:newPhotos[i] atIndex:0];
+          [_ids insertObject:newIDs[i] atIndex:0];
+        }
+      }
+      block(newPhotos);
+    } numResultsToReturn:numResults replaceData:NO];
   }
 }
 
@@ -142,8 +161,10 @@
     _currentPage = 0;
     
     // FIXME: blow away any other requests in progress
-    [self fetchPageWithCompletionBlock:^(NSArray *newPhotos) {
+    [self fetchPageWithCompletionBlock:^(NSArray *newPhotos, NSArray *newIDs) {
       if (block) {
+        _photos = [newPhotos mutableCopy];
+        _ids = [newIDs mutableCopy];
         block(newPhotos);
       }
       _refreshFeedInProgress = NO;
@@ -153,19 +174,14 @@
 
 #pragma mark - Helper Methods
 
-- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults
-{
-  [self fetchPageWithCompletionBlock:block numResultsToReturn:numResults replaceData:NO];
-}
-
-- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *))block numResultsToReturn:(NSUInteger)numResults replaceData:(BOOL)replaceData
+- (void)fetchPageWithCompletionBlock:(void (^)(NSArray *photos, NSArray *ids))block numResultsToReturn:(NSUInteger)numResults replaceData:(BOOL)replaceData
 {
   // early return if reached end of pages
   if (_totalPages) {
     if (_currentPage == _totalPages) {
       dispatch_async(dispatch_get_main_queue(), ^{
         if (block) {
-          block(@[]);
+          block(@[], @[]);
         }
       });
       return;
@@ -217,15 +233,8 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
           @synchronized(self) {
-            if (replaceData) {
-              _photos = [newPhotos mutableCopy];
-              _ids = [newIDs mutableCopy];
-            } else {
-              [_photos addObjectsFromArray:newPhotos];
-              [_ids addObjectsFromArray:newIDs];
-            }
             if (block) {
-              block(newPhotos);
+              block(newPhotos, newIDs);
             }
             _fetchPageInProgress = NO;
           }
