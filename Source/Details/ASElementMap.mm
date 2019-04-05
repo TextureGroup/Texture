@@ -20,9 +20,6 @@
 
 @property (nonatomic, readonly) NSArray<ASSection *> *sections;
 
-// Element -> IndexPath
-@property (nonatomic, readonly) NSMapTable<ASCollectionElement *, NSIndexPath *> *elementToIndexPathMap;
-
 // The items, in a 2D array
 @property (nonatomic, readonly) ASCollectionElementTwoDimensionalArray *sectionsOfItems;
 
@@ -47,20 +44,20 @@
     _supplementaryElements = [[NSDictionary alloc] initWithDictionary:supplementaryElements copyItems:YES];
 
     // Setup our index path map
-    _elementToIndexPathMap = [NSMapTable mapTableWithKeyOptions:(NSMapTableStrongMemory | NSMapTableObjectPointerPersonality) valueOptions:NSMapTableCopyIn];
+    auto mElementToIndexPath = [[NSMutableDictionary<ASCollectionElement *, NSIndexPath *> alloc] init];
     NSInteger s = 0;
     for (NSArray *section in _sectionsOfItems) {
       NSInteger i = 0;
       for (ASCollectionElement *element in section) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:s];
-        [_elementToIndexPathMap setObject:indexPath forKey:element];
+        [mElementToIndexPath setObject:indexPath forKey:element];
         i++;
       }
       s++;
     }
     for (NSDictionary *supplementariesForKind in [_supplementaryElements objectEnumerator]) {
       [supplementariesForKind enumerateKeysAndObjectsUsingBlock:^(NSIndexPath *_Nonnull indexPath, ASCollectionElement * _Nonnull element, BOOL * _Nonnull stop) {
-        [_elementToIndexPathMap setObject:indexPath forKey:element];
+        [mElementToIndexPath setObject:indexPath forKey:element];
       }];
     }
   }
@@ -69,7 +66,7 @@
 
 - (NSUInteger)count
 {
-  return _elementToIndexPathMap.count;
+  return _elementToIndexPath.count;
 }
 
 - (NSArray<NSIndexPath *> *)itemIndexPaths
@@ -112,7 +109,7 @@
 
 - (nullable NSIndexPath *)indexPathForElement:(ASCollectionElement *)element
 {
-  return element ? [_elementToIndexPathMap objectForKey:element] : nil;
+  return element ? [_elementToIndexPath objectForKey:element] : nil;
 }
 
 - (nullable NSIndexPath *)indexPathForElementIfCell:(ASCollectionElement *)element
@@ -196,7 +193,7 @@
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
 {
-  return [_elementToIndexPathMap countByEnumeratingWithState:state objects:buffer count:len];
+  return [_elementToIndexPath countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (NSString *)smallDescription
