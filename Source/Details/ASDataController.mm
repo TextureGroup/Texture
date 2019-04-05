@@ -895,10 +895,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   [elementToIndexPath
    enumerateKeysAndObjectsUsingBlock:^(ASCollectionElement *element, NSIndexPath *indexPath,
                                        __unused BOOL *stop) {
-     element.constrainedSize =
-     [self constrainedSizeForNodeOfKind:(element.supplementaryElementKind
-                                         ?: ASDataControllerRowNodeKind)
-                            atIndexPath:indexPath];
+     element.constrainedSize = [self constrainedSizeForNodeOfKind:(element.supplementaryElementKind
+                                                                   ?: ASDataControllerRowNodeKind)
+                                                      atIndexPath:indexPath];
    }];
   
   // Then concurrently synchronously ensure every node is measured against new constraints.
