@@ -891,8 +891,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _visibleMap = _pendingMap;
 
   // First update size constraints on the main thread.
-  NSDictionary<ASCollectionElement *, NSIndexPath *> *elementToIndexPath =
-  _visibleMap.elementToIndexPath;
+  NSDictionary<ASCollectionElement *, NSIndexPath *> *elementToIndexPath = _visibleMap.elementToIndexPath;
   [elementToIndexPath
    enumerateKeysAndObjectsUsingBlock:^(ASCollectionElement *element, NSIndexPath *indexPath,
                                        __unused BOOL *stop) {
