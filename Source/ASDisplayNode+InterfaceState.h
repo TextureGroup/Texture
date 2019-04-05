@@ -127,4 +127,22 @@ typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
  */
 - (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize;
 
+/**
+ * @abstract Called when the node's layer is about to enter the hierarchy.
+ * @discussion May be called more than once if the layer is participating in a higher-level
+ * animation, such as a UIViewController transition. These animations can cause the layer to get
+ * re-parented multiple times, and each time will trigger this call.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)didEnterHierarchy;
+
+/**
+ * @abstract Called when the node's layer has exited the hierarchy.
+ * @discussion May be called more than once if the layer is participating in a higher-level
+ * animation, such as a UIViewController transition. These animations can cause the layer to get
+ * re-parented multiple times, and each time will trigger this call.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)didExitHierarchy;
+
 @end

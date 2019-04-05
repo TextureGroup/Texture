@@ -92,6 +92,9 @@
 
 - (void)hierarchyDisplayDidFinish {}
 
+- (void)didEnterHierarchy {}
+- (void)didExitHierarchy  {}
+
 - (ASLockSet)lockPair {
   ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {
     if (!addLock(_node)) {
