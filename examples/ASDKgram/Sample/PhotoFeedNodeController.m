@@ -53,7 +53,6 @@
 
 - (void)prependNewRows:(NSArray *)newPhotos
 {
-  __auto_type prevContentHeight = self.tableNode.view.contentSize.height;
   NSInteger section = 0;
   NSMutableArray *indexPaths = [NSMutableArray array];
   for (NSInteger row = 0; row < newPhotos.count; row++) {
@@ -61,6 +60,7 @@
     [indexPaths addObject:path];
   }
 
+  __auto_type prevContentHeight = self.tableNode.view.contentSize.height;
   [self.tableNode performBatchUpdates:^{
     [self.tableNode insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
   } completion:^(BOOL finished) {

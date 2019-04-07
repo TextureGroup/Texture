@@ -11,17 +11,29 @@
 #import <AsyncDisplayKit/ASBatchContext.h>
 #import <AsyncDisplayKit/ASBatchFetchingDelegate.h>
 
-BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView> *scrollView,
-                                         ASBatchContext *context,
-                                         ASScrollDirection scrollDirection,
-                                         ASScrollDirection scrollableDirections,
-                                         CGRect bounds,
-                                         CGSize contentSize,
-                                         CGPoint targetOffset,
-                                         CGFloat leadingScreens,
-                                         BOOL visible,
-                                         CGPoint velocity,
-                                         id<ASBatchFetchingDelegate> delegate);
+BOOL ASDisplayShouldPrependFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+                                            ASScrollDirection scrollDirection,
+                                            ASScrollDirection scrollableDirections,
+                                            CGPoint contentOffset,
+                                            CGPoint velocity)
+{
+
+    // Don't fetch if the scroll view does not allow
+    if (![scrollView canBatchFetchPrepend]) {
+        return NO;
+    }
+
+    // Check if we should batch fetch
+    ASBatchContext *context = scrollView.batchContext;
+    CGRect bounds = scrollView.bounds;
+    CGSize contentSize = scrollView.contentSize;
+    CGFloat leadingScreens = scrollView.leadingScreensForBatching;
+    id<ASBatchFetchingDelegate> delegate = scrollView.batchFetchingDelegate;
+    BOOL visible = (scrollView.window != nil);
+
+    return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate, YES);
+}
+
 
 BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
                                             ASScrollDirection scrollDirection,
@@ -41,7 +53,7 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
   CGFloat leadingScreens = scrollView.leadingScreensForBatching;
   id<ASBatchFetchingDelegate> delegate = scrollView.batchFetchingDelegate;
   BOOL visible = (scrollView.window != nil);
-  return ASDisplayShouldFetchBatchForContext(scrollView, context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate);
+  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate, NO);
 }
 
 BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
@@ -53,22 +65,8 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                          CGFloat leadingScreens,
                                          BOOL visible,
                                          CGPoint velocity,
-                                         _Nullable id<ASBatchFetchingDelegate> delegate)
-{
-  return ASDisplayShouldFetchBatchForContext(nil, context, scrollDirection, scrollableDirections, bounds, contentSize, targetOffset, leadingScreens, visible, velocity, delegate);
-}
-
-BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView> *scrollView,
-                                         ASBatchContext *context,
-                                         ASScrollDirection scrollDirection,
-                                         ASScrollDirection scrollableDirections,
-                                         CGRect bounds,
-                                         CGSize contentSize,
-                                         CGPoint targetOffset,
-                                         CGFloat leadingScreens,
-                                         BOOL visible,
-                                         CGPoint velocity,
-                                         id<ASBatchFetchingDelegate> delegate)
+                                         id<ASBatchFetchingDelegate> delegate,
+                                         BOOL prepend)
 {
   // Do not allow fetching if a batch is already in-flight and hasn't been completed or cancelled
   if ([context isFetching]) {
@@ -111,10 +109,9 @@ BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView>
   BOOL result = remainingDistance <= triggerDistance;
 
   // If they are scrolling toward the head of content, don't batch fetch.
-  // If they are scrolling toward the head of content, don't batch fetch.
-  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
+  BOOL isScrollingTowardHead = ASDisplayIsScrollingTowardHead(scrollDirection);
   if (isScrollingTowardHead) {
-    if ([scrollView canBatchFetchPrepend]) {
+    if (prepend) {
       result = offset <= triggerDistance;
     } else {
       return NO;
@@ -132,9 +129,5 @@ BOOL ASDisplayShouldFetchBatchForContext(UIScrollView<ASBatchFetchingScrollView>
 }
 
 BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection) {
-  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
-  if (isScrollingTowardHead) {
-    return YES;
-  }
-  return NO;
+  return (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
 }

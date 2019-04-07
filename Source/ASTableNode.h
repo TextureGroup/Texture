@@ -650,8 +650,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchWithContext:(ASBatchContext *)context;
 
-- (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchPrependWithContext:(ASBatchContext *)context;
-
 /**
  * Tell the tableView if batch fetching should begin.
  *
@@ -664,8 +662,6 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode;
-
-- (BOOL)shouldBatchFetchPrependForTableNode:(ASTableNode *)tableNode;
 
 /**
  * Informs the delegate that the table view will add the given node

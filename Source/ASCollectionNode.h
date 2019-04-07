@@ -805,6 +805,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)collectionNode:(ASCollectionNode *)collectionNode willBeginBatchFetchWithContext:(ASBatchContext *)context;
 
+- (void)collectionNode:(ASCollectionNode *)collectionNode willBeginBatchFetchPrependWithContext:(ASBatchContext *)context;
+
 /**
  * Tell the collection node if batch fetching should begin.
  *
@@ -817,6 +819,8 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
+
+- (BOOL)shouldBatchFetchPrependForCollectionNode:(ASCollectionNode *)collectionNode;
 
 /**
  * Provides the constrained size range for measuring the node at the index path.

@@ -43,6 +43,12 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchi
                                             CGPoint contentOffset,
                                             CGPoint velocity);
 
+AS_EXTERN BOOL ASDisplayShouldPrependFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+                                                   ASScrollDirection scrollDirection,
+                                                   ASScrollDirection scrollableDirections,
+                                                   CGPoint contentOffset,
+                                                             CGPoint velocity);
+
 
 /**
  @abstract Determine if batch fetching should begin based on the state of the parameters.
@@ -69,7 +75,7 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 CGFloat leadingScreens,
                                                 BOOL visible,
                                                 CGPoint velocity,
-                                                _Nullable id<ASBatchFetchingDelegate> delegate);
+                                                _Nullable id<ASBatchFetchingDelegate> delegate, BOOL prepend);
 
 AS_EXTERN BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection);
 

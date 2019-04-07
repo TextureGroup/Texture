@@ -1836,7 +1836,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (BOOL)canBatchFetchPrepend
 {
-  return NO;
+    if ([_asyncDelegate respondsToSelector:@selector(shouldBatchFetchPrependForCollectionNode:)]) {
+        GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
+        return [_asyncDelegate shouldBatchFetchPrependForCollectionNode:collectionNode];
+    }
+
+    return NO;
 }
 
 - (id<ASBatchFetchingDelegate>)batchFetchingDelegate{
@@ -1869,15 +1874,30 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, self.scrollableDirections, contentOffset, velocity)) {
-    [self _beginBatchFetching];
-  }
+    ASScrollDirection scrollDirection = self.scrollDirection;
+    BOOL shouldFetchBatch = ASDisplayShouldFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+
+    if (shouldFetchBatch) {
+        [self _beginBatchFetching];
+    } else if (ASDisplayIsScrollingTowardHead(scrollDirection)) {
+        BOOL shouldPrependFetchBatch = ASDisplayShouldPrependFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+        if (shouldPrependFetchBatch) {
+            [self _beginBatchFetchingPrepend];
+        }
+    }
+}
+
+- (void)_beginBatchFetchingPrepend
+{
+    if ([_asyncDelegate respondsToSelector:@selector(collectionNode:willBeginBatchFetchPrependWithContext:)]) {
+        GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
+        [_asyncDelegate collectionNode:collectionNode willBeginBatchFetchPrependWithContext:_batchContext];
+    }
 }
 
 - (void)_beginBatchFetching
 {
   as_activity_create_for_scope("Batch fetch for collection node");
-  [_batchContext beginBatchFetching];
   if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
