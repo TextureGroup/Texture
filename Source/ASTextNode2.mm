@@ -396,6 +396,7 @@ static NSArray *DefaultLinkAttributeNames() {
   // Holding it for the duration of the method is more efficient in this case.
   ASLockScopeSelf();
 
+  NSAttributedString *oldAttributedText = _attributedText;
   if (!ASCompareAssignCopy(_attributedText, attributedText)) {
     return;
   }
@@ -418,7 +419,12 @@ static NSArray *DefaultLinkAttributeNames() {
 
   // Accessiblity
   self.accessibilityLabel = self.defaultAccessibilityLabel;
-  self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
+  
+  // We update the isAccessibilityElement setting if this node is not switching between strings.
+  if (oldAttributedText.length == 0 || length == 0) {
+    // We're an accessibility element by default if there is a string.
+    self.isAccessibilityElement = (length != 0);
+  }
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];
