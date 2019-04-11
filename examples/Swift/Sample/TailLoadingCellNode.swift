@@ -21,9 +21,9 @@ final class TailLoadingCellNode: ASCellNode {
     text.attributedText = NSAttributedString(
       string: "Loading…",
       attributes: [
-        NSFontAttributeName: UIFont.systemFont(ofSize: 12),
-        NSForegroundColorAttributeName: UIColor.lightGray,
-        NSKernAttributeName: -0.3
+        NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12),
+        NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+        NSAttributedString.Key.kern: -0.3
       ])
     addSubnode(spinner)
   }
@@ -47,7 +47,7 @@ final class SpinnerNode: ASDisplayNode {
   override init() {
     super.init()
     setViewBlock {
-        UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        UIActivityIndicatorView(style: .gray)
     }
     
     // Set spinner node to default size of the activitiy indicator view
