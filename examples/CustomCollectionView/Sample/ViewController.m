@@ -9,8 +9,8 @@
 
 #import "ViewController.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASCollectionNode+Beta.h>
+#import <Texture/Texture.h>
+#import <Texture/ASCollectionNode+Beta.h>
 #import "MosaicCollectionLayoutDelegate.h"
 #import "ImageCellNode.h"
 #import "ImageCollectionViewCell.h"

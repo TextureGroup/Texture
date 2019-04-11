@@ -11,7 +11,7 @@
 #import "CustomMapAnnotation.h"
 
 #import <Texture/Texture.h>
-#import <AsyncDisplayKit/UIImage+ASConvenience.h>
+#import <Texture/UIImage+ASConvenience.h>
 
 @interface MapHandlerNode () <ASEditableTextNodeDelegate, MKMapViewDelegate>
 

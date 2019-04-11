@@ -9,7 +9,7 @@
 
 import Foundation
 import UIKit
-import AsyncDisplayKit
+import Texture
 
 protocol MosaicCollectionViewLayoutDelegate: ASCollectionDelegate {
   func collectionView(_ collectionView: UICollectionView, layout: MosaicCollectionViewLayout, originalItemSizeAtIndexPath: IndexPath) -> CGSize

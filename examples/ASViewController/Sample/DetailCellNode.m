@@ -8,7 +8,7 @@
 //
 
 #import "DetailCellNode.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @implementation DetailCellNode
 

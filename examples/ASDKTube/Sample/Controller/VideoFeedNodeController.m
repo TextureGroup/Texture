@@ -8,7 +8,7 @@
 //
 
 #import "VideoFeedNodeController.h"
-#import <AsyncDisplayKit/ASVideoPlayerNode.h>
+#import <Texture/ASVideoPlayerNode.h>
 #import "VideoModel.h"
 #import "VideoContentCell.h"
 

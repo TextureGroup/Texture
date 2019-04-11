@@ -8,7 +8,7 @@
 
 #import "MosaicCollectionLayoutInfo.h"
 
-#import <AsyncDisplayKit/ASHashing.h>
+#import <Texture/ASHashing.h>
 
 @implementation MosaicCollectionLayoutInfo
 

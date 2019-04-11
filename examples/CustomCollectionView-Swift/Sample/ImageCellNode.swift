@@ -8,7 +8,7 @@
 //
 
 import UIKit
-import AsyncDisplayKit
+import Texture
 
 class ImageCellNode: ASCellNode {
   let imageNode = ASImageNode()

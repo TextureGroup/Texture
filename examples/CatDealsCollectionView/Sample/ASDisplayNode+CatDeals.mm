@@ -7,7 +7,7 @@
 
 #import "ASDisplayNode+CatDeals.h"
 
-#import <AsyncDisplayKit/ASThread.h>
+#import <Texture/ASThread.h>
 
 // A place to store info on any display node in this app.
 struct CatDealsNodeContext {

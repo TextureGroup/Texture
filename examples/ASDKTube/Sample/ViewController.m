@@ -9,7 +9,7 @@
 
 #import "ViewController.h"
 #import <Texture/Texture.h>
-#import <AsyncDisplayKit/ASVideoPlayerNode.h>
+#import <Texture/ASVideoPlayerNode.h>
 #import "VideoModel.h"
 #import "VideoContentCell.h"
 

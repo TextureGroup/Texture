@@ -9,7 +9,7 @@
 
 #import "LoadingNode.h"
 
-#import <AsyncDisplayKit/ASCenterLayoutSpec.h>
+#import <Texture/ASCenterLayoutSpec.h>
 
 @implementation LoadingNode {
   ASDisplayNode *_loadingSpinner;

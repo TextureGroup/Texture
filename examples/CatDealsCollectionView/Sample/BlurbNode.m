@@ -9,11 +9,11 @@
 
 #import "BlurbNode.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
+#import <Texture/ASHighlightOverlayLayer.h>
 
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASCenterLayoutSpec.h>
+#import <Texture/ASInsetLayoutSpec.h>
+#import <Texture/ASCenterLayoutSpec.h>
 
 static CGFloat kTextPadding = 10.0f;
 

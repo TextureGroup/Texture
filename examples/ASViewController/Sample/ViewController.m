@@ -8,7 +8,7 @@
 //
 
 #import "ViewController.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 #import "DetailViewController.h"
 

@@ -10,7 +10,7 @@
 #import "DetailRootNode.h"
 #import "DetailCellNode.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 static const NSInteger kImageHeight = 200;
 

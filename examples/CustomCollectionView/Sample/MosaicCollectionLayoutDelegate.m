@@ -10,7 +10,7 @@
 #import "MosaicCollectionLayoutInfo.h"
 #import "ImageCellNode.h"
 
-#import <AsyncDisplayKit/ASCollectionElement.h>
+#import <Texture/ASCollectionElement.h>
 
 @implementation MosaicCollectionLayoutDelegate {
   // Read-only properties

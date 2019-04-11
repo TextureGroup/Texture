@@ -8,7 +8,7 @@
 
 #import "OverviewASCollectionNode.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface OverviewASCollectionNode () <ASCollectionDataSource, ASCollectionDelegate>
 @property (nonatomic, strong) ASCollectionNode *node;

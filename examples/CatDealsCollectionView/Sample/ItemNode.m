@@ -12,7 +12,7 @@
 #import "ASDisplayNode+CatDeals.h"
 #import "ItemStyles.h"
 #import "PlaceholderNetworkImageNode.h"
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <Texture/ASDisplayNodeExtras.h>
 
 static CGFloat ASIsRTL()
 {

@@ -9,7 +9,7 @@
 
 #import "LayoutExampleNodes.h"
 
-#import <AsyncDisplayKit/UIImage+ASConvenience.h>
+#import <Texture/UIImage+ASConvenience.h>
 
 #import "Utilities.h"
 

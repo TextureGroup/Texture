@@ -8,7 +8,7 @@
 //
 
 #import "DetailViewController.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 #import "DetailRootNode.h"
 

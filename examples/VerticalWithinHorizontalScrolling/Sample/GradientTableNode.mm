@@ -11,10 +11,10 @@
 #import "RandomCoreGraphicsNode.h"
 #import "AppDelegate.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
+#import <Texture/ASStackLayoutSpec.h>
+#import <Texture/ASInsetLayoutSpec.h>
 
 
 @interface GradientTableNode () <ASTableDelegate, ASTableDataSource>
