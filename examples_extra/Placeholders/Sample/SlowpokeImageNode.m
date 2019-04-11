@@ -9,7 +9,7 @@
 
 #import "SlowpokeImageNode.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 static CGFloat const kASDKLogoAspectRatio = 2.79;
 

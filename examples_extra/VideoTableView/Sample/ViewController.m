@@ -9,12 +9,12 @@
 
 #import "ViewController.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/Texture.h>
+#import <Texture/ASAssert.h>
 
 #import "BlurbNode.h"
 #import "NicCageNode.h"
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <Texture/ASDisplayNode+Beta.h>
 
 static const NSInteger kCageSize = 20;            // intial number of Cage cells in ASTableView
 static const NSInteger kCageBatchSize = 10;       // number of Cage cells to add to ASTableView

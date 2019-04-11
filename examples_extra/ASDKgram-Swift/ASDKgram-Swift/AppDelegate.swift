@@ -8,7 +8,7 @@
 //
 
 import UIKit
-import AsyncDisplayKit
+import Texture
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

@@ -7,8 +7,8 @@
 //
 
 #import "TextCellNode.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <Texture/Texture.h>
+#import <Texture/ASDisplayNode+Beta.h>
 
 #ifndef USE_ASTEXTNODE_2
 #define USE_ASTEXTNODE_2 1

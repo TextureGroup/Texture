@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 import PlaygroundSupport
-import AsyncDisplayKit
+import Texture
 
 public protocol ASPlayground: class {
   func display(inRect: CGRect)

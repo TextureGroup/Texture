@@ -8,7 +8,7 @@
 //
 
 import UIKit
-import AsyncDisplayKit
+import Texture
 
 final class ViewController: ASViewController, ASCollectionDelegate, ASCollectionDataSource {
 	let itemCount = 1000

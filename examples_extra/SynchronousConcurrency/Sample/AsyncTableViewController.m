@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/Texture.h>
+#import <Texture/ASAssert.h>
 
 #import "AsyncTableViewController.h"
 #import "RandomCoreGraphicsNode.h"

@@ -8,7 +8,7 @@
 //
 
 import Foundation
-import AsyncDisplayKit
+import Texture
 
 class PhotoTableNodeCell: ASCellNode {
 

@@ -11,7 +11,7 @@
 
 #import "SlowpokeShareNode.h"
 #import "SlowpokeTextNode.h"
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 @interface PostNode ()
 {

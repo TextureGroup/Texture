@@ -8,7 +8,7 @@
 //
 
 #import "RandomCoreGraphicsNode.h"
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 @implementation RandomCoreGraphicsNode
 

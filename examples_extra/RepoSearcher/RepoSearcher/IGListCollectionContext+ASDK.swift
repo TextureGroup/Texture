@@ -8,7 +8,7 @@
 
 import Foundation
 import IGListKit
-import AsyncDisplayKit
+import Texture
 
 extension ListCollectionContext {
     func nodeForItem(at index: Int, sectionController: ListSectionController) -> ASCellNode? {

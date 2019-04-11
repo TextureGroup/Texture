@@ -9,8 +9,8 @@
 
 #import "ViewController.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import <Texture/Texture.h>
+#import <Texture/ASAssert.h>
 
 #define NumberOfSections 10
 #define NumberOfRowsPerSection 20

@@ -9,11 +9,11 @@
 
 #import "ViewController.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 #import "PostNode.h"
 #import "SlowpokeImageNode.h"
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 @interface ViewController ()
 {

@@ -10,12 +10,12 @@
 #import "NicCageNode.h"
 #import "AppDelegate.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASVideoNode.h>
+#import <Texture/ASDisplayNode+Beta.h>
+#import <Texture/ASStackLayoutSpec.h>
+#import <Texture/ASInsetLayoutSpec.h>
+#import <Texture/ASVideoNode.h>
 
 static const CGFloat kImageSize = 80.0f;
 static const CGFloat kOuterPadding = 16.0f;

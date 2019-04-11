@@ -9,7 +9,7 @@
 
 #import "SlowpokeShareNode.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 static NSUInteger const kRingCount = 3;
 static CGFloat const kRingStrokeWidth = 1.0;

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AsyncDisplayKit
+import Texture
 import IGListKit
 
 class SearchToken: NSObject {}

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import AsyncDisplayKit
+import Texture
 import IGListKit
 
 final class LabelSectionController: ListSectionController, ASSectionController {

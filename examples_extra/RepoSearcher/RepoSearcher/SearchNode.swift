@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import AsyncDisplayKit
+import Texture
 
 class SearchNode: ASCellNode {
     var searchBarNode: SearchBarNode
