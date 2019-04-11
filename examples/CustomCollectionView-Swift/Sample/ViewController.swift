@@ -40,7 +40,7 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     _collectionNode.dataSource = self
     _collectionNode.delegate = self
     _collectionNode.layoutInspector = _layoutInspector
-    _collectionNode.registerSupplementaryNode(ofKind: UICollectionElementKindSectionHeader)
+    _collectionNode.registerSupplementaryNode(ofKind: UICollectionView.elementKindSectionHeader)
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -60,8 +60,8 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
   
   func collectionNode(_ collectionNode: ASCollectionNode, nodeForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> ASCellNode {
     let textAttributes : NSDictionary = [
-      NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline),
-      NSForegroundColorAttributeName: UIColor.gray
+      NSAttributedString.Key.font.rawValue: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.headline),
+      NSAttributedString.Key.foregroundColor.rawValue: UIColor.gray
     ]
     let textInsets = UIEdgeInsets(top: 11, left: 0, bottom: 11, right: 0)
     let textCellNode = ASTextCellNode(attributes: textAttributes as! [AnyHashable : Any], insets: textInsets)
@@ -82,4 +82,3 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     return _sections[originalItemSizeAtIndexPath.section][originalItemSizeAtIndexPath.item].size
   }
 }
-
