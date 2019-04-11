@@ -37,9 +37,9 @@
 
 #pragma mark - Singleton
 
-+ (void)load
+__attribute__((constructor)) static void ASLoadTipsControllerNotification(void)
 {
-  [NSNotificationCenter.defaultCenter addObserver:self.shared
+  [NSNotificationCenter.defaultCenter addObserver:ASTipsController.shared
                                          selector:@selector(windowDidBecomeVisibleWithNotification:)
                                              name:UIWindowDidBecomeVisibleNotification
                                            object:nil];

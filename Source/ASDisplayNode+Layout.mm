@@ -61,7 +61,12 @@ using AS::MutexLocker;
 {
   ASAssertLocked(__instanceLock__);
   if (_style == nil) {
+#if YOGA
+    // In Yoga mode we use the delegate to inform the tree if properties changes
     _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
+#else
+    _style = [[ASLayoutElementStyle alloc] init];
+#endif
   }
   return _style;
 }
@@ -123,15 +128,18 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
-  return _primitiveTraitCollection.load();
+  AS::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
 }
 
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
+  AS::UniqueLock l(__instanceLock__);
+  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
     _primitiveTraitCollection = traitCollection;
     ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
 
+    l.unlock();
     [self asyncTraitCollectionDidChange];
   }
 }
@@ -397,9 +405,19 @@ ASLayoutElementStyleExtensibilityForwarding
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
     NSUInteger version = _layoutVersion;
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
+#if YOGA
+    // This flag indicates to the Texture+Yoga code that this next layout is intended to be
+    // displayed (vs. just for measurement). This will cause it to call setNeedsLayout on any nodes
+    // whose layout changes as a result of the Yoga recalculation. This is necessary because a
+    // change in one Yoga node can change the layout for any other node in the tree.
+    self.willApplyNextYogaCalculatedLayout = YES;
+#endif
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
+#if YOGA
+    self.willApplyNextYogaCalculatedLayout = NO;
+#endif
     nextLayout = ASDisplayNodeLayout(layout, constrainedSize, boundsSizeForLayout, version);
     // Now that the constrained size of pending layout might have been reused, the layout is useless
     // Release it and any orphaned subnodes it retains
@@ -429,6 +447,16 @@ ASLayoutElementStyleExtensibilityForwarding
       __instanceLock__.lock();
     }
 
+    // If we request that our root layout we may generate a new _pendingDisplayNodeLayout.layout which has
+    // requestedLayoutFromAbove set to NO. If the pending layout has a different constrained size than nextLayout's
+    // and the layout sizes don't change we could end up back here asking the root to layout again causing an
+    // infinite layout loop. Instead, we nil out the _pendingDisplayNodeLayout.layout here because it can be
+    // considered an undesired artifact of the layout request. nextLayout will become _calculatedDisplayNodeLayout
+    // when the pending layout transition which will be created later in this method is applied.
+    // We will use _calculatedLayout the next time around, so requestedLayoutFromAbove will be set to YES and we
+    // will break out of this layout loop.
+    _pendingDisplayNodeLayout.layout = nil;
+    
     // Update the layout's version here because _u_setNeedsLayoutFromAbove calls __setNeedsLayout which in turn increases _layoutVersion
     // Failing to do this will cause the layout to be invalid immediately
     nextLayout.version = _layoutVersion;

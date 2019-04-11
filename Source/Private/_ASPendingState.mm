@@ -87,6 +87,7 @@ typedef struct {
   int setPreservesSuperviewLayoutMargins:1;
   int setInsetsLayoutMarginsFromSafeArea:1;
   int setActions:1;
+  int setMaskedCorners : 1;
 } ASPendingStateFlags;
 
 
@@ -215,6 +216,7 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
 @synthesize insetsLayoutMarginsFromSafeArea=insetsLayoutMarginsFromSafeArea;
 @synthesize actions=actions;
+@synthesize maskedCorners = maskedCorners;
 
 static CGColorRef blackColorRef = NULL;
 static UIColor *defaultTintColor = nil;
@@ -414,6 +416,12 @@ static UIColor *defaultTintColor = nil;
 {
   cornerRadius = newCornerRadius;
   _flags.setCornerRadius = YES;
+}
+
+- (void)setMaskedCorners:(CACornerMask)newMaskedCorners
+{
+  maskedCorners = newMaskedCorners;
+  _flags.setMaskedCorners = YES;
 }
 
 - (void)setContentMode:(UIViewContentMode)newContentMode
@@ -889,6 +897,12 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setCornerRadius)
     layer.cornerRadius = cornerRadius;
+
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    if (flags.setMaskedCorners) {
+      layer.maskedCorners = maskedCorners;
+    }
+  }
 
   if (flags.setContentMode)
     layer.contentsGravity = ASDisplayNodeCAContentsGravityFromUIContentMode(contentMode);

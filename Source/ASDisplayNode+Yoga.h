@@ -29,6 +29,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 @property BOOL yogaLayoutInProgress;
 // TODO: Make this atomic (lock).
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
+@property (nonatomic) BOOL willApplyNextYogaCalculatedLayout;
 
 // Will walk up the Yoga tree and returns the root node
 - (ASDisplayNode *)yogaRoot;
@@ -54,7 +55,7 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 /// For internal usage only
 - (ASLayout *)calculateLayoutYoga:(ASSizeRange)constrainedSize;
 /// For internal usage only
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
+- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize willApply:(BOOL)willApply;
 /// For internal usage only
 - (void)invalidateCalculatedYogaLayout;
 /**

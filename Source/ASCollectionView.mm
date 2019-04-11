@@ -334,8 +334,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 
   // Data controller & range controller may own a ton of nodes, let's deallocate those off-main.
-  ASPerformBackgroundDeallocation(&_dataController);
-  ASPerformBackgroundDeallocation(&_rangeController);
+  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
+    ASPerformBackgroundDeallocation(&_dataController);
+    ASPerformBackgroundDeallocation(&_rangeController);
+  }
 }
 
 #pragma mark -

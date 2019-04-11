@@ -175,6 +175,23 @@
   XCTAssertTrue([_textNode.accessibilityLabel isEqualToString:_attributedText.string], @"Accessibility label is incorrectly set to \n%@\n when it should be \n%@\n", _textNode.accessibilityLabel, _attributedText.string);
 }
 
+- (void)testRespectingAccessibilitySetting
+{
+  ASTextNode *textNode = [ASTextNode new];
+  
+  textNode.attributedText = _attributedText;
+  textNode.isAccessibilityElement = NO;
+  
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertFalse(textNode.isAccessibilityElement);
+  
+  // Ensure removing string on an accessible text node updates the setting.
+  ASTextNode *accessibleTextNode = [ASTextNode new];
+  accessibleTextNode.attributedText = _attributedText;
+  accessibleTextNode.attributedText = nil;
+  XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
+}
+
 - (void)testLinkAttribute
 {
   NSString *linkAttributeName = @"MockLinkAttributeName";

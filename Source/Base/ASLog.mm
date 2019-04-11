@@ -46,3 +46,7 @@ os_log_t ASImageLoadingLog() {
 os_log_t ASMainThreadDeallocationLog() {
   return (ASMainThreadDeallocationLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(as_log_create("org.TextureGroup.Texture", "MainDealloc")) : OS_LOG_DISABLED;
 }
+
+os_log_t ASLockingLog() {
+  return (ASLockingLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(as_log_create("org.TextureGroup.Texture", "Locking")) : OS_LOG_DISABLED;
+}

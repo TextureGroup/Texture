@@ -66,6 +66,9 @@ AS_EXTERN os_log_t ASImageLoadingLog(void);
 #define ASMainThreadDeallocationLogEnabled 0
 AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
 
+#define ASLockingLogEnabled 0
+AS_EXTERN os_log_t ASLockingLog(void);
+
 /**
  * The activity tracing system changed a lot between iOS 9 and 10.
  * In iOS 10, the system was merged with logging and became much more powerful
