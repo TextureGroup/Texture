@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASImageNode+CGExtras.h>
+#import <Texture/ASImageNode+CGExtras.h>
 
 static CGSize _FitSizeWithAspectRatio(CGFloat imageRatio, CGSize backingSize);
 static CGSize _FillSizeWithAspectRatio(CGFloat imageRatio, CGSize backingSize);

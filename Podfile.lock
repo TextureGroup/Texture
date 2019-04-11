@@ -1,6 +1,6 @@
 PODS:
   - FBSnapshotTestCase/Core (2.1.4)
-  - JGMethodSwizzler (2.0.1)
+  - JGMethodSwizzler (2.0.2)
   - OCMock (3.4.1)
   - PINCache (3.0.1-beta.7):
     - PINCache/Arc-exception-safe (= 3.0.1-beta.7)
@@ -20,7 +20,7 @@ PODS:
 
 DEPENDENCIES:
   - FBSnapshotTestCase/Core (~> 2.1)
-  - JGMethodSwizzler (from `https://github.com/JonasGessner/JGMethodSwizzler`, branch `master`)
+  - JGMethodSwizzler (from `https://github.com/Kaspik/JGMethodSwizzler`, branch `master`)
   - OCMock (= 3.4.1)
   - PINRemoteImage (= 3.0.0-beta.14)
 
@@ -35,21 +35,21 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   JGMethodSwizzler:
     :branch: master
-    :git: https://github.com/JonasGessner/JGMethodSwizzler
+    :git: https://github.com/Kaspik/JGMethodSwizzler
 
 CHECKOUT OPTIONS:
   JGMethodSwizzler:
-    :commit: 8791eccc5342224bd293b5867348657e3a240c7f
-    :git: https://github.com/JonasGessner/JGMethodSwizzler
+    :commit: 5192af979fca00a724f945895ffee0d0df5e8ccd
+    :git: https://github.com/Kaspik/JGMethodSwizzler
 
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  JGMethodSwizzler: 7328146117fffa8a4038c42eb7cd3d4c75006f97
+  JGMethodSwizzler: 6790fb2ca4a8d8594188ba3a4553af8bda635215
   OCMock: 2cd0716969bab32a2283ff3a46fd26a8c8b4c5e3
   PINCache: 7cb9ae068c8f655717f7c644ef1dff9fd573e979
   PINOperation: a6219e6fc9db9c269eb7a7b871ac193bcf400aac
   PINRemoteImage: 81bbff853acc71c6de9e106e9e489a791b8bbb08
 
-PODFILE CHECKSUM: 890f7111eb49a1b6c05c608e1dfefe90c00e99e7
+PODFILE CHECKSUM: e443195235195116c0e98e8a2072462152a3bc9e
 
 COCOAPODS: 1.6.1
