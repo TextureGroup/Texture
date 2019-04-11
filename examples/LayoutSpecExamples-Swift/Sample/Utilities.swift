@@ -88,10 +88,8 @@ extension NSAttributedString {
   static func attributedString(string: String?, fontSize size: CGFloat, color: UIColor?) -> NSAttributedString? {
     guard let string = string else { return nil }
 
-    let attributes = [NSForegroundColorAttributeName: color ?? UIColor.black,
-                      NSFontAttributeName: UIFont.boldSystemFont(ofSize: size)]
-
-    let attributedString = NSMutableAttributedString(string: string, attributes: attributes)
+    let attributedString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.foregroundColor: color ?? UIColor.black,
+                                                                                  NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: size)])
 
     return attributedString
   }
