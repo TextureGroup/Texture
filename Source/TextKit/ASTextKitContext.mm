@@ -34,15 +34,6 @@
 
 {
   if (self = [super init]) {
-    static dispatch_once_t onceToken;
-    static AS::Mutex *mutex;
-    dispatch_once(&onceToken, ^{
-      mutex = new AS::Mutex();
-    });
-    
-    // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    AS::MutexLocker l(*mutex);
-    
     __instanceLock__ = std::make_shared<AS::Mutex>();
     
     // Create the TextKit component stack with our default configuration.
