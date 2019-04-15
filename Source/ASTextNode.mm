@@ -58,7 +58,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
 #pragma mark - ASTextKitRenderer
 
 @interface ASTextNodeRendererKey : NSObject
-- (instancetype)initWithAttributes:(ASTextKitAttributes)attributes constrainedSize:(CGSize)constrainedSize;
+- (instancetype)initWithTextKitAttributes:(const ASTextKitAttributes &)attributes constrainedSize:(const CGSize)constrainedSize;
 @end
 
 @implementation ASTextNodeRendererKey {
@@ -66,7 +66,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   CGSize _constrainedSize;
 }
 
-- (instancetype)initWithAttributes:(ASTextKitAttributes)attributes constrainedSize:(CGSize)constrainedSize
+- (instancetype)initWithTextKitAttributes:(const ASTextKitAttributes &)attributes constrainedSize:(const CGSize)constrainedSize
 {
   if (self = [super init]) {
     _attributes = attributes;
@@ -126,7 +126,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
 {
   NSCache *cache = sharedRendererCache();
   
-  ASTextNodeRendererKey *key = [[ASTextNodeRendererKey alloc] initWithAttributes:attributes constrainedSize:constrainedSize];
+  ASTextNodeRendererKey *key = [[ASTextNodeRendererKey alloc] initWithTextKitAttributes:attributes constrainedSize:constrainedSize];
 
   ASTextKitRenderer *renderer = [cache objectForKey:key];
   if (renderer == nil) {
