@@ -95,10 +95,9 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   if (self == object) {
     return YES;
   }
-  if (!object || ![object isKindOfClass:[self class]]) {
+  if (!object) {
     return NO;
   }
-  
   // NOTE: Skip the class check for this specialized, internal Key object.
   
   return _attributes == object->_attributes && CGSizeEqualToSize(_constrainedSize, object->_constrainedSize);
