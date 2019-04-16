@@ -1041,8 +1041,18 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
 }
 
 #pragma mark - UIGestureRecognizerDelegate Methods
-
+// The value returned below are default implementation of UIKit's UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceivePress:(UIPress *)press
 {
     return YES;
 }
