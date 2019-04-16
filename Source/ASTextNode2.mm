@@ -429,6 +429,10 @@ static NSArray *DefaultLinkAttributeNames() {
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];
 #endif
+
+  if (self.isNodeLoaded) {
+    [self invalidateAccessibleElementsIfNeeded];
+  }
 }
 
 #pragma mark - Text Layout

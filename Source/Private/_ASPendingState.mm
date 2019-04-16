@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/_ASDisplayView.h>
 
 #define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
   || (flags.setOpaque && opaque != (layer).opaque)\
@@ -80,6 +81,7 @@ typedef struct {
   int setAccessibilityIdentifier:1;
   int setAccessibilityNavigationStyle:1;
   int setAccessibilityHeaderElements:1;
+  int setAccessibilityElements:1;
   int setAccessibilityActivationPoint:1;
   int setAccessibilityPath:1;
   int setSemanticContentAttribute:1;
@@ -142,6 +144,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   NSString *accessibilityIdentifier;
   UIAccessibilityNavigationStyle accessibilityNavigationStyle;
   NSArray *accessibilityHeaderElements;
+  NSArray *accessibilityElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
   UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
@@ -813,6 +816,13 @@ static UIColor *defaultTintColor = nil;
 }
 #pragma clang diagnostic pop
 
+- (void)setAccessibilityElements:(NSArray *)newAccessibilityElements {
+  _flags.setAccessibilityElements = YES;
+  if (accessibilityElements != newAccessibilityElements) {
+    accessibilityElements = [newAccessibilityElements copy];
+  }
+}
+
 - (CGPoint)accessibilityActivationPoint
 {
   if (_flags.setAccessibilityActivationPoint) {
@@ -1160,7 +1170,16 @@ static UIColor *defaultTintColor = nil;
   if (flags.setAccessibilityHeaderElements)
     view.accessibilityHeaderElements = accessibilityHeaderElements;
 #endif
-  
+
+  if (flags.setAccessibilityElements) {
+    _ASDisplayView *displayView = ASDynamicCast(view, _ASDisplayView);
+    if (displayView) {
+      [displayView setAccessibilityElements:nil];
+    } else {
+      view.accessibilityElements = accessibilityElements;
+    }
+  }
+
   if (flags.setAccessibilityActivationPoint)
     view.accessibilityActivationPoint = accessibilityActivationPoint;
   
@@ -1294,6 +1313,7 @@ static UIColor *defaultTintColor = nil;
   pendingState.shouldGroupAccessibilityChildren = view.shouldGroupAccessibilityChildren;
   pendingState.accessibilityIdentifier = view.accessibilityIdentifier;
   pendingState.accessibilityNavigationStyle = view.accessibilityNavigationStyle;
+  pendingState.accessibilityElements = view.accessibilityElements;
 #if TARGET_OS_TV
   pendingState.accessibilityHeaderElements = view.accessibilityHeaderElements;
 #endif

@@ -159,6 +159,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  */
 @property (nonatomic) ASHierarchyState hierarchyState;
 
+@property (nonatomic, weak) UIAccessibilityCustomAction *acessibilityCustomAction;
 /**
  * @abstract Return if the node is range managed or not
  *
@@ -312,8 +313,28 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 
 @end
 
+NS_INLINE UIAccessibilityTraits InteractiveAccessibilityTraitsMask() {
+  return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
+}
+
+NS_INLINE BOOL ASAccessibilityIsEnabled() {
+#if DEBUG
+  return true;
+#else
+  return UIAccessibilityIsVoiceOverRunning();
+#endif
+}
+
 @interface ASDisplayNode (AccessibilityInternal)
+
 - (NSArray *)accessibilityElements;
+
+/**
+ * @discussion call this when a layer backed noded is changed(added/removed/updated) or
+ * a view which in an a11y container is changed.
+ */
+- (void)invalidateAccessibleElementsIfNeeded;
+
 @end;
 
 @interface UIView (ASDisplayNodeInternal)
