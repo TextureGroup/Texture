@@ -317,7 +317,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [self registerClass:[_ASCollectionViewCell class] forCellWithReuseIdentifier:kReuseIdentifier];
   
   [self _configureCollectionViewLayout:layout];
-  
+
+  self.panGestureRecognizer.delegate = self;
   return self;
 }
 
@@ -2516,6 +2517,27 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 {
   [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
+}
+
+#pragma mark - UIGestureRecognizerDelegate Method
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return [self.collectionNode gestureRecognizer:gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:otherGestureRecognizer];
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return [self.collectionNode gestureRecognizerShouldBegin:gestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return [self.collectionNode gestureRecognizer:gestureRecognizer shouldRequireFailureOfGestureRecognizer:otherGestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return [self.collectionNode gestureRecognizer:gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:otherGestureRecognizer];
 }
 
 @end
