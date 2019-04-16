@@ -16,7 +16,6 @@
 #import "ASTestCase.h"
 
 static ASExperimentalFeatures features[] = {
-  ASExperimentalGraphicsContexts,
 #if AS_ENABLE_TEXTNODE
   ASExperimentalTextNode,
 #endif
@@ -46,7 +45,6 @@ static ASExperimentalFeatures features[] = {
 
 + (NSArray *)names {
   return @[
-    @"exp_graphics_contexts",
     @"exp_text_node",
     @"exp_interface_state_coalesce",
     @"exp_unfair_lock",
@@ -79,7 +77,7 @@ static ASExperimentalFeatures features[] = {
 {
   // Set the config
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalGraphicsContexts;
+  config.experimentalFeatures = ASExperimentalLayerDefaults;
   config.delegate = self;
   [ASConfigurationManager test_resetWithConfiguration:config];
   
@@ -92,7 +90,7 @@ static ASExperimentalFeatures features[] = {
   };
   
   // Now activate the graphics experiment and expect it works.
-  XCTAssertTrue(ASActivateExperimentalFeature(ASExperimentalGraphicsContexts));
+  XCTAssertTrue(ASActivateExperimentalFeature(ASExperimentalLayerDefaults));
   // We should get a callback here
   // Now activate text node and expect it fails.
   XCTAssertFalse(ASActivateExperimentalFeature(ASExperimentalTextNode));
