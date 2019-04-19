@@ -118,7 +118,7 @@ id StubLayerActionImplementation(id receiver, SEL _cmd, NSString *key) { return 
  *  @remarks        The instance value is used only if we suspect the class may be dynamic (because it overloads 
  *                  +respondsToSelector: or -respondsToSelector.) In that case we use our "slow path", calling this 
  *                  method on each -init and passing the instance value. While this may seem like an unlikely scenario,
- *                  it turns our our own internal tests use a dynamic class, so it's worth capturing this edge case.
+ *                  it turns out our own internal tests use a dynamic class, so it's worth capturing this edge case.
  *
  *  @return ASDisplayNode flags.
  */
