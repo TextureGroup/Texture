@@ -260,7 +260,7 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
-// TODO It would be easier to work with if we could `DISABLE_ASAssertUnlocked` here, but we
+// TODO It would be easier to work with if we could `ASAssertUnlocked` here, but we
 // cannot due to locking to root in `_u_measureNodeWithBoundsIfNecessary`.
 - (void)_rootNodeDidInvalidateSize
 {
@@ -325,7 +325,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
-  // DISABLE_ASAssertUnlocked(__instanceLock__);
+  DISABLE_ASAssertUnlocked(__instanceLock__);
   ASScopedLockSelfOrToRoot();
 
   // Check if we are a subnode in a layout transition.
@@ -485,7 +485,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_layoutSublayouts
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  // DISABLE_ASAssertUnlocked(__instanceLock__);
+  DISABLE_ASAssertUnlocked(__instanceLock__);
   
   ASLayout *layout;
   {
@@ -925,7 +925,7 @@ ASLayoutElementStyleExtensibilityForwarding
   if (ASDisplayNodeThreadIsMain() || layoutTransition.isSynchronous == NO) {
     // Committing the layout transition will result in subnode insertions and removals, both of which must be called without the lock held
     // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-    // DISABLE_ASAssertUnlocked(__instanceLock__);
+    DISABLE_ASAssertUnlocked(__instanceLock__);
     [layoutTransition commitTransition];
   } else {
     // Subnode insertions and removals need to happen always on the main thread if at least one subnode is already loaded
@@ -991,7 +991,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
   // Subclass hook
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-  // DISABLE_ASAssertUnlocked(__instanceLock__);
+  DISABLE_ASAssertUnlocked(__instanceLock__);
   [self calculatedLayoutDidChange];
 
   // Grab lock after calling out to subclass
