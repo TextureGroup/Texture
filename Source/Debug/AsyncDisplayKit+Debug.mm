@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
@@ -141,7 +140,7 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
       
-      ASGraphicsBeginImageContextWithOptions(imgRect.size, NO, 1);
+      UIGraphicsBeginImageContextWithOptions(imgRect.size, NO, 1);
       
       [fillColor setFill];
       UIRectFill(imgRect);
@@ -149,7 +148,8 @@ static BOOL __enableHitTestDebug = NO;
       [self drawEdgeIfClippedWithEdges:clippedEdges color:clipsBorderColor borderWidth:borderWidth imgRect:imgRect];
       [self drawEdgeIfClippedWithEdges:clipsToBoundsClippedEdges color:borderColor borderWidth:borderWidth imgRect:imgRect];
       
-      UIImage *debugHighlightImage = ASGraphicsGetImageAndEndCurrentContext();
+      UIImage *debugHighlightImage = UIGraphicsGetImageFromCurrentImageContext();
+      UIGraphicsEndImageContext();
       
       UIEdgeInsets edgeInsets = UIEdgeInsetsMake(borderWidth, borderWidth, borderWidth, borderWidth);
       debugOverlay.image = [debugHighlightImage resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
