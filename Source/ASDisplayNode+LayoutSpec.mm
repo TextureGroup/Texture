@@ -117,7 +117,7 @@
 
 - (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASSizeRange)constrainedSize
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLE_ASAssertLocked(__instanceLock__);
 
   BOOL measureLayoutSpec = _measurementOptions & ASDisplayNodePerformanceMeasurementOptionLayoutSpec;
 

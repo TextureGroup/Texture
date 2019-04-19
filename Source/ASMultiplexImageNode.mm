@@ -486,7 +486,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
 {
-  ASAssertUnlocked(_downloadIdentifierLock);
+  DISABLE_ASAssertUnlocked(_downloadIdentifierLock);
 
   if (_downloaderFlags.downloaderImplementsSetPriority) {
     // Read our interface state before locking so that we don't lock super while holding our lock.
@@ -506,7 +506,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (void)_updateProgressImageBlockOnDownloaderIfNeeded
 {
-  ASAssertUnlocked(_downloadIdentifierLock);
+  DISABLE_ASAssertUnlocked(_downloadIdentifierLock);
 
   BOOL shouldRenderProgressImages = self.shouldRenderProgressImages;
   
