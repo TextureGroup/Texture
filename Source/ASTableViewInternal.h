@@ -29,7 +29,7 @@
  *
  * @param dataControllerClass A controller class injected to and used to create a data controller for the table view.
  */
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode;
 
 /// Set YES and we'll log every time we call [super insertRows…] etc
 @property (nonatomic) BOOL test_enableSuperUpdateCallLogging;
