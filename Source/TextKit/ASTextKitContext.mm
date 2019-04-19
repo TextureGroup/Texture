@@ -34,6 +34,16 @@
 
 {
   if (self = [super init]) {
+    static AS::Mutex *mutex = NULL;
+    if (mutex != NULL || ASActivateExperimentalFeature(ASExperimentalAddingLockToTextKitInitialising)) {
+      static dispatch_once_t onceToken;
+      // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
+      dispatch_once(&onceToken, ^{
+        mutex = new AS::Mutex();
+      });
+      mutex->lock();
+    }
+    
     __instanceLock__ = std::make_shared<AS::Mutex>();
     
     // Create the TextKit component stack with our default configuration.
@@ -56,6 +66,10 @@
     _textContainer.maximumNumberOfLines = maximumNumberOfLines;
     _textContainer.exclusionPaths = exclusionPaths;
     [_layoutManager addTextContainer:_textContainer];
+    
+    if (mutex != NULL) {
+      mutex->unlock();
+    }
   }
   return self;
 }
