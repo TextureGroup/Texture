@@ -1268,6 +1268,20 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   return _getAccessibilityFromViewOrProperty(_accessibilityNavigationStyle, accessibilityNavigationStyle);
 }
 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
+- (void)setAccessibilityCustomActions:(NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_write;
+  _setAccessibilityToViewAndProperty(_accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions);
+}
+
+- (NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityCustomActions, accessibilityCustomActions);
+}
+#endif
+
 #if TARGET_OS_TV
 - (void)setAccessibilityHeaderElements:(NSArray *)accessibilityHeaderElements
 {

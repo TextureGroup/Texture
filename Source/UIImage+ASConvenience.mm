@@ -8,7 +8,6 @@
 //
 
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
@@ -131,7 +130,7 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
   
   // We should probably check if the background color has any alpha component but that
   // might be expensive due to needing to check mulitple color spaces.
-  ASGraphicsBeginImageContextWithOptions(bounds.size, cornerColor != nil, scale);
+  UIGraphicsBeginImageContextWithOptions(bounds.size, cornerColor != nil, scale);
   
   BOOL contextIsClean = YES;
   if (cornerColor) {
@@ -161,7 +160,8 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
     [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
   }
   
-  UIImage *result = ASGraphicsGetImageAndEndCurrentContext();
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
   
   UIEdgeInsets capInsets = UIEdgeInsetsMake(cornerRadius, cornerRadius, cornerRadius, cornerRadius);
   result = [result resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];

@@ -26,7 +26,6 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 
 #import <AsyncDisplayKit/ASTextKitCoreTextAdditions.h>
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
@@ -991,7 +990,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   
   ASLockScopeSelf();
   
-  ASGraphicsBeginImageContextWithOptions(size, NO, 1.0);
+  UIGraphicsBeginImageContextWithOptions(size, NO, 1.0);
   [self.placeholderColor setFill];
 
   ASTextKitRenderer *renderer = [self _locked_renderer];
@@ -1010,7 +1009,8 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
     }
   }
 
-  UIImage *image = ASGraphicsGetImageAndEndCurrentContext();
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
   return image;
 }
 
