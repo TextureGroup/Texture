@@ -8,7 +8,7 @@
 
 #import <sys/kdebug_signpost.h>
 
-#if defined(PROFILE) && PROFILE
+#ifdef PROFILE
 static constexpr bool kASSignpostsEnabled = true;
 #else
 static constexpr bool kASSignpostsEnabled = false;
