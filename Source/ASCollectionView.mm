@@ -270,7 +270,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return [self _initWithFrame:frame collectionViewLayout:layout layoutFacilitator:nil owningNode:nil eventLog:nil];
 }
 
-- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(ASCollectionNode *)owningNode eventLog:(ASEventLog *)eventLog
+- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(ASCollectionNode *)owningNode
 {
   if (!(self = [super initWithFrame:frame collectionViewLayout:layout]))
     return nil;

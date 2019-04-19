@@ -103,7 +103,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"insertSubnodes: %@", _insertedSubnodes);
   NSUInteger i = 0;
   NSUInteger j = 0;
   for (auto const &move : _subnodeMoves) {
@@ -139,7 +138,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"removeSubnodes: %@", _removedSubnodes);
   for (ASDisplayNode *subnode in _removedSubnodes) {
     // In this case we should only remove the subnode if it's still a subnode of the _node that executes a layout transition.
     // It can happen that a node already did a layout transition and added this subnode, in this case the subnode

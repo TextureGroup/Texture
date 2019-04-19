@@ -307,7 +307,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return [self _initWithFrame:frame style:style dataControllerClass:nil owningNode:nil eventLog:nil];
 }
 
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode eventLog:(ASEventLog *)eventLog
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode
 {
   if (!(self = [super initWithFrame:frame style:style])) {
     return nil;

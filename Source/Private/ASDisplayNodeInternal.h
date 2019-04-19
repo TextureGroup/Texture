@@ -145,11 +145,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
   ASDisplayNodeMethodOverrides _methodOverrides;
 
   UIEdgeInsets _hitTestSlop;
-  
-#if ASEVENTLOG_ENABLE
-  ASEventLog *_eventLog;
-#endif
-
 
   // Layout support
   ASLayoutElementStyle *_style;
