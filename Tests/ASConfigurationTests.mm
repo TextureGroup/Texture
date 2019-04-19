@@ -34,6 +34,7 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalFixRangeController,
   ASExperimentalOOMBackgroundDeallocDisable,
   ASExperimentalTransactionOperationRetainCycle,
+  ASExperimentalAddingLockToTextKitInitialising,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -61,7 +62,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_text_drawing",
     @"exp_fix_range_controller",
     @"exp_oom_bg_dealloc_disable",
-    @"exp_transaction_operation_retain_cycle"
+    @"exp_transaction_operation_retain_cycle",
+    @"exp_adding_lock_to_textkit_initialising"
   ];
 }
 
