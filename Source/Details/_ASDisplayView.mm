@@ -268,7 +268,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeRemoval) {
       // The node will only disconnect from its supernode, not removeFromSuperview, in this condition.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [node _removeFromSupernode];
+      [node removeFromSupernode];
     }
   }
 }

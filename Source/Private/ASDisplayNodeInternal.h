@@ -308,13 +308,11 @@ static constexpr CACornerMask kASCACornerAllCorners =
  * Internal method to add / replace / insert subnode and remove from supernode without checking if
  * node has automaticallyManagesSubnodes set to YES.
  */
-- (void)_addSubnode:(ASDisplayNode *)subnode;
 - (void)_replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode;
 - (void)_insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below;
 - (void)_insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above;
 - (void)_insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx;
 - (void)_removeFromSupernodeIfEqualTo:(ASDisplayNode *)supernode;
-- (void)_removeFromSupernode;
 
 // Private API for helper functions / unit tests.  Use ASDisplayNodeDisableHierarchyNotifications() to control this.
 - (BOOL)__visibilityNotificationsDisabled;

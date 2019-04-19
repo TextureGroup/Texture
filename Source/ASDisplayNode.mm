@@ -2153,8 +2153,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [subnode __incrementVisibilityNotificationsDisabled];
   }
   
-  [subnode _removeFromSupernode];
-  [oldSubnode _removeFromSupernode];
+  [subnode removeFromSupernode];
+  [oldSubnode removeFromSupernode];
   
   __instanceLock__.lock();
     if (_subnodes == nil) {
