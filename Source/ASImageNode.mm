@@ -163,8 +163,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   if (!(self = [super init]))
     return nil;
 
-  // TODO can this be removed?
-  self.contentsScale = ASScreenScale();
   self.contentMode = UIViewContentModeScaleAspectFill;
   self.opaque = NO;
   self.clipsToBounds = YES;
