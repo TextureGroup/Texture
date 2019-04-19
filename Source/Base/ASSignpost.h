@@ -6,6 +6,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <sys/kdebug_signpost.h>
+
+#if defined(PROFILE) && PROFILE
+static constexpr bool kASSignpostsEnabled = true;
+#else
+static constexpr bool kASSignpostsEnabled = false;
+#endif
+
 /// The signposts we use. Signposts are grouped by color. The SystemTrace.tracetemplate file
 /// should be kept up-to-date with these values.
 typedef NS_ENUM(uint32_t, ASSignpostName) {
@@ -36,23 +44,13 @@ typedef NS_ENUM(uintptr_t, ASSignpostColor) {
   ASSignpostColorDefault
 };
 
-static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
+NS_INLINE ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
   if (colorPref == ASSignpostColorDefault) {
     return (ASSignpostColor)((name / 25) % 4);
   } else {
     return colorPref;
   }
 }
-
-#if defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)
-  #define AS_KDEBUG_ENABLE 1
-#else
-  #define AS_KDEBUG_ENABLE 0
-#endif
-
-#if AS_KDEBUG_ENABLE
-
-#import <sys/kdebug_signpost.h>
 
 // These definitions are required to build the backward-compatible kdebug trace
 // on the iOS 10 SDK.  The kdebug_trace function crashes if run on iOS 9 and earlier.
@@ -66,29 +64,38 @@ static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpost
 #define SYS_kdebug_trace 180
 #define KDBG_CODE(Class, SubClass, code) (((Class & 0xff) << 24) | ((SubClass & 0xff) << 16) | ((code & 0x3fff)  << 2))
 #define APPSDBG_CODE(SubClass,code) KDBG_CODE(DBG_APPS, SubClass, code)
-#endif
+#endif  // !defined(DBG_MACH_CHUD)
 
 // Currently we'll reserve arg3.
-#define ASSignpost(name, identifier, arg2, color) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_NONE, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
+NS_INLINE void ASSignpost(ASSignpostName name, uintptr_t identifier = 0, uintptr_t arg2 = 0, ASSignpostColor preferred_color = ASSignpostColorDefault)
+{
+  if (kASSignpostsEnabled) {
+    if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+      kdebug_signpost(name, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
+    } else {
+      syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_NONE, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
+    }
+  }
+}
 
-#define ASSignpostStartCustom(name, identifier, arg2) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost_start(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_START, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0);
-#define ASSignpostStart(name) ASSignpostStartCustom(name, self, 0)
+NS_INLINE void ASSignpostStart(ASSignpostName name, uintptr_t identifier = 0, uintptr_t arg2 = 0)
+{
+  if (kASSignpostsEnabled) {
+    if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+      kdebug_signpost_start(name, identifier, arg2, 0, 0);
+    } else {
+      syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_START, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0);
+    }
+  }
+}
 
-#define ASSignpostEndCustom(name, identifier, arg2, color) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost_end(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_END, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
-#define ASSignpostEnd(name) ASSignpostEndCustom(name, self, 0, ASSignpostColorDefault)
-
-#else
-
-#define ASSignpost(name, identifier, arg2, color)
-#define ASSignpostStartCustom(name, identifier, arg2)
-#define ASSignpostStart(name)
-#define ASSignpostEndCustom(name, identifier, arg2, color)
-#define ASSignpostEnd(name)
-
-#endif
+NS_INLINE void ASSignpostEnd(ASSignpostName name, uintptr_t identifier = 0, uintptr_t arg2 = 0, ASSignpostColor preferred_color = ASSignpostColorDefault)
+{
+  if (kASSignpostsEnabled) {
+    if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+      kdebug_signpost_end(name, identifier, arg2, 0, 0);
+    } else {
+      syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_END, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
+    }
+  }
+}

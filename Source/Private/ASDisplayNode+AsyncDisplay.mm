@@ -266,15 +266,15 @@ using AS::MutexLocker;
    If we're profiling, wrap the display block with signpost start and end.
    Color the interval red if cancelled, green otherwise.
    */
-#if AS_KDEBUG_ENABLE
-  __unsafe_unretained id ptrSelf = self;
-  displayBlock = ^{
-    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
-    id result = displayBlock();
-    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
-    return result;
-  };
-#endif
+  if (kASSignpostsEnabled) {
+    uintptr_t ptrSelf = (uintptr_t)self;
+    displayBlock = ^{
+      ASSignpostStart(ASSignpostLayerDisplay, ptrSelf, 0);
+      id result = displayBlock();
+      ASSignpostEnd(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+      return result;
+    };
+  }
 
   return displayBlock;
 }

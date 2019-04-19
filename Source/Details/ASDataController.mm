@@ -183,7 +183,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     });
   }
 
-  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (weakDataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
+  ASSignpostEnd(ASSignpostDataControllerBatch, (uintptr_t)self, 0, (weakDataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
 }
 
 /**
