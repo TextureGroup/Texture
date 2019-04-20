@@ -66,6 +66,9 @@ AS_EXTERN os_log_t ASImageLoadingLog(void);
 #define ASMainThreadDeallocationLogEnabled 0
 AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
 
+#define ASLockingLogEnabled 0
+AS_EXTERN os_log_t ASLockingLog(void);
+
 /**
  * The activity tracing system changed a lot between iOS 9 and 10.
  * In iOS 10, the system was merged with logging and became much more powerful
@@ -76,8 +79,11 @@ AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
  * reflected in the log whereas activities described by the newer
  * os_activity_scope are. So unfortunately we must use these iOS 10
  * APIs to get meaningful logging data.
+ * 
+ * NOTE: Creating and tearing down activities require inter-process communication and can
+ * take dozens of microseconds on an A8. We do it quite often. Enable activities only during debugging.
  */
-#if OS_LOG_TARGET_HAS_10_12_FEATURES
+#if DEBUG && OS_LOG_TARGET_HAS_10_12_FEATURES
 
 #define OS_ACTIVITY_NULLABLE                                              nullable
 #define AS_ACTIVITY_CURRENT                                               OS_ACTIVITY_CURRENT

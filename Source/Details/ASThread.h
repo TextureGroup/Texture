@@ -16,6 +16,8 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
@@ -116,6 +118,12 @@ namespace AS {
   public:
     /// Constructs a plain mutex (the default).
     Mutex () : Mutex (false) {}
+
+    void SetDebugNameWithObject(id object) {
+#if ASEnableVerboseLogging && ASDISPLAYNODE_ASSERTIONS_ENABLED
+      _debug_name = std::string(ASObjectDescriptionMakeTiny(object).UTF8String);
+#endif
+    }
 
     ~Mutex () {
       // Manually destroy since unions can't do it.
@@ -243,6 +251,11 @@ namespace AS {
 
     void WillUnlock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
+#if ASEnableVerboseLogging
+      if (!_debug_name.empty()) {
+        as_log_verbose(ASLockingLog(), "unlock %s, count is %d", _debug_name.c_str(), (int)(_count - 1));
+      }
+#endif
       if (--_count == 0) {
         _owner = std::thread::id();
       }
@@ -251,6 +264,11 @@ namespace AS {
     
     void DidLock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
+#if ASEnableVerboseLogging
+      if (!_debug_name.empty()) {
+        as_log_verbose(ASLockingLog(), "lock %s, count is %d", _debug_name.c_str(), (int)(_count + 1));
+      }
+#endif
       if (++_count == 1) {
         // New owner.
         _owner = std::this_thread::get_id();
@@ -265,6 +283,10 @@ namespace AS {
       std::mutex _plain;
       std::recursive_mutex _recursive;
     };
+#if ASEnableVerboseLogging
+    std::string _debug_name;
+#endif
+
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
     std::thread::id _owner = std::thread::id();
     int _count = 0;

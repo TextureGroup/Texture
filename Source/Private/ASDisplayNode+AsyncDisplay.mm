@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
@@ -212,14 +211,15 @@ using AS::MutexLocker;
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
       
-      ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
+      UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
 
       for (dispatch_block_t block in displayBlocks) {
-        CHECK_CANCELLED_AND_RETURN_NIL(ASGraphicsEndImageContext());
+        CHECK_CANCELLED_AND_RETURN_NIL(UIGraphicsEndImageContext());
         block();
       }
       
-      UIImage *image = ASGraphicsGetImageAndEndCurrentContext();
+      UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+      UIGraphicsEndImageContext();
 
       ASDN_DELAY_FOR_DISPLAY();
       return image;
@@ -229,8 +229,7 @@ using AS::MutexLocker;
       CHECK_CANCELLED_AND_RETURN_NIL();
 
       if (shouldCreateGraphicsContext) {
-        ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
+        UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
       }
 
       CGContextRef currentContext = UIGraphicsGetCurrentContext();
@@ -254,8 +253,8 @@ using AS::MutexLocker;
       [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
       
       if (shouldCreateGraphicsContext) {
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
-        image = ASGraphicsGetImageAndEndCurrentContext();
+        CHECK_CANCELLED_AND_RETURN_NIL( UIGraphicsEndImageContext(); );
+        image = UIGraphicsGetImageFromCurrentImageContext();
       }
 
       ASDN_DELAY_FOR_DISPLAY();
@@ -287,13 +286,15 @@ using AS::MutexLocker;
       ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
       CGFloat cornerRadius = _cornerRadius;
       ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
+      CACornerMask maskedCorners = _maskedCorners;
     __instanceLock__.unlock();
 
     if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0) {
       ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
       // TODO: This clip path should be removed if we are rasterizing.
       CGRect boundingBox = CGContextGetClipBoundingBox(context);
-      [[UIBezierPath bezierPathWithRoundedRect:boundingBox cornerRadius:cornerRadius] addClip];
+      CGSize radii = CGSizeMake(cornerRadius, cornerRadius);
+      [[UIBezierPath bezierPathWithRoundedRect:boundingBox byRoundingCorners:maskedCorners cornerRadii:radii] addClip];
     }
     
     if (willDisplayNodeContentWithRenderingContext) {
@@ -313,6 +314,7 @@ using AS::MutexLocker;
     CGFloat cornerRadius = _cornerRadius;
     CGFloat contentsScale = _contentsScaleForDisplay;
     ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+    CACornerMask maskedCorners = _maskedCorners;
   __instanceLock__.unlock();
   
   if (context != NULL) {
@@ -329,7 +331,7 @@ using AS::MutexLocker;
       bounds.size.height *= contentsScale;
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
-      ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
+      UIGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
       [*image drawInRect:bounds];
     } else {
       bounds = CGContextGetClipBoundingBox(context);
@@ -338,7 +340,10 @@ using AS::MutexLocker;
     ASDisplayNodeAssert(UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
     
     UIBezierPath *roundedHole = [UIBezierPath bezierPathWithRect:bounds];
-    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius * contentsScale]];
+    CGSize radii = CGSizeMake(cornerRadius * contentsScale, cornerRadius * contentsScale);
+    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds
+                                                  byRoundingCorners:maskedCorners
+                                                        cornerRadii:radii]];
     roundedHole.usesEvenOddFillRule = YES;
     
     UIBezierPath *roundedPath = nil;
@@ -359,7 +364,8 @@ using AS::MutexLocker;
     [roundedPath stroke];  // Won't do anything if borderWidth is 0 and roundedPath is nil.
     
     if (*image) {
-      *image = ASGraphicsGetImageAndEndCurrentContext();
+      *image = UIGraphicsGetImageFromCurrentImageContext();
+      UIGraphicsEndImageContext();
     }
   }
 }

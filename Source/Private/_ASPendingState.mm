@@ -79,6 +79,7 @@ typedef struct {
   int setShouldGroupAccessibilityChildren:1;
   int setAccessibilityIdentifier:1;
   int setAccessibilityNavigationStyle:1;
+  int setAccessibilityCustomActions:1;
   int setAccessibilityHeaderElements:1;
   int setAccessibilityActivationPoint:1;
   int setAccessibilityPath:1;
@@ -87,6 +88,7 @@ typedef struct {
   int setPreservesSuperviewLayoutMargins:1;
   int setInsetsLayoutMarginsFromSafeArea:1;
   int setActions:1;
+  int setMaskedCorners : 1;
 } ASPendingStateFlags;
 
 
@@ -140,6 +142,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   BOOL shouldGroupAccessibilityChildren;
   NSString *accessibilityIdentifier;
   UIAccessibilityNavigationStyle accessibilityNavigationStyle;
+  NSArray *accessibilityCustomActions;
   NSArray *accessibilityHeaderElements;
   CGPoint accessibilityActivationPoint;
   UIBezierPath *accessibilityPath;
@@ -215,6 +218,7 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize preservesSuperviewLayoutMargins=preservesSuperviewLayoutMargins;
 @synthesize insetsLayoutMarginsFromSafeArea=insetsLayoutMarginsFromSafeArea;
 @synthesize actions=actions;
+@synthesize maskedCorners = maskedCorners;
 
 static CGColorRef blackColorRef = NULL;
 static UIColor *defaultTintColor = nil;
@@ -287,6 +291,7 @@ static UIColor *defaultTintColor = nil;
   shouldGroupAccessibilityChildren = NO;
   accessibilityIdentifier = nil;
   accessibilityNavigationStyle = UIAccessibilityNavigationStyleAutomatic;
+  accessibilityCustomActions = nil;
   accessibilityHeaderElements = nil;
   accessibilityActivationPoint = CGPointZero;
   accessibilityPath = nil;
@@ -414,6 +419,12 @@ static UIColor *defaultTintColor = nil;
 {
   cornerRadius = newCornerRadius;
   _flags.setCornerRadius = YES;
+}
+
+- (void)setMaskedCorners:(CACornerMask)newMaskedCorners
+{
+  maskedCorners = newMaskedCorners;
+  _flags.setMaskedCorners = YES;
 }
 
 - (void)setContentMode:(UIViewContentMode)newContentMode
@@ -789,6 +800,19 @@ static UIColor *defaultTintColor = nil;
   accessibilityNavigationStyle = newAccessibilityNavigationStyle;
 }
 
+- (NSArray *)accessibilityCustomActions
+{
+  return accessibilityCustomActions;
+}
+
+- (void)setAccessibilityCustomActions:(NSArray *)newAccessibilityCustomActions
+{
+  _flags.setAccessibilityCustomActions = YES;
+  if (accessibilityCustomActions != newAccessibilityCustomActions) {
+    accessibilityCustomActions = [newAccessibilityCustomActions copy];
+  }
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (NSArray *)accessibilityHeaderElements
@@ -889,6 +913,12 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setCornerRadius)
     layer.cornerRadius = cornerRadius;
+
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    if (flags.setMaskedCorners) {
+      layer.maskedCorners = maskedCorners;
+    }
+  }
 
   if (flags.setContentMode)
     layer.contentsGravity = ASDisplayNodeCAContentsGravityFromUIContentMode(contentMode);
@@ -1141,7 +1171,13 @@ static UIColor *defaultTintColor = nil;
   
   if (flags.setAccessibilityNavigationStyle)
     view.accessibilityNavigationStyle = accessibilityNavigationStyle;
-  
+
+  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+    if (flags.setAccessibilityCustomActions) {
+      view.accessibilityCustomActions = accessibilityCustomActions;
+    }
+  }
+
 #if TARGET_OS_TV
   if (flags.setAccessibilityHeaderElements)
     view.accessibilityHeaderElements = accessibilityHeaderElements;
@@ -1280,6 +1316,11 @@ static UIColor *defaultTintColor = nil;
   pendingState.shouldGroupAccessibilityChildren = view.shouldGroupAccessibilityChildren;
   pendingState.accessibilityIdentifier = view.accessibilityIdentifier;
   pendingState.accessibilityNavigationStyle = view.accessibilityNavigationStyle;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
+  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+    pendingState.accessibilityCustomActions = view.accessibilityCustomActions;
+  }
+#endif
 #if TARGET_OS_TV
   pendingState.accessibilityHeaderElements = view.accessibilityHeaderElements;
 #endif
