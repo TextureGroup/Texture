@@ -104,15 +104,4 @@
   [layer verify];
 }
 
-// Fails on iOS 11.4
-- (void)testThatLayerDelegateIsActuallyWeak {
-  id del NS_VALID_UNTIL_END_OF_SCOPE;
-  del = [[NSObject alloc] init];
-  CALayer *l = [CALayer layer];
-  l.delegate = del;
-  XCTAssertNotNil(l.delegate);
-  del = nil;
-  XCTAssertNil(l.delegate);
-}
-
 @end
