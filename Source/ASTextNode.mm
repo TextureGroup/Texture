@@ -346,20 +346,20 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (ASTextKitRenderer *)_locked_renderer
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   return [self _locked_rendererWithBounds:[self _locked_threadSafeBounds]];
 }
 
 - (ASTextKitRenderer *)_locked_rendererWithBounds:(CGRect)bounds
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   bounds = UIEdgeInsetsInsetRect(bounds, _textContainerInset);
   return rendererForAttributes([self _locked_rendererAttributes], bounds.size);
 }
 
 - (ASTextKitAttributes)_locked_rendererAttributes
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   return {
     .attributedString = _attributedText,
     .truncationAttributedString = [self _locked_composedTruncationText],
@@ -1302,7 +1302,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_composedTruncationText
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_composedTruncationText == nil) {
     if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
       NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
@@ -1328,7 +1328,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   truncationString = ASCleanseAttributedStringOfCoreTextAttributes(truncationString);
   NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
   // Grab the attributes from the full string

@@ -493,12 +493,10 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 #pragma mark -
 
-/**
- @note: This should be called without _downloadIdentifierLock held. We will lock
- super to read our interface state and it's best to avoid acquiring both locks.
- */
 - (void)_updateProgressImageBlockOnDownloaderIfNeeded
 {
+  DISABLED_ASAssertUnlocked(_downloadIdentifierLock);
+
   BOOL shouldRenderProgressImages = self.shouldRenderProgressImages;
   
   // Read our interface state before locking so that we don't lock super while holding our lock.

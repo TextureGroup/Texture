@@ -973,7 +973,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (AS_AVAILABLE_IOS(11.0)) {
     if (!_flags.layerBacked) {
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);

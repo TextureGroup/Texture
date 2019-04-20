@@ -40,6 +40,7 @@
 
 - (ASLayoutElementStyle *)_locked_style
 {
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
@@ -182,7 +183,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_pendingDisplayNodeLayout.isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout.constrainedSize;
   }
@@ -218,7 +219,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_u_setNeedsLayoutFromAbove
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
 
   as_activity_create_for_scope("Set needs layout from above");
 
@@ -243,7 +244,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_rootNodeDidInvalidateSize
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   
   __instanceLock__.lock();
   
@@ -273,7 +274,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)displayNodeDidInvalidateSizeNewSize:(CGSize)size
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   
   // The default implementation of display node changes the size of itself to the new size
   CGRect oldBounds = self.bounds;
@@ -295,8 +296,8 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
-  ASAssertUnlocked(__instanceLock__);
-  
+  DISABLED_ASAssertUnlocked(__instanceLock__);
+
   ASDN::MutexLocker l(__instanceLock__);
   // Check if we are a subnode in a layout transition.
   // In this case no measurement is needed as it's part of the layout transition
@@ -429,7 +430,7 @@ ASLayoutElementStyleExtensibilityForwarding
   // logic seems correct.  For what case does -this method need to do the CGSizeEqual checks?
   // IF WE CAN REMOVE BOUNDS CHECKS HERE, THEN WE CAN ALSO REMOVE "REQUESTED FROM ABOVE" CHECK
 
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
 
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.threadSafeBounds.size);
 
@@ -455,8 +456,8 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_layoutSublayouts
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
-  
+  DISABLED_ASAssertUnlocked(__instanceLock__);
+
   ASLayout *layout;
   {
     ASDN::MutexLocker l(__instanceLock__);
@@ -514,7 +515,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (BOOL)_locked_isLayoutTransitionInvalid
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
     if (context == nil || _pendingTransitionID != context.transitionID) {
@@ -895,7 +896,7 @@ ASLayoutElementStyleExtensibilityForwarding
   if (ASDisplayNodeThreadIsMain() || layoutTransition.isSynchronous == NO) {
     // Committing the layout transition will result in subnode insertions and removals, both of which must be called without the lock held
     // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-    // ASAssertUnlocked(__instanceLock__);
+    DISABLED_ASAssertUnlocked(__instanceLock__);
     [layoutTransition commitTransition];
   } else {
     // Subnode insertions and removals need to happen always on the main thread if at least one subnode is already loaded
@@ -956,7 +957,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
   // Subclass hook
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-  // ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   [self calculatedLayoutDidChange];
 
   // Grab lock after calling out to subclass
@@ -1000,7 +1001,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_locked_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.layoutElement == self);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.width >= 0.0);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);

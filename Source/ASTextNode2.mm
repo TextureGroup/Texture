@@ -1231,7 +1231,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_composedTruncationText
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_composedTruncationText == nil) {
     if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
       NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
@@ -1257,7 +1257,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
   // Grab the attributes from the full string
   if (_attributedText.length > 0) {
