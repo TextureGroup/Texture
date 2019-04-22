@@ -13,7 +13,6 @@
 #import <Texture/ASAssert.h>
 #import <Texture/ASDisplayNodeInternal.h>
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>
-#import <Texture/ASGraphicsContext.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASSignpost.h>
 #import <Texture/ASDisplayNodeExtras.h>
@@ -212,14 +211,15 @@ using AS::MutexLocker;
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
       
-      ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
+      UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
 
       for (dispatch_block_t block in displayBlocks) {
-        CHECK_CANCELLED_AND_RETURN_NIL(ASGraphicsEndImageContext());
+        CHECK_CANCELLED_AND_RETURN_NIL(UIGraphicsEndImageContext());
         block();
       }
       
-      UIImage *image = ASGraphicsGetImageAndEndCurrentContext();
+      UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+      UIGraphicsEndImageContext();
 
       ASDN_DELAY_FOR_DISPLAY();
       return image;
@@ -229,8 +229,7 @@ using AS::MutexLocker;
       CHECK_CANCELLED_AND_RETURN_NIL();
 
       if (shouldCreateGraphicsContext) {
-        ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
+        UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
       }
 
       CGContextRef currentContext = UIGraphicsGetCurrentContext();
@@ -254,8 +253,8 @@ using AS::MutexLocker;
       [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
       
       if (shouldCreateGraphicsContext) {
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
-        image = ASGraphicsGetImageAndEndCurrentContext();
+        CHECK_CANCELLED_AND_RETURN_NIL( UIGraphicsEndImageContext(); );
+        image = UIGraphicsGetImageFromCurrentImageContext();
       }
 
       ASDN_DELAY_FOR_DISPLAY();
@@ -332,7 +331,7 @@ using AS::MutexLocker;
       bounds.size.height *= contentsScale;
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
-      ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
+      UIGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
       [*image drawInRect:bounds];
     } else {
       bounds = CGContextGetClipBoundingBox(context);
@@ -365,7 +364,8 @@ using AS::MutexLocker;
     [roundedPath stroke];  // Won't do anything if borderWidth is 0 and roundedPath is nil.
     
     if (*image) {
-      *image = ASGraphicsGetImageAndEndCurrentContext();
+      *image = UIGraphicsGetImageFromCurrentImageContext();
+      UIGraphicsEndImageContext();
     }
   }
 }

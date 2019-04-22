@@ -13,7 +13,7 @@
 typedef NS_ENUM(NSInteger, ASAbsoluteLayoutSpecSizing) {
   /** The spec will take up the maximum size possible. */
   ASAbsoluteLayoutSpecSizingDefault,
-  /** Computes a size for the spec that is the union of all childrens' frames. */
+  /** Computes a size for the spec that is the union of all children's frames. */
   ASAbsoluteLayoutSpecSizingSizeToFit,
 };
 

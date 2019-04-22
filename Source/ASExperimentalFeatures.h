@@ -16,24 +16,24 @@ NS_ASSUME_NONNULL_BEGIN
  * A bit mask of features. Make sure to update configuration.json when you add entries.
  */
 typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
-  ASExperimentalGraphicsContexts = 1 << 0,                  // exp_graphics_contexts
   // If AS_ENABLE_TEXTNODE=0 or TextNode2 subspec is used this setting is a no op and ASTextNode2
   // will be used in all cases
-  ASExperimentalTextNode = 1 << 1,                          // exp_text_node
-  ASExperimentalInterfaceStateCoalescing = 1 << 2,          // exp_interface_state_coalesce
-  ASExperimentalUnfairLock = 1 << 3,                        // exp_unfair_lock
-  ASExperimentalLayerDefaults = 1 << 4,                     // exp_infer_layer_defaults
-  ASExperimentalCollectionTeardown = 1 << 5,                // exp_collection_teardown
-  ASExperimentalFramesetterCache = 1 << 6,                  // exp_framesetter_cache
-  ASExperimentalSkipClearData = 1 << 7,                     // exp_skip_clear_data
-  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 8,      // exp_did_enter_preload_skip_asm_layout
-  ASExperimentalDisableAccessibilityCache = 1 << 9,         // exp_disable_a11y_cache
-  ASExperimentalDispatchApply = 1 << 10,                    // exp_dispatch_apply
-  ASExperimentalImageDownloaderPriority = 1 << 11,          // exp_image_downloader_priority
-  ASExperimentalTextDrawing = 1 << 12,                      // exp_text_drawing
-  ASExperimentalFixRangeController = 1 << 13,               // exp_fix_range_controller
-  ASExperimentalOOMBackgroundDeallocDisable = 1 << 14,      // exp_oom_bg_dealloc_disable
-  ASExperimentalTransactionOperationRetainCycle = 1 << 15,   // exp_transaction_operation_retain_cycle
+  ASExperimentalTextNode = 1 << 0,                          // exp_text_node
+  ASExperimentalInterfaceStateCoalescing = 1 << 1,          // exp_interface_state_coalesce
+  ASExperimentalUnfairLock = 1 << 2,                        // exp_unfair_lock
+  ASExperimentalLayerDefaults = 1 << 3,                     // exp_infer_layer_defaults
+  ASExperimentalCollectionTeardown = 1 << 4,                // exp_collection_teardown
+  ASExperimentalFramesetterCache = 1 << 5,                  // exp_framesetter_cache
+  ASExperimentalSkipClearData = 1 << 6,                     // exp_skip_clear_data
+  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 7,      // exp_did_enter_preload_skip_asm_layout
+  ASExperimentalDisableAccessibilityCache = 1 << 8,         // exp_disable_a11y_cache
+  ASExperimentalDispatchApply = 1 << 9,                     // exp_dispatch_apply
+  ASExperimentalImageDownloaderPriority = 1 << 10,          // exp_image_downloader_priority
+  ASExperimentalTextDrawing = 1 << 11,                      // exp_text_drawing
+  ASExperimentalFixRangeController = 1 << 12,               // exp_fix_range_controller
+  ASExperimentalOOMBackgroundDeallocDisable = 1 << 13,      // exp_oom_bg_dealloc_disable
+  ASExperimentalTransactionOperationRetainCycle = 1 << 14,  // exp_transaction_operation_retain_cycle
+  ASExperimentalRemoveTextKitInitialisingLock = 1 << 15,  // exp_remove_textkit_initialising_lock
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

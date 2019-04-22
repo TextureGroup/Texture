@@ -12,8 +12,7 @@
 
 NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags)
 {
-  NSArray *allNames = ASCreateOnce((@[@"exp_graphics_contexts",
-                                      @"exp_text_node",
+  NSArray *allNames = ASCreateOnce((@[@"exp_text_node",
                                       @"exp_interface_state_coalesce",
                                       @"exp_unfair_lock",
                                       @"exp_infer_layer_defaults",
@@ -27,7 +26,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_text_drawing",
                                       @"exp_fix_range_controller",
                                       @"exp_oom_bg_dealloc_disable",
-                                      @"exp_transaction_operation_retain_cycle"]));
+                                      @"exp_transaction_operation_retain_cycle",
+                                      @"exp_remove_textkit_initialising_lock"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
