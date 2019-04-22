@@ -1563,6 +1563,7 @@
 				CC3B20821C3F76D600798563 /* ASPendingStateController.mm */,
 				CC55A70F1E52A0F200594372 /* ASResponderChainEnumerator.h */,
 				CC55A7101E52A0F200594372 /* ASResponderChainEnumerator.mm */,
+				CCB1F95B1EFB6316009C7475 /* ASSignpost.h */,
 				CC512B841DAC45C60054848E /* ASTableView+Undeprecated.h */,
 				CCA282BE1E9EAE010037E8B7 /* ASTip.h */,
 				CCA282BF1E9EAE010037E8B7 /* ASTip.mm */,
@@ -1592,7 +1593,6 @@
 				1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */,
 				0516FA3B1A15563400B4EBED /* ASLog.h */,
 				CCB1F9591EFB60A5009C7475 /* ASLog.mm */,
-				CCB1F95B1EFB6316009C7475 /* ASSignpost.h */,
 			);
 			path = Base;
 			sourceTree = "<group>";
