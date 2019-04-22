@@ -801,6 +801,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property           BOOL accessibilityViewIsModal;
 @property           BOOL shouldGroupAccessibilityChildren;
 @property           UIAccessibilityNavigationStyle accessibilityNavigationStyle;
+@property (nullable, copy)   NSArray *accessibilityCustomActions API_AVAILABLE(ios(8.0),tvos(9.0));
 #if TARGET_OS_TV
 @property (nullable, copy) 	NSArray *accessibilityHeaderElements;
 #endif

@@ -117,7 +117,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * The base implementation of -layoutThatFits:parentSize: does the following for you:
  * 1. First, it uses the parentSize parameter to resolve the nodes's size (the one assigned to the size property).
  * 2. Then, it intersects the resolved size with the constrainedSize parameter. If the two don't intersect,
- *    constrainedSize wins. This allows a component to always override its childrens' sizes when computing its layout.
+ *    constrainedSize wins. This allows a component to always override its children's sizes when computing its layout.
  *    (The analogy for UIView: you might return a certain size from -sizeThatFits:, but a parent view can always override
  *    that size and set your frame to any size.)
  * 3. It caches it result for reuse

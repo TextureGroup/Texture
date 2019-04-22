@@ -17,7 +17,6 @@
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASDisplayNodeExtras.h>
-#import <Texture/ASGraphicsContext.h>
 #import <Texture/ASLayout.h>
 #import <Texture/ASTextNode.h>
 #import <Texture/ASImageNode+AnimatedImagePrivate.h>
@@ -204,10 +203,11 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   
   AS::MutexLocker l(__instanceLock__);
   
-  ASGraphicsBeginImageContextWithOptions(size, NO, 1);
+  UIGraphicsBeginImageContextWithOptions(size, NO, 1);
   [self.placeholderColor setFill];
   UIRectFill(CGRectMake(0, 0, size.width, size.height));
-  UIImage *image = ASGraphicsGetImageAndEndCurrentContext();
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
   
   return image;
 }
@@ -235,7 +235,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (void)_locked_setImage:(UIImage *)image
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (ASObjectIsEqual(_image, image)) {
     return;
   }
@@ -466,7 +466,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  // The following `ASGraphicsBeginImageContextWithOptions` call will sometimes take take longer than 5ms on an
+  // The following `UIGraphicsBeginImageContextWithOptions` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
   // Check for cancellation before we call it.
   if (isCancelled()) {
@@ -475,7 +475,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  ASGraphicsBeginImageContextWithOptions(key.backingSize, key.isOpaque, 1.0);
+  UIGraphicsBeginImageContextWithOptions(key.backingSize, key.isOpaque, 1.0);
   
   BOOL contextIsClean = YES;
   
@@ -518,11 +518,12 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
   // Check cancellation one last time before forming image.
   if (isCancelled()) {
-    ASGraphicsEndImageContext();
+    UIGraphicsEndImageContext();
     return nil;
   }
 
-  UIImage *result = ASGraphicsGetImageAndEndCurrentContext();
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
   
   if (key.imageModificationBlock) {
     result = key.imageModificationBlock(result);
@@ -734,7 +735,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
   return ^(UIImage *originalImage) {
-    ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
+    UIGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
     UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
 
     // Make the image round
@@ -750,21 +751,24 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
       [roundOutline stroke];
     }
 
-    return ASGraphicsGetImageAndEndCurrentContext();
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
   };
 }
 
 asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
   return ^(UIImage *originalImage) {
-    ASGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
+    UIGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
     
     // Set color and render template
     [color setFill];
     UIImage *templateImage = [originalImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [templateImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
     
-    UIImage *modifiedImage = ASGraphicsGetImageAndEndCurrentContext();
+    UIImage *modifiedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
 
     // if the original image was stretchy, keep it stretchy
     if (!UIEdgeInsetsEqualToEdgeInsets(originalImage.capInsets, UIEdgeInsetsZero)) {

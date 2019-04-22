@@ -27,10 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
  
  - Suppose stacking direction is Vertical, min-width=100, max-width=300, min-height=200, max-height=500.
  - All children are laid out with min-width=100, max-width=300, min-height=0, max-height=INFINITY.
- - If the sum of the childrens' heights is less than 200, children with flexGrow are flexed larger.
- - If the sum of the childrens' heights is greater than 500, children with flexShrink are flexed smaller.
+ - If the sum of the children's heights is less than 200, children with flexGrow are flexed larger.
+ - If the sum of the children's heights is greater than 500, children with flexShrink are flexed smaller.
    Each child is shrunk by `((sum of heights) - 500)/(number of flexShrink-able children)`.
- - If the sum of the childrens' heights is greater than 500 even after flexShrink-able children are flexed,
+ - If the sum of the children's heights is greater than 500 even after flexShrink-able children are flexed,
    justifyContent determines how children are laid out.
  */
 @interface ASStackLayoutSpec : ASLayoutSpec

@@ -1021,7 +1021,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (AS_AVAILABLE_IOS(11.0)) {
     if (!_flags.layerBacked) {
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
@@ -1267,6 +1267,20 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   _bridge_prologue_read;
   return _getAccessibilityFromViewOrProperty(_accessibilityNavigationStyle, accessibilityNavigationStyle);
 }
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
+- (void)setAccessibilityCustomActions:(NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_write;
+  _setAccessibilityToViewAndProperty(_accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions);
+}
+
+- (NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityCustomActions, accessibilityCustomActions);
+}
+#endif
 
 #if TARGET_OS_TV
 - (void)setAccessibilityHeaderElements:(NSArray *)accessibilityHeaderElements

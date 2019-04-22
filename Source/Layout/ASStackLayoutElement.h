@@ -31,14 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat spacingAfter;
 
 /**
- * @abstract If the sum of childrens' stack dimensions is less than the minimum size, how much should this component grow?
+ * @abstract If the sum of children's stack dimensions is less than the minimum size, how much should this component grow?
  * This value represents the "flex grow factor" and determines how much this component should grow in relation to any
  * other flexible children.
  */
 @property (nonatomic) CGFloat flexGrow;
 
 /**
- * @abstract If the sum of childrens' stack dimensions is greater than the maximum size, how much should this component shrink?
+ * @abstract If the sum of children's stack dimensions is greater than the maximum size, how much should this component shrink?
  * This value represents the "flex shrink factor" and determines how much this component should shink in relation to
  * other flexible children.
  */

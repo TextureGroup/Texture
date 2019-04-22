@@ -240,6 +240,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   BOOL _shouldGroupAccessibilityChildren;
   NSString *_accessibilityIdentifier;
   UIAccessibilityNavigationStyle _accessibilityNavigationStyle;
+  NSArray *_accessibilityCustomActions;
   NSArray *_accessibilityHeaderElements;
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
