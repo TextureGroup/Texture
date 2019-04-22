@@ -100,8 +100,8 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #include <thread>
 
 // These macros are here for legacy reasons. We may get rid of them later.
-#define ASAssertLocked(m) m.AssertHeld()
-#define ASAssertUnlocked(m) m.AssertNotHeld()
+#define DISABLED_ASAssertLocked(m)
+#define DISABLED_ASAssertUnlocked(m)
 
 namespace AS {
   

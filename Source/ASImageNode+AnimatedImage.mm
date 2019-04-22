@@ -42,7 +42,7 @@
 
 - (void)_locked_setAnimatedImage:(id <ASAnimatedImageProtocol>)animatedImage
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
 
   if (ASObjectIsEqual(_animatedImage, animatedImage) && (animatedImage == nil || animatedImage.playbackReady)) {
     return;
@@ -95,7 +95,7 @@
 - (void)animatedImageSet:(id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(id <ASAnimatedImageProtocol>)previousAnimatedImage
 {
   // Subclass hook should not be called with the lock held
-  ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   
   // Subclasses may override
 }
@@ -131,7 +131,7 @@
 
 - (void)_locked_setCoverImageCompleted:(UIImage *)coverImage
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   
   _displayLinkLock.lock();
   BOOL setCoverImage = (_displayLink == nil) || _displayLink.paused;
@@ -150,7 +150,7 @@
 
 - (void)_locked_setCoverImage:(UIImage *)coverImage
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   
   //If we're a network image node, we want to set the default image so
   //that it will correctly be restored if it exits the range.
@@ -193,7 +193,7 @@
 
 - (void)_locked_setShouldAnimate:(BOOL)shouldAnimate
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   
   // This test is explicitly done and not ASPerformBlockOnMainThread as this would perform the block immediately
   // on main if called on main thread and we have to call methods locked or unlocked based on which thread we are on
@@ -228,7 +228,7 @@
 
 - (void)_locked_startAnimating
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   
   // It should be safe to call self.interfaceState in this case as it will only grab the lock of the superclass
   if (!ASInterfaceStateIncludesVisible(self.interfaceState)) {
@@ -273,7 +273,7 @@
 - (void)_locked_stopAnimating
 {
   ASDisplayNodeAssertMainThread();
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   
 #if ASAnimatedImageDebug
   NSLog(@"stopping animation: %p", self);
