@@ -72,9 +72,13 @@ NS_INLINE void ASSignpost(ASSignpostName name, uintptr_t identifier = 0, uintptr
   if (kASSignpostsEnabled) {
     if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
       kdebug_signpost(name, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
-    } else if (AS_AVAILABLE_IOS(9)) {
+    }
+    // Can't use availability guard here – syscall is totally prohibited on tvOS/watchOS.
+#if TARGET_OS_IOS
+    else {
       syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_NONE, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
     }
+#endif
   }
 }
 
@@ -83,9 +87,12 @@ NS_INLINE void ASSignpostStart(ASSignpostName name, uintptr_t identifier = 0, ui
   if (kASSignpostsEnabled) {
     if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
       kdebug_signpost_start(name, identifier, arg2, 0, 0);
-    } else if (AS_AVAILABLE_IOS(9)) {
+    }
+#if TARGET_OS_IOS
+    else {
       syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_START, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0);
     }
+#endif
   }
 }
 
@@ -94,8 +101,11 @@ NS_INLINE void ASSignpostEnd(ASSignpostName name, uintptr_t identifier = 0, uint
   if (kASSignpostsEnabled) {
     if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
       kdebug_signpost_end(name, identifier, arg2, 0, 0);
-    } else if (AS_AVAILABLE_IOS(9)) {
+    }
+#if TARGET_OS_IOS
+    else {
       syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_END, identifier, arg2, 0, ASSignpostGetColor(name, preferred_color));
     }
+#endif
   }
 }
