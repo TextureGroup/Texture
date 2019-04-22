@@ -1585,7 +1585,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if ([self.collectionViewLayout isKindOfClass:[ASCollectionLayout class]]) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      as_log_debug(ASCollectionLog(), "Collection node item interactive movement is not supported when using a layout delegate. This message will only be logged once. Node: %@", ASObjectDescriptionMakeTiny(self));
+      os_log_debug(ASCollectionLog(), "Collection node item interactive movement is not supported when using a layout delegate. This message will only be logged once. Node: %@", ASObjectDescriptionMakeTiny(self));
     });
     return NO;
   }
@@ -1876,7 +1876,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
-      as_log_debug(ASCollectionLog(), "Beginning batch fetch for %@ with context %@", collectionNode, _batchContext);
+      os_log_debug(ASCollectionLog(), "Beginning batch fetch for %@ with context %@", collectionNode, _batchContext);
       [_asyncDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:_batchContext];
     });
   } else if (_asyncDelegateFlags.collectionViewWillBeginBatchFetch) {
@@ -2252,7 +2252,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       _superIsPendingDataLoad = YES;
       updates();
       [self _superReloadData:nil completion:nil];
-      as_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
+      os_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
     } else {
       [_layoutFacilitator collectionViewWillPerformBatchUpdates];
@@ -2314,7 +2314,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         } completion:completion];
       }
 
-      as_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);
+      os_log_debug(ASCollectionLog(), "Completed batch update %{public}@", self.collectionNode);
       
       // Flush any range changes that happened as part of submitting the update.
       as_activity_scope(changeSet.rootActivity);

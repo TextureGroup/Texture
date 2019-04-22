@@ -556,13 +556,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   
   if (changeSet.includesReloadData) {
     if (_initialReloadDataHasBeenCalled) {
-      as_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      os_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
     } else {
-      as_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      os_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
       _initialReloadDataHasBeenCalled = YES;
     }
   } else {
-    as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
+    os_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
   
   NSTimeInterval transactionQueueFlushDuration = 0.0f;
@@ -575,7 +575,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.
   if (!_initialReloadDataHasBeenCalled) {
-    as_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
+    os_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
     [changeSet executeCompletionHandlerWithFinished:YES];
     return;
   }
@@ -639,7 +639,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     }
   }
 
-  as_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
+  os_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
 
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
   ++_editingTransactionGroupCount;
