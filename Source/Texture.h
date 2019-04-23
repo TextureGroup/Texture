@@ -120,7 +120,6 @@
 #import <Texture/UICollectionViewLayout+ASConvenience.h>
 #import <Texture/UIView+ASConvenience.h>
 #import <Texture/UIImage+ASConvenience.h>
-#import <Texture/ASGraphicsContext.h>
 #import <Texture/NSArray+Diffing.h>
 #import <Texture/ASObjectDescriptionHelpers.h>
 #import <Texture/UIResponder+AsyncDisplayKit.h>
