@@ -626,7 +626,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   NSURL *nextImageURL = (_dataSourceFlags.URL) ? [_dataSource multiplexImageNode:self URLForImageIdentifier:nextImageIdentifier] : nil;
   // If we fail to get a URL for the image, we have no source and can't proceed.
   if (!nextImageURL) {
-    as_log_error(ASImageLoadingLog(), "Could not acquire URL %@ ident: (%@)", self, nextImageIdentifier);
+    os_log_error(ASImageLoadingLog(), "Could not acquire URL %@ ident: (%@)", self, nextImageIdentifier);
     finishedLoadingBlock(nil, nil, [NSError errorWithDomain:ASMultiplexImageNodeErrorDomain code:ASMultiplexImageNodeErrorCodeNoSourceForImage userInfo:nil]);
     return;
   }
@@ -684,7 +684,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
       if (downloadedImage) {
         as_log_verbose(ASImageLoadingLog(), "Acquired image from download for %@ id: %@ img: %@", strongSelf, nextImageIdentifier, downloadedImage);
       } else {
-        as_log_error(ASImageLoadingLog(), "Error downloading image for %@ id: %@ err: %@", strongSelf, nextImageIdentifier, error);
+        os_log_error(ASImageLoadingLog(), "Error downloading image for %@ id: %@ err: %@", strongSelf, nextImageIdentifier, error);
       }
       finishedLoadingBlock(downloadedImage, nextImageIdentifier, error);
     }];
