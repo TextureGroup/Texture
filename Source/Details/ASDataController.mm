@@ -88,7 +88,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(ASEventLog *)eventLog
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node
 {
   if (!(self = [super init])) {
     return nil;
@@ -103,10 +103,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _dataSourceFlags.constrainedSizeForNodeAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForNodeAtIndexPath:)];
   _dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForSupplementaryNodeOfKind:atIndexPath:)];
   _dataSourceFlags.contextForSection = [_dataSource respondsToSelector:@selector(dataController:contextForSection:)];
-  
-#if ASEVENTLOG_ENABLE
-  _eventLog = eventLog;
-#endif
 
   self.visibleMap = self.pendingMap = [[ASElementMap alloc] init];
   
@@ -581,18 +577,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   }
   
   [self invalidateDataSourceItemCounts];
-  
-  // Log events
-#if ASEVENTLOG_ENABLE
-  ASDataControllerLogEvent(self, @"updateWithChangeSet waited on previous update for %fms. changeSet: %@",
-                           transactionQueueFlushDuration * 1000.0f, changeSet);
-  NSTimeInterval changeSetStartTime = CACurrentMediaTime();
-  NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
-  [changeSet addCompletionHandler:^(BOOL finished) {
-    ASDataControllerLogEvent(self, @"finishedUpdate in %fms: %@",
-                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);
-  }];
-#endif
   
   // Attempt to mark the update completed. This is when update validation will occur inside the changeset.
   // If an invalid update exception is thrown, we catch it and inject our "validationErrorSource" object,
