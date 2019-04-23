@@ -137,7 +137,6 @@ ASLayoutElementStyleExtensibilityForwarding
   AS::UniqueLock l(__instanceLock__);
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
     _primitiveTraitCollection = traitCollection;
-    ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
 
     l.unlock();
     [self asyncTraitCollectionDidChange];

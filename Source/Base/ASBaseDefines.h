@@ -73,17 +73,6 @@
 #define AS_ENABLE_TIPS 0
 #endif
 
-/**
- * The event backtraces take a static 2KB of memory
- * and retain all objects present in all the registers
- * of the stack frames. The memory consumption impact
- * is too significant even to be enabled during general
- * development.
- */
-#ifndef AS_SAVE_EVENT_BACKTRACES
-# define AS_SAVE_EVENT_BACKTRACES 0
-#endif
-
 #ifndef __has_feature      // Optional.
 #define __has_feature(x) 0 // Compatibility with non-clang compilers.
 #endif

@@ -313,10 +313,6 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
 {
   [self _staticInitialize];
   __instanceLock__.SetDebugNameWithObject(self);
-
-#if ASEVENTLOG_ENABLE
-  _eventLog = [[ASEventLog alloc] initWithObject:self];
-#endif
   
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
@@ -348,7 +344,6 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
   _automaticallyRelayoutOnLayoutMarginsChanges = NO;
 
   [self baseDidInit];
-  ASDisplayNodeLogEvent(self, @"init");
 }
 
 - (instancetype)init
@@ -595,7 +590,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 {
   ASDisplayNodeAssertMainThread();
   DISABLED_ASAssertUnlocked(__instanceLock__);
-  ASDisplayNodeLogEvent(self, @"didLoad");
   as_log_verbose(ASNodeLog(), "didLoad %@", self);
   TIME_SCOPED(_debugTimeForDidLoad);
   
@@ -1164,8 +1158,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
-  
-  ASDisplayNodeLogEvent(self, @"calculateSizeThatFits: with constrainedSize: %@", NSStringFromCGSize(constrainedSize));
 
   return ASIsCGSizeValidForSize(constrainedSize) ? constrainedSize : CGSizeZero;
 }
@@ -1781,7 +1773,6 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 {
   ASDisplayNodeAssertMainThread();
 
-  ASDisplayNodeLogEvent(self, @"displayWillStart");
   // in case current node takes longer to display than it's subnodes, treat it as a dependent node
   [self _pendingNodeWillDisplay:self];
   
@@ -1796,7 +1787,6 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 {
   ASDisplayNodeAssertMainThread();
   
-  ASDisplayNodeLogEvent(self, @"displayDidFinish");
   [self _pendingNodeDidDisplay:self];
 
   __instanceLock__.lock();
@@ -2034,7 +2024,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   }
   
   if (supernodeDidChange) {
-    ASDisplayNodeLogEvent(self, @"supernodeDidChange: %@, oldValue = %@", ASObjectDescriptionMakeTiny(newSupernode), ASObjectDescriptionMakeTiny(oldSupernode));
     // Hierarchy state
     ASHierarchyState stateToEnterOrExit = (newSupernode ? newSupernode.hierarchyState
                                                         : oldSupernode.hierarchyState);
@@ -2164,8 +2153,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [subnode __incrementVisibilityNotificationsDisabled];
   }
   
-  [subnode _removeFromSupernode];
-  [oldSubnode _removeFromSupernode];
+  [subnode removeFromSupernode];
+  [oldSubnode removeFromSupernode];
   
   __instanceLock__.lock();
     if (_subnodes == nil) {
@@ -2227,13 +2216,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
-  ASDisplayNodeLogEvent(self, @"addSubnode: %@ with automaticallyManagesSubnodes: %@",
-                        subnode, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _addSubnode:subnode];
-}
-
-- (void)_addSubnode:(ASDisplayNode *)subnode
-{
   ASDisplayNodeAssertThreadAffinity(self);
   
   ASDisplayNodeAssert(subnode, @"Cannot insert a nil subnode");
@@ -2278,13 +2260,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode
 {
-  ASDisplayNodeLogEvent(self, @"replaceSubnode: %@ withSubnode: %@ with automaticallyManagesSubnodes: %@",
-                        oldSubnode, replacementSubnode, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _replaceSubnode:oldSubnode withSubnode:replacementSubnode];
-}
-
-- (void)_replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode
-{
   ASDisplayNodeAssertThreadAffinity(self);
 
   if (replacementSubnode == nil) {
@@ -2324,13 +2299,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 }
 
 - (void)insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below
-{
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ belowSubnode: %@ with automaticallyManagesSubnodes: %@",
-                        subnode, below, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _insertSubnode:subnode belowSubnode:below];
-}
-
-- (void)_insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below
 {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
@@ -2390,13 +2358,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (void)insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above
 {
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ abodeSubnode: %@ with automaticallyManagesSubnodes: %@",
-                        subnode, above, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _insertSubnode:subnode aboveSubnode:above];
-}
-
-- (void)_insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above
-{
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
   DISABLED_ASAssertUnlocked(__instanceLock__);
@@ -2452,13 +2413,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 }
 
 - (void)insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx
-{
-  ASDisplayNodeLogEvent(self, @"insertSubnode: %@ atIndex: %td with automaticallyManagesSubnodes: %@",
-                        subnode, idx, self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _insertSubnode:subnode atIndex:idx];
-}
-
-- (void)_insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx
 {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
@@ -2517,13 +2471,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 }
 
 - (void)removeFromSupernode
-{
-  ASDisplayNodeLogEvent(self, @"removeFromSupernode with automaticallyManagesSubnodes: %@",
-                        self.automaticallyManagesSubnodes ? @"YES" : @"NO");
-  [self _removeFromSupernode];
-}
-
-- (void)_removeFromSupernode
 {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
@@ -2700,7 +2647,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isEnteringHierarchy, @"Should not cause recursive __enterHierarchy");
-  ASDisplayNodeLogEvent(self, @"enterHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
   __instanceLock__.lock();
@@ -2748,7 +2694,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   ASDisplayNodeAssertMainThread();
   ASDisplayNodeAssert(!_flags.isExitingHierarchy, @"Should not cause recursive __exitHierarchy");
-  ASDisplayNodeLogEvent(self, @"exitHierarchy");
   
   // Profiling has shown that locking this method is beneficial, so each of the property accesses don't have to lock and unlock.
   __instanceLock__.lock();
@@ -2843,7 +2788,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     }
   }
 
-  ASDisplayNodeLogEvent(self, @"setHierarchyState: %@", NSStringFromASHierarchyStateChange(oldState, newState));
   as_log_verbose(ASNodeLog(), "%s%@ %@", sel_getName(_cmd), NSStringFromASHierarchyStateChange(oldState, newState), self);
 }
 
@@ -2963,7 +2907,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (interfaceState == ASInterfaceStateNone) {
     return; // This method is a no-op with a 0-bitfield argument, so don't bother recursing.
   }
-  ASDisplayNodeLogEvent(self, @"%s %@", sel_getName(_cmd), NSStringFromASInterfaceState(interfaceState));
   ASDisplayNodePerformBlockOnEveryNode(nil, self, YES, ^(ASDisplayNode *node) {
     node.interfaceState &= (~interfaceState);
   });
@@ -3136,7 +3079,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     as_log_verbose(ASNodeLog(), "%s %@ %@", sel_getName(_cmd), NSStringFromASInterfaceStateChange(oldState, newState), self);
   }
   
-  ASDisplayNodeLogEvent(self, @"interfaceStateDidChange: %@", NSStringFromASInterfaceStateChange(oldState, newState));
   [self _interfaceStateDidChange:newState fromState:oldState];
 }
 
@@ -3595,13 +3537,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 }
 
 #pragma mark - Debugging (Private)
-
-#if ASEVENTLOG_ENABLE
-- (ASEventLog *)eventLog
-{
-  return _eventLog;
-}
-#endif
 
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription
 {
