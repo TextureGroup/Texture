@@ -42,7 +42,7 @@
     }
     
     if ([object_getClass(value) needsMainThreadDeallocation]) {
-      as_log_debug(ASMainThreadDeallocationLog(), "%@: Trampolining ivar '%s' value %@ for main deallocation.", self, ivar_getName(ivar), value);
+      os_log_debug(ASMainThreadDeallocationLog(), "%@: Trampolining ivar '%s' value %@ for main deallocation.", self, ivar_getName(ivar), value);
       
       // Release the ivar's reference before handing the object to the queue so we
       // don't risk holding onto it longer than the queue does.
@@ -50,7 +50,7 @@
       
       ASPerformMainThreadDeallocation(&value);
     } else {
-      as_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
+      os_log_debug(ASMainThreadDeallocationLog(), "%@: Not trampolining ivar '%s' value %@.", self, ivar_getName(ivar), value);
     }
   }
 }

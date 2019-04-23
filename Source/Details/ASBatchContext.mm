@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, ASBatchContextState) {
 - (void)completeBatchFetching:(BOOL)didComplete
 {
   if (didComplete) {
-    as_log_debug(ASCollectionLog(), "Completed batch fetch with context %@", self);
+    os_log_debug(ASCollectionLog(), "Completed batch fetch with context %@", self);
     atomic_store(&_state, ASBatchContextStateCompleted);
   }
 }
