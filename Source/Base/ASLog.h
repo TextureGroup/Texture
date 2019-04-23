@@ -119,51 +119,8 @@ AS_EXTERN os_log_t ASLockingLog(void);
 #define as_activity_create_for_scope(description) \
   as_activity_scope(as_activity_create(description, AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT))
 
-/**
- * The logging macros are not guarded by deployment-target checks like the activity macros are, but they are
- * only available on iOS >= 9 at runtime, so just make them conditional.
- */
-
-#define as_log_create(subsystem, category) ({     \
-os_log_t __val;                                   \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  __val = os_log_create(subsystem, category);     \
-} else {                                          \
-  __val = (os_log_t)0;                            \
-}                                                 \
-__val;                                            \
-})
-
-#define as_log_debug(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_debug(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_info(log, format, ...)             \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_info(log, format, ##__VA_ARGS__);        \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_error(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_error(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_fault(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_fault(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
 #if ASEnableVerboseLogging
-  #define as_log_verbose(log, format, ...)  as_log_debug(log, format, ##__VA_ARGS__)
+  #define as_log_verbose(log, format, ...)  os_log_debug(log, format, ##__VA_ARGS__)
 #else
   #define as_log_verbose(log, format, ...)
 #endif

@@ -1136,7 +1136,7 @@ static UIColor *defaultTintColor = nil;
   if (flags.setAccessibilityValue)
     view.accessibilityValue = accessibilityValue;
 
-  if (AS_AVAILABLE_IOS(11)) {
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     if (flags.setAccessibilityAttributedLabel) {
       view.accessibilityAttributedLabel = accessibilityAttributedLabel;
     }
@@ -1172,10 +1172,8 @@ static UIColor *defaultTintColor = nil;
   if (flags.setAccessibilityNavigationStyle)
     view.accessibilityNavigationStyle = accessibilityNavigationStyle;
 
-  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
-    if (flags.setAccessibilityCustomActions) {
-      view.accessibilityCustomActions = accessibilityCustomActions;
-    }
+  if (flags.setAccessibilityCustomActions) {
+    view.accessibilityCustomActions = accessibilityCustomActions;
   }
 
 #if TARGET_OS_TV
@@ -1294,20 +1292,18 @@ static UIColor *defaultTintColor = nil;
   pendingState.semanticContentAttribute = view.semanticContentAttribute;
   pendingState.layoutMargins = view.layoutMargins;
   pendingState.preservesSuperviewLayoutMargins = view.preservesSuperviewLayoutMargins;
-  if (AS_AVAILABLE_IOS(11)) {
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     pendingState.insetsLayoutMarginsFromSafeArea = view.insetsLayoutMarginsFromSafeArea;
   }
   pendingState.isAccessibilityElement = view.isAccessibilityElement;
   pendingState.accessibilityLabel = view.accessibilityLabel;
   pendingState.accessibilityHint = view.accessibilityHint;
   pendingState.accessibilityValue = view.accessibilityValue;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     pendingState.accessibilityAttributedLabel = view.accessibilityAttributedLabel;
     pendingState.accessibilityAttributedHint = view.accessibilityAttributedHint;
     pendingState.accessibilityAttributedValue = view.accessibilityAttributedValue;
   }
-#endif
   pendingState.accessibilityTraits = view.accessibilityTraits;
   pendingState.accessibilityFrame = view.accessibilityFrame;
   pendingState.accessibilityLanguage = view.accessibilityLanguage;
@@ -1316,11 +1312,7 @@ static UIColor *defaultTintColor = nil;
   pendingState.shouldGroupAccessibilityChildren = view.shouldGroupAccessibilityChildren;
   pendingState.accessibilityIdentifier = view.accessibilityIdentifier;
   pendingState.accessibilityNavigationStyle = view.accessibilityNavigationStyle;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
-  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
-    pendingState.accessibilityCustomActions = view.accessibilityCustomActions;
-  }
-#endif
+  pendingState.accessibilityCustomActions = view.accessibilityCustomActions;
 #if TARGET_OS_TV
   pendingState.accessibilityHeaderElements = view.accessibilityHeaderElements;
 #endif

@@ -145,11 +145,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
   ASDisplayNodeMethodOverrides _methodOverrides;
 
   UIEdgeInsets _hitTestSlop;
-  
-#if ASEVENTLOG_ENABLE
-  ASEventLog *_eventLog;
-#endif
-
 
   // Layout support
   ASLayoutElementStyle *_style;
@@ -310,16 +305,10 @@ static constexpr CACornerMask kASCACornerAllCorners =
 - (void)__layout;
 
 /**
- * Internal method to add / replace / insert subnode and remove from supernode without checking if
- * node has automaticallyManagesSubnodes set to YES.
+ * Internal tree modification methods.
  */
-- (void)_addSubnode:(ASDisplayNode *)subnode;
 - (void)_replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode;
-- (void)_insertSubnode:(ASDisplayNode *)subnode belowSubnode:(ASDisplayNode *)below;
-- (void)_insertSubnode:(ASDisplayNode *)subnode aboveSubnode:(ASDisplayNode *)above;
-- (void)_insertSubnode:(ASDisplayNode *)subnode atIndex:(NSInteger)idx;
 - (void)_removeFromSupernodeIfEqualTo:(ASDisplayNode *)supernode;
-- (void)_removeFromSupernode;
 
 // Private API for helper functions / unit tests.  Use ASDisplayNodeDisableHierarchyNotifications() to control this.
 - (BOOL)__visibilityNotificationsDisabled;

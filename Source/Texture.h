@@ -101,7 +101,6 @@
 #import <Texture/ASControlNode+Subclasses.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASEqualityHelpers.h>
-#import <Texture/ASEventLog.h>
 #import <Texture/ASHashing.h>
 #import <Texture/ASHighlightOverlayLayer.h>
 #import <Texture/ASImageContainerProtocolCategories.h>

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note ASCollectionNode is strongly recommended over ASCollectionView.  This class exists for adoption convenience.
  */
-@interface ASCollectionView : UICollectionView
+@interface ASCollectionView : UICollectionView <UIGestureRecognizerDelegate>
 
 /**
  * Returns the corresponding ASCollectionNode

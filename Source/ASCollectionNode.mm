@@ -156,7 +156,7 @@
     __weak __typeof__(self) weakSelf = self;
     [self setViewBlock:^{
       __typeof__(self) strongSelf = weakSelf;
-      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator owningNode:strongSelf];
     }];
   }
   return self;
@@ -1038,6 +1038,38 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   [result addObject:@{ @"dataSource" : ASObjectDescriptionMakeTiny(self.dataSource) }];
   [result addObject:@{ @"delegate" : ASObjectDescriptionMakeTiny(self.delegate) }];
   return result;
+}
+
+#pragma mark - UIGestureRecognizerDelegate Methods
+// The value returned below are default implementation of UIKit's UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceivePress:(UIPress *)press
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
 }
 
 #pragma mark - Private methods

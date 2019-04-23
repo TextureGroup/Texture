@@ -304,10 +304,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
-  return [self _initWithFrame:frame style:style dataControllerClass:nil owningNode:nil eventLog:nil];
+  return [self _initWithFrame:frame style:style dataControllerClass:nil owningNode:nil];
 }
 
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode eventLog:(ASEventLog *)eventLog
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass owningNode:(ASTableNode *)tableNode
 {
   if (!(self = [super initWithFrame:frame style:style])) {
     return nil;
@@ -325,7 +325,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   _rangeController.dataSource = self;
   _rangeController.delegate = self;
   
-  _dataController = [[dataControllerClass alloc] initWithDataSource:self node:tableNode eventLog:eventLog];
+  _dataController = [[dataControllerClass alloc] initWithDataSource:self node:tableNode];
   _dataController.delegate = _rangeController;
   
   _leadingScreensForBatching = 2.0;

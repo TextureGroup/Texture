@@ -61,7 +61,7 @@ ASVisibilityDepthImplementation;
 {
   as_activity_create_for_scope("Pop multiple from ASNavigationController");
   NSArray *viewControllers = [super popToViewController:viewController animated:animated];
-  as_log_info(ASNodeLog(), "Popped %@ to %@, removing %@", self, viewController, ASGetDescriptionValueString(viewControllers));
+  os_log_info(ASNodeLog(), "Popped %@ to %@, removing %@", self, viewController, ASGetDescriptionValueString(viewControllers));
 
   [self visibilityDepthDidChange];
   return viewControllers;
@@ -71,7 +71,7 @@ ASVisibilityDepthImplementation;
 {
   as_activity_create_for_scope("Pop to root of ASNavigationController");
   NSArray *viewControllers = [super popToRootViewControllerAnimated:animated];
-  as_log_info(ASNodeLog(), "Popped view controllers %@ from %@", ASGetDescriptionValueString(viewControllers), self);
+  os_log_info(ASNodeLog(), "Popped view controllers %@ from %@", ASGetDescriptionValueString(viewControllers), self);
 
   [self visibilityDepthDidChange];
   return viewControllers;
@@ -88,7 +88,7 @@ ASVisibilityDepthImplementation;
 - (void)setViewControllers:(NSArray *)viewControllers animated:(BOOL)animated
 {
   as_activity_create_for_scope("Set view controllers of ASNavigationController");
-  as_log_info(ASNodeLog(), "Set view controllers of %@ to %@ animated: %d", self, ASGetDescriptionValueString(viewControllers), animated);
+  os_log_info(ASNodeLog(), "Set view controllers of %@ to %@ animated: %d", self, ASGetDescriptionValueString(viewControllers), animated);
   [super setViewControllers:viewControllers animated:animated];
   [self visibilityDepthDidChange];
 }
@@ -96,7 +96,7 @@ ASVisibilityDepthImplementation;
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
   as_activity_create_for_scope("Push view controller on ASNavigationController");
-  as_log_info(ASNodeLog(), "Pushing %@ onto %@", viewController, self);
+  os_log_info(ASNodeLog(), "Pushing %@ onto %@", viewController, self);
   [super pushViewController:viewController animated:animated];
   [self visibilityDepthDidChange];
 }
@@ -105,7 +105,7 @@ ASVisibilityDepthImplementation;
 {
   as_activity_create_for_scope("Pop view controller from ASNavigationController");
   UIViewController *viewController = [super popViewControllerAnimated:animated];
-  as_log_info(ASNodeLog(), "Popped %@ from %@", viewController, self);
+  os_log_info(ASNodeLog(), "Popped %@ from %@", viewController, self);
   [self visibilityDepthDidChange];
   return viewController;
 }
