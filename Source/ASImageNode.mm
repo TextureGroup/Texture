@@ -268,7 +268,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   CGSize oldImageSize = oldImage.size;
   BOOL shouldReleaseImageOnBackgroundThread = oldImageSize.width > kMinReleaseImageOnBackgroundSize.width
                                               || oldImageSize.height > kMinReleaseImageOnBackgroundSize.height;
-  if (shouldReleaseImageOnBackgroundThread) {
+  if (shouldReleaseImageOnBackgroundThread && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
     ASPerformBackgroundDeallocation(&oldImage);
   }
 }
