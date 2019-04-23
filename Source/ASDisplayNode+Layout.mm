@@ -618,7 +618,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
   as_activity_create_for_scope("Transition node layout");
-  as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
+  os_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
   
   if (constrainedSize.max.width <= 0.0 || constrainedSize.max.height <= 0.0) {
     // Using CGSizeZero for the sizeRange can cause negative values in client layout code.
