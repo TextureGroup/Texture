@@ -7,7 +7,6 @@
 //
 
 #import "OverviewASCollectionNode.h"
-
 #import <Texture/Texture.h>
 
 @interface OverviewASCollectionNode () <ASCollectionDataSource, ASCollectionDelegate>
