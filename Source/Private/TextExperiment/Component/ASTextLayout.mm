@@ -383,7 +383,7 @@ dispatch_semaphore_signal(_lock);
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"lines: %ld, visibleRange:%@, textBoundingRect:%@",
-                                    [self.lines count],
+                                    (long)[self.lines count],
                                     NSStringFromRange(self.visibleRange),
                                     NSStringFromCGRect(self.textBoundingRect)];
 }
