@@ -21,7 +21,7 @@ TEXTURE_EXPORTED_HEADERS = glob([
   'Source/Details/**/*.h',
   'Source/Layout/*.h',
   'Source/Base/*.h',
-  'Source/Debug/AsyncDisplayKit+Debug.h',
+  'Source/Debug/Texturet+Debug.h',
   # Most TextKit components are not public because the C++ content
   # in the headers will cause build errors when using
   # `use_frameworks!` on 0.39.0 & Swift 2.1.
@@ -36,7 +36,7 @@ TEXTURE_PRIVATE_HEADERS = glob([
   excludes = TEXTURE_EXPORTED_HEADERS,
 )
 
-def asyncdisplaykit_library(
+def texture_library(
     name,
     additional_preprocessor_flags = [],
     deps = [],
@@ -82,13 +82,13 @@ def asyncdisplaykit_library(
 #####################################
 # Texture targets
 #####################################
-asyncdisplaykit_library(
-  name = 'AsyncDisplayKit-Core',
+texture_library(
+  name = 'Texture-Core',
 )
 
-# (Default) Texture and AsyncDisplayKit-PINRemoteImage targets are basically the same library with different names
-for name in ['Texture', 'AsyncDisplayKit-PINRemoteImage']:
-  asyncdisplaykit_library(
+# (Default) Texture and Texture-PINRemoteImage targets are basically the same library with different names
+for name in ['Texture', 'Texture-PINRemoteImage']:
+  texture_library(
     name = name,
     deps = [
       '//Pods/PINRemoteImage:PINRemoteImage-PINCache',
@@ -127,7 +127,7 @@ apple_binary(
   linker_flags = COMMON_LINKER_FLAGS,
   deps = [
     ':TestHostResources',
-    ':AsyncDisplayKit-Core',
+    ':Texture-Core',
   ],
   frameworks = [
     '$SDKROOT/System/Library/Frameworks/Photos.framework',
