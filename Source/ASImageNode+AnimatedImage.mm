@@ -84,7 +84,7 @@
     [self animatedImageSet:animatedImage previousAnimatedImage:previousAnimatedImage];
 
     // Animated image can take while to dealloc, do it off the main queue
-    if (previousAnimatedImage != nil) {
+    if (previousAnimatedImage != nil && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
       ASPerformBackgroundDeallocation(&previousAnimatedImage);
     }
   });
