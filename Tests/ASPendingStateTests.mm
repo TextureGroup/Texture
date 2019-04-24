@@ -219,8 +219,6 @@
   [compressed setNeedsDisplay];
   [inflated layoutIfNeeded];
   [compressed layoutIfNeeded];
-  inflated.isAccessibilityElement = YES;
-  compressed.isAccessibilityElement = YES;
   inflated.clipsToBounds = YES;
   compressed.clipsToBounds = YES;
   inflated.hidden = YES;
@@ -239,27 +237,40 @@
   compressed.frame = CGRectMake(10, 10, 10, 10);
   inflated.contentMode = UIViewContentModeScaleAspectFit;
   compressed.contentMode = UIViewContentModeScaleAspectFit;
-
-
-//  @property (nonatomic)          UIViewContentMode contentMode;
-//  @property (nonatomic)          UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
-//  @property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
-//  @property (nonatomic, getter=isExclusiveTouch) BOOL exclusiveTouch;
-//  @property (nonatomic, getter=asyncdisplaykit_isAsyncTransactionContainer, setter = asyncdisplaykit_setAsyncTransactionContainer:) BOOL asyncdisplaykit_asyncTransactionContainer;
-//  @property (nonatomic)           UIEdgeInsets layoutMargins;
-//  @property (nonatomic)           BOOL preservesSuperviewLayoutMargins;
-//  @property (nonatomic)           BOOL insetsLayoutMarginsFromSafeArea;
+  inflated.semanticContentAttribute = UISemanticContentAttributePlayback;
+  compressed.semanticContentAttribute = UISemanticContentAttributePlayback;
+  inflated.userInteractionEnabled = YES;
+  compressed.userInteractionEnabled = YES;
+  inflated.exclusiveTouch = YES;
+  compressed.exclusiveTouch = YES;
+  [inflated asyncdisplaykit_setAsyncTransactionContainer:YES];
+  [compressed asyncdisplaykit_setAsyncTransactionContainer:YES];
+  inflated.layoutMargins = UIEdgeInsetsMake(10, 10, 10, 10);
+  compressed.layoutMargins = UIEdgeInsetsMake(10, 10, 10, 10);
+  inflated.preservesSuperviewLayoutMargins = YES;
+  compressed.preservesSuperviewLayoutMargins = YES;
+  inflated.insetsLayoutMarginsFromSafeArea = YES;
+  compressed.insetsLayoutMarginsFromSafeArea = YES;
+  inflated.isAccessibilityElement = YES;
+  compressed.isAccessibilityElement = YES;
+  inflated.accessibilityLabel = @"Accessibility label";
+  compressed.accessibilityLabel = @"Accessibility label";
+  inflated.accessibilityHint = @"Accessibility hint";
+  compressed.accessibilityHint = @"Accessibility hint";
+  
+  // iOS 11
+  if (@available(iOS 11.0, *)) {
+    inflated.accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:@"Accessibility attributed label"];
+    compressed.accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:@"Accessibility attributed label"];
+    inflated.accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:@"Accessibility attributed hint"];
+    compressed.accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:@"Accessibility attributed hint"];
+  }
   
   /**
    Following properties of the UIAccessibility informal protocol are supported as well.
    We don't declare them here, so _ASPendingState does not complain about them being not implemented,
    as they are already on NSObject
    
-   @property (nonatomic)           BOOL isAccessibilityElement;
-   @property (nonatomic, copy, nullable)   NSString *accessibilityLabel;
-   @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedLabel API_AVAILABLE(ios(11.0),tvos(11.0));
-   @property (nonatomic, copy, nullable)   NSString *accessibilityHint;
-   @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedHint API_AVAILABLE(ios(11.0),tvos(11.0));
    @property (nonatomic, copy, nullable)   NSString *accessibilityValue;
    @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
    @property (nonatomic)           UIAccessibilityTraits accessibilityTraits;
