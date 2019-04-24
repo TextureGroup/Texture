@@ -43,7 +43,7 @@
 @property (nonatomic) CGPoint contentOffset;
 @property (nonatomic) BOOL animatesContentOffset;
 @property (nonatomic) BOOL automaticallyAdjustsContentOffset;
-
+@property (nonatomic) BOOL pagingEnabled;
 @end
 
 @implementation _ASTablePendingState
@@ -66,6 +66,7 @@
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
     _automaticallyAdjustsContentOffset = NO;
+    _pagingEnabled = NO;
   }
   return self;
 }
@@ -164,6 +165,7 @@
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
     view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
+    view.pagingEnabled                        = pendingState.pagingEnabled;
 
     UIEdgeInsets contentInset = pendingState.contentInset;
     if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
@@ -363,6 +365,28 @@
     return pendingState.automaticallyAdjustsContentOffset;
   } else {
     return self.view.automaticallyAdjustsContentOffset;
+  }
+}
+
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.pagingEnabled = pagingEnabled;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded],
+                        @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.pagingEnabled = pagingEnabled;
+  }
+}
+
+- (BOOL)isPagingEnabled
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.pagingEnabled;
+  } else {
+    return self.view.isPagingEnabled;
   }
 }
 

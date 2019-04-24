@@ -52,6 +52,7 @@
 @property (nonatomic) BOOL animatesContentOffset;
 @property (nonatomic) BOOL showsVerticalScrollIndicator;
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic) BOOL pagingEnabled;
 @end
 
 @implementation _ASCollectionPendingState
@@ -72,6 +73,7 @@
     _animatesContentOffset = NO;
     _showsVerticalScrollIndicator = YES;
     _showsHorizontalScrollIndicator = YES;
+    _pagingEnabled = NO;
   }
   return self;
 }
@@ -197,6 +199,7 @@
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+    view.pagingEnabled                  = pendingState.pagingEnabled;
 
     // Only apply these flags if they're enabled; the view might come with them turned on.
     if (pendingState.alwaysBounceVertical) {
@@ -525,6 +528,26 @@
     return _pendingState.showsHorizontalScrollIndicator;
   } else {
     return self.view.showsHorizontalScrollIndicator;
+  }
+}
+
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  if ([self pendingState]) {
+    _pendingState.pagingEnabled = pagingEnabled;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded],
+                        @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.pagingEnabled = pagingEnabled;
+  }
+}
+
+- (BOOL)isPagingEnabled
+{
+  if ([self pendingState]) {
+    return _pendingState.pagingEnabled;
+  } else {
+    return self.view.isPagingEnabled;
   }
 }
 
