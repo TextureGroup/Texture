@@ -1565,7 +1565,7 @@ TYPE_NODE_INTERFACE_AND_IMP(UISemanticContentAttribute, uiSemanticContentAttribu
 TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
 
 @interface _ASPendingStateCompressed () {
-    std::forward_list<_ASPendingStateCompressedNode *> _list;
+  std::forward_list<_ASPendingStateCompressedNode *> _list;
 }
 @end
 

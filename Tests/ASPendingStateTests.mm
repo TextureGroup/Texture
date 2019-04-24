@@ -257,6 +257,20 @@
   compressed.accessibilityLabel = @"Accessibility label";
   inflated.accessibilityHint = @"Accessibility hint";
   compressed.accessibilityHint = @"Accessibility hint";
+  inflated.accessibilityValue = @"Accessibility value";
+  compressed.accessibilityValue = @"Accessibility value";
+  inflated.accessibilityTraits = UIAccessibilityTraitImage;
+  compressed.accessibilityTraits = UIAccessibilityTraitImage;
+  inflated.accessibilityFrame = CGRectMake(10, 10, 10, 10);
+  compressed.accessibilityFrame = CGRectMake(10, 10, 10, 10);
+  inflated.accessibilityLanguage = @"Accessibility language";
+  compressed.accessibilityLanguage = @"Accessibility language";
+  inflated.accessibilityElementsHidden = YES;
+  compressed.accessibilityElementsHidden = YES;
+  inflated.accessibilityViewIsModal = YES;
+  compressed.accessibilityViewIsModal = YES;
+  inflated.shouldGroupAccessibilityChildren = YES;
+  compressed.shouldGroupAccessibilityChildren = YES;
   
   // iOS 11
   if (@available(iOS 11.0, *)) {
@@ -264,24 +278,11 @@
     compressed.accessibilityAttributedLabel = [[NSAttributedString alloc] initWithString:@"Accessibility attributed label"];
     inflated.accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:@"Accessibility attributed hint"];
     compressed.accessibilityAttributedHint = [[NSAttributedString alloc] initWithString:@"Accessibility attributed hint"];
+    inflated.accessibilityAttributedValue = [[NSAttributedString alloc] initWithString:@"Accessibility attributed value"];
+    compressed.accessibilityAttributedValue = [[NSAttributedString alloc] initWithString:@"Accessibility attributed value"];
   }
-  
-  /**
-   Following properties of the UIAccessibility informal protocol are supported as well.
-   We don't declare them here, so _ASPendingState does not complain about them being not implemented,
-   as they are already on NSObject
-   
-   @property (nonatomic, copy, nullable)   NSString *accessibilityValue;
-   @property (nonatomic, copy, nullable)   NSAttributedString *accessibilityAttributedValue API_AVAILABLE(ios(11.0),tvos(11.0));
-   @property (nonatomic)           UIAccessibilityTraits accessibilityTraits;
-   @property (nonatomic)           CGRect accessibilityFrame;
-   @property (nonatomic, nullable) NSString *accessibilityLanguage;
-   @property (nonatomic)           BOOL accessibilityElementsHidden;
-   @property (nonatomic)           BOOL accessibilityViewIsModal;
-   @property (nonatomic)           BOOL shouldGroupAccessibilityChildren;
-   **/
-  XCTAssert([self pendingStatesEqual:inflated toPendingState:compressed]);
 
+  XCTAssert([self pendingStatesEqual:inflated toPendingState:compressed]);
 }
 
 @end
