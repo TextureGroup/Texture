@@ -23,6 +23,7 @@
 
 @property (nonatomic, readonly) BOOL hasSetNeedsLayout;
 @property (nonatomic, readonly) BOOL hasSetNeedsDisplay;
+@property (nonatomic, readonly) BOOL hasLayoutIfNeeded;
 
 - (void)clearChanges;
 

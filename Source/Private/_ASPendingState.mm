@@ -330,6 +330,11 @@ static UIColor *defaultTintColor = nil;
   _flags.layoutIfNeeded = YES;
 }
 
+- (BOOL)hasLayoutIfNeeded
+{
+  return _flags.layoutIfNeeded;
+}
+
 - (void)setClipsToBounds:(BOOL)flag
 {
   clipsToBounds = flag;
@@ -1591,7 +1596,7 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
     return !_list.empty();
 }
 
-- (_ASPendingStateInflated *)inflatePendingState
+- (_ASPendingStateInflated *)inflatedPendingState
 {
   _ASPendingStateInflated *inflated = [[_ASPendingStateInflated alloc] init];
   
@@ -1851,12 +1856,12 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
 
 - (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling
 {
-  [[self inflatePendingState] applyToView:view withSpecialPropertiesHandling:specialPropertiesHandling];
+  [[self inflatedPendingState] applyToView:view withSpecialPropertiesHandling:specialPropertiesHandling];
 }
 
 - (void)applyToLayer:(CALayer *)layer
 {
-  [[self inflatePendingState] applyToLayer:layer];
+  [[self inflatedPendingState] applyToLayer:layer];
 }
 
 - (void)clearChanges
@@ -1966,7 +1971,7 @@ GET_PENDING_STATE_GENERAL(bounds, ASPendingStateTypeBounds, CGRect, cgRect)
 - (void)setBounds:(CGRect)bounds
 {
   validate_bounds(bounds);
-  _list.push_front([[_ASPendingStateCompressedNodeCGRect alloc] initWithPendingStateType:ASPendingStateTypeFrame cgRect:bounds]);
+  _list.push_front([[_ASPendingStateCompressedNodeCGRect alloc] initWithPendingStateType:ASPendingStateTypeBounds cgRect:bounds]);
 }
 
 GET_AND_SET_PENDING_STATE_TRANSFORM_3D(transform, Transform, ASPendingStateTypeTransform)
@@ -2038,6 +2043,14 @@ GET_AND_SET_PENDING_STATE_UINT(edgeAntialiasingMask, EdgeAntialiasingMask, ASPen
 - (void)layoutIfNeeded
 {
   _list.push_front([[_ASPendingStateCompressedNode alloc] initWithPendingStateType:ASPendingStateTypeLayoutIfNeeded]);
+}
+
+- (BOOL)hasLayoutIfNeeded
+{
+  if (_ASPendingStateCompressedNode *node = [self nodeOfPendingStateType:ASPendingStateTypeLayoutIfNeeded]) {
+    return YES;
+  }
+  return NO;
 }
 
 

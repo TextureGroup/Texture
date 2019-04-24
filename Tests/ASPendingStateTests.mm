@@ -74,6 +74,23 @@
     }
   });
   
+  [allProperties addObject:@"isAccessibilityElement"];
+  
+  // Add accessibility protocol
+  [allProperties addObject:@"isAccessibilityElement"];
+  [allProperties addObject:@"accessibilityLabel"];
+  [allProperties addObject:@"accessibilityAttributedLabel"];
+  [allProperties addObject:@"accessibilityHint"];
+  [allProperties addObject:@"accessibilityAttributedHint"];
+  [allProperties addObject:@"accessibilityValue"];
+  [allProperties addObject:@"accessibilityAttributedValue"];
+  [allProperties addObject:@"accessibilityTraits"];
+  [allProperties addObject:@"accessibilityFrame"];
+  [allProperties addObject:@"accessibilityLanguage"];
+  [allProperties addObject:@"accessibilityElementsHidden"];
+  [allProperties addObject:@"accessibilityViewIsModal"];
+  [allProperties addObject:@"shouldGroupAccessibilityChildren"];
+  
   return allProperties;
 }
 
@@ -109,14 +126,8 @@
     isEqual &= propertyEqual;
   }
   
-  // Check some non property properties
-  NSLog(@"Checking equality on layoutIfNeeded");
-  CALayer *layer = [[CALayer alloc] init];
-  id mockLayer = OCMPartialMock(layer);
-  
-  OCMExpect([mockLayer layoutIfNeeded]);
-  [pendingStateOne applyToLayer:mockLayer];
-  OCMVerify([mockLayer layoutIfNeeded]);
+  NSLog(@"Checking equality on hasLayoutIfNeeded");
+  XCTAssertEqual(pendingStateOne.hasLayoutIfNeeded, pendingStateTwo.hasLayoutIfNeeded);
   
   return isEqual;
 }
@@ -202,28 +213,34 @@
   compressed.allowsGroupOpacity = YES;
   inflated.allowsEdgeAntialiasing = YES;
   compressed.allowsEdgeAntialiasing = YES;
+  [inflated setNeedsLayout];
+  [compressed setNeedsLayout];
+  [inflated setNeedsDisplay];
+  [compressed setNeedsDisplay];
   [inflated layoutIfNeeded];
   [compressed layoutIfNeeded];
-//
-//  - (void)setNeedsDisplay;
-//  - (void)setNeedsLayout;
-//  - (void)layoutIfNeeded;
-//
-//  @end
-//
-//  /**
-//   These are all of the "good" properties of the UIView API that we support in pendingViewState or view of an ASDisplayNode.
-//   */
-//  @protocol ASDisplayNodeViewProperties
-//
-//  @property (nonatomic)          BOOL clipsToBounds;
-//  @property (nonatomic, getter=isHidden) BOOL hidden;
-//  @property (nonatomic)          BOOL autoresizesSubviews;
-//  @property (nonatomic)          UIViewAutoresizing autoresizingMask;
-//  @property (nonatomic, null_resettable) UIColor *tintColor;
-//  @property (nonatomic)          CGFloat alpha;
-//  @property (nonatomic)          CGRect bounds;
-//  @property (nonatomic)          CGRect frame;   // Only for use with nodes wrapping synchronous views
+  inflated.isAccessibilityElement = YES;
+  compressed.isAccessibilityElement = YES;
+  inflated.clipsToBounds = YES;
+  compressed.clipsToBounds = YES;
+  inflated.hidden = YES;
+  compressed.hidden = YES;
+  inflated.autoresizesSubviews = YES;
+  compressed.autoresizesSubviews = YES;
+  inflated.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin;
+  compressed.autoresizingMask = inflated.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin;
+  inflated.tintColor = [UIColor greenColor];
+  compressed.tintColor = [UIColor greenColor];
+  inflated.alpha = 0.5;
+  compressed.alpha = 0.5;
+  inflated.bounds = CGRectMake(10, 10, 10, 10);
+  compressed.bounds = CGRectMake(10, 10, 10, 10);
+  inflated.frame = CGRectMake(10, 10, 10, 10);
+  compressed.frame = CGRectMake(10, 10, 10, 10);
+  inflated.contentMode = UIViewContentModeScaleAspectFit;
+  compressed.contentMode = UIViewContentModeScaleAspectFit;
+
+
 //  @property (nonatomic)          UIViewContentMode contentMode;
 //  @property (nonatomic)          UISemanticContentAttribute semanticContentAttribute API_AVAILABLE(ios(9.0), tvos(9.0));
 //  @property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
