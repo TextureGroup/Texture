@@ -255,6 +255,7 @@ using AS::MutexLocker;
       if (shouldCreateGraphicsContext) {
         CHECK_CANCELLED_AND_RETURN_NIL( UIGraphicsEndImageContext(); );
         image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
       }
 
       ASDN_DELAY_FOR_DISPLAY();
