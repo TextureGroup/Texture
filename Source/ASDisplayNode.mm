@@ -2528,7 +2528,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
       if (stretchable) {
         ASDisplayNodeSetResizableContents(_placeholderLayer, _placeholderImage);
       } else {
-        _placeholderLayer.contentsScale = self.contentsScale;
+        _placeholderLayer.contentsScale = _placeholderImage.scale;
         _placeholderLayer.contents = (id)_placeholderImage.CGImage;
       }
     }
