@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A Boolean value that determines whether paging is enabled for the scroll view.
  * The default value of this property is NO.
  */
-@property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled;
+@property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled __TVOS_PROHIBITED;
 
 /*
  * A Boolean value that determines whether users can select a row.

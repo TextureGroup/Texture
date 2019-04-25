@@ -199,7 +199,9 @@
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+#if !TARGET_OS_TV
     view.pagingEnabled                  = pendingState.pagingEnabled;
+#endif
 
     // Only apply these flags if they're enabled; the view might come with them turned on.
     if (pendingState.alwaysBounceVertical) {
@@ -531,6 +533,7 @@
   }
 }
 
+#if !TARGET_OS_TV
 - (void)setPagingEnabled:(BOOL)pagingEnabled
 {
   if ([self pendingState]) {
@@ -550,6 +553,7 @@
     return self.view.isPagingEnabled;
   }
 }
+#endif
 
 - (void)setCollectionViewLayout:(UICollectionViewLayout *)layout
 {

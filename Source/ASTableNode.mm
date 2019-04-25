@@ -165,7 +165,9 @@
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
     view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
+#if !TARGET_OS_TV
     view.pagingEnabled                        = pendingState.pagingEnabled;
+#endif
 
     UIEdgeInsets contentInset = pendingState.contentInset;
     if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
@@ -368,6 +370,7 @@
   }
 }
 
+#if !TARGET_OS_TV
 - (void)setPagingEnabled:(BOOL)pagingEnabled
 {
   _ASTablePendingState *pendingState = self.pendingState;
@@ -389,6 +392,7 @@
     return self.view.isPagingEnabled;
   }
 }
+#endif
 
 - (void)setDelegate:(id <ASTableDelegate>)delegate
 {
