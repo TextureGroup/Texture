@@ -81,9 +81,96 @@ typedef struct {
 
 #pragma mark - ASCollectionDelegate
 
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:willDisplayItemWithNode:)]) {
+    [_collectionDelegate collectionNode:collectionNode willDisplayItemWithNode:node];
+  }
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingItemWithNode:)]) {
+    [_collectionDelegate collectionNode:collectionNode didEndDisplayingItemWithNode:node];
+  }
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplaySupplementaryElementWithNode:(ASCellNode *)node {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:willDisplaySupplementaryElementWithNode:)]) {
+    [_collectionDelegate collectionNode:collectionNode willDisplaySupplementaryElementWithNode:node];
+  }
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingSupplementaryElementWithNode:(ASCellNode *)node {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingSupplementaryElementWithNode:)]) {
+    [_collectionDelegate collectionNode:collectionNode didEndDisplayingSupplementaryElementWithNode:node];
+  }
+}
+
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:shouldHighlightItemAtIndexPath:)]) {
+    return [_collectionDelegate collectionNode:collectionNode shouldHighlightItemAtIndexPath:indexPath];
+  }
+  return YES;
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didHighlightItemAtIndexPath:)]) {
+    [_collectionDelegate collectionNode:collectionNode didHighlightItemAtIndexPath:indexPath];
+  }
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didUnhighlightItemAtIndexPath:)]) {
+    [_collectionDelegate collectionNode:collectionNode didUnhighlightItemAtIndexPath:indexPath];
+  }
+}
+
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:shouldSelectItemAtIndexPath:)]) {
+    return [_collectionDelegate collectionNode:collectionNode shouldSelectItemAtIndexPath:indexPath];
+  }
+  return YES;
+}
+
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:shouldDeselectItemAtIndexPath:)]) {
+    return [_collectionDelegate collectionNode:collectionNode shouldDeselectItemAtIndexPath:indexPath];
+  }
+  return YES;
+}
+  
 - (void)collectionNode:(ASCollectionNode *)collectionNode didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   [self.delegate collectionView:collectionNode.view didSelectItemAtIndexPath:indexPath];
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didSelectItemAtIndexPath:)]) {
+    [_collectionDelegate collectionNode:collectionNode didSelectItemAtIndexPath:indexPath];
+  }
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didDeselectItemAtIndexPath:(NSIndexPath *)indexPath {
+  [self.delegate collectionView:collectionNode.view didDeselectItemAtIndexPath:indexPath];
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:didDeselectItemAtIndexPath:)]) {
+    [_collectionDelegate collectionNode:collectionNode didDeselectItemAtIndexPath:indexPath];
+  }
+}
+
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode shouldShowMenuForItemAtIndexPath:(NSIndexPath *)indexPath {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:shouldShowMenuForItemAtIndexPath:)]) {
+    return [_collectionDelegate collectionNode:collectionNode shouldShowMenuForItemAtIndexPath:indexPath];
+  }
+  return NO;
+}
+
+- (BOOL)collectionNode:(ASCollectionNode *)collectionNode canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(id)sender {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:canPerformAction:forItemAtIndexPath:sender:)]) {
+    return [_collectionDelegate collectionNode:collectionNode canPerformAction:action forItemAtIndexPath:indexPath sender:sender];
+  }
+  return NO;
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath sender:(nullable id)sender {
+  if ([_collectionDelegate respondsToSelector:@selector(collectionNode:performAction:forItemAtIndexPath:sender:)]) {
+    [_collectionDelegate collectionNode:collectionNode performAction:action forItemAtIndexPath:indexPath sender:sender];
+  }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
