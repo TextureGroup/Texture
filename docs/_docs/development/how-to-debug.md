@@ -1,22 +1,18 @@
 ---
 title: Develop and debug
 layout: docs
-permalink: /development/how-to-develop-and-debug.html
+permalink: /development/how-to-debug.html
 ---
-
-# Develop
-
-## Guard with Experiments
 
 # Debug
 
-Debugging Texture (or anything for that matter) can be described in the following procedure:
+Debugging Texture should follow:
 1. Define the erroneous state
-2. Describe how to arrive to that erroneous state
-3. If applicable, look for historical changes that could have led to this condition appearing using a [git bisect](https://git-scm.com/docs/git-bisect)
-4. Identify potential reproduction cases
+2. Describe how to reproduce that erroneous state
+3. If applicable, look for historical changes that could have led to this condition appearing using a [git bisect](https://git-scm.com/docs/git-bisect) or in past PR that had similar surface area/ symptoms
+4. If possible, create a unit test of the reproduction case
 5. Produce a diff where the reproduction case passes
-6. If possible, create a unit test of the reproduction case
+6. Create an experiment to protect other Texture consumers while you verify this change in production
 
 ## Crashes
 
@@ -298,6 +294,10 @@ This is very unsettling. It should be impossible for a 0x0 address to be sent th
 
 ## Weaver (View and Layout debugging)
 
-## Codepath Performance
+[Weaver](https://github.com/TextureGroup/Weaver) is a remote debugging tool for Texture apps. It is a client library and gateway server combination that uses Chrome DevTools on your browser to debug your application's layout hierarchy.
 
-## Zombies
+Demo video: https://youtu.be/zdACP6dQlQ8
+
+Weaver is a hard fork of PonyDebugger. It was trimmed down and modified to work with layout elements from both UIKit and Texture.
+
+To use Weaver, you must enable the client in your iOS application and connect it to the gateway server called "ponyd".
