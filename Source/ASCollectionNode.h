@@ -126,6 +126,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
 
 /**
+ * A Boolean value that determines whether paging is enabled for the scroll view.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled __TVOS_PROHIBITED;
+
+/**
  * The layout used to organize the node's items.
  *
  * @discussion Assigning a new layout object to this property causes the new layout to be applied (without animations) to the node’s items.
