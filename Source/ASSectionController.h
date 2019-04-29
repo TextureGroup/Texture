@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @return A block to be run concurrently to build the node for this item.
  * @see collectionNode:nodeBlockForItemAtIndexPath:
  */
-- (ASCellNodeBlock)nodeBlockForItemAtIndex:(NSInteger)index;
+- (nullable ASCellNodeBlock)nodeBlockForItemAtIndex:(NSInteger)index;
 
 /**
  * Similar to -collectionView:cellForItemAtIndexPath:.
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   not implement reuse (it will be called once per item).  Unlike UICollectionView's version,
  *   this method is not called when the item is about to display.
  */
-- (ASCellNode *)nodeForItemAtIndex:(NSInteger)index;
+- (nullable ASCellNode *)nodeForItemAtIndex:(NSInteger)index;
 
 @optional
 
