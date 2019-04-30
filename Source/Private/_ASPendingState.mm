@@ -2085,3 +2085,25 @@ GET_AND_SET_PENDING_STATE_POINT(accessibilityActivationPoint, AccessibilityActiv
 GET_AND_SET_PENDING_STATE_OBJECT(accessibilityPath, AccessibilityPath, ASPendingStateTypeAccessibilityPath, UIBezierPath *)
 
 @end
+
+@interface _ASPendingStateMapper ()
+{
+  id <_ASPendingState> _pendingState;
+}
+
+@end
+
+@implementation _ASPendingStateMapper
+
+- (instancetype)init
+{
+  _pendingState = [[_ASPendingStateCompressed alloc] init];
+  return self;
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+  return _pendingState;
+}
+
+@end

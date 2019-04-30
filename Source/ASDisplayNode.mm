@@ -191,7 +191,7 @@ NSObject<_ASPendingState> *ASDisplayNodeGetPendingState(ASDisplayNode *node)
   ASLockScope(node);
   NSObject<_ASPendingState> *result = node->_pendingViewState;
   if (result == nil) {
-    result = [[_ASPendingStateCompressed alloc] init];
+    result = [[_ASPendingStateMapper alloc] init];
     node->_pendingViewState = result;
     [[ASPendingStateTracker sharedTracker] nodeSetPendingState:node];
       static dispatch_once_t onceToken;

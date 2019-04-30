@@ -41,6 +41,10 @@
  When you want to configure a view from this pending state information, just call -applyToView:
  */
 
+@interface _ASPendingStateMapper : NSObject <_ASPendingState>
+
+@end
+
 @interface _ASPendingStateInflated : NSObject <_ASPendingState>
 
 - (NSUInteger)cost;
