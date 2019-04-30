@@ -562,7 +562,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
   if (_downloadIdentifier) {
     if (storeResume && _downloaderFlags.downloaderImplementsCancelWithResume) {
-      as_log_verbose(ASImageLoadingLog(), "Canceling image download w resume for %@ id: %@", self, _downloadIdentifier);
+      as_log_verbose(ASImageLoadingLog(), "Canceling image download with resume for %@ id: %@", self, _downloadIdentifier);
       [_downloader cancelImageDownloadWithResumePossibilityForIdentifier:_downloadIdentifier];
     } else {
       as_log_verbose(ASImageLoadingLog(), "Canceling image download no resume for %@ id: %@", self, _downloadIdentifier);
@@ -666,7 +666,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     BOOL delegateWillLoadImageFromNetwork = _delegateFlags.delegateWillLoadImageFromNetwork;
     BOOL delegateDidLoadImageFromCache = _delegateFlags.delegateDidLoadImageFromCache;
     BOOL isImageLoaded = _imageLoaded;
-    NSURL *URL = _URL;
+    __block NSURL *URL = _URL;
     id currentDownloadIdentifier = _downloadIdentifier;
   [self unlock];
   
@@ -696,6 +696,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
             NSString *filename = [[NSBundle mainBundle] pathForResource:URL.path.lastPathComponent ofType:nil];
             if (filename != nil) {
               nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:filename];
+              URL = nonAnimatedImage ? [NSURL URLWithString:filename] : URL;
             }
           }
 
