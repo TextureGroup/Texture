@@ -204,6 +204,9 @@ static constexpr CACornerMask kASCACornerAllCorners =
   UIImage *_placeholderImage;
   BOOL _placeholderEnabled;
   CALayer *_placeholderLayer;
+  NSTimeInterval _placeholderFadeDuration;
+
+  NSInteger _drawingPriority;
 
   // keeps track of nodes/subnodes that have not finished display, used with placeholders
   ASWeakSet *_pendingDisplayNodes;
@@ -350,20 +353,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
  * Lock is not held during block invocation. Method must not be called with the lock held.
  */
 - (void)enumerateInterfaceStateDelegates:(void(NS_NOESCAPE ^)(id<ASInterfaceStateDelegate> delegate))block;
-
-/**
- * // TODO: NOT YET IMPLEMENTED
- *
- * @abstract Prevents interface state changes from affecting the node, until disabled.
- *
- * @discussion Useful to avoid flashing after removing a node from the hierarchy and re-adding it.
- * Removing a node from the hierarchy will cause it to exit the Display state, clearing its contents.
- * For some animations, it's desirable to be able to remove a node without causing it to re-display.
- * Once re-enabled, the interface state will be updated to the same value it would have been.
- *
- * @see ASInterfaceState
- */
-@property (nonatomic) BOOL interfaceStateSuspended;
 
 /**
  * This method has proven helpful in a few rare scenarios, similar to a category extension on UIView,
