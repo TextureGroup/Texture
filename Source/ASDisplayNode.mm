@@ -2637,32 +2637,38 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (BOOL)placeholderEnabled
 {
-    return _placeholderEnabled;
+  MutexLocker l(__instanceLock__);
+  return _placeholderEnabled;
 }
 
 - (void)setPlaceholderEnabled:(BOOL)placeholderEnabled
 {
-    _placeholderEnabled = placeholderEnabled;
+  MutexLocker l(__instanceLock__);
+  _placeholderEnabled = placeholderEnabled;
 }
 
 - (NSTimeInterval)placeholderFadeDuration
 {
-    return _placeholderFadeDuration;
+  MutexLocker l(__instanceLock__);
+  return _placeholderFadeDuration;
 }
 
 - (void)setPlaceholderFadeDuration:(NSTimeInterval)placeholderFadeDuration
 {
-    _placeholderFadeDuration = placeholderFadeDuration;
+  MutexLocker l(__instanceLock__);
+  _placeholderFadeDuration = placeholderFadeDuration;
 }
 
 - (NSInteger)drawingPriority
 {
-    return _drawingPriority;
+  MutexLocker l(__instanceLock__);
+  return _drawingPriority;
 }
 
 - (void)setDrawingPriority:(NSInteger)drawingPriority
 {
-    _drawingPriority = drawingPriority;
+  MutexLocker l(__instanceLock__);
+  _drawingPriority = drawingPriority;
 }
 
 #pragma mark - Hierarchy State
