@@ -77,6 +77,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) BOOL automaticallyAdjustsContentOffset;
 
+/**
+ * A Boolean value that determines whether paging is enabled for the scroll view.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled __TVOS_PROHIBITED;
+
 /*
  * A Boolean value that determines whether users can select a row.
  * If the value of this property is YES (the default), users can select rows. If you set it to NO, they cannot select rows. Setting this property affects cell selection only when the table view is not in editing mode. If you want to restrict selection of cells in editing mode, use `allowsSelectionDuringEditing`.

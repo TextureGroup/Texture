@@ -52,6 +52,7 @@
 @property (nonatomic) BOOL animatesContentOffset;
 @property (nonatomic) BOOL showsVerticalScrollIndicator;
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
+@property (nonatomic) BOOL pagingEnabled;
 @end
 
 @implementation _ASCollectionPendingState
@@ -72,6 +73,7 @@
     _animatesContentOffset = NO;
     _showsVerticalScrollIndicator = YES;
     _showsHorizontalScrollIndicator = YES;
+    _pagingEnabled = NO;
   }
   return self;
 }
@@ -156,7 +158,7 @@
     __weak __typeof__(self) weakSelf = self;
     [self setViewBlock:^{
       __typeof__(self) strongSelf = weakSelf;
-      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[[strongSelf collectionViewClass] alloc] _initWithFrame:frame collectionViewLayout:strongSelf->_pendingState.collectionViewLayout layoutFacilitator:layoutFacilitator owningNode:strongSelf];
     }];
   }
   return self;
@@ -197,6 +199,9 @@
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+#if !TARGET_OS_TV
+    view.pagingEnabled                  = pendingState.pagingEnabled;
+#endif
 
     // Only apply these flags if they're enabled; the view might come with them turned on.
     if (pendingState.alwaysBounceVertical) {
@@ -527,6 +532,28 @@
     return self.view.showsHorizontalScrollIndicator;
   }
 }
+
+#if !TARGET_OS_TV
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  if ([self pendingState]) {
+    _pendingState.pagingEnabled = pagingEnabled;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded],
+                        @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.pagingEnabled = pagingEnabled;
+  }
+}
+
+- (BOOL)isPagingEnabled
+{
+  if ([self pendingState]) {
+    return _pendingState.pagingEnabled;
+  } else {
+    return self.view.isPagingEnabled;
+  }
+}
+#endif
 
 - (void)setCollectionViewLayout:(UICollectionViewLayout *)layout
 {
@@ -1038,6 +1065,38 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
   [result addObject:@{ @"dataSource" : ASObjectDescriptionMakeTiny(self.dataSource) }];
   [result addObject:@{ @"delegate" : ASObjectDescriptionMakeTiny(self.delegate) }];
   return result;
+}
+
+#pragma mark - UIGestureRecognizerDelegate Methods
+// The value returned below are default implementation of UIKit's UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceivePress:(UIPress *)press
+{
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return NO;
 }
 
 #pragma mark - Private methods

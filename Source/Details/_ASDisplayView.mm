@@ -207,7 +207,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeUpdate) {
       // -removeFromSupernode is called by -addSubnode:, if it is needed.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [newSuperview.asyncdisplaykit_node _addSubnode:node];
+      [newSuperview.asyncdisplaykit_node addSubnode:node];
     }
   }
 }
@@ -268,7 +268,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeRemoval) {
       // The node will only disconnect from its supernode, not removeFromSuperview, in this condition.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [node _removeFromSupernode];
+      [node removeFromSupernode];
     }
   }
 }

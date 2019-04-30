@@ -20,6 +20,9 @@
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLocking.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #define ASDisplayNodeLoggingEnabled 0
@@ -987,3 +990,5 @@ typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
 @end
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop
