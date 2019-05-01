@@ -21,6 +21,103 @@
 
 @implementation ASViewControllerTests
 
+- (void)testBackgroundDealloc
+{
+  __weak ASViewController *weakViewController = nil;
+  __weak ASImageNode *weakImageNode = nil;
+  __weak _ASDisplayLayer *displayLayer = nil;
+
+  @autoreleasepool {
+    ASViewController *viewController = [[ASViewController alloc] init];
+    weakViewController = viewController;
+    ASImageNode *node = [[ASImageNode alloc] init];
+    weakImageNode = node;
+    [node setImage:[ASViewControllerTests imageOfSize:CGSizeMake(120, 120) filledWithColor:[UIColor blueColor]]];
+    XCTAssertNotNil(node.layer);
+    displayLayer = (_ASDisplayLayer *)node.layer;
+    [viewController.view addSubnode:node];
+    [viewController.view layoutSubviews];
+    viewController = nil;
+
+    // intends to semaphore mainthread until an arbitrary amount dispatch queue creates and block dispatches
+    // loosely confirm that all background queues have been flushed
+    //    [ASViewControllerTests haltMainUntilBackgroundFlushes];
+
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+  }
+
+  XCTAssertNil(weakViewController);
+  XCTAssertNil(weakImageNode);
+  XCTAssertNil(displayLayer);
+}
+
+- (void)testBackgroundDealloc2
+{
+  __weak ASViewController *weakViewController = nil;
+  __weak ASImageNode *weakImageNode = nil;
+  __weak _ASDisplayLayer *displayLayer = nil;
+  // .image.CGImage declarations
+  //    @property(nullable, nonatomic,readonly) CGImageRef CGImage; // returns underlying CGImageRef or nil if CIImage based
+  //    - (nullable CGImageRef)CGImage NS_RETURNS_INNER_POINTER CF_RETURNS_NOT_RETAINED;
+  CGDataProviderRef *observedColorSpaceRef = NULL; //typedef struct CF_BRIDGED_TYPE(id) CGColorSpace *CGColorSpaceRef;
+
+  @autoreleasepool {
+    ASViewController *viewController = [[ASViewController alloc] init];
+    weakViewController = viewController;
+    ASImageNode *node = [[ASImageNode alloc] init];
+    weakImageNode = node;
+    [node setImage:[ASViewControllerTests imageOfSize:CGSizeMake(120, 120) filledWithColor:[UIColor blueColor]]];
+    XCTAssertNotNil(node.layer);
+    displayLayer = (_ASDisplayLayer *)node.layer;
+    [viewController.view addSubnode:node];
+    [viewController.view layoutSubviews];
+    CGDataProviderRef ref = CGImageGetDataProvider(node.image.CGImage);
+    observedColorSpaceRef = &ref;
+    viewController = nil;
+
+
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+  }
+
+//  XCTAssert([ASViewControllerTests haltMainUntilBackgroundFlushes]);
+
+  XCTAssertNil(weakViewController);
+  XCTAssertNil(weakImageNode);
+  XCTAssertNil(displayLayer);
+//  XCTAssert(*observedColorSpaceRef == NULL); //ignoring for now, undefined
+}
+
++ (void)haltMainUntilBackgroundFlushes
+{
+  assert([NSThread isMainThread]);
+  //    dispatch_semaphore_t sema = dispatch_semaphore_create(9001);
+  int max_count = 10;
+  //    __block BOOL GCDFlushed = NO;
+  for (int i=0; i < max_count; i++) {
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+      usleep(10000);
+      //            if (i == 1000) {
+      //                GCDFlushed = YES;
+      //                dispatch_semaphore_signal(sema);
+      //            }
+    });
+  }
+  //    dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 3));
+  //    return GCDFlushed;
+  return;
+}
+
++ (UIImage *)imageOfSize:(CGSize)size filledWithColor:(UIColor *)color {
+  UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  CGRect rect = (CGRect){CGPointZero, size};
+  CGContextFillRect(context, rect);
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return image;
+}
+
+
 - (void)testThatAutomaticSubnodeManagementScrollViewInsetsAreApplied
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
