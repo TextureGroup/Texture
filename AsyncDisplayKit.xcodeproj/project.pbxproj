@@ -189,6 +189,7 @@
 		92DD2FE61BF4D05E0074C9DD /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92DD2FE51BF4D05E0074C9DD /* MapKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */; };
 		92DD2FE81BF4D0A80074C9DD /* ASMapNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9618CB4C22791B9700531EC3 /* ASBackgroundDeallocLeak.m in Sources */ = {isa = PBXBuildFile; fileRef = 9618CB4B22791B9700531EC3 /* ASBackgroundDeallocLeak.m */; };
 		9644CFE02193777C00213478 /* ASThrashUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 9644CFDF2193777C00213478 /* ASThrashUtility.m */; };
 		9692B4FF219E12370060C2C3 /* ASCollectionViewThrashTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */; };
 		9C49C3701B853961000B0DD5 /* ASStackLayoutElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C49C36E1B853957000B0DD5 /* ASStackLayoutElement.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -760,6 +761,7 @@
 		92DD2FE11BF4B97E0074C9DD /* ASMapNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMapNode.h; sourceTree = "<group>"; };
 		92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMapNode.mm; sourceTree = "<group>"; };
 		92DD2FE51BF4D05E0074C9DD /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		9618CB4B22791B9700531EC3 /* ASBackgroundDeallocLeak.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASBackgroundDeallocLeak.m; sourceTree = "<group>"; };
 		9644CFDE2193777C00213478 /* ASThrashUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASThrashUtility.h; sourceTree = "<group>"; };
 		9644CFDF2193777C00213478 /* ASThrashUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASThrashUtility.m; sourceTree = "<group>"; };
 		9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionViewThrashTests.mm; sourceTree = "<group>"; };
@@ -1293,6 +1295,7 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				9618CB4B22791B9700531EC3 /* ASBackgroundDeallocLeak.m */,
 				9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */,
 				F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */,
 				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
@@ -2345,6 +2348,7 @@
 				F325E490217460B100AC93A4 /* ASTextNode2Tests.mm in Sources */,
 				058D0A3D195D057000B7D73C /* ASTextKitCoreTextAdditionsTests.mm in Sources */,
 				CC3B20901C3F892D00798563 /* ASBridgedPropertiesTests.mm in Sources */,
+				9618CB4C22791B9700531EC3 /* ASBackgroundDeallocLeak.m in Sources */,
 				CCE4F9BE1F0ECE5200062E4E /* ASTLayoutFixture.mm in Sources */,
 				058D0A40195D057000B7D73C /* ASTextNodeTests.mm in Sources */,
 				DBC453221C5FD97200B16017 /* ASDisplayNodeImplicitHierarchyTests.mm in Sources */,
