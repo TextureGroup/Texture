@@ -35,9 +35,10 @@
 @public
   std::vector<std::vector<ASRangeTuningParameters>> _tuningParameters;
 
+  // Keep these enums by the bitfield struct to save memory.
+  ASLayoutRangeMode _rangeMode;
+  ASCellLayoutMode _cellLayoutMode;
   struct {
-    ASLayoutRangeMode rangeMode;
-    ASCellLayoutMode cellLayoutMode;
     unsigned int allowsSelection:1; // default is YES
     unsigned int allowsMultipleSelection:1; // default is NO
     unsigned int inverted:1; //default is NO
@@ -47,7 +48,7 @@
     unsigned int showsVerticalScrollIndicator:1;
     unsigned int showsHorizontalScrollIndicator:1;
     unsigned int pagingEnabled:1;
-  } _fields;
+  } _flags;
 }
 @property (nonatomic, weak) id <ASCollectionDelegate>   delegate;
 @property (nonatomic, weak) id <ASCollectionDataSource> dataSource;
@@ -79,15 +80,15 @@
   if (self) {
     _fields.rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
-    _fields.allowsSelection = YES;
-    _fields.allowsMultipleSelection = NO;
-    _fields.inverted = NO;
+    _flags.allowsSelection = YES;
+    _flags.allowsMultipleSelection = NO;
+    _flags.inverted = NO;
     _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
-    _fields.animatesContentOffset = NO;
-    _fields.showsVerticalScrollIndicator = YES;
-    _fields.showsHorizontalScrollIndicator = YES;
-    _fields.pagingEnabled = NO;
+    _flags.animatesContentOffset = NO;
+    _flags.showsVerticalScrollIndicator = YES;
+    _flags.showsHorizontalScrollIndicator = YES;
+    _flags.pagingEnabled = NO;
   }
   return self;
 }
@@ -96,112 +97,112 @@
 
 - (ASLayoutRangeMode)rangeMode
 {
-  return _fields.rangeMode;
+  return _rangeMode;
 }
 
 - (void)setRangeMode:(ASLayoutRangeMode)rangeMode
 {
-  _fields.rangeMode = rangeMode;
+  _rangeMode = rangeMode;
 }
 
 - (ASCellLayoutMode)cellLayoutMode
 {
-  return _fields.cellLayoutMode;
+  return _cellLayoutMode;
 }
 
 - (void)setCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
 {
-  _fields.cellLayoutMode = cellLayoutMode;
+  _cellLayoutMode = cellLayoutMode;
 }
 
 - (BOOL)allowsSelection
 {
-  return _fields.allowsSelection;
+  return _flags.allowsSelection;
 }
 
 - (void)setAllowsSelection:(BOOL)allowsSelection
 {
-  _fields.allowsSelection = allowsSelection;
+  _flags.allowsSelection = allowsSelection;
 }
 
 - (BOOL)allowsMultipleSelection
 {
-  return _fields.allowsMultipleSelection;
+  return _flags.allowsMultipleSelection;
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
 {
-  _fields.allowsMultipleSelection = allowsMultipleSelection;
+  _flags.allowsMultipleSelection = allowsMultipleSelection;
 }
 
 - (BOOL)inverted
 {
-  return _fields.inverted;
+  return _flags.inverted;
 }
 
 -(void)setInverted:(BOOL)inverted
 {
-  _fields.inverted = inverted;
+  _flags.inverted = inverted;
 }
 
 -(BOOL)alwaysBounceVertical
 {
-  return _fields.alwaysBounceVertical;
+  return _flags.alwaysBounceVertical;
 }
 
 -(void)setAlwaysBounceVertical:(BOOL)alwaysBounceVertical
 {
-  _fields.alwaysBounceVertical = alwaysBounceVertical;
+  _flags.alwaysBounceVertical = alwaysBounceVertical;
 }
 
 -(BOOL)alwaysBounceHorizontal
 {
-  return _fields.alwaysBounceHorizontal;
+  return _flags.alwaysBounceHorizontal;
 }
 
 -(void)setAlwaysBounceHorizontal:(BOOL)alwaysBounceHorizontal
 {
-  _fields.alwaysBounceHorizontal = alwaysBounceHorizontal;
+  _flags.alwaysBounceHorizontal = alwaysBounceHorizontal;
 }
 
 - (BOOL)animatesContentOffset
 {
-  return _fields.animatesContentOffset;
+  return _flags.animatesContentOffset;
 }
 
 -(void)setAnimatesContentOffset:(BOOL)animatesContentOffset
 {
-  _fields.animatesContentOffset = animatesContentOffset;
+  _flags.animatesContentOffset = animatesContentOffset;
 }
 
 - (BOOL)showsVerticalScrollIndicator
 {
-  return _fields.showsVerticalScrollIndicator;
+  return _flags.showsVerticalScrollIndicator;
 }
 
 - (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
 {
-  _fields.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+  _flags.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
 }
 
 -(BOOL)showsHorizontalScrollIndicator
 {
-  return _fields.showsHorizontalScrollIndicator;
+  return _flags.showsHorizontalScrollIndicator;
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
-  _fields.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+  _flags.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
 }
 
 -(BOOL)pagingEnabled
 {
-  return _fields.pagingEnabled;
+  return _flags.pagingEnabled;
 }
 
 - (void)setPagingEnabled:(BOOL)pagingEnabled
 {
-  _fields.pagingEnabled = pagingEnabled;
+  _flags.pagingEnabled = pagingEnabled;
 }
 
 #pragma mark Tuning Parameters
