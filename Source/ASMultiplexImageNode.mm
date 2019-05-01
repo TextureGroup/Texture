@@ -301,9 +301,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-  if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
-  }
+  [self _updatePriorityOnDownloaderIfNeeded];
 }
 
 #pragma mark - Core
@@ -484,7 +482,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 #pragma mark -
 
-- (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
+- (void)_updatePriorityOnDownloaderIfNeeded
 {
   DISABLED_ASAssertUnlocked(_downloadIdentifierLock);
 
@@ -494,11 +492,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     MutexLocker l(_downloadIdentifierLock);
 
     if (_downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = defaultPriority;
-      if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-      }
-
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
       [_downloader setPriority:priority withDownloadIdentifier:_downloadIdentifier];
     }
   }
@@ -872,14 +866,12 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     dispatch_queue_t callbackQueue = dispatch_get_main_queue();
 
     id downloadIdentifier;
-    if (strongSelf->_downloaderFlags.downloaderImplementsDownloadWithPriority
-        && ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-
+    if (strongSelf->_downloaderFlags.downloaderImplementsDownloadWithPriority) {
       /*
-       Decide a priority based on the current interface state of this node.
-       It can happen that this method was called when the node entered preload state
-       but the interface state, at this point, tells us that the node is (going to be) visible,
-       If that's the case, we jump to a higher priority directly.
+        Decide a priority based on the current interface state of this node.
+        It can happen that this method was called when the node entered preload state
+        but the interface state, at this point, tells us that the node is (going to be) visible,
+        If that's the case, we jump to a higher priority directly.
        */
       ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(strongSelf.interfaceState);
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
@@ -889,13 +881,13 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
                                                               completion:completion];
     } else {
       /*
-       Kick off a download with default priority.
-       The actual "default" value is decided by the downloader.
-       ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
-       which is mapped to NSURLSessionTaskPriorityDefault.
+        Kick off a download with default priority.
+        The actual "default" value is decided by the downloader.
+        ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
+        which is mapped to NSURLSessionTaskPriorityDefault.
 
-       This means that preload and display nodes use the same priority
-       and their requests are put into the same pool.
+        This means that preload and display nodes use the same priority
+        and their requests are put into the same pool.
        */
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
                                                            callbackQueue:callbackQueue

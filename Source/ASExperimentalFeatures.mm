@@ -22,7 +22,6 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_did_enter_preload_skip_asm_layout",
                                       @"exp_disable_a11y_cache",
                                       @"exp_dispatch_apply",
-                                      @"exp_image_downloader_priority",
                                       @"exp_text_drawing",
                                       @"exp_fix_range_controller",
                                       @"exp_oom_bg_dealloc_disable",
