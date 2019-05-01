@@ -19,59 +19,15 @@
 
 @implementation ASBackgroundDeallocLeak
 
-
-- (void)testBackgroundDealloc
+- (void)testViewBacked_Background
 {
   __weak ASViewController *weakViewController = nil;
-  __weak ASImageNode *weakImageNode = nil;
-  __weak _ASDisplayLayer *displayLayer = nil;
-
-  @autoreleasepool {
-    ASViewController *viewController = [[ASViewController alloc] init];
-    weakViewController = viewController;
-    ASImageNode *node = [[ASImageNode alloc] init];
-    weakImageNode = node;
-    [node setImage:[ASBackgroundDeallocLeak imageOfSize:CGSizeMake(120, 120) filledWithColor:[UIColor blueColor]]];
-//    XCTAssertNotNil(node.layer);
-    displayLayer = (_ASDisplayLayer *)node.layer;
-    [viewController.view addSubnode:node];
-    [viewController.view layoutSubviews];
-    viewController = nil;
-
-    // intends to semaphore mainthread until an arbitrary amount dispatch queue creates and block dispatches
-    // loosely confirm that all background queues have been flushed
-    //    [ASViewControllerTests haltMainUntilBackgroundFlushes];
-
-    [[ASDeallocQueue sharedDeallocationQueue] drain];
-
-    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
-  }
-
-  XCTAssertNil(weakViewController);
-  XCTAssertNil(weakImageNode);
-  XCTAssertNil(displayLayer);
-}
-
-- (void)testVerifyDefaultDealloc
-{
-  __weak ASViewController *weakViewController = nil;
-  __weak ASImageNode *weakImageNode = nil;
   __weak id displayLayer = nil;
-
-  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalOOMBackgroundDeallocDisable;
-  [ASConfigurationManager test_resetWithConfiguration:config];
 
   @autoreleasepool {
     ASViewController *viewController = [[ASViewController alloc] initWithNode:[[ASDisplayNode alloc] init]];
     weakViewController = viewController;
-//    ASImageNode *node = [[ASImageNode alloc] init];
-//    weakImageNode = node;
-//    [node setImage:[ASBackgroundDeallocLeak imageOfSize:CGSizeMake(120, 120) filledWithColor:[UIColor blueColor]]];
-////    XCTAssertNotNil(node.layer);
-    displayLayer = viewController.node.layer;
-//    [viewController.view addSubnode:node];
-//    [viewController.view layoutSubviews];
+    displayLayer = viewController.node.view;
     viewController = nil;
 
     // intends to semaphore mainthread until an arbitrary amount dispatch queue creates and block dispatches
@@ -84,14 +40,36 @@
   }
 
   XCTAssertNil(weakViewController);
-  XCTAssertNil(weakImageNode);
   XCTAssertNil(displayLayer);
 }
 
-- (void)testVerifyDefaultDeallocViewBacked
+- (void)testLayerBacked_Background
 {
   __weak ASViewController *weakViewController = nil;
-  __weak ASImageNode *weakImageNode = nil;
+  __weak id displayLayer = nil;
+
+  @autoreleasepool {
+    ASViewController *viewController = [[ASViewController alloc] initWithNode:[[ASDisplayNode alloc] init]];
+    weakViewController = viewController;
+    displayLayer = viewController.node.layer;
+    viewController = nil;
+
+    // intends to semaphore mainthread until an arbitrary amount dispatch queue creates and block dispatches
+    // loosely confirm that all background queues have been flushed
+    //    [ASViewControllerTests haltMainUntilBackgroundFlushes];
+
+    [[ASDeallocQueue sharedDeallocationQueue] drain];
+
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+  }
+
+  XCTAssertNil(weakViewController);
+  XCTAssertNil(displayLayer);
+}
+
+- (void)testViewBacked_Default
+{
+  __weak ASViewController *weakViewController = nil;
   __weak id displayLayer = nil;
 
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
@@ -114,14 +92,12 @@
   }
 
   XCTAssertNil(weakViewController);
-  XCTAssertNil(weakImageNode);
   XCTAssertNil(displayLayer);
 }
 
-- (void)testVerifyDefaultDeallocLayerBacked
+- (void)testLayerBacked_Default
 {
   __weak ASViewController *weakViewController = nil;
-  __weak ASImageNode *weakImageNode = nil;
   __weak id displayLayer = nil;
 
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
@@ -144,7 +120,6 @@
   }
 
   XCTAssertNil(weakViewController);
-  XCTAssertNil(weakImageNode);
   XCTAssertNil(displayLayer);
 }
 
