@@ -372,7 +372,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   }
 
   if (self.image == nil) {
-    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityImminent];
+    [self _updatePriorityOnDownloaderIfNeeded];
   }
 }
 
@@ -381,14 +381,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)didEnterVisibleState
 {
   [super didEnterVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityVisible];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitVisibleState
 {
   [super didExitVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
