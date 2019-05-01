@@ -9,6 +9,9 @@
 
 #import <AsyncDisplayKit/ASDisplayNode.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class ASCellNode, ASTextNode;
@@ -257,3 +260,5 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
 @end
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop

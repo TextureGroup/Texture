@@ -38,6 +38,16 @@
   BOOL _selected;
   BOOL _highlighted;
   UICollectionViewLayoutAttributes *_layoutAttributes;
+
+  BOOL _neverShowPlaceholders;
+  id _nodeModel;
+  __weak id<ASRangeManagingNode> _owningNode;
+  UITableViewCellSelectionStyle _selectionStyle;
+  UITableViewCellFocusStyle _focusStyle;
+  UIView *_selectedBackgroundView;
+  UIView *_backgroundView;
+  UITableViewCellAccessoryType _accessoryType;
+  UIEdgeInsets _separatorInset;
 }
 
 @end
@@ -157,6 +167,96 @@
       });
     }
   }
+}
+
+- (BOOL)neverShowPlaceholders
+{
+  return ASLockedSelf(_neverShowPlaceholders);
+}
+
+- (void)setNeverShowPlaceholders:(BOOL)neverShowPlaceholders
+{
+  ASLockedSelfCompareAssign(_neverShowPlaceholders, neverShowPlaceholders);
+}
+
+- (id)nodeModel
+{
+  return ASLockedSelf(_nodeModel);
+}
+
+- (void)setNodeModel:(id)nodeModel
+{
+  ASLockedSelfCompareAssign(_nodeModel, nodeModel);
+}
+
+- (id)owningNode
+{
+  return ASLockedSelf(_owningNode);
+}
+
+- (void)setOwningNode:(id<ASRangeManagingNode>)owningNode
+{
+  ASLockedSelfCompareAssign(_owningNode, owningNode);
+}
+
+- (UITableViewCellSelectionStyle)selectionStyle
+{
+  return ASLockedSelf(_selectionStyle);
+}
+
+- (void)setSelectionStyle:(UITableViewCellSelectionStyle)selectionStyle
+{
+  ASLockedSelfCompareAssign(_selectionStyle, selectionStyle);
+}
+
+- (UITableViewCellFocusStyle)focusStyle
+{
+  return ASLockedSelf(_focusStyle);
+}
+
+- (void)setFocusStyle:(UITableViewCellFocusStyle)focusStyle
+{
+  ASLockedSelfCompareAssign(_focusStyle, focusStyle);
+}
+
+- (UIView *)selectedBackgroundView
+{
+  return ASLockedSelf(_selectedBackgroundView);
+}
+
+- (void)setSelectedBackgroundView:(UIView *)selectedBackgroundView
+{
+  ASLockedSelfCompareAssign(_selectedBackgroundView, selectedBackgroundView);
+}
+
+- (UIView *)backgroundView
+{
+  return ASLockedSelf(_backgroundView);
+}
+
+- (void)setBackgroundView:(UIView *)backgroundView
+{
+  ASLockedSelfCompareAssign(_backgroundView, backgroundView);
+}
+
+- (UITableViewCellAccessoryType)accessoryType
+{
+  return ASLockedSelf(_accessoryType);
+}
+
+- (void)setAccessoryType:(UITableViewCellAccessoryType)accessoryType
+{
+  ASLockedSelfCompareAssign(_accessoryType, accessoryType);
+}
+
+- (UIEdgeInsets)separatorInset
+{
+  return ASLockedSelf(_separatorInset);
+}
+
+- (void)setSeparatorInset:(UIEdgeInsets)separatorInset
+{
+  ASLockedSelfCompareAssignCustom(_separatorInset, separatorInset, UIEdgeInsetsEqualToEdgeInsets);
 }
 
 - (void)__setSelectedFromUIKit:(BOOL)selected;
@@ -393,6 +493,7 @@
   NSDictionary<NSAttributedStringKey, id> *_textAttributes;
   UIEdgeInsets _textInsets;
   NSString *_text;
+  ASTextNode *_textNode;
 }
 
 static const CGFloat kASTextCellNodeDefaultFontSize = 18.0f;
@@ -468,6 +569,11 @@ static const CGFloat kASTextCellNodeDefaultVerticalPadding = 11.0f;
   if (ASCompareAssignCopy(_text, text)) {
     [self locked_updateAttributedText];
   }
+}
+
+- (ASTextNode *)textNode
+{
+  return ASLockedSelf(_textNode);
 }
 
 - (void)locked_updateAttributedText
