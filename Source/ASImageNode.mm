@@ -732,22 +732,24 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 #pragma mark - Extras
 
-asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
+asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGSize size, CGFloat borderWidth, UIColor *borderColor)
 {
   return ^(UIImage *originalImage) {
-    UIGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
-    UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
+
+    CGRect imageRect = (CGRect){CGPointZero, size};
+    UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+    UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:imageRect];
 
     // Make the image round
     [roundOutline addClip];
 
     // Draw the original image
-    [originalImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
-
+    [originalImage drawInRect:imageRect blendMode:kCGBlendModeCopy alpha:1];
     // Draw a border on top.
     if (borderWidth > 0.0) {
       [borderColor setStroke];
-      [roundOutline setLineWidth:borderWidth];
+      CGFloat correctedBorderWidth = borderWidth * 2;
+      [roundOutline setLineWidth:correctedBorderWidth];
       [roundOutline stroke];
     }
 

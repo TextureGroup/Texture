@@ -189,6 +189,7 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
 /**
  * @abstract Image modification block that rounds (and optionally adds a border to) an image.
  *
+ * @param size The desired final size for the image.
  * @param borderWidth The width of the round border to draw, or zero if no border is desired.
  * @param borderColor What colour border to draw.
  *
@@ -196,7 +197,7 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
  *
  * @return An ASImageNode image modification block.
  */
-AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor * _Nullable borderColor);
+AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGSize size, CGFloat borderWidth, UIColor * _Nullable borderColor);
 
 /**
  * @abstract Image modification block that applies a tint color à la UIImage configured with

@@ -83,7 +83,7 @@
   UIRectFill(CGRectMake(0, 0, 100, 100));
   UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result);
+  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(CGSizeMake(100, 100), 2, [UIColor redColor])(result);
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = rounded;
   ASDisplayNodeSizeToFitSize(node, rounded.size);
