@@ -2635,6 +2635,42 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return NO;
 }
 
+- (BOOL)placeholderEnabled
+{
+  MutexLocker l(__instanceLock__);
+  return _placeholderEnabled;
+}
+
+- (void)setPlaceholderEnabled:(BOOL)placeholderEnabled
+{
+  MutexLocker l(__instanceLock__);
+  _placeholderEnabled = placeholderEnabled;
+}
+
+- (NSTimeInterval)placeholderFadeDuration
+{
+  MutexLocker l(__instanceLock__);
+  return _placeholderFadeDuration;
+}
+
+- (void)setPlaceholderFadeDuration:(NSTimeInterval)placeholderFadeDuration
+{
+  MutexLocker l(__instanceLock__);
+  _placeholderFadeDuration = placeholderFadeDuration;
+}
+
+- (NSInteger)drawingPriority
+{
+  MutexLocker l(__instanceLock__);
+  return _drawingPriority;
+}
+
+- (void)setDrawingPriority:(NSInteger)drawingPriority
+{
+  MutexLocker l(__instanceLock__);
+  _drawingPriority = drawingPriority;
+}
+
 #pragma mark - Hierarchy State
 
 - (BOOL)isInHierarchy
