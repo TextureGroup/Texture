@@ -33,6 +33,7 @@
   // Control Attributes
   BOOL _enabled;
   BOOL _highlighted;
+  BOOL _selected;
 
   // Tracking
   BOOL _tracking;
@@ -119,6 +120,68 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   if (self.tracking) {
     [self _cancelTrackingWithEvent:nil];
   }
+}
+
+#pragma mark - ASDisplayNode Overrides
+
+- (BOOL)isEnabled
+{
+  ASLockScopeSelf();
+  return _enabled;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+  ASLockScopeSelf();
+  _enabled = enabled;
+}
+
+- (BOOL)isHighlighted
+{
+  ASLockScopeSelf();
+  return _highlighted;
+}
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+  ASLockScopeSelf();
+  _highlighted = highlighted;
+}
+
+- (void)setSelected:(BOOL)selected
+{
+  ASLockScopeSelf();
+  _selected = selected;
+}
+
+- (BOOL)isSelected
+{
+  ASLockScopeSelf();
+  return _selected;
+}
+
+- (void)setTracking:(BOOL)tracking
+{
+  ASLockScopeSelf();
+  _tracking = tracking;
+}
+
+- (BOOL)isTracking
+{
+  ASLockScopeSelf();
+  return _tracking;
+}
+
+- (void)setTouchInside:(BOOL)touchInside
+{
+  ASLockScopeSelf();
+  _touchInside = touchInside;
+}
+
+- (BOOL)isTouchInside
+{
+  ASLockScopeSelf();
+  return _touchInside;
 }
 
 #pragma clang diagnostic push
