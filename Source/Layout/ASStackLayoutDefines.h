@@ -108,7 +108,7 @@ typedef NS_ENUM(NSUInteger, ASStackLayoutAlignContent) {
 };
 
 /** Orientation of children along horizontal axis */
-typedef NS_ENUM(NSUInteger, ASHorizontalAlignment) {
+typedef NS_ENUM(unsigned char, ASHorizontalAlignment) {
   /** No alignment specified. Default value */
   ASHorizontalAlignmentNone,
   /** Left aligned */
@@ -128,7 +128,7 @@ typedef NS_ENUM(NSUInteger, ASHorizontalAlignment) {
 };
 
 /** Orientation of children along vertical axis */
-typedef NS_ENUM(NSUInteger, ASVerticalAlignment) {
+typedef NS_ENUM(unsigned char, ASVerticalAlignment) {
   /** No alignment specified. Default value */
   ASVerticalAlignmentNone,
   /** Top aligned */
