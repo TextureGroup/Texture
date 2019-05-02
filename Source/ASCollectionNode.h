@@ -14,6 +14,9 @@
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 @protocol ASCollectionViewLayoutFacilitatorProtocol;
 @protocol ASCollectionDelegate;
 @protocol ASCollectionDataSource;
@@ -954,3 +957,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop

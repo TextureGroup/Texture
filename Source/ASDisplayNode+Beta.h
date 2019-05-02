@@ -25,7 +25,7 @@ AS_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATC
 /**
  * Bitmask to indicate what performance measurements the cell should record.
  */
-typedef NS_OPTIONS(NSUInteger, ASDisplayNodePerformanceMeasurementOptions) {
+typedef NS_OPTIONS(unsigned char, ASDisplayNodePerformanceMeasurementOptions) {
   ASDisplayNodePerformanceMeasurementOptionLayoutSpec = 1 << 0,
   ASDisplayNodePerformanceMeasurementOptionLayoutComputation = 1 << 1
 };

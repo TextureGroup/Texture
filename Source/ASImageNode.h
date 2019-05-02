@@ -10,6 +10,9 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASControlNode.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASAnimatedImageProtocol;
@@ -211,3 +214,5 @@ AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlo
 AS_EXTERN asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop

@@ -34,12 +34,8 @@
   ASDisplayNodeDidLoadBlock _viewControllerDidLoadBlock;
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
-  BOOL _suspendInteractionDelegate;
-  BOOL _selected;
-  BOOL _highlighted;
   UICollectionViewLayoutAttributes *_layoutAttributes;
 
-  BOOL _neverShowPlaceholders;
   id _nodeModel;
   __weak id<ASRangeManagingNode> _owningNode;
   UITableViewCellSelectionStyle _selectionStyle;
@@ -48,6 +44,13 @@
   UIView *_backgroundView;
   UITableViewCellAccessoryType _accessoryType;
   UIEdgeInsets _separatorInset;
+
+  struct {
+    unsigned int suspendInteractionDelegate:1;
+    unsigned int selected:1;
+    unsigned int highlighted:1;
+    unsigned int neverShowPlaceholders:1;
+  } _cellNodeFlags;
 }
 
 @end
@@ -139,13 +142,13 @@
 
 - (BOOL)isSelected
 {
-  return ASLockedSelf(_selected);
+  return ASLockedSelf(_cellNodeFlags.selected);
 }
 
 - (void)setSelected:(BOOL)selected
 {
-  if (ASLockedSelfCompareAssign(_selected, selected)) {
-    if (!_suspendInteractionDelegate) {
+  if (ASLockedSelfCompareAssign(_cellNodeFlags.selected, selected)) {
+    if (!_cellNodeFlags.suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
         [_interactionDelegate nodeSelectedStateDidChange:self];
       });
@@ -155,13 +158,13 @@
 
 - (BOOL)isHighlighted
 {
-  return ASLockedSelf(_highlighted);
+  return ASLockedSelf(_cellNodeFlags.highlighted);
 }
 
 - (void)setHighlighted:(BOOL)highlighted
 {
-  if (ASLockedSelfCompareAssign(_highlighted, highlighted)) {
-    if (!_suspendInteractionDelegate) {
+  if (ASLockedSelfCompareAssign(_cellNodeFlags.highlighted, highlighted)) {
+    if (!_cellNodeFlags.suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
         [_interactionDelegate nodeHighlightedStateDidChange:self];
       });
@@ -171,12 +174,12 @@
 
 - (BOOL)neverShowPlaceholders
 {
-  return ASLockedSelf(_neverShowPlaceholders);
+  return ASLockedSelf(_cellNodeFlags.neverShowPlaceholders);
 }
 
 - (void)setNeverShowPlaceholders:(BOOL)neverShowPlaceholders
 {
-  ASLockedSelfCompareAssign(_neverShowPlaceholders, neverShowPlaceholders);
+  ASLockedSelfCompareAssign(_cellNodeFlags.neverShowPlaceholders, neverShowPlaceholders);
 }
 
 - (id)nodeModel
@@ -262,20 +265,20 @@
 - (void)__setSelectedFromUIKit:(BOOL)selected;
 {
   // Note: Race condition could mean redundant sets. Risk is low.
-  if (ASLockedSelf(_selected != selected)) {
-    _suspendInteractionDelegate = YES;
+  if (ASLockedSelf(_cellNodeFlags.selected != selected)) {
+    _cellNodeFlags.suspendInteractionDelegate = YES;
     self.selected = selected;
-    _suspendInteractionDelegate = NO;
+    _cellNodeFlags.suspendInteractionDelegate = NO;
   }
 }
 
 - (void)__setHighlightedFromUIKit:(BOOL)highlighted;
 {
   // Note: Race condition could mean redundant sets. Risk is low.
-  if (ASLockedSelf(_highlighted != highlighted)) {
-    _suspendInteractionDelegate = YES;
+  if (ASLockedSelf(_cellNodeFlags.highlighted != highlighted)) {
+    _cellNodeFlags.suspendInteractionDelegate = YES;
     self.highlighted = highlighted;
-    _suspendInteractionDelegate = NO;
+    _cellNodeFlags.suspendInteractionDelegate = NO;
   }
 }
 

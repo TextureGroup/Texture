@@ -11,6 +11,9 @@
 
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 /**
 
  Private header for ASDisplayNode.mm
@@ -39,3 +42,6 @@
 - (void)clearChanges;
 
 @end
+
+#pragma clang diagnostic pop
+

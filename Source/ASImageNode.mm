@@ -146,8 +146,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASTextNode *_debugLabelNode;
   
   // Cropping.
-  BOOL _cropEnabled; // Defaults to YES.
-  BOOL _forceUpscaling; //Defaults to NO.
   CGSize _forcedSize; //Defaults to CGSizeZero, indicating no forced size.
   CGRect _cropRect; // Defaults to CGRectMake(0.5, 0.5, 0, 0)
   CGRect _cropDisplayBounds; // Defaults to CGRectNull
@@ -174,8 +172,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   // initial value. With setting a explicit backgroundColor we can prevent that change.
   self.backgroundColor = [UIColor clearColor];
 
-  _cropEnabled = YES;
-  _forceUpscaling = NO;
+  _imageNodeFlags.cropEnabled = YES;
+  _imageNodeFlags.forceUpscaling = NO;
   _cropRect = CGRectMake(0.5, 0.5, 0, 0);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
@@ -287,7 +285,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 {
   ASLockScopeSelf();
   if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
-    _placeholderEnabled = (placeholderColor != nil);
+    _flags.placeholderEnabled = (placeholderColor != nil);
   }
 }
 
@@ -304,8 +302,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;
   drawParameters->_contentMode = self.contentMode;
-  drawParameters->_cropEnabled = _cropEnabled;
-  drawParameters->_forceUpscaling = _forceUpscaling;
+  drawParameters->_cropEnabled = self.cropEnabled;
+  drawParameters->_forceUpscaling = self.forceUpscaling;
   drawParameters->_forcedSize = _forcedSize;
   drawParameters->_cropRect = _cropRect;
   drawParameters->_cropDisplayBounds = _cropDisplayBounds;
@@ -606,7 +604,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (BOOL)isCropEnabled
 {
   AS::MutexLocker l(__instanceLock__);
-  return _cropEnabled;
+  return _imageNodeFlags.cropEnabled;
 }
 
 - (void)setCropEnabled:(BOOL)cropEnabled
@@ -617,12 +615,12 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)setCropEnabled:(BOOL)cropEnabled recropImmediately:(BOOL)recropImmediately inBounds:(CGRect)cropBounds
 {
   __instanceLock__.lock();
-  if (_cropEnabled == cropEnabled) {
+  if (_imageNodeFlags.cropEnabled == cropEnabled) {
     __instanceLock__.unlock();
     return;
   }
 
-  _cropEnabled = cropEnabled;
+  _imageNodeFlags.cropEnabled = cropEnabled;
   _cropDisplayBounds = cropBounds;
   
   UIImage *image = _image;
@@ -672,13 +670,13 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (BOOL)forceUpscaling
 {
   AS::MutexLocker l(__instanceLock__);
-  return _forceUpscaling;
+  return _imageNodeFlags.forceUpscaling;
 }
 
 - (void)setForceUpscaling:(BOOL)forceUpscaling
 {
   AS::MutexLocker l(__instanceLock__);
-  _forceUpscaling = forceUpscaling;
+  _imageNodeFlags.forceUpscaling = forceUpscaling;
 }
 
 - (CGSize)forcedSize

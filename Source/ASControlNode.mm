@@ -30,14 +30,16 @@
 @interface ASControlNode ()
 {
 @private
-  // Control Attributes
-  BOOL _enabled;
-  BOOL _highlighted;
-  BOOL _selected;
+  struct {
+    // Control Attributes
+    unsigned int enabled:1;
+    unsigned int highlighted:1;
+    unsigned int selected:1;
 
-  // Tracking
-  BOOL _tracking;
-  BOOL _touchInside;
+    // Tracking
+    unsigned int tracking:1;
+    unsigned int touchInside:1;
+  } _controlNodeFlags;
 
   // Target action pairs stored in an array for each event type
   // ASControlEvent -> [ASTargetAction0, ASTargetAction1]
@@ -84,7 +86,7 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
   if (!(self = [super init]))
     return nil;
 
-  _enabled = YES;
+  _controlNodeFlags.enabled = YES;
 
   // As we have no targets yet, we start off with user interaction off. When a target is added, it'll get turned back on.
   self.userInteractionEnabled = NO;
@@ -127,61 +129,61 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 - (BOOL)isEnabled
 {
   ASLockScopeSelf();
-  return _enabled;
+  return _controlNodeFlags.enabled;
 }
 
 - (void)setEnabled:(BOOL)enabled
 {
   ASLockScopeSelf();
-  _enabled = enabled;
+  _controlNodeFlags.enabled = enabled;
 }
 
 - (BOOL)isHighlighted
 {
   ASLockScopeSelf();
-  return _highlighted;
+  return _controlNodeFlags.highlighted;
 }
 
 - (void)setHighlighted:(BOOL)highlighted
 {
   ASLockScopeSelf();
-  _highlighted = highlighted;
+  _controlNodeFlags.highlighted = highlighted;
 }
 
 - (void)setSelected:(BOOL)selected
 {
   ASLockScopeSelf();
-  _selected = selected;
+  _controlNodeFlags.selected = selected;
 }
 
 - (BOOL)isSelected
 {
   ASLockScopeSelf();
-  return _selected;
+  return _controlNodeFlags.selected;
 }
 
 - (void)setTracking:(BOOL)tracking
 {
   ASLockScopeSelf();
-  _tracking = tracking;
+  _controlNodeFlags.tracking = tracking;
 }
 
 - (BOOL)isTracking
 {
   ASLockScopeSelf();
-  return _tracking;
+  return _controlNodeFlags.tracking;
 }
 
 - (void)setTouchInside:(BOOL)touchInside
 {
   ASLockScopeSelf();
-  _touchInside = touchInside;
+  _controlNodeFlags.touchInside = touchInside;
 }
 
 - (BOOL)isTouchInside
 {
   ASLockScopeSelf();
-  return _touchInside;
+  return _controlNodeFlags.touchInside;
 }
 
 #pragma clang diagnostic push

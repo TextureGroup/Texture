@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSUInteger ASDataControllerAnimationOptions;
 
-typedef NS_ENUM(NSInteger, _ASHierarchyChangeType) {
+typedef NS_ENUM(unsigned char, _ASHierarchyChangeType) {
   /**
    * A reload change, as submitted by the user. When a change set is
    * completed, these changes are decomposed into delete-insert pairs

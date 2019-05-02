@@ -10,6 +10,9 @@
 #import <AsyncDisplayKit/ASControlNode.h>
 #import <UIKit/UIKit.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class ASImageNode, ASTextNode;
@@ -17,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Image alignment defines where the image will be placed relative to the text.
  */
-typedef NS_ENUM(NSInteger, ASButtonNodeImageAlignment) {
+typedef NS_ENUM(unsigned char, ASButtonNodeImageAlignment) {
   /** Places the image before the text. */
   ASButtonNodeImageAlignmentBeginning,
   /** Places the image after the text. */
@@ -128,3 +131,5 @@ typedef NS_ENUM(NSInteger, ASButtonNodeImageAlignment) {
 @end
 
 NS_ASSUME_NONNULL_END
+
+#pragma clang diagnostic pop

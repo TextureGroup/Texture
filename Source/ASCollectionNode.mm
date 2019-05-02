@@ -29,11 +29,28 @@
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
+
 #pragma mark - _ASCollectionPendingState
 
 @interface _ASCollectionPendingState : NSObject {
 @public
   std::vector<std::vector<ASRangeTuningParameters>> _tuningParameters;
+
+  struct {
+    ASLayoutRangeMode rangeMode;
+    ASCellLayoutMode cellLayoutMode;
+    unsigned int allowsSelection:1; // default is YES
+    unsigned int allowsMultipleSelection:1; // default is NO
+    unsigned int inverted:1; //default is NO
+    unsigned int alwaysBounceVertical:1;
+    unsigned int alwaysBounceHorizontal:1;
+    unsigned int animatesContentOffset:1;
+    unsigned int showsVerticalScrollIndicator:1;
+    unsigned int showsHorizontalScrollIndicator:1;
+    unsigned int pagingEnabled:1;
+  } _fields;
 }
 @property (nonatomic, weak) id <ASCollectionDelegate>   delegate;
 @property (nonatomic, weak) id <ASCollectionDataSource> dataSource;
@@ -57,25 +74,145 @@
 
 @implementation _ASCollectionPendingState
 
+@synthesize delegate;
+@synthesize dataSource;
+@synthesize collectionViewLayout;
+@synthesize leadingScreensForBatching;
+@synthesize layoutInspector;
+@synthesize contentInset = _contentInset;
+@synthesize contentOffset = _contentOffset;
+
 #pragma mark Lifecycle
 
 - (instancetype)init
 {
   self = [super init];
   if (self) {
-    _rangeMode = ASLayoutRangeModeUnspecified;
+    _fields.rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
-    _allowsSelection = YES;
-    _allowsMultipleSelection = NO;
-    _inverted = NO;
+    _fields.allowsSelection = YES;
+    _fields.allowsMultipleSelection = NO;
+    _fields.inverted = NO;
     _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
-    _animatesContentOffset = NO;
-    _showsVerticalScrollIndicator = YES;
-    _showsHorizontalScrollIndicator = YES;
-    _pagingEnabled = NO;
+    _fields.animatesContentOffset = NO;
+    _fields.showsVerticalScrollIndicator = YES;
+    _fields.showsHorizontalScrollIndicator = YES;
+    _fields.pagingEnabled = NO;
   }
   return self;
+}
+
+#pragma mark Properties
+
+- (ASLayoutRangeMode)rangeMode
+{
+  return _fields.rangeMode;
+}
+
+- (void)setRangeMode:(ASLayoutRangeMode)rangeMode
+{
+  _fields.rangeMode = rangeMode;
+}
+
+- (ASCellLayoutMode)cellLayoutMode
+{
+  return _fields.cellLayoutMode;
+}
+
+- (void)setCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
+{
+  _fields.cellLayoutMode = cellLayoutMode;
+}
+
+- (BOOL)allowsSelection
+{
+  return _fields.allowsSelection;
+}
+
+- (void)setAllowsSelection:(BOOL)allowsSelection
+{
+  _fields.allowsSelection = allowsSelection;
+}
+
+- (BOOL)allowsMultipleSelection
+{
+  return _fields.allowsMultipleSelection;
+}
+
+- (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
+{
+  _fields.allowsMultipleSelection = allowsMultipleSelection;
+}
+
+- (BOOL)inverted
+{
+  return _fields.inverted;
+}
+
+-(void)setInverted:(BOOL)inverted
+{
+  _fields.inverted = inverted;
+}
+
+-(BOOL)alwaysBounceVertical
+{
+  return _fields.alwaysBounceVertical;
+}
+
+-(void)setAlwaysBounceVertical:(BOOL)alwaysBounceVertical
+{
+  _fields.alwaysBounceVertical = alwaysBounceVertical;
+}
+
+-(BOOL)alwaysBounceHorizontal
+{
+  return _fields.alwaysBounceHorizontal;
+}
+
+-(void)setAlwaysBounceHorizontal:(BOOL)alwaysBounceHorizontal
+{
+  _fields.alwaysBounceHorizontal = alwaysBounceHorizontal;
+}
+
+- (BOOL)animatesContentOffset
+{
+  return _fields.animatesContentOffset;
+}
+
+-(void)setAnimatesContentOffset:(BOOL)animatesContentOffset
+{
+  _fields.animatesContentOffset = animatesContentOffset;
+}
+
+- (BOOL)showsVerticalScrollIndicator
+{
+  return _fields.showsVerticalScrollIndicator;
+}
+
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
+{
+  _fields.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
+-(BOOL)showsHorizontalScrollIndicator
+{
+  return _fields.showsHorizontalScrollIndicator;
+}
+
+- (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
+{
+  _fields.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+}
+
+-(BOOL)pagingEnabled
+{
+  return _fields.pagingEnabled;
+}
+
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  _fields.pagingEnabled = pagingEnabled;
 }
 
 #pragma mark Tuning Parameters
@@ -117,6 +254,9 @@
 @end
 
 @implementation ASCollectionNode
+
+@synthesize pendingState = _pendingState;
+@synthesize rangeController = _rangeController;
 
 #pragma mark Lifecycle
 
@@ -1110,3 +1250,5 @@ ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
 }
 
 @end
+
+#pragma clang diagnostic pop
