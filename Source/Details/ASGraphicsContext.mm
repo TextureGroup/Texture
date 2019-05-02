@@ -28,13 +28,18 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
 {
   if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     if (ASActivateExperimentalFeature(ASExperimentalDrawingGlobal)) {
-      // If they used default scale, reuse one of two default formats.
+      // If they used default scale, reuse one of two preferred formats.
       static UIGraphicsImageRendererFormat *defaultFormat;
       static UIGraphicsImageRendererFormat *opaqueFormat;
       static dispatch_once_t onceToken;
       dispatch_once(&onceToken, ^{
-        defaultFormat = [[UIGraphicsImageRendererFormat alloc] init];
-        opaqueFormat = [[UIGraphicsImageRendererFormat alloc] init];
+        if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+          defaultFormat = [UIGraphicsImageRendererFormat preferredFormat];
+          opaqueFormat = [UIGraphicsImageRendererFormat preferredFormat];
+        } else {
+          defaultFormat = [UIGraphicsImageRendererFormat defaultFormat];
+          opaqueFormat = [UIGraphicsImageRendererFormat defaultFormat];
+        }
         opaqueFormat.opaque = YES;
         ASConfigureExtendedRange(defaultFormat);
         ASConfigureExtendedRange(opaqueFormat);
@@ -50,7 +55,11 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
       } else if (scale == 0 || scale == ASScreenScale()) {
         format = opaque ? opaqueFormat : defaultFormat;
       } else {
-        format = [[UIGraphicsImageRendererFormat alloc] init];
+        if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+          format = [UIGraphicsImageRendererFormat preferredFormat];
+        } else {
+          format = [UIGraphicsImageRendererFormat defaultFormat];
+        }
         if (opaque) format.opaque = YES;
         format.scale = scale;
         ASConfigureExtendedRange(format);
