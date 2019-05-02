@@ -67,7 +67,7 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
   UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
   work();
   UIImage *image = nil;
-  if (isCancelled && !isCancelled()) {
+  if (isCancelled == nil || !isCancelled()) {
     image = UIGraphicsGetImageFromCurrentImageContext();
   }
   UIGraphicsEndImageContext();
