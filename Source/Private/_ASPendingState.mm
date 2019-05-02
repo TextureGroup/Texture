@@ -17,7 +17,7 @@
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
-  || (flags.setOpaque && opaque != (layer).opaque)\
+  || (flags.setOpaque && _boolFlags.opaque != (layer).opaque)\
   || (flags.setBackgroundColor && !CGColorEqualToColor(backgroundColor, (layer).backgroundColor)))
 
 typedef struct {
@@ -123,11 +123,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   CGFloat shadowRadius;
   CGFloat borderWidth;
   CGColorRef borderColor;
-  BOOL asyncTransactionContainer;
   UIEdgeInsets layoutMargins;
-  BOOL preservesSuperviewLayoutMargins;
-  BOOL insetsLayoutMarginsFromSafeArea;
-  BOOL isAccessibilityElement;
   NSString *accessibilityLabel;
   NSAttributedString *accessibilityAttributedLabel;
   NSString *accessibilityHint;
@@ -137,9 +133,6 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   UIAccessibilityTraits accessibilityTraits;
   CGRect accessibilityFrame;
   NSString *accessibilityLanguage;
-  BOOL accessibilityElementsHidden;
-  BOOL accessibilityViewIsModal;
-  BOOL shouldGroupAccessibilityChildren;
   NSString *accessibilityIdentifier;
   UIAccessibilityNavigationStyle accessibilityNavigationStyle;
   NSArray *accessibilityCustomActions;
@@ -150,6 +143,24 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   NSDictionary<NSString *, id<CAAction>> *actions;
 
   ASPendingStateFlags _flags;
+  struct {
+    unsigned int asyncTransactionContainer:1;
+    unsigned int preservesSuperviewLayoutMargins:1;
+    unsigned int insetsLayoutMarginsFromSafeArea:1;
+    unsigned int isAccessibilityElement:1;
+    unsigned int accessibilityElementsHidden:1;
+    unsigned int accessibilityViewIsModal:1;
+    unsigned int shouldGroupAccessibilityChildren:1;
+    unsigned int clipsToBounds:1;
+    unsigned int opaque:1;
+    unsigned int hidden:1;
+    unsigned int needsDisplayOnBoundsChange:1;
+    unsigned int allowsGroupOpacity:1;
+    unsigned int allowsEdgeAntialiasing:1;
+    unsigned int autoresizesSubviews:1;
+    unsigned int userInteractionEnabled:1;
+    unsigned int exclusiveTouch:1;
+  } _boolFlags;
 }
 
 /**
@@ -177,17 +188,10 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
   }
 }
 
-@synthesize clipsToBounds=clipsToBounds;
-@synthesize opaque=opaque;
 @synthesize frame=frame;
 @synthesize bounds=bounds;
 @synthesize backgroundColor=backgroundColor;
-@synthesize hidden=isHidden;
-@synthesize needsDisplayOnBoundsChange=needsDisplayOnBoundsChange;
-@synthesize allowsGroupOpacity=allowsGroupOpacity;
-@synthesize allowsEdgeAntialiasing=allowsEdgeAntialiasing;
 @synthesize edgeAntialiasingMask=edgeAntialiasingMask;
-@synthesize autoresizesSubviews=autoresizesSubviews;
 @synthesize autoresizingMask=autoresizingMask;
 @synthesize tintColor=tintColor;
 @synthesize alpha=alpha;
@@ -240,17 +244,17 @@ static UIColor *defaultTintColor = nil;
   });
 
   // Set defaults, these come from the defaults specified in CALayer and UIView
-  clipsToBounds = NO;
-  opaque = YES;
+  _boolFlags.clipsToBounds = NO;
+  _boolFlags.opaque = YES;
   frame = CGRectZero;
   bounds = CGRectZero;
   backgroundColor = nil;
   tintColor = defaultTintColor;
-  isHidden = NO;
-  needsDisplayOnBoundsChange = NO;
-  allowsGroupOpacity = ASDefaultAllowsGroupOpacity();
-  allowsEdgeAntialiasing = ASDefaultAllowsEdgeAntialiasing();
-  autoresizesSubviews = YES;
+  _boolFlags.hidden = NO;
+  _boolFlags.needsDisplayOnBoundsChange = NO;
+  _boolFlags.allowsGroupOpacity = ASDefaultAllowsGroupOpacity();
+  _boolFlags.allowsEdgeAntialiasing = ASDefaultAllowsEdgeAntialiasing();
+  _boolFlags.autoresizesSubviews = YES;
   alpha = 1.0f;
   cornerRadius = 0.0f;
   contentMode = UIViewContentModeScaleToFill;
@@ -266,7 +270,7 @@ static UIColor *defaultTintColor = nil;
   contentsCenter = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
   contentsScale = 1.0f;
   rasterizationScale = 1.0f;
-  userInteractionEnabled = YES;
+  _boolFlags.userInteractionEnabled = YES;
   shadowColor = blackColorRef;
   shadowOpacity = 0.0;
   shadowOffset = CGSizeMake(0, -3);
@@ -274,9 +278,9 @@ static UIColor *defaultTintColor = nil;
   borderWidth = 0;
   borderColor = blackColorRef;
   layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8);
-  preservesSuperviewLayoutMargins = NO;
-  insetsLayoutMarginsFromSafeArea = YES;
-  isAccessibilityElement = NO;
+  _boolFlags.preservesSuperviewLayoutMargins = NO;
+  _boolFlags.insetsLayoutMarginsFromSafeArea = YES;
+  _boolFlags.isAccessibilityElement = NO;
   accessibilityLabel = nil;
   accessibilityAttributedLabel = nil;
   accessibilityHint = nil;
@@ -286,9 +290,9 @@ static UIColor *defaultTintColor = nil;
   accessibilityTraits = UIAccessibilityTraitNone;
   accessibilityFrame = CGRectZero;
   accessibilityLanguage = nil;
-  accessibilityElementsHidden = NO;
-  accessibilityViewIsModal = NO;
-  shouldGroupAccessibilityChildren = NO;
+  _boolFlags.accessibilityElementsHidden = NO;
+  _boolFlags.accessibilityViewIsModal = NO;
+  _boolFlags.shouldGroupAccessibilityChildren = NO;
   accessibilityIdentifier = nil;
   accessibilityNavigationStyle = UIAccessibilityNavigationStyleAutomatic;
   accessibilityCustomActions = nil;
@@ -318,32 +322,57 @@ static UIColor *defaultTintColor = nil;
 
 - (void)setClipsToBounds:(BOOL)flag
 {
-  clipsToBounds = flag;
+  _boolFlags.clipsToBounds = flag;
   _flags.setClipsToBounds = YES;
+}
+
+- (BOOL)clipsToBounds
+{
+    return _boolFlags.clipsToBounds;
 }
 
 - (void)setOpaque:(BOOL)flag
 {
-  opaque = flag;
+  _boolFlags.opaque = flag;
   _flags.setOpaque = YES;
+}
+
+- (BOOL)isOpaque
+{
+    return _boolFlags.opaque;
 }
 
 - (void)setNeedsDisplayOnBoundsChange:(BOOL)flag
 {
-  needsDisplayOnBoundsChange = flag;
+  _boolFlags.needsDisplayOnBoundsChange = flag;
   _flags.setNeedsDisplayOnBoundsChange = YES;
+}
+
+- (BOOL)needsDisplayOnBoundsChange
+{
+    return _boolFlags.needsDisplayOnBoundsChange;
 }
 
 - (void)setAllowsGroupOpacity:(BOOL)flag
 {
-  allowsGroupOpacity = flag;
+  _boolFlags.allowsGroupOpacity = flag;
   _flags.setAllowsGroupOpacity = YES;
+}
+
+- (BOOL)allowsGroupOpacity
+{
+    return _boolFlags.allowsGroupOpacity;
 }
 
 - (void)setAllowsEdgeAntialiasing:(BOOL)flag
 {
-  allowsEdgeAntialiasing = flag;
+  _boolFlags.allowsEdgeAntialiasing = flag;
   _flags.setAllowsEdgeAntialiasing = YES;
+}
+
+- (BOOL)allowsEdgeAntialiasing
+{
+    return _boolFlags.allowsEdgeAntialiasing;
 }
 
 - (void)setEdgeAntialiasingMask:(unsigned int)mask
@@ -354,8 +383,13 @@ static UIColor *defaultTintColor = nil;
 
 - (void)setAutoresizesSubviews:(BOOL)flag
 {
-  autoresizesSubviews = flag;
+  _boolFlags.autoresizesSubviews = flag;
   _flags.setAutoresizesSubviews = YES;
+}
+
+- (BOOL)autoresizesSubviews
+{
+    return _boolFlags.autoresizesSubviews;
 }
 
 - (void)setAutoresizingMask:(UIViewAutoresizing)mask
@@ -405,8 +439,13 @@ static UIColor *defaultTintColor = nil;
 
 - (void)setHidden:(BOOL)flag
 {
-  isHidden = flag;
+  _boolFlags.hidden = flag;
   _flags.setHidden = YES;
+}
+
+- (BOOL)isHidden
+{
+    return _boolFlags.hidden;
 }
 
 - (void)setAlpha:(CGFloat)newAlpha
@@ -510,14 +549,24 @@ static UIColor *defaultTintColor = nil;
 
 - (void)setUserInteractionEnabled:(BOOL)flag
 {
-  userInteractionEnabled = flag;
+  _boolFlags.userInteractionEnabled = flag;
   _flags.setUserInteractionEnabled = YES;
+}
+
+- (BOOL)isUserInteractionEnabled
+{
+    return _boolFlags.userInteractionEnabled;
 }
 
 - (void)setExclusiveTouch:(BOOL)flag
 {
-  exclusiveTouch = flag;
+  _boolFlags.exclusiveTouch = flag;
   _flags.setExclusiveTouch = YES;
+}
+
+- (BOOL)isExclusiveTouch
+{
+    return _boolFlags.exclusiveTouch;
 }
 
 - (void)setShadowColor:(CGColorRef)color
@@ -576,8 +625,13 @@ static UIColor *defaultTintColor = nil;
 
 - (void)asyncdisplaykit_setAsyncTransactionContainer:(BOOL)flag
 {
-  asyncTransactionContainer = flag;
+  _boolFlags.asyncTransactionContainer = flag;
   _flags.setAsyncTransactionContainer = YES;
+}
+
+- (BOOL)asyncdisplaykit_isAsyncTransactionContainer
+{
+    return _boolFlags.asyncTransactionContainer;
 }
 
 - (void)setLayoutMargins:(UIEdgeInsets)margins
@@ -588,14 +642,24 @@ static UIColor *defaultTintColor = nil;
 
 - (void)setPreservesSuperviewLayoutMargins:(BOOL)flag
 {
-  preservesSuperviewLayoutMargins = flag;
+  _boolFlags.preservesSuperviewLayoutMargins = flag;
   _flags.setPreservesSuperviewLayoutMargins = YES;
+}
+
+- (BOOL)preservesSuperviewLayoutMargins
+{
+    return _boolFlags.preservesSuperviewLayoutMargins;
 }
 
 - (void)setInsetsLayoutMarginsFromSafeArea:(BOOL)flag
 {
-  insetsLayoutMarginsFromSafeArea = flag;
+  _boolFlags.insetsLayoutMarginsFromSafeArea = flag;
   _flags.setInsetsLayoutMarginsFromSafeArea = YES;
+}
+
+- (BOOL)insetsLayoutMarginsFromSafeArea
+{
+    return _boolFlags.insetsLayoutMarginsFromSafeArea;
 }
 
 - (void)setSemanticContentAttribute:(UISemanticContentAttribute)attribute API_AVAILABLE(ios(9.0), tvos(9.0)) {
@@ -611,12 +675,12 @@ static UIColor *defaultTintColor = nil;
 
 - (BOOL)isAccessibilityElement
 {
-  return isAccessibilityElement;
+  return _boolFlags.isAccessibilityElement;
 }
 
 - (void)setIsAccessibilityElement:(BOOL)newIsAccessibilityElement
 {
-  isAccessibilityElement = newIsAccessibilityElement;
+  _boolFlags.isAccessibilityElement = newIsAccessibilityElement;
   _flags.setIsAccessibilityElement = YES;
 }
 
@@ -745,34 +809,34 @@ static UIColor *defaultTintColor = nil;
 
 - (BOOL)accessibilityElementsHidden
 {
-  return accessibilityElementsHidden;
+  return _boolFlags.accessibilityElementsHidden;
 }
 
 - (void)setAccessibilityElementsHidden:(BOOL)newAccessibilityElementsHidden
 {
-  accessibilityElementsHidden = newAccessibilityElementsHidden;
+  _boolFlags.accessibilityElementsHidden = newAccessibilityElementsHidden;
   _flags.setAccessibilityElementsHidden = YES;
 }
 
 - (BOOL)accessibilityViewIsModal
 {
-  return accessibilityViewIsModal;
+  return _boolFlags.accessibilityViewIsModal;
 }
 
 - (void)setAccessibilityViewIsModal:(BOOL)newAccessibilityViewIsModal
 {
-  accessibilityViewIsModal = newAccessibilityViewIsModal;
+  _boolFlags.accessibilityViewIsModal = newAccessibilityViewIsModal;
   _flags.setAccessibilityViewIsModal = YES;
 }
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
-  return shouldGroupAccessibilityChildren;
+  return _boolFlags.shouldGroupAccessibilityChildren;
 }
 
 - (void)setShouldGroupAccessibilityChildren:(BOOL)newShouldGroupAccessibilityChildren
 {
-  shouldGroupAccessibilityChildren = newShouldGroupAccessibilityChildren;
+  _boolFlags.shouldGroupAccessibilityChildren = newShouldGroupAccessibilityChildren;
   _flags.setShouldGroupAccessibilityChildren = YES;
 }
 
@@ -897,16 +961,16 @@ static UIColor *defaultTintColor = nil;
     layer.rasterizationScale = rasterizationScale;
 
   if (flags.setClipsToBounds)
-    layer.masksToBounds = clipsToBounds;
+    layer.masksToBounds = _boolFlags.clipsToBounds;
 
   if (flags.setBackgroundColor)
     layer.backgroundColor = backgroundColor;
 
   if (flags.setOpaque)
-    layer.opaque = opaque;
+    layer.opaque = _boolFlags.opaque;
 
   if (flags.setHidden)
-    layer.hidden = isHidden;
+    layer.hidden = _boolFlags.hidden;
 
   if (flags.setAlpha)
     layer.opacity = alpha;
@@ -942,22 +1006,22 @@ static UIColor *defaultTintColor = nil;
     layer.borderColor = borderColor;
 
   if (flags.setNeedsDisplayOnBoundsChange)
-    layer.needsDisplayOnBoundsChange = needsDisplayOnBoundsChange;
+    layer.needsDisplayOnBoundsChange = _boolFlags.needsDisplayOnBoundsChange;
   
   if (flags.setAllowsGroupOpacity)
-    layer.allowsGroupOpacity = allowsGroupOpacity;
+    layer.allowsGroupOpacity = _boolFlags.allowsGroupOpacity;
 
   if (flags.setAllowsEdgeAntialiasing)
-    layer.allowsEdgeAntialiasing = allowsEdgeAntialiasing;
+    layer.allowsEdgeAntialiasing = _boolFlags.allowsEdgeAntialiasing;
 
   if (flags.setEdgeAntialiasingMask)
     layer.edgeAntialiasingMask = edgeAntialiasingMask;
 
   if (flags.setAsyncTransactionContainer)
-    layer.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+    layer.asyncdisplaykit_asyncTransactionContainer = _boolFlags.asyncTransactionContainer;
 
   if (flags.setOpaque)
-    ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
+    ASDisplayNodeAssert(layer.opaque == _boolFlags.opaque, @"Didn't set opaque as desired");
 
   if (flags.setActions)
     layer.actions = actions;
@@ -1028,7 +1092,7 @@ static UIColor *defaultTintColor = nil;
     layer.actions = actions;
 
   if (flags.setClipsToBounds)
-    view.clipsToBounds = clipsToBounds;
+    view.clipsToBounds = _boolFlags.clipsToBounds;
 
   if (flags.setBackgroundColor) {
     // We have to make sure certain nodes get the background color call directly set
@@ -1044,10 +1108,10 @@ static UIColor *defaultTintColor = nil;
     view.tintColor = self.tintColor;
 
   if (flags.setOpaque)
-    layer.opaque = opaque;
+    layer.opaque = _boolFlags.opaque;
 
   if (flags.setHidden)
-    view.hidden = isHidden;
+    view.hidden = _boolFlags.hidden;
 
   if (flags.setAlpha)
     view.alpha = alpha;
@@ -1059,11 +1123,11 @@ static UIColor *defaultTintColor = nil;
     view.contentMode = contentMode;
 
   if (flags.setUserInteractionEnabled)
-    view.userInteractionEnabled = userInteractionEnabled;
+    view.userInteractionEnabled = _boolFlags.userInteractionEnabled;
 
   #if TARGET_OS_IOS
   if (flags.setExclusiveTouch)
-    view.exclusiveTouch = exclusiveTouch;
+    view.exclusiveTouch = _boolFlags.exclusiveTouch;
   #endif
     
   if (flags.setShadowColor)
@@ -1088,35 +1152,35 @@ static UIColor *defaultTintColor = nil;
     view.autoresizingMask = autoresizingMask;
 
   if (flags.setAutoresizesSubviews)
-    view.autoresizesSubviews = autoresizesSubviews;
+    view.autoresizesSubviews = _boolFlags.autoresizesSubviews;
 
   if (flags.setNeedsDisplayOnBoundsChange)
-    layer.needsDisplayOnBoundsChange = needsDisplayOnBoundsChange;
+    layer.needsDisplayOnBoundsChange = _boolFlags.needsDisplayOnBoundsChange;
   
   if (flags.setAllowsGroupOpacity)
-    layer.allowsGroupOpacity = allowsGroupOpacity;
+    layer.allowsGroupOpacity = _boolFlags.allowsGroupOpacity;
 
   if (flags.setAllowsEdgeAntialiasing)
-    layer.allowsEdgeAntialiasing = allowsEdgeAntialiasing;
+    layer.allowsEdgeAntialiasing = _boolFlags.allowsEdgeAntialiasing;
 
   if (flags.setEdgeAntialiasingMask)
     layer.edgeAntialiasingMask = edgeAntialiasingMask;
 
   if (flags.setAsyncTransactionContainer)
-    view.asyncdisplaykit_asyncTransactionContainer = asyncTransactionContainer;
+    view.asyncdisplaykit_asyncTransactionContainer = _boolFlags.asyncTransactionContainer;
 
   if (flags.setOpaque)
-    ASDisplayNodeAssert(layer.opaque == opaque, @"Didn't set opaque as desired");
+    ASDisplayNodeAssert(layer.opaque == _boolFlags.opaque, @"Didn't set opaque as desired");
 
   if (flags.setLayoutMargins)
     view.layoutMargins = layoutMargins;
 
   if (flags.setPreservesSuperviewLayoutMargins)
-    view.preservesSuperviewLayoutMargins = preservesSuperviewLayoutMargins;
+    view.preservesSuperviewLayoutMargins = _boolFlags.preservesSuperviewLayoutMargins;
 
   if (AS_AVAILABLE_IOS(11.0)) {
     if (flags.setInsetsLayoutMarginsFromSafeArea) {
-      view.insetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+      view.insetsLayoutMarginsFromSafeArea = _boolFlags.insetsLayoutMarginsFromSafeArea;
     }
   }
 
@@ -1125,7 +1189,7 @@ static UIColor *defaultTintColor = nil;
   }
 
   if (flags.setIsAccessibilityElement)
-    view.isAccessibilityElement = isAccessibilityElement;
+    view.isAccessibilityElement = _boolFlags.isAccessibilityElement;
 
   if (flags.setAccessibilityLabel)
     view.accessibilityLabel = accessibilityLabel;
@@ -1158,13 +1222,13 @@ static UIColor *defaultTintColor = nil;
     view.accessibilityLanguage = accessibilityLanguage;
 
   if (flags.setAccessibilityElementsHidden)
-    view.accessibilityElementsHidden = accessibilityElementsHidden;
+    view.accessibilityElementsHidden = _boolFlags.accessibilityElementsHidden;
 
   if (flags.setAccessibilityViewIsModal)
-    view.accessibilityViewIsModal = accessibilityViewIsModal;
+    view.accessibilityViewIsModal = _boolFlags.accessibilityViewIsModal;
 
   if (flags.setShouldGroupAccessibilityChildren)
-    view.shouldGroupAccessibilityChildren = shouldGroupAccessibilityChildren;
+    view.shouldGroupAccessibilityChildren = _boolFlags.shouldGroupAccessibilityChildren;
 
   if (flags.setAccessibilityIdentifier)
     view.accessibilityIdentifier = accessibilityIdentifier;
