@@ -2,7 +2,7 @@ language: objective-c
 cache:
   - bundler
   - cocoapods
-osx_image: xcode8.1
+osx_image: xcode9.4
 git:
   depth: 10
 before_install:
