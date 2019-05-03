@@ -23,6 +23,7 @@
   CFTimeInterval _playHead;
   NSUInteger _playedLoops;
 
+  // Group the BOOLs into a bitfield struct to save memory.
   struct {
     unsigned int animatedImagePaused:1;
     unsigned int cropEnabled:1; // Defaults to YES.

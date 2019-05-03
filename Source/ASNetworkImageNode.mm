@@ -50,6 +50,8 @@
 
   // Immutable and set on init only. We don't need to lock in this case.
   __weak id<ASImageCacheProtocol> _cache;
+
+  // Group all of these BOOLs into a shared bitfield struct in order to save on memory used.
   struct {
       unsigned int delegateWillStartDisplayAsynchronously:1;
       unsigned int delegateWillLoadImageFromCache:1;
