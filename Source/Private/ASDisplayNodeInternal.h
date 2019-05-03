@@ -221,7 +221,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // Placeholder support
   UIImage *_placeholderImage;
-  BOOL _placeholderEnabled;
   CALayer *_placeholderLayer;
   NSTimeInterval _placeholderFadeDuration;
 

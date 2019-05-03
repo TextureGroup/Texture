@@ -287,7 +287,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 {
   ASLockScopeSelf();
   if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
-    _placeholderEnabled = (placeholderColor != nil);
+    _flags.placeholderEnabled = (placeholderColor != nil);
   }
 }
 
