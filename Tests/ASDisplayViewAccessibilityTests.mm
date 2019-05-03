@@ -50,6 +50,40 @@
   XCTAssertEqual([node.view indexOfAccessibilityElement:node.view.accessibilityElements.firstObject], 0);*/
 }
 
+- (void)testAccessibilityElementsBlock
+{
+  // Setup nodes
+  ASDisplayNode *node = nil;
+  ASDisplayNode *innerNode1 = nil;
+  ASDisplayNode *innerNode2 = nil;
+  node = [[ASDisplayNode alloc] init];
+  innerNode1 = [[ASDisplayNode alloc] init];
+  innerNode2 = [[ASDisplayNode alloc] init];
+
+  innerNode1.accessibilityLabel = @"hello";
+  innerNode1.isAccessibilityElement = YES;
+  innerNode2.accessibilityLabel = @"world";
+  innerNode2.isAccessibilityElement = YES;
+
+  // Attach the subnodes to the parent node, then check that all the subnodes added are returned as accessibilityElements
+  [node addSubnode:innerNode1];
+  [node addSubnode:innerNode2];
+
+  XCTAssertTrue(node.view.accessibilityElements.count == 2);
+  XCTAssertEqualObjects([node.view.accessibilityElements[0] accessibilityLabel], [innerNode1 accessibilityLabel]);
+  XCTAssertEqualObjects([node.view.accessibilityElements[1] accessibilityLabel], [innerNode2 accessibilityLabel]);
+
+  // Override accessibilityElements, check that only the specified element is returned as accessibilityElements
+  node.accessibilityElementsBlock = ^NSArray * _Nonnull(NSArray *_Nonnull elements) {
+    return @[innerNode2];
+  };
+
+  XCTAssertTrue(node.view.accessibilityElements.count == 1);
+  XCTAssertEqualObjects([node.view.accessibilityElements.firstObject accessibilityLabel],
+                        [innerNode2 accessibilityLabel],
+                        @"Parent node accessibilityElements override broken");
+}
+
 - (void)testThatSubnodeAccessibilityLabelAggregationWorks
 {
   // Setup nodes

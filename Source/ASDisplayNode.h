@@ -782,6 +782,12 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+/**
+ * Accessibility elements modification block. Used to modify/override the elements returned by
+ * `accessibilityElements` for a node.
+ */
+typedef NSArray *_Nonnull(^ASDisplayNodeAccessibilityElementsBlock)(NSArray * _Nonnull);
+
 @interface ASDisplayNode (UIViewBridgeAccessibility)
 
 // Accessibility support
@@ -802,12 +808,16 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property           BOOL shouldGroupAccessibilityChildren;
 @property           UIAccessibilityNavigationStyle accessibilityNavigationStyle;
 @property (nullable, copy)   NSArray *accessibilityCustomActions API_AVAILABLE(ios(8.0),tvos(9.0));
+
 #if TARGET_OS_TV
 @property (nullable, copy) 	NSArray *accessibilityHeaderElements;
 #endif
 
 // Accessibility identification support
 @property (nullable, copy)   NSString *accessibilityIdentifier;
+
+/// Block used for modifying/overriding the a11y elements returned by `accessibilityElements`.
+@property (nullable, copy)   ASDisplayNodeAccessibilityElementsBlock accessibilityElementsBlock;
 
 @end
 

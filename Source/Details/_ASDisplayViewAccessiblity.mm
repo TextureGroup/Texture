@@ -287,6 +287,12 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
   NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
   CollectAccessibilityElementsForView(self.view, accessibilityElements);
   SortAccessibilityElements(accessibilityElements);
+
+  if (_accessibilityElementsBlock) {
+    NSArray *accessibilityElementsCopy = [accessibilityElements copy];
+    accessibilityElements = _accessibilityElementsBlock(accessibilityElementsCopy);
+  }
+
   return accessibilityElements;
 }
 
