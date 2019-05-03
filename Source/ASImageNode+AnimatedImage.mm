@@ -315,18 +315,7 @@
 #if ASAnimatedImageDebug
     NSLog(@"exiting display state: %p", self);
 #endif
-    
-  // Check to see if we're an animated image before calling super in case someone
-  // decides they want to clear out the animatedImage itself on exiting the display
-  // state
-  BOOL isAnimatedImage = self.animatedImage != nil;
   [super didExitDisplayState];
-  
-  // Also clear out the contents we've set to be good citizens, we'll put it back in when we become visible.
-  if (isAnimatedImage) {
-    self.contents = nil;
-    [self setCoverImage:nil];
-  }
 }
 
 #pragma mark - Display Link Callbacks
