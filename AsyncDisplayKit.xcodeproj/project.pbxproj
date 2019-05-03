@@ -432,6 +432,8 @@
 		CCCCCCE41EC3EF060087FE10 /* NSParagraphStyle+ASText.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.mm */; };
 		CCCCCCE71EC3F0FC0087FE10 /* NSAttributedString+ASText.h in Headers */ = {isa = PBXBuildFile; fileRef = CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */; };
 		CCCCCCE81EC3F0FC0087FE10 /* NSAttributedString+ASText.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.mm */; };
+		CCDC9B4D200991D10063C1F8 /* ASGraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */; };
+		CCDC9B4E200991D10063C1F8 /* ASGraphicsContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.mm */; };
 		CCDD148B1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.mm */; };
 		CCE4F9B31F0D60AC00062E4E /* ASIntegerMapTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B21F0D60AC00062E4E /* ASIntegerMapTests.mm */; };
 		CCE4F9B51F0DA4F300062E4E /* ASLayoutEngineTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CCE4F9B41F0DA4F300062E4E /* ASLayoutEngineTests.mm */; };
@@ -962,6 +964,8 @@
 		CCCCCCD41EC3EF060087FE10 /* NSParagraphStyle+ASText.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSParagraphStyle+ASText.mm"; sourceTree = "<group>"; };
 		CCCCCCE51EC3F0FC0087FE10 /* NSAttributedString+ASText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+ASText.h"; sourceTree = "<group>"; };
 		CCCCCCE61EC3F0FC0087FE10 /* NSAttributedString+ASText.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSAttributedString+ASText.mm"; sourceTree = "<group>"; };
+		CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASGraphicsContext.h; sourceTree = "<group>"; };
+		CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASGraphicsContext.mm; sourceTree = "<group>"; };
 		CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionModernDataSourceTests.mm; sourceTree = "<group>"; };
 		CCE04B1E1E313EA7006AEBBB /* ASSectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASSectionController.h; sourceTree = "<group>"; };
 		CCE04B201E313EB9006AEBBB /* IGListAdapter+AsyncDisplayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IGListAdapter+AsyncDisplayKit.h"; sourceTree = "<group>"; };
@@ -1425,6 +1429,8 @@
 				68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.mm */,
 				E5B225271F1790B5001E1431 /* ASHashing.h */,
 				E5B225261F1790B5001E1431 /* ASHashing.mm */,
+				CCDC9B4B200991D10063C1F8 /* ASGraphicsContext.h */,
+				CCDC9B4C200991D10063C1F8 /* ASGraphicsContext.mm */,
 				058D09E6195D050800B7D73C /* ASHighlightOverlayLayer.h */,
 				058D09E7195D050800B7D73C /* ASHighlightOverlayLayer.mm */,
 				68355B371CB57A5A001D4E68 /* ASImageContainerProtocolCategories.h */,
@@ -1980,6 +1986,7 @@
 				68EE0DBE1C1B4ED300BA1B99 /* ASMainSerialQueue.h in Headers */,
 				CCCCCCE11EC3EF060087FE10 /* ASTextUtilities.h in Headers */,
 				B350624B1B010EFD0018CF92 /* _ASPendingState.h in Headers */,
+				CCDC9B4D200991D10063C1F8 /* ASGraphicsContext.h in Headers */,
 				E5C347B11ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h in Headers */,
 				CC54A81C1D70079800296A24 /* ASDispatch.h in Headers */,
 				B350624D1B010EFD0018CF92 /* _ASScopeTimer.h in Headers */,
@@ -2395,6 +2402,7 @@
 				9C8898BC1C738BA800D6B02E /* ASTextKitFontSizeAdjuster.mm in Sources */,
 				690ED59B1E36D118000627C0 /* ASImageNode+tvOS.mm in Sources */,
 				0FAFDF7620EC1C90003A51C0 /* ASLayout+IGListKit.mm in Sources */,
+				CCDC9B4E200991D10063C1F8 /* ASGraphicsContext.mm in Sources */,
 				CCCCCCD81EC3EF060087FE10 /* ASTextInput.mm in Sources */,
 				34EFC7621B701CA400AD841F /* ASBackgroundLayoutSpec.mm in Sources */,
 				9D9AA56921E23EE200172C09 /* ASDisplayNode+LayoutSpec.mm in Sources */,

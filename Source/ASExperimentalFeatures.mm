@@ -27,7 +27,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_fix_range_controller",
                                       @"exp_oom_bg_dealloc_disable",
                                       @"exp_transaction_operation_retain_cycle",
-                                      @"exp_remove_textkit_initialising_lock"]));
+                                      @"exp_remove_textkit_initialising_lock",
+                                      @"exp_drawing_global"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
