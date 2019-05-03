@@ -356,29 +356,13 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       // DO NOT set Visible: even though these elements are in the visible range / "viewport",
       // our overall container object is itself not yet, or no longer, visible.
       // The moment it becomes visible, we will run the condition above.
-
-      ASInterfaceState interfaceStateBeforeFix = interfaceState;
-      if ([allCurrentIndexPaths containsObject:indexPath]) {
-        interfaceStateBeforeFix |= ASInterfaceStatePreload;
-        if (rangeMode != ASLayoutRangeModeLowMemory) {
-          interfaceStateBeforeFix |= ASInterfaceStateDisplay;
-        }
-      }
-
-      ASInterfaceState interfaceStateAfterFix = interfaceState;
       if ([visibleIndexPaths containsObject:indexPath]) {
-        interfaceStateAfterFix |= ASInterfaceStatePreload;
+        interfaceState |= ASInterfaceStatePreload;
         if (rangeMode != ASLayoutRangeModeLowMemory) {
-          interfaceStateAfterFix |= ASInterfaceStateDisplay;
+          interfaceState |= ASInterfaceStateDisplay;
         }
       } else if ([displayIndexPaths containsObject:indexPath]) {
-        interfaceStateAfterFix |= ASInterfaceStatePreload;
-      }
-
-      if (interfaceStateBeforeFix != interfaceStateAfterFix && ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
-        interfaceState = interfaceStateAfterFix;
-      } else {
-        interfaceState = interfaceStateBeforeFix;
+        interfaceState |= ASInterfaceStatePreload;
       }
     }
 
