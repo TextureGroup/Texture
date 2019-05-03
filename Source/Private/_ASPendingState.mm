@@ -1365,78 +1365,9 @@ static UIColor *defaultTintColor = nil;
   }
 }
 
-- (NSUInteger)cost
-{
-    ASPendingStateFlags flags = _flags;
-    
-    NSUInteger total = 0;
-    total += flags.setAnchorPoint ? sizeof(self.anchorPoint) + sizeof(void *) : 0;
-    total += flags.setPosition ? sizeof(self.position) + sizeof(void *) : 0;
-    total += flags.setZPosition ? sizeof(self.zPosition) + sizeof(void *) : 0;
-    total += flags.setFrame ? sizeof(self.frame) + sizeof(void *) : 0;
-    total += flags.setBounds ? sizeof(self.bounds) + sizeof(void *) : 0;
-    total += flags.setTransform ? sizeof(self.transform) + sizeof(void *) : 0;
-    total += flags.setSublayerTransform ? sizeof(self.sublayerTransform) + sizeof(void *) : 0;
-    total += flags.setContents ? sizeof(self.contents) + sizeof(void *) : 0;
-    total += flags.setContentsGravity ? sizeof(self.contentsGravity) + sizeof(void *) : 0;
-    total += flags.setContentsRect ? sizeof(self.contentsRect) + sizeof(void *) : 0;
-    total += flags.setContentsCenter ? sizeof(self.contentsCenter) + sizeof(void *) : 0;
-    total += flags.setContentsScale ? sizeof(self.contentsScale) + sizeof(void *) : 0;
-    total += flags.setRasterizationScale ? sizeof(self.rasterizationScale) + sizeof(void *) : 0;
-    total += flags.setClipsToBounds ? sizeof(self.clipsToBounds) + sizeof(void *) : 0;
-    total += flags.setBackgroundColor ? sizeof(self.backgroundColor) + sizeof(void *) : 0;
-    total += flags.setTintColor ? sizeof(self.tintColor) + sizeof(void *) : 0;
-    total += flags.setHidden ? sizeof(self.hidden) + sizeof(void *) : 0;
-    total += flags.setAlpha ? sizeof(self.alpha) + sizeof(void *) : 0;
-    total += flags.setCornerRadius ? sizeof(self.cornerRadius) + sizeof(void *) : 0;
-    total += flags.setContentMode ? sizeof(self.contentMode) + sizeof(void *) : 0;
-    total += flags.setUserInteractionEnabled ? sizeof(self.userInteractionEnabled) + sizeof(void *) : 0;
-    total += flags.setExclusiveTouch ? sizeof(self.exclusiveTouch) + sizeof(void *) : 0;
-    total += flags.setShadowOpacity ? sizeof(self.shadowOpacity) + sizeof(void *) : 0;
-    total += flags.setShadowOffset ? sizeof(self.shadowOffset) + sizeof(void *) : 0;
-    total += flags.setShadowRadius ? sizeof(self.shadowRadius) + sizeof(void *) : 0;
-    total += flags.setShadowColor ? sizeof(self.shadowColor) + sizeof(void *) : 0;
-    total += flags.setBorderWidth ? sizeof(self.borderWidth) + sizeof(void *) : 0;
-    total += flags.setBorderColor ? sizeof(self.borderColor) + sizeof(void *) : 0;
-    total += flags.setAutoresizingMask ? sizeof(self.autoresizingMask) + sizeof(void *) : 0;
-    total += flags.setAutoresizesSubviews ? sizeof(self.autoresizesSubviews) + sizeof(void *) : 0;
-    total += flags.setNeedsDisplayOnBoundsChange ? sizeof(self.needsDisplayOnBoundsChange) + sizeof(void *) : 0;
-    total += flags.setAllowsGroupOpacity ? sizeof(self.allowsGroupOpacity) + sizeof(void *) : 0;
-    total += flags.setAllowsEdgeAntialiasing ? sizeof(self.allowsEdgeAntialiasing) + sizeof(void *) : 0;
-    total += flags.setEdgeAntialiasingMask ? sizeof(self.edgeAntialiasingMask) + sizeof(void *) : 0;
-    total += flags.needsDisplay ? sizeof(BOOL) + sizeof(void *) : 0;
-    total += flags.needsLayout ? sizeof(BOOL) + sizeof(void *) : 0;
-    total += flags.setAsyncTransactionContainer ? sizeof(self->asyncTransactionContainer) + sizeof(void *) : 0;
-    total += flags.setOpaque ? sizeof(self.opaque) + sizeof(void *) : 0;
-    total += flags.setSemanticContentAttribute ? sizeof(self.semanticContentAttribute) + sizeof(void *) : 0;
-    total += flags.setLayoutMargins ? sizeof(self.layoutMargins) + sizeof(void *) : 0;
-    total += flags.setPreservesSuperviewLayoutMargins ? sizeof(self.preservesSuperviewLayoutMargins) + sizeof(void *) : 0;
-    total += flags.setInsetsLayoutMarginsFromSafeArea ? sizeof(self.insetsLayoutMarginsFromSafeArea) + sizeof(void *) : 0;
-    total += flags.setIsAccessibilityElement ? sizeof(self.isAccessibilityElement) + sizeof(void *) : 0;
-    total += flags.setAccessibilityLabel ? sizeof(self.accessibilityLabel) + sizeof(void *) : 0;
-    total += flags.setAccessibilityAttributedLabel ? sizeof(self.accessibilityAttributedLabel) + sizeof(void *) : 0;
-    total += flags.setAccessibilityHint ? sizeof(self.accessibilityHint) + sizeof(void *) : 0;
-    total += flags.setAccessibilityAttributedHint ? sizeof(self.accessibilityAttributedHint) + sizeof(void *) : 0;
-    total += flags.setAccessibilityValue ? sizeof(self.accessibilityValue) + sizeof(void *) : 0;
-    total += flags.setAccessibilityAttributedValue ? sizeof(self.accessibilityAttributedValue) + sizeof(void *) : 0;
-    total += flags.setAccessibilityTraits ? sizeof(self.accessibilityTraits) + sizeof(void *) : 0;
-    total += flags.setAccessibilityFrame ? sizeof(self.accessibilityFrame) + sizeof(void *) : 0;
-    total += flags.setAccessibilityLanguage ? sizeof(self.accessibilityLanguage) + sizeof(void *) : 0;
-    total += flags.setAccessibilityElementsHidden ? sizeof(self.accessibilityElementsHidden) + sizeof(void *) : 0;
-    total += flags.setAccessibilityViewIsModal ? sizeof(self.accessibilityViewIsModal) + sizeof(void *) : 0;
-    total += flags.setShouldGroupAccessibilityChildren ? sizeof(self.shouldGroupAccessibilityChildren) + sizeof(void *) : 0;
-    total += flags.setAccessibilityIdentifier ? sizeof(self.accessibilityIdentifier) + sizeof(void *) : 0;
-    total += flags.setAccessibilityNavigationStyle ? sizeof(self.accessibilityNavigationStyle) + sizeof(void *) : 0;
-    total += flags.setAccessibilityHeaderElements ? sizeof(self->accessibilityHeaderElements) + sizeof(void *) : 0;
-    total += flags.setAccessibilityActivationPoint ? sizeof(self.accessibilityActivationPoint) + sizeof(void *) : 0;
-    total += flags.setAccessibilityPath ? sizeof(self.accessibilityPath) + sizeof(void *) : 0;
-    
-    return total;
-}
-
 @end
 
-typedef NS_ENUM(NSUInteger, ASPendingStateType) {
+typedef NS_ENUM(unsigned char, ASPendingStateType) {
   ASPendingStateTypeNone = 0,
   ASPendingStateTypeAnchorPoint,
   ASPendingStateTypePosition,
@@ -1496,9 +1427,12 @@ typedef NS_ENUM(NSUInteger, ASPendingStateType) {
   ASPendingStateTypeShouldGroupAccessibilityChildren,
   ASPendingStateTypeAccessibilityIdentifier,
   ASPendingStateTypeAccessibilityNavigationStyle,
+  ASPendingStateTypeAccessibilityCustomActions,
   ASPendingStateTypeAccessibilityHeaderElements,
   ASPendingStateTypeAccessibilityActivationPoint,
   ASPendingStateTypeAccessibilityPath,
+  ASPendingStateTypeActions, //TODO
+  ASPendingStateTypeMaskedCorners, //TODO
 };
 
 @interface _ASPendingStateCompressedNode : NSObject
@@ -1563,6 +1497,7 @@ TYPE_NODE_INTERFACE_AND_IMP(UIAccessibilityTraits, uiAccessibilityTraits)
 TYPE_NODE_INTERFACE_AND_IMP(UIAccessibilityNavigationStyle, uiAccessibilityNavigationStyle)
 TYPE_NODE_INTERFACE_AND_IMP(UISemanticContentAttribute, uiSemanticContentAttribute)
 TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
+TYPE_NODE_INTERFACE_AND_IMP(CACornerMask, caCornerMask)
 
 @interface _ASPendingStateCompressed () {
   std::forward_list<_ASPendingStateCompressedNode *> _list;
@@ -1833,10 +1768,15 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
         if (inflated->_flags.setAccessibilityNavigationStyle) continue;
         [inflated setAccessibilityNavigationStyle:((_ASPendingStateCompressedNodeUIAccessibilityNavigationStyle *)compressedNode)->_uiAccessibilityNavigationStyle];
         break;
+      case ASPendingStateTypeAccessibilityCustomActions:
+        if (inflated->_flags.setAccessibilityCustomActions) continue;
+        [inflated setAccessibilityCustomActions:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+#if TARGET_OS_TV
       case ASPendingStateTypeAccessibilityHeaderElements:
         if (inflated->_flags.setAccessibilityHeaderElements) continue;
-        [inflated setAccessibilityElementsHidden:((_ASPendingStateCompressedNodeBOOL *)compressedNode)->_bool];
+        [inflated setAccessibilityHeaderElements:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
         break;
+#endif
       case ASPendingStateTypeAccessibilityActivationPoint:
         if (inflated->_flags.setAccessibilityActivationPoint) continue;
         [inflated setAccessibilityActivationPoint:((_ASPendingStateCompressedNodeCGPoint *)compressedNode)->_cgPoint];
@@ -1845,6 +1785,12 @@ TYPE_NODE_INTERFACE_AND_IMP(UIEdgeInsets, uiEdgeInsets)
         if (inflated->_flags.setAccessibilityPath) continue;
         [inflated setAccessibilityPath:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
         break;
+      case ASPendingStateTypeActions:
+        if (inflated->_flags.setActions) continue;
+        [inflated setActions:((_ASPendingStateCompressedNodeObject *)compressedNode)->_object];
+      case ASPendingStateTypeMaskedCorners:
+        if (inflated->_flags.setMaskedCorners) continue;
+        [inflated setMaskedCorners:((_ASPendingStateCompressedNodeCACornerMask *)compressedNode)->_caCornerMask];
       default:
         ASDisplayNodeAssert(YES, @"unhandled pending node state type");
         break;
@@ -1954,6 +1900,10 @@ GET_PENDING_STATE_GENERAL(lower, pendingStateType, UISemanticContentAttribute, u
 SET_PENDING_STATE_GENERAL(upper, pendingStateType, UIEdgeInsets, uiEdgeInsets) \
 GET_PENDING_STATE_GENERAL(lower, pendingStateType, UIEdgeInsets, uiEdgeInsets) \
 
+#define GET_AND_SET_PENDING_STATE_CORNER_MASK(lower, upper, pendingStateType) \
+SET_PENDING_STATE_GENERAL(upper, pendingStateType, CACornerMask, caCornerMask) \
+GET_PENDING_STATE_GENERAL(lower, pendingStateType, CACornerMask, caCornerMask) \
+
 #define GET_AND_SET_PENDING_STATE_OBJECT(lower, upper, pendingStateType, refType) \
 SET_PENDING_STATE_GENERAL_BRIDGED(upper, pendingStateType, refType, Object, object, ) \
 GET_PENDING_STATE_GENERAL_BRIDGED(lower, pendingStateType, refType, Object, object, ) \
@@ -2013,6 +1963,8 @@ GET_AND_SET_PENDING_STATE_BOOL(needsDisplayOnBoundsChange, NeedsDisplayOnBoundsC
 GET_AND_SET_PENDING_STATE_BOOL(allowsGroupOpacity, AllowsGroupOpacity, ASPendingStateTypeAllowsGroupOpacity)
 GET_AND_SET_PENDING_STATE_BOOL(allowsEdgeAntialiasing, AllowsEdgeAntialiasing, ASPendingStateTypeAllowsEdgeAntialiasing)
 GET_AND_SET_PENDING_STATE_UINT(edgeAntialiasingMask, EdgeAntialiasingMask, ASPendingStateTypeEdgeAntialiasingMask)
+GET_AND_SET_PENDING_STATE_OBJECT(actions, Actions, ASPendingStateTypeActions, NSDictionary *)
+GET_AND_SET_PENDING_STATE_CORNER_MASK(maskedCorners, MaskedCorners, ASPendingStateTypeMaskedCorners)
 
 - (BOOL)hasSetNeedsDisplay
 {
@@ -2080,7 +2032,11 @@ GET_AND_SET_PENDING_STATE_BOOL(accessibilityViewIsModal, AccessibilityViewIsModa
 GET_AND_SET_PENDING_STATE_BOOL(shouldGroupAccessibilityChildren, ShouldGroupAccessibilityChildren, ASPendingStateTypeShouldGroupAccessibilityChildren)
 GET_AND_SET_PENDING_STATE_OBJECT(accessibilityIdentifier, AccessibilityIdentifier, ASPendingStateTypeAccessibilityIdentifier, NSString *)
 GET_AND_SET_PENDING_STATE_ACCESSIBILITY_NAVIGATION_STYLE(accessibilityNavigationStyle, AccessibilityNavigationStyle, ASPendingStateTypeAccessibilityNavigationStyle)
+GET_AND_SET_PENDING_STATE_OBJECT(accessibilityCustomActions, AccessibilityCustomActions, ASPendingStateTypeAccessibilityCustomActions, NSArray *)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 GET_AND_SET_PENDING_STATE_OBJECT(accessibilityHeaderElements, AccessibilityHeaderElements, ASPendingStateTypeAccessibilityHeaderElements, NSArray *)
+#pragma clang diagnostic pop
 GET_AND_SET_PENDING_STATE_POINT(accessibilityActivationPoint, AccessibilityActivationPoint, ASPendingStateTypeAccessibilityActivationPoint)
 GET_AND_SET_PENDING_STATE_OBJECT(accessibilityPath, AccessibilityPath, ASPendingStateTypeAccessibilityPath, UIBezierPath *)
 

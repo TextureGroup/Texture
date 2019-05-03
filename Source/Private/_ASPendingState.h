@@ -47,8 +47,6 @@
 
 @interface _ASPendingStateInflated : NSObject <_ASPendingState>
 
-- (NSUInteger)cost;
-
 @end
 
 @interface _ASPendingStateCompressed: NSObject <_ASPendingState>
