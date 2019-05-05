@@ -46,6 +46,7 @@
   BOOL _imageWasSetExternally;
   CGFloat _currentImageQuality;
   CGFloat _renderedImageQuality;
+  CGFloat _loadingProgress;
   BOOL _shouldRenderProgressImages;
 
   struct {
@@ -155,6 +156,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   // If our image is being set externally, the image quality is 100%
   if (imageWasSetExternally) {
     [self _setCurrentImageQuality:1.0];
+    [self _locked_setLoadingProgress:1.0];
   }
   
   [self _locked__setImage:image];
@@ -206,7 +208,9 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     _imageWasSetExternally = NO;
     
     [self _locked_cancelImageDownloadWithResumePossibility:NO];
-
+    
+    [self _locked_setLoadingProgress:0.0];
+    
     _imageLoaded = NO;
     
     _URL = URL;
@@ -274,6 +278,24 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     self.currentImageQuality = imageQuality;
+  });
+}
+
+- (void)setLoadingProgress:(CGFloat)loadingProgress
+{
+  ASLockScopeSelf();
+  _loadingProgress = loadingProgress;
+}
+
+- (CGFloat)loadingProgress
+{
+  return ASLockedSelf(_loadingProgress);
+}
+
+- (void)_locked_setLoadingProgress:(CGFloat)loadingProgress
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    self.loadingProgress = loadingProgress;
   });
 }
 
@@ -355,6 +377,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
       UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:url] asdk_image];
       if (result) {
         [self _setCurrentImageQuality:1.0];
+        [self _locked_setLoadingProgress:1.0];
         [self _locked__setImage:result];
         _imageLoaded = YES;
         
@@ -431,6 +454,17 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 }
 
 #pragma mark - Progress
+
+- (void)_updateDownloadedProgress:(CGFloat)progress
+              downloadIdentifier:(nullable id)downloadIdentifier
+{
+  ASLockScopeSelf();
+  // Getting a result back for a different download identifier, download must not have been successfully canceled
+  if (ASObjectIsEqual(_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
+    return;
+  }
+  [self _locked_setLoadingProgress:progress];
+}
 
 - (void)handleProgressImage:(UIImage *)progressImage progress:(CGFloat)progress downloadIdentifier:(nullable id)downloadIdentifier
 {
@@ -534,6 +568,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
   [self _locked_setAnimatedImage:nil];
   [self _setCurrentImageQuality:0.0];
+  [self _locked_setLoadingProgress:0.0];
   [self _locked__setImage:_defaultImage];
 
   _imageLoaded = NO;
@@ -591,7 +626,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     }
 
     dispatch_queue_t callbackQueue = [self callbackQueue];
-    ASImageDownloaderProgress downloadProgress = NULL;
+    __weak __typeof__(self) weakSelf = self;
+    ASImageDownloaderProgress downloadProgress = ^(CGFloat progress){
+      __typeof__(self) strongSelf = weakSelf;
+      if (strongSelf == nil) {
+        return;
+      }
+      [strongSelf _updateDownloadedProgress:progress downloadIdentifier:downloadIdentifier];
+    };
     ASImageDownloaderCompletion completion = ^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier, id _Nullable userInfo) {
       if (finished != NULL) {
         finished(imageContainer, error, downloadIdentifier, userInfo);
@@ -722,6 +764,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         self->_imageLoaded = YES;
 
         [self _setCurrentImageQuality:1.0];
+        [self _locked_setLoadingProgress:1.0];
 
         if (self->_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
@@ -761,6 +804,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           UIImage *newImage;
           if (imageContainer != nil) {
             [strongSelf _setCurrentImageQuality:1.0];
+            [self _locked_setLoadingProgress:1.0];
             NSData *animatedImageData = [imageContainer asdk_animatedImageData];
             if (animatedImageData && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
               id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];

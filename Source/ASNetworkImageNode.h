@@ -133,6 +133,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (readonly) CGFloat renderedImageQuality;
 
+/**
+ * Loading progress of the current image.
+ * When downloading a network image, this value would be updated to track downloading progress. ( number between 0.0 and 1.0 )
+ * If the URL is unset, this is 1.0 if defaultImage or image is set to non-nil.
+ */
+@property (readonly) CGFloat loadingProgress;
+
 @end
 
 
