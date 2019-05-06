@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.8.1](https://github.com/TextureGroup/Texture/tree/2.8) (2019-05-05)
+## [2.8.1](https://github.com/TextureGroup/Texture/tree/2.8.1) (2019-05-05)
 [Full Changelog](https://github.com/TextureGroup/Texture/compare/2.8...2.8.1)
 
 **Merged pull requests:**
