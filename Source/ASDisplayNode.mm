@@ -34,6 +34,7 @@
 #import <Texture/ASDisplayNode+InterfaceState.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASEqualityHelpers.h>
+#import <Texture/ASGraphicsContext.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASLayoutElementStylePrivate.h>
 #import <Texture/ASLayoutSpec.h>
@@ -1553,26 +1554,24 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIGraphicsBeginImageContextWithOptions(size, NO, self.contentsScaleForDisplay);
-
-      CGContextRef ctx = UIGraphicsGetCurrentContext();
-      if (isRight == YES) {
-        CGContextTranslateCTM(ctx, -radius + 1, 0);
-      }
-      if (isTop == NO) {
-        CGContextTranslateCTM(ctx, 0, -radius + 1);
-      }
-
-      UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
-      [roundedRect setUsesEvenOddFillRule:YES];
-      [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
-      [backgroundColor setFill];
-      [roundedRect fill];
+      UIImage *newContents = ASGraphicsCreateImageWithOptions(size, NO, self.contentsScaleForDisplay, nil, nil, ^{
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        if (isRight == YES) {
+          CGContextTranslateCTM(ctx, -radius + 1, 0);
+        }
+        if (isTop == NO) {
+          CGContextTranslateCTM(ctx, 0, -radius + 1);
+        }
+        UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, radius * 2, radius * 2) cornerRadius:radius];
+        [roundedRect setUsesEvenOddFillRule:YES];
+        [roundedRect appendPath:[UIBezierPath bezierPathWithRect:CGRectMake(-1, -1, radius * 2 + 1, radius * 2 + 1)]];
+        [backgroundColor setFill];
+        [roundedRect fill];
+      });
 
       // No lock needed, as _clipCornerLayers is only modified on the main thread.
       unowned CALayer *clipCornerLayer = _clipCornerLayers[idx];
-      clipCornerLayer.contents = (id)(UIGraphicsGetImageFromCurrentImageContext().CGImage);
-      UIGraphicsEndImageContext();
+      clipCornerLayer.contents = (id)(newContents.CGImage);
       clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
       clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 0.0 : 1.0);
     }
