@@ -78,7 +78,7 @@
 {
   self = [super init];
   if (self) {
-    _fields.rangeMode = ASLayoutRangeModeUnspecified;
+    _rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
     _flags.allowsSelection = YES;
     _flags.allowsMultipleSelection = NO;
