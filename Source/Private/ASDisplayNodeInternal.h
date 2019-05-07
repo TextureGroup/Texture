@@ -314,7 +314,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 /**
  * Internal tree modification methods.
  */
-- (void)_replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode;
 - (void)_removeFromSupernodeIfEqualTo:(ASDisplayNode *)supernode;
 
 // Private API for helper functions / unit tests.  Use ASDisplayNodeDisableHierarchyNotifications() to control this.
