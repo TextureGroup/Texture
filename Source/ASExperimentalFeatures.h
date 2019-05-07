@@ -30,11 +30,10 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDispatchApply = 1 << 9,                     // exp_dispatch_apply
   ASExperimentalImageDownloaderPriority = 1 << 10,          // exp_image_downloader_priority
   ASExperimentalTextDrawing = 1 << 11,                      // exp_text_drawing
-  ASExperimentalFixRangeController = 1 << 12,               // exp_fix_range_controller
-  ASExperimentalOOMBackgroundDeallocDisable = 1 << 13,      // exp_oom_bg_dealloc_disable
-  ASExperimentalTransactionOperationRetainCycle = 1 << 14,  // exp_transaction_operation_retain_cycle
-  ASExperimentalRemoveTextKitInitialisingLock = 1 << 15,    // exp_remove_textkit_initialising_lock
-  ASExperimentalDrawingGlobal = 1 << 16,                    // exp_drawing_global
+  ASExperimentalOOMBackgroundDeallocDisable = 1 << 12,      // exp_oom_bg_dealloc_disable
+  ASExperimentalTransactionOperationRetainCycle = 1 << 13,  // exp_transaction_operation_retain_cycle
+  ASExperimentalRemoveTextKitInitialisingLock = 1 << 14,    // exp_remove_textkit_initialising_lock
+  ASExperimentalDrawingGlobal = 1 << 15,                    // exp_drawing_global
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
