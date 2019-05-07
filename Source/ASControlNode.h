@@ -11,9 +11,6 @@
 
 #pragma once
 
-#pragma clang diagnostic push
-#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -150,5 +147,3 @@ static UIControlState const ASControlStateSelected ASDISPLAYNODE_DEPRECATED_MSG(
 #endif
 
 NS_ASSUME_NONNULL_END
-
-#pragma clang diagnostic pop
