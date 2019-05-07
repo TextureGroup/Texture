@@ -22,7 +22,7 @@ typedef NS_ENUM(uint32_t, ASSignpostName) {
   
   // Misc
   ASSignpostDeallocQueueDrain = 375,      // One chunk of dealloc queue work. arg0 is count.
-  ASSignpostStatusBarOrientationChange,   // From WillChangeStatusBarOrientation to animation end.
+  ASSignpostOrientationChange,            // From WillChangeStatusBarOrientation to animation end.
 };
 
 #if defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)

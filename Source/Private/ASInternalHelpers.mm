@@ -51,14 +51,14 @@ void _ASInitializeSignpostObservers(void)
   // Orientation changes.
   [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationWillChangeStatusBarOrientationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[note.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
-    ASSignpostStart(StatusBarOrientationChange, (id)nil, "from %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
+    ASSignpostStart(OrientationChange, (id)nil, "from %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
     [CATransaction begin];
   }];
   [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationDidChangeStatusBarOrientationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
     // When profiling, go ahead and commit the transaction early so that it happens as part of our interval.
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[note.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
     [CATransaction setCompletionBlock:^{
-      ASSignpostEnd(StatusBarOrientationChange, (id)nil, "to %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
+      ASSignpostEnd(OrientationChange, (id)nil, "to %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
     }];
     [CATransaction commit];
   }];
