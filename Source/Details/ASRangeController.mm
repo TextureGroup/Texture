@@ -13,6 +13,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
@@ -397,10 +398,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (ASDisplayNode.shouldShowRangeDebugOverlay) {
     ASScrollDirection scrollableDirections = ASScrollDirectionUp | ASScrollDirectionDown;
     if ([_dataSource isKindOfClass:NSClassFromString(@"ASCollectionView")]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-      scrollableDirections = (ASScrollDirection)[_dataSource performSelector:@selector(scrollableDirections)];
-#pragma clang diagnostic pop
+        scrollableDirections = ((ASCollectionView *)_dataSource).scrollableDirections;
     }
     
     [self updateRangeController:self
