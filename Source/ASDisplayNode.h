@@ -70,7 +70,7 @@ typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode *node
  */
 typedef void (^ASDisplayNodeNonFatalErrorBlock)(NSError *error);
 
-typedef NS_ENUM(NSInteger, ASCornerRoundingType) {
+typedef NS_ENUM(unsigned char, ASCornerRoundingType) {
   ASCornerRoundingTypeDefaultSlowCALayer,
   ASCornerRoundingTypePrecomposited,
   ASCornerRoundingTypeClipping
