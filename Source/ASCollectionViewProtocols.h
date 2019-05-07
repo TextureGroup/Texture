@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-typedef NS_OPTIONS(NSUInteger, ASCellLayoutMode) {
+typedef NS_OPTIONS(unsigned short, ASCellLayoutMode) {
   /**
    * No options set. If cell layout mode is set to ASCellLayoutModeNone, the default values for
    * each flag listed below is used.
