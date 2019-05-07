@@ -8,6 +8,7 @@
 
 #import <AsyncDisplayKit/ASLog.h>
 #import <stdatomic.h>
+#import <os/signpost.h>
 
 static atomic_bool __ASLogEnabled = ATOMIC_VAR_INIT(YES);
 
@@ -49,4 +50,8 @@ os_log_t ASMainThreadDeallocationLog() {
 
 os_log_t ASLockingLog() {
   return (ASLockingLogEnabled && ASLoggingIsEnabled()) ? ASCreateOnce(os_log_create("org.TextureGroup.Texture", "Locking")) : OS_LOG_DISABLED;
+}
+
+os_log_t ASPointsOfInterestLog() {
+  return ASCreateOnce(os_log_create("org.TextureGroup.Texture", OS_LOG_CATEGORY_POINTS_OF_INTEREST));
 }

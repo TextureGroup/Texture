@@ -16,6 +16,7 @@
 
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASThread.h>
 
 static NSNumber *allowsGroupOpacityFromUIKitOrNil;
@@ -43,6 +44,28 @@ BOOL ASDefaultAllowsEdgeAntialiasing()
   return edgeAntialiasing;
 }
 
+#if AS_KDEBUG_ENABLE
+void _ASInitializeSignpostObservers(void)
+{
+#if !TARGET_OS_TV
+  // Orientation changes.
+  [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationWillChangeStatusBarOrientationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+    UIInterfaceOrientation orientation = (UIInterfaceOrientation)[note.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
+    ASSignpostStart(StatusBarOrientationChange, (id)nil, "from %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
+    [CATransaction begin];
+  }];
+  [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationDidChangeStatusBarOrientationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+    // When profiling, go ahead and commit the transaction early so that it happens as part of our interval.
+    UIInterfaceOrientation orientation = (UIInterfaceOrientation)[note.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
+    [CATransaction setCompletionBlock:^{
+      ASSignpostEnd(StatusBarOrientationChange, (id)nil, "to %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
+    }];
+    [CATransaction commit];
+  }];
+#endif
+}
+#endif
+
 void ASInitializeFrameworkMainThread(void)
 {
   static dispatch_once_t onceToken;
@@ -57,6 +80,9 @@ void ASInitializeFrameworkMainThread(void)
       allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
     }
     ASNotifyInitialized();
+#if AS_KDEBUG_ENABLE
+    _ASInitializeSignpostObservers();
+#endif
   });
 }
 
