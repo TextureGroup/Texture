@@ -47,8 +47,8 @@ BOOL ASDefaultAllowsEdgeAntialiasing()
 #if AS_SIGNPOST_ENABLE
 void _ASInitializeSignpostObservers(void)
 {
+  // Orientation changes. Unavailable on tvOS.
 #if !TARGET_OS_TV
-  // Orientation changes.
   [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationWillChangeStatusBarOrientationNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[note.userInfo[UIApplicationStatusBarOrientationUserInfoKey] integerValue];
     ASSignpostStart(OrientationChange, (id)nil, "from %s", UIInterfaceOrientationIsPortrait(orientation) ? "portrait" : "landscape");
@@ -62,9 +62,9 @@ void _ASInitializeSignpostObservers(void)
     }];
     [CATransaction commit];
   }];
-#endif
+#endif  // TARGET_OS_TV
 }
-#endif
+#endif  // AS_SIGNPOST_ENABLE
 
 void ASInitializeFrameworkMainThread(void)
 {
