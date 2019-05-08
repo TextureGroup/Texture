@@ -25,16 +25,18 @@ typedef NS_ENUM(uint32_t, ASSignpostName) {
   ASSignpostOrientationChange,            // From WillChangeStatusBarOrientation to animation end.
 };
 
-#if defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)
-  #define AS_KDEBUG_ENABLE 1
+#ifdef PROFILE
+  #define AS_SIGNPOST_ENABLE 1
 #else
-  #define AS_KDEBUG_ENABLE 0
+  #define AS_SIGNPOST_ENABLE 0
 #endif
 
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
 
 #import <sys/kdebug_signpost.h>
+#if AS_HAS_OS_SIGNPOST
 #import <os/signpost.h>
+#endif
 
 // These definitions are required to build the backward-compatible kdebug trace
 // on the iOS 10 SDK.  The kdebug_trace function crashes if run on iOS 9 and earlier.
@@ -49,6 +51,8 @@ typedef NS_ENUM(uint32_t, ASSignpostName) {
 #define KDBG_CODE(Class, SubClass, code) (((Class & 0xff) << 24) | ((SubClass & 0xff) << 16) | ((code & 0x3fff)  << 2))
 #define APPSDBG_CODE(SubClass,code) KDBG_CODE(DBG_APPS, SubClass, code)
 #endif
+
+#if AS_HAS_OS_SIGNPOST
 
 #define ASSignpostStart(name, identifier, format, ...) ({\
   if (AS_AVAILABLE_IOS_TVOS(12, 12)) { \
@@ -74,7 +78,27 @@ typedef NS_ENUM(uint32_t, ASSignpostName) {
   } \
 })
 
-#else
+#else // !AS_HAS_OS_SIGNPOST
+
+#define ASSignpostStart(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_start(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_START, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
+
+#define ASSignpostEnd(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_end(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_END, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
+
+#endif
+
+#else // !AS_SIGNPOST_ENABLE
 
 #define ASSignpostStart(name, identifier, format, ...)
 #define ASSignpostEnd(name, identifier, format, ...)

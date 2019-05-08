@@ -44,7 +44,7 @@ BOOL ASDefaultAllowsEdgeAntialiasing()
   return edgeAntialiasing;
 }
 
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
 void _ASInitializeSignpostObservers(void)
 {
 #if !TARGET_OS_TV
@@ -80,7 +80,7 @@ void ASInitializeFrameworkMainThread(void)
       allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
     }
     ASNotifyInitialized();
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
     _ASInitializeSignpostObservers();
 #endif
   });

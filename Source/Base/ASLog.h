@@ -69,8 +69,10 @@ AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
 #define ASLockingLogEnabled 0
 AS_EXTERN os_log_t ASLockingLog(void);
 
+#if AS_HAS_OS_SIGNPOST
 /// Uses the special POI category for Instruments. Used by ASSignpost.h.
 AS_EXTERN os_log_t ASPointsOfInterestLog(void);
+#endif
 
 /**
  * The activity tracing system changed a lot between iOS 9 and 10.
