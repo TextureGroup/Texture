@@ -222,9 +222,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // Placeholder support
   UIImage *_placeholderImage;
   CALayer *_placeholderLayer;
-  NSTimeInterval _placeholderFadeDuration;
-
-  NSInteger _drawingPriority;
 
   // keeps track of nodes/subnodes that have not finished display, used with placeholders
   ASWeakSet *_pendingDisplayNodes;
