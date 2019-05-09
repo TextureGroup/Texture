@@ -31,7 +31,7 @@ AS_EXTERN CGFloat const ASLayoutElementParentDimensionUndefined;
 AS_EXTERN CGSize const ASLayoutElementParentSizeUndefined;
 
 /** Type of ASLayoutElement  */
-typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
+typedef NS_ENUM(unsigned char, ASLayoutElementType) {
   ASLayoutElementTypeLayoutSpec,
   ASLayoutElementTypeDisplayNode
 };
