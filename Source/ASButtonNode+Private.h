@@ -11,7 +11,7 @@
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/ASStackLayoutDefines.h>
 
-@interface ASButtonNode() {
+@interface ASButtonNode () {
   NSAttributedString *_normalAttributedTitle;
   NSAttributedString *_highlightedAttributedTitle;
   NSAttributedString *_selectedAttributedTitle;
@@ -29,14 +29,14 @@
   UIImage *_selectedBackgroundImage;
   UIImage *_selectedHighlightedBackgroundImage;
   UIImage *_disabledBackgroundImage;
-  
+
   CGFloat _contentSpacing;
   UIEdgeInsets _contentEdgeInsets;
   ASTextNode *_titleNode;
   ASImageNode *_imageNode;
   ASImageNode *_backgroundImageNode;
 
-  BOOL  _laysOutHorizontally;
+  BOOL _laysOutHorizontally;
   ASVerticalAlignment _contentVerticalAlignment;
   ASHorizontalAlignment _contentHorizontalAlignment;
   ASButtonNodeImageAlignment _imageAlignment;
