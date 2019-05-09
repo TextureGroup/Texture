@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_OPTIONS(NSInteger, ASScrollDirection) {
+typedef NS_OPTIONS(unsigned char, ASScrollDirection) {
   ASScrollDirectionNone  = 0,
   ASScrollDirectionRight = 1 << 0,
   ASScrollDirectionLeft  = 1 << 1,

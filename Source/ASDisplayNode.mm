@@ -338,11 +338,11 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
   _flags.canCallSetNeedsDisplayOfLayer = YES;
 
   _fallbackSafeAreaInsets = UIEdgeInsetsZero;
-  _fallbackInsetsLayoutMarginsFromSafeArea = YES;
-  _isViewControllerRoot = NO;
+  _flags.fallbackInsetsLayoutMarginsFromSafeArea = YES;
+  _flags.isViewControllerRoot = NO;
 
-  _automaticallyRelayoutOnSafeAreaChanges = NO;
-  _automaticallyRelayoutOnLayoutMarginsChanges = NO;
+  _flags.automaticallyRelayoutOnSafeAreaChanges = NO;
+  _flags.automaticallyRelayoutOnLayoutMarginsChanges = NO;
 
   [self baseDidInit];
 }
@@ -862,37 +862,37 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (BOOL)isViewControllerRoot
 {
   MutexLocker l(__instanceLock__);
-  return _isViewControllerRoot;
+  return _flags.isViewControllerRoot;
 }
 
 - (void)setViewControllerRoot:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _isViewControllerRoot = flag;
+  _flags.isViewControllerRoot = flag;
 }
 
 - (BOOL)automaticallyRelayoutOnSafeAreaChanges
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyRelayoutOnSafeAreaChanges;
+  return _flags.automaticallyRelayoutOnSafeAreaChanges;
 }
 
 - (void)setAutomaticallyRelayoutOnSafeAreaChanges:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyRelayoutOnSafeAreaChanges = flag;
+  _flags.automaticallyRelayoutOnSafeAreaChanges = flag;
 }
 
 - (BOOL)automaticallyRelayoutOnLayoutMarginsChanges
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyRelayoutOnLayoutMarginsChanges;
+  return _flags.automaticallyRelayoutOnLayoutMarginsChanges;
 }
 
 - (void)setAutomaticallyRelayoutOnLayoutMarginsChanges:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyRelayoutOnLayoutMarginsChanges = flag;
+  _flags.automaticallyRelayoutOnLayoutMarginsChanges = flag;
 }
 
 - (void)__setNodeController:(ASNodeController *)controller
@@ -2592,7 +2592,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (BOOL)_locked_shouldHavePlaceholderLayer
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  return (_placeholderEnabled && [self _implementsDisplay]);
+  return (_flags.placeholderEnabled && [self _implementsDisplay]);
 }
 
 - (void)_locked_setupPlaceholderLayerIfNeeded
@@ -2632,42 +2632,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // Subclass hook
   return NO;
-}
-
-- (BOOL)placeholderEnabled
-{
-  MutexLocker l(__instanceLock__);
-  return _placeholderEnabled;
-}
-
-- (void)setPlaceholderEnabled:(BOOL)placeholderEnabled
-{
-  MutexLocker l(__instanceLock__);
-  _placeholderEnabled = placeholderEnabled;
-}
-
-- (NSTimeInterval)placeholderFadeDuration
-{
-  MutexLocker l(__instanceLock__);
-  return _placeholderFadeDuration;
-}
-
-- (void)setPlaceholderFadeDuration:(NSTimeInterval)placeholderFadeDuration
-{
-  MutexLocker l(__instanceLock__);
-  _placeholderFadeDuration = placeholderFadeDuration;
-}
-
-- (NSInteger)drawingPriority
-{
-  MutexLocker l(__instanceLock__);
-  return _drawingPriority;
-}
-
-- (void)setDrawingPriority:(NSInteger)drawingPriority
-{
-  MutexLocker l(__instanceLock__);
-  _drawingPriority = drawingPriority;
 }
 
 #pragma mark - Hierarchy State
@@ -3143,7 +3107,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   MutexLocker l(__instanceLock__);
-  _hasHadInterfaceStateDelegates = YES;
+  _flags.hasHadInterfaceStateDelegates = YES;
   for (int i = 0; i < AS_MAX_INTERFACE_STATE_DELEGATES; i++) {
     if (_interfaceStateDelegates[i] == nil) {
       _interfaceStateDelegates[i] = interfaceStateDelegate;
@@ -3325,7 +3289,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   {
     ASLockScopeSelf();
     // Fast path for non-delegating nodes.
-    if (!_hasHadInterfaceStateDelegates) {
+    if (!_flags.hasHadInterfaceStateDelegates) {
       return;
     }
 
@@ -3537,13 +3501,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
 {
   MutexLocker l(__instanceLock__);
-  _isAccessibilityContainer = isAccessibilityContainer;
+  _flags.isAccessibilityContainer = isAccessibilityContainer;
 }
 
 - (BOOL)isAccessibilityContainer
 {
   MutexLocker l(__instanceLock__);
-  return _isAccessibilityContainer;
+  return _flags.isAccessibilityContainer;
 }
 
 - (NSString *)defaultAccessibilityLabel

@@ -110,7 +110,7 @@
 {
   ASLockScopeSelf();
 
-  _animatedImagePaused = animatedImagePaused;
+  _imageNodeFlags.animatedImagePaused = animatedImagePaused;
 
   [self _locked_setShouldAnimate:!animatedImagePaused];
 }
@@ -118,7 +118,7 @@
 - (BOOL)animatedImagePaused
 {
   ASLockScopeSelf();
-  return _animatedImagePaused;
+  return _imageNodeFlags.animatedImagePaused;
 }
 
 - (void)setCoverImageCompleted:(UIImage *)coverImage
@@ -235,7 +235,7 @@
     return;
   }
   
-  if (_animatedImagePaused) {
+  if (_imageNodeFlags.animatedImagePaused) {
     return;
   }
   

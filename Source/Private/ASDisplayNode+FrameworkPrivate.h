@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  cancelled below the point they are enabled.  They continue to the leaves of the hierarchy.
  */
 
-typedef NS_OPTIONS(NSUInteger, ASHierarchyState)
+typedef NS_OPTIONS(unsigned char, ASHierarchyState)
 {
   /** The node may or may not have a supernode, but no supernode has a special hierarchy-influencing option enabled. */
   ASHierarchyStateNormal                  = 0,
@@ -115,11 +115,6 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 #undef HIERARCHY_STATE_DELTA
 
 @interface ASDisplayNode () <ASDescriptionProvider, ASDebugDescriptionProvider>
-{
-@protected
-  ASInterfaceState _interfaceState;
-  ASHierarchyState _hierarchyState;
-}
 
 // The view class to use when creating a new display node instance. Defaults to _ASDisplayView.
 + (Class)viewClass;

@@ -34,10 +34,11 @@
   ASDisplayNodeDidLoadBlock _viewControllerDidLoadBlock;
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
+  UICollectionViewLayoutAttributes *_layoutAttributes;
   BOOL _suspendInteractionDelegate;
   BOOL _selected;
   BOOL _highlighted;
-  UICollectionViewLayoutAttributes *_layoutAttributes;
+  BOOL _neverShowPlaceholders;
 }
 
 @end

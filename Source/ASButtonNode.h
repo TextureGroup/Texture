@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Image alignment defines where the image will be placed relative to the text.
  */
-typedef NS_ENUM(NSInteger, ASButtonNodeImageAlignment) {
+typedef NS_ENUM(unsigned char, ASButtonNodeImageAlignment) {
   /** Places the image before the text. */
   ASButtonNodeImageAlignmentBeginning,
   /** Places the image after the text. */

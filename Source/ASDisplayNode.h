@@ -20,9 +20,6 @@
 #import <Texture/ASLayoutElement.h>
 #import <Texture/ASLocking.h>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic error "-Wobjc-missing-property-synthesis"
-
 NS_ASSUME_NONNULL_BEGIN
 
 #define ASDisplayNodeLoggingEnabled 0
@@ -70,7 +67,7 @@ typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode *node
  */
 typedef void (^ASDisplayNodeNonFatalErrorBlock)(NSError *error);
 
-typedef NS_ENUM(NSInteger, ASCornerRoundingType) {
+typedef NS_ENUM(unsigned char, ASCornerRoundingType) {
   ASCornerRoundingTypeDefaultSlowCALayer,
   ASCornerRoundingTypePrecomposited,
   ASCornerRoundingTypeClipping
@@ -990,5 +987,3 @@ typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
 @end
 
 NS_ASSUME_NONNULL_END
-
-#pragma clang diagnostic pop
