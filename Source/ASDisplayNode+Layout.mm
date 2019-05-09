@@ -547,13 +547,13 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)automaticallyManagesSubnodes
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyManagesSubnodes;
+  return _flags.automaticallyManagesSubnodes;
 }
 
 - (void)setAutomaticallyManagesSubnodes:(BOOL)automaticallyManagesSubnodes
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyManagesSubnodes = automaticallyManagesSubnodes;
+  _flags.automaticallyManagesSubnodes = automaticallyManagesSubnodes;
 }
 
 @end
@@ -1027,7 +1027,7 @@ ASLayoutElementStyleExtensibilityForwarding
   // We generate placeholders at -layoutThatFits: time so that a node is guaranteed to have a placeholder ready to go.
   // This is also because measurement is usually asynchronous, but placeholders need to be set up synchronously.
   // First measurement is guaranteed to be before the node is onscreen, so we can create the image async. but still have it appear sync.
-  if (_placeholderEnabled && !_placeholderImage && [self _locked_displaysAsynchronously]) {
+  if (_flags.placeholderEnabled && !_placeholderImage && [self _locked_displaysAsynchronously]) {
     
     // Zero-sized nodes do not require a placeholder.
     CGSize layoutSize = _calculatedDisplayNodeLayout.layout.size;

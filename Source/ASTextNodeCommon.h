@@ -22,7 +22,7 @@
 /**
  * Highlight styles.
  */
-typedef NS_ENUM(NSUInteger, ASTextNodeHighlightStyle) {
+typedef NS_ENUM(unsigned char, ASTextNodeHighlightStyle) {
   /**
    * Highlight style for text on a light background.
    */

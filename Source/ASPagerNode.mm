@@ -29,6 +29,7 @@
     unsigned nodeBlockAtIndex:1;
     unsigned nodeAtIndex:1;
   } _pagerDataSourceFlags;
+    BOOL _allowsAutomaticInsetsAdjustment;
 
   __weak id <ASPagerDelegate> _pagerDelegate;
   ASPagerNodeProxy *_proxyDelegate;

@@ -167,11 +167,11 @@
 }
 
 - (BOOL)willApplyNextYogaCalculatedLayout {
-  return _willApplyNextYogaCalculatedLayout;
+  return _flags.willApplyNextYogaCalculatedLayout;
 }
 
 - (void)setWillApplyNextYogaCalculatedLayout:(BOOL)willApplyNextYogaCalculatedLayout {
-  _willApplyNextYogaCalculatedLayout = willApplyNextYogaCalculatedLayout;
+  _flags.willApplyNextYogaCalculatedLayout = willApplyNextYogaCalculatedLayout;
 }
 
 - (void)setYogaLayoutInProgress:(BOOL)yogaLayoutInProgress

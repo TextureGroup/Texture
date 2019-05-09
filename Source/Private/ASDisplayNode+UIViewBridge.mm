@@ -943,7 +943,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
 
-    _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+    _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
     if (AS_AVAILABLE_IOS(11.0)) {
       if (!_flags.layerBacked) {
@@ -1027,7 +1027,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
     }
   }
-  return _fallbackInsetsLayoutMarginsFromSafeArea;
+  return _flags.fallbackInsetsLayoutMarginsFromSafeArea;
 }
 
 @end
@@ -1056,13 +1056,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)isAccessibilityElement
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_isAccessibilityElement, isAccessibilityElement);
+  return _getAccessibilityFromViewOrProperty(_flags.isAccessibilityElement, isAccessibilityElement);
 }
 
 - (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
+  _setAccessibilityToViewAndProperty(_flags.isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
 }
 
 - (NSString *)accessibilityLabel
@@ -1192,37 +1192,37 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityElementsHidden, accessibilityElementsHidden);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (void)setAccessibilityElementsHidden:(BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityViewIsModal, accessibilityViewIsModal);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (void)setAccessibilityViewIsModal:(BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  return _getAccessibilityFromViewOrProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (void)setShouldGroupAccessibilityChildren:(BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  _setAccessibilityToViewAndProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (NSString *)accessibilityIdentifier
