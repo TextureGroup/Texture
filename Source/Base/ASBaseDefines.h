@@ -123,6 +123,8 @@
 
 #define ASOVERLOADABLE __attribute__((overloadable))
 
+/// Xcode >= 10.
+#define AS_HAS_OS_SIGNPOST __has_include(<os/signpost.h>)
 
 #if __has_attribute(noescape)
 #define AS_NOESCAPE __attribute__((noescape))
