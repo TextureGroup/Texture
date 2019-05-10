@@ -257,3 +257,15 @@ CGFloat ASRoundPixelValue(CGFloat f)
 }
 
 @end
+
+NSMutableSet *ASCreatePointerBasedMutableSet()
+{
+  static CFSetCallBacks callbacks;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    callbacks = kCFTypeSetCallBacks;
+    callbacks.equal = nullptr;
+    callbacks.hash = nullptr;
+  });
+  return (__bridge_transfer NSMutableSet *)CFSetCreateMutable(NULL, 0, &callbacks);
+}
