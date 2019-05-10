@@ -1387,6 +1387,8 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   [_pendingDisplayNodes removeObject:node];
 
   if (_pendingDisplayNodes.isEmpty) {
+    // Reclaim object memory.
+    _pendingDisplayNodes = nil;
     
     [self hierarchyDisplayDidFinish];
     [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> delegate) {
