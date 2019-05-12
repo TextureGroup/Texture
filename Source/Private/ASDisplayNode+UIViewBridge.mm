@@ -943,7 +943,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
 
-    _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+    _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
     if (AS_AVAILABLE_IOS(11.0)) {
       if (!_flags.layerBacked) {
@@ -1021,13 +1021,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (AS_AVAILABLE_IOS(11.0)) {
     if (!_flags.layerBacked) {
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
     }
   }
-  return _fallbackInsetsLayoutMarginsFromSafeArea;
+  return _flags.fallbackInsetsLayoutMarginsFromSafeArea;
 }
 
 @end
@@ -1053,23 +1053,16 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 @implementation ASDisplayNode (UIViewBridgeAccessibility)
 
-// iOS 11 only properties. Add this to silence "unimplemented selector" warnings
-// in old SDKs. If the caller doesn't respect our API_AVAILABLE attributes, then they
-// get an appropriate "unrecognized selector" runtime error.
-#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_11_0
-@dynamic accessibilityAttributedLabel, accessibilityAttributedHint, accessibilityAttributedValue;
-#endif
-
 - (BOOL)isAccessibilityElement
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_isAccessibilityElement, isAccessibilityElement);
+  return _getAccessibilityFromViewOrProperty(_flags.isAccessibilityElement, isAccessibilityElement);
 }
 
 - (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
+  _setAccessibilityToViewAndProperty(_flags.isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
 }
 
 - (NSString *)accessibilityLabel
@@ -1082,15 +1075,12 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel);
   }
-#endif
 }
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
 - (NSAttributedString *)accessibilityAttributedLabel
 {
   _bridge_prologue_read;
@@ -1103,7 +1093,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   { _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel); }
   { _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityAttributedLabel.string, accessibilityLabel, accessibilityAttributedLabel.string); }
 }
-#endif
 
 - (NSString *)accessibilityHint
 {
@@ -1115,15 +1104,12 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSAttributedString *accessibilityAttributedHint = accessibilityHint ? [[NSAttributedString alloc] initWithString:accessibilityHint] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint);
   }
-#endif
 }
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
 - (NSAttributedString *)accessibilityAttributedHint
 {
   _bridge_prologue_read;
@@ -1137,7 +1123,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
   { _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityAttributedHint.string, accessibilityHint, accessibilityAttributedHint.string); }
 }
-#endif
 
 - (NSString *)accessibilityValue
 {
@@ -1149,15 +1134,12 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSAttributedString *accessibilityAttributedValue = accessibilityValue ? [[NSAttributedString alloc] initWithString:accessibilityValue] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue);
   }
-#endif
 }
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0
 - (NSAttributedString *)accessibilityAttributedValue
 {
   _bridge_prologue_read;
@@ -1170,7 +1152,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   { _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue); }
   { _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityAttributedValue.string, accessibilityValue, accessibilityAttributedValue.string); }
 }
-#endif
 
 - (UIAccessibilityTraits)accessibilityTraits
 {
@@ -1211,37 +1192,37 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityElementsHidden, accessibilityElementsHidden);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (void)setAccessibilityElementsHidden:(BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityViewIsModal, accessibilityViewIsModal);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (void)setAccessibilityViewIsModal:(BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  return _getAccessibilityFromViewOrProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (void)setShouldGroupAccessibilityChildren:(BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  _setAccessibilityToViewAndProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (NSString *)accessibilityIdentifier
@@ -1266,6 +1247,18 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_read;
   return _getAccessibilityFromViewOrProperty(_accessibilityNavigationStyle, accessibilityNavigationStyle);
+}
+
+- (void)setAccessibilityCustomActions:(NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_write;
+  _setAccessibilityToViewAndProperty(_accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions, accessibilityCustomActions);
+}
+
+- (NSArray *)accessibilityCustomActions
+{
+  _bridge_prologue_read;
+  return _getAccessibilityFromViewOrProperty(_accessibilityCustomActions, accessibilityCustomActions);
 }
 
 #if TARGET_OS_TV

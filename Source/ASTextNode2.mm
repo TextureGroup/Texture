@@ -170,12 +170,14 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   
   NSString *_highlightedLinkAttributeName;
   id _highlightedLinkAttributeValue;
-  ASTextNodeHighlightStyle _highlightStyle;
   NSRange _highlightRange;
   ASHighlightOverlayLayer *_activeHighlightLayer;
   UIColor *_placeholderColor;
   
   UILongPressGestureRecognizer *_longPressGestureRecognizer;
+  ASTextNodeHighlightStyle _highlightStyle;
+  BOOL _longPressCancelsTouches;
+  BOOL _passthroughNonlinkTouches;
 }
 @dynamic placeholderEnabled;
 
@@ -396,6 +398,7 @@ static NSArray *DefaultLinkAttributeNames() {
   // Holding it for the duration of the method is more efficient in this case.
   ASLockScopeSelf();
 
+  NSAttributedString *oldAttributedText = _attributedText;
   if (!ASCompareAssignCopy(_attributedText, attributedText)) {
     return;
   }
@@ -418,7 +421,12 @@ static NSArray *DefaultLinkAttributeNames() {
 
   // Accessiblity
   self.accessibilityLabel = self.defaultAccessibilityLabel;
-  self.isAccessibilityElement = (length != 0); // We're an accessibility element by default if there is a string.
+  
+  // We update the isAccessibilityElement setting if this node is not switching between strings.
+  if (oldAttributedText.length == 0 || length == 0) {
+    // We're an accessibility element by default if there is a string.
+    self.isAccessibilityElement = (length != 0);
+  }
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS
   [ASTextNode _registerAttributedText:_attributedText];
@@ -1243,7 +1251,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_composedTruncationText
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_composedTruncationText == nil) {
     if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
       NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
@@ -1269,7 +1277,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
  */
 - (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
   // Grab the attributes from the full string
   if (_attributedText.length > 0) {

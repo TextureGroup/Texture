@@ -468,7 +468,7 @@ static void layoutFlexibleChildrenAtZeroSize(std::vector<ASStackLayoutSpecItem> 
 static CGFloat computeItemsStackDimensionSum(const std::vector<ASStackLayoutSpecItem> &items,
                                              const ASStackLayoutSpecStyle &style)
 {
-  // Sum up the childrens' spacing
+  // Sum up the children's spacing
   const CGFloat childSpacingSum = std::accumulate(items.begin(), items.end(),
                                                   // Start from default spacing between each child:
                                                   items.empty() ? 0 : style.spacing * (items.size() - 1),
@@ -476,7 +476,7 @@ static CGFloat computeItemsStackDimensionSum(const std::vector<ASStackLayoutSpec
                                                     return x + l.child.style.spacingBefore + l.child.style.spacingAfter;
                                                   });
 
-  // Sum up the childrens' dimensions (including spacing) in the stack direction.
+  // Sum up the children's dimensions (including spacing) in the stack direction.
   const CGFloat childStackDimensionSum = std::accumulate(items.begin(), items.end(),
                                                          childSpacingSum,
                                                          [&](CGFloat x, const ASStackLayoutSpecItem &l) {

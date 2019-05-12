@@ -9,50 +9,34 @@
 /// The signposts we use. Signposts are grouped by color. The SystemTrace.tracetemplate file
 /// should be kept up-to-date with these values.
 typedef NS_ENUM(uint32_t, ASSignpostName) {
-  // Collection/Table (Blue)
+  // Collection/Table
   ASSignpostDataControllerBatch = 300,    // Alloc/layout nodes before collection update.
   ASSignpostRangeControllerUpdate,        // Ranges update pass.
-  ASSignpostCollectionUpdate,             // Entire update process, from -endUpdates to [super perform…]
   
-  // Rendering (Green)
+  // Rendering
   ASSignpostLayerDisplay = 325,           // Client display callout.
   ASSignpostRunLoopQueueBatch,            // One batch of ASRunLoopQueue.
   
-  // Layout (Purple)
+  // Layout
   ASSignpostCalculateLayout = 350,        // Start of calculateLayoutThatFits to end. Max 1 per thread.
   
-  // Misc (Orange)
+  // Misc
   ASSignpostDeallocQueueDrain = 375,      // One chunk of dealloc queue work. arg0 is count.
-  ASSignpostCATransactionLayout,          // The CA transaction commit layout phase.
-  ASSignpostCATransactionCommit           // The CA transaction commit post-layout phase.
+  ASSignpostOrientationChange,            // From WillChangeStatusBarOrientation to animation end.
 };
 
-typedef NS_ENUM(uintptr_t, ASSignpostColor) {
-  ASSignpostColorBlue,
-  ASSignpostColorGreen,
-  ASSignpostColorPurple,
-  ASSignpostColorOrange,
-  ASSignpostColorRed,
-  ASSignpostColorDefault
-};
-
-static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpostColor colorPref) {
-  if (colorPref == ASSignpostColorDefault) {
-    return (ASSignpostColor)((name / 25) % 4);
-  } else {
-    return colorPref;
-  }
-}
-
-#if defined(PROFILE) && __has_include(<sys/kdebug_signpost.h>)
-  #define AS_KDEBUG_ENABLE 1
+#ifdef PROFILE
+  #define AS_SIGNPOST_ENABLE 1
 #else
-  #define AS_KDEBUG_ENABLE 0
+  #define AS_SIGNPOST_ENABLE 0
 #endif
 
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
 
 #import <sys/kdebug_signpost.h>
+#if AS_HAS_OS_SIGNPOST
+#import <os/signpost.h>
+#endif
 
 // These definitions are required to build the backward-compatible kdebug trace
 // on the iOS 10 SDK.  The kdebug_trace function crashes if run on iOS 9 and earlier.
@@ -68,27 +52,55 @@ static inline ASSignpostColor ASSignpostGetColor(ASSignpostName name, ASSignpost
 #define APPSDBG_CODE(SubClass,code) KDBG_CODE(DBG_APPS, SubClass, code)
 #endif
 
-// Currently we'll reserve arg3.
-#define ASSignpost(name, identifier, arg2, color) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_NONE, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
+#if AS_HAS_OS_SIGNPOST
 
-#define ASSignpostStartCustom(name, identifier, arg2) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost_start(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_START, (uintptr_t)identifier, (uintptr_t)arg2, 0, 0);
-#define ASSignpostStart(name) ASSignpostStartCustom(name, self, 0)
+#define ASSignpostStart(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(12, 12)) { \
+    unowned os_log_t log = ASPointsOfInterestLog(); \
+    os_signpost_id_t spid = os_signpost_id_make_with_id(log, identifier); \
+    os_signpost_interval_begin(log, spid, #name, format, ##__VA_ARGS__); \
+  } else if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_start(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_START, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
 
-#define ASSignpostEndCustom(name, identifier, arg2, color) \
-AS_AT_LEAST_IOS10 ? kdebug_signpost_end(name, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color)) \
-: syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, name) | DBG_FUNC_END, (uintptr_t)identifier, (uintptr_t)arg2, 0, ASSignpostGetColor(name, color));
-#define ASSignpostEnd(name) ASSignpostEndCustom(name, self, 0, ASSignpostColorDefault)
+#define ASSignpostEnd(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(12, 12)) { \
+    unowned os_log_t log = ASPointsOfInterestLog(); \
+    os_signpost_id_t spid = os_signpost_id_make_with_id(log, identifier); \
+    os_signpost_interval_end(log, spid, #name, format, ##__VA_ARGS__); \
+  } else if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_end(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_END, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
 
-#else
+#else // !AS_HAS_OS_SIGNPOST
 
-#define ASSignpost(name, identifier, arg2, color)
-#define ASSignpostStartCustom(name, identifier, arg2)
-#define ASSignpostStart(name)
-#define ASSignpostEndCustom(name, identifier, arg2, color)
-#define ASSignpostEnd(name)
+#define ASSignpostStart(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_start(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_START, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
+
+#define ASSignpostEnd(name, identifier, format, ...) ({\
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
+    kdebug_signpost_end(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
+  } else { \
+    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_END, (uintptr_t)identifier, 0, 0, 0); \
+  } \
+})
+
+#endif
+
+#else // !AS_SIGNPOST_ENABLE
+
+#define ASSignpostStart(name, identifier, format, ...)
+#define ASSignpostEnd(name, identifier, format, ...)
 
 #endif

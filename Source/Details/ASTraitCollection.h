@@ -106,16 +106,6 @@ AS_EXTERN void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPri
 
 @end
 
-#define ASPrimitiveTraitCollectionDefaults \
-- (ASPrimitiveTraitCollection)primitiveTraitCollection\
-{\
-  return _primitiveTraitCollection.load();\
-}\
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
-{\
-  _primitiveTraitCollection = traitCollection;\
-}\
-
 #define ASLayoutElementCollectionTableSetTraitCollection(lock) \
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
 {\
