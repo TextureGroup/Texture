@@ -13,6 +13,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
@@ -210,16 +211,13 @@ using AS::MutexLocker;
 
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
-      
-      UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
 
-      for (dispatch_block_t block in displayBlocks) {
-        CHECK_CANCELLED_AND_RETURN_NIL(UIGraphicsEndImageContext());
-        block();
-      }
-      
-      UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-      UIGraphicsEndImageContext();
+      UIImage *image = ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, ^{
+        for (dispatch_block_t block in displayBlocks) {
+          if (isCancelledBlock()) return;
+          block();
+        }
+      });
 
       ASDN_DELAY_FOR_DISPLAY();
       return image;
@@ -228,38 +226,35 @@ using AS::MutexLocker;
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
 
+      __block UIImage *image = nil;
+      void (^workWithContext)() = ^{
+        CGContextRef currentContext = UIGraphicsGetCurrentContext();
+
+        if (shouldCreateGraphicsContext && !currentContext) {
+          ASDisplayNodeAssert(NO, @"Failed to create a CGContext (size: %@)", NSStringFromCGSize(bounds.size));
+          return;
+        }
+
+        // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
+        // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
+        [self __willDisplayNodeContentWithRenderingContext:currentContext drawParameters:drawParameters];
+
+        if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
+          image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
+        } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
+          [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
+        }
+
+        [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
+        ASDN_DELAY_FOR_DISPLAY();
+      };
+
       if (shouldCreateGraphicsContext) {
-        UIGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
+        return ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, workWithContext);
+      } else {
+        workWithContext();
+        return image;
       }
-
-      CGContextRef currentContext = UIGraphicsGetCurrentContext();
-      UIImage *image = nil;
-
-      if (shouldCreateGraphicsContext && !currentContext) {
-        ASDisplayNodeAssert(NO, @"Failed to create a CGContext (size: %@)", NSStringFromCGSize(bounds.size));
-        return nil;
-      }
-
-      // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
-      // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
-      [self __willDisplayNodeContentWithRenderingContext:currentContext drawParameters:drawParameters];
-      
-      if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
-        image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
-      } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
-        [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
-      }
-      
-      [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
-      
-      if (shouldCreateGraphicsContext) {
-        CHECK_CANCELLED_AND_RETURN_NIL( UIGraphicsEndImageContext(); );
-        image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-      }
-
-      ASDN_DELAY_FOR_DISPLAY();
-      return image;
     };
   }
 
@@ -267,12 +262,12 @@ using AS::MutexLocker;
    If we're profiling, wrap the display block with signpost start and end.
    Color the interval red if cancelled, green otherwise.
    */
-#if AS_KDEBUG_ENABLE
-  __unsafe_unretained id ptrSelf = self;
+#if AS_SIGNPOST_ENABLE
+  __unsafe_unretained id ptrSelf = (id)self;
   displayBlock = ^{
-    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
+    ASSignpostStart(LayerDisplay, ptrSelf, "%@", ASObjectDescriptionMakeTiny(ptrSelf));
     id result = displayBlock();
-    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    ASSignpostEnd(LayerDisplay, ptrSelf, "(%d %d), canceled: %d", (int)bounds.size.width, (int)bounds.size.height, (int)isCancelledBlock());
     return result;
   };
 #endif
@@ -366,6 +361,8 @@ using AS::MutexLocker;
     
     if (*image) {
       *image = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    if (context == NULL) {
       UIGraphicsEndImageContext();
     }
   }

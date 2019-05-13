@@ -114,7 +114,6 @@
 
   // Core.
   id <ASEditableTextNodeDelegate> __weak _delegate;
-  BOOL _delegateDidUpdateEnqueued;
 
   // TextKit.
   AS::RecursiveMutex _textKitLock;
@@ -131,6 +130,9 @@
   BOOL _displayingPlaceholder; // Defaults to YES.
   BOOL _isPreservingSelection;
   BOOL _selectionChangedForEditedText;
+  BOOL _delegateDidUpdateEnqueued;
+  BOOL _scrollEnabled;
+
   NSRange _previousSelectedRange;
 }
 

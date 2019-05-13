@@ -34,6 +34,21 @@
 @interface _ASCollectionPendingState : NSObject {
 @public
   std::vector<std::vector<ASRangeTuningParameters>> _tuningParameters;
+
+  // Keep these enums by the bitfield struct to save memory.
+  ASLayoutRangeMode _rangeMode;
+  ASCellLayoutMode _cellLayoutMode;
+  struct {
+    unsigned int allowsSelection:1; // default is YES
+    unsigned int allowsMultipleSelection:1; // default is NO
+    unsigned int inverted:1; //default is NO
+    unsigned int alwaysBounceVertical:1;
+    unsigned int alwaysBounceHorizontal:1;
+    unsigned int animatesContentOffset:1;
+    unsigned int showsVerticalScrollIndicator:1;
+    unsigned int showsHorizontalScrollIndicator:1;
+    unsigned int pagingEnabled:1;
+  } _flags;
 }
 @property (nonatomic, weak) id <ASCollectionDelegate>   delegate;
 @property (nonatomic, weak) id <ASCollectionDataSource> dataSource;
@@ -65,17 +80,129 @@
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
-    _allowsSelection = YES;
-    _allowsMultipleSelection = NO;
-    _inverted = NO;
+    _flags.allowsSelection = YES;
+    _flags.allowsMultipleSelection = NO;
+    _flags.inverted = NO;
     _contentInset = UIEdgeInsetsZero;
     _contentOffset = CGPointZero;
-    _animatesContentOffset = NO;
-    _showsVerticalScrollIndicator = YES;
-    _showsHorizontalScrollIndicator = YES;
-    _pagingEnabled = NO;
+    _flags.animatesContentOffset = NO;
+    _flags.showsVerticalScrollIndicator = YES;
+    _flags.showsHorizontalScrollIndicator = YES;
+    _flags.pagingEnabled = NO;
   }
   return self;
+}
+
+#pragma mark Properties
+
+- (ASLayoutRangeMode)rangeMode
+{
+  return _rangeMode;
+}
+
+- (void)setRangeMode:(ASLayoutRangeMode)rangeMode
+{
+  _rangeMode = rangeMode;
+}
+
+- (ASCellLayoutMode)cellLayoutMode
+{
+  return _cellLayoutMode;
+}
+
+- (void)setCellLayoutMode:(ASCellLayoutMode)cellLayoutMode
+{
+  _cellLayoutMode = cellLayoutMode;
+}
+
+- (BOOL)allowsSelection
+{
+  return _flags.allowsSelection;
+}
+
+- (void)setAllowsSelection:(BOOL)allowsSelection
+{
+  _flags.allowsSelection = allowsSelection;
+}
+
+- (BOOL)allowsMultipleSelection
+{
+  return _flags.allowsMultipleSelection;
+}
+
+- (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
+{
+  _flags.allowsMultipleSelection = allowsMultipleSelection;
+}
+
+- (BOOL)inverted
+{
+  return _flags.inverted;
+}
+
+-(void)setInverted:(BOOL)inverted
+{
+  _flags.inverted = inverted;
+}
+
+-(BOOL)alwaysBounceVertical
+{
+  return _flags.alwaysBounceVertical;
+}
+
+-(void)setAlwaysBounceVertical:(BOOL)alwaysBounceVertical
+{
+  _flags.alwaysBounceVertical = alwaysBounceVertical;
+}
+
+-(BOOL)alwaysBounceHorizontal
+{
+  return _flags.alwaysBounceHorizontal;
+}
+
+-(void)setAlwaysBounceHorizontal:(BOOL)alwaysBounceHorizontal
+{
+  _flags.alwaysBounceHorizontal = alwaysBounceHorizontal;
+}
+
+- (BOOL)animatesContentOffset
+{
+  return _flags.animatesContentOffset;
+}
+
+-(void)setAnimatesContentOffset:(BOOL)animatesContentOffset
+{
+  _flags.animatesContentOffset = animatesContentOffset;
+}
+
+- (BOOL)showsVerticalScrollIndicator
+{
+  return _flags.showsVerticalScrollIndicator;
+}
+
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsVerticalScrollIndicator
+{
+  _flags.showsVerticalScrollIndicator = showsVerticalScrollIndicator;
+}
+
+-(BOOL)showsHorizontalScrollIndicator
+{
+  return _flags.showsHorizontalScrollIndicator;
+}
+
+- (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
+{
+  _flags.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
+}
+
+-(BOOL)pagingEnabled
+{
+  return _flags.pagingEnabled;
+}
+
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  _flags.pagingEnabled = pagingEnabled;
 }
 
 #pragma mark Tuning Parameters

@@ -15,6 +15,7 @@
 #import <atomic>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutTransition.h>
 #import <AsyncDisplayKit/ASThread.h>
@@ -35,7 +36,7 @@ BOOL ASDisplayNodeNeedsSpecialPropertiesHandling(BOOL isSynchronous, BOOL isLaye
 /// Get the pending view state for the node, creating one if needed.
 _ASPendingState * ASDisplayNodeGetPendingState(ASDisplayNode * node);
 
-typedef NS_OPTIONS(NSUInteger, ASDisplayNodeMethodOverrides)
+typedef NS_OPTIONS(unsigned short, ASDisplayNodeMethodOverrides)
 {
   ASDisplayNodeMethodOverrideNone                   = 0,
   ASDisplayNodeMethodOverrideTouchesBegan           = 1 << 0,
@@ -84,9 +85,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   AS::RecursiveMutex __instanceLock__;
 
   _ASPendingState *_pendingViewState;
-  ASInterfaceState _pendingInterfaceState;
-  ASInterfaceState _preExitingInterfaceState;
-  
+
   UIView *_view;
   CALayer *_layer;
 
@@ -126,8 +125,34 @@ static constexpr CACornerMask kASCACornerAllCorners =
     unsigned isInHierarchy:1;
     unsigned visibilityNotificationsDisabled:VISIBILITY_NOTIFICATIONS_DISABLED_BITS;
     unsigned isDeallocating:1;
+
+#if YOGA
+      unsigned willApplyNextYogaCalculatedLayout:1;
+#endif
+      // Automatically manages subnodes
+      unsigned automaticallyManagesSubnodes:1; // Main thread only
+      unsigned placeholderEnabled:1;
+      // Accessibility support
+      unsigned isAccessibilityElement:1;
+      unsigned accessibilityElementsHidden:1;
+      unsigned accessibilityViewIsModal:1;
+      unsigned shouldGroupAccessibilityChildren:1;
+      unsigned isAccessibilityContainer:1;
+      unsigned fallbackInsetsLayoutMarginsFromSafeArea:1;
+      unsigned automaticallyRelayoutOnSafeAreaChanges:1;
+      unsigned automaticallyRelayoutOnLayoutMarginsChanges:1;
+      unsigned isViewControllerRoot:1;
+      unsigned hasHadInterfaceStateDelegates:1;
   } _flags;
-  
+
+  ASInterfaceState _interfaceState;
+  ASHierarchyState _hierarchyState;
+  ASInterfaceState _pendingInterfaceState;
+  ASInterfaceState _preExitingInterfaceState;
+  ASCornerRoundingType _cornerRoundingType;
+  ASDisplayNodePerformanceMeasurementOptions _measurementOptions;
+  ASDisplayNodeMethodOverrides _methodOverrides;
+
 @protected
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
@@ -142,7 +167,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // This is the desired contentsScale, not the scale at which the layer's contents should be displayed
   CGFloat _contentsScaleForDisplay;
-  ASDisplayNodeMethodOverrides _methodOverrides;
 
   UIEdgeInsets _hitTestSlop;
 
@@ -161,11 +185,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
   __weak ASDisplayNode *_yogaParent;
   ASLayout *_yogaCalculatedLayout;
-  BOOL _willApplyNextYogaCalculatedLayout;
 #endif
-
-  // Automatically manages subnodes
-  BOOL _automaticallyManagesSubnodes; // Main thread only
 
   // Layout Transition
   _ASTransitionContext *_pendingLayoutTransitionContext;
@@ -185,7 +205,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
 
   // Layout Spec performance measurement
-  ASDisplayNodePerformanceMeasurementOptions _measurementOptions;
   NSTimeInterval _layoutSpecTotalTime;
   NSInteger _layoutSpecNumberOfPasses;
   NSTimeInterval _layoutComputationTotalTime;
@@ -202,11 +221,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // Placeholder support
   UIImage *_placeholderImage;
-  BOOL _placeholderEnabled;
   CALayer *_placeholderLayer;
-  NSTimeInterval _placeholderFadeDuration;
-
-  NSInteger _drawingPriority;
 
   // keeps track of nodes/subnodes that have not finished display, used with placeholders
   ASWeakSet *_pendingDisplayNodes;
@@ -214,7 +229,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // Corner Radius support
   CGFloat _cornerRadius;
-  ASCornerRoundingType _cornerRoundingType;
   CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
   CACornerMask _maskedCorners;
 
@@ -223,7 +237,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
 
   // Accessibility support
-  BOOL _isAccessibilityElement;
   NSString *_accessibilityLabel;
   NSAttributedString *_accessibilityAttributedLabel;
   NSString *_accessibilityHint;
@@ -233,28 +246,17 @@ static constexpr CACornerMask kASCACornerAllCorners =
   UIAccessibilityTraits _accessibilityTraits;
   CGRect _accessibilityFrame;
   NSString *_accessibilityLanguage;
-  BOOL _accessibilityElementsHidden;
-  BOOL _accessibilityViewIsModal;
-  BOOL _shouldGroupAccessibilityChildren;
   NSString *_accessibilityIdentifier;
   UIAccessibilityNavigationStyle _accessibilityNavigationStyle;
   NSArray *_accessibilityCustomActions;
   NSArray *_accessibilityHeaderElements;
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
-  BOOL _isAccessibilityContainer;
 
 
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
   UIEdgeInsets _fallbackSafeAreaInsets;
-  BOOL _fallbackInsetsLayoutMarginsFromSafeArea;
-
-  BOOL _automaticallyRelayoutOnSafeAreaChanges;
-  BOOL _automaticallyRelayoutOnLayoutMarginsChanges;
-
-  BOOL _isViewControllerRoot;
-
 
 #pragma mark - ASDisplayNode (Debugging)
   ASLayout *_unflattenedLayout;
@@ -268,7 +270,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 #endif
 
   /// Fast path: tells whether we've ever had an interface state delegate before.
-  BOOL _hasHadInterfaceStateDelegates;
   __weak id<ASInterfaceStateDelegate> _interfaceStateDelegates[AS_MAX_INTERFACE_STATE_DELEGATES];
 }
 
@@ -310,7 +311,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 /**
  * Internal tree modification methods.
  */
-- (void)_replaceSubnode:(ASDisplayNode *)oldSubnode withSubnode:(ASDisplayNode *)replacementSubnode;
 - (void)_removeFromSupernodeIfEqualTo:(ASDisplayNode *)supernode;
 
 // Private API for helper functions / unit tests.  Use ASDisplayNodeDisableHierarchyNotifications() to control this.

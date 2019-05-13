@@ -16,7 +16,7 @@
  * The defualt state, ASInterfaceStateNone, means that the element is not predicted to be onscreen soon and
  * preloading should not be performed. Swift: use [] for the default behavior.
  */
-typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
+typedef NS_OPTIONS(unsigned char, ASInterfaceState)
 {
     /** The element is not predicted to be onscreen soon and preloading should not be performed */
     ASInterfaceStateNone          = 0,
