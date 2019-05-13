@@ -562,4 +562,11 @@
   _titleNode.hidden = (_titleNode.attributedText.length == 0);
 }
 
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+  _imageNode.imageModificationBlock = ASImageNodeTintColorModificationBlock(self.tintColor);
+  [_imageNode setNeedsDisplay];
+}
+
 @end

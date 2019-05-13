@@ -51,4 +51,13 @@
                 buttonNode.defaultAccessibilityTraits);
 }
 
+- (void)testTintColor
+{
+  ASButtonNode *buttonNode = nil;
+  buttonNode = [[ASButtonNode alloc] init];
+  XCTAssertFalse(buttonNode.tintColor == [UIColor whiteColor]);
+  buttonNode.tintColor = [UIColor whiteColor];
+  XCTAssertTrue(buttonNode.tintColor == [UIColor whiteColor]);
+}
+
 @end
