@@ -117,6 +117,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASImageDownloaderPriority ASImageDown
 - (NSComparisonResult)asdk_inverseCompare:(NSIndexPath *)otherIndexPath;
 @end
 
+/**
+ * Create an NSMutableSet that uses pointers for hash & equality.
+ */
+AS_EXTERN NSMutableSet *ASCreatePointerBasedMutableSet(void);
+
 NS_ASSUME_NONNULL_END
 
 #ifndef AS_INITIALIZE_FRAMEWORK_MANUALLY
