@@ -11,6 +11,7 @@
 #import <Texture/_ASAsyncTransactionContainer+Private.h>
 
 #import <Texture/ASConfigurationInternal.h>
+#import <Texture/ASInternalHelpers.h>
 #import <Texture/_ASAsyncTransaction.h>
 #import <Texture/_ASAsyncTransactionGroup.h>
 
@@ -49,9 +50,9 @@
 {
   _ASAsyncTransaction *transaction = self.asyncdisplaykit_currentAsyncTransaction;
   if (transaction == nil) {
-    NSHashTable *transactions = self.asyncdisplaykit_asyncLayerTransactions;
+    NSMutableSet<_ASAsyncTransaction *> *transactions = self.asyncdisplaykit_asyncLayerTransactions;
     if (transactions == nil) {
-      transactions = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
+      transactions = ASCreatePointerBasedMutableSet();
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
@@ -62,6 +63,10 @@
           return;
         }
         [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
+        if (self.asyncdisplaykit_asyncLayerTransactions.count == 0) {
+          // Reclaim object memory.
+          self.asyncdisplaykit_asyncLayerTransactions = nil;
+        }
         [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
       }];
     } else {
@@ -71,6 +76,10 @@
           return;
         }
         [transactions removeObject:completedTransaction];
+        if (transactions.count == 0) {
+          // Reclaim object memory.
+          self.asyncdisplaykit_asyncLayerTransactions = nil;
+        }
         [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
       }];
     }

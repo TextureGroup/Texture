@@ -225,7 +225,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
-  ASSignpostStart(ASSignpostRangeControllerUpdate);
+  ASSignpostStart(RangeControllerUpdate, _dataSource, "%@", ASObjectDescriptionMakeTiny(_dataSource));
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];
@@ -243,6 +243,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       [newVisibleNodes addObject:element.node];
     }
     [self _setVisibleNodes:newVisibleNodes];
+    ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
 
@@ -424,7 +425,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   NSLog(@"Range update complete; modifiedIndexPaths: %@, rangeMode: %d", [self descriptionWithIndexPaths:modifiedIndexPaths], rangeMode);
 #endif
   
-  ASSignpostEnd(ASSignpostRangeControllerUpdate);
+  ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
 }
 
 #pragma mark - Notification observers
