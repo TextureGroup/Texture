@@ -15,10 +15,13 @@
 
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
+#import <AsyncDisplayKit/ASPropertyMacros.h>
 #import <AsyncDisplayKit/ASThread.h>
 
 @interface ASMapNode()
@@ -26,6 +29,7 @@
   MKMapSnapshotter *_snapshotter;
   BOOL _snapshotAfterLayout;
   NSArray *_annotations;
+  ASMapNodeShowAnnotationsOptions _showAnnotationsOptions;
 }
 @end
 
@@ -35,7 +39,6 @@
 @synthesize mapDelegate = _mapDelegate;
 @synthesize options = _options;
 @synthesize liveMap = _liveMap;
-@synthesize showAnnotationsOptions = _showAnnotationsOptions;
 
 #pragma mark - Lifecycle
 - (instancetype)init
@@ -320,36 +323,28 @@
   _mapView = nil;
 }
 
-- (NSArray *)annotations
-{
-  ASLockScopeSelf();
-  return _annotations;
-}
-
-- (void)setAnnotations:(NSArray *)annotations
-{
-  annotations = [annotations copy] ? : @[];
-
-  ASLockScopeSelf();
-  _annotations = annotations;
+void DidSetAnnotations(ASMapNode *self, NSArray *oldValue) {
   ASMapNodeShowAnnotationsOptions showAnnotationsOptions = self.showAnnotationsOptions;
-  if (self.isLiveMap) {
-    [_mapView removeAnnotations:_mapView.annotations];
-    [_mapView addAnnotations:annotations];
+  if (self->_liveMap) {
+    [self->_mapView removeAnnotations:self->_mapView.annotations];
+    [self->_mapView addAnnotations:self->_annotations];
 
     if (showAnnotationsOptions & ASMapNodeShowAnnotationsOptionsZoomed) {
       BOOL const animated = showAnnotationsOptions & ASMapNodeShowAnnotationsOptionsAnimated;
-      [_mapView showAnnotations:_mapView.annotations animated:animated];
+      [self->_mapView showAnnotations:self->_mapView.annotations animated:animated];
     }
   } else {
     if (showAnnotationsOptions & ASMapNodeShowAnnotationsOptionsZoomed) {
-      self.region = [self regionToFitAnnotations:annotations];
+      self.region = [self regionToFitAnnotations:self->_annotations];
     }
     else {
       [self takeSnapshot];
     }
   }
 }
+
+AS_GETTER(annotations, __instanceLock__, NSArray *, _annotations);
+AS_SETTER(Annotations, __instanceLock__, NSArray *, _annotations, ASObjectIsEqual, AS::ObjCCopy, nullptr, DidSetAnnotations);
 
 - (MKCoordinateRegion)regionToFitAnnotations:(NSArray<id<MKAnnotation>> *)annotations
 {
@@ -374,14 +369,8 @@
   return region;
 }
 
--(ASMapNodeShowAnnotationsOptions)showAnnotationsOptions {
-  return ASLockedSelf(_showAnnotationsOptions);
-}
-
--(void)setShowAnnotationsOptions:(ASMapNodeShowAnnotationsOptions)showAnnotationsOptions {
-  ASLockScopeSelf();
-  _showAnnotationsOptions = showAnnotationsOptions;
-}
+AS_GETTER(showAnnotationsOptions, __instanceLock__, ASMapNodeShowAnnotationsOptions, _showAnnotationsOptions)
+AS_BASIC_SETTER(ShowAnnotationsOptions, __instanceLock__, ASMapNodeShowAnnotationsOptions, _showAnnotationsOptions);
 
 #pragma mark - Layout
 - (void)setSnapshotSizeWithReloadIfNeeded:(CGSize)snapshotSize

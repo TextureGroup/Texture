@@ -24,11 +24,14 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASPropertyMacros.h>
 
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
+
+using namespace AS;
 
 @interface ASTextCacheValue : NSObject {
   @package
@@ -315,30 +318,13 @@ static NSArray *DefaultLinkAttributeNames() {
 
 #pragma mark - Layout and Sizing
 
-- (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
-{
-  ASLockScopeSelf();
-  if (ASCompareAssignCustom(_textContainer.insets, textContainerInset, UIEdgeInsetsEqualToEdgeInsets)) {
-    [self setNeedsLayout];
-  }
-}
+AS_GETTER(textContainerInset, __instanceLock__, UIEdgeInsets, _textContainer.insets);
+AS_SETTER_PLUS_METHOD(TextContainerInset, __instanceLock__, UIEdgeInsets, _textContainer.insets,
+                      UIEdgeInsetsEqualToEdgeInsets, nullptr, nullptr, setNeedsLayout);
 
-- (UIEdgeInsets)textContainerInset
-{
-  // textContainer is invariant and has an atomic accessor.
-  return _textContainer.insets;
-}
-
-- (void)setTextContainerLinePositionModifier:(id<ASTextLinePositionModifier>)modifier
-{
-  ASLockedSelfCompareAssignObjects(_textContainer.linePositionModifier, modifier);
-}
-
-- (id<ASTextLinePositionModifier>)textContainerLinePositionModifier
-{
-  ASLockScopeSelf();
-  return _textContainer.linePositionModifier;
-}
+AS_GETTER(textContainerLinePositionModifier, __instanceLock__, id<ASTextLinePositionModifier>,
+          _textContainer.linePositionModifier);
+AS_SETTER_PLUS_METHOD(TextContainerLinePositionModifier, __instanceLock__, id<ASTextLinePositionModifier>, _textContainer.linePositionModifier, ASObjectIsEqual, ObjCCopy, nullptr, setNeedsLayout);
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
@@ -745,26 +731,10 @@ static NSArray *DefaultLinkAttributeNames() {
 
 #pragma mark - Highlighting
 
-- (ASTextNodeHighlightStyle)highlightStyle
-{
-  ASLockScopeSelf();
-  
-  return _highlightStyle;
-}
+AS_GETTER(highlightStyle, __instanceLock__, ASTextNodeHighlightStyle, _highlightStyle);
+AS_BASIC_SETTER(HighlightStyle, __instanceLock__, ASTextNodeHighlightStyle, _highlightStyle);
 
-- (void)setHighlightStyle:(ASTextNodeHighlightStyle)highlightStyle
-{
-  ASLockScopeSelf();
-  
-  _highlightStyle = highlightStyle;
-}
-
-- (NSRange)highlightRange
-{
-  ASLockScopeSelf();
-
-  return _highlightRange;
-}
+AS_GETTER(highlightRange, __instanceLock__, NSRange, _highlightRange);
 
 - (void)setHighlightRange:(NSRange)highlightRange
 {
@@ -838,18 +808,11 @@ static NSArray *DefaultLinkAttributeNames() {
 
 #pragma mark - Placeholders
 
-- (UIColor *)placeholderColor
-{
-  return ASLockedSelf(_placeholderColor);
+void DidSetPlaceholderColor(ASTextNode2 *self, UIColor *oldValue) {
+  self.placeholderEnabled = (CGColorGetAlpha(self->_placeholderColor.CGColor) > 0);
 }
-
-- (void)setPlaceholderColor:(UIColor *)placeholderColor
-{
-  ASLockScopeSelf();
-  if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
-    self.placeholderEnabled = CGColorGetAlpha(placeholderColor.CGColor) > 0;
-  }
-}
+AS_GETTER(placeholderColor, __instanceLock__, UIColor *, _placeholderColor);
+AS_SETTER(PlaceholderColor, __instanceLock__, UIColor *, _placeholderColor, ASObjectIsEqual, AS::ObjCCopy, nullptr, DidSetPlaceholderColor);
 
 - (UIImage *)placeholderImage
 {
@@ -1020,59 +983,21 @@ static NSArray *DefaultLinkAttributeNames() {
  * Shadowed text is pretty rare, and we are a framework that targets serious developers.
  * We should probably ignore these properties and tell developers to set the shadow into their attributed text instead.
  */
-- (CGColorRef)shadowColor
-{
-  return ASLockedSelf(_shadowColor);
-}
+AS_GETTER(shadowColor, __instanceLock__, CGColorRef, _shadowColor);
+AS_SETTER_PLUS_METHOD(ShadowColor, __instanceLock__, CGColorRef, _shadowColor, CGColorEqualToColor,
+                      CGColorRetain, CGColorRelease, setNeedsDisplay);
 
-- (void)setShadowColor:(CGColorRef)shadowColor
-{
-  ASLockScopeSelf();
-  if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
-    CGColorRelease(_shadowColor);
-    _shadowColor = CGColorRetain(shadowColor);
-    [self setNeedsDisplay];
-  }
-}
+AS_GETTER(shadowOffset, __instanceLock__, CGSize, _shadowOffset);
+AS_SETTER_PLUS_METHOD(ShadowOffset, __instanceLock__, CGSize, _shadowOffset, CGSizeEqualToSize,
+                      nullptr, nullptr, setNeedsDisplay);
 
-- (CGSize)shadowOffset
-{
-  return ASLockedSelf(_shadowOffset);
-}
+AS_GETTER(shadowOpacity, __instanceLock__, CGFloat, _shadowOpacity);
+AS_SETTER_PLUS_METHOD(ShadowOpacity, __instanceLock__, CGFloat, _shadowOpacity, nullptr,
+                      nullptr, nullptr, setNeedsDisplay);
 
-- (void)setShadowOffset:(CGSize)shadowOffset
-{
-  ASLockScopeSelf();
-  if (ASCompareAssignCustom(_shadowOffset, shadowOffset, CGSizeEqualToSize)) {
-    [self setNeedsDisplay];
-  }
-}
-
-- (CGFloat)shadowOpacity
-{
-  return ASLockedSelf(_shadowOpacity);
-}
-
-- (void)setShadowOpacity:(CGFloat)shadowOpacity
-{
-  ASLockScopeSelf();
-  if (ASCompareAssign(_shadowOpacity, shadowOpacity)) {
-    [self setNeedsDisplay];
-  }
-}
-
-- (CGFloat)shadowRadius
-{
-  return ASLockedSelf(_shadowRadius);
-}
-
-- (void)setShadowRadius:(CGFloat)shadowRadius
-{
-  ASLockScopeSelf();
-  if (ASCompareAssign(_shadowRadius, shadowRadius)) {
-    [self setNeedsDisplay];
-  }
-}
+AS_GETTER(shadowRadius, __instanceLock__, CGFloat, _shadowRadius);
+AS_SETTER_PLUS_METHOD(ShadowRadius, __instanceLock__, CGFloat, _shadowRadius, nullptr, nullptr,
+                      nullptr, setNeedsDisplay);
 
 - (UIEdgeInsets)shadowPadding
 {
@@ -1080,19 +1005,8 @@ static NSArray *DefaultLinkAttributeNames() {
   return UIEdgeInsetsZero;
 }
 
-- (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
-{
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  ASLockScopeSelf();
-  if (ASCompareAssignCopy(_pointSizeScaleFactors, scaleFactors)) {
-    [self setNeedsLayout];
-  }
-}
-
-- (NSArray<NSNumber *> *)pointSizeScaleFactors
-{
-  return ASLockedSelf(_pointSizeScaleFactors);
-}
+AS_GETTER(pointSizeScaleFactors, __instanceLock__, NSArray<NSNumber *> *, _pointSizeScaleFactors);
+AS_SETTER_PLUS_METHOD(PointSizeScaleFactors, __instanceLock__, NSArray<NSNumber *> *, _pointSizeScaleFactors, ASObjectIsEqual, ObjCCopy, nullptr, setNeedsLayout);
 
 #pragma mark - Truncation Message
 
@@ -1114,61 +1028,39 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
 }
 
-- (NSAttributedString *)truncationAttributedText
-{
-  return ASLockedSelf(_truncationAttributedText);
-}
+AS_GETTER(truncationAttributedText, __instanceLock__, NSAttributedString *, _truncationAttributedText);
+AS_SETTER_PLUS_METHOD(TruncationAttributedText, __instanceLock__, NSAttributedString *, _truncationAttributedText,
+                      ASObjectIsEqual, AS::ObjCCopy, nullptr, _invalidateTruncationText);
 
-- (void)setTruncationAttributedText:(NSAttributedString *)truncationAttributedText
+AS_GETTER(additionalTruncationMessage, __instanceLock__, NSAttributedString *, _additionalTruncationMessage);
+AS_SETTER_PLUS_METHOD(AdditionalTruncationMessage, __instanceLock__, NSAttributedString *,
+                      _additionalTruncationMessage, ASObjectIsEqual, AS::ObjCCopy, nullptr, _invalidateTruncationText);
+
+NS_INLINE void DidSetTruncationMode(ASTextNode2 *self, NSLineBreakMode oldValue)
 {
-  ASLockScopeSelf();
-  if (ASCompareAssignCopy(_truncationAttributedText, truncationAttributedText)) {
-    [self _invalidateTruncationText];
+  ASTextTruncationType truncationType;
+  switch (self->_truncationMode) {
+    case NSLineBreakByTruncatingHead:
+      truncationType = ASTextTruncationTypeStart;
+      break;
+    case NSLineBreakByTruncatingTail:
+      truncationType = ASTextTruncationTypeEnd;
+      break;
+    case NSLineBreakByTruncatingMiddle:
+      truncationType = ASTextTruncationTypeMiddle;
+      break;
+    default:
+      truncationType = ASTextTruncationTypeNone;
   }
+
+  self->_textContainer.truncationType = truncationType;
+
+  [self setNeedsDisplay];
 }
 
-- (NSAttributedString *)additionalTruncationMessage
-{
-  return ASLockedSelf(_additionalTruncationMessage);
-}
-
-- (void)setAdditionalTruncationMessage:(NSAttributedString *)additionalTruncationMessage
-{
-  ASLockScopeSelf();
-  if (ASCompareAssignCopy(_additionalTruncationMessage, additionalTruncationMessage)) {
-    [self _invalidateTruncationText];
-  }
-}
-
-- (NSLineBreakMode)truncationMode
-{
-  return ASLockedSelf(_truncationMode);
-}
-
-- (void)setTruncationMode:(NSLineBreakMode)truncationMode
-{
-  ASLockScopeSelf();
-  if (ASCompareAssign(_truncationMode, truncationMode)) {
-    ASTextTruncationType truncationType;
-    switch (truncationMode) {
-      case NSLineBreakByTruncatingHead:
-        truncationType = ASTextTruncationTypeStart;
-        break;
-      case NSLineBreakByTruncatingTail:
-        truncationType = ASTextTruncationTypeEnd;
-        break;
-      case NSLineBreakByTruncatingMiddle:
-        truncationType = ASTextTruncationTypeMiddle;
-        break;
-      default:
-        truncationType = ASTextTruncationTypeNone;
-    }
-    
-    _textContainer.truncationType = truncationType;
-    
-    [self setNeedsDisplay];
-  }
-}
+AS_GETTER(truncationMode, __instanceLock__, NSLineBreakMode, _truncationMode);
+AS_SETTER(TruncationMode, __instanceLock__, NSLineBreakMode, _truncationMode, nullptr, nullptr, nullptr,
+          DidSetTruncationMode);
 
 - (BOOL)isTruncated
 {
@@ -1187,19 +1079,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
   return ASTextNodeCompatibleLayoutWithContainerAndText(container, _attributedText);
 }
 
-- (NSUInteger)maximumNumberOfLines
-{
-  // _textContainer is invariant and this is just atomic access.
-  return _textContainer.maximumNumberOfRows;
-}
-
-- (void)setMaximumNumberOfLines:(NSUInteger)maximumNumberOfLines
-{
-  ASLockScopeSelf();
-  if (ASCompareAssign(_textContainer.maximumNumberOfRows, maximumNumberOfLines)) {
-    [self setNeedsDisplay];
-  }
-}
+AS_GETTER(maximumNumberOfLines, __instanceLock__, NSUInteger, _textContainer.maximumNumberOfRows);
+AS_SETTER_PLUS_METHOD(MaximumNumberOfLines, __instanceLock__, NSUInteger, _textContainer.maximumNumberOfRows, nullptr, nullptr, nullptr, setNeedsDisplay);
 
 - (NSUInteger)lineCount
 {

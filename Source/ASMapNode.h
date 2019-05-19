@@ -77,7 +77,7 @@ typedef NS_OPTIONS(NSUInteger, ASMapNodeShowAnnotationsOptions)
  * @abstract This property specifies how to show the annotations.
  * @default Default value is ASMapNodeShowAnnotationsIgnored
  */
-@property ASMapNodeShowAnnotationsOptions showAnnotationsOptions;
+@property (nonatomic) ASMapNodeShowAnnotationsOptions showAnnotationsOptions;
 
 /**
  * @abstract The block which should return annotation image for static map based on provided annotation.

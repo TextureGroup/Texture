@@ -341,6 +341,7 @@
 		CC224E962066CA6D00BBA57F /* configuration.json in Resources */ = {isa = PBXBuildFile; fileRef = CC224E952066CA6D00BBA57F /* configuration.json */; };
 		CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */; };
 		CC2F65EF1E5FFB1600DA57C9 /* ASMutableElementMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.mm */; };
+		CC31881C2291B8380065A093 /* ASPropertyMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = CC31881B2291B0A20065A093 /* ASPropertyMacros.h */; };
 		CC35CEC320DD7F600006448D /* ASCollections.h in Headers */ = {isa = PBXBuildFile; fileRef = CC35CEC120DD7F600006448D /* ASCollections.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC35CEC420DD7F600006448D /* ASCollections.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC35CEC220DD7F600006448D /* ASCollections.mm */; };
 		CC35CEC620DD87280006448D /* ASCollectionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC35CEC520DD87280006448D /* ASCollectionsTests.mm */; };
@@ -868,6 +869,7 @@
 		CC2E317F1DAC353700EEE891 /* ASCollectionView+Undeprecated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionView+Undeprecated.h"; sourceTree = "<group>"; };
 		CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMutableElementMap.h; sourceTree = "<group>"; };
 		CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMutableElementMap.mm; sourceTree = "<group>"; };
+		CC31881B2291B0A20065A093 /* ASPropertyMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASPropertyMacros.h; sourceTree = "<group>"; };
 		CC35CEC120DD7F600006448D /* ASCollections.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASCollections.h; sourceTree = "<group>"; };
 		CC35CEC220DD7F600006448D /* ASCollections.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollections.mm; sourceTree = "<group>"; };
 		CC35CEC520DD87280006448D /* ASCollectionsTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionsTests.mm; sourceTree = "<group>"; };
@@ -1246,6 +1248,7 @@
 				E54E00711F1D3828000B30D7 /* ASPagerNode+Beta.h */,
 				A2763D771CBDD57D00A9ADBD /* ASPINRemoteImageDownloader.h */,
 				A2763D781CBDD57D00A9ADBD /* ASPINRemoteImageDownloader.mm */,
+				CC31881B2291B0A20065A093 /* ASPropertyMacros.h */,
 				CCBBBF5C1EB161760069AA91 /* ASRangeManagingNode.h */,
 				D785F6601A74327E00291744 /* ASScrollNode.h */,
 				D785F6611A74327E00291744 /* ASScrollNode.mm */,
@@ -1986,6 +1989,7 @@
 				68EE0DBE1C1B4ED300BA1B99 /* ASMainSerialQueue.h in Headers */,
 				CCCCCCE11EC3EF060087FE10 /* ASTextUtilities.h in Headers */,
 				B350624B1B010EFD0018CF92 /* _ASPendingState.h in Headers */,
+				CC31881C2291B8380065A093 /* ASPropertyMacros.h in Headers */,
 				CCDC9B4D200991D10063C1F8 /* ASGraphicsContext.h in Headers */,
 				E5C347B11ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h in Headers */,
 				CC54A81C1D70079800296A24 /* ASDispatch.h in Headers */,

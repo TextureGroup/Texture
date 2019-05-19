@@ -1489,6 +1489,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   [self _recursivelyTriggerDisplayAndBlock:synchronously];
 }
 
+
 - (void)setShouldBypassEnsureDisplay:(BOOL)shouldBypassEnsureDisplay
 {
   MutexLocker l(__instanceLock__);
