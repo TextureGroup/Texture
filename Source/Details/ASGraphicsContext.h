@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASBlockTypes.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASBlockTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
