@@ -40,7 +40,7 @@ We use Slack for real-time debugging, community updates, and general talk about 
 
 ## Release process
 
-For the release process see the [RELEASE] (https://github.com/texturegroup/texture/blob/master/RELEASE.md) file.
+For the release process see the [RELEASE](https://github.com/texturegroup/texture/blob/master/RELEASE.md) file.
 
 ## Contributing
 

@@ -91,4 +91,20 @@
                 _textNode.defaultAccessibilityLabel, _attributedText.string);
 }
 
+- (void)testRespectingAccessibilitySetting
+{
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = _attributedText;
+  textNode.isAccessibilityElement = NO;
+  
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertFalse(textNode.isAccessibilityElement);
+  
+  // Ensure removing string on an accessible text node updates the setting.
+  ASTextNode2 *accessibleTextNode = [ASTextNode2 new];
+  accessibleTextNode.attributedText = _attributedText;
+  accessibleTextNode.attributedText = nil;
+  XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
+}
+
 @end

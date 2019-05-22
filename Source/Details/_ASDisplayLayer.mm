@@ -115,6 +115,13 @@
 
 #pragma mark -
 
++ (id<CAAction>)defaultActionForKey:(NSString *)event
+{
+  // We never want to run one of CA's root default actions. So if we return nil from actionForLayer:forKey:, and let CA
+  // dig into the actions dictionary, and it doesn't find it there, it will check here and we need to stop the search.
+  return (id)kCFNull;
+}
+
 + (dispatch_queue_t)displayQueue
 {
   static dispatch_queue_t displayQueue = NULL;

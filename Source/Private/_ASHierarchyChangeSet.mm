@@ -240,7 +240,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 - (NSIndexSet *)indexesForItemChangesOfType:(_ASHierarchyChangeType)changeType inSection:(NSUInteger)section
 {
   [self _ensureCompleted];
-  let result = [[NSMutableIndexSet alloc] init];
+  const auto result = [[NSMutableIndexSet alloc] init];
   for (_ASHierarchyItemChange *change in [self itemChangesOfType:changeType]) {
     [result addIndexes:[NSIndexSet as_indexSetFromIndexPaths:change.indexPaths inSection:section]];
   }
@@ -282,10 +282,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
   if (_itemMappings == nil) {
     _itemMappings = [[NSMutableArray alloc] init];
-    let insertMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalInsertItemChanges];
-    let deleteMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalDeleteItemChanges];
+    const auto insertMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalInsertItemChanges];
+    const auto deleteMap = [_ASHierarchyItemChange sectionToIndexSetMapFromChanges:_originalDeleteItemChanges];
     NSInteger oldSection = 0;
-    for (let oldCount : _oldItemCounts) {
+    for (NSInteger oldCount : _oldItemCounts) {
       NSInteger newSection = [self newSectionForOldSection:oldSection];
       ASIntegerMap *table;
       if (newSection == NSNotFound) {
@@ -500,7 +500,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     for (_ASHierarchyItemChange *change in _reloadItemChanges) {
       NSAssert(change.changeType == _ASHierarchyChangeTypeReload, @"It must be a reload change to be in here");
 
-      let newIndexPaths = ASArrayByFlatMapping(change.indexPaths, NSIndexPath *indexPath, [self newIndexPathForOldIndexPath:indexPath]);
+      const auto newIndexPaths = ASArrayByFlatMapping(change.indexPaths, NSIndexPath *indexPath, [self newIndexPathForOldIndexPath:indexPath]);
       
       // All reload changes are translated into deletes and inserts
       // We delete the items that needs reload together with other deleted items, at their original index
@@ -754,7 +754,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   NSMutableArray *result = [[NSMutableArray alloc] init];
   
   __block ASDataControllerAnimationOptions currentOptions = 0;
-  let currentIndexes = [[NSMutableIndexSet alloc] init];
+  const auto currentIndexes = [[NSMutableIndexSet alloc] init];
 
   BOOL reverse = type == _ASHierarchyChangeTypeDelete || type == _ASHierarchyChangeTypeOriginalDelete;
   NSEnumerationOptions options = reverse ? NSEnumerationReverse : kNilOptions;
@@ -793,7 +793,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 
 + (NSMutableIndexSet *)allIndexesInSectionChanges:(NSArray<_ASHierarchySectionChange *> *)changes
 {
-  let indexes = [[NSMutableIndexSet alloc] init];
+  const auto indexes = [[NSMutableIndexSet alloc] init];
   for (_ASHierarchySectionChange *change in changes) {
     [indexes addIndexes:change.indexSet];
   }
@@ -920,10 +920,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   ASDisplayNodeAssert(ASHierarchyChangeTypeIsFinal(type), @"Attempt to sort and coalesce item changes of intermediary type %@. Why?", NSStringFromASHierarchyChangeType(type));
     
   // Lookup table [NSIndexPath: AnimationOptions]
-  let animationOptions = [[NSMutableDictionary<NSIndexPath *, NSNumber *> alloc] init];
+  const auto animationOptions = [[NSMutableDictionary<NSIndexPath *, NSNumber *> alloc] init];
   
   // All changed index paths, sorted
-  let allIndexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
+  const auto allIndexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
   
   for (_ASHierarchyItemChange *change in changes) {
     for (NSIndexPath *indexPath in change.indexPaths) {
@@ -938,10 +938,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   [allIndexPaths sortUsingSelector:sorting];
 
   // Create new changes by grouping sorted changes by animation option
-  let result = [[NSMutableArray<_ASHierarchyItemChange *> alloc] init];
+  const auto result = [[NSMutableArray<_ASHierarchyItemChange *> alloc] init];
 
   ASDataControllerAnimationOptions currentOptions = 0;
-  let currentIndexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
+  const auto currentIndexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
 
   for (NSIndexPath *indexPath in allIndexPaths) {
     ASDataControllerAnimationOptions options = [animationOptions[indexPath] integerValue];

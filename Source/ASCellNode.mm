@@ -17,7 +17,6 @@
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASTableNode.h>
@@ -35,10 +34,11 @@
   ASDisplayNodeDidLoadBlock _viewControllerDidLoadBlock;
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
+  UICollectionViewLayoutAttributes *_layoutAttributes;
   BOOL _suspendInteractionDelegate;
   BOOL _selected;
   BOOL _highlighted;
-  UICollectionViewLayoutAttributes *_layoutAttributes;
+  BOOL _neverShowPlaceholders;
 }
 
 @end

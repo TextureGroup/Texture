@@ -15,6 +15,8 @@
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASExperimentalFeatures.h>
 
 @implementation ASViewController
 {
@@ -98,6 +100,9 @@
 
 - (void)dealloc
 {
+  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable)) {
+    return;
+  }
   ASPerformBackgroundDeallocation(&_node);
 }
 
@@ -182,7 +187,7 @@ ASVisibilityDidMoveToParentViewController;
 - (void)viewWillAppear:(BOOL)animated
 {
   as_activity_create_for_scope("ASViewController will appear");
-  as_log_debug(ASNodeLog(), "View controller %@ will appear", self);
+  os_log_debug(ASNodeLog(), "View controller %@ will appear", self);
 
   [super viewWillAppear:animated];
 
@@ -320,13 +325,8 @@ ASVisibilityDepthImplementation;
   
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, oldTraitCollection) == NO) {
     as_activity_scope_verbose(as_activity_create("Propagate ASViewController trait collection", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-    as_log_debug(ASNodeLog(), "Propagating new traits for %@: %@", self, NSStringFromASPrimitiveTraitCollection(traitCollection));
-    self.node.primitiveTraitCollection = traitCollection;
-    
-    NSArray<id<ASLayoutElement>> *children = [self.node sublayoutElements];
-    for (id<ASLayoutElement> child in children) {
-      ASTraitCollectionPropagateDown(child, traitCollection);
-    }
+    os_log_debug(ASNodeLog(), "Propagating new traits for %@: %@", self, NSStringFromASPrimitiveTraitCollection(traitCollection));
+    ASTraitCollectionPropagateDown(self.node, traitCollection);
     
     // Once we've propagated all the traits, layout this node.
     // Remeasure the node with the latest constrained size – old constrained size may be incorrect.
@@ -344,6 +344,8 @@ ASVisibilityDepthImplementation;
   [self propagateNewTraitCollection:traitCollection];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
@@ -352,5 +354,6 @@ ASVisibilityDepthImplementation;
   traitCollection.containerSize = self.view.bounds.size;
   [self propagateNewTraitCollection:traitCollection];
 }
+#pragma clang diagnostic pop
 
 @end
