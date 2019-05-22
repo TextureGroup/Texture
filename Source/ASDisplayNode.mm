@@ -584,6 +584,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   if (ASDisplayNodeThreadIsMain()) {
     // Because the view and layer can only be created and destroyed on Main, that is also the only thread
     // where the state of this property can change. As an optimization, we can avoid locking.
+      //  是否存在layer
     return _loaded(self);
   } else {
     ASDN::MutexLocker l(__instanceLock__);

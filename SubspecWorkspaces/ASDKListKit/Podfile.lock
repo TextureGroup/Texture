@@ -1,0 +1,44 @@
+PODS:
+  - IGListKit (3.4.0):
+    - IGListKit/Default (= 3.4.0)
+  - IGListKit/Default (3.4.0):
+    - IGListKit/Diffing
+  - IGListKit/Diffing (3.4.0)
+  - JGMethodSwizzler (2.0.1)
+  - OCMock (3.4.3)
+  - Texture/Core (2.7)
+  - Texture/IGListKit (2.7):
+    - IGListKit (~> 3.0)
+    - Texture/Core
+
+DEPENDENCIES:
+  - JGMethodSwizzler (from `https://github.com/JonasGessner/JGMethodSwizzler`, branch `master`)
+  - OCMock (~> 3.4)
+  - Texture/IGListKit (from `../..`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - IGListKit
+    - OCMock
+
+EXTERNAL SOURCES:
+  JGMethodSwizzler:
+    :branch: master
+    :git: https://github.com/JonasGessner/JGMethodSwizzler
+  Texture:
+    :path: "../.."
+
+CHECKOUT OPTIONS:
+  JGMethodSwizzler:
+    :commit: 8791eccc5342224bd293b5867348657e3a240c7f
+    :git: https://github.com/JonasGessner/JGMethodSwizzler
+
+SPEC CHECKSUMS:
+  IGListKit: 7a5d788e9fb746bcd402baa8e8b24bc3bd2a5a07
+  JGMethodSwizzler: 7328146117fffa8a4038c42eb7cd3d4c75006f97
+  OCMock: 43565190abc78977ad44a61c0d20d7f0784d35ab
+  Texture: 34a58d93c979ccf0fc8d61db5405bcec0486176c
+
+PODFILE CHECKSUM: 42974d51cffb596613ec9d1550bc787409333185
+
+COCOAPODS: 1.5.3

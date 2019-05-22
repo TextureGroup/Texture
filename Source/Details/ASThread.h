@@ -20,6 +20,7 @@
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 {
+    // 判断当前线程是否为主线程.
   return 0 != pthread_main_np();
 }
 
@@ -117,6 +118,7 @@ namespace ASDN {
     /// Constructs a plain mutex (the default).
     Mutex () : Mutex (false) {}
 
+      // 类的析构函数.
     ~Mutex () {
       // Manually destroy since unions can't do it.
       switch (_type) {
@@ -204,6 +206,7 @@ namespace ASDN {
       ASDisplayNodeCAssert(_owner != std::this_thread::get_id(), @"Thread should not hold lock");
     }
     
+      // 抑制内置类型隐式转换
     explicit Mutex (bool recursive) {
       
       // Check if we can use unfair lock and store in static var.
@@ -258,8 +261,8 @@ namespace ASDN {
 #endif
     }
     
-    Type _type;
-    union {
+    Type _type;  // 锁的类型.
+    union { // 共同体
       os_unfair_lock _unfair;
       ASRecursiveUnfairLock _runfair;
       std::mutex _plain;

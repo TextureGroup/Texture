@@ -30,6 +30,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
   
   // Go through all names, testing each bit.
   NSUInteger i = 0;
+    // collectionArg  decl work
   return ASArrayByFlatMapping(allNames, NSString *name, ({
     (flags & (1 << i++)) ? name : nil;
   }));

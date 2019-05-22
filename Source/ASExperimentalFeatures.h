@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A bit mask of features. Make sure to update configuration.json when you add entries.
  */
+// 更新设置
 typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalGraphicsContexts = 1 << 0,                  // exp_graphics_contexts
 #if AS_ENABLE_TEXTNODE
