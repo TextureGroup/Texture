@@ -19,7 +19,7 @@
 @implementation ASTextKitContext
 {
   // All TextKit operations (even non-mutative ones) must be executed serially.
-  std::shared_ptr<ASDN::Mutex> __instanceLock__;
+  std::shared_ptr<AS::Mutex> __instanceLock__;
 
   NSLayoutManager *_layoutManager;
   NSTextStorage *_textStorage;
@@ -34,16 +34,19 @@
 
 {
   if (self = [super init]) {
+    static AS::Mutex *mutex = NULL;
     static dispatch_once_t onceToken;
-    static ASDN::Mutex *mutex;
-    dispatch_once(&onceToken, ^{
-      mutex = new ASDN::Mutex();
-    });
-    
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    ASDN::MutexLocker l(*mutex);
+    dispatch_once(&onceToken, ^{
+      if (!ASActivateExperimentalFeature(ASExperimentalRemoveTextKitInitialisingLock)) {
+        mutex = new AS::Mutex();
+      }
+    });
+    if (mutex != NULL) {
+      mutex->lock();
+    }
     
-    __instanceLock__ = std::make_shared<ASDN::Mutex>();
+    __instanceLock__ = std::make_shared<AS::Mutex>();
     
     // Create the TextKit component stack with our default configuration.
     
@@ -65,6 +68,10 @@
     _textContainer.maximumNumberOfLines = maximumNumberOfLines;
     _textContainer.exclusionPaths = exclusionPaths;
     [_layoutManager addTextContainer:_textContainer];
+    
+    if (mutex != NULL) {
+      mutex->unlock();
+    }
   }
   return self;
 }
@@ -73,7 +80,7 @@
                                                                       NSTextStorage *,
                                                                       NSTextContainer *))block
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  AS::MutexLocker l(*__instanceLock__);
   if (block) {
     block(_layoutManager, _textStorage, _textContainer);
   }

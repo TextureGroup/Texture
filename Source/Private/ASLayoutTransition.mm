@@ -9,11 +9,10 @@
 
 #import <AsyncDisplayKit/ASLayoutTransition.h>
 
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _insertSubnode... / _removeFromSupernode.
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _removeFromSupernodeIfEqualTo:
 #import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
@@ -22,6 +21,8 @@
 #import <IGListKit/IGListKit.h>
 #import <AsyncDisplayKit/ASLayout+IGListKit.h>
 #endif
+
+using AS::MutexLocker;
 
 /**
  * Search the whole layout stack if at least one layout has a layoutElement object that can not be layed out asynchronous.
@@ -53,7 +54,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 }
 
 @implementation ASLayoutTransition {
-  std::shared_ptr<ASDN::RecursiveMutex> __instanceLock__;
+  std::shared_ptr<AS::RecursiveMutex> __instanceLock__;
   
   BOOL _calculatedSubnodeOperations;
   NSArray<ASDisplayNode *> *_insertedSubnodes;
@@ -70,7 +71,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 {
   self = [super init];
   if (self) {
-    __instanceLock__ = std::make_shared<ASDN::RecursiveMutex>();
+    __instanceLock__ = std::make_shared<AS::RecursiveMutex>();
       
     _node = node;
     _pendingLayout = pendingLayout;
@@ -81,7 +82,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (BOOL)isSynchronous
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   return !ASLayoutCanTransitionAsynchronous(_pendingLayout.layout);
 }
 
@@ -93,7 +94,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)applySubnodeInsertionsAndMoves
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   
   // Create an activity even if no subnodes affected.
@@ -102,7 +103,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"insertSubnodes: %@", _insertedSubnodes);
   NSUInteger i = 0;
   NSUInteger j = 0;
   for (auto const &move : _subnodeMoves) {
@@ -113,32 +113,31 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     NSUInteger p = _insertedSubnodePositions[i];
     NSUInteger q = _subnodeMoves[j].second;
     if (p < q) {
-      [_node _insertSubnode:_insertedSubnodes[i] atIndex:p];
+      [_node insertSubnode:_insertedSubnodes[i] atIndex:p];
       i++;
     } else {
-      [_node _insertSubnode:_subnodeMoves[j].first atIndex:q];
+      [_node insertSubnode:_subnodeMoves[j].first atIndex:q];
       j++;
     }
   }
   for (; i < _insertedSubnodePositions.size(); ++i) {
-    [_node _insertSubnode:_insertedSubnodes[i] atIndex:_insertedSubnodePositions[i]];
+    [_node insertSubnode:_insertedSubnodes[i] atIndex:_insertedSubnodePositions[i]];
   }
   for (; j < _subnodeMoves.size(); ++j) {
-    [_node _insertSubnode:_subnodeMoves[j].first atIndex:_subnodeMoves[j].second];
+    [_node insertSubnode:_subnodeMoves[j].first atIndex:_subnodeMoves[j].second];
   }
 }
 
 - (void)applySubnodeRemovals
 {
   as_activity_scope(as_activity_create("Apply subnode removals", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
 
   if (_removedSubnodes.count == 0) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"removeSubnodes: %@", _removedSubnodes);
   for (ASDisplayNode *subnode in _removedSubnodes) {
     // In this case we should only remove the subnode if it's still a subnode of the _node that executes a layout transition.
     // It can happen that a node already did a layout transition and added this subnode, in this case the subnode
@@ -151,7 +150,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (void)calculateSubnodeOperationsIfNeeded
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   if (_calculatedSubnodeOperations) {
     return;
   }
@@ -206,27 +205,27 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (NSArray<ASDisplayNode *> *)currentSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   return _node.subnodes;
 }
 
 - (NSArray<ASDisplayNode *> *)insertedSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   return _insertedSubnodes;
 }
 
 - (NSArray<ASDisplayNode *> *)removedSubnodesWithTransitionContext:(_ASTransitionContext *)context
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   [self calculateSubnodeOperationsIfNeeded];
   return _removedSubnodes;
 }
 
 - (ASLayout *)transitionContext:(_ASTransitionContext *)context layoutForKey:(NSString *)key
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
     return _previousLayout.layout;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
@@ -238,7 +237,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
 
 - (ASSizeRange)transitionContext:(_ASTransitionContext *)context constrainedSizeForKey:(NSString *)key
 {
-  ASDN::MutexLocker l(*__instanceLock__);
+  MutexLocker l(*__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
     return _previousLayout.constrainedSize;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {

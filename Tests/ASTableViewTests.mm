@@ -8,7 +8,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
 #import <JGMethodSwizzler/JGMethodSwizzler.h>
+#pragma clang diagnostic pop
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableView.h>
@@ -54,7 +57,7 @@
 - (instancetype)__initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
   
-  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil eventLog:nil];
+  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil];
 }
 
 - (ASTestDataController *)testDataController

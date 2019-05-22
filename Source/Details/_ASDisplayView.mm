@@ -153,22 +153,19 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 
 #pragma mark - UIView Overrides
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
+- (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  BOOL visible = (newWindow != nil);
-  if (visible && !node.inHierarchy) {
-    [node __enterHierarchy];
-  }
-}
+  id<CAAction> uikitAction = [super actionForLayer:layer forKey:event];
 
-- (void)didMoveToWindow
-{
-  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  BOOL visible = (self.window != nil);
-  if (!visible && node.inHierarchy) {
-    [node __exitHierarchy];
+  // Even though the UIKit action will take precedence, we still unconditionally forward to the node so that it can
+  // track events like kCAOnOrderIn.
+  id<CAAction> nodeAction = [_asyncdisplaykit_node actionForLayer:layer forKey:event];
+
+  // If UIKit specifies an action, that takes precedence. That's an animation block so it's explicit.
+  if (uikitAction && uikitAction != (id)kCFNull) {
+    return uikitAction;
   }
+  return nodeAction;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
@@ -210,7 +207,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeUpdate) {
       // -removeFromSupernode is called by -addSubnode:, if it is needed.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [newSuperview.asyncdisplaykit_node _addSubnode:node];
+      [newSuperview.asyncdisplaykit_node addSubnode:node];
     }
   }
 }
@@ -271,9 +268,17 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeRemoval) {
       // The node will only disconnect from its supernode, not removeFromSuperview, in this condition.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [node _removeFromSupernode];
+      [node removeFromSupernode];
     }
   }
+}
+
+- (void)insertSubview:(UIView *)view atIndex:(NSInteger)index {
+  [super insertSubview:view atIndex:index];
+
+#ifndef ASDK_ACCESSIBILITY_DISABLE
+  self.accessibilityElements = nil;
+#endif
 }
 
 - (void)addSubview:(UIView *)view

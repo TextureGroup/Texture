@@ -12,15 +12,6 @@
 #define AS_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
-// TODO: Remove these now that we're all-C++.
-#if defined(__cplusplus)
-# define var auto
-# define let const auto
-#else
-# define var __auto_type
-# define let const __auto_type
-#endif
-
 /**
  * Hack to support building for iOS with Xcode 9. UIUserInterfaceStyle was previously tvOS-only,
  * and it was added to iOS 12. Xcode 9 (iOS 11 SDK) will flat-out refuse to build anything that
@@ -32,6 +23,12 @@
 #else
 #define AS_BUILD_UIUSERINTERFACESTYLE 0
 #endif
+
+/**
+ * Decorates methods that clients can implement in categories on our base class. These methods
+ * will be stubbed with an empty implementation if no implementation is provided.
+ */
+#define AS_CATEGORY_IMPLEMENTABLE
 
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
@@ -74,17 +71,6 @@
 
 #ifndef AS_ENABLE_TIPS
 #define AS_ENABLE_TIPS 0
-#endif
-
-/**
- * The event backtraces take a static 2KB of memory
- * and retain all objects present in all the registers
- * of the stack frames. The memory consumption impact
- * is too significant even to be enabled during general
- * development.
- */
-#ifndef AS_SAVE_EVENT_BACKTRACES
-# define AS_SAVE_EVENT_BACKTRACES 0
 #endif
 
 #ifndef __has_feature      // Optional.
@@ -137,6 +123,8 @@
 
 #define ASOVERLOADABLE __attribute__((overloadable))
 
+/// Xcode >= 10.
+#define AS_HAS_OS_SIGNPOST __has_include(<os/signpost.h>)
 
 #if __has_attribute(noescape)
 #define AS_NOESCAPE __attribute__((noescape))
@@ -149,6 +137,8 @@
 #else
 #define AS_SUBCLASSING_RESTRICTED
 #endif
+
+#define AS_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 #define ASCreateOnce(expr) ({ \
   static dispatch_once_t onceToken; \
@@ -246,7 +236,7 @@
 /**
  * Capture-and-clear a strong reference without the intervening retain/release pair.
  *
- * E.g. let localVar = ASTransferStrong(_myIvar);
+ * E.g. const auto localVar = ASTransferStrong(_myIvar);
  * Post-condition: localVar has the strong value from _myIvar and _myIvar is nil.
  * No retain/release is emitted when the optimizer is on.
  */

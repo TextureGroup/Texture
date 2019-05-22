@@ -38,7 +38,7 @@ AS_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger visib
  * @discussion Represents the number of user actions necessary to reach the view controller. An increased visibility
  * depth indicates a higher number of user interactions for the view controller to be visible again. For example,
  * an onscreen navigation controller's top view controller should have a visibility depth of 0. The view controller
- * one from the top should have a visibility deptch of 1 as should the root view controller in the stack (because
+ * one from the top should have a visibility depth of 1 as should the root view controller in the stack (because
  * the user can hold the back button to pop to the root view controller).
  *
  * Visibility depth is used to automatically adjust ranges on range controllers (and thus free up memory) and can

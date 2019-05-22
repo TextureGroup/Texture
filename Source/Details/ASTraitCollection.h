@@ -106,20 +106,10 @@ AS_EXTERN void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPri
 
 @end
 
-#define ASPrimitiveTraitCollectionDefaults \
-- (ASPrimitiveTraitCollection)primitiveTraitCollection\
-{\
-  return _primitiveTraitCollection.load();\
-}\
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
-{\
-  _primitiveTraitCollection = traitCollection;\
-}\
-
 #define ASLayoutElementCollectionTableSetTraitCollection(lock) \
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
 {\
-  ASDN::MutexLocker l(lock);\
+  AS::MutexLocker l(lock);\
 \
   ASPrimitiveTraitCollection oldTraits = self.primitiveTraitCollection;\
   [super setPrimitiveTraitCollection:traitCollection];\

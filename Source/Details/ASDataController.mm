@@ -88,7 +88,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(ASEventLog *)eventLog
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node
 {
   if (!(self = [super init])) {
     return nil;
@@ -103,10 +103,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _dataSourceFlags.constrainedSizeForNodeAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForNodeAtIndexPath:)];
   _dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForSupplementaryNodeOfKind:atIndexPath:)];
   _dataSourceFlags.contextForSection = [_dataSource respondsToSelector:@selector(dataController:contextForSection:)];
-  
-#if ASEVENTLOG_ENABLE
-  _eventLog = eventLog;
-#endif
 
   self.visibleMap = self.pendingMap = [[ASElementMap alloc] init];
   
@@ -151,7 +147,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     return;
   }
 
-  ASSignpostStart(ASSignpostDataControllerBatch);
+  ASSignpostStart(DataControllerBatch, self, "%@", ASObjectDescriptionMakeTiny(weakDataSource));
 
   {
     as_activity_create_for_scope("Data controller batch");
@@ -168,7 +164,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       }
 
       unowned ASCollectionElement *element = elements[i];
+
+      NSMutableDictionary *dict = [[NSThread currentThread] threadDictionary];
+      dict[ASThreadDictMaxConstraintSizeKey] =
+          [NSValue valueWithCGSize:element.constrainedSize.max];
       unowned ASCellNode *node = element.node;
+      [dict removeObjectForKey:ASThreadDictMaxConstraintSizeKey];
+
       // Layout the node if the size range is valid.
       ASSizeRange sizeRange = element.constrainedSize;
       if (ASSizeRangeHasSignificantArea(sizeRange)) {
@@ -177,7 +179,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     });
   }
 
-  ASSignpostEndCustom(ASSignpostDataControllerBatch, self, 0, (weakDataSource != nil ? ASSignpostColorDefault : ASSignpostColorRed));
+  ASSignpostEnd(DataControllerBatch, self, "count: %lu", (unsigned long)nodeCount);
 }
 
 /**
@@ -206,7 +208,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     return @[];
   }
   
-  let indexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
+  const auto indexPaths = [[NSMutableArray<NSIndexPath *> alloc] init];
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
     std::vector<NSInteger> counts = [self itemCountsFromDataSource];
     [sections enumerateRangesUsingBlock:^(NSRange range, BOOL * _Nonnull stop) {
@@ -550,18 +552,18 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   
   if (changeSet.includesReloadData) {
     if (_initialReloadDataHasBeenCalled) {
-      as_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      os_log_debug(ASCollectionLog(), "reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
     } else {
-      as_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
+      os_log_debug(ASCollectionLog(), "Initial reloadData %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)));
       _initialReloadDataHasBeenCalled = YES;
     }
   } else {
-    as_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
+    os_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
   
   NSTimeInterval transactionQueueFlushDuration = 0.0f;
   {
-    ASDN::ScopeTimer t(transactionQueueFlushDuration);
+    AS::ScopeTimer t(transactionQueueFlushDuration);
     dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
   }
   
@@ -569,24 +571,12 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.
   if (!_initialReloadDataHasBeenCalled) {
-    as_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
+    os_log_debug(ASCollectionLog(), "%@ Skipped update because load hasn't happened.", ASObjectDescriptionMakeTiny(_dataSource));
     [changeSet executeCompletionHandlerWithFinished:YES];
     return;
   }
   
   [self invalidateDataSourceItemCounts];
-  
-  // Log events
-#if ASEVENTLOG_ENABLE
-  ASDataControllerLogEvent(self, @"updateWithChangeSet waited on previous update for %fms. changeSet: %@",
-                           transactionQueueFlushDuration * 1000.0f, changeSet);
-  NSTimeInterval changeSetStartTime = CACurrentMediaTime();
-  NSString *changeSetDescription = ASObjectDescriptionMakeTiny(changeSet);
-  [changeSet addCompletionHandler:^(BOOL finished) {
-    ASDataControllerLogEvent(self, @"finishedUpdate in %fms: %@",
-                             (CACurrentMediaTime() - changeSetStartTime) * 1000.0f, changeSetDescription);
-  }];
-#endif
   
   // Attempt to mark the update completed. This is when update validation will occur inside the changeset.
   // If an invalid update exception is thrown, we catch it and inject our "validationErrorSource" object,
@@ -633,7 +623,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     }
   }
 
-  as_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
+  os_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
 
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
   ++_editingTransactionGroupCount;
@@ -645,7 +635,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     if (canDelegate) {
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
     } else {
-      let elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
+      const auto elementsToProcess = [[NSMutableArray<ASCollectionElement *> alloc] init];
       for (ASCollectionElement *element in newMap) {
         ASCellNode *nodeIfAllocated = element.nodeIfAllocated;
         if (nodeIfAllocated.shouldUseUIKitCell) {
@@ -824,10 +814,10 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   }
   
   id<ASDataControllerSource> dataSource = self.dataSource;
-  let visibleMap = self.visibleMap;
-  let pendingMap = self.pendingMap;
+  const auto visibleMap = self.visibleMap;
+  const auto pendingMap = self.pendingMap;
   for (ASCellNode *node in nodes) {
-    let element = node.collectionElement;
+    const auto element = node.collectionElement;
     NSIndexPath *indexPathInPendingMap = [pendingMap indexPathForElement:element];
     // Ensure the element is present in both maps or skip it. If it's not in the visible map,
     // then we can't check the presented size. If it's not in the pending map, we can't get the constrained size.
