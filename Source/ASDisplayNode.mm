@@ -3515,7 +3515,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)setAccessibilityElementsBlock:(ASDisplayNodeAccessibilityElementsBlock)accessibilityElementsBlock
 {
   MutexLocker l(__instanceLock__);
-  _accessibilityElementsBlock = accessibilityElementsBlock;
+  _accessibilityElementsBlock = [accessibilityElementsBlock copy];
 }
 
 - (ASDisplayNodeAccessibilityElementsBlock)accessibilityElementsBlock
