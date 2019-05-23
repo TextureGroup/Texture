@@ -52,7 +52,6 @@ static ASExperimentalFeatures features[] = {
     @"exp_framesetter_cache",
     @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
-    @"exp_disable_a11y_cache",
     @"exp_dispatch_apply",
     @"exp_text_drawing",
     @"exp_oom_bg_dealloc_disable",
