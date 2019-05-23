@@ -31,7 +31,9 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalOOMBackgroundDeallocDisable,
   ASExperimentalTransactionOperationRetainCycle,
   ASExperimentalRemoveTextKitInitialisingLock,
-  ASExperimentalDrawingGlobal
+  ASExperimentalDrawingGlobal,
+  ASExperimentalTextNode2A11YContainer,
+  ASExperimentalExposeTextLinksForA11Y
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -57,7 +59,9 @@ static ASExperimentalFeatures features[] = {
     @"exp_oom_bg_dealloc_disable",
     @"exp_transaction_operation_retain_cycle",
     @"exp_remove_textkit_initialising_lock",
-    @"exp_drawing_global"
+    @"exp_drawing_global",
+    @"exp_text_node_2_a11y_container",
+    @"exp_expose_text_links_a11y"
   ];
 }
 

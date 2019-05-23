@@ -14,3 +14,10 @@
 // should still work as long as accessibility is enabled, this framework provides no guarantees on
 // their correctness. For details, see
 // https://developer.apple.com/documentation/objectivec/nsobject/1615147-accessibilityelements
+
+struct _ASDisplayViewAccessibilityFlags {
+  unsigned inAccessibilityElementCount:1;
+  unsigned inIndexOfAccessibilityElement:1;
+  unsigned inAccessibilityElementAtIndex:1;
+  unsigned inSetAccessibilityElements:1;
+};

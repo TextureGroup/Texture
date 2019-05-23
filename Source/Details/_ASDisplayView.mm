@@ -43,8 +43,7 @@
     unsigned inIsFirstResponder:1;
   } _internalFlags;
 
-  NSArray *_accessibilityElements;
-  CGRect _lastAccessibilityElementsFrame;
+  _ASDisplayViewAccessibilityFlags _accessibilityFlags;
 }
 
 #pragma mark - Class

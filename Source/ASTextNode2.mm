@@ -30,6 +30,23 @@
 #import <AsyncDisplayKit/ASTextLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+@interface ASTextNodeAccessiblityElement : UIAccessibilityElement
+@property (assign) NSRange accessibilityRange;
+@end
+
+@implementation ASTextNodeAccessiblityElement
+
+- (instancetype)initWithAccessibilityContainer:(id)container
+{
+  self = [super initWithAccessibilityContainer:container];
+  if (self) {
+    _accessibilityRange = NSMakeRange(NSNotFound, 0);
+  }
+  return self;
+}
+
+@end
+
 @interface ASTextCacheValue : NSObject {
   @package
   AS::Mutex _m;
@@ -215,7 +232,7 @@ static NSArray *DefaultLinkAttributeNames() {
     // Accessibility
     self.isAccessibilityElement = YES;
     self.accessibilityTraits = self.defaultAccessibilityTraits;
-    
+
     // Placeholders
     // Disabled by default in ASDisplayNode, but add a few options for those who toggle
     // on the special placeholder behavior of ASTextNode.
@@ -311,6 +328,114 @@ static NSArray *DefaultLinkAttributeNames() {
 - (UIAccessibilityTraits)defaultAccessibilityTraits
 {
   return UIAccessibilityTraitStaticText;
+}
+
+/// Uses the given layout, node and container node to calculate the accessibiliyty frame for the given ASTextNodeAccessiblityElement in screen coordinates.
+static void ASUpdateAccessibilityFrame(ASTextNodeAccessiblityElement *accessibilityElement, ASTextLayout *layout, ASDisplayNode * _Nullable containerNode, ASDisplayNode *node) {
+  containerNode = containerNode ?:  ASFirstNonLayerBackedSupernodeForNode(node);
+  CGRect textLayoutFrame = CGRectZero;
+  if (accessibilityElement.accessibilityRange.location == NSNotFound) {
+    // If no accessibilityRange was specified (as is done for the text element), just use the
+    // label's range and clampt to the visible range otherwise the returned rect would be invalid.
+    NSRange range = NSMakeRange(0, accessibilityElement.accessibilityLabel.length);
+    range = NSIntersectionRange(range, layout.visibleRange);
+    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:range]];
+  } else {
+    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:accessibilityElement.accessibilityRange]];
+  }
+  CGRect accessibilityFrame = [node convertRect:textLayoutFrame toNode:containerNode];
+  accessibilityElement.accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, containerNode.view);
+}
+
+/// Walks up the node tree and searches for the first node that is not layer backed
+static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node) {
+  ASDisplayNode *containerNode = node;
+  while (containerNode.isLayerBacked) {
+    containerNode = containerNode.supernode;
+  }
+  return containerNode;
+}
+
+/// Overwrite accessibilityElementAtIndex: so we can update the element's accessibilityFrame when it is requested.
+- (id)accessibilityElementAtIndex:(NSInteger)index
+{
+  ASTextNodeAccessiblityElement *accessibilityElement = self.accessibilityElements[index];
+
+  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, _attributedText);
+  ASUpdateAccessibilityFrame(accessibilityElement, layout, nil, self);
+  return accessibilityElement;
+}
+
+- (NSArray *)accessibilityElements
+{
+  if (_accessibilityElements != nil) {
+    return _accessibilityElements;
+  }
+
+  NSAttributedString *attributedText = _attributedText;
+  NSInteger attributedTextLength = attributedText.length;
+  if (attributedTextLength == 0) {
+    _accessibilityElements = @[];
+    return _accessibilityElements;
+  }
+
+  NSMutableArray<ASTextNodeAccessiblityElement *> *accessibilityElements = [[NSMutableArray alloc] init];
+
+  // Searc the first node that is not layer backed
+  ASDisplayNode *containerNode = ASFirstNonLayerBackedSupernodeForNode(self);
+  UIAccessibilityTraits accessibilityTraits = self.accessibilityTraits;
+  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, attributedText);
+
+  // Create an accessibility element to represent the label's text. It's not necessary to specify
+  // a accessibilityRange here, as the entirety of the text is being represented.
+  ASTextNodeAccessiblityElement *accessibilityElement = [[ASTextNodeAccessiblityElement alloc] initWithAccessibilityContainer:containerNode.view];
+  accessibilityElement.accessibilityTraits = accessibilityTraits;
+  accessibilityElement.accessibilityLabel = self.accessibilityLabel;
+  ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
+  [accessibilityElements addObject:accessibilityElement];
+
+  if (ASActivateExperimentalFeature(ASExperimentalExposeTextLinksForA11Y)) {
+    // Collect all links as accessiblity items
+    for (NSString *linkAttributeName in _linkAttributeNames) {
+      [attributedText enumerateAttribute:linkAttributeName inRange:NSMakeRange(0, attributedTextLength) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+        if (value == nil) {
+          return;
+        }
+
+        ASTextNodeAccessiblityElement *accessibilityElement = [[ASTextNodeAccessiblityElement alloc] initWithAccessibilityContainer:self];
+        accessibilityElement.accessibilityTraits = UIAccessibilityTraitLink;;
+        accessibilityElement.accessibilityLabel = [attributedText.string substringWithRange:range];
+        accessibilityElement.accessibilityRange = range;
+        ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
+        [accessibilityElements addObject:accessibilityElement];
+      }];
+    }
+  }
+  _accessibilityElements = accessibilityElements;
+  return _accessibilityElements;
+}
+
+- (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
+  {
+    if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+      // Instead of relying on labels accessibility, We implement UIAccessibilityContainer and
+      // handle accessibility with ASTextNode2
+      return;
+    }
+
+    [super setIsAccessibilityElement:isAccessibilityElement];
+
+  }
+
+- (BOOL)isAccessibilityElement {
+  if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    // Instead of relying on labels accessibility, We implement UIAccessibilityContainer and
+    // handle accessibility with ASTextNode2
+    return NO;
+  }
+
+  // Use whatever the default is
+  return [super isAccessibilityElement];
 }
 
 #pragma mark - Layout and Sizing
@@ -412,16 +537,16 @@ static NSArray *DefaultLinkAttributeNames() {
     style.ascender = [[self class] ascenderWithAttributedString:attributedText];
     style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
   }
-  
+
   // Tell the display node superclasses that the cached layout is incorrect now
   [self setNeedsLayout];
-  
+
   // Force display to create renderer with new size and redisplay with new string
   [self setNeedsDisplay];
 
   // Accessiblity
   self.accessibilityLabel = self.defaultAccessibilityLabel;
-  
+
   // We update the isAccessibilityElement setting if this node is not switching between strings.
   if (oldAttributedText.length == 0 || length == 0) {
     // We're an accessibility element by default if there is a string.

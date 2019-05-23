@@ -84,9 +84,13 @@ typedef struct {
 @property (readonly) ASDisplayNodePerformanceMeasurements performanceMeasurements;
 
 /**
- * @abstract Whether this node acts as an accessibility container. If set to YES, then this node's accessibility label will represent
- * an aggregation of all child nodes' accessibility labels. Nodes in this node's subtree that are also accessibility containers will
- * not be included in this aggregation, and will be exposed as separate accessibility elements to UIKit.
+ * @abstract Whether this node acts as an accessibility container. If set to YES, then this node's
+ * accessibility label will represent an aggregation of all child nodes' accessibility labels and
+ * this node's accessibility custom actions will be represented will be the aggregation of all
+ * child nodes that have a accessibility trait of UIAccessibilityTraitLink,
+ * UIAccessibilityTraitKeyboardKey or UIAccessibilityTraitButton.
+ * Nodes in this node's subtree that are also accessibility containers will not be included in this
+ * aggregation, and will be exposed as separate accessibility elements to UIKit.
  */
 @property BOOL isAccessibilityContainer;
 

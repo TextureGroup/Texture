@@ -1325,12 +1325,6 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   return _getAccessibilityFromViewOrProperty(_accessibilityPath, accessibilityPath);
 }
 
-- (NSInteger)accessibilityElementCount
-{
-  _bridge_prologue_read;
-  return _getFromViewOnly(accessibilityElementCount);
-}
-
 @end
 
 

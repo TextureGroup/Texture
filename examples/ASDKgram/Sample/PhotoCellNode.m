@@ -84,6 +84,8 @@
     self.automaticallyManagesSubnodes = YES;
 
     [self setupYogaLayoutIfNeeded];
+
+    self.accessibilityIdentifier = @"PhotoCellNode";
     
 #if DEBUG_PHOTOCELL_LAYOUT
     _userAvatarImageNode.backgroundColor              = [UIColor greenColor];
