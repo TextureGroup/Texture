@@ -256,7 +256,7 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
   ASDisplayNodeAssertMainThread();
-  _accessibilityElements = nil;
+  _accessibilityElements = accessibilityElements;
 }
 
 - (NSArray *)accessibilityElements
