@@ -26,7 +26,6 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
-  ASExperimentalDisableAccessibilityCache,
   ASExperimentalDispatchApply,
   ASExperimentalTextDrawing,
   ASExperimentalOOMBackgroundDeallocDisable,
