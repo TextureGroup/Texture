@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
+
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+
 #import "ASXCTExtensions.h"
 
 @interface ASScrollNodeTests : XCTestCase
@@ -94,6 +96,40 @@
   ASSizeRange sizeRange = ASSizeRangeMake(CGSizeMake(100, 100), CGSizeMake(100, 200));
 
   self.subnode.style.preferredSize = subnodeSize;
+
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
+
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, sizeRange.max);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
+}
+
+- (void)testAutomaticallyManagesContentSizeWithSizeRangeSmallerThanParentSizeFillContainer
+{
+  CGSize subnodeSize = CGSizeMake(100, 200);
+  CGSize parentSize = CGSizeMake(100, 500);
+  ASSizeRange sizeRange = ASSizeRangeMake(CGSizeMake(100, 200), CGSizeMake(100, 200));
+
+  self.subnode.style.flexGrow = 1.0;
+  self.subnode.style.minHeight = ASDimensionMake(ASDimensionUnitPoints, 50.0);
+  self.subnode.style.width = ASDimensionMake(ASDimensionUnitPoints, 100.0);
+  [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
+  [self.scrollNode layout];
+
+  ASXCTAssertEqualSizes(self.scrollNode.calculatedSize, sizeRange.max);
+  ASXCTAssertEqualSizes(self.scrollNode.view.contentSize, subnodeSize);
+}
+
+// It's expected that the contentSize is 100x100 when ScrollNode's bounds is 100x200, which currently
+// not the case for LayoutSepc but work in Yoga.
+- (void)disable_testAutomaticallyManagesContentSizeWithSizeRangeSmallerThanParentSizeKeepChildSize
+{
+  CGSize subnodeSize = CGSizeMake(100, 100);
+  CGSize parentSize = CGSizeMake(100, 200);
+  ASSizeRange sizeRange = ASSizeRangeMake(CGSizeMake(100, 200), CGSizeMake(100, 200));
+
+  self.subnode.style.width = ASDimensionMake(ASDimensionUnitPoints, 100.0);
+  self.subnode.style.height = ASDimensionMake(ASDimensionUnitPoints, 100.0);
 
   [self.scrollNode layoutThatFits:sizeRange parentSize:parentSize];
   [self.scrollNode layout];

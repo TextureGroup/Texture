@@ -32,7 +32,7 @@
 @end
 
 @implementation ASCollectionLayoutState {
-  ASDN::Mutex __instanceLock__;
+  AS::Mutex __instanceLock__;
   CGSize _contentSize;
   ASCollectionLayoutContext *_context;
   NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
@@ -155,7 +155,7 @@ elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   }
 
   // Use a set here because some items may span multiple pages
-  let result = [[NSMutableSet<UICollectionViewLayoutAttributes *> alloc] init];
+  const auto result = [[NSMutableSet<UICollectionViewLayoutAttributes *> alloc] init];
   for (id pagePtr in pages) {
     ASPageCoordinate page = (ASPageCoordinate)pagePtr;
     NSArray<UICollectionViewLayoutAttributes *> *allAttrs = [_pageToLayoutAttributesTable objectForPage:page];
@@ -182,7 +182,7 @@ elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   CGSize pageSize = _context.viewportSize;
   CGSize contentSize = _contentSize;
 
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (_unmeasuredPageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
     return nil;
   }

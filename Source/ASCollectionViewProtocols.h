@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-typedef NS_OPTIONS(NSUInteger, ASCellLayoutMode) {
+typedef NS_OPTIONS(unsigned short, ASCellLayoutMode) {
   /**
    * No options set. If cell layout mode is set to ASCellLayoutModeNone, the default values for
    * each flag listed below is used.
@@ -45,7 +45,7 @@ typedef NS_OPTIONS(NSUInteger, ASCellLayoutMode) {
    * Reload operations. This is useful only when ASCellLayoutModeAlwaysReloadData is enabled and
    * cell height animations are desired.
    */
-  ASCellLayoutModeAlwaysBatchUpdateSectionReload = 1 << 9 // Default OFF
+  ASCellLayoutModeAlwaysBatchUpdateSectionReload = 1 << 9, // Default OFF
 };
 
 NS_ASSUME_NONNULL_BEGIN

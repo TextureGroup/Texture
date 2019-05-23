@@ -9,17 +9,17 @@
 
 #import <CoreText/CoreText.h>
 
-#import "ASTestCase.h"
-
+#import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
-
-#import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+
+#import "ASTestCase.h"
+
 
 
 @interface ASTextNodeTestDelegate : NSObject <ASTextNodeDelegate>
@@ -173,6 +173,23 @@
   XCTAssertTrue(_textNode.accessibilityTraits == UIAccessibilityTraitStaticText, @"Should have static text accessibility trait, instead has %llu", _textNode.accessibilityTraits);
 
   XCTAssertTrue([_textNode.accessibilityLabel isEqualToString:_attributedText.string], @"Accessibility label is incorrectly set to \n%@\n when it should be \n%@\n", _textNode.accessibilityLabel, _attributedText.string);
+}
+
+- (void)testRespectingAccessibilitySetting
+{
+  ASTextNode *textNode = [ASTextNode new];
+  
+  textNode.attributedText = _attributedText;
+  textNode.isAccessibilityElement = NO;
+  
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertFalse(textNode.isAccessibilityElement);
+  
+  // Ensure removing string on an accessible text node updates the setting.
+  ASTextNode *accessibleTextNode = [ASTextNode new];
+  accessibleTextNode.attributedText = _attributedText;
+  accessibleTextNode.attributedText = nil;
+  XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
 }
 
 - (void)testLinkAttribute

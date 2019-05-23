@@ -9,13 +9,12 @@
 
 #import <AsyncDisplayKit/ASThread.h>
 
-AS_EXTERN NSString *const ASAnimatedImageDefaultRunLoopMode;
+#define ASAnimatedImageDefaultRunLoopMode NSRunLoopCommonModes
 
 @interface ASImageNode ()
 {
-  ASDN::Mutex _displayLinkLock;
+  AS::Mutex _displayLinkLock;
   id <ASAnimatedImageProtocol> _animatedImage;
-  BOOL _animatedImagePaused;
   NSString *_animatedImageRunLoopMode;
   CADisplayLink *_displayLink;
   NSUInteger _lastSuccessfulFrameIndex;
@@ -23,6 +22,13 @@ AS_EXTERN NSString *const ASAnimatedImageDefaultRunLoopMode;
   //accessed on main thread only
   CFTimeInterval _playHead;
   NSUInteger _playedLoops;
+
+  // Group the BOOLs into a bitfield struct to save memory.
+  struct {
+    unsigned int animatedImagePaused:1;
+    unsigned int cropEnabled:1; // Defaults to YES.
+    unsigned int forceUpscaling:1; //Defaults to NO.
+  } _imageNodeFlags;
 }
 
 @property (nonatomic) CFTimeInterval lastDisplayLinkFire;

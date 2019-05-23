@@ -140,10 +140,10 @@ justifyContent determines how children are laid out.</li>
 <ul>
 <li>Suppose stacking direction is Vertical, min-width=100, max-width=300, min-height=200, max-height=500.</li>
 <li>All children are laid out with min-width=100, max-width=300, min-height=0, max-height=INFINITY.</li>
-<li>If the sum of the childrens' heights is less than 200, children with flexGrow are flexed larger.</li>
-<li>If the sum of the childrens' heights is greater than 500, children with flexShrink are flexed smaller.
+<li>If the sum of the children's heights is less than 200, children with flexGrow are flexed larger.</li>
+<li>If the sum of the children's heights is greater than 500, children with flexShrink are flexed smaller.
  Each child is shrunk by <code>((sum of heights) - 500)/(number of flexShrink-able children)</code>.</li>
-<li>If the sum of the childrens' heights is greater than 500 even after flexShrink-able children are flexed,
+<li>If the sum of the children's heights is greater than 500 even after flexShrink-able children are flexed,
  justifyContent determines how children are laid out.</li>
 </ul>
 

@@ -8,7 +8,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/_ASDisplayView.h>
 
 // WARNING: When dealing with accessibility elements, please use the `accessibilityElements`
 // property instead of the older methods e.g. `accessibilityElementCount()`. While the older methods

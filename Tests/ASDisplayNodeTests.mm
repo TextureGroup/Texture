@@ -8,9 +8,8 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-
-#import "ASXCTExtensions.h"
 #import <XCTest/XCTest.h>
+#import <OCMock/OCMock.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
@@ -19,7 +18,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
-#import "ASDisplayNodeTestsHelper.h"
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASEditableTextNode.h>
@@ -31,8 +29,10 @@
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASViewController.h>
+
+#import "ASXCTExtensions.h"
+#import "ASDisplayNodeTestsHelper.h"
 
 // Conveniences for making nodes named a certain way
 #define DeclareNodeNamed(n) ASDisplayNode *n = [[ASDisplayNode alloc] init]; n.debugName = @#n
@@ -499,6 +499,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(NO, node.accessibilityElementsHidden, @"default accessibilityElementsHidden is broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.accessibilityViewIsModal, @"default accessibilityViewIsModal is broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.shouldGroupAccessibilityChildren, @"default shouldGroupAccessibilityChildren is broken %@", hasLoadedView);
+  XCTAssertEqual((id)nil, node.accessibilityCustomActions, @"default acccessibilityCustomActions is broken %@", hasLoadedView);
 
   if (!isLayerBacked) {
     XCTAssertEqual(YES, node.userInteractionEnabled, @"default userInteractionEnabled broken %@", hasLoadedView);
@@ -555,6 +556,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return bogusImage;
 }
 
+- (BOOL)dummySelector
+{
+  // no-op; only used for testing of UIAccessibilityCustomAction propagation
+  return YES;
+}
+
 - (void)checkValuesMatchSetValues:(ASDisplayNode *)node isLayerBacked:(BOOL)isLayerBacked
 {
   NSString *targetName = isLayerBacked ? @"layer" : @"view";
@@ -609,6 +616,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(YES, node.accessibilityViewIsModal, @"accessibilityViewIsModal broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.shouldGroupAccessibilityChildren, @"shouldGroupAccessibilityChildren broken %@", hasLoadedView);
   XCTAssertEqual(UIAccessibilityNavigationStyleSeparate, node.accessibilityNavigationStyle, @"accessibilityNavigationStyle broken %@", hasLoadedView);
+  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+    XCTAssertNotNil(node.accessibilityCustomActions, @"accessibilityCustomActions broken %@", hasLoadedView);
+    XCTAssertEqualObjects(@"custom action", ((UIAccessibilityCustomAction *)(node.accessibilityCustomActions.firstObject)).name, @"accessibilityCustomActions broken %@", hasLoadedView);
+  }
+
   XCTAssertTrue(CGPointEqualToPoint(CGPointMake(1.0, 1.0), node.accessibilityActivationPoint), @"accessibilityActivationPoint broken %@", hasLoadedView);
   XCTAssertNotNil(node.accessibilityPath, @"accessibilityPath broken %@", hasLoadedView);
   
@@ -680,6 +692,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.accessibilityViewIsModal = YES;
     node.shouldGroupAccessibilityChildren = YES;
     node.accessibilityNavigationStyle = UIAccessibilityNavigationStyleSeparate;
+    if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+      node.accessibilityCustomActions = @[ [[UIAccessibilityCustomAction alloc] initWithName:@"custom action" target:self selector:@selector(dummySelector)] ];
+    }
     node.accessibilityActivationPoint = CGPointMake(1.0, 1.0);
     node.accessibilityPath = [UIBezierPath bezierPath];
 
@@ -2696,6 +2711,19 @@ static bool stringContainsPointer(NSString *description, id p) {
     CALayer *cornerLayer = (*l)[i];
     XCTAssertTrue([cornerLayer.delegate isKindOfClass:[ASDisplayNodeCornerLayerDelegate class]], @"");
   }
+}
+
+- (void)testLayerActionForKeyIsCalled
+{
+  UIWindow *window = [[UIWindow alloc] init];
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+
+  id mockNode = OCMPartialMock(node);
+  OCMExpect([mockNode layerActionForKey:kCAOnOrderIn]);
+  [window.layer addSublayer:node.layer];
+  OCMExpect([mockNode layerActionForKey:@"position"]);
+  node.layer.position = CGPointMake(10, 10);
+  OCMVerifyAll(mockNode);
 }
 
 @end
