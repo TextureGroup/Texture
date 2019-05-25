@@ -11,7 +11,7 @@
 
 #if YOGA /* YOGA */
 
-#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
+#import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
@@ -408,7 +408,7 @@
   // Reset accessible elements, since layout may have changed.
   ASPerformBlockOnMainThread(^{
     if (self.nodeLoaded && !self.isSynchronous) {
-      [(_ASDisplayView *)self.view setAccessibilityElements:nil];
+      self.view.accessibilityElements = nil;
     }
   });
 

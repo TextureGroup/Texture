@@ -383,7 +383,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   }
 
   if (self.image == nil) {
-    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityImminent];
+    [self _updatePriorityOnDownloaderIfNeeded];
   }
 }
 
@@ -392,23 +392,21 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 - (void)didEnterVisibleState
 {
   [super didEnterVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityVisible];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitVisibleState
 {
   [super didExitVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-  if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
-  }
+  [self _updatePriorityOnDownloaderIfNeeded];
 }
 
 - (void)didExitPreloadState
@@ -457,17 +455,13 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   [self _locked__setImage:progressImage];
 }
 
-- (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
+- (void)_updatePriorityOnDownloaderIfNeeded
 {
   if (_networkImageNodeFlags.downloaderImplementsSetPriority) {
     ASLockScopeSelf();
 
     if (_downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = defaultPriority;
-      if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(_interfaceState);
-      }
-
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(_interfaceState);
       [_downloader setPriority:priority withDownloadIdentifier:_downloadIdentifier];
     }
   }
@@ -609,8 +603,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
       }
     };
 
-    if (self->_networkImageNodeFlags.downloaderImplementsDownloadWithPriority
-        && ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
+    if (self->_networkImageNodeFlags.downloaderImplementsDownloadWithPriority) {
       /*
         Decide a priority based on the current interface state of this node.
         It can happen that this method was called when the node entered preload state
@@ -620,7 +613,8 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
       ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
 
       downloadIdentifier = [self->_downloader downloadImageWithURL:url
-                                                          priority:priority
+                           
+                            priority:priority
                                                      callbackQueue:callbackQueue
                                                   downloadProgress:downloadProgress
                                                         completion:completion];
@@ -631,7 +625,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
         which is mapped to NSURLSessionTaskPriorityDefault.
 
-       This means that preload and display nodes use the same priority
+        This means that preload and display nodes use the same priority
         and their requests are put into the same pool.
       */
       downloadIdentifier = [self->_downloader downloadImageWithURL:url
