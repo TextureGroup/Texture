@@ -46,11 +46,6 @@ typedef NS_OPTIONS(unsigned short, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideLayoutSpecThatFits     = 1 << 4,
   ASDisplayNodeMethodOverrideCalcLayoutThatFits     = 1 << 5,
   ASDisplayNodeMethodOverrideCalcSizeThatFits       = 1 << 6,
-  ASDisplayNodeMethodOverrideCanBecomeFirstResponder= 1 << 7,
-  ASDisplayNodeMethodOverrideBecomeFirstResponder   = 1 << 8,
-  ASDisplayNodeMethodOverrideCanResignFirstResponder= 1 << 9,
-  ASDisplayNodeMethodOverrideResignFirstResponder   = 1 << 10,
-  ASDisplayNodeMethodOverrideIsFirstResponder       = 1 << 11,
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
@@ -318,13 +313,6 @@ static constexpr CACornerMask kASCACornerAllCorners =
 - (BOOL)__selfOrParentHasVisibilityNotificationsDisabled;
 - (void)__incrementVisibilityNotificationsDisabled;
 - (void)__decrementVisibilityNotificationsDisabled;
-
-// Helper methods for UIResponder forwarding
-- (BOOL)__canBecomeFirstResponder;
-- (BOOL)__becomeFirstResponder;
-- (BOOL)__canResignFirstResponder;
-- (BOOL)__resignFirstResponder;
-- (BOOL)__isFirstResponder;
 
 /// Helper method to summarize whether or not the node run through the display process
 - (BOOL)_implementsDisplay;
