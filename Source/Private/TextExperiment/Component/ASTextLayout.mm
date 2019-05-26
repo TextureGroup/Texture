@@ -2146,6 +2146,8 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
       } else {
+        // TODO(maicki): Fixes highlighting first row only to the end of the text and not the line
+//        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
         topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset, startLine.height);
       }
     }
@@ -2160,7 +2162,7 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         bottomRect.rect = CGRectMake(endLine.left, bottomOffset, endLine.width, (_container.path ? endLine.bottom : _container.size.height - _container.insets.bottom) - bottomOffset);
       } else {
-        bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
+        bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset , endLine.height);
       }
       bottomRect.writingDirection = UITextWritingDirectionRightToLeft;
     } else {
