@@ -2146,9 +2146,9 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
       } else {
-        // TODO(maicki): Fixes highlighting first row only to the end of the text and not the line
-//        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
-        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset, startLine.height);
+        // TODO: Fixes highlighting first row only to the end of the text and not highlight
+        //       the while line to the end. Needs to brought over to multiline support
+        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
       }
     }
     [rects addObject:topRect];
