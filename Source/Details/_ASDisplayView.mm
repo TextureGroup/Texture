@@ -32,14 +32,16 @@
 
 @implementation _ASDisplayView
 {
-  BOOL _inHitTest;
-  BOOL _inPointInside;
+  struct _ASDisplayViewInternalFlags {
+    unsigned inHitTest:1;
+    unsigned inPointInside:1;
 
-  BOOL _inCanBecomeFirstResponder;
-  BOOL _inBecomeFirstResponder;
-  BOOL _inCanResignFirstResponder;
-  BOOL _inResignFirstResponder;
-  BOOL _inIsFirstResponder;
+    unsigned inCanBecomeFirstResponder:1;
+    unsigned inBecomeFirstResponder:1;
+    unsigned inCanResignFirstResponder:1;
+    unsigned inResignFirstResponder:1;
+    unsigned inIsFirstResponder:1;
+  } _internalFlags;
 
   NSArray *_accessibilityElements;
   CGRect _lastAccessibilityElementsFrame;
@@ -338,10 +340,10 @@
   // hitTest:, it will call it on the view, which is _ASDisplayView.  After calling into the node, any additional calls
   // should use the UIView implementation of hitTest:
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inHitTest) {
-    _inHitTest = YES;
+  if (!_internalFlags.inHitTest) {
+    _internalFlags.inHitTest = YES;
     UIView *hitView = [node hitTest:point withEvent:event];
-    _inHitTest = NO;
+    _internalFlags.inHitTest = NO;
     return hitView;
   } else {
     return [super hitTest:point withEvent:event];
@@ -352,10 +354,10 @@
 {
   // See comments in -hitTest:withEvent: for the strategy here.
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inPointInside) {
-    _inPointInside = YES;
+  if (!_internalFlags.inPointInside) {
+    _internalFlags.inPointInside = YES;
     BOOL result = [node pointInside:point withEvent:event];
-    _inPointInside = NO;
+    _internalFlags.inPointInside = NO;
     return result;
   } else {
     return [super pointInside:point withEvent:event];
@@ -381,10 +383,10 @@
 - (BOOL)canBecomeFirstResponder
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inCanBecomeFirstResponder) {
-    _inCanBecomeFirstResponder = YES;
+  if (!_internalFlags.inCanBecomeFirstResponder) {
+    _internalFlags.inCanBecomeFirstResponder = YES;
     BOOL result = [node canBecomeFirstResponder];
-    _inCanBecomeFirstResponder = NO;
+    _internalFlags.inCanBecomeFirstResponder = NO;
     return result;
   } else {
     return [super canBecomeFirstResponder];
@@ -394,10 +396,10 @@
 - (BOOL)becomeFirstResponder
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inBecomeFirstResponder) {
-    _inBecomeFirstResponder = YES;
+  if (!_internalFlags.inBecomeFirstResponder) {
+    _internalFlags.inBecomeFirstResponder = YES;
     BOOL result = [node becomeFirstResponder];
-    _inBecomeFirstResponder = NO;
+    _internalFlags.inBecomeFirstResponder = NO;
     return result;
   } else {
     return [super becomeFirstResponder];
@@ -407,10 +409,10 @@
 - (BOOL)canResignFirstResponder
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inCanResignFirstResponder) {
-    _inCanResignFirstResponder = YES;
+  if (!_internalFlags.inCanResignFirstResponder) {
+    _internalFlags.inCanResignFirstResponder = YES;
     BOOL result = [node canResignFirstResponder];
-    _inCanResignFirstResponder = NO;
+    _internalFlags.inCanResignFirstResponder = NO;
     return result;
   } else {
     return [super canResignFirstResponder];
@@ -420,10 +422,10 @@
 - (BOOL)resignFirstResponder
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inResignFirstResponder) {
-    _inResignFirstResponder = YES;
+  if (!_internalFlags.inResignFirstResponder) {
+    _internalFlags.inResignFirstResponder = YES;
     BOOL result = [node resignFirstResponder];
-    _inResignFirstResponder = NO;
+    _internalFlags.inResignFirstResponder = NO;
     return result;
   } else {
     return [super resignFirstResponder];
@@ -433,10 +435,10 @@
 - (BOOL)isFirstResponder
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inIsFirstResponder) {
-    _inIsFirstResponder = YES;
+  if (!_internalFlags.inIsFirstResponder) {
+    _internalFlags.inIsFirstResponder = YES;
     BOOL result = [node isFirstResponder];
-    _inIsFirstResponder = NO;
+    _internalFlags.inIsFirstResponder = NO;
     return result;
   } else {
     return [super isFirstResponder];
