@@ -213,8 +213,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  @abstract if YES will not intercept touches for non-link areas of the text. Default is NO.
+ @discussion If you still want to handle tap truncation action when passthroughNonlinkTouches is YES,
+ you should set the alwaysHandleTapTruncationAction to YES.
  */
 @property (nonatomic) BOOL passthroughNonlinkTouches;
+
+/**
+ @abstract Always handle tap truncationAction, even the passthroughNonlinkTouches is YES. Default is NO.
+ */
+@property (nonatomic) BOOL alwaysHandleTapTruncationAction;
 
 @end
 
