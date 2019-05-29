@@ -92,6 +92,11 @@ static NSDate *parseRfc3339ToNSDate(NSString *rfc3339DateTimeString)
 
 @implementation UIColor (Additions)
 
++ (UIColor *)backgroundColor
+{
+  return [UIColor whiteColor];
+}
+
 + (UIColor *)darkBlueColor
 {
   return [UIColor colorWithRed:70.0/255.0 green:102.0/255.0 blue:118.0/255.0 alpha:1.0];
@@ -106,55 +111,20 @@ static NSDate *parseRfc3339ToNSDate(NSString *rfc3339DateTimeString)
 
 @implementation UIImage (Additions)
 
-+ (UIImage *)followingButtonStretchableImageForCornerRadius:(CGFloat)cornerRadius following:(BOOL)followingEnabled
-{
-  CGSize unstretchedSize  = CGSizeMake(2 * cornerRadius + 1, 2 * cornerRadius + 1);
-  CGRect rect             = (CGRect) {CGPointZero, unstretchedSize};
-  UIBezierPath *path      = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:cornerRadius];
-  
-  // create a graphics context for the following status button
-  UIGraphicsBeginImageContextWithOptions(unstretchedSize, NO, 0);
-  
-  [path addClip];
-  
-  if (followingEnabled) {
-    
-    [[UIColor whiteColor] setFill];
-    [path fill];
-    
-    path.lineWidth = 3;
-    [[UIColor lightBlueColor] setStroke];
-    [path stroke];
-    
-  } else {
-    
-    [[UIColor lightBlueColor] setFill];
-    [path fill];
-  }
-  
-  UIImage *followingBtnImage = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  
-  UIImage *followingBtnImageStretchable = [followingBtnImage stretchableImageWithLeftCapWidth:cornerRadius
-                                                                                 topCapHeight:cornerRadius];
-  return followingBtnImageStretchable;
-}
-
 + (void)downloadImageForURL:(NSURL *)url completion:(void (^)(UIImage *))block
 {
-  static NSCache *simpleImageCache = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    simpleImageCache = [[NSCache alloc] init];
-    simpleImageCache.countLimit = 10;
-  });
-  
   if (!block) {
     return;
   }
-  
+
+  static NSCache *cache = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    cache = [[NSCache alloc] init];
+  });
+
   // check if image is cached
-  UIImage *image = [simpleImageCache objectForKey:url];
+  UIImage *image = [cache objectForKey:url];
   if (image) {
     dispatch_async(dispatch_get_main_queue(), ^{
       block(image);
@@ -165,6 +135,7 @@ static NSDate *parseRfc3339ToNSDate(NSString *rfc3339DateTimeString)
     NSURLSessionDataTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
       if (data) {
         UIImage *image = [UIImage imageWithData:data];
+        [cache setObject:image forKey:url];
         dispatch_async(dispatch_get_main_queue(), ^{
           block(image);
         });
@@ -174,13 +145,19 @@ static NSDate *parseRfc3339ToNSDate(NSString *rfc3339DateTimeString)
   }
 }
 
-- (UIImage *)makeCircularImageWithSize:(CGSize)size
+- (UIImage *)makeCircularImageWithSize:(CGSize)size backgroundColor:(UIColor *)backgroundColor
 {
   // make a CGRect with the image's size
   CGRect circleRect = (CGRect) {CGPointZero, size};
   
   // begin the image context since we're not in a drawRect:
-  UIGraphicsBeginImageContextWithOptions(circleRect.size, NO, 0);
+  UIGraphicsBeginImageContextWithOptions(circleRect.size, backgroundColor != nil, 0);
+
+  // Draw background color for opaqueness
+  if (backgroundColor) {
+    [backgroundColor set];
+    UIRectFill(circleRect);
+  }
   
   // create a UIBezierPath circle
   UIBezierPath *circle = [UIBezierPath bezierPathWithRoundedRect:circleRect cornerRadius:circleRect.size.width/2];
