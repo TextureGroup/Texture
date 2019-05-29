@@ -780,6 +780,7 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
+  ASDisplayNodeAssertMainThread();
   ASLockScopeSelf(); // Protect usage of _highlight* ivars.
 
   // Set these so that link tapping works.

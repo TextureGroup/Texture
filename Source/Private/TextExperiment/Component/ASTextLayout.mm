@@ -2162,7 +2162,7 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         bottomRect.rect = CGRectMake(endLine.left, bottomOffset, endLine.width, (_container.path ? endLine.bottom : _container.size.height - _container.insets.bottom) - bottomOffset);
       } else {
-        bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset , endLine.height);
+        bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
       }
       bottomRect.writingDirection = UITextWritingDirectionRightToLeft;
     } else {
