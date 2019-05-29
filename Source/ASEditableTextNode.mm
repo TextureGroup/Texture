@@ -89,6 +89,20 @@
 
   [super setScrollEnabled:YES];
 }
+
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if (self.tag < 0) {
+        return NO;//为了让自定义菜单能显示
+    } else if (action == @selector(select:)) {
+        return YES;
+    } else if (action == @selector(selectAll:)) {
+        return YES;
+    } else if (action == @selector(copy:)) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
 #endif
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer

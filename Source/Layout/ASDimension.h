@@ -121,8 +121,8 @@ ASOVERLOADABLE AS_WARN_UNUSED_RESULT AS_EXTERN ASDimension ASDimensionMake(NSStr
  */
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASDimension ASDimensionMakeWithPoints(CGFloat points)
 {
-  ASDisplayNodeCAssertPositiveReal(@"Points", points);
-  return ASDimensionMake(ASDimensionUnitPoints, points);
+    ASDisplayNodeCAssertPositiveReal(@"Points", fmax(points, 0.1));
+  return ASDimensionMake(ASDimensionUnitPoints, fmax(points, 0.1));
 }
 
 /**
