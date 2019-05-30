@@ -18,6 +18,8 @@
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 using AS::MutexLocker;
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>

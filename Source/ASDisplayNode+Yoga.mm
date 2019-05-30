@@ -25,6 +25,8 @@
 
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 #define YOGA_LAYOUT_LOGGING 0
 
 #pragma mark - ASDisplayNode+Yoga
@@ -107,6 +109,7 @@
   if (child == nil) {
     return;
   }
+  ASDisplayNodeAssert(_nodeContext == child->_nodeContext, @"Cannot add yoga child from different node context.");
   if (_yogaChildren == nil) {
     _yogaChildren = [[NSMutableArray alloc] init];
   }

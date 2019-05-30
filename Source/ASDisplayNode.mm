@@ -60,6 +60,12 @@
 // TODO(wsdwsd0829): Rework enabling code to ensure that interface state behavior is not altered when ASCATransactionQueue is disabled.
 #define ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR 0
 
+/**
+ * A temporary convenience macro during the transition from __instanceLock__ to context-or-instance lock.
+ * A diff will come soon with a massive find-and-replace.
+ */
+#define __instanceLock__ _mutexOrPtr.get()
+
 using AS::MutexLocker;
 
 static ASDisplayNodeNonFatalErrorBlock _nonFatalErrorBlock = nil;
@@ -296,7 +302,13 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
 - (void)_initializeInstance
 {
   [self _staticInitialize];
-  __instanceLock__.SetDebugNameWithObject(self);
+  _nodeContext = ASNodeContextGet();
+  if (_nodeContext) {
+    new (&_mutexOrPtr) AS::MutexOrPointer(&_nodeContext->_mutex);
+  } else {
+    new (&_mutexOrPtr) AS::MutexOrPointer(nullptr);
+    _mutexOrPtr.get().SetDebugNameWithObject(self);
+  }
   
   _viewClass = [self.class viewClass];
   _layerClass = [self.class layerClass];
@@ -2040,6 +2052,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssertThreadAffinity(self);
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
   DISABLED_ASAssertUnlocked(__instanceLock__);
+  ASDisplayNodeAssert(subnode->_nodeContext == _nodeContext, @"Cannot mix nodes from different contexts.");
   
   as_log_verbose(ASNodeLog(), "Insert subnode %@ at index %zd of %@ and remove subnode %@", subnode, subnodeIndex, self, oldSubnode);
   

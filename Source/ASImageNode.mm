@@ -32,6 +32,8 @@
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
 
 typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);

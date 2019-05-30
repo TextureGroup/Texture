@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
 
 @implementation ASDisplayNode (ASLayoutSpec)
 

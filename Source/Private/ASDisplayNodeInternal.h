@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutTransition.h>
+#import <AsyncDisplayKit/ASNodeContext+Private.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/_ASTransitionContext.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
@@ -77,8 +78,8 @@ static constexpr CACornerMask kASCACornerAllCorners =
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate, CALayerDelegate>
 {
 @package
-  AS::RecursiveMutex __instanceLock__;
-
+  AS::MutexOrPointer _mutexOrPtr;
+  ASNodeContext *_nodeContext;
   _ASPendingState *_pendingViewState;
 
   UIView *_view;

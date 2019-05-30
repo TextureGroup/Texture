@@ -312,6 +312,37 @@ namespace AS {
   typedef std::lock_guard<Mutex> MutexLocker;
   typedef std::unique_lock<Mutex> UniqueLock;
 
+  /// A simple variant-ish class for holding either a pointer (to your context's mutex) or its own mutex.
+  class MutexOrPointer {
+  public:
+    MutexOrPointer() : initialized_(false), own_mutex_(false) {}
+    explicit MutexOrPointer(AS::RecursiveMutex *ptr) {
+      own_mutex_ = !ptr;
+      initialized_ = true;
+      if (own_mutex_) {
+        new (&mutex_) AS::RecursiveMutex();
+      } else {
+        pointer_ = ptr;
+      }
+    }
+    ~MutexOrPointer() {
+      if (own_mutex_) {
+        mutex_.~RecursiveMutex();
+      }
+    }
+    AS::RecursiveMutex &get() {
+      ASDisplayNodeCAssert(initialized_, @"Use of class before initialization.");
+      return own_mutex_ ? mutex_ : *pointer_;
+    }
+  private:
+    union {
+      AS::RecursiveMutex *pointer_;
+      AS::RecursiveMutex mutex_;
+    };
+    bool initialized_:1;
+    bool own_mutex_:1;
+  };
+
 } // namespace AS
 
 #endif /* __cplusplus */
