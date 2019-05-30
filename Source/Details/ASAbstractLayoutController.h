@@ -22,12 +22,4 @@ AS_EXTERN CGRect CGRectExpandToRangeWithScrollableDirections(CGRect rect, ASRang
 
 @end
 
-@interface ASAbstractLayoutController (Unavailable)
-
-- (NSHashTable *)indexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType __unavailable;
-
-- (void)allIndexPathsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable * _Nullable * _Nullable)displaySet preloadSet:(NSHashTable * _Nullable * _Nullable)preloadSet __unavailable;
-
-@end
-
 NS_ASSUME_NONNULL_END

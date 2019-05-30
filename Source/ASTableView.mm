@@ -684,8 +684,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSArray<ASCellNode *> *)visibleNodes
 {
-  const auto elements = [self visibleElementsForRangeController:_rangeController];
-  return ASArrayByFlatMapping(elements, ASCollectionElement *e, e.node);
+  NSMutableArray *nodes = [[NSMutableArray alloc] initWithCapacity:_visibleElements.count];
+  for (ASCollectionElement *element in _visibleElements) {
+    [nodes addObject:element.node];
+  }
+  return nodes;
 }
 
 - (void)beginUpdates
@@ -1519,14 +1522,23 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return _rangeController;
 }
 
-- (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
+- (void)getVisibleElementsForRangeController:(ASRangeController *)rangeController buffer:(std::vector<unowned ASCollectionElement *> *)buffer
 {
-  return ASPointerTableByFlatMapping(_visibleElements, id element, element);
+  NSParameterAssert(buffer->empty());
+  buffer->reserve(_visibleElements.count);
+  for (ASCollectionElement *element in _visibleElements) {
+    buffer->push_back(element);
+  }
 }
 
 - (ASScrollDirection)scrollDirectionForRangeController:(ASRangeController *)rangeController
 {
   return self.scrollDirection;
+}
+
+- (ASScrollDirection)scrollableDirectionsForRangeController:(ASRangeController *)rangeController
+{
+  return ASScrollDirectionVerticalDirections;
 }
 
 - (ASInterfaceState)interfaceStateForRangeController:(ASRangeController *)rangeController

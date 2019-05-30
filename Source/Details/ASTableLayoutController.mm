@@ -30,25 +30,21 @@
 
 #pragma mark - ASLayoutController
 
-- (NSHashTable<ASCollectionElement *> *)elementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType map:(ASElementMap *)map
+- (CGRect)bounds
 {
-  CGRect bounds = _tableView.bounds;
-
-  ASRangeTuningParameters tuningParameters = [self tuningParametersForRangeMode:rangeMode rangeType:rangeType];
-  CGRect rangeBounds = CGRectExpandToRangeWithScrollableDirections(bounds, tuningParameters, ASScrollDirectionVerticalDirections, scrollDirection);
-  NSArray *array = [_tableView indexPathsForRowsInRect:rangeBounds];
-  return ASPointerTableByFlatMapping(array, NSIndexPath *indexPath, [map elementForItemAtIndexPath:indexPath]);
+  ASDisplayNodeAssertMainThread();
+  return _tableView.bounds;
 }
 
-- (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)displaySet preloadSet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)preloadSet map:(ASElementMap *)map
+- (void)getLayoutItemsInRect:(CGRect)rect buffer:(std::vector<ASCollectionLayoutItem> *)buffer
 {
-  if (displaySet == NULL || preloadSet == NULL) {
-    return;
+  ASDisplayNodeAssertMainThread();
+  NSParameterAssert(buffer->empty());
+  __autoreleasing NSArray<NSIndexPath *> *paths = [_tableView indexPathsForRowsInRect:rect];
+  buffer->reserve(paths.count);
+  for (NSIndexPath *indexPath in paths) {
+    buffer->push_back({[_tableView rectForRowAtIndexPath:indexPath], indexPath, nil});
   }
-
-  *displaySet = [self elementsForScrolling:scrollDirection rangeMode:rangeMode rangeType:ASLayoutRangeTypeDisplay map:map];
-  *preloadSet = [self elementsForScrolling:scrollDirection rangeMode:rangeMode rangeType:ASLayoutRangeTypePreload map:map];
-  return;
 }
 
 @end

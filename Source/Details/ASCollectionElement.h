@@ -8,6 +8,8 @@
 //
 
 #import <AsyncDisplayKit/ASDataController.h>
+
+#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASDisplayNode;
@@ -16,7 +18,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 AS_SUBCLASSING_RESTRICTED
-@interface ASCollectionElement : NSObject
+@interface ASCollectionElement : NSObject {
+@package
+  /**
+   * Storage used by ASRangeController to know what range this element falls in during a given update pass.
+   *
+   * Note that this value is not necessarily _going to be_ the interface state that the element's node gets in the
+   * update pass. For example, if the collection itself is not visible, then the cell won't be marked visible.
+   */
+  ASInterfaceState _rangeControllerPendingInterfaceState;
+}
 
 @property (nullable, nonatomic, copy, readonly) NSString *supplementaryElementKind;
 @property (nonatomic) ASSizeRange constrainedSize;

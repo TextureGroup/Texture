@@ -171,13 +171,13 @@ CGRect CGRectExpandToRangeWithScrollableDirections(CGRect rect, ASRangeTuningPar
 
 #pragma mark - Abstract Index Path Range Support
 
-- (NSHashTable<ASCollectionElement *> *)elementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType map:(ASElementMap *)map
+- (CGRect)bounds
 {
   ASDisplayNodeAssertNotSupported();
-  return nil;
+  return CGRectZero;
 }
 
-- (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)displaySet preloadSet:(NSHashTable<ASCollectionElement *> *__autoreleasing  _Nullable *)preloadSet map:(ASElementMap *)map
+- (void)getLayoutItemsInRect:(CGRect)rect buffer:(std::vector<ASCollectionLayoutItem> *)buffer
 {
   ASDisplayNodeAssertNotSupported();
 }

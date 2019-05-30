@@ -9,7 +9,10 @@
 
 #import <UIKit/UIKit.h>
 
+#include <vector>
+
 #import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayoutRangeType.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
 
@@ -29,11 +32,10 @@ typedef struct ASDirectionalScreenfulBuffer ASDirectionalScreenfulBuffer;
 
 - (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType;
 
-- (NSHashTable<ASCollectionElement *> *)elementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType map:(ASElementMap *)map;
+@property (nonatomic, readonly) CGRect bounds;
 
-- (void)allElementsForScrolling:(ASScrollDirection)scrollDirection rangeMode:(ASLayoutRangeMode)rangeMode displaySet:(NSHashTable<ASCollectionElement *> * _Nullable * _Nullable)displaySet preloadSet:(NSHashTable<ASCollectionElement *> * _Nullable * _Nullable)preloadSet map:(ASElementMap *)map;
-
-@optional
+/** Queries the layout for the items in the given rect. Called by ASRangeController. */
+- (void)getLayoutItemsInRect:(CGRect)rect buffer:(std::vector<ASCollectionLayoutItem> *)buffer;
 
 @end
 

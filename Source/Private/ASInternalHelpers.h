@@ -122,6 +122,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASImageDownloaderPriority ASImageDown
  */
 AS_EXTERN NSMutableSet *ASCreatePointerBasedMutableSet(void);
 
+/**
+ * Create an NSMutableSet that uses pointers for hash & equality and which does not retain its contents.
+ */
+AS_EXTERN NSMutableSet *ASCreateUnownedPointerBasedMutableSet(void);
+
 NS_ASSUME_NONNULL_END
 
 #ifndef AS_INITIALIZE_FRAMEWORK_MANUALLY

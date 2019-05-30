@@ -154,6 +154,15 @@
   }
 }
 
+- (ASCollectionElement *)elementForLayoutItem:(const ASCollectionLayoutItem &)item
+{
+  if (item.supplementaryElementKind) {
+    return [self supplementaryElementOfKind:item.supplementaryElementKind atIndexPath:item.indexPath];
+  } else {
+    return [self elementForItemAtIndexPath:item.indexPath];
+  }
+}
+
 - (NSIndexPath *)convertIndexPath:(NSIndexPath *)indexPath fromMap:(ASElementMap *)map
 {
   if (indexPath.item == NSNotFound) {

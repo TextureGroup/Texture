@@ -2189,9 +2189,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   return _rangeController;
 }
 
-- (NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController
+- (void)getVisibleElementsForRangeController:(ASRangeController *)rangeController buffer:(std::vector<unowned ASCollectionElement *> *)buffer
 {
-  return ASPointerTableByFlatMapping(_visibleElements, id element, element);
+  NSParameterAssert(buffer->empty());
+  buffer->reserve(_visibleElements.count);
+  for (ASCollectionElement *e in _visibleElements) {
+    buffer->push_back(e);
+  }
 }
 
 - (ASElementMap *)elementMapForRangeController:(ASRangeController *)rangeController
@@ -2202,6 +2206,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (ASScrollDirection)scrollDirectionForRangeController:(ASRangeController *)rangeController
 {
   return self.scrollDirection;
+}
+
+- (ASScrollDirection)scrollableDirectionsForRangeController:(ASRangeController *)rangeController
+{
+  return self.scrollableDirections;
 }
 
 - (ASInterfaceState)interfaceStateForRangeController:(ASRangeController *)rangeController

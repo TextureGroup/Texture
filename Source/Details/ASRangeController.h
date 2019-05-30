@@ -8,8 +8,12 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#include <vector>
+
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDataController.h>
+#import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
 #import <AsyncDisplayKit/ASLayoutRangeType.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
@@ -115,10 +119,10 @@ AS_SUBCLASSING_RESTRICTED
 
 /**
  * @param rangeController Sender.
- *
- * @return an table of elements corresponding to the data currently visible onscreen (i.e., the visible range).
+ * @param buffer The vector into which to add the visible elements. The vector will be empty.
  */
-- (nullable NSHashTable<ASCollectionElement *> *)visibleElementsForRangeController:(ASRangeController *)rangeController;
+- (void)getVisibleElementsForRangeController:(ASRangeController *)rangeController
+                                      buffer:(std::vector<unowned ASCollectionElement *> *)buffer;
 
 /**
  * @param rangeController Sender.
@@ -126,6 +130,13 @@ AS_SUBCLASSING_RESTRICTED
  * @return the current scroll direction of the view using this range controller.
  */
 - (ASScrollDirection)scrollDirectionForRangeController:(ASRangeController *)rangeController;
+
+/**
+ * @param rangeController Sender.
+ *
+ * @return the available scrollable directions of the view using this range controller.
+ */
+- (ASScrollDirection)scrollableDirectionsForRangeController:(ASRangeController *)rangeController;
 
 /**
  * @param rangeController Sender.

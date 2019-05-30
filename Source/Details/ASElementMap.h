@@ -7,6 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <CoreGraphics/CoreGraphics.h>
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
@@ -14,6 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASCollectionElement, ASSection, UICollectionViewLayoutAttributes;
 @protocol ASSectionContext;
+
+/** A C++ analogue to UICollectionViewLayoutAttributes. */
+struct ASCollectionLayoutItem {
+  CGRect frame;
+  NSIndexPath *indexPath;
+  NSString * _Nullable supplementaryElementKind;
+};
 
 /**
  * An immutable representation of the state of a collection view's data.
@@ -102,6 +110,16 @@ AS_SUBCLASSING_RESTRICTED
  * have any concept of size/position.
  */
 - (nullable ASCollectionElement *)elementForLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes;
+
+#ifdef __cplusplus
+/**
+ * Returns the element that corresponds to the given item specifier, if any.
+ *
+ * NOTE: This method only regards the kind and index path of the item. Elements do not
+ * have any concept of size/position.
+ */
+- (nullable ASCollectionElement *)elementForLayoutItem:(const ASCollectionLayoutItem &)item;
+#endif  // __cplusplus
 
 /**
  * A very terse description e.g. { itemCounts = [ <S0: 1> <S1: 16> ] }

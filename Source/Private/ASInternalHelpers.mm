@@ -269,3 +269,13 @@ NSMutableSet *ASCreatePointerBasedMutableSet()
   });
   return (__bridge_transfer NSMutableSet *)CFSetCreateMutable(NULL, 0, &callbacks);
 }
+
+NSMutableSet *ASCreateUnownedPointerBasedMutableSet()
+{
+  static CFSetCallBacks callbacks;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    callbacks.copyDescription = CFCopyDescription;
+  });
+  return (__bridge_transfer NSMutableSet *)CFSetCreateMutable(NULL, 0, &callbacks);
+}
