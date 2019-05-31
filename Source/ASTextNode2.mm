@@ -356,6 +356,15 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
   return containerNode;
 }
 
+- (NSInteger)accessibilityElementCount
+{
+  if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    return self.accessibilityElements.count;
+  }
+
+  return [super accessibilityElementCount];
+}
+
 /// Overwrite accessibilityElementAtIndex: so we can update the element's accessibilityFrame when it is requested.
 - (id)accessibilityElementAtIndex:(NSInteger)index
 {
@@ -416,16 +425,16 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
 }
 
 - (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
-  {
-    if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
-      // Instead of relying on labels accessibility, We implement UIAccessibilityContainer and
-      // handle accessibility with ASTextNode2
-      return;
-    }
-
-    [super setIsAccessibilityElement:isAccessibilityElement];
-
+{
+  if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    // Instead of relying on labels accessibility, We implement UIAccessibilityContainer and
+    // handle accessibility with ASTextNode2
+    return;
   }
+
+  [super setIsAccessibilityElement:isAccessibilityElement];
+
+}
 
 - (BOOL)isAccessibilityElement {
   if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
