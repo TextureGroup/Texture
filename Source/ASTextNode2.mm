@@ -397,8 +397,16 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
   // Create an accessibility element to represent the label's text. It's not necessary to specify
   // a accessibilityRange here, as the entirety of the text is being represented.
   ASTextNodeAccessiblityElement *accessibilityElement = [[ASTextNodeAccessiblityElement alloc] initWithAccessibilityContainer:containerNode.view];
-  accessibilityElement.accessibilityTraits = self.accessibilityTraits;
+  accessibilityElement.accessibilityIdentifier = self.accessibilityIdentifier;
   accessibilityElement.accessibilityLabel = self.accessibilityLabel;
+  accessibilityElement.accessibilityHint = self.accessibilityHint;
+  accessibilityElement.accessibilityValue = self.accessibilityValue;
+  accessibilityElement.accessibilityTraits = self.accessibilityTraits;
+  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+    accessibilityElement.accessibilityAttributedLabel = self.accessibilityAttributedLabel;
+    accessibilityElement.accessibilityAttributedHint = self.accessibilityAttributedHint;
+    accessibilityElement.accessibilityAttributedValue = self.accessibilityAttributedValue;
+  }
   ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
   [accessibilityElements addObject:accessibilityElement];
 
@@ -414,6 +422,9 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
         accessibilityElement.accessibilityTraits = UIAccessibilityTraitLink;;
         accessibilityElement.accessibilityLabel = [attributedText.string substringWithRange:range];
         accessibilityElement.accessibilityRange = range;
+        if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+          accessibilityElement.accessibilityAttributedLabel = [attributedText attributedSubstringFromRange:range];
+        }
         ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
         [accessibilityElements addObject:accessibilityElement];
       }];
