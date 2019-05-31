@@ -230,7 +230,7 @@ static NSArray *DefaultLinkAttributeNames() {
     self.linkAttributeNames = DefaultLinkAttributeNames();
 
     // Accessibility
-    self.isAccessibilityElement = YES;
+    self.isAccessibilityElement = !ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer);
     self.accessibilityTraits = self.defaultAccessibilityTraits;
 
     // Placeholders
@@ -358,16 +358,21 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
 
 - (NSInteger)accessibilityElementCount
 {
-  if (ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
-    return self.accessibilityElements.count;
+  if (
+      !ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    return [super accessibilityElementCount];
   }
 
-  return [super accessibilityElementCount];
+  return self.accessibilityElements.count;
 }
 
 /// Overwrite accessibilityElementAtIndex: so we can update the element's accessibilityFrame when it is requested.
 - (id)accessibilityElementAtIndex:(NSInteger)index
 {
+  if (!ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    return [super accessibilityElementAtIndex:index];
+  }
+
   ASTextNodeAccessiblityElement *accessibilityElement = self.accessibilityElements[index];
 
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, _attributedText);
@@ -377,6 +382,10 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
 
 - (NSArray *)accessibilityElements
 {
+  if (!ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    return [super accessibilityElements];
+  }
+
   if (_accessibilityElements != nil) {
     return _accessibilityElements;
   }
@@ -566,10 +575,12 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
   // Accessiblity
   self.accessibilityLabel = self.defaultAccessibilityLabel;
 
-  // We update the isAccessibilityElement setting if this node is not switching between strings.
-  if (oldAttributedText.length == 0 || length == 0) {
-    // We're an accessibility element by default if there is a string.
-    self.isAccessibilityElement = (length != 0);
+  if (!ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    // We update the isAccessibilityElement setting if this node is not switching between strings.
+    if (oldAttributedText.length == 0 || length == 0) {
+      // We're an accessibility element by default if there is a string.
+      self.isAccessibilityElement = (length != 0);
+    }
   }
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS

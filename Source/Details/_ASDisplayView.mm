@@ -43,6 +43,7 @@
     unsigned inIsFirstResponder:1;
   } _internalFlags;
 
+  NSArray *_accessibilityElements;
   _ASDisplayViewAccessibilityFlags _accessibilityFlags;
 }
 

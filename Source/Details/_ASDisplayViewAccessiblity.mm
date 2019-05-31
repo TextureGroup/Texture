@@ -258,6 +258,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
 }
 
 @interface _ASDisplayView () {
+  NSArray *_accessibilityElements;
   _ASDisplayViewAccessibilityFlags _accessibilityFlags;
 }
 
@@ -311,6 +312,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }
   _accessibilityFlags.inSetAccessibilityElements = YES;
   [self.asyncdisplaykit_node setAccessibilityElements:accessibilityElements];
+  _accessibilityElements = accessibilityElements;
   _accessibilityFlags.inSetAccessibilityElements = NO;
 }
 
@@ -323,7 +325,12 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return @[];
   }
 
-  return [viewNode accessibilityElements];
+//  return [viewNode accessibilityElements];
+
+  if (_accessibilityElements == nil) {
+    _accessibilityElements = [viewNode accessibilityElements];
+  }
+  return _accessibilityElements;
 }
 
 @end
@@ -358,12 +365,12 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return @[];
   }
 
-  if (_accessibilityElements == nil) {
+//  if (_accessibilityElements == nil) {
     NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
     CollectAccessibilityElements(self, accessibilityElements);
     SortAccessibilityElements(accessibilityElements);
     _accessibilityElements = accessibilityElements;
-  }
+//  }
   return _accessibilityElements;
 }
 

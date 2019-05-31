@@ -19,6 +19,8 @@
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <OCMock/OCMock.h>
 
+#import "ASDisplayNodeTestsHelper.h"
+
 @interface ASDisplayViewAccessibilityTests : XCTestCase
 @end
 
@@ -90,26 +92,31 @@
 
 - (void)testAccessibilityNonLayerbackedNodesOperationInNonContainer
 {
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 600);
-  contianer.backgroundColor = [UIColor grayColor];
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:container];
+  [window makeKeyAndVisible];
+
+  container.frame = CGRectMake(50, 50, 200, 600);
+  container.backgroundColor = [UIColor grayColor];
   // Do any additional setup after loading the view, typically from a nib.
   ASTextNode *text1 = [[ASTextNode alloc] init];
   text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
   text1.frame = CGRectMake(50, 100, 200, 200);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
+  [container addSubnode:text1];
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+  NSArray<UIAccessibilityElement *> *elements = container.view.accessibilityElements;
   XCTAssertTrue(elements.count == 1);
   XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   ASTextNode *text2 = [[ASTextNode alloc] init];
   text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
   text2.frame = CGRectMake(50, 300, 200, 200);
-  [contianer addSubnode:text2];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements = contianer.view.accessibilityElements;
+  [container addSubnode:text2];
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+  ASCATransactionQueueWait(nil);
+  NSArray<UIAccessibilityElement *> *updatedElements = container.view.accessibilityElements;
   XCTAssertTrue(updatedElements.count == 2);
   XCTAssertTrue([[updatedElements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   XCTAssertTrue([[updatedElements.lastObject accessibilityLabel] isEqualToString:@"world"]);
@@ -117,9 +124,10 @@
   text3.attributedText = [[NSAttributedString alloc] initWithString:@"!!!!"];
   text3.frame = CGRectMake(50, 400, 200, 100);
   [text2 addSubnode:text3];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+  ASCATransactionQueueWait(nil);
+  NSArray<UIAccessibilityElement *> *updatedElements2 = container.view.accessibilityElements;
   //text3 won't be read out cause it's overshadowed by text2
   XCTAssertTrue(updatedElements2.count == 2);
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello"]);
