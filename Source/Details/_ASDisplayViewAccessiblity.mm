@@ -246,7 +246,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
         [elements addObject:subnode.view];
       }
     } else if (subnode.isLayerBacked) {
-      // Go down the hierarchy for layer backed subnodes which are also accessibility containe
+      // Go down the hierarchy for layer backed subnodes which are also accessibility container
       // and collect all of the UIAccessibilityElement
       CollectAccessibilityElementsForLayerBackedOrRasterizedNode(node, subnode, elements);
     } else if (subnode.accessibilityElementCount > 0) {

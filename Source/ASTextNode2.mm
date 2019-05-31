@@ -390,15 +390,14 @@ static ASDisplayNode *ASFirstNonLayerBackedSupernodeForNode(ASDisplayNode *node)
 
   NSMutableArray<ASTextNodeAccessiblityElement *> *accessibilityElements = [[NSMutableArray alloc] init];
 
-  // Searc the first node that is not layer backed
+  // Search the first node that is not layer backed
   ASDisplayNode *containerNode = ASFirstNonLayerBackedSupernodeForNode(self);
-  UIAccessibilityTraits accessibilityTraits = self.accessibilityTraits;
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, attributedText);
 
   // Create an accessibility element to represent the label's text. It's not necessary to specify
   // a accessibilityRange here, as the entirety of the text is being represented.
   ASTextNodeAccessiblityElement *accessibilityElement = [[ASTextNodeAccessiblityElement alloc] initWithAccessibilityContainer:containerNode.view];
-  accessibilityElement.accessibilityTraits = accessibilityTraits;
+  accessibilityElement.accessibilityTraits = self.accessibilityTraits;
   accessibilityElement.accessibilityLabel = self.accessibilityLabel;
   ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
   [accessibilityElements addObject:accessibilityElement];
