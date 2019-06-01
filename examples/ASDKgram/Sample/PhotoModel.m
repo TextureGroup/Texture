@@ -47,12 +47,27 @@
 
 - (NSAttributedString *)descriptionAttributedStringWithFontSize:(CGFloat)size
 {
-  NSString *string               = [NSString stringWithFormat:@"%@ %@", self.ownerUserProfile.username, self.descriptionText];
-  NSAttributedString *attrString = [NSAttributedString attributedStringWithString:string
-                                                                         fontSize:size
-                                                                            color:[UIColor darkGrayColor]
-                                                                   firstWordColor:[UIColor darkBlueColor]];
-  return attrString;
+  if ((id)self.descriptionText == [NSNull null] || self.descriptionText.length == 0) {
+    return [[NSAttributedString alloc] init];
+  }
+
+  NSString *descriptionText = self.descriptionText;
+  NSMutableAttributedString *attributedString = [[NSAttributedString attributedStringWithString:descriptionText fontSize:size color:[UIColor darkGrayColor] firstWordColor:nil] mutableCopy];
+
+  // Scan through description text for links
+  static NSDataDetector *dataDector = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    dataDector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+  });
+
+  [dataDector enumerateMatchesInString:descriptionText options:kNilOptions range:NSMakeRange(0, descriptionText.length) usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+    NSRange range = result.range;
+    [attributedString addAttribute:NSLinkAttributeName value:[descriptionText substringWithRange:range] range:range];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor darkBlueColor] range:range];
+  }];
+
+  return [attributedString copy];
 }
 
 - (NSAttributedString *)uploadDateAttributedStringWithFontSize:(CGFloat)size
@@ -62,7 +77,7 @@
 
 - (NSAttributedString *)likesAttributedStringWithFontSize:(CGFloat)size
 {
-  NSString *likesString = [NSString stringWithFormat:@"♥︎ %lu likes", (unsigned long)_likesCount];
+  NSString *likesString = [NSString stringWithFormat:@"♥︎ %lu likes", (unsigned long)self.likesCount];
 
   return [NSAttributedString attributedStringWithString:likesString fontSize:size color:[UIColor darkBlueColor] firstWordColor:nil];
 }
@@ -74,7 +89,7 @@
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"%@ - %@", _photoID, _descriptionText];
+  return [NSString stringWithFormat:@"%@ - %@", self.photoID, self.descriptionText];
 }
 
 - (id<NSObject>)diffIdentifier

@@ -26,6 +26,7 @@
                     "exp_oom_bg_dealloc_disable",
                     "exp_transaction_operation_retain_cycle",
                     "exp_remove_textkit_initialising_lock"
+                    "exp_text_node_2_a11y_container",
                 ]
     		}
 		}

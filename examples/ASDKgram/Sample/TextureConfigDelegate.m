@@ -18,6 +18,7 @@
 {
   ASConfiguration *config = [[ASConfiguration alloc] init];
   config.experimentalFeatures = ASExperimentalTextNode;
+//    config.experimentalFeatures = ASExperimentalTextNode | ASExperimentalTextNode2A11YContainer;
   config.delegate = [[TextureConfigDelegate alloc] init];
   return config;
 }

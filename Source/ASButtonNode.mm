@@ -66,6 +66,12 @@
 
 #pragma mark - Public Getter
 
+- (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled
+{
+  [super setUserInteractionEnabled:userInteractionEnabled];
+  self.isAccessibilityElement = userInteractionEnabled;
+}
+
 - (ASImageNode *)imageNode
 {
   ASLockScopeSelf();

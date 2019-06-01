@@ -50,6 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (copy, readonly) NSString *ancestryDescription;
 
+/**
+ * Returns the first non layer backed supernode
+ */
+@property (readonly) ASDisplayNode *firstNonLayerNode;
+
 @end
 
 NS_ASSUME_NONNULL_END

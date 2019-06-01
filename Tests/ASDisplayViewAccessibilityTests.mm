@@ -44,6 +44,21 @@
   XCTAssertEqual([node.view indexOfAccessibilityElement:node.view.accessibilityElements.firstObject], 0);*/
 }
 
+- (void)testManualSettingOfAccessiblityElements
+{
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+
+  ASTextNode *subnode = [[ASTextNode alloc] init];
+  subnode.layerBacked = YES;
+  subnode.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
+  subnode.frame = CGRectMake(50, 100, 200, 200);
+  [container addSubnode:subnode];
+  XCTAssertEqual(container.view.accessibilityElements.count, 1);
+
+  container.accessibilityElements = nil;
+  XCTAssertEqual(container.view.accessibilityElements.count, 1);
+}
+
 - (void)testThatSubnodeAccessibilityLabelAggregationWorks
 {
   // Setup nodes

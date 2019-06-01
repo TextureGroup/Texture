@@ -9,6 +9,7 @@
 
 #import "PhotoCellNode.h"
 
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 
@@ -28,6 +29,30 @@
 #define InsetForAvatar UIEdgeInsetsMake(HORIZONTAL_BUFFER, 0, HORIZONTAL_BUFFER, HORIZONTAL_BUFFER)
 #define InsetForHeader UIEdgeInsetsMake(0, HORIZONTAL_BUFFER, 0, HORIZONTAL_BUFFER)
 #define InsetForFooter UIEdgeInsetsMake(VERTICAL_BUFFER, HORIZONTAL_BUFFER, VERTICAL_BUFFER, HORIZONTAL_BUFFER)
+
+
+// If an ASTextNode2 is member of a node tree that contains as accessibility container
+// it will be represented as a UIAccessibilityCustomAction attached to the accessibility container node. The UIAccessibilityCustomAction has as target the
+// ASTextNode2 itself as well as 
+@interface ASTextNode2(UIAccessibilityCustomAction)
+
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
+
+@end
+
+@implementation ASTextNode2(UIAccessibilityCustomAction)
+
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action
+{
+  if ([self.delegate respondsToSelector:@selector(performAccessibilityCustomAction:)]) {
+    return [self.delegate performSelector:@selector(performAccessibilityCustomAction:)
+                               withObject:action];
+  }
+
+  return NO;
+}
+
+@end
 
 @interface PhotoCellNode () <ASNetworkImageNodeDelegate>
 @end
@@ -51,7 +76,10 @@
   self = [super init];
   
   if (self) {
-    
+
+    // Activate if you would like to test the accessibility container behavior
+//    self.isAccessibilityContainer = YES;
+
     _photoModel              = photo;
     
     _userAvatarImageNode     = [[ASNetworkImageNode alloc] init];
@@ -247,13 +275,6 @@
 }
 #endif
 
-#pragma mark - Instance Methods
-
-- (void)didEnterPreloadState
-{
-  [super didEnterPreloadState];
-}
-
 #pragma mark - Network Image Delegate
 
 - (void)imageNode:(ASNetworkImageNode *)imageNode didLoadImage:(UIImage *)image info:(ASNetworkImageLoadInfo *)info
@@ -271,10 +292,29 @@
 
 - (ASTextNode *)createLayerBackedTextNodeWithString:(NSAttributedString *)attributedString
 {
-  ASTextNode *textNode      = [[ASTextNode alloc] init];
-  textNode.layerBacked      = YES;
+  ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = attributedString;
+  textNode.delegate = (id<ASTextNodeDelegate>)self; // Setup delegate for link handling
+  BOOL supportsLayerBacking = [textNode supportsLayerBacking];
+  textNode.layerBacked = supportsLayerBacking;
+  textNode.userInteractionEnabled = !supportsLayerBacking;
   return textNode;
+}
+
+- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action
+{
+  if ([action isKindOfClass:[ASAccessibilityCustomAction class]] && (action.accessibilityTraits & UIAccessibilityTraitLink)) {
+    NSString *linkValue = [(ASAccessibilityCustomAction *)action value];
+    NSLog(@"performAccessibilityCustomAction: Handle link: %@", linkValue);
+    return YES;
+  }
+
+  return NO;
+}
+
+- (void)textNode:(ASTextNode *)textNode tappedLinkAttribute:(NSString *)attribute value:(id)value atPoint:(CGPoint)point textRange:(NSRange)textRange
+{
+  NSLog(@"textNode:tappedLinkAttribute:atPoint:textRange: Handle link: %@", value);
 }
 
 - (void)setupYogaLayoutIfNeeded
