@@ -4,7 +4,7 @@ layout: docs
 permalink: /development/how-to-develop.html
 ---
 
-As an open source project, contributions are always welcome. Before you start, please read our <a href = "https://github.com/TextureGroup/Texture/blob/master/CONTRIBUTING.md">Contribution Guidelines</a>. It's als a good idea to familiar yourselves with our <a href = "overview.html">Development documentations</a>.
+As an open source project, contributions are always welcome. Before you start, please read our <a href = "https://github.com/TextureGroup/Texture/blob/master/CONTRIBUTING.md">Contribution Guidelines</a>. It's also a good idea to familiarize yourself with our <a href = "overview.html">Development documentations</a>.
 
 Setting up your dev environment:
 - If you don't have CocoaPods installed on your machine yet, you should install it now.
