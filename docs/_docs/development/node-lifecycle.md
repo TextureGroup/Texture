@@ -8,7 +8,7 @@ permalink: /development/node-lifecycle.html
 
 Texture uses ARC (Automatic Reference Counting) and thus objects are deallocated as soon as they are no longer strongly referenced. When it comes to instances of ASDisplayNode and its subclasses, different kinds of nodes have different lifecycles and there are benefits in understanding their lifecycles as well as when they enter interface and loading states, so keep reading.
 
-# Nodes managed by [node containers](http://texturegroup.org/docs/containers-overview.html)
+# Nodes managed by <a href = "http://texturegroup.org/docs/containers-overview.html">node containers</a>
 
 Node containers are responsible for the lifecycle of nodes that it manages. Generally speaking, node containers allocate their nodes as soon as needed and release them when they are no longer useful. Texture assumes that node containers fully manage their nodes and expects clients to not retain these nodes and/or modify their lifecycles. For example, clients should not attempt to store instances of ASCellNodes allocated by ASCollectionNode, ASPagerNode (which is a thin subclass of ASCollectionNOde) or ASTableNode as an attempt to reuse them later.
 
@@ -39,13 +39,13 @@ As mentioned above, ASDeallocQueue helps to defer the deallocation of objects gi
 
 These are nodes that are often directly created by client code, such as direct and indirect subnodes of cell nodes. When a node is added to a parent node, the parent node retain it until it's removed from the parent node, or until the parent node is deallocated. As a result, if the subnode is not retained by client code in any other way or if it's not removed from the parent node, the subnode's lifecycle is tied to the parent node's lifecycle. In addition, since nodes often live in a hierarchy, the entire node hierarchy has the same lifecycle as the root node's. Lastly, if the root node is managed by a node container -- directly in case of ASViewController and the like, or indirectly as a cell node of a collection or table node --, then the entire node hierarchy is managed by the node container.
 
-## Node lifecycle under [Automatic Subnode Management (ASM)](http://texturegroup.org/docs/automatic-subnode-mgmt.html)
+## Node lifecycle under <a href = "http://texturegroup.org/docs/automatic-subnode-mgmt.html">Automatic Subnode Management (ASM)</a>
 
 ASM allows clients to manipulate the node hierarchy by simply returning layout specs that contain the only subnodes needed by a parent node at a given time. Texture then calculates subnode insertions and removals by looking at the previous and current layout specs and updates the node hierarchy accordingly. To support animation between the two layout specs, subnodes insertions and removals are performed at different times. New subnodes are inserted at the beginning of the animation so that they are present in the view hierarchy and ready for the upcoming animation. As a result, new subnodes are retained by the parent node at the beginning. Old subnodes, however, are removed after the animation finishes. If the old subnodes are not retained anywhere else, then they'll be released at that time.
 
 # Node interface states
 
-With the support of [Intelligent Preloading](http://texturegroup.org/docs/intelligent-preloading.html), ASDisplayNode has three interface states: Preload, Display and Visible. These states are fully utilizied when a node is managed by an ASTableView or ASCollectionView, either directly as an ASCellNode or indirectly as a subnode of an ASCellNode. Both ASTableView and ASCollectionView use ASRangeController to determine the state of each ASCellNode they manage and recursively set the state to every node in the hierarchy. 
+With the support of <a href = "http://texturegroup.org/docs/intelligent-preloading.html">Intelligent Preloading</a>, ASDisplayNode has three interface states: Preload, Display and Visible. These states are fully utilizied when a node is managed by an ASTableView or ASCollectionView, either directly as an ASCellNode or indirectly as a subnode of an ASCellNode. Both ASTableView and ASCollectionView use ASRangeController to determine the state of each ASCellNode they manage and recursively set the state to every node in the hierarchy. 
 
 For more details, look into the implementation of ASDataController, particularly `-_updateVisibleNodeIndexPaths`.
 
