@@ -7,6 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -1100,12 +1101,24 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (void)setAccessibilityLabel:(NSString *)accessibilityLabel
 {
   _bridge_prologue_write;
+  NSString *oldAccessibilityLabel = _getFromViewOnly(accessibilityLabel);
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel);
   }
+
+  // We need to update action name when it's changed to reflect the latest state.
+  // Note: Update the custom action itself won't work when a11y is inside a list of custom actions
+  // in which one action results in a name change in the next action. In that case the UIAccessibility
+  // will hold the old action strongly until a11y jumps out of the list of custom actions.
+  // Thus we can only update name in place to have the change take effect.
+  BOOL needsUpdateActionName = self.isNodeLoaded && ![oldAccessibilityLabel isEqualToString:accessibilityLabel] && (_accessibilityTraits & ASInteractiveAccessibilityTraitsMask());
+  if (needsUpdateActionName) {
+    self.accessibilityCustomAction.name = accessibilityLabel;
+  }
 }
+
 
 - (NSAttributedString *)accessibilityAttributedLabel
 {
