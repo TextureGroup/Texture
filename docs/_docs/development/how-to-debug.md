@@ -16,9 +16,9 @@ Debugging Texture should follow:
 
 ## Crashes
 
-Sometimes, the environment can get into a state where a fatal interrupt signal occurs inside UIKit. The exception could be from an invalid memory address, unrecognized selector, or a typical out of bounds to name a few. Since Texture is fairly robust due to the awesome designers, it is the case sometimes that UIKit is more fragile. It is also likely that crashes will be occurring for a small percentage of your users, visible to you only through Crashlytics.
+Sometimes, the environment can get into a state where a fatal interrupt signal occurs inside UIKit. The exception could be from an invalid memory address, unrecognized selector, or a typical out of bounds to name a few. Since Texture is fairly robust, it is the case sometimes that UIKit is more fragile or implicitly expects some behavior by its implementors. It is also likely that crashes will be occurring for a small percentage of your users, visible to you only through a crash reporting service.
 
-Let's go through an example where @maicki and @hnugyen solved a mysterious and non-deterministic crash.
+Let's go through an example where @maicki and @nguyenhuy solved a mysterious and non-deterministic crash.
 
 __The Symptoms__
 
@@ -88,7 +88,7 @@ The proposed change was then to then prevent destroying the internal data store 
 
 Using `if (ASActivateExperimentalFeature(ASExperimentalSkipClearData)) {` you can safely gate your new logic to a universal experiment that consumers of Texture can opt into.
 
-@maicki and @hnugyen were then able to confirm that preventing the clearData in the data source change prevented this crash from occurring in the wild.
+@maicki and @nguyenhuy were then able to confirm that preventing the clearData in the data source change prevented this crash from occurring in the wild.
 
 ## UIKit Debugging
 
