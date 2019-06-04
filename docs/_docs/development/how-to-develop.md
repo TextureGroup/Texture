@@ -9,7 +9,7 @@ As an open source project, contributions are always welcome. Before you start, p
 Setting up your dev environment:
 - If you don't have CocoaPods installed on your machine yet, you should install it now.
 - Clone the framework's source code to your machine. More details can be found <a href = "https://help.github.com/en/articles/cloning-a-repository">here</a>.
-- Run <code>pod install</code> in the directory that you cloned to.
+- Run `pod install` in the directory that you cloned to.
 - Open "AsyncDisplayKit.xcworkspace" file CocoaPods has just generated. The workspace includes all the source code, as well as our test suite.
 - To run the test suite, make sure you select the same <a href = "https://github.com/TextureGroup/Texture/blob/master/build.sh#L3">device configuration we are using for our CI</a>, which is an iPhone 7 running iOS 10.2. This is important as our snapshot tests only have snapshots captured on such device configuration.
-- To run one of our sample projects, run <code>pod install</code> in the sample's directory and open the generated workspace.
+- To run one of our sample projects, run `pod install` in the sample's directory and open the generated workspace.
