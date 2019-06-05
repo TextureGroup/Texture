@@ -54,10 +54,6 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 }
 
 static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
-  ASDisplayNode *supernode = node.firstNonLayerNode;
-  ASDisplayNodeCAssert(!supernode.isLayerBacked, @"No non-layerbacked node found.");
-
-
   CALayer *layer = node.layer;
   return [layer convertRect:node.bounds toLayer:ASFindWindowOfLayer(layer).layer];
 }

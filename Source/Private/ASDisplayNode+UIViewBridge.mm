@@ -1113,7 +1113,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   // in which one action results in a name change in the next action. In that case the UIAccessibility
   // will hold the old action strongly until a11y jumps out of the list of custom actions.
   // Thus we can only update name in place to have the change take effect.
-  BOOL needsUpdateActionName = self.isNodeLoaded && ![oldAccessibilityLabel isEqualToString:accessibilityLabel] && (_accessibilityTraits & ASInteractiveAccessibilityTraitsMask());
+  BOOL needsUpdateActionName = self.isNodeLoaded && ![oldAccessibilityLabel isEqualToString:accessibilityLabel] && (0 != (_accessibilityTraits & ASInteractiveAccessibilityTraitsMask()));
   if (needsUpdateActionName) {
     self.accessibilityCustomAction.name = accessibilityLabel;
   }
