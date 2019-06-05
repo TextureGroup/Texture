@@ -11,7 +11,7 @@
 
 #if YOGA /* YOGA */
 
-#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
+#import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASYogaUtilities.h>
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
@@ -167,11 +167,11 @@
 }
 
 - (BOOL)willApplyNextYogaCalculatedLayout {
-  return _willApplyNextYogaCalculatedLayout;
+  return _flags.willApplyNextYogaCalculatedLayout;
 }
 
 - (void)setWillApplyNextYogaCalculatedLayout:(BOOL)willApplyNextYogaCalculatedLayout {
-  _willApplyNextYogaCalculatedLayout = willApplyNextYogaCalculatedLayout;
+  _flags.willApplyNextYogaCalculatedLayout = willApplyNextYogaCalculatedLayout;
 }
 
 - (void)setYogaLayoutInProgress:(BOOL)yogaLayoutInProgress
@@ -408,7 +408,7 @@
   // Reset accessible elements, since layout may have changed.
   ASPerformBlockOnMainThread(^{
     if (self.nodeLoaded && !self.isSynchronous) {
-      [(_ASDisplayView *)self.view setAccessibilityElements:nil];
+      self.view.accessibilityElements = nil;
     }
   });
 

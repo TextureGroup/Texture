@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
@@ -146,8 +147,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASTextNode *_debugLabelNode;
   
   // Cropping.
-  BOOL _cropEnabled; // Defaults to YES.
-  BOOL _forceUpscaling; //Defaults to NO.
   CGSize _forcedSize; //Defaults to CGSizeZero, indicating no forced size.
   CGRect _cropRect; // Defaults to CGRectMake(0.5, 0.5, 0, 0)
   CGRect _cropDisplayBounds; // Defaults to CGRectNull
@@ -174,8 +173,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   // initial value. With setting a explicit backgroundColor we can prevent that change.
   self.backgroundColor = [UIColor clearColor];
 
-  _cropEnabled = YES;
-  _forceUpscaling = NO;
+  _imageNodeFlags.cropEnabled = YES;
+  _imageNodeFlags.forceUpscaling = NO;
   _cropRect = CGRectMake(0.5, 0.5, 0, 0);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
@@ -201,15 +200,11 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return nil;
   }
   
-  AS::MutexLocker l(__instanceLock__);
-  
-  UIGraphicsBeginImageContextWithOptions(size, NO, 1);
-  [self.placeholderColor setFill];
-  UIRectFill(CGRectMake(0, 0, size.width, size.height));
-  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  
-  return image;
+  return ASGraphicsCreateImageWithOptions(size, NO, 1, nil, nil, ^{
+    AS::MutexLocker l(__instanceLock__);
+    [_placeholderColor setFill];
+    UIRectFill(CGRectMake(0, 0, size.width, size.height));
+  });
 }
 
 #pragma mark - Layout and Sizing
@@ -287,7 +282,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 {
   ASLockScopeSelf();
   if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
-    _placeholderEnabled = (placeholderColor != nil);
+    _flags.placeholderEnabled = (placeholderColor != nil);
   }
 }
 
@@ -304,8 +299,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;
   drawParameters->_contentMode = self.contentMode;
-  drawParameters->_cropEnabled = _cropEnabled;
-  drawParameters->_forceUpscaling = _forceUpscaling;
+  drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
+  drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
   drawParameters->_forcedSize = _forcedSize;
   drawParameters->_cropRect = _cropRect;
   drawParameters->_cropDisplayBounds = _cropDisplayBounds;
@@ -466,7 +461,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  // The following `UIGraphicsBeginImageContextWithOptions` call will sometimes take take longer than 5ms on an
+  // The following `ASGraphicsCreateImageWithOptions` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
   // Check for cancellation before we call it.
   if (isCancelled()) {
@@ -475,55 +470,46 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  UIGraphicsBeginImageContextWithOptions(key.backingSize, key.isOpaque, 1.0);
-  
-  BOOL contextIsClean = YES;
-  
-  CGContextRef context = UIGraphicsGetCurrentContext();
-  if (context && key.willDisplayNodeContentWithRenderingContext) {
-    key.willDisplayNodeContentWithRenderingContext(context, drawParameters);
-    contextIsClean = NO;
-  }
-  
-  // if view is opaque, fill the context with background color
-  if (key.isOpaque && key.backgroundColor) {
-    [key.backgroundColor setFill];
-    UIRectFill({ .size = key.backingSize });
-    contextIsClean = NO;
-  }
-  
-  // iOS 9 appears to contain a thread safety regression when drawing the same CGImageRef on
-  // multiple threads concurrently.  In fact, instead of crashing, it appears to deadlock.
-  // The issue is present in Mac OS X El Capitan and has been seen hanging Pro apps like Adobe Premiere,
-  // as well as iOS games, and a small number of ASDK apps that provide the same image reference
-  // to many separate ASImageNodes.  A workaround is to set .displaysAsynchronously = NO for the nodes
-  // that may get the same pointer for a given UI asset image, etc.
-  // FIXME: We should replace @synchronized here, probably using a global, locked NSMutableSet, and
-  // only if the object already exists in the set we should create a semaphore to signal waiting threads
-  // upon removal of the object from the set when the operation completes.
-  // Another option is to have ASDisplayNode+AsyncDisplay coordinate these cases, and share the decoded buffer.
-  // Details tracked in https://github.com/facebook/AsyncDisplayKit/issues/1068
-  
-  UIImage *image = key.image;
-  BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
-  CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
-  
-  @synchronized(image) {
-    [image drawInRect:key.imageDrawRect blendMode:blendMode alpha:1];
-  }
-  
-  if (context && key.didDisplayNodeContentWithRenderingContext) {
-    key.didDisplayNodeContentWithRenderingContext(context, drawParameters);
-  }
+  UIImage *result = ASGraphicsCreateImageWithOptions(key.backingSize, key.isOpaque, 1.0, key.image, isCancelled, ^{
+    BOOL contextIsClean = YES;
 
-  // Check cancellation one last time before forming image.
-  if (isCancelled()) {
-    UIGraphicsEndImageContext();
-    return nil;
-  }
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    if (context && key.willDisplayNodeContentWithRenderingContext) {
+      key.willDisplayNodeContentWithRenderingContext(context, drawParameters);
+      contextIsClean = NO;
+    }
 
-  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
+    // if view is opaque, fill the context with background color
+    if (key.isOpaque && key.backgroundColor) {
+      [key.backgroundColor setFill];
+      UIRectFill({ .size = key.backingSize });
+      contextIsClean = NO;
+    }
+
+    // iOS 9 appears to contain a thread safety regression when drawing the same CGImageRef on
+    // multiple threads concurrently.  In fact, instead of crashing, it appears to deadlock.
+    // The issue is present in Mac OS X El Capitan and has been seen hanging Pro apps like Adobe Premiere,
+    // as well as iOS games, and a small number of ASDK apps that provide the same image reference
+    // to many separate ASImageNodes.  A workaround is to set .displaysAsynchronously = NO for the nodes
+    // that may get the same pointer for a given UI asset image, etc.
+    // FIXME: We should replace @synchronized here, probably using a global, locked NSMutableSet, and
+    // only if the object already exists in the set we should create a semaphore to signal waiting threads
+    // upon removal of the object from the set when the operation completes.
+    // Another option is to have ASDisplayNode+AsyncDisplay coordinate these cases, and share the decoded buffer.
+    // Details tracked in https://github.com/facebook/AsyncDisplayKit/issues/1068
+
+    UIImage *image = key.image;
+    BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
+    CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
+
+    @synchronized(image) {
+      [image drawInRect:key.imageDrawRect blendMode:blendMode alpha:1];
+    }
+
+    if (context && key.didDisplayNodeContentWithRenderingContext) {
+      key.didDisplayNodeContentWithRenderingContext(context, drawParameters);
+    }
+  });
   
   if (key.imageModificationBlock) {
     result = key.imageModificationBlock(result);
@@ -606,7 +592,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (BOOL)isCropEnabled
 {
   AS::MutexLocker l(__instanceLock__);
-  return _cropEnabled;
+  return _imageNodeFlags.cropEnabled;
 }
 
 - (void)setCropEnabled:(BOOL)cropEnabled
@@ -617,12 +603,12 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)setCropEnabled:(BOOL)cropEnabled recropImmediately:(BOOL)recropImmediately inBounds:(CGRect)cropBounds
 {
   __instanceLock__.lock();
-  if (_cropEnabled == cropEnabled) {
+  if (_imageNodeFlags.cropEnabled == cropEnabled) {
     __instanceLock__.unlock();
     return;
   }
 
-  _cropEnabled = cropEnabled;
+  _imageNodeFlags.cropEnabled = cropEnabled;
   _cropDisplayBounds = cropBounds;
   
   UIImage *image = _image;
@@ -672,13 +658,13 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (BOOL)forceUpscaling
 {
   AS::MutexLocker l(__instanceLock__);
-  return _forceUpscaling;
+  return _imageNodeFlags.forceUpscaling;
 }
 
 - (void)setForceUpscaling:(BOOL)forceUpscaling
 {
   AS::MutexLocker l(__instanceLock__);
-  _forceUpscaling = forceUpscaling;
+  _imageNodeFlags.forceUpscaling = forceUpscaling;
 }
 
 - (CGSize)forcedSize
@@ -735,40 +721,34 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
   return ^(UIImage *originalImage) {
-    UIGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
-    UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
+    return ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+      UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
 
-    // Make the image round
-    [roundOutline addClip];
+      // Make the image round
+      [roundOutline addClip];
 
-    // Draw the original image
-    [originalImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
+      // Draw the original image
+      [originalImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
 
-    // Draw a border on top.
-    if (borderWidth > 0.0) {
-      [borderColor setStroke];
-      [roundOutline setLineWidth:borderWidth];
-      [roundOutline stroke];
-    }
-
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
+      // Draw a border on top.
+      if (borderWidth > 0.0) {
+        [borderColor setStroke];
+        [roundOutline setLineWidth:borderWidth];
+        [roundOutline stroke];
+      }
+    });
   };
 }
 
 asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
   return ^(UIImage *originalImage) {
-    UIGraphicsBeginImageContextWithOptions(originalImage.size, NO, originalImage.scale);
-    
-    // Set color and render template
-    [color setFill];
-    UIImage *templateImage = [originalImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [templateImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
-    
-    UIImage *modifiedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+    UIImage *modifiedImage = ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+      // Set color and render template
+      [color setFill];
+      UIImage *templateImage = [originalImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+      [templateImage drawAtPoint:CGPointZero blendMode:kCGBlendModeCopy alpha:1];
+    });
 
     // if the original image was stretchy, keep it stretchy
     if (!UIEdgeInsetsEqualToEdgeInsets(originalImage.capInsets, UIEdgeInsetsZero)) {

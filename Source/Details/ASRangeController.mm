@@ -13,6 +13,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
@@ -224,7 +225,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
-  ASSignpostStart(ASSignpostRangeControllerUpdate);
+  ASSignpostStart(RangeControllerUpdate, _dataSource, "%@", ASObjectDescriptionMakeTiny(_dataSource));
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];
@@ -242,6 +243,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       [newVisibleNodes addObject:element.node];
     }
     [self _setVisibleNodes:newVisibleNodes];
+    ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
 
@@ -356,29 +358,13 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       // DO NOT set Visible: even though these elements are in the visible range / "viewport",
       // our overall container object is itself not yet, or no longer, visible.
       // The moment it becomes visible, we will run the condition above.
-
-      ASInterfaceState interfaceStateBeforeFix = interfaceState;
-      if ([allCurrentIndexPaths containsObject:indexPath]) {
-        interfaceStateBeforeFix |= ASInterfaceStatePreload;
-        if (rangeMode != ASLayoutRangeModeLowMemory) {
-          interfaceStateBeforeFix |= ASInterfaceStateDisplay;
-        }
-      }
-
-      ASInterfaceState interfaceStateAfterFix = interfaceState;
       if ([visibleIndexPaths containsObject:indexPath]) {
-        interfaceStateAfterFix |= ASInterfaceStatePreload;
+        interfaceState |= ASInterfaceStatePreload;
         if (rangeMode != ASLayoutRangeModeLowMemory) {
-          interfaceStateAfterFix |= ASInterfaceStateDisplay;
+          interfaceState |= ASInterfaceStateDisplay;
         }
       } else if ([displayIndexPaths containsObject:indexPath]) {
-        interfaceStateAfterFix |= ASInterfaceStatePreload;
-      }
-
-      if (interfaceStateBeforeFix != interfaceStateAfterFix && ASActivateExperimentalFeature(ASExperimentalFixRangeController)) {
-        interfaceState = interfaceStateAfterFix;
-      } else {
-        interfaceState = interfaceStateBeforeFix;
+        interfaceState |= ASInterfaceStatePreload;
       }
     }
 
@@ -413,10 +399,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (ASDisplayNode.shouldShowRangeDebugOverlay) {
     ASScrollDirection scrollableDirections = ASScrollDirectionUp | ASScrollDirectionDown;
     if ([_dataSource isKindOfClass:NSClassFromString(@"ASCollectionView")]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-      scrollableDirections = (ASScrollDirection)[_dataSource performSelector:@selector(scrollableDirections)];
-#pragma clang diagnostic pop
+        scrollableDirections = ((ASCollectionView *)_dataSource).scrollableDirections;
     }
     
     [self updateRangeController:self
@@ -442,7 +425,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   NSLog(@"Range update complete; modifiedIndexPaths: %@, rangeMode: %d", [self descriptionWithIndexPaths:modifiedIndexPaths], rangeMode);
 #endif
   
-  ASSignpostEnd(ASSignpostRangeControllerUpdate);
+  ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
 }
 
 #pragma mark - Notification observers

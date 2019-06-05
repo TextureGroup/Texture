@@ -8,6 +8,7 @@
 //
 
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASAssert.h>
 
@@ -130,38 +131,35 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
   
   // We should probably check if the background color has any alpha component but that
   // might be expensive due to needing to check mulitple color spaces.
-  UIGraphicsBeginImageContextWithOptions(bounds.size, cornerColor != nil, scale);
-  
-  BOOL contextIsClean = YES;
-  if (cornerColor) {
-    contextIsClean = NO;
-    [cornerColor setFill];
-    // Copy "blend" mode is extra fast because it disregards any value currently in the buffer and overrides directly.
-    UIRectFillUsingBlendMode(bounds, kCGBlendModeCopy);
-  }
-  
-  BOOL canUseCopy = contextIsClean || (CGColorGetAlpha(fillColor.CGColor) == 1);
-  [fillColor setFill];
-  [path fillWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
-  
-  if (borderColor) {
-    [borderColor setStroke];
-    
-    // Inset border fully inside filled path (not halfway on each side of path)
-    CGRect strokeRect = CGRectInset(bounds, borderWidth / 2.0, borderWidth / 2.0);
-    
-    // It is rarer to have a stroke path, and our cache key only handles rounded rects for the exact-stretchable
-    // size calculated by cornerRadius, so we won't bother caching this path.  Profiling validates this decision.
-    UIBezierPath *strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
-                                                     byRoundingCorners:roundedCorners
-                                                           cornerRadii:cornerRadii];
-    [strokePath setLineWidth:borderWidth];
-    BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
-    [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
-  }
-  
-  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
+  UIImage *result = ASGraphicsCreateImageWithOptions(bounds.size, cornerColor != nil, scale, nil, nil, ^{
+    BOOL contextIsClean = YES;
+    if (cornerColor) {
+      contextIsClean = NO;
+      [cornerColor setFill];
+      // Copy "blend" mode is extra fast because it disregards any value currently in the buffer and overrides directly.
+      UIRectFillUsingBlendMode(bounds, kCGBlendModeCopy);
+    }
+
+    BOOL canUseCopy = contextIsClean || (CGColorGetAlpha(fillColor.CGColor) == 1);
+    [fillColor setFill];
+    [path fillWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
+
+    if (borderColor) {
+      [borderColor setStroke];
+
+      // Inset border fully inside filled path (not halfway on each side of path)
+      CGRect strokeRect = CGRectInset(bounds, borderWidth / 2.0, borderWidth / 2.0);
+
+      // It is rarer to have a stroke path, and our cache key only handles rounded rects for the exact-stretchable
+      // size calculated by cornerRadius, so we won't bother caching this path.  Profiling validates this decision.
+      UIBezierPath *strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
+                                                       byRoundingCorners:roundedCorners
+                                                             cornerRadii:cornerRadii];
+      [strokePath setLineWidth:borderWidth];
+      BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
+      [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
+    }
+  });
   
   UIEdgeInsets capInsets = UIEdgeInsetsMake(cornerRadius, cornerRadius, cornerRadius, cornerRadius);
   result = [result resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];

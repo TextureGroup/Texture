@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASTableNode.h>
 
@@ -88,8 +87,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 - (CGRect)accessibilityFrame
 {
   CGRect accessibilityFrame = [self.containerNode convertRect:self.node.bounds fromNode:self.node];
-  accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.accessibilityContainer);
-  return accessibilityFrame;
+  return UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.accessibilityContainer);
 }
 
 @end
@@ -109,8 +107,7 @@ static void SortAccessibilityElements(NSMutableArray *elements)
 - (CGRect)accessibilityFrame
 {
   CGRect accessibilityFrame = [self.containerNode convertRect:self.node.bounds fromNode:self.node];
-  accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.container);
-  return accessibilityFrame;
+  return UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, self.container);
 }
 
 @end
@@ -256,7 +253,7 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
   ASDisplayNodeAssertMainThread();
-  _accessibilityElements = nil;
+  _accessibilityElements = accessibilityElements;
 }
 
 - (NSArray *)accessibilityElements
@@ -268,7 +265,7 @@ static void CollectAccessibilityElementsForView(UIView *view, NSMutableArray *el
     return @[];
   }
 
-  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDisableAccessibilityCache)) {
+  if (_accessibilityElements == nil) {
     _accessibilityElements = [viewNode accessibilityElements];
   }
   return _accessibilityElements;

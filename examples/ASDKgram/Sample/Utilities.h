@@ -9,6 +9,7 @@
 
 @interface UIColor (Additions)
 
++ (UIColor *)backgroundColor;
 + (UIColor *)darkBlueColor;
 + (UIColor *)lightBlueColor;
 
@@ -16,10 +17,8 @@
 
 @interface UIImage (Additions)
 
-+ (UIImage *)followingButtonStretchableImageForCornerRadius:(CGFloat)cornerRadius following:(BOOL)followingEnabled;
 + (void)downloadImageForURL:(NSURL *)url completion:(void (^)(UIImage *))block;
-
-- (UIImage *)makeCircularImageWithSize:(CGSize)size;
+- (UIImage *)makeCircularImageWithSize:(CGSize)size backgroundColor:(nullable UIColor *)backgroundColor;
 
 @end
 

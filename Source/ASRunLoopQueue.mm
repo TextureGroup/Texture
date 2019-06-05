@@ -215,7 +215,7 @@ static void runLoopSourceCallback(void *info) {
       return;
     }
 
-    ASSignpostStart(ASSignpostRunLoopQueueBatch);
+    ASSignpostStart(RunLoopQueueBatch, self, "%s", object_getClassName(self));
 
     // Snatch the next batch of items.
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
@@ -278,7 +278,7 @@ static void runLoopSourceCallback(void *info) {
     CFRunLoopWakeUp(_runLoop);
   }
   
-  ASSignpostEnd(ASSignpostRunLoopQueueBatch);
+  ASSignpostEnd(RunLoopQueueBatch, self, "count: %d", (int)count);
 }
 
 - (void)enqueue:(id)object
@@ -440,7 +440,7 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
     return;
   }
   as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-  ASSignpostStart(ASSignpostRunLoopQueueBatch);
+  ASSignpostStart(RunLoopQueueBatch, self, "CATransactionQueue");
   
   // Swap buffers, clear our hash table.
   _internalQueue.swap(_batchBuffer);
@@ -455,7 +455,7 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
   }
   _batchBuffer.clear();
   as_log_verbose(ASDisplayLog(), "processed %lu items", (unsigned long)count);
-  ASSignpostEnd(ASSignpostRunLoopQueueBatch);
+  ASSignpostEnd(RunLoopQueueBatch, self, "count: %d", (int)count);
 }
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object
