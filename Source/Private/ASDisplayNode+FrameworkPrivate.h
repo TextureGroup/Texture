@@ -155,6 +155,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 @property (nonatomic) ASHierarchyState hierarchyState;
 
 /**
+ * Represent the current custom action in representation for the node
+ */
+@property (nonatomic, weak) UIAccessibilityCustomAction *accessibilityCustomAction;
+
+/**
  * @abstract Return if the node is range managed or not
  *
  * @discussion Currently only set interface state on nodes in table and collection views. For other nodes, if they are
@@ -306,6 +311,14 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)_pendingLayoutTransitionDidComplete;
 
 @end
+
+/**
+ * Defines interactive accessibility traits which will be exposed as UIAccessibilityCustomActions
+ * for nodes within nodes that have isAccessibilityContainer is YES
+ */
+NS_INLINE UIAccessibilityTraits ASInteractiveAccessibilityTraitsMask() {
+  return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
+}
 
 @interface ASDisplayNode (AccessibilityInternal)
 - (NSArray *)accessibilityElements;
