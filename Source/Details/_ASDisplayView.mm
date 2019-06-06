@@ -44,7 +44,6 @@
   } _internalFlags;
 
   NSArray *_accessibilityElements;
-  CGRect _lastAccessibilityElementsFrame;
 }
 
 #pragma mark - Class

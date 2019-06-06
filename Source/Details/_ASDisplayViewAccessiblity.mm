@@ -9,6 +9,7 @@
 
 #ifndef ASDK_ACCESSIBILITY_DISABLE
 
+#import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
@@ -246,6 +247,39 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     }
   }
 }
+
+@interface _ASDisplayLayer () {
+  NSArray *_accessibilityElements;
+}
+
+@end
+
+@implementation _ASDisplayLayer (UIAccessibilityContainer)
+
+#pragma mark - UIAccessibility
+
+- (void)setAccessibilityElements:(NSArray *)accessibilityElements
+{
+  ASDisplayNodeAssertMainThread();
+  _accessibilityElements = nil;
+}
+
+- (NSArray *)accessibilityElements
+{
+  ASDisplayNodeAssertMainThread();
+
+  ASDisplayNode *viewNode = self.asyncdisplaykit_node;
+  if (viewNode == nil) {
+    return @[];
+  }
+
+  if (_accessibilityElements == nil) {
+    _accessibilityElements = [viewNode accessibilityElements];
+  }
+  return _accessibilityElements;
+}
+
+@end
 
 @interface _ASDisplayView () {
   NSArray *_accessibilityElements;

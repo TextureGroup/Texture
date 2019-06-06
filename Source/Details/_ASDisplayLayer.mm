@@ -26,6 +26,8 @@
   struct {
     BOOL delegateDidChangeBounds:1;
   } _delegateFlags;
+
+  NSArray *_accessibilityElements;
 }
 
 @dynamic displaysAsynchronously;

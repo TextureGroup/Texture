@@ -44,6 +44,38 @@
   XCTAssertEqual([node.view indexOfAccessibilityElement:node.view.accessibilityElements.firstObject], 0);*/
 }
 
+- (void)testBasicAccessibilityElementsWithView
+{
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  container.frame = CGRectMake(50, 50, 200, 600);
+
+  ASTextNode *text1 = [[ASTextNode alloc] init];
+  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello, world"];
+  text1.frame = CGRectMake(50, 100, 200, 200);
+  text1.layerBacked = YES;
+  [container addSubnode:text1];
+
+  NSArray<UIAccessibilityElement *> *accessibilityElements = container.layer.accessibilityElements;
+  XCTAssertEqual(accessibilityElements.count, 1);
+  XCTAssertEqualObjects(accessibilityElements[0].accessibilityLabel, @"hello, world");
+}
+
+- (void)testBasicAccessibilityElementsWithLayer
+{
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  container.frame = CGRectMake(50, 50, 200, 600);
+
+  ASTextNode *text1 = [[ASTextNode alloc] init];
+  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello, world"];
+  text1.frame = CGRectMake(50, 100, 200, 200);
+  text1.layerBacked = YES;
+  [container addSubnode:text1];
+
+  NSArray<UIAccessibilityElement *> *accessibilityElements = container.layer.accessibilityElements;
+  XCTAssertEqual(accessibilityElements.count, 1);
+  XCTAssertEqualObjects(accessibilityElements[0].accessibilityLabel, @"hello, world");
+}
+
 - (void)testThatSubnodeAccessibilityLabelAggregationWorks
 {
   // Setup nodes
