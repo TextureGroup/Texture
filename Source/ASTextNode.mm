@@ -398,6 +398,12 @@ static NSArray *DefaultLinkAttributeNames() {
   return UIAccessibilityTraitStaticText;
 }
 
+- (BOOL)performAccessibilityCustomActionLink:(UIAccessibilityCustomAction *)action
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  return NO;
+}
+
 #pragma mark - Layout and Sizing
 
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset

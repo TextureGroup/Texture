@@ -13,7 +13,7 @@
 #import <deque>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
@@ -46,6 +46,27 @@
     _accessibilityRange = NSMakeRange(NSNotFound, 0);
   }
   return self;
+}
+
+/// Uses the given layout, node and container node to calculate the accessibility frame for the ASTextNodeAccessiblityElement in screen coordinates.
+- (void)updateFrameWithLayout:(ASTextLayout *)layout containerNode:(nullable ASDisplayNode *) containerNode textNode:(ASDisplayNode *)node
+{
+  // This needs to be in the first non layer nodes coordinates space
+  containerNode = containerNode ?: ASFindClosestViewOfLayer(node.layer).asyncdisplaykit_node;
+  NSCAssert(containerNode != nil, @"No container node found");
+  CGRect textLayoutFrame = CGRectZero;
+  NSRange accessibilityRange = self.accessibilityRange;
+  if (accessibilityRange.location == NSNotFound) {
+    // If no accessibilityRange was specified (as is done for the text element), just use the
+    // label's range and clamp to the visible range otherwise the returned rect would be invalid.
+    NSRange range = NSMakeRange(0, self.accessibilityLabel.length);
+    range = NSIntersectionRange(range, layout.visibleRange);
+    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:range]];
+  } else {
+    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:accessibilityRange]];
+  }
+  CGRect accessibilityFrame = [node convertRect:textLayoutFrame toNode:containerNode];
+  self.accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, containerNode.view);
 }
 
 @end
@@ -336,25 +357,6 @@ static NSArray *DefaultLinkAttributeNames() {
   return UIAccessibilityTraitStaticText;
 }
 
-/// Uses the given layout, node and container node to calculate the accessibiliyty frame for the given ASTextNodeAccessiblityElement in screen coordinates.
-static void ASUpdateAccessibilityFrame(ASTextNodeAccessiblityElement *accessibilityElement, ASTextLayout *layout, ASDisplayNode * _Nullable containerNode, ASDisplayNode *node) {
-  // This needs to be in the first non layer nodes coordinates space
-  containerNode = containerNode ?:  node.firstNonLayerNode;
-  CGRect textLayoutFrame = CGRectZero;
-  NSRange accessibilityRange = accessibilityElement.accessibilityRange;
-  if (accessibilityRange.location == NSNotFound) {
-    // If no accessibilityRange was specified (as is done for the text element), just use the
-    // label's range and clampt to the visible range otherwise the returned rect would be invalid.
-    NSRange range = NSMakeRange(0, accessibilityElement.accessibilityLabel.length);
-    range = NSIntersectionRange(range, layout.visibleRange);
-    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:range]];
-  } else {
-    textLayoutFrame = [layout rectForRange:[ASTextRange rangeWithRange:accessibilityRange]];
-  }
-  CGRect accessibilityFrame = [node convertRect:textLayoutFrame toNode:containerNode];
-  accessibilityElement.accessibilityFrame = UIAccessibilityConvertFrameToScreenCoordinates(accessibilityFrame, containerNode.view);
-}
-
 - (BOOL)isAccessibilityElement
 {
   if (!ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
@@ -381,8 +383,7 @@ static void ASUpdateAccessibilityFrame(ASTextNodeAccessiblityElement *accessibil
     return [super accessibilityElements];
   }
 
-  NSAttributedString *attributedText = _attributedText;
-  NSInteger attributedTextLength = attributedText.length;
+  NSInteger attributedTextLength = _attributedText.length;
   if (attributedTextLength == 0) {
     return @[];
   }
@@ -390,8 +391,9 @@ static void ASUpdateAccessibilityFrame(ASTextNodeAccessiblityElement *accessibil
   NSMutableArray<ASTextNodeAccessiblityElement *> *accessibilityElements = [[NSMutableArray alloc] init];
 
   // Search the first node that is not layer backed
-  ASDisplayNode *containerNode = self.firstNonLayerNode;
-  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, attributedText);
+  ASDisplayNode *containerNode = ASFindClosestViewOfLayer(self.layer).asyncdisplaykit_node;
+  NSCAssert(containerNode != nil, @"No container node found");
+  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, _attributedText);
 
   // Create an accessibility element to represent the label's text. It's not necessary to specify
   // a accessibilityRange here, as the entirety of the text is being represented.
@@ -404,27 +406,49 @@ static void ASUpdateAccessibilityFrame(ASTextNodeAccessiblityElement *accessibil
     accessibilityElement.accessibilityAttributedHint = self.accessibilityAttributedHint;
     accessibilityElement.accessibilityAttributedValue = self.accessibilityAttributedValue;
   }
-  ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
+  [accessibilityElement updateFrameWithLayout:layout containerNode:containerNode textNode:self];
   [accessibilityElements addObject:accessibilityElement];
 
   // Collect all links as accessiblity items
   for (NSString *linkAttributeName in _linkAttributeNames) {
-    [attributedText enumerateAttribute:linkAttributeName inRange:NSMakeRange(0, attributedTextLength) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+    [_attributedText enumerateAttribute:linkAttributeName inRange:NSMakeRange(0, attributedTextLength) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
       if (value == nil) {
         return;
       }
       ASTextNodeAccessiblityElement *accessibilityElement = [[ASTextNodeAccessiblityElement alloc] initWithAccessibilityContainer:self];
       accessibilityElement.accessibilityTraits = UIAccessibilityTraitLink;
-      accessibilityElement.accessibilityLabel = [attributedText.string substringWithRange:range];
+      accessibilityElement.accessibilityLabel = [_attributedText.string substringWithRange:range];
       accessibilityElement.accessibilityRange = range;
       if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
-        accessibilityElement.accessibilityAttributedLabel = [attributedText attributedSubstringFromRange:range];
+        accessibilityElement.accessibilityAttributedLabel = [_attributedText attributedSubstringFromRange:range];
       }
-      ASUpdateAccessibilityFrame(accessibilityElement, layout, containerNode, self);
+      [accessibilityElement updateFrameWithLayout:layout containerNode:containerNode textNode:self];
       [accessibilityElements addObject:accessibilityElement];
     }];
   }
   return accessibilityElements;
+}
+
+// If an ASTextNode2 is member of a node tree that contains a node with isAccessibilityContainer
+// set to YES it will be represented as a UIAccessibilityCustomAction attached to the accessibility
+// container node. The UIAccessibilityCustomAction has as target of the ASTextNode2 itself as well
+// as a action of performAccessibilityCustomAction:
+- (BOOL)performAccessibilityCustomActionLink:(UIAccessibilityCustomAction *)action
+{
+  NSCAssert(0 != (action.accessibilityTraits & UIAccessibilityTraitLink), @"Action needs to have UIAccessibilityTraitLink trait set");
+  NSCAssert([action isKindOfClass:[ASAccessibilityCustomAction class]], @"Action needs to be of kind ASAccessibilityCustomAction");
+  ASAccessibilityCustomAction *customAction = (ASAccessibilityCustomAction *)action;
+
+  // In TextNode2 forward the link custom action to textNode:tappedLinkAttribute:value:atPoint:textRange:
+  // the default method that is available for link handling within ASTextNodeDelegate
+  if ([self.delegate respondsToSelector:@selector(textNode:tappedLinkAttribute:value:atPoint:textRange:)]) {
+    // Convert from screen coordinates to the node coordinate space
+    CGPoint centerAccessibilityFrame = CGPointMake(CGRectGetMidX(customAction.accessibilityFrame), CGRectGetMidY(customAction.accessibilityFrame));
+    CGPoint center = [self.supernode convertPoint:centerAccessibilityFrame fromNode:nil];
+    [self.delegate textNode:(ASTextNode *)self tappedLinkAttribute:NSLinkAttributeName value:customAction.value atPoint:center textRange:customAction.textRange];
+    return YES;
+  }
+  return NO;
 }
 
 

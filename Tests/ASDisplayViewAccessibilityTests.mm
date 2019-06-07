@@ -55,8 +55,15 @@
   [container addSubnode:subnode];
   XCTAssertEqual(container.view.accessibilityElements.count, 1);
 
-  container.accessibilityElements = nil;
-  XCTAssertEqual(container.view.accessibilityElements.count, 1);
+  // Clearing the accessibility elements
+  XCTAssertEqual(container.view.accessibilityElements.count, 1, @"Clearing the accessibility elements should requery the accessibility elements.");
+
+  UIAccessibilityElement *accessibilityElementOne = [[UIAccessibilityElement alloc] initWithAccessibilityContainer:container.view];
+  UIAccessibilityElement *accessibilityElementTwo = [[UIAccessibilityElement alloc] initWithAccessibilityContainer:container.view];
+  container.accessibilityElements = @[accessibilityElementOne, accessibilityElementTwo];
+  XCTAssertEqual(container.view.accessibilityElements.count, 2);
+  XCTAssertEqualObjects(container.view.accessibilityElements[0], accessibilityElementOne);
+  XCTAssertEqualObjects(container.view.accessibilityElements[1], accessibilityElementTwo);
 }
 
 - (void)testThatSubnodeAccessibilityLabelAggregationWorks

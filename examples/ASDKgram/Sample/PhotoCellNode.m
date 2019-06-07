@@ -9,7 +9,6 @@
 
 #import "PhotoCellNode.h"
 
-#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 
@@ -29,30 +28,6 @@
 #define InsetForAvatar UIEdgeInsetsMake(HORIZONTAL_BUFFER, 0, HORIZONTAL_BUFFER, HORIZONTAL_BUFFER)
 #define InsetForHeader UIEdgeInsetsMake(0, HORIZONTAL_BUFFER, 0, HORIZONTAL_BUFFER)
 #define InsetForFooter UIEdgeInsetsMake(VERTICAL_BUFFER, HORIZONTAL_BUFFER, VERTICAL_BUFFER, HORIZONTAL_BUFFER)
-
-
-// If an ASTextNode2 is member of a node tree that contains as accessibility container
-// it will be represented as a UIAccessibilityCustomAction attached to the accessibility container node. The UIAccessibilityCustomAction has as target the
-// ASTextNode2 itself as well as 
-@interface ASTextNode2(UIAccessibilityCustomAction)
-
-- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action;
-
-@end
-
-@implementation ASTextNode2(UIAccessibilityCustomAction)
-
-- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action
-{
-  if ([self.delegate respondsToSelector:@selector(performAccessibilityCustomAction:)]) {
-    return [self.delegate performSelector:@selector(performAccessibilityCustomAction:)
-                               withObject:action];
-  }
-
-  return NO;
-}
-
-@end
 
 @interface PhotoCellNode () <ASNetworkImageNodeDelegate>
 @end
@@ -301,20 +276,10 @@
   return textNode;
 }
 
-- (BOOL)performAccessibilityCustomAction:(UIAccessibilityCustomAction *)action
-{
-  if ([action isKindOfClass:[ASAccessibilityCustomAction class]] && (action.accessibilityTraits & UIAccessibilityTraitLink)) {
-    NSString *linkValue = [(ASAccessibilityCustomAction *)action value];
-    NSLog(@"performAccessibilityCustomAction: Handle link: %@", linkValue);
-    return YES;
-  }
-
-  return NO;
-}
-
 - (void)textNode:(ASTextNode *)textNode tappedLinkAttribute:(NSString *)attribute value:(id)value atPoint:(CGPoint)point textRange:(NSRange)textRange
 {
-  NSLog(@"textNode:tappedLinkAttribute:atPoint:textRange: Handle link: %@", value);
+  NSLog(@"Handle ASTextNode link: %@", value);
+  [[UIApplication sharedApplication] openURL:[NSURL URLWithString:value]];
 }
 
 - (void)setupYogaLayoutIfNeeded

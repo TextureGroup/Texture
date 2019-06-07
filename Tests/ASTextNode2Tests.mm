@@ -544,7 +544,7 @@
   XCTAssertEqual(elements.count, 2);
   XCTAssertEqualObjects([elements[0] accessibilityLabel], attributedText.string);
   XCTAssertEqualObjects([elements[1] accessibilityLabel], link);
-  XCTAssertTrue(([elements[1] accessibilityTraits] & UIAccessibilityTraitLink), @"");
+  XCTAssertTrue(([elements[1] accessibilityTraits] & UIAccessibilityTraitLink), @"Accessibility elements need to have an element with a UIAccessibilityTraitLink trait set on");
 }
 
 - (void)testAccessibilityContainerTwoTextNodesAndOneLayerBackedAndOneWithLinks
