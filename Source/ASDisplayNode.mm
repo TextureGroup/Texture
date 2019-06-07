@@ -3277,7 +3277,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   } else {
     return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:_view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
   }
-  return NO;
 }
 
 - (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop {
