@@ -170,24 +170,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
-  
-  // Responder chain
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(becomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canResignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(resignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(isFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideIsFirstResponder;
-  }
-  
+
   // Layout related methods
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
@@ -907,26 +890,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
-#pragma mark - UIResponder
-
-#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
-  /* All responder methods should be called on the main thread */ \
-  ASDisplayNodeAssertMainThread(); \
-  if (checkFlag(Synchronous)) { \
-    /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
-     expect it's a non _ASDisplayView subclass that will respond */ \
-    return [_view __sel]; \
-  } else { \
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
-    /* If the subclass overwrites canBecomeFirstResponder just call through
-       to it as we expect it will handle it */ \
-      return [_view __sel]; \
-    } else { \
-      /* Call through to _ASDisplayView's superclass to get it handled */ \
-      return [(_ASDisplayView *)_view __##__sel]; \
-    } \
-  } \
-
 - (void)checkResponderCompatibility
 {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
@@ -942,60 +905,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), ([NSString stringWithFormat:message, @"isFirstResponder"]));
   }
 #endif
-}
-
-- (BOOL)__canBecomeFirstResponder
-{
-  if (_view == nil) {
-    // By default we return NO if not view is created yet
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
-}
-
-- (BOOL)__becomeFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canBecomeFirstResponder]) {
-    return NO;
-  }
-
-  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
-}
-
-- (BOOL)__canResignFirstResponder
-{
-  if (_view == nil) {
-    // By default we return YES if no view is created yet
-    return YES;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
-}
-
-- (BOOL)__resignFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canResignFirstResponder]) {
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
-}
-
-- (BOOL)__isFirstResponder
-{
-  if (_view == nil) {
-    // If no view is created yet we can just return NO as it's unlikely it's the first responder
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>

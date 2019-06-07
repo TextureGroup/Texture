@@ -18,18 +18,12 @@
 #import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <OCMock/OCMock.h>
+#import "ASDisplayNodeTestsHelper.h"
 
 @interface ASDisplayViewAccessibilityTests : XCTestCase
 @end
 
 @implementation ASDisplayViewAccessibilityTests
-
-- (void)setUp
-{
-  ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalDisableAccessibilityCache;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-}
 
 - (void)testAccessibilityElementsAccessors
 {
@@ -95,100 +89,63 @@
                         [node.view.accessibilityElements.firstObject accessibilityLabel]);
 }
 
-- (void)testAccessibilityLayerbackedNodesOperationInContainer {
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 400);
-  contianer.backgroundColor = [UIColor grayColor];
-  contianer.isAccessibilityContainer = YES;
-  // Do any additional setup after loading the view, typically from a nib.
-  ASTextNode *text1 = [[ASTextNode alloc] init];
-  text1.layerBacked = YES;
-  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
-  text1.frame = CGRectMake(50, 100, 200, 200);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
-  XCTAssertTrue(elements.count == 1);
-  XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
-  ASTextNode *text2 = [[ASTextNode alloc] init];
-  text2.layerBacked = YES;
-  text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
-  text2.frame = CGRectMake(50, 300, 200, 200);
-  [contianer addSubnode:text2];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements = contianer.view.accessibilityElements;
-  XCTAssertTrue(updatedElements.count == 1);
-  XCTAssertTrue([[updatedElements.firstObject accessibilityLabel] isEqualToString:@"hello, world"]);
-  ASTextNode *text3 = [[ASTextNode alloc] init];
-  text3.attributedText = [[NSAttributedString alloc] initWithString:@"!!!!"];
-  text3.frame = CGRectMake(50, 400, 200, 100);
-  text3.layerBacked = YES;
-  [text2 addSubnode:text3];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
-  XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello, world, !!!!"]);
-}
-
-- (void)testAccessibilityNonLayerbackedNodesOperationInContainer
+- (void)testAccessibilityLayerBackedContainerWithinAccessibilityContainer
 {
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 600);
-  contianer.backgroundColor = [UIColor grayColor];
-  contianer.isAccessibilityContainer = YES;
-  // Do any additional setup after loading the view, typically from a nib.
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  container.frame = CGRectMake(50, 50, 200, 600);
+  container.isAccessibilityContainer = YES;
+
+  ASDisplayNode *subContainer = [[ASDisplayNode alloc] init];
+  subContainer.frame = CGRectMake(50, 50, 200, 600);
+
+  subContainer.layerBacked = YES;
+  subContainer.isAccessibilityContainer = YES;
+  [container addSubnode:subContainer];
+
   ASTextNode *text1 = [[ASTextNode alloc] init];
   text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
   text1.frame = CGRectMake(50, 100, 200, 200);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
-  XCTAssertTrue(elements.count == 1);
-  XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
+  text1.layerBacked = YES;
+  [subContainer addSubnode:text1];
+
   ASTextNode *text2 = [[ASTextNode alloc] init];
   text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
   text2.frame = CGRectMake(50, 300, 200, 200);
-  [contianer addSubnode:text2];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements = contianer.view.accessibilityElements;
-  XCTAssertTrue(updatedElements.count == 1);
-  XCTAssertTrue([[updatedElements.firstObject accessibilityLabel] isEqualToString:@"hello, world"]);
-  ASTextNode *text3 = [[ASTextNode alloc] init];
-  text3.attributedText = [[NSAttributedString alloc] initWithString:@"!!!!"];
-  text3.frame = CGRectMake(50, 400, 200, 100);
-  [text2 addSubnode:text3];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
-  XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello, world, !!!!"]);
+  text2.layerBacked = YES;
+  [subContainer addSubnode:text2];
+
+  NSArray<UIAccessibilityElement *> *accessibilityElements = container.view.accessibilityElements;
+  XCTAssertEqual(accessibilityElements.count, 2);
+  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"hello, world");
 }
 
 - (void)testAccessibilityNonLayerbackedNodesOperationInNonContainer
 {
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 600);
-  contianer.backgroundColor = [UIColor grayColor];
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:container];
+  [window makeKeyAndVisible];
+
+  container.frame = CGRectMake(50, 50, 200, 600);
+  container.backgroundColor = [UIColor grayColor];
   // Do any additional setup after loading the view, typically from a nib.
   ASTextNode *text1 = [[ASTextNode alloc] init];
   text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
   text1.frame = CGRectMake(50, 100, 200, 200);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
+  [container addSubnode:text1];
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+  NSArray<UIAccessibilityElement *> *elements = container.view.accessibilityElements;
   XCTAssertTrue(elements.count == 1);
   XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   ASTextNode *text2 = [[ASTextNode alloc] init];
   text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
   text2.frame = CGRectMake(50, 300, 200, 200);
-  [contianer addSubnode:text2];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements = contianer.view.accessibilityElements;
+  [container addSubnode:text2];
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+   ASCATransactionQueueWait(nil);
+  NSArray<UIAccessibilityElement *> *updatedElements = container.view.accessibilityElements;
   XCTAssertTrue(updatedElements.count == 2);
   XCTAssertTrue([[updatedElements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   XCTAssertTrue([[updatedElements.lastObject accessibilityLabel] isEqualToString:@"world"]);
@@ -196,78 +153,14 @@
   text3.attributedText = [[NSAttributedString alloc] initWithString:@"!!!!"];
   text3.frame = CGRectMake(50, 400, 200, 100);
   [text2 addSubnode:text3];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
+  [container layoutIfNeeded];
+  [container.layer displayIfNeeded];
+  ASCATransactionQueueWait(nil);
+  NSArray<UIAccessibilityElement *> *updatedElements2 = container.view.accessibilityElements;
   //text3 won't be read out cause it's overshadowed by text2
   XCTAssertTrue(updatedElements2.count == 2);
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   XCTAssertTrue([[updatedElements2.lastObject accessibilityLabel] isEqualToString:@"world"]);
-}
-- (void)testAccessibilityLayerbackedNodesOperationInNonContainer
-{
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 600);
-  contianer.backgroundColor = [UIColor grayColor];
-  // Do any additional setup after loading the view, typically from a nib.
-  ASTextNode *text1 = [[ASTextNode alloc] init];
-  text1.layerBacked = YES;
-  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
-  text1.frame = CGRectMake(50, 0, 100, 100);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
-  XCTAssertTrue(elements.count == 1);
-  XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
-  ASTextNode *text2 = [[ASTextNode alloc] init];
-  text2.layerBacked = YES;
-  text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
-  text2.frame = CGRectMake(50, 100, 100, 100);
-  [contianer addSubnode:text2];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements = contianer.view.accessibilityElements;
-  XCTAssertTrue(updatedElements.count == 2);
-  XCTAssertTrue([[updatedElements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
-  XCTAssertTrue([[updatedElements.lastObject accessibilityLabel] isEqualToString:@"world"]);
-  ASTextNode *text3 = [[ASTextNode alloc] init];
-  text3.layerBacked = YES;
-  text3.attributedText = [[NSAttributedString alloc] initWithString:@"!!!!"];
-  text3.frame = CGRectMake(50, 200, 100, 100);
-  [text2 addSubnode:text3];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *updatedElements2 = contianer.view.accessibilityElements;
-  //text3 won't be read out cause it's overshadowed by text2
-  XCTAssertTrue(updatedElements2.count == 2);
-  XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello"]);
-  XCTAssertTrue([[updatedElements2.lastObject accessibilityLabel] isEqualToString:@"world"]);
-}
-
-- (void)testAccessibilityUpdatesWithElementsChanges
-{
-  ASDisplayNode *contianer = [[ASDisplayNode alloc] init];
-  contianer.frame = CGRectMake(50, 50, 200, 600);
-  contianer.backgroundColor = [UIColor grayColor];
-  contianer.isAccessibilityContainer = YES;
-  // Do any additional setup after loading the view, typically from a nib.
-  ASTextNode *text1 = [[ASTextNode alloc] init];
-  text1.layerBacked = YES;
-  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
-  text1.frame = CGRectMake(50, 0, 100, 100);
-  [contianer addSubnode:text1];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements = contianer.view.accessibilityElements;
-  XCTAssertTrue(elements.count == 1);
-  XCTAssertTrue([[elements.firstObject accessibilityLabel] isEqualToString:@"hello"]);
-  text1.attributedText = [[NSAttributedString alloc] initWithString:@"greeting"];
-  [contianer layoutIfNeeded];
-  [contianer.layer displayIfNeeded];
-  NSArray<UIAccessibilityElement *> *elements2 = contianer.view.accessibilityElements;
-  XCTAssertTrue(elements2.count == 1);
-  XCTAssertTrue([[elements2.firstObject accessibilityLabel] isEqualToString:@"greeting"]);
 }
 
 #pragma mark -

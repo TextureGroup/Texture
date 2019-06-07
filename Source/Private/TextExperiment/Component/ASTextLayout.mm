@@ -971,15 +971,16 @@ dispatch_semaphore_signal(_lock);
       [truncationToken enumerateAttributesInRange:NSMakeRange(0, truncationToken.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     }
   }
-  
-  attachments = [NSMutableArray new];
-  attachmentRanges = [NSMutableArray new];
-  attachmentRects = [NSMutableArray new];
-  attachmentContentsSet = [NSMutableSet new];
   for (NSUInteger i = 0, max = lines.count; i < max; i++) {
     ASTextLine *line = lines[i];
     if (truncatedLine && line.index == truncatedLine.index) line = truncatedLine;
     if (line.attachments.count > 0) {
+      if (!attachments) {
+        attachments = [[NSMutableArray alloc] init];
+        attachmentRanges = [[NSMutableArray alloc] init];
+        attachmentRects = [[NSMutableArray alloc] init];
+        attachmentContentsSet = [[NSMutableSet alloc] init];
+      }
       [attachments addObjectsFromArray:line.attachments];
       [attachmentRanges addObjectsFromArray:line.attachmentRanges];
       [attachmentRects addObjectsFromArray:line.attachmentRects];
@@ -989,9 +990,6 @@ dispatch_semaphore_signal(_lock);
         }
       }
     }
-  }
-  if (attachments.count == 0) {
-    attachments = attachmentRanges = attachmentRects = nil;
   }
 
   layout.frame = ctFrame;
@@ -2146,7 +2144,9 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
       } else {
-        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset, startLine.height);
+        // TODO: Fixes highlighting first row only to the end of the text and not highlight
+        //       the while line to the end. Needs to brought over to multiline support
+        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
       }
     }
     [rects addObject:topRect];
