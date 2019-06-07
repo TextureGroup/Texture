@@ -105,6 +105,14 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 }
 #endif
 
+- (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled
+{
+  [super setUserInteractionEnabled:userInteractionEnabled];
+  if (!ASActivateExperimentalFeature(ASExperimentalTextNode2A11YContainer)) {
+    self.isAccessibilityElement = userInteractionEnabled;
+  }
+}
+
 - (void)__exitHierarchy
 {
   [super __exitHierarchy];
