@@ -107,4 +107,55 @@
   XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
 }
 
+- (void)testAccessibilityLayerBackedSubContainerWithinContainer
+{
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  container.frame = CGRectMake(50, 50, 200, 600);
+
+  ASDisplayNode *subContainer = [[ASDisplayNode alloc] init];
+  subContainer.frame = CGRectMake(50, 50, 200, 600);
+
+  // SubContainer is explicitly layerBacked
+  subContainer.layerBacked = YES;
+  subContainer.isAccessibilityContainer = YES;
+  [container addSubnode:subContainer];
+
+  ASTextNode *text1 = [[ASTextNode alloc] init];
+  text1.attributedText = [[NSAttributedString alloc] initWithString:@"hello"];
+  text1.frame = CGRectMake(50, 100, 200, 200);
+  text1.layerBacked = YES;
+  [subContainer addSubnode:text1];
+
+  // This is a text that acts like a button
+  ASTextNode *text2 = [[ASTextNode alloc] init];
+  text2.accessibilityTraits = UIAccessibilityTraitButton;
+  text2.attributedText = [[NSAttributedString alloc] initWithString:@"world"];
+  text2.frame = CGRectMake(50, 300, 200, 200);
+  text2.layerBacked = YES;
+  [subContainer addSubnode:text2];
+
+  // Setting the container explicitly as no accessibility container
+  container.isAccessibilityContainer = NO;
+
+  // TODO(maicki): I this the right output??
+  // TODO(maicki): Should this return an accessibility custom actions somewhere?
+  // TODO(maicki): This needs to be newly handled: a container that is not layer backed and not an accessiblity container and a subcontainer that is layer backed and a accessibiilty container
+  NSArray<UIAccessibilityElement *> *accessibilityElements = container.view.accessibilityElements;
+  XCTAssertEqual(accessibilityElements.count, 2);
+  XCTAssertEqualObjects(accessibilityElements[0].accessibilityLabel, @"hello");
+  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"world");
+
+//  container.isAccessibilityContainer = YES;
+//  container.view.accessibilityElements = nil;
+//  accessibilityElements = container.view.accessibilityElements;
+//
+//  // TODO(maicki): I this the right output??
+//  XCTAssertEqual(accessibilityElements.count, 2);
+//
+//  NSArray<UIAccessibilityCustomAction *> *firstAccessibilityElementCustomActions = accessibilityElements[1].accessibilityCustomActions;
+//  XCTAssertEqual(firstAccessibilityElementCustomActions.count, 1);
+//  XCTAssertEqualObjects(firstAccessibilityElementCustomActions[0].name, @"world");
+//  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"hello");
+}
+
 @end
