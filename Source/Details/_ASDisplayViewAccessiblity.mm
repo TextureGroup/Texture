@@ -504,16 +504,6 @@ static void CollectAccessibilityElementsWithTextNodeLinkHandling(ASDisplayNode *
 
 @implementation ASDisplayNode (AccessibilityInternal)
 
-- (BOOL)isAccessibilityElement
-{
-  if (!self.isNodeLoaded) {
-    ASDisplayNodeFailAssert(@"Cannot access isAccessibilityElement since node is not loaded");
-    return [super isAccessibilityElement];
-  }
-
-  return [_view isAccessibilityElement];
-}
-
 - (NSInteger)accessibilityElementCount
 {
   if (!self.isNodeLoaded) {
