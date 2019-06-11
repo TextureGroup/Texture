@@ -130,9 +130,10 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
   if (view == nil) {
     return;
   }
+
+  // Accessibility element that represents the accessibility container
   UIAccessibilityElement *accessiblityElement =
-      [ASAccessibilityElement accessibilityElementWithContainer:view
-                                                           node:container];
+      [ASAccessibilityElement accessibilityElementWithContainer:view node:container];
 
   NSMutableArray<ASAccessibilityElement *> *labeledNodes = [[NSMutableArray alloc] init];
   NSMutableArray<ASAccessibilityCustomAction *> *actions = [[NSMutableArray alloc] init];
@@ -152,6 +153,9 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
     queue.pop();
 
     if (node != container && node.isAccessibilityContainer) {
+      // TODO(maicki): I think this needs to change and use a containerView / containerNode passed in here ...
+      // This should handle multiple container in containers
+      // TODO(maicki): Shoud we flatten this?
       UIView *containerView = node.isLayerBacked ? view : node.view;
       CollectAccessibilityElementsForContainer(node, containerView, elements);
       continue;
@@ -237,7 +241,6 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
         // Accessiblity element is not layer backed just add the view as accessibility element
         [elements addObject:subnode.view];
       }
-      // TODO(maicki): Do we have to handle a subnode accessibility container
     } else if (subnode.isAccessibilityContainer) {
       // Handle subnodes that are accessibility containers
       CollectAccessibilityElementsForContainer(subnode, view, elements);

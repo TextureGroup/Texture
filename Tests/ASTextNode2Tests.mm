@@ -107,6 +107,13 @@
   XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
 }
 
+// Node (isAccessibilityContainer = YES / NO)
+//  - Node (layerBacked = YES, isAccessibilityContainer = YES)
+//    - ASTextNode (layerBacked = YES)
+//    - ASTextNode (layerBacked = YES, accessibilityTraits = UIAccessibilityTraitButton)
+// Result??:
+// The fix would be within _ASDisplayViewAccessibility
+
 - (void)testAccessibilityLayerBackedSubContainerWithinContainer
 {
   ASDisplayNode *container = [[ASDisplayNode alloc] init];
@@ -140,22 +147,43 @@
   // TODO(maicki): I this the right output??
   // TODO(maicki): Should this return an accessibility custom actions somewhere?
   // TODO(maicki): This needs to be newly handled: a container that is not layer backed and not an accessiblity container and a subcontainer that is layer backed and a accessibiilty container
-  NSArray<UIAccessibilityElement *> *accessibilityElements = container.view.accessibilityElements;
-  XCTAssertEqual(accessibilityElements.count, 2);
-  XCTAssertEqualObjects(accessibilityElements[0].accessibilityLabel, @"hello");
-  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"world");
 
-//  container.isAccessibilityContainer = YES;
-//  container.view.accessibilityElements = nil;
-//  accessibilityElements = container.view.accessibilityElements;
-//
-//  // TODO(maicki): I this the right output??
-//  XCTAssertEqual(accessibilityElements.count, 2);
-//
-//  NSArray<UIAccessibilityCustomAction *> *firstAccessibilityElementCustomActions = accessibilityElements[1].accessibilityCustomActions;
-//  XCTAssertEqual(firstAccessibilityElementCustomActions.count, 1);
-//  XCTAssertEqualObjects(firstAccessibilityElementCustomActions[0].name, @"world");
-//  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"hello");
+  // This should be fine as the accessibility element represents the accessibility container
+  NSArray<UIAccessibilityElement *> *accessibilityElements = nil;
+//  NSArray<UIAccessibilityElement *> *accessibilityElements = container.view.accessibilityElements;
+
+  // UIAccessibilityElement (accessibilityLabel = "hello")
+  //  - UIAccessibilityCustomAction (name = "world")
+
+  // We have one element that represents the subContainer
+//  XCTAssertEqual(accessibilityElements.count, 1);
+
+  // The sub container element has the flattened text of hello
+//  XCTAssertEqualObjects(accessibilityElements[0].accessibilityLabel, @"hello");
+
+  // The sub container element has the custom action for the other text node
+//  NSArray<UIAccessibilityCustomAction *> *accessibilityCustomActions = accessibilityElements[0].accessibilityCustomActions;
+//  XCTAssertEqual(accessibilityCustomActions.count, 1);
+//  XCTAssertEqualObjects(accessibilityCustomActions[0].name, @"world");
+
+  // Change container settings
+  container.isAccessibilityContainer = YES;
+  container.view.accessibilityElements = nil; // Clear accessibilityElements elements cache
+  accessibilityElements = container.view.accessibilityElements; // Requery elements
+
+  // TODO(maicki): Should the first a11y element be optimized away?
+  // UIAccessibilityElement (accessibilityLabel = nil, accessibilityCustomActions = [])
+  // UIAccessibilityElement (accessibilityLabel = "hello")
+  //  - UIAccessibilityCustomAction (name = "world")
+
+  // We have two elements one that represents the subContainer and one that is the text node
+  XCTAssertEqual(accessibilityElements.count, 2);
+  XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"hello");
+
+  // Sub container representation has the custom action set on it
+  NSArray<UIAccessibilityCustomAction *> *firstAccessibilityElementCustomActions = accessibilityElements[1].accessibilityCustomActions;
+  XCTAssertEqual(firstAccessibilityElementCustomActions.count, 1);
+  XCTAssertEqualObjects(firstAccessibilityElementCustomActions[0].name, @"world");
 }
 
 @end
