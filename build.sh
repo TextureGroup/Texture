@@ -159,7 +159,7 @@ fi
 
 # Support building a specific example: sh build.sh example examples/ASDKLayoutTransition
 if [ "$MODE" = "example" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying $2 compiles."
     #Update cocoapods repo
     pod repo update master
 
