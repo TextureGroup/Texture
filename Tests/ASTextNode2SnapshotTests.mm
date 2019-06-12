@@ -298,4 +298,23 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
+- (void)testThatDefaultTruncationTokenAttributesAreInheritedFromTextWhenTruncated_ASTextNode2
+{
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(20, 80);
+
+  // Set initial attributed text
+  textNode.attributedText = [[NSMutableAttributedString alloc] initWithString:@"Quality is an important thing" attributes:@{NSForegroundColorAttributeName : [UIColor greenColor]}];
+
+  // Trigger sizing for internal composed truncation text creation
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+
+  // Change attributed text with different foreground color
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is an important thing" attributes:@{NSForegroundColorAttributeName : [UIColor grayColor]}];
+
+  // Size again and verify snapshot
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
 @end
