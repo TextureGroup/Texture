@@ -202,6 +202,7 @@ if [ "$MODE" = "carthage" -o "$MODE" = "all" ]; then
     echo "Verifying carthage works."
     
     set -o pipefail && carthage update && carthage build --no-skip-current
+    success="1"
 fi
 
 if [ "$success" = "1" ]; then 
