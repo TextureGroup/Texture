@@ -281,10 +281,7 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
-/**
- * https://github.com/TextureGroup/Texture/issues/822
- */
-- (void)DISABLED_testThatTruncationTokenAttributesPrecedeThoseInheritedFromTextWhenTruncateTailMode_ASTextNode2
+- (void)testThatTruncationTokenAttributesPrecedeThoseInheritedFromTextWhenTruncateTailMode_ASTextNode2
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.style.maxSize = CGSizeMake(20, 80);
