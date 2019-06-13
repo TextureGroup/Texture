@@ -164,7 +164,6 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
   NSAttributedString *_additionalTruncationMessage;
-  NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
   NSLineBreakMode _truncationMode;
   
@@ -1199,16 +1198,6 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 #pragma mark - Truncation Message
 
-static NSAttributedString *DefaultTruncationAttributedString()
-{
-  static NSAttributedString *defaultTruncationAttributedString;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    defaultTruncationAttributedString = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"\u2026", @"Default truncation string")];
-  });
-  return defaultTruncationAttributedString;
-}
-
 - (void)_ensureTruncationText
 {
   ASLockScopeSelf();
@@ -1268,7 +1257,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
     }
     
     _textContainer.truncationType = truncationType;
-    
+
+    [self _invalidateTruncationText];
     [self setNeedsDisplay];
   }
 }
@@ -1300,6 +1290,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 {
   ASLockScopeSelf();
   if (ASCompareAssign(_textContainer.maximumNumberOfRows, maximumNumberOfLines)) {
+    [self _invalidateTruncationText];
     [self setNeedsDisplay];
   }
 }
@@ -1355,48 +1346,18 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)_locked_composedTruncationText
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (_composedTruncationText == nil) {
-    if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
-      NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
-      [newComposedTruncationString.mutableString appendString:@" "];
-      [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
-      _composedTruncationText = newComposedTruncationString;
-    } else if (_truncationAttributedText != nil) {
-      _composedTruncationText = _truncationAttributedText;
-    } else if (_additionalTruncationMessage != nil) {
-      _composedTruncationText = _additionalTruncationMessage;
-    } else {
-      _composedTruncationText = DefaultTruncationAttributedString();
-    }
-    _composedTruncationText = [self _locked_prepareTruncationStringForDrawing:_composedTruncationText];
+  NSAttributedString *composedTruncationText = nil;
+  if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
+    NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
+    [newComposedTruncationString.mutableString appendString:@" "];
+    [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
+    composedTruncationText = newComposedTruncationString;
+  } else if (_truncationAttributedText != nil) {
+    composedTruncationText = _truncationAttributedText;
+  } else if (_additionalTruncationMessage != nil) {
+    composedTruncationText = _additionalTruncationMessage;
   }
-  return _composedTruncationText;
-}
-
-/**
- * - cleanses it of core text attributes so TextKit doesn't crash
- * - Adds whole-string attributes so the truncation message matches the styling
- * of the body text
- */
-- (NSAttributedString *)_locked_prepareTruncationStringForDrawing:(NSAttributedString *)truncationString
-{
-  DISABLED_ASAssertLocked(__instanceLock__);
-  NSMutableAttributedString *truncationMutableString = [truncationString mutableCopy];
-  // Grab the attributes from the full string
-  if (_attributedText.length > 0) {
-    NSAttributedString *originalString = _attributedText;
-    NSInteger originalStringLength = _attributedText.length;
-    // Add any of the original string's attributes to the truncation string,
-    // but don't overwrite any of the truncation string's attributes
-    NSDictionary *originalStringAttributes = [originalString attributesAtIndex:originalStringLength-1 effectiveRange:NULL];
-    [truncationString enumerateAttributesInRange:NSMakeRange(0, truncationString.length) options:0 usingBlock:
-     ^(NSDictionary *attributes, NSRange range, BOOL *stop) {
-       NSMutableDictionary *futureTruncationAttributes = [originalStringAttributes mutableCopy];
-       [futureTruncationAttributes addEntriesFromDictionary:attributes];
-       [truncationMutableString setAttributes:futureTruncationAttributes range:range];
-     }];
-  }
-  return truncationMutableString;
+  return composedTruncationText;
 }
 
 #if AS_TEXTNODE2_RECORD_ATTRIBUTED_STRINGS

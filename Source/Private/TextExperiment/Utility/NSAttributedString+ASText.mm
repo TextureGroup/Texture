@@ -37,6 +37,52 @@
   return [self as_attributesAtIndex:0];
 }
 
+- (NSDictionary *)as_ctAttributes {
+  NSDictionary *attributes = self.as_attributes;
+  if (attributes == nil) {
+    return nil;
+  }
+
+  NSMutableDictionary *mutableCTAttributes = [[NSMutableDictionary alloc] initWithCapacity:attributes.count];
+
+  // Map for NS attributes that are not mapping cleanly to CT attributes
+  static NSDictionary *NSToCTAttributeNamesMap = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSToCTAttributeNamesMap = @{
+      NSFontAttributeName:            (NSString *)kCTFontAttributeName,
+      NSBackgroundColorAttributeName: (NSString *)kCTBackgroundColorAttributeName,
+      NSForegroundColorAttributeName: (NSString *)kCTForegroundColorAttributeName,
+      NSUnderlineColorAttributeName:  (NSString *)kCTUnderlineColorAttributeName,
+      NSUnderlineStyleAttributeName:  (NSString *)kCTUnderlineStyleAttributeName,
+      NSStrokeWidthAttributeName:     (NSString *)kCTStrokeWidthAttributeName,
+      NSStrokeColorAttributeName:     (NSString *)kCTStrokeColorAttributeName,
+      NSKernAttributeName:            (NSString *)kCTKernAttributeName,
+      NSLigatureAttributeName:        (NSString *)kCTLigatureAttributeName
+    };
+  });
+
+  BOOL isMutableParagraphStyleAvailable = [NSMutableParagraphStyle class];
+  [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
+    key = NSToCTAttributeNamesMap[key] ?: key;
+    if (!isMutableParagraphStyleAvailable) {
+      // Support < iOS 10.0
+      if ([value isKindOfClass:[UIFont class]]) {
+        UIFont *font = (UIFont *)value;
+        CTFontRef ctfont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
+        [mutableCTAttributes setObject:(__bridge id)ctfont forKey:key];
+        CFRelease(ctfont);
+        return;
+      } else if ([value isKindOfClass:[UIColor class]]) {
+        value = (__bridge id)((UIColor *)value).CGColor;
+      }
+    }
+    [mutableCTAttributes setObject:value forKey:key];
+  }];
+
+  return [mutableCTAttributes copy];
+}
+
 - (UIFont *)as_font {
   return [self as_fontAtIndex:0];
 }

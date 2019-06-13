@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy, readonly) NSDictionary<NSString *, id> *as_attributes;
 
 /**
+ Returns the attributes at the first character as Core Text attributes if NS attributes.
+ */
+@property (nullable, nonatomic, copy, readonly) NSDictionary<NSString *, id> *as_ctAttributes;
+
+/**
  Returns the attributes for the character at a given index.
  
  @discussion Raises an `NSRangeException` if index lies beyond the end of the

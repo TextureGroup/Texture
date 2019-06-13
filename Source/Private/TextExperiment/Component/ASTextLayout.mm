@@ -777,44 +777,39 @@ dispatch_semaphore_signal(_lock);
       NSRange lastRange = lastLine.range;
       visibleRange.length = lastRange.location + lastRange.length - visibleRange.location;
 
-      // create truncated line
+      // Create truncated line
       if (container.truncationType != ASTextTruncationTypeNone) {
         CTLineRef truncationTokenLine = NULL;
-        if (container.truncationToken) {
-          truncationToken = container.truncationToken;
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
-        } else {
-          CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
-          NSUInteger runCount = CFArrayGetCount(runs);
-          NSMutableDictionary *attrs = nil;
-          if (runCount > 0) {
-            CTRunRef run = (CTRunRef) CFArrayGetValueAtIndex(runs, runCount - 1);
-            attrs = (id) CTRunGetAttributes(run);
-            attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
-            [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
-            CTFontRef font = (__bridge CTFontRef) attrs[(id) kCTFontAttributeName];
-            CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
-            UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
-            if (uiFont) {
-              font = CTFontCreateWithName((__bridge CFStringRef) uiFont.fontName, uiFont.pointSize, NULL);
-            } else {
-              font = NULL;
-            }
-            if (font) {
-              attrs[(id) kCTFontAttributeName] = (__bridge id) (font);
-              uiFont = nil;
-              CFRelease(font);
-            }
-            CGColorRef color = (__bridge CGColorRef) (attrs[(id) kCTForegroundColorAttributeName]);
-            if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
-              // ignore clear color
-              [attrs removeObjectForKey:(id) kCTForegroundColorAttributeName];
-            }
-            if (!attrs) attrs = [NSMutableDictionary new];
+        CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
+        NSUInteger runCount = CFArrayGetCount(runs);
+        NSString *string = ASTextTruncationToken;
+        NSMutableDictionary *attrs = nil;
+        if (runCount > 0) {
+
+          // Get last line run
+          CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, runCount - 1);
+
+          // Attributes from last run
+          attrs = (id)CTRunGetAttributes(run);
+          attrs = attrs ? [attrs mutableCopy] : [[NSMutableDictionary alloc] init];
+          [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
+
+          if (container.truncationToken) {
+            string = container.truncationToken.string;
+
+            // Merge attributes from given truncation token and last line
+            NSDictionary<NSAttributedStringKey, id> *truncationTokenCTAttributes = [container.truncationToken as_ctAttributes];
+            [attrs addEntriesFromDictionary:truncationTokenCTAttributes];
           }
-          truncationToken = [[NSAttributedString alloc] initWithString:ASTextTruncationToken attributes:attrs];
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
+
+          // Ignore clear color
+          CGColorRef color = (__bridge CGColorRef)attrs[(id)kCTForegroundColorAttributeName];
+          if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
+            [attrs removeObjectForKey:(id)kCTForegroundColorAttributeName];
+          }
         }
+        truncationToken = [[NSAttributedString alloc] initWithString:string attributes:attrs];
+        truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
         if (truncationTokenLine) {
           CTLineTruncationType type = kCTLineTruncationEnd;
           if (container.truncationType == ASTextTruncationTypeStart) {
