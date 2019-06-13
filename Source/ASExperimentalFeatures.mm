@@ -22,7 +22,6 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_did_enter_preload_skip_asm_layout",
                                       @"exp_dispatch_apply",
                                       @"exp_oom_bg_dealloc_disable",
-                                      @"exp_transaction_operation_retain_cycle",
                                       @"exp_remove_textkit_initialising_lock",
                                       @"exp_drawing_global"]));
   if (flags == ASExperimentalFeatureAll) {
