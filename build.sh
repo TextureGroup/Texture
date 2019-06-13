@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=10.2,name=iPhone 7}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator11.4}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator12.2}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -159,7 +159,7 @@ fi
 
 # Support building a specific example: sh build.sh example examples/ASDKLayoutTransition
 if [ "$MODE" = "example" ]; then
-    echo "Verifying that all AsyncDisplayKit examples compile."
+    echo "Verifying $2 compiles."
     #Update cocoapods repo
     pod repo update master
 
@@ -202,6 +202,7 @@ if [ "$MODE" = "carthage" -o "$MODE" = "all" ]; then
     echo "Verifying carthage works."
     
     set -o pipefail && carthage update && carthage build --no-skip-current
+    success="1"
 fi
 
 if [ "$success" = "1" ]; then 
