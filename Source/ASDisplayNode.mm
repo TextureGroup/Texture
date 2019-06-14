@@ -878,6 +878,18 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   _flags.automaticallyRelayoutOnLayoutMarginsChanges = flag;
 }
 
+- (BOOL)placeholderEnabled
+{
+  MutexLocker l(__instanceLock__);
+  return _flags.placeholderEnabled;
+}
+
+- (void)setPlaceholderEnabled:(BOOL)flag
+{
+  MutexLocker l(__instanceLock__);
+  _flags.placeholderEnabled = flag;
+}
+
 - (void)__setNodeController:(ASNodeController *)controller
 {
   // See docs for why we don't lock.
