@@ -109,7 +109,7 @@
 #endif
   [ASConfigurationManager test_resetWithConfiguration:config];
 
-  self.recordMode = YES;
+  self.recordMode = NO;
 }
 
 - (void)tearDown
@@ -281,7 +281,7 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
-- (void)testThatTruncationTokenDefaultInheritesAttributesFromText
+- (void)testThatTruncationTokenDefaultInheritsAttributesFromText
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.style.maxSize = CGSizeMake(20, 80);
