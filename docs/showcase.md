@@ -277,6 +277,13 @@ permalink: /showcase.html
         <br /> 
         <b>App in the Air</b>
         </td>
+
+		<td align="center" valign="top">
+        <a href="https://apps.apple.com/us/app/longwalks-a-conversation-app/id1412531085"><img class="roundrect" src="https://media.licdn.com/dms/image/C560BAQEEl1y2TT6fxg/company-logo_200_200/0?e=2159024400&v=beta&t=ZdIFP0AXZiAHgw2_0sJHvCv9z6dO7JF8O-fnCqc2530" style="width:100px;height:100px;"></a>
+        <br /> 
+        <b>Longwalks</b>
+        </td>
+		
 		
 		<td align="center" valign="top">
 		</td>
