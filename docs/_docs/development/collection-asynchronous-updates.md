@@ -46,9 +46,13 @@ At any given time, ASDataController's `pendingMap` is the latest map fetched fro
 
 Each change set is processed in 5 steps:
 1. The process starts on the main thread. At this point, `pendingMap` and `visibleMap` are the same. A mutable copy of `pendingMap` is made and then updated according to the change set. This includes removing old items and asking the data source for information regarding newly inserted items, such as node block and constrained size. At the end of this step, `pendingMap` is updated to reflect the data source's world view.
+
 2. This is an optional step that is only run if a layout delegate is set to the data controller. By default, the data controller allocates and measures all new items in one pass (step 3). Having a layout delegate allows other classes to customize this behavior. ASCollectionLayout, for example, allocates and measures just enough cells to fill the visible viewport and a bit more. It will allocate more cells on demand as user scrolls. In order to do this, the layout delegate may need to construct a context which must happen on the same main thread run loop and this is the last chance to do so -- the next step will be on a background thread.
+
 3. On `_editingTransactionQueue`, allocate and measure all elements in the pending map, or call out to the layout delegate and let it decide. At the end of this step, elements are ready to be consumed by the backing view.
+
 4. Dispatch back to main thread using `_mainSerialQueue` by scheduling the next step (step 5) in a block and add it to the queue. If there are any other blocks scheduled to the queue before this point and are not yet consumed, they will be executed before step 5.
+
 5. Notify ASRangeController, collection view's layout facilitator and, more importantly, the collection view itself about the new change set. ASCollectionView calls its superclass to perform a batch update in which ASDataController's pending map is deployed as the visible map. UICollectionView requires the new data set to be deployed within the `updates` block of `-[UICollectionView performBatchUpdates:completion:`. It also requires edit operations to be in a specific order which is validated by the change set before step 1 (see `-[_ASHierarchyChangeSet markCompletedWithNewItemCounts:]`). The order is strictly followed by ASCollectionView when it relays the edits to UICollectionView.
 
 # Animations
