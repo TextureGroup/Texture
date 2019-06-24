@@ -1722,10 +1722,14 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
-  if (event == kCAOnOrderIn) {
-    [self __enterHierarchy];
-  } else if (event == kCAOnOrderOut) {
-    [self __exitHierarchy];
+  // Only drive __enterHierarchy and __exitHierarchy if the node is layer-backed.
+  // View-backed nodes handle them in _ASDisplayView's -willMoveToWindow: and -didMoveToWindow.
+  if (self.isLayerBacked) {
+    if (event == kCAOnOrderIn) {
+      [self __enterHierarchy];
+    } else if (event == kCAOnOrderOut) {
+      [self __exitHierarchy];
+    }
   }
 
   return [self layerActionForKey:event];

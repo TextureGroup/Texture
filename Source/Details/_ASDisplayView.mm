@@ -99,6 +99,24 @@
   return nodeAction;
 }
 
+- (void)willMoveToWindow:(UIWindow *)newWindow
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  BOOL visible = (newWindow != nil);
+  if (visible && !node.inHierarchy) {
+    [node __enterHierarchy];
+  }
+}
+
+- (void)didMoveToWindow
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  BOOL visible = (self.window != nil);
+  if (!visible && node.inHierarchy) {
+    [node __exitHierarchy];
+  }
+}
+
 - (void)willMoveToSuperview:(UIView *)newSuperview
 {
   // Keep the node alive while the view is in a view hierarchy.  This helps ensure that async-drawing views can always
