@@ -292,7 +292,10 @@ static NSArray *DefaultLinkAttributeNames() {
   for (NSString *linkAttributeName in _linkAttributeNames) {
     __block BOOL hasLink = NO;
     [attributedText enumerateAttribute:linkAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-      hasLink = (value != nil);
+      if (value == nil) {
+        return;
+      }
+      hasLink = YES;
       *stop = YES;
     }];
     if (hasLink) {
