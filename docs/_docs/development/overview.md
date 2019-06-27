@@ -14,15 +14,15 @@ Here are the main directories within the repository:
 - [Source](https://github.com/TextureGroup/Texture/tree/master/Source): All source code of the framework resides here
   - [Base](https://github.com/TextureGroup/Texture/tree/master/Source/Base): Helper and utility files used throughout the framework.
   - [Debug](https://github.com/TextureGroup/Texture/tree/master/Source/Debug): Files used for debugging functionalities.
-  - [Details](https://github.com/TextureGroup/Texture/tree/master/Source/Details): Implementaion details of the framework that are exposed to end users.
-  - [Layout](https://github.com/TextureGroup/Texture/tree/master/Source/Layout): Files related to the layout system, including layout-premitives types, layout specs and utility files for Yoga and IGListKit support.
+  - [Details](https://github.com/TextureGroup/Texture/tree/master/Source/Details): Implementaion details of the framework.
+  - [Layout](https://github.com/TextureGroup/Texture/tree/master/Source/Layout): Files related to the layout system, including layout-premitive types, layout specs and utility files for Yoga and IGListKit support.
   - [Private](https://github.com/TextureGroup/Texture/tree/master/Source/Private): Framework-private files that are not exposed to end users, including implementation details, private data structures and helpers.
   - [TextKit](https://github.com/TextureGroup/Texture/tree/master/Source/TextKit): All files related to TextKit that are used by ASTextNode.
   - [tvOS](https://github.com/TextureGroup/Texture/tree/master/Source/tvOS): tvOS support.
-  - All other files in the [Source](https://github.com/TextureGroup/Texture/tree/master/Source) directory: Main files that are exposed to end users, including include important components such as nodes (e.g ASDisplayNode, ASButtonNode, ASImageNode, ASCollectionNode and ASTableNode), ASNavigationController, etc.
+  - All other files in the [Source](https://github.com/TextureGroup/Texture/tree/master/Source) directory: Main files, including important components such as nodes (e.g ASDisplayNode, ASButtonNode, ASImageNode, ASCollectionNode and ASTableNode), ASNavigationController, etc.
 - [Tests](https://github.com/TextureGroup/Texture/tree/master/Tests): The framework's test suite, including unit, integration and snapshot test cases.
 - [docs](https://github.com/TextureGroup/Texture/tree/master/docs): Texture documentation that powers [texturegroup.org](https://texturegroup.org/).
-- [examples](https://github.com/TextureGroup/Texture/tree/master/examples): Sample projects on demonstrate how to use various features of the framework.
+- [examples](https://github.com/TextureGroup/Texture/tree/master/examples): Sample projects which demonstrate how to use various features of the framework.
 - [examples-extra](https://github.com/TextureGroup/Texture/tree/master/examples_extra): More sample projects.
 - All other files in the root directory: Build, CI, git, CocoaPods and Carthage configuration files.
 
