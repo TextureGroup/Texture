@@ -27,9 +27,10 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalSkipClearData = 1 << 6,                     // exp_skip_clear_data
   ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 7,      // exp_did_enter_preload_skip_asm_layout
   ASExperimentalDispatchApply = 1 << 8,                     // exp_dispatch_apply
-  ASExperimentalOOMBackgroundDeallocDisable = 1 << 9,      // exp_oom_bg_dealloc_disable
+  ASExperimentalOOMBackgroundDeallocDisable = 1 << 9,       // exp_oom_bg_dealloc_disable
   ASExperimentalRemoveTextKitInitialisingLock = 1 << 10,    // exp_remove_textkit_initialising_lock
   ASExperimentalDrawingGlobal = 1 << 11,                    // exp_drawing_global
+  ASExperimentalOptimizeDataControllerPipeline = 1 << 12,   // exp_optimize_data_controller_pipeline
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
