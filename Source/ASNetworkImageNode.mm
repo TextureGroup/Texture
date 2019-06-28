@@ -46,7 +46,7 @@
   BOOL _imageWasSetExternally;
   CGFloat _currentImageQuality;
   CGFloat _renderedImageQuality;
-  CGFloat _loadingProgress;
+  CGFloat _downloadProgress;
   BOOL _shouldRenderProgressImages;
 
   struct {
@@ -156,7 +156,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   // If our image is being set externally, the image quality is 100%
   if (imageWasSetExternally) {
     [self _setCurrentImageQuality:1.0];
-    [self _locked_setLoadingProgress:1.0];
+    [self _setDownloadProgress:1.0];
   }
   
   [self _locked__setImage:image];
@@ -209,7 +209,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     
     [self _locked_cancelImageDownloadWithResumePossibility:NO];
     
-    [self _locked_setLoadingProgress:0.0];
+    [self _setDownloadProgress:0.0];
     
     _imageLoaded = NO;
     
@@ -281,21 +281,28 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   });
 }
 
-- (void)setLoadingProgress:(CGFloat)loadingProgress
+- (void)setDownloadProgress:(CGFloat)downloadProgress
 {
   ASLockScopeSelf();
-  _loadingProgress = loadingProgress;
+  _downloadProgress = downloadProgress;
 }
 
-- (CGFloat)loadingProgress
+- (CGFloat)downloadProgress
 {
-  return ASLockedSelf(_loadingProgress);
+  return ASLockedSelf(_downloadProgress);
 }
 
-- (void)_locked_setLoadingProgress:(CGFloat)loadingProgress
+/**
+ * Always use these methods internally to update the current image quality
+ * We want to maintain the order that downloadProgress is set regardless of the calling thread,
+ * so we always have to dispatch to the main thread to ensure that we queue the operations in the correct order.
+ * (see comment in displayDidFinish)
+ */
+- (void)_setDownloadProgress:(CGFloat)downloadProgress
 {
+  NSLog(@"download progress is %f", downloadProgress);
   dispatch_async(dispatch_get_main_queue(), ^{
-    self.loadingProgress = loadingProgress;
+    self.downloadProgress = downloadProgress;
   });
 }
 
@@ -377,7 +384,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
       UIImage *result = [[_cache synchronouslyFetchedCachedImageWithURL:url] asdk_image];
       if (result) {
         [self _setCurrentImageQuality:1.0];
-        [self _locked_setLoadingProgress:1.0];
+        [self _setDownloadProgress:1.0];
         [self _locked__setImage:result];
         _imageLoaded = YES;
         
@@ -463,7 +470,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   if (ASObjectIsEqual(_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
     return;
   }
-  [self _locked_setLoadingProgress:progress];
+  [self _setDownloadProgress:progress];
 }
 
 - (void)handleProgressImage:(UIImage *)progressImage progress:(CGFloat)progress downloadIdentifier:(nullable id)downloadIdentifier
@@ -568,7 +575,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
   [self _locked_setAnimatedImage:nil];
   [self _setCurrentImageQuality:0.0];
-  [self _locked_setLoadingProgress:0.0];
+  [self _setDownloadProgress:0.0];
   [self _locked__setImage:_defaultImage];
 
   _imageLoaded = NO;
@@ -764,7 +771,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
         self->_imageLoaded = YES;
 
         [self _setCurrentImageQuality:1.0];
-        [self _locked_setLoadingProgress:1.0];
+        [self _setDownloadProgress:1.0];
 
         if (self->_delegateFlags.delegateDidLoadImageWithInfo) {
           ASUnlockScope(self);
@@ -804,7 +811,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           UIImage *newImage;
           if (imageContainer != nil) {
             [strongSelf _setCurrentImageQuality:1.0];
-            [self _locked_setLoadingProgress:1.0];
+            [self _setDownloadProgress:1.0];
             NSData *animatedImageData = [imageContainer asdk_animatedImageData];
             if (animatedImageData && strongSelf->_downloaderFlags.downloaderImplementsAnimatedImage) {
               id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];
