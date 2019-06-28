@@ -59,7 +59,8 @@ static ASExperimentalFeatures features[] = {
   ];
 }
 
-- (ASExperimentalFeatures)allFeatures {
+- (ASExperimentalFeatures)allFeatures
+{
   ASExperimentalFeatures allFeatures = 0;
   for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
     allFeatures |= features[i];
