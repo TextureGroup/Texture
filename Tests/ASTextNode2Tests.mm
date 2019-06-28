@@ -107,4 +107,18 @@
   XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
 }
 
+- (void)testSupportsLayerBacking
+{
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertTrue(textNode.supportsLayerBacking);
+
+  NSString *link = @"https://texturegroup.com";
+  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Texture Website: %@", link]];
+  NSRange linkRange = [attributedText.string rangeOfString:link];
+  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
+  textNode.attributedText = attributedText;
+  XCTAssertFalse(textNode.supportsLayerBacking);
+}
+
 @end

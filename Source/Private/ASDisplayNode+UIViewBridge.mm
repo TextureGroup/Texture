@@ -7,6 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -127,32 +128,58 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (BOOL)canBecomeFirstResponder
 {
-  ASDisplayNodeAssertMainThread();
-  return [self __canBecomeFirstResponder];
-}
-
-- (BOOL)canResignFirstResponder
-{
-  ASDisplayNodeAssertMainThread();
-  return [self __canResignFirstResponder];
-}
-
-- (BOOL)isFirstResponder
-{
-  ASDisplayNodeAssertMainThread();
-  return [self __isFirstResponder];
+  if (_view == nil) {
+    // By default we return NO if not view is created yet
+    return NO;
+  }
+  return [_view canBecomeFirstResponder];
 }
 
 - (BOOL)becomeFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return [self __becomeFirstResponder];
+
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
+  if (![self canBecomeFirstResponder]) {
+    return NO;
+  }
+  return [_view becomeFirstResponder];
+}
+
+- (BOOL)canResignFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (_view == nil) {
+    // By default we return YES if no view is created yet
+    return YES;
+  }
+  return [_view canResignFirstResponder];
 }
 
 - (BOOL)resignFirstResponder
 {
   ASDisplayNodeAssertMainThread();
-  return [self __resignFirstResponder];
+
+  // Note: This implicitly loads the view if it hasn't been loaded yet.
+  [self view];
+
+  if (![self canResignFirstResponder]) {
+    return NO;
+  }
+  return [_view resignFirstResponder];
+}
+
+- (BOOL)isFirstResponder
+{
+  ASDisplayNodeAssertMainThread();
+  if (_view == nil) {
+    // If no view is created yet we can just return NO as it's unlikely it's the first responder
+    return NO;
+  }
+  return [_view isFirstResponder];
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
@@ -943,7 +970,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   {
     _bridge_prologue_write;
 
-    _fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
+    _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
     if (AS_AVAILABLE_IOS(11.0)) {
       if (!_flags.layerBacked) {
@@ -1027,7 +1054,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
     }
   }
-  return _fallbackInsetsLayoutMarginsFromSafeArea;
+  return _flags.fallbackInsetsLayoutMarginsFromSafeArea;
 }
 
 @end
@@ -1056,13 +1083,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)isAccessibilityElement
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_isAccessibilityElement, isAccessibilityElement);
+  return _getAccessibilityFromViewOrProperty(_flags.isAccessibilityElement, isAccessibilityElement);
 }
 
 - (void)setIsAccessibilityElement:(BOOL)isAccessibilityElement
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
+  _setAccessibilityToViewAndProperty(_flags.isAccessibilityElement, isAccessibilityElement, isAccessibilityElement, isAccessibilityElement);
 }
 
 - (NSString *)accessibilityLabel
@@ -1074,12 +1101,24 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (void)setAccessibilityLabel:(NSString *)accessibilityLabel
 {
   _bridge_prologue_write;
+  NSString *oldAccessibilityLabel = _getFromViewOnly(accessibilityLabel);
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel);
   }
+
+  // We need to update action name when it's changed to reflect the latest state.
+  // Note: Update the custom action itself won't work when a11y is inside a list of custom actions
+  // in which one action results in a name change in the next action. In that case the UIAccessibility
+  // will hold the old action strongly until a11y jumps out of the list of custom actions.
+  // Thus we can only update name in place to have the change take effect.
+  BOOL needsUpdateActionName = self.isNodeLoaded && ![oldAccessibilityLabel isEqualToString:accessibilityLabel] && (0 != (_accessibilityTraits & ASInteractiveAccessibilityTraitsMask()));
+  if (needsUpdateActionName) {
+    self.accessibilityCustomAction.name = accessibilityLabel;
+  }
 }
+
 
 - (NSAttributedString *)accessibilityAttributedLabel
 {
@@ -1192,37 +1231,37 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityElementsHidden, accessibilityElementsHidden);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (void)setAccessibilityElementsHidden:(BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
 }
 
 - (BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_accessibilityViewIsModal, accessibilityViewIsModal);
+  return _getAccessibilityFromViewOrProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (void)setAccessibilityViewIsModal:(BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
 }
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_read;
-  return _getAccessibilityFromViewOrProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  return _getAccessibilityFromViewOrProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (void)setShouldGroupAccessibilityChildren:(BOOL)shouldGroupAccessibilityChildren
 {
   _bridge_prologue_write;
-  _setAccessibilityToViewAndProperty(_shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
+  _setAccessibilityToViewAndProperty(_flags.shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren, shouldGroupAccessibilityChildren);
 }
 
 - (NSString *)accessibilityIdentifier

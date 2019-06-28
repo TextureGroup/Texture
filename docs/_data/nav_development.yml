@@ -3,7 +3,8 @@
   - overview
   - structure
   - components
-  - how-to-develop-and-debug
+  - how-to-develop
+  - how-to-debug
 - title: Threading
   items:
   - threading

@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.8.1](https://github.com/TextureGroup/Texture/tree/2.8.1) (2019-05-05)
+[Full Changelog](https://github.com/TextureGroup/Texture/compare/2.8...2.8.1)
+
+**Merged pull requests:**
+
+- Update for 9.4.1 CI [\#1392](https://github.com/TextureGroup/Texture/pull/1392) ([garrettmoon](https://github.com/garrettmoon))
+- Disable ASAssertLocked and ASAssertUnlocked [\#1412](https://github.com/TextureGroup/Texture/pull/1412) ([nguyenhuy](https://github.com/nguyenhuy))
+
 ## [2.8](https://github.com/TextureGroup/Texture/tree/2.8) (2019-02-12)
 [Full Changelog](https://github.com/TextureGroup/Texture/compare/2.7...2.8)
 

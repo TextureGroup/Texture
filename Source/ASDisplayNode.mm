@@ -170,24 +170,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
-  
-  // Responder chain
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(becomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canResignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(resignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(isFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideIsFirstResponder;
-  }
-  
+
   // Layout related methods
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
@@ -338,11 +321,11 @@ __attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
   _flags.canCallSetNeedsDisplayOfLayer = YES;
 
   _fallbackSafeAreaInsets = UIEdgeInsetsZero;
-  _fallbackInsetsLayoutMarginsFromSafeArea = YES;
-  _isViewControllerRoot = NO;
+  _flags.fallbackInsetsLayoutMarginsFromSafeArea = YES;
+  _flags.isViewControllerRoot = NO;
 
-  _automaticallyRelayoutOnSafeAreaChanges = NO;
-  _automaticallyRelayoutOnLayoutMarginsChanges = NO;
+  _flags.automaticallyRelayoutOnSafeAreaChanges = NO;
+  _flags.automaticallyRelayoutOnLayoutMarginsChanges = NO;
 
   [self baseDidInit];
 }
@@ -862,37 +845,37 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (BOOL)isViewControllerRoot
 {
   MutexLocker l(__instanceLock__);
-  return _isViewControllerRoot;
+  return _flags.isViewControllerRoot;
 }
 
 - (void)setViewControllerRoot:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _isViewControllerRoot = flag;
+  _flags.isViewControllerRoot = flag;
 }
 
 - (BOOL)automaticallyRelayoutOnSafeAreaChanges
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyRelayoutOnSafeAreaChanges;
+  return _flags.automaticallyRelayoutOnSafeAreaChanges;
 }
 
 - (void)setAutomaticallyRelayoutOnSafeAreaChanges:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyRelayoutOnSafeAreaChanges = flag;
+  _flags.automaticallyRelayoutOnSafeAreaChanges = flag;
 }
 
 - (BOOL)automaticallyRelayoutOnLayoutMarginsChanges
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyRelayoutOnLayoutMarginsChanges;
+  return _flags.automaticallyRelayoutOnLayoutMarginsChanges;
 }
 
 - (void)setAutomaticallyRelayoutOnLayoutMarginsChanges:(BOOL)flag
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyRelayoutOnLayoutMarginsChanges = flag;
+  _flags.automaticallyRelayoutOnLayoutMarginsChanges = flag;
 }
 
 - (void)__setNodeController:(ASNodeController *)controller
@@ -906,26 +889,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     _strongNodeController = nil;
   }
 }
-
-#pragma mark - UIResponder
-
-#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
-  /* All responder methods should be called on the main thread */ \
-  ASDisplayNodeAssertMainThread(); \
-  if (checkFlag(Synchronous)) { \
-    /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
-     expect it's a non _ASDisplayView subclass that will respond */ \
-    return [_view __sel]; \
-  } else { \
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
-    /* If the subclass overwrites canBecomeFirstResponder just call through
-       to it as we expect it will handle it */ \
-      return [_view __sel]; \
-    } else { \
-      /* Call through to _ASDisplayView's superclass to get it handled */ \
-      return [(_ASDisplayView *)_view __##__sel]; \
-    } \
-  } \
 
 - (void)checkResponderCompatibility
 {
@@ -942,60 +905,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), ([NSString stringWithFormat:message, @"isFirstResponder"]));
   }
 #endif
-}
-
-- (BOOL)__canBecomeFirstResponder
-{
-  if (_view == nil) {
-    // By default we return NO if not view is created yet
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
-}
-
-- (BOOL)__becomeFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canBecomeFirstResponder]) {
-    return NO;
-  }
-
-  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
-}
-
-- (BOOL)__canResignFirstResponder
-{
-  if (_view == nil) {
-    // By default we return YES if no view is created yet
-    return YES;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
-}
-
-- (BOOL)__resignFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canResignFirstResponder]) {
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
-}
-
-- (BOOL)__isFirstResponder
-{
-  if (_view == nil) {
-    // If no view is created yet we can just return NO as it's unlikely it's the first responder
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>
@@ -1110,12 +1019,12 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   as_activity_scope_verbose(as_activity_create("Calculate node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   as_log_verbose(ASLayoutLog(), "Calculating layout for %@ sizeRange %@", self, NSStringFromASSizeRange(constrainedSize));
 
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
   // We only want one calculateLayout signpost interval per thread.
   // Currently there is no fallback for profiling i386, since it's not useful.
   static _Thread_local NSInteger tls_callDepth;
   if (tls_callDepth++ == 0) {
-    ASSignpostStart(ASSignpostCalculateLayout);
+    ASSignpostStart(CalculateLayout, self, "%@", ASObjectDescriptionMakeTiny(self));
   }
 #endif
 
@@ -1124,9 +1033,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
   as_log_verbose(ASLayoutLog(), "Calculated layout %@", result);
 
-#if AS_KDEBUG_ENABLE
+#if AS_SIGNPOST_ENABLE
   if (--tls_callDepth == 0) {
-    ASSignpostEnd(ASSignpostCalculateLayout);
+    ASSignpostEnd(CalculateLayout, self, "");
   }
 #endif
   
@@ -1387,6 +1296,8 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   [_pendingDisplayNodes removeObject:node];
 
   if (_pendingDisplayNodes.isEmpty) {
+    // Reclaim object memory.
+    _pendingDisplayNodes = nil;
     
     [self hierarchyDisplayDidFinish];
     [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> delegate) {
@@ -1811,10 +1722,14 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
-  if (event == kCAOnOrderIn) {
-    [self __enterHierarchy];
-  } else if (event == kCAOnOrderOut) {
-    [self __exitHierarchy];
+  // Only drive __enterHierarchy and __exitHierarchy if the node is layer-backed.
+  // View-backed nodes handle them in _ASDisplayView's -willMoveToWindow: and -didMoveToWindow.
+  if (self.isLayerBacked) {
+    if (event == kCAOnOrderIn) {
+      [self __enterHierarchy];
+    } else if (event == kCAOnOrderOut) {
+      [self __exitHierarchy];
+    }
   }
 
   return [self layerActionForKey:event];
@@ -2592,7 +2507,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (BOOL)_locked_shouldHavePlaceholderLayer
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  return (_placeholderEnabled && [self _implementsDisplay]);
+  return (_flags.placeholderEnabled && [self _implementsDisplay]);
 }
 
 - (void)_locked_setupPlaceholderLayerIfNeeded
@@ -2632,42 +2547,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 {
   // Subclass hook
   return NO;
-}
-
-- (BOOL)placeholderEnabled
-{
-  MutexLocker l(__instanceLock__);
-  return _placeholderEnabled;
-}
-
-- (void)setPlaceholderEnabled:(BOOL)placeholderEnabled
-{
-  MutexLocker l(__instanceLock__);
-  _placeholderEnabled = placeholderEnabled;
-}
-
-- (NSTimeInterval)placeholderFadeDuration
-{
-  MutexLocker l(__instanceLock__);
-  return _placeholderFadeDuration;
-}
-
-- (void)setPlaceholderFadeDuration:(NSTimeInterval)placeholderFadeDuration
-{
-  MutexLocker l(__instanceLock__);
-  _placeholderFadeDuration = placeholderFadeDuration;
-}
-
-- (NSInteger)drawingPriority
-{
-  MutexLocker l(__instanceLock__);
-  return _drawingPriority;
-}
-
-- (void)setDrawingPriority:(NSInteger)drawingPriority
-{
-  MutexLocker l(__instanceLock__);
-  _drawingPriority = drawingPriority;
 }
 
 #pragma mark - Hierarchy State
@@ -3143,7 +3022,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)addInterfaceStateDelegate:(id <ASInterfaceStateDelegate>)interfaceStateDelegate
 {
   MutexLocker l(__instanceLock__);
-  _hasHadInterfaceStateDelegates = YES;
+  _flags.hasHadInterfaceStateDelegates = YES;
   for (int i = 0; i < AS_MAX_INTERFACE_STATE_DELEGATES; i++) {
     if (_interfaceStateDelegates[i] == nil) {
       _interfaceStateDelegates[i] = interfaceStateDelegate;
@@ -3325,7 +3204,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   {
     ASLockScopeSelf();
     // Fast path for non-delegating nodes.
-    if (!_hasHadInterfaceStateDelegates) {
+    if (!_flags.hasHadInterfaceStateDelegates) {
       return;
     }
 
@@ -3537,13 +3416,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 - (void)setIsAccessibilityContainer:(BOOL)isAccessibilityContainer
 {
   MutexLocker l(__instanceLock__);
-  _isAccessibilityContainer = isAccessibilityContainer;
+  _flags.isAccessibilityContainer = isAccessibilityContainer;
 }
 
 - (BOOL)isAccessibilityContainer
 {
   MutexLocker l(__instanceLock__);
-  return _isAccessibilityContainer;
+  return _flags.isAccessibilityContainer;
 }
 
 - (NSString *)defaultAccessibilityLabel
