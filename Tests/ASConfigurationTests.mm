@@ -29,7 +29,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDispatchApply,
   ASExperimentalOOMBackgroundDeallocDisable,
   ASExperimentalRemoveTextKitInitialisingLock,
-  ASExperimentalDrawingGlobal
+  ASExperimentalDrawingGlobal,
+  ASExperimentalOptimizeDataControllerPipeline
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -53,11 +54,13 @@ static ASExperimentalFeatures features[] = {
     @"exp_dispatch_apply",
     @"exp_oom_bg_dealloc_disable",
     @"exp_remove_textkit_initialising_lock",
-    @"exp_drawing_global"
+    @"exp_drawing_global",
+    @"exp_optimize_data_controller_pipeline"
   ];
 }
 
-- (ASExperimentalFeatures)allFeatures {
+- (ASExperimentalFeatures)allFeatures
+{
   ASExperimentalFeatures allFeatures = 0;
   for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
     allFeatures |= features[i];
