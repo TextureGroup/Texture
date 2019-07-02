@@ -164,7 +164,6 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
   NSAttributedString *_additionalTruncationMessage;
-  NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
   NSLineBreakMode _truncationMode;
   
@@ -1358,22 +1357,20 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)_locked_composedTruncationText
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (_composedTruncationText == nil) {
-    if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
-      NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
-      [newComposedTruncationString.mutableString appendString:@" "];
-      [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
-      _composedTruncationText = newComposedTruncationString;
-    } else if (_truncationAttributedText != nil) {
-      _composedTruncationText = _truncationAttributedText;
-    } else if (_additionalTruncationMessage != nil) {
-      _composedTruncationText = _additionalTruncationMessage;
-    } else {
-      _composedTruncationText = DefaultTruncationAttributedString();
-    }
-    _composedTruncationText = [self _locked_prepareTruncationStringForDrawing:_composedTruncationText];
+  NSAttributedString *composedTruncationText = nil;
+  if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
+    NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
+    [newComposedTruncationString.mutableString appendString:@" "];
+    [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
+    composedTruncationText = newComposedTruncationString;
+  } else if (_truncationAttributedText != nil) {
+    composedTruncationText = _truncationAttributedText;
+  } else if (_additionalTruncationMessage != nil) {
+    composedTruncationText = _additionalTruncationMessage;
+  } else {
+    composedTruncationText = DefaultTruncationAttributedString();
   }
-  return _composedTruncationText;
+  return [self _locked_prepareTruncationStringForDrawing:composedTruncationText];
 }
 
 /**
