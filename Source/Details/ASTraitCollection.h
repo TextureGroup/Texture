@@ -48,6 +48,10 @@ typedef struct {
   unowned UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
 
   CGSize containerSize;
+  
+  UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0));
+  UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
+  UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 } ASPrimitiveTraitCollection;
 #pragma clang diagnostic pop
 
@@ -142,9 +146,13 @@ AS_SUBCLASSING_RESTRICTED
 #if AS_BUILD_UIUSERINTERFACESTYLE
 @property (readonly) UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
 #endif
-@property (readonly) UIContentSizeCategory preferredContentSizeCategory  API_AVAILABLE(ios(10.0));
+@property (readonly) UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
 
 @property (readonly) CGSize containerSize;
+
+@property (readonly) UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0));
+@property (readonly) UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
+@property (readonly) UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 
 - (BOOL)isEqualToTraitCollection:(ASTraitCollection *)traitCollection;
 
