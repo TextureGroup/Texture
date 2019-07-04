@@ -32,12 +32,19 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, vo
 #pragma mark - Yoga Type Conversion Helpers
 
 AS_EXTERN YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems);
+AS_EXTERN ASStackLayoutAlignItems stackAlignItems(YGAlign alignItems);
 AS_EXTERN YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent);
+AS_EXTERN ASStackLayoutJustifyContent stackJustifyContent(YGJustify justifyContent);
 AS_EXTERN YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf);
+AS_EXTERN ASStackLayoutAlignSelf stackAlignSelf(YGAlign alignSelf);
 AS_EXTERN YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction);
+AS_EXTERN ASStackLayoutDirection stackFlexDirection(YGFlexDirection direction);
 AS_EXTERN float yogaFloatForCGFloat(CGFloat value);
+AS_EXTERN CGFloat cgFloatForYogaFloat(float yogaFloat, CGFloat undefinedDefault);
 AS_EXTERN float yogaDimensionToPoints(ASDimension dimension);
 AS_EXTERN float yogaDimensionToPercent(ASDimension dimension);
+AS_EXTERN YGValue yogaValueForDimension(ASDimension dimension);
+AS_EXTERN ASDimension dimensionForYogaValue(YGValue value);
 AS_EXTERN ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
 
 AS_EXTERN void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
@@ -74,5 +81,43 @@ AS_EXTERN YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
   } else { \
     YGNodeStyleSet##property(yogaNode, edge, YGUndefined); \
   } \
+
+#define AS_EDGE_INSETS_FROM_YGNODE_STYLE(yogaNode, property, dimensionFunc) \
+  ASEdgeInsets insets;\
+  YGEdge edge = YGEdgeLeft; \
+  for (int i = 0; i < YGEdgeAll + 1; ++i) { \
+    ASDimension dimension = dimensionFunc(YGNodeStyleGet##property(yogaNode, edge)); \
+    switch (edge) { \
+      case YGEdgeLeft: \
+        insets.left = dimension; \
+        break; \
+      case YGEdgeTop: \
+        insets.top = dimension; \
+        break; \
+      case YGEdgeRight: \
+        insets.right = dimension; \
+        break; \
+      case YGEdgeBottom: \
+        insets.bottom = dimension; \
+        break; \
+      case YGEdgeStart: \
+        insets.start = dimension; \
+        break; \
+      case YGEdgeEnd: \
+        insets.end = dimension; \
+        break; \
+      case YGEdgeHorizontal: \
+        insets.horizontal = dimension; \
+        break; \
+      case YGEdgeVertical: \
+        insets.vertical = dimension; \
+        break; \
+      case YGEdgeAll: \
+        insets.all = dimension; \
+        break; \
+    } \
+    edge = (YGEdge)(edge + 1); \
+  } \
+  return insets; \
 
 #endif /* YOGA */

@@ -35,7 +35,9 @@
   return self;
 }
 
+#if AS_USE_LAYOUT_EXTENSIBILITY
 ASLayoutElementStyleExtensibilityForwarding
+#endif
 
 - (ASTraitCollection *)asyncTraitCollection
 {

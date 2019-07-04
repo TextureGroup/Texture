@@ -160,7 +160,9 @@ ASLayoutElementLayoutCalculationDefaults
 
 #pragma mark - ASLayoutElementStyleExtensibility
 
+#if AS_USE_LAYOUT_EXTENSIBILITY
 ASLayoutElementStyleExtensibilityForwarding
+#endif
 
 #pragma mark - ASDescriptionProvider
 

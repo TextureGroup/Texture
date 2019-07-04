@@ -75,6 +75,18 @@
   #define YOGA __has_include(YOGA_HEADER_PATH)
 #endif
 
+#if YOGA
+  #ifndef USE_YOGA_NODE
+    #define USE_YOGA_NODE 0
+  #endif
+#else
+  #define USE_YOGA_NODE 0
+#endif
+
+#ifndef AS_USE_LAYOUT_EXTENSIBILITY
+  #define AS_USE_LAYOUT_EXTENSIBILITY 1
+#endif
+
 #ifdef ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE
   #error "ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE is unavailable. See ASConfiguration.h."
 #endif

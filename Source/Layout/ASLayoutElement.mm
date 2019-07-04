@@ -163,21 +163,29 @@ do {\
 
 @implementation ASLayoutElementStyle {
   AS::RecursiveMutex __instanceLock__;
-  ASLayoutElementStyleExtensions _extensions;
 
-  std::atomic<ASLayoutElementSize> _size;
+#if AS_USE_LAYOUT_EXTENSIBILITY
+  ASLayoutElementStyleExtensions _extensions;
+#endif
+
+  // Used by Texture and Yoga
   std::atomic<CGFloat> _spacingBefore;
   std::atomic<CGFloat> _spacingAfter;
+  std::atomic<CGFloat> _ascender;
+  std::atomic<CGFloat> _descender;
+
+#if !USE_YOGA_NODE
+  std::atomic<ASLayoutElementSize> _size;
   std::atomic<CGFloat> _flexGrow;
   std::atomic<CGFloat> _flexShrink;
   std::atomic<ASDimension> _flexBasis;
   std::atomic<ASStackLayoutAlignSelf> _alignSelf;
-  std::atomic<CGFloat> _ascender;
-  std::atomic<CGFloat> _descender;
-  std::atomic<CGPoint> _layoutPosition;
+#endif // !USE_YOGA_NODE
+
 
 #if YOGA
   YGNodeRef _yogaNode;
+#if !USE_YOGA_NODE
   std::atomic<YGWrap> _flexWrap;
   std::atomic<ASStackLayoutDirection> _flexDirection;
   std::atomic<YGDirection> _direction;
@@ -189,12 +197,16 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
-  ASStackLayoutAlignItems _parentAlignStyle;
-#endif
+#endif // !USE_YOGA_NODE
+  std::atomic<ASStackLayoutAlignItems> _parentAlignStyle;
+#else // YOGA
+  std::atomic<CGPoint> _layoutPosition;
+#endif // YOGA
 }
 
 @dynamic width, height, minWidth, maxWidth, minHeight, maxHeight;
 @dynamic preferredSize, minSize, maxSize, preferredLayoutSize, minLayoutSize, maxLayoutSize;
+@dynamic layoutPosition;
 
 #pragma mark - Lifecycle
 
@@ -211,14 +223,29 @@ do {\
 {
   self = [super init];
   if (self) {
+#if !USE_YOGA_NODE
     std::atomic_init(&_size, ASLayoutElementSizeMake());
     std::atomic_init(&_flexBasis, ASDimensionAuto);
+#endif // !USE_YOGA_NODE
+
 #if YOGA
-    _parentAlignStyle = ASStackLayoutAlignItemsNotSet;
+    std::atomic_init(&_parentAlignStyle, ASStackLayoutAlignItemsNotSet);
+#if !USE_YOGA_NODE
     std::atomic_init(&_flexDirection, ASStackLayoutDirectionVertical);
     std::atomic_init(&_alignItems, ASStackLayoutAlignItemsStretch);
     std::atomic_init(&_aspectRatio, static_cast<CGFloat>(YGUndefined));
-#endif
+#else
+    // If we use the Yoga node as backing store  we have to create a yoga node for
+    // every ASDisplayNode
+    [self yogaNodeCreateIfNeeded];
+
+    // Set default values that differ between Yoga and Texture
+    YGNODE_STYLE_SET_DIMENSION(_yogaNode, FlexBasis, ASDimensionAuto);
+    YGNodeStyleSetFlexDirection(_yogaNode, yogaFlexDirection(ASStackLayoutDirectionVertical));
+    YGNodeStyleSetAlignItems(_yogaNode, yogaAlignItems(ASStackLayoutAlignItemsStretch));
+    YGNodeStyleSetAspectRatio(_yogaNode, YGUndefined);
+#endif // !USE_YOGA_NODE
+#endif // YOGA
   }
   return self;
 }
@@ -229,95 +256,177 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (ASLayoutElementSize)size
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return (ASLayoutElementSize){
+    dimensionForYogaValue(YGNodeStyleGetWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetHeight(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMinWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMaxWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMinHeight(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMaxHeight(_yogaNode)),
+  };
+#else
   return _size.load();
+#endif
 }
 
 - (void)setSize:(ASLayoutElementSize)size
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, size.width);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Height, size.height);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinWidth, size.minWidth);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxWidth, size.maxWidth);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinHeight, size.minHeight);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxHeight, size.maxHeight);
+#else
   ASLayoutElementStyleSetSizeWithScope({
     newSize = size;
   });
   // No CallDelegate method as ASLayoutElementSize is currently internal.
+#endif
 }
 
 #pragma mark - ASLayoutElementStyleSizeForwarding
 
 - (ASDimension)width
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetWidth(_yogaNode));
+#else
   return _size.load().width;
+#endif
 }
 
 - (void)setWidth:(ASDimension)width
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, width);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.width = width; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
   }
+#endif
 }
 
 - (ASDimension)height
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetHeight(_yogaNode));
+#else
   return _size.load().height;
+#endif
 }
 
 - (void)setHeight:(ASDimension)height
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Height, height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.height = height; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
   }
+#endif
 }
 
 - (ASDimension)minWidth
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetMinWidth(_yogaNode));
+#else
   return _size.load().minWidth;
+#endif
 }
 
 - (void)setMinWidth:(ASDimension)minWidth
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinWidth, minWidth);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.minWidth = minWidth; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
   }
+#endif
 }
 
 - (ASDimension)maxWidth
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetMaxWidth(_yogaNode));
+#else
   return _size.load().maxWidth;
+#endif
 }
 
 - (void)setMaxWidth:(ASDimension)maxWidth
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxWidth, maxWidth);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.maxWidth = maxWidth; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
   }
+#endif
 }
 
 - (ASDimension)minHeight
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetMinWidth(_yogaNode));
+#else
   return _size.load().minHeight;
+#endif
 }
 
 - (void)setMinHeight:(ASDimension)minHeight
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinHeight, minHeight);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.minHeight = minHeight; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
   }
+#endif
 }
 
 - (ASDimension)maxHeight
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetMaxHeight(_yogaNode));
+#else
   return _size.load().maxHeight;
+#endif
 }
 
 - (void)setMaxHeight:(ASDimension)maxHeight
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxHeight, maxHeight);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({ newSize.maxHeight = maxHeight; });
   if (changed) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
   }
+#endif
 }
 
 
@@ -325,6 +434,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (void)setPreferredSize:(CGSize)preferredSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, ASDimensionMakeWithPoints(preferredSize.width));
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Height, ASDimensionMakeWithPoints(preferredSize.height));
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.width = ASDimensionMakeWithPoints(preferredSize.width);
     newSize.height = ASDimensionMakeWithPoints(preferredSize.height);
@@ -333,10 +447,20 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
   }
+#endif
 }
 
 - (CGSize)preferredSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGValue width = YGNodeStyleGetWidth(_yogaNode);
+  YGValue height = YGNodeStyleGetHeight(_yogaNode);
+  NSCAssert(width.unit != YGUnitPoint, @"Cannot get preferredSize of element with fractional width. Width: %f.", width.value);
+  NSCAssert(height.unit != YGUnitPoint, @"Cannot get preferredSize of element with fractional height. Height: %f.", height.value);
+
+  return (CGSize){cgFloatForYogaFloat(width.value, 0), cgFloatForYogaFloat(height.value, 0)};
+#else
   ASLayoutElementSize size = _size.load();
   if (size.width.unit == ASDimensionUnitFraction) {
     NSCAssert(NO, @"Cannot get preferredSize of element with fractional width. Width: %@.", NSStringFromASDimension(size.width));
@@ -349,10 +473,16 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
   }
   
   return CGSizeMake(size.width.value, size.height.value);
+#endif
 }
 
 - (void)setMinSize:(CGSize)minSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetMinWidth(_yogaNode, minSize.width);
+  YGNodeStyleSetMinHeight(_yogaNode, minSize.height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.minWidth = ASDimensionMakeWithPoints(minSize.width);
     newSize.minHeight = ASDimensionMakeWithPoints(minSize.height);
@@ -361,10 +491,16 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
   }
+#endif
 }
 
 - (void)setMaxSize:(CGSize)maxSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetMaxWidth(_yogaNode, maxSize.width);
+  YGNodeStyleSetMaxHeight(_yogaNode, maxSize.height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.maxWidth = ASDimensionMakeWithPoints(maxSize.width);
     newSize.maxHeight = ASDimensionMakeWithPoints(maxSize.height);
@@ -373,16 +509,30 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
   }
+#endif
 }
 
 - (ASLayoutSize)preferredLayoutSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return ASLayoutSizeMake(
+    dimensionForYogaValue(YGNodeStyleGetWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetHeight(_yogaNode))
+  );
+#else
   ASLayoutElementSize size = _size.load();
   return ASLayoutSizeMake(size.width, size.height);
+#endif
 }
 
 - (void)setPreferredLayoutSize:(ASLayoutSize)preferredLayoutSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, preferredLayoutSize.width);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, Width, preferredLayoutSize.height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.width = preferredLayoutSize.width;
     newSize.height = preferredLayoutSize.height;
@@ -391,16 +541,30 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleHeightProperty);
   }
+#endif
 }
 
 - (ASLayoutSize)minLayoutSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return ASLayoutSizeMake(
+    dimensionForYogaValue(YGNodeStyleGetMinWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMinHeight(_yogaNode))
+  );
+#else
   ASLayoutElementSize size = _size.load();
   return ASLayoutSizeMake(size.minWidth, size.minHeight);
+#endif
 }
 
 - (void)setMinLayoutSize:(ASLayoutSize)minLayoutSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinWidth, minLayoutSize.width);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MinHeight, minLayoutSize.height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.minWidth = minLayoutSize.width;
     newSize.minHeight = minLayoutSize.height;
@@ -409,16 +573,29 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMinHeightProperty);
   }
+#endif
 }
 
 - (ASLayoutSize)maxLayoutSize
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return ASLayoutSizeMake(
+    dimensionForYogaValue(YGNodeStyleGetMaxWidth(_yogaNode)),
+    dimensionForYogaValue(YGNodeStyleGetMaxHeight(_yogaNode))
+  );
+#else
   ASLayoutElementSize size = _size.load();
   return ASLayoutSizeMake(size.maxWidth, size.maxHeight);
+#endif
 }
 
 - (void)setMaxLayoutSize:(ASLayoutSize)maxLayoutSize
 {
+#if USE_YOGA_NODE
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxWidth, maxLayoutSize.width);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, MaxHeight, maxLayoutSize.height);
+#else
   BOOL changed = ASLayoutElementStyleSetSizeWithScope({
     newSize.maxWidth = maxLayoutSize.width;
     newSize.maxHeight = maxLayoutSize.height;
@@ -427,12 +604,14 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxWidthProperty);
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleMaxHeightProperty);
   }
+#endif
 }
 
 #pragma mark - ASStackLayoutElement
 
 - (void)setSpacingBefore:(CGFloat)spacingBefore
 {
+  // Not an equivalent on _yogaNode
   if (_spacingBefore.exchange(spacingBefore) != spacingBefore) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleSpacingBeforeProperty);
   }
@@ -440,11 +619,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (CGFloat)spacingBefore
 {
+  // Not an equivalent on _yogaNode
   return _spacingBefore.load();
 }
 
 - (void)setSpacingAfter:(CGFloat)spacingAfter
 {
+  // Not an equivalent on _yogaNode
   if (_spacingAfter.exchange(spacingAfter) != spacingAfter) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleSpacingAfterProperty);
   }
@@ -452,59 +633,101 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (CGFloat)spacingAfter
 {
+  // Not an equivalent on _yogaNode
   return _spacingAfter.load();
 }
 
 - (void)setFlexGrow:(CGFloat)flexGrow
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetFlexGrow(_yogaNode, flexGrow);
+#else
   if (_flexGrow.exchange(flexGrow) != flexGrow) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleFlexGrowProperty);
   }
+#endif
 }
 
 - (CGFloat)flexGrow
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetFlexGrow(_yogaNode);
+#else
   return _flexGrow.load();
+#endif
 }
 
 - (void)setFlexShrink:(CGFloat)flexShrink
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetFlexShrink(_yogaNode, flexShrink);
+#else
   if (_flexShrink.exchange(flexShrink) != flexShrink) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleFlexShrinkProperty);
   }
+#endif
 }
 
 - (CGFloat)flexShrink
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetFlexShrink(_yogaNode);
+#else
   return _flexShrink.load();
+#endif
 }
 
 - (void)setFlexBasis:(ASDimension)flexBasis
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNODE_STYLE_SET_DIMENSION(_yogaNode, FlexBasis, flexBasis);
+#else
   if (!ASDimensionEqualToDimension(_flexBasis.exchange(flexBasis), flexBasis)) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleFlexBasisProperty);
   }
+#endif
 }
 
 - (ASDimension)flexBasis
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return dimensionForYogaValue(YGNodeStyleGetFlexBasis(_yogaNode));
+#else
   return _flexBasis.load();
+#endif
 }
 
 - (void)setAlignSelf:(ASStackLayoutAlignSelf)alignSelf
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetAlignSelf(_yogaNode, yogaAlignSelf(alignSelf));
+#else
   if (_alignSelf.exchange(alignSelf) != alignSelf) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleAlignSelfProperty);
   }
+#endif
 }
 
 - (ASStackLayoutAlignSelf)alignSelf
 {
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return stackAlignSelf(YGNodeStyleGetAlignSelf(_yogaNode));
+#else
   return _alignSelf.load();
+#endif
 }
 
 - (void)setAscender:(CGFloat)ascender
 {
+  // Not an equivalent on _yogaNode
   if (_ascender.exchange(ascender) != ascender) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleAscenderProperty);
   }
@@ -512,11 +735,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (CGFloat)ascender
 {
+  // Not an equivalent on _yogaNode
   return _ascender.load();
 }
 
 - (void)setDescender:(CGFloat)descender
 {
+  // Not an equivalent on _yogaNode
   if (_descender.exchange(descender) != descender) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleDescenderProperty);
   }
@@ -524,13 +749,16 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (CGFloat)descender
 {
+  // Not an equivalent on _yogaNode
   return _descender.load();
 }
 
 #pragma mark - ASAbsoluteLayoutElement
 
+#if !YOGA
 - (void)setLayoutPosition:(CGPoint)layoutPosition
 {
+  // Not an equivalent on _yogaNode
   if (!CGPointEqualToPoint(_layoutPosition.exchange(layoutPosition), layoutPosition)) {
     ASLayoutElementStyleCallDelegate(ASLayoutElementStyleLayoutPositionProperty);
   }
@@ -538,10 +766,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 
 - (CGPoint)layoutPosition
 {
+  // Not an equivalent on _yogaNode
   return _layoutPosition.load();
 }
+#endif
 
-#pragma mark - Extensions
+#if AS_USE_LAYOUT_EXTENSIBILITY
+#pragma mark - Extensibility
 
 - (void)setLayoutOptionExtensionBool:(BOOL)value atIndex:(int)idx
 {
@@ -590,6 +821,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
   MutexLocker l(__instanceLock__);
   return _extensions.edgeInsetsExtensions[idx];
 }
+
+#endif // AS_USE_LAYOUT_EXTENSIBILITY
 
 #pragma mark - Debugging
 
@@ -660,9 +893,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
   return result;
 }
 
+#pragma mark - Yoga Support
+
 - (void)propertyDidChange:(NSString *)propertyName
 {
-#if YOGA
+#if YOGA && !USE_YOGA_NODE
   /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
    void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
    void YGNodeStyleSetFlex(YGNodeRef node, float flex);
@@ -804,85 +1039,283 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
   [self destroyYogaNode];
 }
 
-- (YGWrap)flexWrap                            { return _flexWrap.load(); }
-- (ASStackLayoutDirection)flexDirection       { return _flexDirection.load(); }
-- (YGDirection)direction                      { return _direction.load(); }
-- (ASStackLayoutJustifyContent)justifyContent { return _justifyContent.load(); }
-- (ASStackLayoutAlignItems)alignItems         { return _alignItems.load(); }
-- (YGPositionType)positionType                { return _positionType.load(); }
-- (ASEdgeInsets)position                      { return _position.load(); }
-- (ASEdgeInsets)margin                        { return _margin.load(); }
-- (ASEdgeInsets)padding                       { return _padding.load(); }
-- (ASEdgeInsets)border                        { return _border.load(); }
-- (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
-// private (ASLayoutElementStylePrivate.h)
-- (ASStackLayoutAlignItems)parentAlignStyle {
-  return _parentAlignStyle;
+- (YGWrap)flexWrap
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetFlexWrap(_yogaNode);
+#else
+  return _flexWrap.load();
+#endif
 }
 
-- (void)setFlexWrap:(YGWrap)flexWrap {
+- (ASStackLayoutDirection)flexDirection
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return stackFlexDirection(YGNodeStyleGetFlexDirection(_yogaNode));
+#else
+  return _flexDirection.load();
+#endif
+}
+
+- (YGDirection)direction
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetDirection(_yogaNode);
+#else
+  return _direction.load();
+#endif
+}
+
+- (ASStackLayoutJustifyContent)justifyContent
+{
+#if USE_YOGA_NODE
+  return stackJustifyContent(YGNodeStyleGetJustifyContent(_yogaNode));
+#else
+  return _justifyContent.load();
+#endif
+}
+
+- (ASStackLayoutAlignItems)alignItems
+{
+#if USE_YOGA_NODE
+  return stackAlignItems(YGNodeStyleGetAlignItems(_yogaNode));
+#else
+  return _alignItems.load();
+#endif
+}
+
+- (YGPositionType)positionType
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetPositionType(_yogaNode);
+#else
+  return _positionType.load();
+#endif
+}
+
+- (ASEdgeInsets)position
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  AS_EDGE_INSETS_FROM_YGNODE_STYLE(_yogaNode, Position, dimensionForYogaValue);
+#else
+  return _position.load();
+#endif
+}
+
+- (ASEdgeInsets)margin
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  AS_EDGE_INSETS_FROM_YGNODE_STYLE(_yogaNode, Margin, dimensionForYogaValue);
+#else
+  return _margin.load();
+#endif
+}
+
+- (ASEdgeInsets)padding
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  AS_EDGE_INSETS_FROM_YGNODE_STYLE(_yogaNode, Padding, dimensionForYogaValue);
+#else
+  return _padding.load();
+#endif
+}
+
+- (ASEdgeInsets)border
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  AS_EDGE_INSETS_FROM_YGNODE_STYLE(_yogaNode, Border, [](float border) -> ASDimension {
+    return ASDimensionMake(ASDimensionUnitPoints, cgFloatForYogaFloat(border, 0));
+  });
+#else
+  return _border.load();
+#endif
+}
+
+- (CGFloat)aspectRatio
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetAspectRatio(_yogaNode);
+#else
+  return _aspectRatio.load();
+#endif
+}
+
+// private (ASLayoutElementStylePrivate.h)
+- (ASStackLayoutAlignItems)parentAlignStyle
+{
+  // Not an equivalent on _yogaNode
+  return _parentAlignStyle.load();
+}
+
+- (void)setFlexWrap:(YGWrap)flexWrap
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetFlexWrap(_yogaNode, flexWrap);
+#else
   if (_flexWrap.exchange(flexWrap) != flexWrap) {
     ASLayoutElementStyleCallDelegate(ASYogaFlexWrapProperty);
   }
+#endif
 }
-- (void)setFlexDirection:(ASStackLayoutDirection)flexDirection {
+
+- (void)setFlexDirection:(ASStackLayoutDirection)flexDirection
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetFlexDirection(_yogaNode, yogaFlexDirection(flexDirection));
+#else
   if (_flexDirection.exchange(flexDirection) != flexDirection) {
     ASLayoutElementStyleCallDelegate(ASYogaFlexDirectionProperty);
   }
+#endif
 }
-- (void)setDirection:(YGDirection)direction {
+
+- (void)setDirection:(YGDirection)direction
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetDirection(_yogaNode, direction);
+#else
   if (_direction.exchange(direction) != direction) {
     ASLayoutElementStyleCallDelegate(ASYogaDirectionProperty);
   }
+#endif
 }
-- (void)setJustifyContent:(ASStackLayoutJustifyContent)justify {
+
+- (void)setJustifyContent:(ASStackLayoutJustifyContent)justify
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetJustifyContent(_yogaNode, yogaJustifyContent(justify));
+#else
   if (_justifyContent.exchange(justify) != justify) {
     ASLayoutElementStyleCallDelegate(ASYogaJustifyContentProperty);
   }
+#endif
 }
-- (void)setAlignItems:(ASStackLayoutAlignItems)alignItems {
+
+- (void)setAlignItems:(ASStackLayoutAlignItems)alignItems
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetAlignItems(_yogaNode, yogaAlignItems(alignItems));
+#else
   if (_alignItems.exchange(alignItems) != alignItems) {
     ASLayoutElementStyleCallDelegate(ASYogaAlignItemsProperty);
   }
+#endif
 }
-- (void)setPositionType:(YGPositionType)positionType {
+
+- (void)setPositionType:(YGPositionType)positionType
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetPositionType(_yogaNode, positionType);
+#else
   if (_positionType.exchange(positionType) != positionType) {
     ASLayoutElementStyleCallDelegate(ASYogaPositionTypeProperty);
   }
+#endif
 }
+
 /// TODO: smart compare ASEdgeInsets instead of memory compare.
-- (void)setPosition:(ASEdgeInsets)position {
+- (void)setPosition:(ASEdgeInsets)position
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGEdge edge = YGEdgeLeft;
+  for (int i = 0; i < YGEdgeAll + 1; ++i) {
+    YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Position, dimensionForEdgeWithEdgeInsets(edge, position), edge);
+    edge = (YGEdge)(edge + 1);
+  }
+#else
   ASEdgeInsets oldValue = _position.exchange(position);
   if (0 != memcmp(&position, &oldValue, sizeof(ASEdgeInsets))) {
     ASLayoutElementStyleCallDelegate(ASYogaPositionProperty);
   }
+#endif
 }
-- (void)setMargin:(ASEdgeInsets)margin {
+
+- (void)setMargin:(ASEdgeInsets)margin
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGEdge edge = YGEdgeLeft;
+  for (int i = 0; i < YGEdgeAll + 1; ++i) {
+    YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Margin, dimensionForEdgeWithEdgeInsets(edge, margin), edge);
+    edge = (YGEdge)(edge + 1);
+  }
+#else
   ASEdgeInsets oldValue = _margin.exchange(margin);
   if (0 != memcmp(&margin, &oldValue, sizeof(ASEdgeInsets))) {
     ASLayoutElementStyleCallDelegate(ASYogaMarginProperty);
   }
+#endif
 }
-- (void)setPadding:(ASEdgeInsets)padding {
+
+- (void)setPadding:(ASEdgeInsets)padding
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGEdge edge = YGEdgeLeft;
+  for (int i = 0; i < YGEdgeAll + 1; ++i) {
+    YGNODE_STYLE_SET_DIMENSION_WITH_EDGE(_yogaNode, Padding, dimensionForEdgeWithEdgeInsets(edge, padding), edge);
+    edge = (YGEdge)(edge + 1);
+  }
+#else
   ASEdgeInsets oldValue = _padding.exchange(padding);
   if (0 != memcmp(&padding, &oldValue, sizeof(ASEdgeInsets))) {
     ASLayoutElementStyleCallDelegate(ASYogaPaddingProperty);
   }
+#endif
 }
-- (void)setBorder:(ASEdgeInsets)border {
+
+- (void)setBorder:(ASEdgeInsets)border
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGEdge edge = YGEdgeLeft;
+  for (int i = 0; i < YGEdgeAll + 1; ++i) {
+    YGNODE_STYLE_SET_FLOAT_WITH_EDGE(_yogaNode, Border, dimensionForEdgeWithEdgeInsets(edge, border), edge);
+    edge = (YGEdge)(edge + 1);
+  }
+#else
   ASEdgeInsets oldValue = _border.exchange(border);
   if (0 != memcmp(&border, &oldValue, sizeof(ASEdgeInsets))) {
     ASLayoutElementStyleCallDelegate(ASYogaBorderProperty);
   }
+#endif
 }
-- (void)setAspectRatio:(CGFloat)aspectRatio {
+
+- (void)setAspectRatio:(CGFloat)aspectRatio
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  if (aspectRatio > FLT_EPSILON && aspectRatio < CGFLOAT_MAX / 2.0) {
+    YGNodeStyleSetAspectRatio(_yogaNode, aspectRatio);
+  }
+#else
   if (_aspectRatio.exchange(aspectRatio) != aspectRatio) {
     ASLayoutElementStyleCallDelegate(ASYogaAspectRatioProperty);
   }
+#endif
 }
+
 // private (ASLayoutElementStylePrivate.h)
-- (void)setParentAlignStyle:(ASStackLayoutAlignItems)style {
-  _parentAlignStyle = style;
+- (void)setParentAlignStyle:(ASStackLayoutAlignItems)style
+{
+  // Not an equivalent on _yogaNode
+  _parentAlignStyle.store(style);
 }
 
 #endif /* YOGA */

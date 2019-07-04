@@ -72,6 +72,23 @@ YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems)
   }
 }
 
+ASStackLayoutAlignItems stackAlignItems(YGAlign alignItems)
+{
+  switch (alignItems) {
+    case YGAlignAuto:       return ASStackLayoutAlignItemsNotSet;
+    case YGAlignFlexStart:  return ASStackLayoutAlignItemsStart;
+    case YGAlignFlexEnd:    return ASStackLayoutAlignItemsEnd;
+    case YGAlignCenter:     return ASStackLayoutAlignItemsCenter;
+    case YGAlignStretch:    return ASStackLayoutAlignItemsStretch;
+    case YGAlignBaseline:   return ASStackLayoutAlignItemsBaselineFirst;
+    case YGAlignSpaceAround:
+    case YGAlignSpaceBetween: {
+      NSCAssert(NO, @"Align items value not supported.");
+      return ASStackLayoutAlignItemsNotSet;
+    }
+  }
+}
+
 YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent)
 {
   switch (justifyContent) {
@@ -83,6 +100,17 @@ YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent)
   }
 }
 
+ASStackLayoutJustifyContent stackJustifyContent(YGJustify justifyContent)
+{
+  switch (justifyContent) {
+    case YGJustifyFlexStart:    return ASStackLayoutJustifyContentStart;
+    case YGJustifyCenter:       return ASStackLayoutJustifyContentCenter;
+    case YGJustifyFlexEnd:      return ASStackLayoutJustifyContentEnd;
+    case YGJustifySpaceBetween: return ASStackLayoutJustifyContentSpaceBetween;
+    case YGJustifySpaceAround:  return ASStackLayoutJustifyContentSpaceAround;
+  }
+}
+
 YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf)
 {
   switch (alignSelf) {
@@ -91,6 +119,23 @@ YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf)
     case ASStackLayoutAlignSelfEnd:     return YGAlignFlexEnd;
     case ASStackLayoutAlignSelfStretch: return YGAlignStretch;
     case ASStackLayoutAlignSelfAuto:    return YGAlignAuto;
+  }
+}
+
+ASStackLayoutAlignSelf stackAlignSelf(YGAlign alignSelf)
+{
+  switch (alignSelf) {
+    case YGAlignFlexStart:  return ASStackLayoutAlignSelfStart;
+    case YGAlignCenter:     return ASStackLayoutAlignSelfCenter;
+    case YGAlignFlexEnd:    return ASStackLayoutAlignSelfEnd;
+    case YGAlignStretch:    return ASStackLayoutAlignSelfStretch;
+    case YGAlignAuto:       return ASStackLayoutAlignSelfAuto;
+    case YGAlignBaseline:
+    case YGAlignSpaceBetween:
+    case YGAlignSpaceAround: {
+      NSCAssert(NO, @"Align self value not supported.");
+      return ASStackLayoutAlignSelfStart;
+    }
   }
 }
 
@@ -108,6 +153,20 @@ YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction)
   }
 }
 
+ASStackLayoutDirection stackFlexDirection(YGFlexDirection direction)
+{
+  switch (direction) {
+    case YGFlexDirectionColumn:
+      return ASStackLayoutDirectionVertical;
+    case YGFlexDirectionColumnReverse:
+      return ASStackLayoutDirectionVerticalReverse;
+    case YGFlexDirectionRow:
+      return ASStackLayoutDirectionHorizontal;
+    case YGFlexDirectionRowReverse:
+      return ASStackLayoutDirectionHorizontalReverse;
+  }
+}
+
 float yogaFloatForCGFloat(CGFloat value)
 {
   if (value < CGFLOAT_MAX / 2) {
@@ -117,9 +176,9 @@ float yogaFloatForCGFloat(CGFloat value)
   }
 }
 
-float cgFloatForYogaFloat(float yogaFloat)
+CGFloat cgFloatForYogaFloat(float yogaFloat, CGFloat undefinedDefault)
 {
-  return (yogaFloat == YGUndefined) ? CGFLOAT_MAX : yogaFloat;
+  return YGFloatIsUndefined(yogaFloat) ? undefinedDefault : yogaFloat;
 }
 
 float yogaDimensionToPoints(ASDimension dimension)
@@ -135,6 +194,40 @@ float yogaDimensionToPercent(ASDimension dimension)
                        @"Dimensions should not be type Points for this method: %f", dimension.value);
   return 100.0 * yogaFloatForCGFloat(dimension.value);
 
+}
+
+YGValue yogaValueForDimension(ASDimension dimension)
+{
+  switch (dimension.unit) {
+    case ASDimensionUnitFraction: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitPercent};
+    }
+    case ASDimensionUnitPoints: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitPoint};
+    }
+    case ASDimensionUnitAuto: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitAuto};
+    }
+  }
+}
+
+ASDimension dimensionForYogaValue(YGValue value)
+{
+  switch (value.unit) {
+    case YGUnitPercent: {
+      return ASDimensionMake(ASDimensionUnitFraction, cgFloatForYogaFloat(value.value, 0));
+    }
+    case YGUnitPoint: {
+      return ASDimensionMake(ASDimensionUnitPoints, cgFloatForYogaFloat(value.value, 0));
+    }
+    case YGUnitAuto: {
+      return ASDimensionMake(ASDimensionUnitAuto, cgFloatForYogaFloat(value.value, 0));
+    }
+    case YGUnitUndefined: {
+      // YGUnitUndefined maps over to Auto the default value within Texture
+      return ASDimensionMake(ASDimensionUnitAuto, cgFloatForYogaFloat(value.value, 0));
+    }
+  }
 }
 
 ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets)
@@ -213,8 +306,8 @@ YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasure
   id <ASLayoutElement> layoutElement = (__bridge id <ASLayoutElement>)YGNodeGetContext(yogaNode);
   ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)], @"Yoga context must be <ASLayoutElement>");
 
-  width = cgFloatForYogaFloat(width);
-  height = cgFloatForYogaFloat(height);
+  width = cgFloatForYogaFloat(width, CGFLOAT_MAX);
+  height = cgFloatForYogaFloat(height, CGFLOAT_MAX);
 
   ASSizeRange sizeRange;
   sizeRange.min = CGSizeZero;
