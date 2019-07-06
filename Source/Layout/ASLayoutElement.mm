@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
-#import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 #import <atomic>
 
@@ -139,6 +139,7 @@ NSString * const ASYogaMarginProperty = @"ASYogaMarginProperty";
 NSString * const ASYogaPaddingProperty = @"ASYogaPaddingProperty";
 NSString * const ASYogaBorderProperty = @"ASYogaBorderProperty";
 NSString * const ASYogaAspectRatioProperty = @"ASYogaAspectRatioProperty";
+NSString * const ASYogaOverflowProperty = @"ASYogaOverflowProperty";
 #endif
 
 #define ASLayoutElementStyleSetSizeWithScope(x)                                    \
@@ -189,7 +190,8 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
-  ASStackLayoutAlignItems _parentAlignStyle;
+  std::atomic<YGOverflow> _overflow;
+  std::atomic<ASStackLayoutAlignItems> _parentAlignStyle;
 #endif
 }
 
@@ -214,7 +216,7 @@ do {\
     std::atomic_init(&_size, ASLayoutElementSizeMake());
     std::atomic_init(&_flexBasis, ASDimensionAuto);
 #if YOGA
-    _parentAlignStyle = ASStackLayoutAlignItemsNotSet;
+    std::atomic_init(&_parentAlignStyle, ASStackLayoutAlignItemsNotSet);
     std::atomic_init(&_flexDirection, ASStackLayoutDirectionVertical);
     std::atomic_init(&_alignItems, ASStackLayoutAlignItemsStretch);
     std::atomic_init(&_aspectRatio, static_cast<CGFloat>(YGUndefined));
@@ -664,7 +666,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
 #if YOGA
   /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
-   void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
    void YGNodeStyleSetFlex(YGNodeRef node, float flex);
    */
 
@@ -760,6 +761,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     if (aspectRatio > FLT_EPSILON && aspectRatio < CGFLOAT_MAX / 2.0) {
       YGNodeStyleSetAspectRatio(_yogaNode, aspectRatio);
     }
+  } else if (propertyName == ASYogaOverflowProperty) {
+    YGNodeStyleSetOverflow(_yogaNode, self.overflow);
   }
 #endif
 }
@@ -817,7 +820,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (CGFloat)aspectRatio                        { return _aspectRatio.load(); }
 // private (ASLayoutElementStylePrivate.h)
 - (ASStackLayoutAlignItems)parentAlignStyle {
-  return _parentAlignStyle;
+  return _parentAlignStyle.load();
+}
+- (YGOverflow)overflow {
+  return _overflow.load();
 }
 
 - (void)setFlexWrap:(YGWrap)flexWrap {
@@ -882,9 +888,13 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 }
 // private (ASLayoutElementStylePrivate.h)
 - (void)setParentAlignStyle:(ASStackLayoutAlignItems)style {
-  _parentAlignStyle = style;
+  _parentAlignStyle.store(style);
 }
-
+- (void)setOverflow:(YGOverflow)overflow {
+  if (_overflow.exchange(overflow) != overflow) {
+    ASLayoutElementStyleCallDelegate(ASYogaOverflowProperty);
+  }
+}
 #endif /* YOGA */
 
 @end
