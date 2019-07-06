@@ -139,6 +139,7 @@ NSString * const ASYogaMarginProperty = @"ASYogaMarginProperty";
 NSString * const ASYogaPaddingProperty = @"ASYogaPaddingProperty";
 NSString * const ASYogaBorderProperty = @"ASYogaBorderProperty";
 NSString * const ASYogaAspectRatioProperty = @"ASYogaAspectRatioProperty";
+NSString * const ASYogaOverflowProperty = @"ASYogaOverflowProperty";
 #endif
 
 #define ASLayoutElementStyleSetSizeWithScope(x)                                    \
@@ -197,6 +198,7 @@ do {\
   std::atomic<ASEdgeInsets> _padding;
   std::atomic<ASEdgeInsets> _border;
   std::atomic<CGFloat> _aspectRatio;
+  std::atomic<YGOverflow> _overflow;
 #endif // !USE_YOGA_NODE
   std::atomic<ASStackLayoutAlignItems> _parentAlignStyle;
 #else // YOGA
@@ -899,7 +901,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
 #if YOGA && !USE_YOGA_NODE
   /* TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT
-   void YGNodeStyleSetOverflow(YGNodeRef node, YGOverflow overflow);
    void YGNodeStyleSetFlex(YGNodeRef node, float flex);
    */
 
@@ -995,6 +996,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
     if (aspectRatio > FLT_EPSILON && aspectRatio < CGFLOAT_MAX / 2.0) {
       YGNodeStyleSetAspectRatio(_yogaNode, aspectRatio);
     }
+  } else if (propertyName == ASYogaOverflowProperty) {
+    YGNodeStyleSetOverflow(_yogaNode, self.overflow);
   }
 #endif
 }
@@ -1154,6 +1157,16 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   // Not an equivalent on _yogaNode
   return _parentAlignStyle.load();
+}
+
+- (YGOverflow)overflow
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  return YGNodeStyleGetOverflow(_yogaNode);
+#else
+  return _overflow.load();
+#endif
 }
 
 - (void)setFlexWrap:(YGWrap)flexWrap
@@ -1316,6 +1329,18 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 {
   // Not an equivalent on _yogaNode
   _parentAlignStyle.store(style);
+}
+
+- (void)setOverflow:(YGOverflow)overflow
+{
+#if USE_YOGA_NODE
+  MutexLocker l(__instanceLock__);
+  YGNodeStyleSetOverflow(_yogaNode, overflow);
+#else
+  if (_overflow.exchange(overflow) != overflow) {
+    ASLayoutElementStyleCallDelegate(ASYogaOverflowProperty);
+  }
+#endif
 }
 
 #endif /* YOGA */
