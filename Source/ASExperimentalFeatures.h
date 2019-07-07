@@ -31,6 +31,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalRemoveTextKitInitialisingLock = 1 << 10,    // exp_remove_textkit_initialising_lock
   ASExperimentalDrawingGlobal = 1 << 11,                    // exp_drawing_global
   ASExperimentalOptimizeDataControllerPipeline = 1 << 12,   // exp_optimize_data_controller_pipeline
+  ASExperimentalLayoutElementStyleYogaNode = 1 << 13,       // exp_layout_element_style_yoga_node
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

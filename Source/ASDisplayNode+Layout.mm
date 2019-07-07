@@ -66,6 +66,7 @@ using AS::MutexLocker;
   DISABLED_ASAssertLocked(__instanceLock__);
   if (_style == nil) {
 #if YOGA
+    if (ASActivateExperimentalFeature(ASExperimentalLayoutElementStyleYogaNode)) {
 #if USE_YOGA_NODE
     // In Yoga mode we use the delegate to inform the tree if properties changes
     _style = (ASLayoutElementStyle *)[[ASLayoutElementStyleYoga alloc] initWithDelegate:self];
@@ -73,7 +74,10 @@ using AS::MutexLocker;
     // In Yoga mode we use the delegate to inform the tree if properties changes
     _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
 #endif // USE_YOGA_NODE
-
+    } else {
+      // In Yoga mode we use the delegate to inform the tree if properties changes
+      _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
+    }
 #else
     _style = [[ASLayoutElementStyle alloc] init];
 #endif // YOGA
