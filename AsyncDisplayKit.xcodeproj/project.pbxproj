@@ -212,6 +212,8 @@
 		9D9AA56921E23EE200172C09 /* ASDisplayNode+LayoutSpec.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AA56721E23EE200172C09 /* ASDisplayNode+LayoutSpec.mm */; };
 		9D9AA56B21E254B800172C09 /* ASDisplayNode+Yoga.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D9AA56A21E254B800172C09 /* ASDisplayNode+Yoga.h */; };
 		9D9AA56D21E2568500172C09 /* ASDisplayNode+LayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D9AA56C21E2568500172C09 /* ASDisplayNode+LayoutSpec.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9DC6C85922D243E0005BB8B2 /* ASLayoutElementStyleYoga.h in Headers */ = {isa = PBXBuildFile; fileRef = 9DC6C85722D243E0005BB8B2 /* ASLayoutElementStyleYoga.h */; };
+		9DC6C85A22D243E0005BB8B2 /* ASLayoutElementStyleYoga.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9DC6C85822D243E0005BB8B2 /* ASLayoutElementStyleYoga.mm */; };
 		9F06E5CD1B4CAF4200F015D8 /* ASCollectionViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9F06E5CC1B4CAF4200F015D8 /* ASCollectionViewTests.mm */; };
 		9F98C0261DBE29E000476D92 /* ASControlTargetAction.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9F98C0241DBDF2A300476D92 /* ASControlTargetAction.mm */; };
 		9F98C0271DBE29FC00476D92 /* ASControlTargetAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 9F98C0231DBDF2A300476D92 /* ASControlTargetAction.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -781,6 +783,8 @@
 		9D9AA56721E23EE200172C09 /* ASDisplayNode+LayoutSpec.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASDisplayNode+LayoutSpec.mm"; sourceTree = "<group>"; };
 		9D9AA56A21E254B800172C09 /* ASDisplayNode+Yoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Yoga.h"; sourceTree = "<group>"; };
 		9D9AA56C21E2568500172C09 /* ASDisplayNode+LayoutSpec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+LayoutSpec.h"; sourceTree = "<group>"; };
+		9DC6C85722D243E0005BB8B2 /* ASLayoutElementStyleYoga.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASLayoutElementStyleYoga.h; sourceTree = "<group>"; };
+		9DC6C85822D243E0005BB8B2 /* ASLayoutElementStyleYoga.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutElementStyleYoga.mm; sourceTree = "<group>"; };
 		9F06E5CC1B4CAF4200F015D8 /* ASCollectionViewTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASCollectionViewTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		9F98C0231DBDF2A300476D92 /* ASControlTargetAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASControlTargetAction.h; sourceTree = "<group>"; };
 		9F98C0241DBDF2A300476D92 /* ASControlTargetAction.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASControlTargetAction.mm; sourceTree = "<group>"; };
@@ -1695,6 +1699,8 @@
 				E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */,
 				698C8B601CAB49FC0052DC3F /* ASLayoutElementExtensibility.h */,
 				9CDC18CB1B910E12004965E2 /* ASLayoutElementPrivate.h */,
+				9DC6C85722D243E0005BB8B2 /* ASLayoutElementStyleYoga.h */,
+				9DC6C85822D243E0005BB8B2 /* ASLayoutElementStyleYoga.mm */,
 				ACF6ED0D1B17843500DA7C62 /* ASLayoutSpec.h */,
 				ACF6ED0E1B17843500DA7C62 /* ASLayoutSpec.mm */,
 				6977965D1D8AC8D3007E93D7 /* ASLayoutSpec+Subclasses.h */,
@@ -1993,6 +1999,7 @@
 				CC0F88631E4281E700576FED /* ASSupplementaryNodeSource.h in Headers */,
 				254C6B771BF94DF4003EC431 /* ASTextKitAttributes.h in Headers */,
 				254C6B7D1BF94DF4003EC431 /* ASTextKitShadower.h in Headers */,
+				9DC6C85922D243E0005BB8B2 /* ASLayoutElementStyleYoga.h in Headers */,
 				690ED58E1E36BCA6000627C0 /* ASLayoutElementStylePrivate.h in Headers */,
 				CC55A70D1E529FA200594372 /* UIResponder+AsyncDisplayKit.h in Headers */,
 				254C6B731BF94DF4003EC431 /* ASTextKitCoreTextAdditions.h in Headers */,
@@ -2467,6 +2474,7 @@
 				AC6145441D8AFD4F003D62A2 /* ASSection.mm in Sources */,
 				E5775AFE1F13CF7400CAC9BC /* _ASCollectionGalleryLayoutItem.mm in Sources */,
 				34EFC75E1B701BF000AD841F /* ASInternalHelpers.mm in Sources */,
+				9DC6C85A22D243E0005BB8B2 /* ASLayoutElementStyleYoga.mm in Sources */,
 				34EFC7681B701CDE00AD841F /* ASLayout.mm in Sources */,
 				DECBD6EA1BE56E1900CF4905 /* ASButtonNode.mm in Sources */,
 				CCCCCCE01EC3EF060087FE10 /* ASTextRunDelegate.mm in Sources */,

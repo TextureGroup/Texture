@@ -7,13 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASAvailability.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
-#import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 #import <atomic>
 
@@ -23,6 +24,8 @@ using AS::MutexLocker;
   #import YOGA_HEADER_PATH
   #import <AsyncDisplayKit/ASYogaUtilities.h>
 #endif
+
+using namespace AS;
 
 #pragma mark - ASLayoutElementContext
 
@@ -140,6 +143,7 @@ NSString * const ASYogaPaddingProperty = @"ASYogaPaddingProperty";
 NSString * const ASYogaBorderProperty = @"ASYogaBorderProperty";
 NSString * const ASYogaAspectRatioProperty = @"ASYogaAspectRatioProperty";
 NSString * const ASYogaOverflowProperty = @"ASYogaOverflowProperty";
+NSString * const ASLayoutElementStyleParentAlignStyle = @"ASLayoutElementStyleParentAlignStyle";
 #endif
 
 #define ASLayoutElementStyleSetSizeWithScope(x)                                    \
@@ -1030,8 +1034,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (void)destroyYogaNode
 {
   if (_yogaNode != NULL) {
-    // Release the __bridge_retained Context object.
-    ASLayoutElementYogaUpdateMeasureFunc(_yogaNode, nil);
+    if (ASDisplayNode *delegateAsNode = ASDynamicCast(_delegate, ASDisplayNode)) {
+      MutexLocker l(delegateAsNode->__instanceLock__);
+      ASLayoutElementYogaUpdateMeasureFunc(_yogaNode, nil);
+    }
     YGNodeFree(_yogaNode);
     _yogaNode = NULL;
   }
@@ -1328,7 +1334,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__)
 - (void)setParentAlignStyle:(ASStackLayoutAlignItems)style
 {
   // Not an equivalent on _yogaNode
-  _parentAlignStyle.store(style);
+  if (_parentAlignStyle.exchange(style) != style) {
+    ASLayoutElementStyleCallDelegate(ASLayoutElementStyleParentAlignStyle);
+  }
 }
 
 - (void)setOverflow:(YGOverflow)overflow
