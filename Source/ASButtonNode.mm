@@ -180,7 +180,7 @@
   }
 
   // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
-  if ((_titleNode != nil || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
+  if (((_titleNode != nil && self.titleNode.attributedText.length > 0) || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
     _titleNode.attributedText = newTitle;
     [self unlock];
     
