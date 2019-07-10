@@ -73,8 +73,9 @@ NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *co
       CGFloat fontSize = CTFontGetSize(coreTextFont);
       UIFont *font = [UIFont fontWithName:fontName size:fontSize];
       ASDisplayNodeCAssertNotNil(font, @"unable to load font %@ with size %f", fontName, fontSize);
-      if (font == nil) {
+      if (font == nil || ![font.familyName isEqualToString:fontName]) {
         // Gracefully fail if we were unable to load the font.
+        // Additionally UIFont is returning a different font family than expected, fallback to the system font
         font = [UIFont systemFontOfSize:fontSize];
       }
       cleanAttributes[NSFontAttributeName] = font;
