@@ -179,9 +179,10 @@
     newTitle = _normalAttributedTitle;
   }
 
-  // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
-  if (((_titleNode != nil && self.titleNode.attributedText.length > 0) || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
-    _titleNode.attributedText = newTitle;
+  NSAttributedString *attributedString = _titleNode.attributedText;
+  if ((attributedString.length > 0 || newTitle.length > 0) && [attributedString isEqualToAttributedString:newTitle] == NO) {
+    // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
+    self.titleNode.attributedText = newTitle;
     [self unlock];
     
     self.accessibilityLabel = self.defaultAccessibilityLabel;

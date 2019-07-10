@@ -66,4 +66,13 @@
   XCTAssertTrue([buttonNode.accessibilityLabel isEqualToString:@"My Test"]);
 }
 
+- (void)testUpdateTitle
+{
+  NSAttributedString *title = [[NSAttributedString alloc] initWithString:@"MyTitle"];
+  ASButtonNode *buttonNode = [[ASButtonNode alloc] init];
+  [buttonNode setAttributedTitle:title forState:UIControlStateNormal];
+  XCTAssertTrue([[buttonNode attributedTitleForState:UIControlStateNormal] isEqualToAttributedString:title]);
+  XCTAssert([buttonNode.titleNode.attributedText isEqualToAttributedString:title]);
+}
+
 @end
