@@ -76,7 +76,14 @@ NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *co
       if (font == nil || ![font.familyName isEqualToString:fontName]) {
         // Gracefully fail if we were unable to load the font.
         // Additionally UIFont is returning a different font family than expected, fallback to the system font
-        font = [UIFont systemFontOfSize:fontSize];
+        CTFontSymbolicTraits symbolicTraits = CTFontGetSymbolicTraits(coreTextFont);
+          if (symbolicTraits & kCTFontTraitItalic) {
+              font = [UIFont italicSystemFontOfSize:fontSize];
+          } else if (symbolicTraits & kCTFontTraitBold) {
+              font = [UIFont boldSystemFontOfSize:fontSize];
+          } else {
+              font = [UIFont systemFontOfSize:fontSize];
+          }
       }
       cleanAttributes[NSFontAttributeName] = font;
     }
