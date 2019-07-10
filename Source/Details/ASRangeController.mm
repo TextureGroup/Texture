@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
