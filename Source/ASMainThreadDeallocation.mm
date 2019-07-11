@@ -8,14 +8,10 @@
 
 #import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASThread.h>
-
-#import <objc/runtime.h>
-#import <UIKit/UIKit.h>
 
 @implementation NSObject (ASMainThreadIvarTeardown)
 

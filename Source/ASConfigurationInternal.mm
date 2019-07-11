@@ -8,7 +8,6 @@
 
 #import "ASConfigurationInternal.h"
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationDelegate.h>
 #import <stdatomic.h>
 
