@@ -20,8 +20,15 @@
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
+#import <AsyncDisplayKit/ASTextKitShadower.h>
+#import <AsyncDisplayKit/ASEqualityHelpers.h>
 
+#import <AsyncDisplayKit/ASInternalHelpers.h>
+
+#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
+#import <AsyncDisplayKit/ASThread.h>
 
 @interface ASTextCacheValue : NSObject {
   @package
