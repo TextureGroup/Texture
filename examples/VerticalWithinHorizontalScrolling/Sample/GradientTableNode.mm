@@ -58,7 +58,8 @@
 {
   RandomCoreGraphicsNode *elementNode = [[RandomCoreGraphicsNode alloc] init];
   elementNode.style.preferredSize = _elementSize;
-  elementNode.indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:_pageNumber];
+  NSString *content = [[NSIndexPath indexPathForRow:indexPath.row inSection:_pageNumber] description];
+  [elementNode setContent:content];
   
   return elementNode;
 }

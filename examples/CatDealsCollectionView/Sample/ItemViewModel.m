@@ -35,11 +35,11 @@ NSArray *badges;
       _identifier = atomic_fetch_add(&nextID, 1);
       _titleText = [self randomObjectFromArray:titles];
       _firstInfoText = [self randomObjectFromArray:firstInfos];
-      _secondInfoText = [NSString stringWithFormat:@"%zd+ bought", [self randomNumberInRange:5 to:6000]];
-      _originalPriceText = [NSString stringWithFormat:@"$%zd", [self randomNumberInRange:40 to:90]];
-      _finalPriceText = [NSString stringWithFormat:@"$%zd", [self randomNumberInRange:5 to:30]];
+      _secondInfoText = [NSString stringWithFormat:@"%u+ bought", [self randomNumberInRange:5 to:6000]];
+      _originalPriceText = [NSString stringWithFormat:@"$%u", [self randomNumberInRange:40 to:90]];
+      _finalPriceText = [NSString stringWithFormat:@"$%u", [self randomNumberInRange:5 to:30]];
       _soldOutText = (arc4random() % 5 == 0) ? @"SOLD OUT" : nil;
-      _distanceLabelText = [NSString stringWithFormat:@"%zd mi", [self randomNumberInRange:1 to:20]];
+      _distanceLabelText = [NSString stringWithFormat:@"%u mi", [self randomNumberInRange:1 to:20]];
       if (arc4random() % 2 == 0) {
         _badgeText = [self randomObjectFromArray:badges];
       }

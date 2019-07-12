@@ -7,6 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UIColor (Additions)
 
 + (UIColor *)backgroundColor;
@@ -33,7 +35,9 @@
 
 + (NSAttributedString *)attributedStringWithString:(NSString *)string
                                           fontSize:(CGFloat)size
-                                             color:(UIColor *)color
-                                    firstWordColor:(UIColor *)firstWordColor;
+                                             color:(nullable UIColor *)color
+                                    firstWordColor:(nullable UIColor *)firstWordColor;
 
 @end
+
+NS_ASSUME_NONNULL_END
