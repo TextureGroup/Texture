@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/ASEditableTextNode.h>
 
-#import <objc/message.h>
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
