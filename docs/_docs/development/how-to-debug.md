@@ -1,5 +1,5 @@
 ---
-title: Develop and debug
+title: How to debug issues in Texture
 layout: docs
 permalink: /development/how-to-debug.html
 ---
