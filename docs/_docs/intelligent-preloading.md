@@ -2,7 +2,7 @@
 title: Intelligent Preloading 
 layout: docs
 permalink: /docs/intelligent-preloading.html
-prevPage: upgrading.html
+prevPage: adoption-guide-2-0-beta1.html
 nextPage: containers-overview.html
 ---
 
