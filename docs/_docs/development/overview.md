@@ -4,6 +4,10 @@ layout: docs
 permalink: /development/overview.html
 ---
 
+## Components
+
+For a quick overview of Texture's components, please see the [Getting Started Guide](/docs/getting-started.html).
+
 # Framework dependencies:
 
 At its [core](https://github.com/TextureGroup/Texture/blob/master/Texture.podspec#L18), Texture doesn't depend on any non-system frameworks or libraries. Functionalities such as image downloading and caching, video, map and photo assets supports are considered add-ons and extensible by end-users. [By default](https://github.com/TextureGroup/Texture/blob/master/Texture.podspec#L90) Texture includes first-class support for image downloading and caching by integrating [PINRemoteImage](https://github.com/TextureGroup/Texture/blob/master/Texture.podspec#L41) as well as default implementations for other functionalities mentioned above.
