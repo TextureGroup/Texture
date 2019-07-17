@@ -1924,14 +1924,9 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
   XCTAssertTrue(node.opaque, @"Node should start opaque");
   XCTAssertTrue(node.layer.opaque, @"Node should start opaque");
 
-  node.backgroundColor = [UIColor clearColor];
+  node.backgroundColor = [UIColor blackColor];
 
   // This could be debated, but at the moment we differ from UIView's behavior to change the other property in response
-  XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
-  XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this not opaque");
-
-  [node layer];
-
   XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
   XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this not opaque");
 }

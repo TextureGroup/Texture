@@ -511,7 +511,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (BOOL)isOpaque
 {
   _bridge_prologue_read;
-  return _getFromLayer(opaque);
+  return _getFromViewOrLayer(opaque, opaque);
 }
 
 - (void)setOpaque:(BOOL)newOpaque
@@ -740,13 +740,12 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   if (shouldApply) {
     CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
     
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    if (specialPropertiesHandling) {
-        _view.backgroundColor = newBackgroundColor;
+    if (_flags.layerBacked) {
+      _layer.backgroundColor = newBackgroundCGColor;
     } else {
-        _layer.backgroundColor = newBackgroundCGColor;
+      _view.backgroundColor = newBackgroundColor;
     }
-      
+
     if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
       [self setNeedsDisplay];
     }
