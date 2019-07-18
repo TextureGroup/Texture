@@ -2727,25 +2727,26 @@ static bool stringContainsPointer(NSString *description, id p) {
   OCMVerifyAll(mockNode);
 }
 
-- (void)testHitSlopWithoutRTL {
-  ASDisplayNode *node = [[ASDisplayNode alloc] init];
-  node.frame = CGRectMake(0, 0, 100, 100);
-  node.hitTestSlop = UIEdgeInsetsMake(0, -10, 0, -20);
-  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
-  XCTAssertEqual(adjustedSlop.left, -10);
-  XCTAssertEqual(adjustedSlop.right, -20);
-}
-
-- (void)testHitSlopWithRTL {
+- (void)testHitSlopWithRTLTraitCollection {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.frame = CGRectMake(0, 0, 100, 100);
   ASPrimitiveTraitCollection tc = ASPrimitiveTraitCollectionMakeDefault();
   tc.layoutDirection = UITraitEnvironmentLayoutDirectionRightToLeft;
   [node setPrimitiveTraitCollection:tc];
-  node.hitTestSlop = UIEdgeInsetsMake(0, -10, 0, -20);
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
   UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
-  XCTAssertEqual(adjustedSlop.left, -20);
-  XCTAssertEqual(adjustedSlop.right, -10);
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
+}
+
+- (void)testHitSlopWithRTLYoga {
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  [node semanticContentAttributeDidChange:UISemanticContentAttributeForceRightToLeft];
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
 }
 
 @end

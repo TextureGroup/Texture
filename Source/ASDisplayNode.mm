@@ -3273,13 +3273,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
 
 - (BOOL)isRTL {
   if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+    ASDisplayNodeAssertMainThread();
     return _primitiveTraitCollection.layoutDirection == UITraitEnvironmentLayoutDirectionRightToLeft;
-  } else {
+  } else if(_view) {
     return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:_view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+  } else {
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft;
   }
 }
 
-- (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop {
+- (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop
+{
+  ASDisplayNodeAssertMainThread();
   return [self isRTL] ? UIEdgeInsetsMake(slop.top, slop.right, slop.bottom, slop.left) : slop;
 }
 
