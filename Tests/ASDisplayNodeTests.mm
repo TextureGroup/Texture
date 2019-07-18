@@ -183,6 +183,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return &self->_clipCornerLayers;
 }
 
++ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
+{
+  return nil;
+}
+
 @end
 
 @interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
@@ -2727,25 +2732,25 @@ static bool stringContainsPointer(NSString *description, id p) {
   OCMVerifyAll(mockNode);
 }
 
-- (void)testHitSlopWithoutRTL {
-  ASDisplayNode *node = [[ASDisplayNode alloc] init];
-  node.frame = CGRectMake(0, 0, 100, 100);
-  node.hitTestSlop = UIEdgeInsetsMake(0, -10, 0, -20);
-  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
-  XCTAssertEqual(adjustedSlop.left, -10);
-  XCTAssertEqual(adjustedSlop.right, -20);
-}
-
-- (void)testHitSlopWithRTL {
-  ASDisplayNode *node = [[ASDisplayNode alloc] init];
-  node.frame = CGRectMake(0, 0, 100, 100);
-  ASPrimitiveTraitCollection tc = ASPrimitiveTraitCollectionMakeDefault();
-  tc.layoutDirection = UITraitEnvironmentLayoutDirectionRightToLeft;
-  [node setPrimitiveTraitCollection:tc];
-  node.hitTestSlop = UIEdgeInsetsMake(0, -10, 0, -20);
-  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
-  XCTAssertEqual(adjustedSlop.left, -20);
-  XCTAssertEqual(adjustedSlop.right, -10);
+- (void)testPlaceholder
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+  ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
+  node.placeholderEnabled = YES;
+  node.frame = window.bounds;
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  CALayer *layer = node.layer;
+  XCTAssertNotNil(layer);
+  BOOL hasPlaceholderLayer = NO;
+  for (CALayer *sublayer in layer.sublayers) {
+    if (sublayer.zPosition == 9999.0) {
+      hasPlaceholderLayer = YES;
+      break;
+    }
+  }
+  XCTAssertTrue(hasPlaceholderLayer);
 }
 
 @end

@@ -3,7 +3,7 @@ title: Accessibility
 layout: docs
 permalink: /docs/accessibility.html
 prevPage: placeholder-fade-duration.html
-nextPage: layer-backing.html
+nextPage: uicollectionviewinterop.html
 ---
 
 Accessibility works seamlessly in ways that even UIKit doesn’t provide. When using the powerful optimization features of <a href = "layer-backing.html">Layer Backing</a> (`.layerBacked`) and <a href = "subtree-rasterization.html">Subtree Rasterization</a> (`.shouldRasterizeDescendants`), VoiceOver can access fine-grained metadata about each element. This is pretty amazing: `CALayer` doesn’t support accessibility, and rasterization reduces everything to a single flat image. 

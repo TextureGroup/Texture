@@ -2,7 +2,7 @@
 title: Quickstart
 layout: docs
 permalink: /docs/layout2-quickstart.html
-prevPage: multiplex-image-node.html
+prevPage: faq.html
 nextPage: automatic-layout-examples-2.html
 ---
 

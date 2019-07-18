@@ -12,9 +12,10 @@
 #import <AsyncDisplayKit/ASCollectionView.h>
 #import <stdatomic.h>
 
+#import "ASTestCase.h"
 #import "ASThrashUtility.h"
 
-@interface ASCollectionViewThrashTests : XCTestCase
+@interface ASCollectionViewThrashTests : ASTestCase
 
 @end
 
@@ -25,8 +26,17 @@
   BOOL _failed;
 }
 
+- (void)setUp
+{
+  [super setUp];
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+}
+
 - (void)tearDown
 {
+  [super tearDown];
   if (_failed && _update != nil) {
     NSLog(@"Failed update %@: %@", _update, _update.logFriendlyBase64Representation);
   }
