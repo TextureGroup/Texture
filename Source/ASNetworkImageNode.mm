@@ -57,6 +57,7 @@
       unsigned int delegateDidLoadImage:1;
       unsigned int delegateDidLoadImageFromCache:1;
       unsigned int delegateDidLoadImageWithInfo:1;
+      unsigned int delegateDidFailToLoadImageFromCache:1;
 
       unsigned int downloaderImplementsSetProgress:1;
       unsigned int downloaderImplementsSetPriority:1;
@@ -298,6 +299,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   _networkImageNodeFlags.delegateDidLoadImage = [delegate respondsToSelector:@selector(imageNode:didLoadImage:)];
   _networkImageNodeFlags.delegateDidLoadImageFromCache = [delegate respondsToSelector:@selector(imageNodeDidLoadImageFromCache:)];
   _networkImageNodeFlags.delegateDidLoadImageWithInfo = [delegate respondsToSelector:@selector(imageNode:didLoadImage:info:)];
+  _networkImageNodeFlags.delegateDidFailToLoadImageFromCache = [delegate respondsToSelector:@selector(imageNode:delegateDidFailToLoadImageFromCache:)];
 }
 
 - (id<ASNetworkImageNodeDelegate>)delegate
@@ -665,6 +667,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     BOOL delegateWillLoadImageFromCache = _networkImageNodeFlags.delegateWillLoadImageFromCache;
     BOOL delegateWillLoadImageFromNetwork = _networkImageNodeFlags.delegateWillLoadImageFromNetwork;
     BOOL delegateDidLoadImageFromCache = _networkImageNodeFlags.delegateDidLoadImageFromCache;
+    BOOL delegateDidFailToLoadImageFromCache = _networkImageNodeFlags.delegateDidFailToLoadImageFromCache;
     BOOL isImageLoaded = _networkImageNodeFlags.imageLoaded;
     __block NSURL *URL = _URL;
     id currentDownloadIdentifier = _downloadIdentifier;
@@ -824,6 +827,9 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           }
           
           if ([imageContainer asdk_image] == nil && [imageContainer asdk_animatedImageData] == nil && self->_downloader != nil) {
+            if (delegateDidFailToLoadImageFromCache) {
+              [delegate imageNodeDidFailToLoadImageFromCache:self];
+            }
             if (delegateWillLoadImageFromNetwork) {
               [delegate imageNodeWillLoadImageFromNetwork:self];
             }
