@@ -183,6 +183,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return &self->_clipCornerLayers;
 }
 
++ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
+{
+  return nil;
+}
+
 @end
 
 @interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
@@ -2747,6 +2752,27 @@ static bool stringContainsPointer(NSString *description, id p) {
   UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
   XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
                 @"Hit test slop not adjusted correctly.");
+}
+
+- (void)testPlaceholder
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+  ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
+  node.placeholderEnabled = YES;
+  node.frame = window.bounds;
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  CALayer *layer = node.layer;
+  XCTAssertNotNil(layer);
+  BOOL hasPlaceholderLayer = NO;
+  for (CALayer *sublayer in layer.sublayers) {
+    if (sublayer.zPosition == 9999.0) {
+      hasPlaceholderLayer = YES;
+      break;
+    }
+  }
+  XCTAssertTrue(hasPlaceholderLayer);
 }
 
 @end

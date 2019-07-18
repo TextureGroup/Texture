@@ -2,6 +2,7 @@
 title: Layout API Sizing
 layout: docs
 permalink: /docs/layout2-api-sizing.html
+prevPage: layout2-layout-element-properties.html
 nextPage: layout-transition-api.html
 ---
 

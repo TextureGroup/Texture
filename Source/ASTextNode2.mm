@@ -144,18 +144,16 @@ static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
 #if AS_ENABLE_TEXTNODE
-@interface ASTextNode2 () <UIGestureRecognizerDelegate>
+#define AS_TN2_CLASSNAME ASTextNode2
 #else
-@interface ASTextNode () <UIGestureRecognizerDelegate>
+#define AS_TN2_CLASSNAME ASTextNode
 #endif
+
+@interface AS_TN2_CLASSNAME () <UIGestureRecognizerDelegate>
 
 @end
 
-#if AS_ENABLE_TEXTNODE
-@implementation ASTextNode2 {
-#else
-@implementation ASTextNode {
-#endif
+@implementation AS_TN2_CLASSNAME {
   ASTextContainer *_textContainer;
   
   CGSize _shadowOffset;
@@ -166,7 +164,6 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
   NSAttributedString *_additionalTruncationMessage;
-  NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
   NSLineBreakMode _truncationMode;
   
@@ -294,7 +291,10 @@ static NSArray *DefaultLinkAttributeNames() {
   for (NSString *linkAttributeName in _linkAttributeNames) {
     __block BOOL hasLink = NO;
     [attributedText enumerateAttribute:linkAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-      hasLink = (value != nil);
+      if (value == nil) {
+        return;
+      }
+      hasLink = YES;
       *stop = YES;
     }];
     if (hasLink) {
@@ -1357,22 +1357,20 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)_locked_composedTruncationText
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (_composedTruncationText == nil) {
-    if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
-      NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
-      [newComposedTruncationString.mutableString appendString:@" "];
-      [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
-      _composedTruncationText = newComposedTruncationString;
-    } else if (_truncationAttributedText != nil) {
-      _composedTruncationText = _truncationAttributedText;
-    } else if (_additionalTruncationMessage != nil) {
-      _composedTruncationText = _additionalTruncationMessage;
-    } else {
-      _composedTruncationText = DefaultTruncationAttributedString();
-    }
-    _composedTruncationText = [self _locked_prepareTruncationStringForDrawing:_composedTruncationText];
+  NSAttributedString *composedTruncationText = nil;
+  if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
+    NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
+    [newComposedTruncationString.mutableString appendString:@" "];
+    [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
+    composedTruncationText = newComposedTruncationString;
+  } else if (_truncationAttributedText != nil) {
+    composedTruncationText = _truncationAttributedText;
+  } else if (_additionalTruncationMessage != nil) {
+    composedTruncationText = _additionalTruncationMessage;
+  } else {
+    composedTruncationText = DefaultTruncationAttributedString();
   }
-  return _composedTruncationText;
+  return [self _locked_prepareTruncationStringForDrawing:composedTruncationText];
 }
 
 /**

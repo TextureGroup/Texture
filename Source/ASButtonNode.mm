@@ -14,8 +14,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation ASButtonNode
 
@@ -179,9 +177,10 @@
     newTitle = _normalAttributedTitle;
   }
 
-  // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
-  if ((_titleNode != nil || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
-    _titleNode.attributedText = newTitle;
+  NSAttributedString *attributedString = _titleNode.attributedText;
+  if ((attributedString.length > 0 || newTitle.length > 0) && [attributedString isEqualToAttributedString:newTitle] == NO) {
+    // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
+    self.titleNode.attributedText = newTitle;
     [self unlock];
     
     self.accessibilityLabel = self.defaultAccessibilityLabel;

@@ -2,7 +2,8 @@
 title: "Upgrading to 2.0"
 layout: docs
 permalink: /docs/adoption-guide-2-0-beta1.html
-prevPage: adoption-guide-2-0-beta1.html
+prevPage: installation.html
+nextPage: intelligent-preloading.html
 ---
 
 <ol>

@@ -19,7 +19,6 @@
 #import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
-#import <AsyncDisplayKit/ASDataController.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -30,7 +29,6 @@
 #import <AsyncDisplayKit/_ASCollectionViewCell.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASCollectionReusableView.h>
-#import <AsyncDisplayKit/ASPagerNode.h>
 #import <AsyncDisplayKit/ASSectionContext.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/_ASHierarchyChangeSet.h>

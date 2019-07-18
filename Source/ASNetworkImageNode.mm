@@ -9,21 +9,16 @@
 
 #import <AsyncDisplayKit/ASNetworkImageNode.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASImageNode+Private.h>
 #import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
-#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASNetworkImageLoadInfo+Private.h>
-
-#import <atomic>
 
 #if AS_PIN_REMOTE_IMAGE
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
@@ -567,7 +562,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
   if (_downloadIdentifier) {
     if (storeResume && _networkImageNodeFlags.downloaderImplementsCancelWithResume) {
-      as_log_verbose(ASImageLoadingLog(), "Canceling image download w resume for %@ id: %@", self, _downloadIdentifier);
+      as_log_verbose(ASImageLoadingLog(), "Canceling image download with resume for %@ id: %@", self, _downloadIdentifier);
       [_downloader cancelImageDownloadWithResumePossibilityForIdentifier:_downloadIdentifier];
     } else {
       as_log_verbose(ASImageLoadingLog(), "Canceling image download no resume for %@ id: %@", self, _downloadIdentifier);
@@ -671,7 +666,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     BOOL delegateWillLoadImageFromNetwork = _networkImageNodeFlags.delegateWillLoadImageFromNetwork;
     BOOL delegateDidLoadImageFromCache = _networkImageNodeFlags.delegateDidLoadImageFromCache;
     BOOL isImageLoaded = _networkImageNodeFlags.imageLoaded;
-    NSURL *URL = _URL;
+    __block NSURL *URL = _URL;
     id currentDownloadIdentifier = _downloadIdentifier;
   [self unlock];
   
@@ -701,6 +696,8 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
             NSString *filename = [[NSBundle mainBundle] pathForResource:URL.path.lastPathComponent ofType:nil];
             if (filename != nil) {
               nonAnimatedImage = [[UIImage alloc] initWithContentsOfFile:filename];
+              // Update URL to point to newly-resolved file URL for animated image load.
+              URL = nonAnimatedImage ? [NSURL URLWithString:filename] : URL;
             }
           }
 
