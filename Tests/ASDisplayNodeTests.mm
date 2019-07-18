@@ -575,7 +575,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(isLayerBacked, node.isLayerBacked, @"isLayerBacked broken %@", hasLoadedView);
   XCTAssertEqualObjects((id)[self bogusImage].CGImage, (id)node.contents, @"contents broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.clipsToBounds, @"clipsToBounds broken %@", hasLoadedView);
-  XCTAssertEqual(NO, node.opaque, @"opaque broken %@", hasLoadedView);
+  if (node.nodeLoaded && !isLayerBacked) {
+    XCTAssertEqual(YES, node.opaque, @"opaque broken %@", hasLoadedView);
+  } else {
+    XCTAssertEqual(NO, node.opaque, @"opaque broken %@", hasLoadedView);
+  }
   XCTAssertEqual(YES, node.needsDisplayOnBoundsChange, @"needsDisplayOnBoundsChange broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.allowsGroupOpacity, @"allowsGroupOpacity broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.allowsEdgeAntialiasing, @"allowsEdgeAntialiasing broken %@", hasLoadedView);
@@ -718,6 +722,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Assert that the realized view/layer have the correct values.
   [node layer];
+
 
   [self checkValuesMatchSetValues:node isLayerBacked:isLayerBacked];
 

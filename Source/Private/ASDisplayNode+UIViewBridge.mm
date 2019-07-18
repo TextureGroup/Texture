@@ -521,8 +521,15 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
   
   if (shouldApply) {
-    BOOL oldOpaque = _layer.opaque;
-    _layer.opaque = newOpaque;
+    BOOL oldOpaque;
+    if (_flags.layerBacked) {
+      oldOpaque = _layer.opaque;
+      _layer.opaque = newOpaque;
+    } else {
+      oldOpaque = _view.opaque;
+      _view.opaque = newOpaque;
+    }
+
     if (oldOpaque != newOpaque) {
       [self setNeedsDisplay];
     }
@@ -727,7 +734,14 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIColor *)backgroundColor
 {
   _bridge_prologue_read;
-  return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+  if (_loaded(self)) {
+    if (_view != nil) {
+      return _view.backgroundColor;
+    } else {
+      return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+    }
+  }
+  return [UIColor colorWithCGColor:ASDisplayNodeGetPendingState(self).backgroundColor];
 }
 
 - (void)setBackgroundColor:(UIColor *)newBackgroundColor
