@@ -271,27 +271,21 @@ permalink: /showcase.html
 		<br /> 
 		<b>Bluebird</b>
 		</td>
-        
-        <td align="center" valign="top">
-        <a href="https://itunes.apple.com/bf/app/id527299553"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple124/v4/41/48/85/414885c3-f346-ed3b-8ee9-f82c9fbf2159/AppIcon-2-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg" style="width:100px;height:100px;"></a>
-        <br /> 
-        <b>App in the Air</b>
-        </td>
-
-	<td align="center" valign="top">
-        <a href="https://apps.apple.com/us/app/longwalks-a-conversation-app/id1412531085"><img class="roundrect" src="https://media.licdn.com/dms/image/C560BAQEEl1y2TT6fxg/company-logo_200_200/0?e=2159024400&v=beta&t=ZdIFP0AXZiAHgw2_0sJHvCv9z6dO7JF8O-fnCqc2530" style="width:100px;height:100px;"></a>
-        <br /> 
-        <b>Longwalks</b>
-        </td>
-		
 		
 		<td align="center" valign="top">
+		<a href="https://itunes.apple.com/bf/app/id527299553"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple124/v4/41/48/85/414885c3-f346-ed3b-8ee9-f82c9fbf2159/AppIcon-2-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>App in the Air</b>
 		</td>
 		
 		<td align="center" valign="top">
+		<a href="https://apps.apple.com/us/app/longwalks-a-conversation-app/id1412531085"><img class="roundrect" src="https://media.licdn.com/dms/image/C560BAQEEl1y2TT6fxg/company-logo_200_200/0?e=2159024400&v=beta&t=ZdIFP0AXZiAHgw2_0sJHvCv9z6dO7JF8O-fnCqc2530" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>Longwalks</b>
 		</td>
 
 		</tr>
+		
 		</table>
 		
 		<br />
