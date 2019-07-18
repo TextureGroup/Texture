@@ -173,6 +173,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)imageNodeDidLoadImageFromCache:(ASNetworkImageNode *)imageNode;
 
 /**
+ * Notification that the image node is not able to load image from cache
+ *
+ * @param imageNode The sender.
+ *
+ * @discussion Called on the main thread.
+ */
+- (void)imageNodeDidFailToLoadImageFromCache:(ASNetworkImageNode *)imageNode;
+
+/**
  * Notification that the image node will load image from network
  *
  * @param imageNode The sender.
