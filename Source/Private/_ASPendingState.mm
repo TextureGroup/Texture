@@ -1096,6 +1096,7 @@ static UIColor *defaultTintColor = nil;
 
   if (flags.setBackgroundColor) {
     view.backgroundColor = [UIColor colorWithCGColor:backgroundColor];
+    layer.backgroundColor = backgroundColor;
   }
 
   if (flags.setTintColor)

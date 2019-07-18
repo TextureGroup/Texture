@@ -753,6 +753,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       _layer.backgroundColor = newBackgroundCGColor;
     } else {
       _view.backgroundColor = newBackgroundColor;
+      _layer.backgroundColor = _view.backgroundColor.CGColor;
     }
 
     if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
