@@ -3271,7 +3271,8 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _hitTestSlop;
 }
 
-- (BOOL)isRTL {
+- (BOOL)isRTL
+{
   if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     ASDisplayNodeAssertMainThread();
     return _primitiveTraitCollection.layoutDirection == UITraitEnvironmentLayoutDirectionRightToLeft;
