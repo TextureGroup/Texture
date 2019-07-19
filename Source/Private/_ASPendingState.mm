@@ -1102,8 +1102,10 @@ static UIColor *defaultTintColor = nil;
   if (flags.setTintColor)
     view.tintColor = self.tintColor;
 
-  if (flags.setOpaque)
+  if (flags.setOpaque) {
+    view.opaque = _flags.opaque;
     layer.opaque = _flags.opaque;
+  }
 
   if (flags.setHidden)
     view.hidden = _flags.hidden;

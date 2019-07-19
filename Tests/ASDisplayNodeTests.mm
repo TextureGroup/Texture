@@ -1923,13 +1923,23 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
   }
 
   XCTAssertTrue(node.opaque, @"Node should start opaque");
-  XCTAssertTrue(node.layer.opaque, @"Node should start opaque");
+  if (isLayerBacked) {
+      XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
+    } else {
+      XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
+    }
 
-  node.backgroundColor = [UIColor blackColor];
+  node.backgroundColor = [UIColor clearColor];
+//  [node.view setNeedsDisplay];
 
   // This could be debated, but at the moment we differ from UIView's behavior to change the other property in response
   XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
-  XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this not opaque");
+  if (isLayerBacked) {
+    XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
+  } else {
+    XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
+  }
+
 }
 
 - (void)testBackgroundColorOpaqueRelationshipView
