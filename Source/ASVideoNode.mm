@@ -453,6 +453,10 @@ static NSString * const kRate = @"rate";
 {
   [super didEnterVisibleState];
   
+  if ([self isPlaying]) {
+    return;
+  }
+  
   BOOL shouldPlay = NO;
   {
     ASLockScopeSelf();
