@@ -534,6 +534,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
      */
     BOOL oldOpaque = _layer.opaque;
     if (!_flags.layerBacked) {
+      oldOpaque = _view.opaque;
       _view.opaque = newOpaque;
     }
     _layer.opaque = newOpaque;
