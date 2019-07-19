@@ -1922,15 +1922,25 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
     [node layer];
   }
 
+  /*
+   NOTE: The values of `opaque` can be different between a view and layer.
+
+   In debugging on Xcode 11 I saw the following in lldb:
+   - Initially for a new ASDisplayNode layer.isOpaque and _view.isOpaque are true
+   - Set the backgroundColor of the node to a valid UIColor
+   Expected: layer.isOpaque and view.isOpaque would be equal and true
+   Actual: view.isOpaque is true and layer.isOpaque is now false
+
+   For these reasons we have the following variations of asserts depending on the backing type of the node.
+   */
   XCTAssertTrue(node.opaque, @"Node should start opaque");
   if (isLayerBacked) {
-      XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
-    } else {
-      XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
-    }
+    XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
+  } else {
+    XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
+  }
 
   node.backgroundColor = [UIColor clearColor];
-//  [node.view setNeedsDisplay];
 
   // This could be debated, but at the moment we differ from UIView's behavior to change the other property in response
   XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
@@ -1939,7 +1949,6 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
   } else {
     XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
   }
-
 }
 
 - (void)testBackgroundColorOpaqueRelationshipView
