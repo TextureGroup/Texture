@@ -640,10 +640,9 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     __weak __typeof__(self) weakSelf = self;
     ASImageDownloaderProgress downloadProgress = ^(CGFloat progress){
       __typeof__(self) strongSelf = weakSelf;
-      if (strongSelf == nil) {
-        return;
+      if (strongSelf) {
+        [strongSelf _updateDownloadedProgress:progress downloadIdentifier:downloadIdentifier];
       }
-      [strongSelf _updateDownloadedProgress:progress downloadIdentifier:downloadIdentifier];
     };
     ASImageDownloaderCompletion completion = ^(id <ASImageContainerProtocol> _Nullable imageContainer, NSError * _Nullable error, id  _Nullable downloadIdentifier, id _Nullable userInfo) {
       if (finished != NULL) {
@@ -817,7 +816,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           UIImage *newImage;
           if (imageContainer != nil) {
             [strongSelf _setCurrentImageQuality:1.0];
-            [self _setDownloadProgress:1.0];
+            [strongSelf _setDownloadProgress:1.0];
             NSData *animatedImageData = [imageContainer asdk_animatedImageData];
             if (animatedImageData && strongSelf->_networkImageNodeFlags.downloaderImplementsAnimatedImage) {
               id animatedImage = [strongSelf->_downloader animatedImageWithData:animatedImageData];
