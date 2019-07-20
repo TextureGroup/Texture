@@ -16,9 +16,13 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-#define __shouldSetNeedsDisplay(layer) (flags.needsDisplay \
+#define __shouldSetNeedsDisplayForView(view) (flags.needsDisplay \
+  || (flags.setOpaque && _flags.opaque != (view).opaque)\
+  || (flags.setBackgroundColor && ![backgroundColor isEqual:(view).backgroundColor]))
+
+#define __shouldSetNeedsDisplayForLayer(layer) (flags.needsDisplay \
   || (flags.setOpaque && _flags.opaque != (layer).opaque)\
-  || (flags.setBackgroundColor && !CGColorEqualToColor(backgroundColor, (layer).backgroundColor)))
+  || (flags.setBackgroundColor && ![backgroundColor isEqual:[UIColor colorWithCGColor:(layer).backgroundColor]]))
 
 typedef struct {
   // Properties
@@ -102,7 +106,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   unsigned int edgeAntialiasingMask;
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
   CGRect bounds;
-  CGColorRef backgroundColor;
+  UIColor *backgroundColor;
   CGFloat alpha;
   CGFloat cornerRadius;
   UIViewContentMode contentMode;
@@ -415,19 +419,17 @@ static UIColor *defaultTintColor = nil;
   _stateToApplyFlags.setBounds = YES;
 }
 
-- (CGColorRef)backgroundColor
+- (UIColor *)backgroundColor
 {
   return backgroundColor;
 }
 
-- (void)setBackgroundColor:(CGColorRef)color
+- (void)setBackgroundColor:(UIColor *)color
 {
-  if (color == backgroundColor) {
+  if ([color isEqual:backgroundColor]) {
     return;
   }
-
-  CGColorRelease(backgroundColor);
-  backgroundColor = CGColorRetain(color);
+  backgroundColor = color;
   _stateToApplyFlags.setBackgroundColor = YES;
 }
 
@@ -926,7 +928,7 @@ static UIColor *defaultTintColor = nil;
 {
   ASPendingStateFlags flags = _stateToApplyFlags;
 
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (__shouldSetNeedsDisplayForLayer(layer)) {
     [layer setNeedsDisplay];
   }
 
@@ -964,7 +966,7 @@ static UIColor *defaultTintColor = nil;
     layer.masksToBounds = _flags.clipsToBounds;
 
   if (flags.setBackgroundColor)
-    layer.backgroundColor = backgroundColor;
+    layer.backgroundColor = backgroundColor.CGColor;
 
   if (flags.setOpaque)
     layer.opaque = _flags.opaque;
@@ -1048,7 +1050,7 @@ static UIColor *defaultTintColor = nil;
   unowned CALayer *layer = view.layer;
 
   ASPendingStateFlags flags = _stateToApplyFlags;
-  if (__shouldSetNeedsDisplay(layer)) {
+  if (__shouldSetNeedsDisplayForView(view)) {
     [view setNeedsDisplay];
   }
 
@@ -1095,8 +1097,8 @@ static UIColor *defaultTintColor = nil;
     view.clipsToBounds = _flags.clipsToBounds;
 
   if (flags.setBackgroundColor) {
-    view.backgroundColor = [UIColor colorWithCGColor:backgroundColor];
-    layer.backgroundColor = backgroundColor;
+    view.backgroundColor = backgroundColor;
+    layer.backgroundColor = backgroundColor.CGColor;
   }
 
   if (flags.setTintColor)
@@ -1286,7 +1288,7 @@ static UIColor *defaultTintColor = nil;
   pendingState.contentsScale = layer.contentsScale;
   pendingState.rasterizationScale = layer.rasterizationScale;
   pendingState.clipsToBounds = layer.masksToBounds;
-  pendingState.backgroundColor = layer.backgroundColor;
+  pendingState.backgroundColor = [UIColor colorWithCGColor:layer.backgroundColor];
   pendingState.opaque = layer.opaque;
   pendingState.hidden = layer.hidden;
   pendingState.alpha = layer.opacity;
@@ -1327,7 +1329,7 @@ static UIColor *defaultTintColor = nil;
   pendingState.contentsScale = layer.contentsScale;
   pendingState.rasterizationScale = layer.rasterizationScale;
   pendingState.clipsToBounds = view.clipsToBounds;
-  pendingState.backgroundColor = layer.backgroundColor;
+  pendingState.backgroundColor = [UIColor colorWithCGColor:layer.backgroundColor];
   pendingState.tintColor = view.tintColor;
   pendingState.opaque = layer.opaque;
   pendingState.hidden = view.hidden;
@@ -1404,8 +1406,6 @@ static UIColor *defaultTintColor = nil;
 
 - (void)dealloc
 {
-  CGColorRelease(backgroundColor);
-  
   if (shadowColor != blackColorRef) {
     CGColorRelease(shadowColor);
   }

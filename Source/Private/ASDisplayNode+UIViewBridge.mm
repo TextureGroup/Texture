@@ -750,24 +750,23 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     if (!_flags.layerBacked) {
       return _view.backgroundColor;
     } else {
-      return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+      return [UIColor colorWithCGColor:_layer.backgroundColor];
     }
   }
-  return [UIColor colorWithCGColor:ASDisplayNodeGetPendingState(self).backgroundColor];
+  return ASDisplayNodeGetPendingState(self).backgroundColor;
 }
 
 - (void)setBackgroundColor:(UIColor *)newBackgroundColor
 {
   _bridge_prologue_write;
-  
-
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-  CGColorRef newBackgroundCGColor = newBackgroundColor.CGColor;
+  CGColorRef newBackgroundCGColor = nil;
   if (shouldApply) {
     CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
     
     if (_flags.layerBacked) {
       _layer.backgroundColor = newBackgroundColor.CGColor;
+      newBackgroundCGColor = _layer.backgroundColor;
     } else {
       /*
        NOTE: Setting to the view and layer individually is necessary.
@@ -778,9 +777,9 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
        */
       _view.backgroundColor = newBackgroundColor;
-      _layer.backgroundColor = _view.backgroundColor.CGColor;
       // Gather the CGColorRef from the view incase there are any changes it might apply to which CGColorRef is returned for dynamic colors
       newBackgroundCGColor = _view.backgroundColor.CGColor;
+      _layer.backgroundColor = newBackgroundCGColor;
     }
 
     if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
@@ -790,7 +789,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     // NOTE: If we're in the background, we cannot read the current value of bgcolor (if loaded).
     // When the pending state is applied to the view on main, we will call `setNeedsDisplay` if
     // the new background color doesn't match the one on the layer.
-    ASDisplayNodeGetPendingState(self).backgroundColor = newBackgroundCGColor;
+    ASDisplayNodeGetPendingState(self).backgroundColor = newBackgroundColor;
   }
 }
 
