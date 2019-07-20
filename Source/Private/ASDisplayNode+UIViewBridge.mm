@@ -511,17 +511,32 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (BOOL)isOpaque
 {
   _bridge_prologue_read;
-  return _getFromLayer(opaque);
+  return _getFromViewOrLayer(opaque, opaque);
 }
+
 
 - (void)setOpaque:(BOOL)newOpaque
 {
   _bridge_prologue_write;
-  
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
   
   if (shouldApply) {
+    /*
+     NOTE: The values of `opaque` can be different between a view and layer.
+
+     In debugging on Xcode 11 I saw the following in lldb:
+     - Initially for a new ASDisplayNode layer.isOpaque and _view.isOpaque are true
+     - Set the backgroundColor of the node to a valid UIColor
+     Expected: layer.isOpaque and view.isOpaque would be equal and true
+     Actual: view.isOpaque is true and layer.isOpaque is now false
+
+     This broke some unit tests for view-backed nodes so I think we need to read directly from the view and can't rely on the layers value at this point.
+     */
     BOOL oldOpaque = _layer.opaque;
+    if (!_flags.layerBacked) {
+      oldOpaque = _view.opaque;
+      _view.opaque = newOpaque;
+    }
     _layer.opaque = newOpaque;
     if (oldOpaque != newOpaque) {
       [self setNeedsDisplay];
@@ -727,26 +742,47 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIColor *)backgroundColor
 {
   _bridge_prologue_read;
-  return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+  if (_loaded(self)) {
+    /*
+     Note: We can no longer rely simply on the layers backgroundColor value if the color is set directly on `_view`
+     There is no longer a 1:1 mapping between _view.backgroundColor and _layer.backgroundColor after testing in iOS 13 / Xcode 11 so we should prefer one or the other depending on the backing type for the node (view or layer)
+     */
+    if (!_flags.layerBacked) {
+      return _view.backgroundColor;
+    } else {
+      return [UIColor colorWithCGColor:_getFromLayer(backgroundColor)];
+    }
+  }
+  return [UIColor colorWithCGColor:ASDisplayNodeGetPendingState(self).backgroundColor];
 }
 
 - (void)setBackgroundColor:(UIColor *)newBackgroundColor
 {
   _bridge_prologue_write;
   
-  CGColorRef newBackgroundCGColor = [newBackgroundColor CGColor];
+
   BOOL shouldApply = ASDisplayNodeShouldApplyBridgedWriteToView(self);
-  
+  CGColorRef newBackgroundCGColor = newBackgroundColor.CGColor;
   if (shouldApply) {
     CGColorRef oldBackgroundCGColor = _layer.backgroundColor;
     
-    BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    if (specialPropertiesHandling) {
-        _view.backgroundColor = newBackgroundColor;
+    if (_flags.layerBacked) {
+      _layer.backgroundColor = newBackgroundColor.CGColor;
     } else {
-        _layer.backgroundColor = newBackgroundCGColor;
+      /*
+       NOTE: Setting to the view and layer individually is necessary.
+
+       As observed in lldb, the view does not appear to immediately propagate background color to the layer and actually clears it's value (`nil`) initially. This was caught by our snapshot tests.
+
+       Given that UIColor / UIView has dynamic capabilties now, we should set directly to the view and make sure that the layers value is consistent here.
+
+       */
+      _view.backgroundColor = newBackgroundColor;
+      _layer.backgroundColor = _view.backgroundColor.CGColor;
+      // Gather the CGColorRef from the view incase there are any changes it might apply to which CGColorRef is returned for dynamic colors
+      newBackgroundCGColor = _view.backgroundColor.CGColor;
     }
-      
+
     if (!CGColorEqualToColor(oldBackgroundCGColor, newBackgroundCGColor)) {
       [self setNeedsDisplay];
     }

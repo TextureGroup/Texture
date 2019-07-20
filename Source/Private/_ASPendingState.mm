@@ -1095,20 +1095,17 @@ static UIColor *defaultTintColor = nil;
     view.clipsToBounds = _flags.clipsToBounds;
 
   if (flags.setBackgroundColor) {
-    // We have to make sure certain nodes get the background color call directly set
-    if (specialPropertiesHandling) {
-      view.backgroundColor = [UIColor colorWithCGColor:backgroundColor];
-    } else {
-      // Set the background color to the layer as in the UIView bridge we use this value as background color
-      layer.backgroundColor = backgroundColor;
-    }
+    view.backgroundColor = [UIColor colorWithCGColor:backgroundColor];
+    layer.backgroundColor = backgroundColor;
   }
 
   if (flags.setTintColor)
     view.tintColor = self.tintColor;
 
-  if (flags.setOpaque)
+  if (flags.setOpaque) {
+    view.opaque = _flags.opaque;
     layer.opaque = _flags.opaque;
+  }
 
   if (flags.setHidden)
     view.hidden = _flags.hidden;
