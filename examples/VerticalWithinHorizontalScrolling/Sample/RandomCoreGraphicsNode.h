@@ -11,6 +11,6 @@
 
 @interface RandomCoreGraphicsNode : ASCellNode
 
-- (void)setContent:(NSString *)content;
+- (instancetype)initWithContent:(NSString *)content;
 
 @end

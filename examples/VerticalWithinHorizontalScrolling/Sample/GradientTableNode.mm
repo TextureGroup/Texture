@@ -56,10 +56,9 @@
 
 - (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  RandomCoreGraphicsNode *elementNode = [[RandomCoreGraphicsNode alloc] init];
-  elementNode.style.preferredSize = _elementSize;
   NSString *content = [[NSIndexPath indexPathForRow:indexPath.row inSection:_pageNumber] description];
-  [elementNode setContent:content];
+  RandomCoreGraphicsNode *elementNode = [[RandomCoreGraphicsNode alloc] initWithContent:content];
+  elementNode.style.preferredSize = _elementSize;
   
   return elementNode;
 }

@@ -44,21 +44,17 @@
   CGColorSpaceRelease(colorSpace);
 }
 
-- (instancetype)init
+- (instancetype)initWithContent:(NSString *)content
 {
   if (!(self = [super init])) {
     return nil;
   }
   
   _indexPathTextNode = [[ASTextNode alloc] init];
+  _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:content attributes:nil];
   [self addSubnode:_indexPathTextNode];
   
   return self;
-}
-
-- (void)setContent:(NSString *)content
-{
-  _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:content attributes:nil];
 }
 
 - (void)layout
