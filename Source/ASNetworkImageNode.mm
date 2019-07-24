@@ -293,7 +293,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 }
 
 /**
- * Always use these methods internally to update the current image quality
+ * Always use these methods internally to update the current download progress
  * We want to maintain the order that downloadProgress is set regardless of the calling thread,
  * so we always have to dispatch to the main thread to ensure that we queue the operations in the correct order.
  * (see comment in displayDidFinish)

@@ -136,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Download progress of the current image.
  * When downloading a network image, this value would be updated to track download progress (value between 0 and 1)
- * If the URL is unset, this is 1 if defaultImage or image is set to non-nil.
+ * This is 1 if image load from cache or network successfully.
  */
 @property (readonly) CGFloat downloadProgress;
 
