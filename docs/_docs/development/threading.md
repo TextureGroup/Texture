@@ -2,6 +2,8 @@
 title: Threading
 layout: docs
 permalink: /development/threading.html
+prevPage: how-to-develop.html
+nextPage: node-lifecycle.html
 ---
 
 # Threading
