@@ -50,8 +50,11 @@ extension OverviewViewController: ASTableDataSource {
     return layoutExamples.count
   }
 
-  func tableNode(_ tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath) -> ASCellNode {
-    return OverviewCellNode(layoutExampleType: layoutExamples[indexPath.row])
+  func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
+    let layoutExample = layoutExamples[indexPath.row]
+    return {
+      return OverviewCellNode(layoutExampleType: layoutExample)
+    }
   }
 }
 
