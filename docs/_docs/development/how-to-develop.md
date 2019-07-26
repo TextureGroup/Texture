@@ -2,6 +2,8 @@
 title: How to start contributing to Texture
 layout: docs
 permalink: /development/how-to-develop.html
+prevPage: overview.html
+nextPage: how-to-debug.html
 ---
 
 As an open source project, contributions are always welcome. Before you start, please read our [Contribution Guidelines](https://github.com/TextureGroup/Texture/blob/master/CONTRIBUTING.md). It's also a good idea to familiarize yourself with our [Development documentations](overview.html).

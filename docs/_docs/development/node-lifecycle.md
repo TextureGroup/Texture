@@ -2,6 +2,8 @@
 title: Node lifecycle
 layout: docs
 permalink: /development/node-lifecycle.html
+prevPage: threading.html
+nextPage: layout-specs.html
 ---
 
 # At a glance

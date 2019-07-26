@@ -2,6 +2,8 @@
 title: Layout specs
 layout: docs
 permalink: /development/layout-specs.html
+prevPage: node-lifecycle.html
+nextPage: collection-asynchronous-updates.html
 ---
 
 # Layout specs

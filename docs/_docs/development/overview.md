@@ -2,6 +2,8 @@
 title: Overview and Structure
 layout: docs
 permalink: /development/overview.html
+prevPage: /docs/multiplex-image-node.html
+nextPage: how-to-develop.html
 ---
 
 ## Components
