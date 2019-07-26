@@ -2,6 +2,7 @@
 title: Collections and asynchronous updates
 layout: docs
 permalink: /development/collection-asynchronous-updates.html
+prevPage: layout-specs.html
 ---
 
 # At a glance

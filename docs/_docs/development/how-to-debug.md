@@ -2,6 +2,8 @@
 title: How to debug issues in Texture
 layout: docs
 permalink: /development/how-to-debug.html
+prevPage: how-to-develop.html
+nextPage: threading.html
 ---
 
 # Debug
