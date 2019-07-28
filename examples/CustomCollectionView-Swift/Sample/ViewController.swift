@@ -52,9 +52,11 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
     _collectionNode.view.isScrollEnabled = true
   }
 
-  func collectionNode(_ collectionNode: ASCollectionNode, nodeForItemAt indexPath: IndexPath) -> ASCellNode {
+  func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
     let image = _sections[indexPath.section][indexPath.item]
-    return ImageCellNode(with: image)
+    return {
+      return ImageCellNode(with: image)
+    }
   }
   
   

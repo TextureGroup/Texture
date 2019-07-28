@@ -66,12 +66,12 @@
   return _videoFeedData.count;
 }
 
-- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath {
   VideoModel *videoObject = [_videoFeedData objectAtIndex:indexPath.row];
-  VideoContentCell *cellNode = [[VideoContentCell alloc] initWithVideoObject:videoObject];
-  
-  return cellNode;
+  return ^{
+    VideoContentCell *cellNode = [[VideoContentCell alloc] initWithVideoObject:videoObject];
+    return cellNode;
+  };
 }
 
 @end
