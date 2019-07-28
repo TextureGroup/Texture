@@ -45,6 +45,11 @@
   [_tableNode reloadData];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return UIStatusBarStyleLightContent;
+}
+
 - (void)generateFeedData
 {
   _videoFeedData = [[NSMutableArray alloc] init];

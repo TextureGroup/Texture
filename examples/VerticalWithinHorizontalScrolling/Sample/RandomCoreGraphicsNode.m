@@ -10,9 +10,9 @@
 #import "RandomCoreGraphicsNode.h"
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 
-@implementation RandomCoreGraphicsNode
-
-@synthesize indexPath = _indexPath;
+@implementation RandomCoreGraphicsNode {
+  ASTextNode *_indexPathTextNode;
+}
 
 + (UIColor *)randomColor
 {
@@ -22,7 +22,7 @@
   return [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
 }
 
-+ (void)drawRect:(CGRect)bounds withParameters:(id<NSObject>)parameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
++ (void)drawRect:(CGRect)bounds withParameters:(id<NSObject>)parameters isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelledBlock isRasterizing:(BOOL)isRasterizing
 {
   CGFloat locations[3];
   NSMutableArray *colors = [NSMutableArray arrayWithCapacity:3];
@@ -44,33 +44,17 @@
   CGColorSpaceRelease(colorSpace);
 }
 
-- (instancetype)init
+- (instancetype)initWithContent:(NSString *)content
 {
   if (!(self = [super init])) {
     return nil;
   }
   
   _indexPathTextNode = [[ASTextNode alloc] init];
+  _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:content attributes:nil];
   [self addSubnode:_indexPathTextNode];
   
   return self;
-}
-
-- (void)setIndexPath:(NSIndexPath *)indexPath
-{
-  @synchronized (self) {
-    _indexPath = indexPath;
-    _indexPathTextNode.attributedText = [[NSAttributedString alloc] initWithString:[indexPath description] attributes:nil];
-  }
-}
-
-- (NSIndexPath *)indexPath
-{
-  NSIndexPath *indexPath = nil;
-  @synchronized (self) {
-    indexPath = _indexPath;
-  }
-  return indexPath;
 }
 
 - (void)layout
