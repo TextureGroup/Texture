@@ -32,3 +32,6 @@ playground.xcworkspace
 /.buckconfig.local
 /.buckd
 
+# Carthage
+Carthage/Checkouts
+Carthage/Build
