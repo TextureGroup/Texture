@@ -1134,6 +1134,12 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
+- (BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  return _alwaysHandleTruncationTokenTap;
+}
+
 #pragma mark - Shadow Properties
 
 - (CGColorRef)shadowColor
