@@ -16,6 +16,7 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASLog.h>
 
@@ -141,6 +142,8 @@
     return @YES;
   } else if ([key isEqualToString:@"opaque"]) {
     return @YES;
+  } else if ([key isEqualToString:@"contentsScale"]) {
+    return @(ASScreenScale());
   } else {
     return [super defaultValueForKey:key];
   }

@@ -681,7 +681,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property (nullable) id contents;                             // default=nil
 @property           CGRect contentsRect;                      // default={0,0,1,1}. @see CALayer.h for details.
 @property           CGRect contentsCenter;                    // default={0,0,1,1}. @see CALayer.h for details.
-@property           CGFloat contentsScale;                    // default=1.0f. See @contentsScaleForDisplay for details.
+@property           CGFloat contentsScale;                    // default=main screen scale. See @contentsScaleForDisplay for details.
 @property           CGFloat rasterizationScale;               // default=1.0f.
 
 @property           CGPoint anchorPoint;                      // default={0.5, 0.5}
