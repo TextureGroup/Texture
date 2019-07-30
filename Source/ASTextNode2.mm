@@ -177,6 +177,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   ASTextNodeHighlightStyle _highlightStyle;
   BOOL _longPressCancelsTouches;
   BOOL _passthroughNonlinkTouches;
+  BOOL _alwaysHandleTruncationTokenTap;
 }
 @dynamic placeholderEnabled;
 
@@ -967,9 +968,14 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   ASDisplayNodeAssertMainThread();
-  
+  ASLockScopeSelf(); // Protect usage of _passthroughNonlinkTouches and _alwaysHandleTruncationTokenTap ivars.
+
   if (!_passthroughNonlinkTouches) {
     return [super pointInside:point withEvent:event];
+  }
+
+  if (_alwaysHandleTruncationTokenTap) {
+    return YES;
   }
   
   NSRange range = NSMakeRange(0, 0);
@@ -1117,6 +1123,18 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   return [ASLockedSelf(_highlightedLinkAttributeName) isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
+- (BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  return _alwaysHandleTruncationTokenTap;
+}
+
+- (void)setAlwaysHandleTruncationTokenTap:(BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  _alwaysHandleTruncationTokenTap = alwaysHandleTruncationTokenTap;
+}
+  
 #pragma mark - Shadow Properties
 
 /**
