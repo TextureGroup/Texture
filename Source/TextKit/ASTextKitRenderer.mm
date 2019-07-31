@@ -61,6 +61,7 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
     CGSize shadowConstrainedSize = [[self shadower] insetSizeWithConstrainedSize:_constrainedSize];
     
     _context = [[ASTextKitContext alloc] initWithAttributedString:attributes.attributedString
+                                                        tintColor:attributes.tintColor
                                                     lineBreakMode:attributes.lineBreakMode
                                              maximumNumberOfLines:attributes.maximumNumberOfLines
                                                    exclusionPaths:attributes.exclusionPaths

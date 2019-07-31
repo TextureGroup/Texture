@@ -85,6 +85,10 @@ struct ASTextKitAttributes {
   NSArray *pointSizeScaleFactors;
 
   /**
+   The tint color to use in drawing the text foreground color. Only applied if the attributedString does not define foreground color
+   */
+  UIColor *tintColor;
+  /**
    We provide an explicit copy function so we can use aggregate initializer syntax while providing copy semantics for
    the NSObjects inside.
    */
@@ -102,6 +106,7 @@ struct ASTextKitAttributes {
       shadowOpacity,
       shadowRadius,
       pointSizeScaleFactors,
+      [tintColor copy]
     };
   };
 
@@ -119,7 +124,8 @@ struct ASTextKitAttributes {
     && ASObjectIsEqual(avoidTailTruncationSet, other.avoidTailTruncationSet)
     && ASObjectIsEqual(shadowColor, other.shadowColor)
     && ASObjectIsEqual(attributedString, other.attributedString)
-    && ASObjectIsEqual(truncationAttributedString, other.truncationAttributedString);
+    && ASObjectIsEqual(truncationAttributedString, other.truncationAttributedString)
+    && ASObjectIsEqual(tintColor, other.tintColor);
   }
 
   size_t hash() const;

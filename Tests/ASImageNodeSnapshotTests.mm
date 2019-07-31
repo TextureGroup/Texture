@@ -19,7 +19,6 @@
 - (void)setUp
 {
   [super setUp];
-  
   self.recordMode = NO;
 }
 
@@ -72,7 +71,43 @@
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = tinted;
   ASDisplayNodeSizeToFitSize(node, test.size);
-  
+  ASSnapshotVerifyNode(node, nil);
+}
+
+- (void)testTintColorOnNodePropertyAlwaysTemplate
+{
+  UIImage *test = [self testImage];
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = [test imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  node.tintColor = UIColor.redColor;
+  ASDisplayNodeSizeToFitSize(node, test.size);
+  // Tint color should change view
+  ASSnapshotVerifyNode(node, @"red_tint");
+
+  node.tintColor = UIColor.blueColor;
+  // Tint color should change view
+  ASSnapshotVerifyNode(node, @"blue_tint");
+}
+
+- (void)testTintColorOnNodePropertyAutomatic
+{
+  UIImage *test = [self testImage];
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = [test imageWithRenderingMode:UIImageRenderingModeAutomatic];
+  // Tint color should change view
+  node.tintColor = UIColor.redColor;
+  ASDisplayNodeSizeToFitSize(node, test.size);
+  ASSnapshotVerifyNode(node, nil);
+}
+
+- (void)testTintColorOnNodePropertyAlwaysOriginal
+{
+  UIImage *test = [self testImage];
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = [test imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+  // Tint color should not have changed since the image render mode is original
+  node.tintColor = UIColor.redColor;
+  ASDisplayNodeSizeToFitSize(node, test.size);
   ASSnapshotVerifyNode(node, nil);
 }
 
@@ -87,7 +122,6 @@
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = rounded;
   ASDisplayNodeSizeToFitSize(node, rounded.size);
-  
   ASSnapshotVerifyNode(node, nil);
 }
 
