@@ -244,13 +244,10 @@
   NSLog(@"starting animation: %p", self);
 #endif
 
-  // Get frame interval before holding display link lock to avoid deadlock
-  NSUInteger frameInterval = self.animatedImage.frameInterval;
   AS::MutexLocker l(_displayLinkLock);
   if (_displayLink == nil) {
     _playHead = 0;
     _displayLink = [CADisplayLink displayLinkWithTarget:[ASWeakProxy weakProxyWithTarget:self] selector:@selector(displayLinkFired:)];
-    _displayLink.frameInterval = frameInterval;
     _lastSuccessfulFrameIndex = NSUIntegerMax;
     
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
