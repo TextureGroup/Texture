@@ -530,7 +530,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)_locked_loadViewOrLayer
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  
   if (_flags.layerBacked) {
     TIME_SCOPED(_debugTimeToCreateView);
     _layer = [self _locked_layerToLoad];
@@ -550,6 +549,14 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     _view = [self _locked_viewToLoad];
     _view.asyncdisplaykit_node = self;
     _layer = _view.layer;
+    // Needed to force `-[_ASDisplayLayer setDelegate:]` to evaluate
+    // It appears that UIKit might be setting the delegate ivar directly which
+    // bypasses establishing the `_delegateFlags` ivar on `ASDisplayLayer`
+    // This is critical for things like ASPagerNode, ASCollectionNode that depend
+    // on layer delegateFlags to forward bounds changes
+    if (_layer.delegate == _view) {
+      [_layer setDelegate:_view];
+    }
   }
   _layer.asyncdisplaykit_node = self;
   
