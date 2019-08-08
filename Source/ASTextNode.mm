@@ -252,6 +252,10 @@ static NSArray *DefaultLinkAttributeNames() {
     // on the special placeholder behavior of ASTextNode.
     _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
     _placeholderInsets = UIEdgeInsetsMake(1.0, 0.0, 1.0, 0.0);
+
+    // Tint color is applied when text nodes are within controls and indicate user action
+    // Most text nodes do not require interaction and this matches the default value of UILabel
+    _textColorFollowsTintColor = NO;
   }
 
   return self;
@@ -378,7 +382,7 @@ static NSArray *DefaultLinkAttributeNames() {
     .shadowColor = _cachedShadowUIColor,
     .shadowOpacity = _shadowOpacity,
     .shadowRadius = _shadowRadius,
-    .tintColor = self.tintColor
+    .tintColor = self.textColorFollowsTintColor ? self.tintColor : nil
   };
 }
 

@@ -54,6 +54,7 @@
     _titleNode = [[ASTextNode alloc] init];
     // Intentionally not layer-backing the image node since tintColor may be applied
     _titleNode.style.flexShrink = 1.0;
+    _titleNode.textColorFollowsTintColor = YES;
   }
   return _titleNode;
 }
