@@ -27,7 +27,7 @@
   NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"logo-square"
                                                                     ofType:@"png"
                                                                inDirectory:@"TestResources"];
-  return [UIImage imageWithContentsOfFile:path];
+  return [[UIImage imageWithContentsOfFile:path] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 }
 
 - (void)testTintColor

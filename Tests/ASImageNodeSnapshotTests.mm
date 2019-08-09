@@ -64,16 +64,6 @@
             @"Contents should be 100 x 100 by contents scale.");
 }
 
-- (void)testTintColorBlock
-{
-  UIImage *test = [self testImage];
-  UIImage *tinted = ASImageNodeTintColorModificationBlock([UIColor redColor])(test);
-  ASImageNode *node = [[ASImageNode alloc] init];
-  node.image = tinted;
-  ASDisplayNodeSizeToFitSize(node, test.size);
-  ASSnapshotVerifyNode(node, nil);
-}
-
 - (void)testTintColorOnNodePropertyAlwaysTemplate
 {
   UIImage *test = [self testImage];
@@ -93,7 +83,7 @@
 {
   UIImage *test = [self testImage];
   ASImageNode *node = [[ASImageNode alloc] init];
-  node.image = [test imageWithRenderingMode:UIImageRenderingModeAutomatic];
+  node.image = test;
   // Tint color should not change view since it depends on being contained within certain views
   // for automatic rendering to utilize tint color.
   node.tintColor = UIColor.redColor;
