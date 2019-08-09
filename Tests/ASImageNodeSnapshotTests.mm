@@ -94,7 +94,8 @@
   UIImage *test = [self testImage];
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = [test imageWithRenderingMode:UIImageRenderingModeAutomatic];
-  // Tint color should change view
+  // Tint color should not change view since it depends on being contained within certain views
+  // for automatic rendering to utilize tint color.
   node.tintColor = UIColor.redColor;
   ASDisplayNodeSizeToFitSize(node, test.size);
   ASSnapshotVerifyNode(node, nil);
