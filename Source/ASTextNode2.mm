@@ -517,6 +517,20 @@ static NSArray *DefaultLinkAttributeNames() {
     shadow.shadowBlurRadius = _shadowRadius;
     [attributedString addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, attributedString.length)];
   }
+
+  // Apply tint color if needed and foreground color is not already specified
+  if (self.textColorFollowsTintColor) {
+    // Apply tint color if specified and if foreground color is undefined for attributedString
+    NSRange limit = NSMakeRange(0, attributedString.length);
+    NSRange effectiveRange;
+    // Look for previous attributes that define foreground color
+    UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:&effectiveRange];
+    UIColor *tintColor = self.tintColor;
+    if (attributeValue == nil && tintColor) {
+      // None are found, apply tint color if available. Fallback to "black" text color
+      [attributedString addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+    }
+  }
 }
 
 #pragma mark - Drawing
