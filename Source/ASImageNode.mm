@@ -41,6 +41,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   CGRect _bounds;
   CGFloat _contentsScale;
   UIColor *_backgroundColor;
+  UIColor *_tintColor;
   UIViewContentMode _contentMode;
   BOOL _cropEnabled;
   BOOL _forceUpscaling;
@@ -69,6 +70,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 @property CGRect imageDrawRect;
 @property BOOL isOpaque;
 @property (nonatomic, copy) UIColor *backgroundColor;
+@property (nonatomic, copy) UIColor *tintColor;
 @property (nonatomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
 @property (nonatomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 @property (nonatomic) asimagenode_modification_block_t imageModificationBlock;
@@ -94,6 +96,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       && CGRectEqualToRect(_imageDrawRect, other.imageDrawRect)
       && _isOpaque == other.isOpaque
       && [_backgroundColor isEqual:other.backgroundColor]
+      && [_tintColor isEqual:other.tintColor]
       && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
       && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
       && _imageModificationBlock == other.imageModificationBlock;
@@ -112,6 +115,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     CGRect imageDrawRect;
     NSInteger isOpaque;
     NSUInteger backgroundColorHash;
+    NSUInteger tintColorHash;
     void *willDisplayNodeContentWithRenderingContext;
     void *didDisplayNodeContentWithRenderingContext;
     void *imageModificationBlock;
@@ -122,6 +126,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     _imageDrawRect,
     _isOpaque,
     _backgroundColor.hash,
+    _tintColor.hash,
     (void *)_willDisplayNodeContentWithRenderingContext,
     (void *)_didDisplayNodeContentWithRenderingContext,
     (void *)_imageModificationBlock
@@ -296,6 +301,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;
+  drawParameters->_tintColor = self.tintColor;
   drawParameters->_contentMode = self.contentMode;
   drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
   drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
@@ -330,6 +336,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   BOOL cropEnabled                 = drawParameter->_cropEnabled;
   BOOL isOpaque                    = drawParameter->_opaque;
   UIColor *backgroundColor         = drawParameter->_backgroundColor;
+  UIColor *tintColor               = drawParameter->_tintColor;
   UIViewContentMode contentMode    = drawParameter->_contentMode;
   CGFloat contentsScale            = drawParameter->_contentsScale;
   CGRect cropDisplayBounds         = drawParameter->_cropDisplayBounds;
@@ -401,6 +408,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.imageDrawRect = imageDrawRect;
   contentsKey.isOpaque = isOpaque;
   contentsKey.backgroundColor = backgroundColor;
+  contentsKey.tintColor = tintColor;
   contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
   contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
@@ -499,6 +507,10 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     UIImage *image = key.image;
     BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
     CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
+    UIImageRenderingMode renderingMode = [image renderingMode];
+    if (renderingMode == UIImageRenderingModeAlwaysTemplate && key.tintColor) {
+      [key.tintColor setFill];
+    }
 
     @synchronized(image) {
       [image drawInRect:key.imageDrawRect blendMode:blendMode alpha:1];
@@ -508,7 +520,13 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
       key.didDisplayNodeContentWithRenderingContext(context, drawParameters);
     }
   });
-  
+
+  // if the original image was stretchy, keep it stretchy
+  UIImage *originalImage = key.image;
+  if (!UIEdgeInsetsEqualToEdgeInsets(originalImage.capInsets, UIEdgeInsetsZero)) {
+    result = [result resizableImageWithCapInsets:originalImage.capInsets resizingMode:originalImage.resizingMode];
+  }
+
   if (key.imageModificationBlock) {
     result = key.imageModificationBlock(result);
   }

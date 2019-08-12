@@ -317,4 +317,18 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
+- (void)testTextTintColor_ASTextNode2
+{
+  // trivial test case to ensure ASSnapshotTestCase works
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"judar"
+                                                        attributes:@{NSFontAttributeName: [UIFont italicSystemFontOfSize:24]}];
+  textNode.textColorFollowsTintColor = YES;
+  textNode.textContainerInset = UIEdgeInsetsMake(0, 2, 0, 2);
+  textNode.tintColor = UIColor.redColor;
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)));
+
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
 @end

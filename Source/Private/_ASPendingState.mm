@@ -229,7 +229,6 @@ ASDISPLAYNODE_INLINE void ASPendingStateApplyMetricsToLayer(_ASPendingState *sta
 @synthesize maskedCorners = maskedCorners;
 
 static CGColorRef blackColorRef = NULL;
-static UIColor *defaultTintColor = nil;
 
 - (instancetype)init
 {
@@ -244,7 +243,6 @@ static UIColor *defaultTintColor = nil;
     blackColorRef = CGColorCreate(colorSpace, (CGFloat[]){0,0,0,1} );
     CFRetain(blackColorRef);
     CGColorSpaceRelease(colorSpace);
-    defaultTintColor = [UIColor colorWithRed:0.0 green:0.478 blue:1.0 alpha:1.0];
   });
 
   // Set defaults, these come from the defaults specified in CALayer and UIView
@@ -253,7 +251,7 @@ static UIColor *defaultTintColor = nil;
   frame = CGRectZero;
   bounds = CGRectZero;
   backgroundColor = nil;
-  tintColor = defaultTintColor;
+  tintColor = nil;
   _flags.hidden = NO;
   _flags.needsDisplayOnBoundsChange = NO;
   _flags.allowsGroupOpacity = ASDefaultAllowsGroupOpacity();

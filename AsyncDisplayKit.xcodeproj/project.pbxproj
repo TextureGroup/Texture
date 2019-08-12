@@ -174,6 +174,7 @@
 		8021EC1D1D2B00B100799119 /* UIImage+ASConvenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 8021EC1A1D2B00B100799119 /* UIImage+ASConvenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8021EC1F1D2B00B100799119 /* UIImage+ASConvenience.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8021EC1B1D2B00B100799119 /* UIImage+ASConvenience.mm */; };
 		81E95C141D62639600336598 /* ASTextNodeSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 81E95C131D62639600336598 /* ASTextNodeSnapshotTests.mm */; };
+		81FF150722EB5F410039311A /* ASButtonNodeSnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 81FF150622EB5F410039311A /* ASButtonNodeSnapshotTests.mm */; };
 		83A7D95B1D44547700BF333E /* ASWeakMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D9591D44542100BF333E /* ASWeakMap.mm */; };
 		83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 83A7D9581D44542100BF333E /* ASWeakMap.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		83A7D95E1D446A6E00BF333E /* ASWeakMapTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */; };
@@ -747,6 +748,7 @@
 		81E95C131D62639600336598 /* ASTextNodeSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTextNodeSnapshotTests.mm; sourceTree = "<group>"; };
 		81EE384D1C8E94F000456208 /* ASRunLoopQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASRunLoopQueue.h; path = ../ASRunLoopQueue.h; sourceTree = "<group>"; };
 		81EE384E1C8E94F000456208 /* ASRunLoopQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ASRunLoopQueue.mm; path = ../ASRunLoopQueue.mm; sourceTree = "<group>"; };
+		81FF150622EB5F410039311A /* ASButtonNodeSnapshotTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASButtonNodeSnapshotTests.mm; sourceTree = "<group>"; };
 		83A7D9581D44542100BF333E /* ASWeakMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASWeakMap.h; sourceTree = "<group>"; };
 		83A7D9591D44542100BF333E /* ASWeakMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASWeakMap.mm; sourceTree = "<group>"; };
 		83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASWeakMapTests.mm; sourceTree = "<group>"; };
@@ -1297,10 +1299,6 @@
 		058D09C5195D04C000B7D73C /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */,
-				F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */,
-				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
-				F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */,
 				DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.mm */,
 				AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.mm */,
 				696FCB301D6E46050093471E /* ASBackgroundLayoutSpecSnapshotTests.mm */,
@@ -1308,12 +1306,15 @@
 				242995D21B29743C00090100 /* ASBasicImageDownloaderTests.mm */,
 				296A0A341A951ABF005ACEAA /* ASBatchFetchingTests.mm */,
 				CC3B208F1C3F892D00798563 /* ASBridgedPropertiesTests.mm */,
+				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
+				81FF150622EB5F410039311A /* ASButtonNodeSnapshotTests.mm */,
 				CC051F1E1D7A286A006434CB /* ASCALayerTests.mm */,
 				ACF6ED531B178DC700DA7C62 /* ASCenterLayoutSpecSnapshotTests.mm */,
 				CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.mm */,
 				CC35CEC520DD87280006448D /* ASCollectionsTests.mm */,
 				2538B6F21BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.mm */,
 				9F06E5CC1B4CAF4200F015D8 /* ASCollectionViewTests.mm */,
+				9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */,
 				CCEDDDD8200C518800FFCD0A /* ASConfigurationTests.mm */,
 				2911485B1A77147A005D0878 /* ASControlNodeTests.mm */,
 				1A6C000F1FAB4ED400D05926 /* ASCornerLayoutSpecSnapshotTests.mm */,
@@ -1328,6 +1329,7 @@
 				058D0A2F195D057000B7D73C /* ASDisplayNodeTests.mm */,
 				058D0A30195D057000B7D73C /* ASDisplayNodeTestsHelper.h */,
 				058D0A31195D057000B7D73C /* ASDisplayNodeTestsHelper.mm */,
+				F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */,
 				697B31591CFE4B410049936F /* ASEditableTextNodeTests.mm */,
 				471D04B0224CB98600649215 /* ASImageNodeBackingSizeTests.mm */,
 				056D21541ABCEF50001107EF /* ASImageNodeSnapshotTests.mm */,
@@ -1366,6 +1368,7 @@
 				254C6B531BF8FF2A003EC431 /* ASTextKitTests.mm */,
 				254C6B511BF8FE6D003EC431 /* ASTextKitTruncationTests.mm */,
 				C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.mm */,
+				F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */,
 				CC8B05D71D73979700F54286 /* ASTextNodePerformanceTests.mm */,
 				81E95C131D62639600336598 /* ASTextNodeSnapshotTests.mm */,
 				058D0A36195D057000B7D73C /* ASTextNodeTests.mm */,
@@ -1374,13 +1377,13 @@
 				9644CFDF2193777C00213478 /* ASThrashUtility.m */,
 				CCE4F9BC1F0ECE5200062E4E /* ASTLayoutFixture.h */,
 				CCE4F9BD1F0ECE5200062E4E /* ASTLayoutFixture.mm */,
+				D933F040224AD17F00FF495E /* ASTransactionTests.mm */,
 				CC0AEEA31D66316E005D1C78 /* ASUICollectionViewTests.mm */,
 				AEEC47E31C21D3D200EC1693 /* ASVideoNodeTests.mm */,
 				CCA221D21D6FA7EF00AF6A0F /* ASViewControllerTests.mm */,
 				83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */,
 				CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.mm */,
 				695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */,
-				D933F040224AD17F00FF495E /* ASTransactionTests.mm */,
 				057D02C01AC0A66700C7AC3C /* AsyncDisplayKitTestHost */,
 				CC583ABF1EF9BAB400134156 /* Common */,
 				058D09C6195D04C000B7D73C /* Supporting Files */,
@@ -2293,6 +2296,7 @@
 				CC3B208E1C3F7D0A00798563 /* ASWeakSetTests.mm in Sources */,
 				F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.mm in Sources */,
 				BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.mm in Sources */,
+				81FF150722EB5F410039311A /* ASButtonNodeSnapshotTests.mm in Sources */,
 				ACF6ED5D1B178DC700DA7C62 /* ASDimensionTests.mm in Sources */,
 				BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.mm in Sources */,
 				695BE2551DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm in Sources */,

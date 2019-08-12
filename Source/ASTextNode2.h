@@ -220,6 +220,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) BOOL alwaysHandleTruncationTokenTap;
 
+/**
+ @abstract if YES will use the value of `self.tintColor` if the foreground color of text is not defined.
+ @discussion This is mainly used from ASButtonNode since by default text nodes do not respect tintColor settings unless contained within a interactive control
+ */
+@property (nonatomic) BOOL textColorFollowsTintColor;
+
 + (void)enableDebugging;
 
 #pragma mark - Layout and Sizing
