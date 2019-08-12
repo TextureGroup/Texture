@@ -510,7 +510,6 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     UIImageRenderingMode renderingMode = [image renderingMode];
     if (renderingMode == UIImageRenderingModeAlwaysTemplate && key.tintColor) {
       [key.tintColor setFill];
-      image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     }
 
     @synchronized(image) {
