@@ -507,7 +507,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     UIImage *image = key.image;
     BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
     CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
-    UIImageRenderingMode renderingMode = [key.image renderingMode];
+    UIImageRenderingMode renderingMode = [image renderingMode];
     if (renderingMode == UIImageRenderingModeAlwaysTemplate && key.tintColor) {
       [key.tintColor setFill];
       image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
