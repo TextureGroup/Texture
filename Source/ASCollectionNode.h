@@ -806,6 +806,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)collectionNode:(ASCollectionNode *)collectionNode willBeginBatchFetchWithContext:(ASBatchContext *)context;
 
 /**
+ * Receive a message that the collection node is near the start of its data set and more data should be fetched if
+ * necessary.
+ *
+ * @param collectionNode The sender.
+ * @param context A context object that must be notified when the batch fetch is completed.
+ *
+ * @discussion You must eventually call -completeBatchFetching: with an argument of YES in order to receive future
+ * notifications to do batch fetches. This method is called on a background queue.
+ *
+ * ASCollectionNode currently only supports batch events for tail loads. If you require a head load, consider
+ * implementing a UIRefreshControl.
+ */
+- (void)collectionNode:(ASCollectionNode *)collectionNode willBeginBatchFetchPrependWithContext:(ASBatchContext *)context;
+
+/**
  * Tell the collection node if batch fetching should begin.
  *
  * @param collectionNode The sender.
@@ -817,6 +832,20 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForCollectionNode:(ASCollectionNode *)collectionNode;
+
+/**
+ * Tell the collection node if batch prepend fetching should begin.
+ * Prepend is opposite a normal fetch (by collection leading)
+ *
+ * @param collectionNode The sender.
+ *
+ * @discussion Use this method to conditionally fetch batches. Example use cases are: limiting the total number of
+ * objects that can be fetched or no network connection.
+ *
+ * If not implemented, the collection node assumes that it should notify its asyncDelegate when batch fetching
+ * should occur.
+ */
+- (BOOL)shouldBatchFetchPrependForCollectionNode:(ASCollectionNode *)collectionNode;
 
 /**
  * Provides the constrained size range for measuring the node at the index path.

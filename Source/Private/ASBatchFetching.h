@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASBatchFetchingScrollView <NSObject>
 
 - (BOOL)canBatchFetch;
+- (BOOL)canBatchFetchPrepend;
 - (ASBatchContext *)batchContext;
 - (CGFloat)leadingScreensForBatching;
 - (nullable id<ASBatchFetchingDelegate>)batchFetchingDelegate;
@@ -41,6 +42,12 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchi
                                             ASScrollDirection scrollableDirections,
                                             CGPoint contentOffset,
                                             CGPoint velocity);
+
+AS_EXTERN BOOL ASDisplayShouldPrependFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+                                                   ASScrollDirection scrollDirection,
+                                                   ASScrollDirection scrollableDirections,
+                                                   CGPoint contentOffset,
+                                                             CGPoint velocity);
 
 
 /**
@@ -68,6 +75,8 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 CGFloat leadingScreens,
                                                 BOOL visible,
                                                 CGPoint velocity,
-                                                _Nullable id<ASBatchFetchingDelegate> delegate);
+                                                _Nullable id<ASBatchFetchingDelegate> delegate, BOOL prepend);
+
+AS_EXTERN BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection);
 
 NS_ASSUME_NONNULL_END
