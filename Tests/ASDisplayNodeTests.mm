@@ -182,6 +182,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return &self->_clipCornerLayers;
 }
 
++ (UIImage *)displayWithParameters:(id<NSObject>)parameter isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
+{
+  return nil;
+}
+
 @end
 
 @interface ASSynchronousTestDisplayNodeViaViewClass : ASDisplayNode
@@ -499,6 +504,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(NO, node.accessibilityElementsHidden, @"default accessibilityElementsHidden is broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.accessibilityViewIsModal, @"default accessibilityViewIsModal is broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.shouldGroupAccessibilityChildren, @"default shouldGroupAccessibilityChildren is broken %@", hasLoadedView);
+  XCTAssertEqual((id)nil, node.accessibilityCustomActions, @"default acccessibilityCustomActions is broken %@", hasLoadedView);
 
   if (!isLayerBacked) {
     XCTAssertEqual(YES, node.userInteractionEnabled, @"default userInteractionEnabled broken %@", hasLoadedView);
@@ -555,6 +561,12 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   return bogusImage;
 }
 
+- (BOOL)dummySelector
+{
+  // no-op; only used for testing of UIAccessibilityCustomAction propagation
+  return YES;
+}
+
 - (void)checkValuesMatchSetValues:(ASDisplayNode *)node isLayerBacked:(BOOL)isLayerBacked
 {
   NSString *targetName = isLayerBacked ? @"layer" : @"view";
@@ -609,6 +621,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(YES, node.accessibilityViewIsModal, @"accessibilityViewIsModal broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.shouldGroupAccessibilityChildren, @"shouldGroupAccessibilityChildren broken %@", hasLoadedView);
   XCTAssertEqual(UIAccessibilityNavigationStyleSeparate, node.accessibilityNavigationStyle, @"accessibilityNavigationStyle broken %@", hasLoadedView);
+  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+    XCTAssertNotNil(node.accessibilityCustomActions, @"accessibilityCustomActions broken %@", hasLoadedView);
+    XCTAssertEqualObjects(@"custom action", ((UIAccessibilityCustomAction *)(node.accessibilityCustomActions.firstObject)).name, @"accessibilityCustomActions broken %@", hasLoadedView);
+  }
+
   XCTAssertTrue(CGPointEqualToPoint(CGPointMake(1.0, 1.0), node.accessibilityActivationPoint), @"accessibilityActivationPoint broken %@", hasLoadedView);
   XCTAssertNotNil(node.accessibilityPath, @"accessibilityPath broken %@", hasLoadedView);
   
@@ -680,6 +697,9 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.accessibilityViewIsModal = YES;
     node.shouldGroupAccessibilityChildren = YES;
     node.accessibilityNavigationStyle = UIAccessibilityNavigationStyleSeparate;
+    if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
+      node.accessibilityCustomActions = @[ [[UIAccessibilityCustomAction alloc] initWithName:@"custom action" target:self selector:@selector(dummySelector)] ];
+    }
     node.accessibilityActivationPoint = CGPointMake(1.0, 1.0);
     node.accessibilityPath = [UIBezierPath bezierPath];
 
@@ -698,6 +718,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 
   // Assert that the realized view/layer have the correct values.
   [node layer];
+
 
   [self checkValuesMatchSetValues:node isLayerBacked:isLayerBacked];
 
@@ -1901,19 +1922,33 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
     [node layer];
   }
 
+  /*
+   NOTE: The values of `opaque` can be different between a view and layer.
+
+   In debugging on Xcode 11 I saw the following in lldb:
+   - Initially for a new ASDisplayNode layer.isOpaque and _view.isOpaque are true
+   - Set the backgroundColor of the node to a valid UIColor
+   Expected: layer.isOpaque and view.isOpaque would be equal and true
+   Actual: view.isOpaque is true and layer.isOpaque is now false
+
+   For these reasons we have the following variations of asserts depending on the backing type of the node.
+   */
   XCTAssertTrue(node.opaque, @"Node should start opaque");
-  XCTAssertTrue(node.layer.opaque, @"Node should start opaque");
+  if (isLayerBacked) {
+    XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
+  } else {
+    XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
+  }
 
   node.backgroundColor = [UIColor clearColor];
 
   // This could be debated, but at the moment we differ from UIView's behavior to change the other property in response
   XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
-  XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this not opaque");
-
-  [node layer];
-
-  XCTAssertTrue(node.opaque, @"Set background color should not have made this not opaque");
-  XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this not opaque");
+  if (isLayerBacked) {
+    XCTAssertTrue(node.layer.opaque, @"Set background color should not have made this layer not opaque");
+  } else {
+    XCTAssertTrue(node.view.opaque, @"Set background color should not have made this view not opaque");
+  }
 }
 
 - (void)testBackgroundColorOpaqueRelationshipView
@@ -2709,6 +2744,27 @@ static bool stringContainsPointer(NSString *description, id p) {
   OCMExpect([mockNode layerActionForKey:@"position"]);
   node.layer.position = CGPointMake(10, 10);
   OCMVerifyAll(mockNode);
+}
+
+- (void)testPlaceholder
+{
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+  ASTestDisplayNode *node = [[ASTestDisplayNode alloc] init];
+  node.placeholderEnabled = YES;
+  node.frame = window.bounds;
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+  
+  CALayer *layer = node.layer;
+  XCTAssertNotNil(layer);
+  BOOL hasPlaceholderLayer = NO;
+  for (CALayer *sublayer in layer.sublayers) {
+    if (sublayer.zPosition == 9999.0) {
+      hasPlaceholderLayer = YES;
+      break;
+    }
+  }
+  XCTAssertTrue(hasPlaceholderLayer);
 }
 
 @end

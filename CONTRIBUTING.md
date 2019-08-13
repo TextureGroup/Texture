@@ -199,12 +199,12 @@ static void someFunction() {
   return contentSpacing;
 }
 ```
-  2. Create an `ASDN::MutexLocker` :
+  2. Create an `AS::MutexLocker` :
 ```objc
 - (void)setContentSpacing:(CGFloat)contentSpacing
 {
   {
-    ASDN::MutexLocker l(__instanceLock__);
+    AS::MutexLocker l(__instanceLock__);
     if (contentSpacing == _contentSpacing) {
       return;
     }
@@ -217,7 +217,7 @@ static void someFunction() {
 
 - (CGFloat)contentSpacing
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   return _contentSpacing;
 }
 ```

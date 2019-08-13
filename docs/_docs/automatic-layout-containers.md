@@ -93,11 +93,11 @@ The following properties may be set on any node or `layoutSpec`s, but will only 
   </tr>
   <tr>
     <td><b><code>BOOL .flexGrow</code></b></td>
-    <td>If the sum of childrens' stack dimensions is less than the minimum size, should this object grow? Used when attached to a stack layout.</td> 
+    <td>If the sum of children's stack dimensions is less than the minimum size, should this object grow? Used when attached to a stack layout.</td> 
   </tr>
   <tr>
     <td><b><code>BOOL .flexShrink</code></b></td>
-    <td>If the sum of childrens' stack dimensions is greater than the maximum size, should this object shrink? Used when attached to a stack layout.</td> 
+    <td>If the sum of children's stack dimensions is greater than the maximum size, should this object shrink? Used when attached to a stack layout.</td> 
   </tr>
   <tr>
     <td><b><code>ASRelativeDimension .flexBasis</code></b></td>

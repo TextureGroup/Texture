@@ -11,13 +11,10 @@
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
@@ -59,7 +56,7 @@ using AS::MutexLocker;
 
 - (ASLayoutElementStyle *)_locked_style
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_style == nil) {
 #if YOGA
     // In Yoga mode we use the delegate to inform the tree if properties changes
@@ -128,15 +125,17 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASPrimitiveTraitCollection)primitiveTraitCollection
 {
-  return _primitiveTraitCollection.load();
+  AS::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
 }
 
 - (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
+  AS::UniqueLock l(__instanceLock__);
+  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
     _primitiveTraitCollection = traitCollection;
-    ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
 
+    l.unlock();
     [self asyncTraitCollectionDidChange];
   }
 }
@@ -207,7 +206,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (_pendingDisplayNodeLayout.isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout.constrainedSize;
   }
@@ -243,7 +242,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_u_setNeedsLayoutFromAbove
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
 
   as_activity_create_for_scope("Set needs layout from above");
 
@@ -330,7 +329,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
-  // ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   ASScopedLockSelfOrToRoot();
 
   // Check if we are a subnode in a layout transition.
@@ -484,7 +483,7 @@ ASLayoutElementStyleExtensibilityForwarding
   // logic seems correct.  For what case does -this method need to do the CGSizeEqual checks?
   // IF WE CAN REMOVE BOUNDS CHECKS HERE, THEN WE CAN ALSO REMOVE "REQUESTED FROM ABOVE" CHECK
 
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
 
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.threadSafeBounds.size);
 
@@ -510,7 +509,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_layoutSublayouts
 {
   ASDisplayNodeAssertThreadAffinity(self);
-  // ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   
   ASLayout *layout;
   {
@@ -545,13 +544,13 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)automaticallyManagesSubnodes
 {
   MutexLocker l(__instanceLock__);
-  return _automaticallyManagesSubnodes;
+  return _flags.automaticallyManagesSubnodes;
 }
 
 - (void)setAutomaticallyManagesSubnodes:(BOOL)automaticallyManagesSubnodes
 {
   MutexLocker l(__instanceLock__);
-  _automaticallyManagesSubnodes = automaticallyManagesSubnodes;
+  _flags.automaticallyManagesSubnodes = automaticallyManagesSubnodes;
 }
 
 @end
@@ -569,7 +568,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (BOOL)_locked_isLayoutTransitionInvalid
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   if (ASHierarchyStateIncludesLayoutPending(_hierarchyState)) {
     ASLayoutElementContext *context = ASLayoutElementGetCurrentContext();
     if (context == nil || _pendingTransitionID != context.transitionID) {
@@ -615,7 +614,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
   as_activity_create_for_scope("Transition node layout");
-  as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
+  os_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASSizeRange(constrainedSize), animated, shouldMeasureAsync);
   
   if (constrainedSize.max.width <= 0.0 || constrainedSize.max.height <= 0.0) {
     // Using CGSizeZero for the sizeRange can cause negative values in client layout code.
@@ -950,7 +949,7 @@ ASLayoutElementStyleExtensibilityForwarding
   if (ASDisplayNodeThreadIsMain() || layoutTransition.isSynchronous == NO) {
     // Committing the layout transition will result in subnode insertions and removals, both of which must be called without the lock held
     // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-    // ASAssertUnlocked(__instanceLock__);
+    DISABLED_ASAssertUnlocked(__instanceLock__);
     [layoutTransition commitTransition];
   } else {
     // Subnode insertions and removals need to happen always on the main thread if at least one subnode is already loaded
@@ -1016,7 +1015,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
   // Subclass hook
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
-  // ASAssertUnlocked(__instanceLock__);
+  DISABLED_ASAssertUnlocked(__instanceLock__);
   [self calculatedLayoutDidChange];
 
   // Grab lock after calling out to subclass
@@ -1025,7 +1024,7 @@ ASLayoutElementStyleExtensibilityForwarding
   // We generate placeholders at -layoutThatFits: time so that a node is guaranteed to have a placeholder ready to go.
   // This is also because measurement is usually asynchronous, but placeholders need to be set up synchronously.
   // First measurement is guaranteed to be before the node is onscreen, so we can create the image async. but still have it appear sync.
-  if (_placeholderEnabled && !_placeholderImage && [self _locked_displaysAsynchronously]) {
+  if (_flags.placeholderEnabled && !_placeholderImage && [self _locked_displaysAsynchronously]) {
     
     // Zero-sized nodes do not require a placeholder.
     CGSize layoutSize = _calculatedDisplayNodeLayout.layout.size;
@@ -1060,7 +1059,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_locked_setCalculatedDisplayNodeLayout:(const ASDisplayNodeLayout &)displayNodeLayout
 {
-  ASAssertLocked(__instanceLock__);
+  DISABLED_ASAssertLocked(__instanceLock__);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.layoutElement == self);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.width >= 0.0);
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);

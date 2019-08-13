@@ -17,7 +17,6 @@
 		768843851CAA37EF00D8629E /* ImageURLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7688436D1CAA37EF00D8629E /* ImageURLModel.m */; };
 		768843891CAA37EF00D8629E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843711CAA37EF00D8629E /* main.m */; };
 		7688438B1CAA37EF00D8629E /* PhotoCellNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843731CAA37EF00D8629E /* PhotoCellNode.m */; };
-		7688438C1CAA37EF00D8629E /* PhotoCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843741CAA37EF00D8629E /* PhotoCollectionViewCell.m */; };
 		7688438D1CAA37EF00D8629E /* PhotoFeedModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843751CAA37EF00D8629E /* PhotoFeedModel.m */; };
 		7688438E1CAA37EF00D8629E /* PhotoFeedNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843761CAA37EF00D8629E /* PhotoFeedNodeController.m */; };
 		768843901CAA37EF00D8629E /* PhotoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 768843781CAA37EF00D8629E /* PhotoModel.m */; };
@@ -49,7 +48,6 @@
 		768843511CAA37EF00D8629E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = AppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		768843561CAA37EF00D8629E /* ImageURLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = ImageURLModel.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		7688435B1CAA37EF00D8629E /* PhotoCellNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhotoCellNode.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		7688435C1CAA37EF00D8629E /* PhotoCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhotoCollectionViewCell.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		7688435D1CAA37EF00D8629E /* PhotoFeedModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhotoFeedModel.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		7688435E1CAA37EF00D8629E /* PhotoFeedNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhotoFeedNodeController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		768843601CAA37EF00D8629E /* PhotoModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PhotoModel.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -62,7 +60,6 @@
 		7688436D1CAA37EF00D8629E /* ImageURLModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ImageURLModel.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		768843711CAA37EF00D8629E /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		768843731CAA37EF00D8629E /* PhotoCellNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PhotoCellNode.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		768843741CAA37EF00D8629E /* PhotoCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PhotoCollectionViewCell.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		768843751CAA37EF00D8629E /* PhotoFeedModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PhotoFeedModel.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		768843761CAA37EF00D8629E /* PhotoFeedNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PhotoFeedNodeController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		768843781CAA37EF00D8629E /* PhotoModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PhotoModel.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -236,8 +233,6 @@
 			children = (
 				768843611CAA37EF00D8629E /* PhotoTableViewCell.h */,
 				768843791CAA37EF00D8629E /* PhotoTableViewCell.m */,
-				7688435C1CAA37EF00D8629E /* PhotoCollectionViewCell.h */,
-				768843741CAA37EF00D8629E /* PhotoCollectionViewCell.m */,
 			);
 			name = UIKit;
 			sourceTree = "<group>";
@@ -364,7 +359,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				768843891CAA37EF00D8629E /* main.m in Sources */,
-				7688438C1CAA37EF00D8629E /* PhotoCollectionViewCell.m in Sources */,
 				768843921CAA37EF00D8629E /* PhotoFeedViewController.m in Sources */,
 				76229A781CBB79E000B62CEF /* WindowWithStatusBarUnderlay.m in Sources */,
 				768843961CAA37EF00D8629E /* Utilities.m in Sources */,

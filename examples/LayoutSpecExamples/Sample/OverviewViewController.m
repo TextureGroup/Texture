@@ -62,9 +62,11 @@
   return [_layoutExamples count];
 }
 
-- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  return [[OverviewCellNode alloc] initWithLayoutExampleClass:_layoutExamples[indexPath.row]];
+- (ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath {
+    Class layoutExample = _layoutExamples[indexPath.row];
+    return ^{
+        return [[OverviewCellNode alloc] initWithLayoutExampleClass:layoutExample];
+    };
 }
 
 - (void)tableNode:(ASTableNode *)tableNode didSelectRowAtIndexPath:(NSIndexPath *)indexPath

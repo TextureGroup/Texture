@@ -80,7 +80,7 @@ static const _UIContentModeStringLUTEntry *UIContentModeCAGravityLUT(size_t *cou
     {UIViewContentModeBottomLeft,      kCAGravityTopLeft},
     {UIViewContentModeBottomRight,     kCAGravityTopRight},
   };
-  *count = sizeof(sUIContentModeCAGravityLUT) / sizeof(sUIContentModeCAGravityLUT[0]);
+  *count = AS_ARRAY_SIZE(sUIContentModeCAGravityLUT);
   return sUIContentModeCAGravityLUT;
 }
 
@@ -103,7 +103,7 @@ static const _UIContentModeStringLUTEntry *UIContentModeDescriptionLUT(size_t *c
     {UIViewContentModeBottomLeft,      @"bottomLeft"},
     {UIViewContentModeBottomRight,     @"bottomRight"},
   };
-  *count = sizeof(sUIContentModeDescriptionLUT) / sizeof(sUIContentModeDescriptionLUT[0]);
+  *count = AS_ARRAY_SIZE(sUIContentModeDescriptionLUT);
   return sUIContentModeDescriptionLUT;
 }
 

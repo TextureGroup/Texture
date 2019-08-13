@@ -146,7 +146,17 @@ ASLayoutElementLayoutCalculationDefaults
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
-ASPrimitiveTraitCollectionDefaults
+- (ASPrimitiveTraitCollection)primitiveTraitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
+}
+
+- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  _primitiveTraitCollection = traitCollection;
+}
 
 #pragma mark - ASLayoutElementStyleExtensibility
 

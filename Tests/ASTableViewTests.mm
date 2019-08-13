@@ -22,6 +22,7 @@
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#import "ASTestCase.h"
 #import "ASXCTExtensions.h"
 
 #define NumberOfSections 10
@@ -57,7 +58,7 @@
 - (instancetype)__initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
   
-  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil eventLog:nil];
+  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil];
 }
 
 - (ASTestDataController *)testDataController
@@ -217,11 +218,19 @@
 
 @end
 
-@interface ASTableViewTests : XCTestCase
+@interface ASTableViewTests : ASTestCase
 @property (nonatomic, retain) ASTableView *testTableView;
 @end
 
 @implementation ASTableViewTests
+
+- (void)setUp
+{
+  [super setUp];
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+}
 
 - (void)testDataSourceImplementsNecessaryMethods
 {

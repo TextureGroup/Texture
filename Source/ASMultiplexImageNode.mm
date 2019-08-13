@@ -13,7 +13,6 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
 
-#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
@@ -279,7 +278,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 {
   [super displayWillStartAsynchronously:asynchronously];
   [self didEnterPreloadState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityImminent];
+  [self _updatePriorityOnDownloaderIfNeeded];
 }
 
 /* didEnterVisibleState / didExitVisibleState in ASNetworkImageNode has a very similar implementation. Changes here are likely necessary
@@ -287,23 +286,21 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 - (void)didEnterVisibleState
 {
   [super didEnterVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityVisible];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitVisibleState
 {
   [super didExitVisibleState];
-  [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
+  [self _updatePriorityOnDownloaderIfNeeded];
   [self _updateProgressImageBlockOnDownloaderIfNeeded];
 }
 
 - (void)didExitDisplayState
 {
   [super didExitDisplayState];
-  if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-    [self _updatePriorityOnDownloaderIfNeededWithDefaultPriority:ASImageDownloaderPriorityPreload];
-  }
+  [self _updatePriorityOnDownloaderIfNeeded];
 }
 
 #pragma mark - Core
@@ -484,9 +481,9 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 #pragma mark -
 
-- (void)_updatePriorityOnDownloaderIfNeededWithDefaultPriority:(ASImageDownloaderPriority)defaultPriority
+- (void)_updatePriorityOnDownloaderIfNeeded
 {
-  ASAssertUnlocked(_downloadIdentifierLock);
+  DISABLED_ASAssertUnlocked(_downloadIdentifierLock);
 
   if (_downloaderFlags.downloaderImplementsSetPriority) {
     // Read our interface state before locking so that we don't lock super while holding our lock.
@@ -494,11 +491,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     MutexLocker l(_downloadIdentifierLock);
 
     if (_downloadIdentifier != nil) {
-      ASImageDownloaderPriority priority = defaultPriority;
-      if (ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-        priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
-      }
-
+      ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(interfaceState);
       [_downloader setPriority:priority withDownloadIdentifier:_downloadIdentifier];
     }
   }
@@ -506,7 +499,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (void)_updateProgressImageBlockOnDownloaderIfNeeded
 {
-  ASAssertUnlocked(_downloadIdentifierLock);
+  DISABLED_ASAssertUnlocked(_downloadIdentifierLock);
 
   BOOL shouldRenderProgressImages = self.shouldRenderProgressImages;
   
@@ -548,7 +541,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   BOOL shouldReleaseImageOnBackgroundThread = imageSize.width > kMinReleaseImageOnBackgroundSize.width ||
   imageSize.height > kMinReleaseImageOnBackgroundSize.height;
   [self _setImage:nil];
-  if (shouldReleaseImageOnBackgroundThread) {
+  if (shouldReleaseImageOnBackgroundThread && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
     ASPerformBackgroundDeallocation(&image);
   }
 }
@@ -626,7 +619,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   NSURL *nextImageURL = (_dataSourceFlags.URL) ? [_dataSource multiplexImageNode:self URLForImageIdentifier:nextImageIdentifier] : nil;
   // If we fail to get a URL for the image, we have no source and can't proceed.
   if (!nextImageURL) {
-    as_log_error(ASImageLoadingLog(), "Could not acquire URL %@ ident: (%@)", self, nextImageIdentifier);
+    os_log_error(ASImageLoadingLog(), "Could not acquire URL %@ ident: (%@)", self, nextImageIdentifier);
     finishedLoadingBlock(nil, nil, [NSError errorWithDomain:ASMultiplexImageNodeErrorDomain code:ASMultiplexImageNodeErrorCodeNoSourceForImage userInfo:nil]);
     return;
   }
@@ -684,7 +677,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
       if (downloadedImage) {
         as_log_verbose(ASImageLoadingLog(), "Acquired image from download for %@ id: %@ img: %@", strongSelf, nextImageIdentifier, downloadedImage);
       } else {
-        as_log_error(ASImageLoadingLog(), "Error downloading image for %@ id: %@ err: %@", strongSelf, nextImageIdentifier, error);
+        os_log_error(ASImageLoadingLog(), "Error downloading image for %@ id: %@ err: %@", strongSelf, nextImageIdentifier, error);
       }
       finishedLoadingBlock(downloadedImage, nextImageIdentifier, error);
     }];
@@ -872,14 +865,12 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     dispatch_queue_t callbackQueue = dispatch_get_main_queue();
 
     id downloadIdentifier;
-    if (strongSelf->_downloaderFlags.downloaderImplementsDownloadWithPriority
-        && ASActivateExperimentalFeature(ASExperimentalImageDownloaderPriority)) {
-
+    if (strongSelf->_downloaderFlags.downloaderImplementsDownloadWithPriority) {
       /*
-       Decide a priority based on the current interface state of this node.
-       It can happen that this method was called when the node entered preload state
-       but the interface state, at this point, tells us that the node is (going to be) visible,
-       If that's the case, we jump to a higher priority directly.
+        Decide a priority based on the current interface state of this node.
+        It can happen that this method was called when the node entered preload state
+        but the interface state, at this point, tells us that the node is (going to be) visible,
+        If that's the case, we jump to a higher priority directly.
        */
       ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(strongSelf.interfaceState);
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
@@ -889,13 +880,13 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
                                                               completion:completion];
     } else {
       /*
-       Kick off a download with default priority.
-       The actual "default" value is decided by the downloader.
-       ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
-       which is mapped to NSURLSessionTaskPriorityDefault.
+        Kick off a download with default priority.
+        The actual "default" value is decided by the downloader.
+        ASBasicImageDownloader and ASPINRemoteImageDownloader both use ASImageDownloaderPriorityImminent
+        which is mapped to NSURLSessionTaskPriorityDefault.
 
-       This means that preload and display nodes use the same priority
-       and their requests are put into the same pool.
+        This means that preload and display nodes use the same priority
+        and their requests are put into the same pool.
        */
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
                                                            callbackQueue:callbackQueue

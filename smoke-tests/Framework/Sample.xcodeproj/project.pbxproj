@@ -136,7 +136,7 @@
 		34566C9C1BC1202A00715E6B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				34566CA31BC1202A00715E6B /* libAsyncDisplayKit.a */,
+				34566CA31BC1202A00715E6B /* AsyncDisplayKit.framework */,
 				34566CA51BC1202A00715E6B /* AsyncDisplayKitTests.xctest */,
 				34566CA71BC1202A00715E6B /* AsyncDisplayKitTestHost.app */,
 			);
@@ -177,7 +177,7 @@
 				TargetAttributes = {
 					050E7C6D19D22E19004363C2 = {
 						CreatedOnToolsVersion = 6.0.1;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -186,6 +186,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -206,7 +207,7 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		34566CA31BC1202A00715E6B /* libAsyncDisplayKit.a */ = {
+		34566CA31BC1202A00715E6B /* AsyncDisplayKit.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = AsyncDisplayKit.framework;
@@ -350,7 +351,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.AsyncDisplayKit.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -363,7 +364,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.AsyncDisplayKit.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

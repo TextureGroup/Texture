@@ -14,8 +14,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASAbsoluteLayoutSpec.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation ASButtonNode
 
@@ -43,7 +41,7 @@
     _contentEdgeInsets = UIEdgeInsetsZero;
     _imageAlignment = ASButtonNodeImageAlignmentBeginning;
     self.accessibilityTraits = self.defaultAccessibilityTraits;
-
+    
     [self updateYogaLayoutIfNeeded];
   }
   return self;
@@ -54,12 +52,9 @@
   ASLockScopeSelf();
   if (!_titleNode) {
     _titleNode = [[ASTextNode alloc] init];
-#if TARGET_OS_IOS 
-      // tvOS needs access to the underlying view
-      // of the button node to add a touch handler.
-    [_titleNode setLayerBacked:YES];
-#endif
+    // Intentionally not layer-backing the image node since tintColor may be applied
     _titleNode.style.flexShrink = 1.0;
+    _titleNode.textColorFollowsTintColor = YES;
   }
   return _titleNode;
 }
@@ -71,7 +66,7 @@
   ASLockScopeSelf();
   if (!_imageNode) {
     _imageNode = [[ASImageNode alloc] init];
-    [_imageNode setLayerBacked:YES];
+    // Intentionally not layer-backing the image node since tintColor may be applied
   }
   return _imageNode;
 }
@@ -133,6 +128,17 @@
   [self.titleNode setDisplaysAsynchronously:displaysAsynchronously];
 }
 
+-(void)tintColorDidChange
+{
+  [super tintColorDidChange];
+  // UIButton documentation states that it tints the image and title of buttons when tintColor is set.
+  // | "The tint color to apply to the button title and image."
+  // | From: https://developer.apple.com/documentation/uikit/uibutton/1624025-tintcolor
+  UIColor *tintColor = self.tintColor;
+  self.imageNode.tintColor = tintColor;
+  self.titleNode.tintColor = tintColor;
+}
+
 - (void)updateImage
 {
   [self lock];
@@ -179,9 +185,10 @@
     newTitle = _normalAttributedTitle;
   }
 
-  // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
-  if ((_titleNode != nil || newTitle.length > 0) && [self.titleNode.attributedText isEqualToAttributedString:newTitle] == NO) {
-    _titleNode.attributedText = newTitle;
+  NSAttributedString *attributedString = _titleNode.attributedText;
+  if ((attributedString.length > 0 || newTitle.length > 0) && [attributedString isEqualToAttributedString:newTitle] == NO) {
+    // Calling self.titleNode is essential here because _titleNode is lazily created by the getter.
+    self.titleNode.attributedText = newTitle;
     [self unlock];
     
     self.accessibilityLabel = self.defaultAccessibilityLabel;
@@ -302,12 +309,14 @@
 #if TARGET_OS_IOS
 - (void)setTitle:(NSString *)title withFont:(UIFont *)font withColor:(UIColor *)color forState:(UIControlState)state
 {
-  NSDictionary *attributes = @{
-    NSFontAttributeName: font ? : [UIFont systemFontOfSize:[UIFont buttonFontSize]],
-    NSForegroundColorAttributeName : color ? : [UIColor blackColor]
-  };
-    
-  NSAttributedString *string = [[NSAttributedString alloc] initWithString:title attributes:attributes];
+  NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+  attributes[NSFontAttributeName] = font ? : [UIFont systemFontOfSize:[UIFont buttonFontSize]];
+  if (color != nil) {
+    // From apple's documentation: If color is not specified, NSForegroundColorAttributeName will fallback to black
+    // Only set if the color is nonnull
+    attributes[NSForegroundColorAttributeName] = color;
+  }
+  NSAttributedString *string = [[NSAttributedString alloc] initWithString:title attributes:[attributes copy]];
   [self setAttributedTitle:string forState:state];
 }
 #endif

@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * ASCollectionNode is a node based class that wraps an ASCollectionView. It can be used
  * as a subnode of another node, and provide room for many (great) features and improvements later on.
  */
-@interface ASCollectionNode : ASDisplayNode <ASRangeControllerUpdateRangeProtocol, ASRangeManagingNode>
+@interface ASCollectionNode : ASDisplayNode <ASRangeControllerUpdateRangeProtocol, ASRangeManagingNode, UIGestureRecognizerDelegate>
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -124,6 +124,12 @@ NS_ASSUME_NONNULL_BEGIN
  * The default value of this property is NO.
  */
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
+
+/**
+ * A Boolean value that determines whether paging is enabled for the scroll view.
+ * The default value of this property is NO.
+ */
+@property (nonatomic, getter=isPagingEnabled) BOOL pagingEnabled __TVOS_PROHIBITED;
 
 /**
  * The layout used to organize the node's items.

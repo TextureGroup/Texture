@@ -2,7 +2,7 @@
 title: ASViewController
 layout: docs
 permalink: /docs/containers-asviewcontroller.html
-prevPage: faq.html
+prevPage: asrunloopqueue.html
 nextPage: containers-asnodecontroller.html
 ---
 

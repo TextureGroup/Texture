@@ -8,9 +8,7 @@
 //
 
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 
@@ -91,6 +89,9 @@
                       fromState:(ASInterfaceState)oldState {}
 
 - (void)hierarchyDisplayDidFinish {}
+
+- (void)didEnterHierarchy {}
+- (void)didExitHierarchy  {}
 
 - (ASLockSet)lockPair {
   ASLockSet lockSet = ASLockSequence(^BOOL(ASAddLockBlock addLock) {

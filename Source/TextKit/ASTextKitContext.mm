@@ -27,6 +27,7 @@
 }
 
 - (instancetype)initWithAttributedString:(NSAttributedString *)attributedString
+                               tintColor:(UIColor *)tintColor
                            lineBreakMode:(NSLineBreakMode)lineBreakMode
                     maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
                           exclusionPaths:(NSArray *)exclusionPaths
@@ -34,14 +35,17 @@
 
 {
   if (self = [super init]) {
+    static AS::Mutex *mutex = NULL;
     static dispatch_once_t onceToken;
-    static AS::Mutex *mutex;
-    dispatch_once(&onceToken, ^{
-      mutex = new AS::Mutex();
-    });
-    
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    AS::MutexLocker l(*mutex);
+    dispatch_once(&onceToken, ^{
+      if (!ASActivateExperimentalFeature(ASExperimentalRemoveTextKitInitialisingLock)) {
+        mutex = new AS::Mutex();
+      }
+    });
+    if (mutex != NULL) {
+      mutex->lock();
+    }
     
     __instanceLock__ = std::make_shared<AS::Mutex>();
     
@@ -56,6 +60,18 @@
     // See https://github.com/facebook/AsyncDisplayKit/issues/2894
     if (attributedString) {
       [_textStorage setAttributedString:attributedString];
+
+      // Apply tint color if specified and if foreground color is undefined for attributedString
+      NSRange limit = NSMakeRange(0, attributedString.length);
+      NSRange effectiveRange;
+      // Look for previous attributes that define foreground color
+      UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:&effectiveRange];
+      if (attributeValue == nil) {
+        // None are found, apply tint color if available. Fallback to "black" text color
+        if (tintColor) {
+          [_textStorage addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+        }
+      }
     }
     
     _textContainer = [[NSTextContainer alloc] initWithSize:constrainedSize];
@@ -65,6 +81,10 @@
     _textContainer.maximumNumberOfLines = maximumNumberOfLines;
     _textContainer.exclusionPaths = exclusionPaths;
     [_layoutManager addTextContainer:_textContainer];
+    
+    if (mutex != NULL) {
+      mutex->unlock();
+    }
   }
   return self;
 }

@@ -12,7 +12,7 @@
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _insertSubnode... / _removeFromSupernode.
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _removeFromSupernodeIfEqualTo:
 #import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
@@ -103,7 +103,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"insertSubnodes: %@", _insertedSubnodes);
   NSUInteger i = 0;
   NSUInteger j = 0;
   for (auto const &move : _subnodeMoves) {
@@ -114,18 +113,18 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     NSUInteger p = _insertedSubnodePositions[i];
     NSUInteger q = _subnodeMoves[j].second;
     if (p < q) {
-      [_node _insertSubnode:_insertedSubnodes[i] atIndex:p];
+      [_node insertSubnode:_insertedSubnodes[i] atIndex:p];
       i++;
     } else {
-      [_node _insertSubnode:_subnodeMoves[j].first atIndex:q];
+      [_node insertSubnode:_subnodeMoves[j].first atIndex:q];
       j++;
     }
   }
   for (; i < _insertedSubnodePositions.size(); ++i) {
-    [_node _insertSubnode:_insertedSubnodes[i] atIndex:_insertedSubnodePositions[i]];
+    [_node insertSubnode:_insertedSubnodes[i] atIndex:_insertedSubnodePositions[i]];
   }
   for (; j < _subnodeMoves.size(); ++j) {
-    [_node _insertSubnode:_subnodeMoves[j].first atIndex:_subnodeMoves[j].second];
+    [_node insertSubnode:_subnodeMoves[j].first atIndex:_subnodeMoves[j].second];
   }
 }
 
@@ -139,7 +138,6 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     return;
   }
 
-  ASDisplayNodeLogEvent(_node, @"removeSubnodes: %@", _removedSubnodes);
   for (ASDisplayNode *subnode in _removedSubnodes) {
     // In this case we should only remove the subnode if it's still a subnode of the _node that executes a layout transition.
     // It can happen that a node already did a layout transition and added this subnode, in this case the subnode
