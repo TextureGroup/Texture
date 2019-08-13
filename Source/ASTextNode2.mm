@@ -519,12 +519,11 @@ static NSArray *DefaultLinkAttributeNames() {
   }
 
   // Apply tint color if needed and foreground color is not already specified
-  if (self.textColorFollowsTintColor) {
+  if (self.textColorFollowsTintColor && attributedString.length > 0) {
     // Apply tint color if specified and if foreground color is undefined for attributedString
     NSRange limit = NSMakeRange(0, attributedString.length);
-    NSRange effectiveRange;
     // Look for previous attributes that define foreground color
-    UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:&effectiveRange];
+    UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
     UIColor *tintColor = self.tintColor;
     if (attributeValue == nil && tintColor) {
       // None are found, apply tint color if available. Fallback to "black" text color
