@@ -121,4 +121,13 @@
   XCTAssertFalse(textNode.supportsLayerBacking);
 }
 
+- (void)testEmptyStringSize
+{
+  CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
+  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@""];
+  CGSize sizeWithEmptyString = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(ASIsCGSizeValidForSize(sizeWithEmptyString));
+  XCTAssertTrue(sizeWithEmptyString.width == 0);
+}
+
 @end
