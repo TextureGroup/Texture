@@ -102,6 +102,18 @@
   ASSnapshotVerifyNode(node, nil);
 }
 
+- (void)testTintColorOnNodePropertyAlwaysTemplateLayerBackedNode
+{
+  // Test support for layerBacked image node tinting
+  UIImage *test = [self testImage];
+  ASImageNode *node = [[ASImageNode alloc] init];
+  [node setLayerBacked:YES];
+  node.tintColor = UIColor.redColor;
+  node.image = [test imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  ASDisplayNodeSizeToFitSize(node, test.size);
+  ASSnapshotVerifyNode(node, nil);
+}
+
 - (void)testRoundedCornerBlock
 {
   UIGraphicsBeginImageContext(CGSizeMake(100, 100));

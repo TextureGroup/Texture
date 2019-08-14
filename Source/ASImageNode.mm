@@ -143,6 +143,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   UIImage *_image;
   ASWeakMapEntry *_weakCacheEntry;  // Holds a reference that keeps our contents in cache.
   UIColor *_placeholderColor;
+  UIColor *_tintColor; // Used to cache color information for layer backed nodes. View backed will use UIViewBridge
 
   void (^_displayCompletionBlock)(BOOL canceled);
   
@@ -286,6 +287,29 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASLockScopeSelf();
   if (ASCompareAssignCopy(_placeholderColor, placeholderColor)) {
     _flags.placeholderEnabled = (placeholderColor != nil);
+  }
+}
+
+- (UIColor *)tintColor
+{
+  ASLockScopeSelf();
+  if (_flags.layerBacked) {
+    return _tintColor;
+  } else {
+    return super.tintColor;
+  }
+}
+
+- (void)setTintColor:(UIColor *)tintColor
+{
+  ASLockScopeSelf();
+  // CALayer does not have a tintColor property but we can support this capability so use the local ivar instead of the bridge
+  if (_flags.layerBacked && ![_tintColor isEqual:tintColor]) {
+    _tintColor = tintColor;
+    [self setNeedsDisplay];
+  } else {
+    // If we are view-backed, rely on the tintColor value from the UIViewBridge
+    [super setTintColor:tintColor];
   }
 }
 
