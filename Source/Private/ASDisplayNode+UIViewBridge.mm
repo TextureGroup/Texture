@@ -796,15 +796,41 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIColor *)tintColor
 {
   _bridge_prologue_read;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  return _getFromViewOnly(tintColor);
+  if (_loaded(self)) {
+    if (_flags.layerBacked) {
+        // The first nondefault tint color value in the view’s hierarchy, ascending from and starting with the view itself.
+        return _tintColor ?: self.supernode.tintColor;
+      } else {
+        return _getFromViewOnly(tintColor);
+      }
+  } else {
+    if (_flags.layerBacked) {
+      return _tintColor;
+    } else {
+      return ASDisplayNodeGetPendingState(self).tintColor;
+    }
+  }
 }
 
 - (void)setTintColor:(UIColor *)color
 {
   _bridge_prologue_write;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  _setToViewOnly(tintColor, color);
+  if (_loaded(self)) {
+    if (_flags.layerBacked) {
+      if (![_tintColor isEqual:color]) {
+        _tintColor = color;
+        [self tintColorDidChange];
+      }
+    } else {
+      _setToViewOnly(tintColor, color);
+    }
+  } else {
+    if (_flags.layerBacked) {
+      _tintColor = color;
+    } else {
+      ASDisplayNodeGetPendingState(self).tintColor = color;
+    }
+  }
 }
 
 - (void)tintColorDidChange

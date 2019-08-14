@@ -290,29 +290,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   }
 }
 
-- (UIColor *)tintColor
-{
-  ASLockScopeSelf();
-  if (_flags.layerBacked) {
-    return _tintColor;
-  } else {
-    return super.tintColor;
-  }
-}
-
-- (void)setTintColor:(UIColor *)tintColor
-{
-  ASLockScopeSelf();
-  // CALayer does not have a tintColor property but we can support this capability so use the local ivar instead of the bridge
-  if (_flags.layerBacked && ![_tintColor isEqual:tintColor]) {
-    _tintColor = tintColor;
-    [self setNeedsDisplay];
-  } else {
-    // If we are view-backed, rely on the tintColor value from the UIViewBridge
-    [super setTintColor:tintColor];
-  }
-}
-
 #pragma mark - Drawing
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer

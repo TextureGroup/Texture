@@ -52,7 +52,11 @@
   ASLockScopeSelf();
   if (!_titleNode) {
     _titleNode = [[ASTextNode alloc] init];
-    // Intentionally not layer-backing the image node since tintColor may be applied
+    #if TARGET_OS_IOS
+          // tvOS needs access to the underlying view
+          // of the button node to add a touch handler.
+        [_titleNode setLayerBacked:YES];
+    #endif
     _titleNode.style.flexShrink = 1.0;
     _titleNode.textColorFollowsTintColor = YES;
   }
@@ -66,7 +70,7 @@
   ASLockScopeSelf();
   if (!_imageNode) {
     _imageNode = [[ASImageNode alloc] init];
-    // Intentionally not layer-backing the image node since tintColor may be applied
+    [_imageNode setLayerBacked:YES];
   }
   return _imageNode;
 }
@@ -133,7 +137,7 @@
   [super tintColorDidChange];
   // UIButton documentation states that it tints the image and title of buttons when tintColor is set.
   // | "The tint color to apply to the button title and image."
-  // | From: https://developer.apple.com/documentation/uikit/uibutton/1624025-tintcolor
+  // | From: https://developerx.apple.com/documentation/uikit/uibutton/1624025-tintcolor
   UIColor *tintColor = self.tintColor;
   self.imageNode.tintColor = tintColor;
   self.titleNode.tintColor = tintColor;
