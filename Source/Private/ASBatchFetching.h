@@ -75,7 +75,8 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 CGFloat leadingScreens,
                                                 BOOL visible,
                                                 CGPoint velocity,
-                                                _Nullable id<ASBatchFetchingDelegate> delegate, BOOL prepend);
+                                                _Nullable id<ASBatchFetchingDelegate> delegate,
+                                                BOOL prepend);
 
 AS_EXTERN BOOL ASDisplayIsScrollingTowardHead(ASScrollDirection scrollDirection);
 
