@@ -8,7 +8,6 @@
 //
 
 #import "ASTextAttribute.h"
-#import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
 

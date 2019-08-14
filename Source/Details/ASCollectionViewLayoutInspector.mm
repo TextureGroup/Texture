@@ -10,7 +10,6 @@
 #import <AsyncDisplayKit/ASCollectionViewLayoutInspector.h>
 
 #import <AsyncDisplayKit/ASCollectionView.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 
 #pragma mark - Helper Functions

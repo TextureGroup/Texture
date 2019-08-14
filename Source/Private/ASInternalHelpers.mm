@@ -9,11 +9,6 @@
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-#import <UIKit/UIKit.h>
-
-#import <objc/runtime.h>
-#import <cmath>
-
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>

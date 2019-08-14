@@ -14,8 +14,6 @@
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 
-#include <memory>
-
 @implementation ASTextKitContext
 {
   // All TextKit operations (even non-mutative ones) must be executed serially.

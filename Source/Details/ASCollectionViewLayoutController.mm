@@ -12,8 +12,6 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
 
 struct ASRangeGeometry {
   CGRect rangeBounds;

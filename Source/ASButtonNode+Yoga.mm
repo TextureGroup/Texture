@@ -11,7 +11,6 @@
 #import <AsyncDisplayKit/ASButtonNode+Private.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASStackLayoutSpecUtilities.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 #if YOGA
 static void ASButtonNodeResolveHorizontalAlignmentForStyle(ASLayoutElementStyle *style, ASStackLayoutDirection _direction, ASHorizontalAlignment _horizontalAlignment, ASStackLayoutJustifyContent _justifyContent, ASStackLayoutAlignItems _alignItems) {
