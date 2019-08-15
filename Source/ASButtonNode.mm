@@ -137,7 +137,7 @@
   [super tintColorDidChange];
   // UIButton documentation states that it tints the image and title of buttons when tintColor is set.
   // | "The tint color to apply to the button title and image."
-  // | From: https://developerx.apple.com/documentation/uikit/uibutton/1624025-tintcolor
+  // | From: https://developer.apple.com/documentation/uikit/uibutton/1624025-tintcolor
   UIColor *tintColor = self.tintColor;
   self.imageNode.tintColor = tintColor;
   self.titleNode.tintColor = tintColor;

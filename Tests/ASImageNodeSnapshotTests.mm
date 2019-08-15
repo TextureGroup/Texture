@@ -148,7 +148,6 @@
   ASSnapshotVerifyNode(node, nil);
 }
 
-
 - (void)testRoundedCornerBlock
 {
   UIGraphicsBeginImageContext(CGSizeMake(100, 100));

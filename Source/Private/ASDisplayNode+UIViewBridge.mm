@@ -819,7 +819,10 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
     if (_flags.layerBacked) {
       if (![_tintColor isEqual:color]) {
         _tintColor = color;
+        // Tint color has changed. Unlock here before calling subclasses and exit-early
+        AS::MutexLocker unlock(__instanceLock__);
         [self tintColorDidChange];
+        return;
       }
     } else {
       _setToViewOnly(tintColor, color);
