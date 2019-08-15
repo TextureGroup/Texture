@@ -795,32 +795,36 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (UIColor *)tintColor
 {
-  _bridge_prologue_read;
+  __instanceLock__.lock();
+  UIColor *retVal;
   if (_loaded(self)) {
     if (_flags.layerBacked) {
-        // The first nondefault tint color value in the view’s hierarchy, ascending from and starting with the view itself.
-        return _tintColor ?: self.supernode.tintColor;
-      } else {
-        return _getFromViewOnly(tintColor);
-      }
+      // The first nondefault tint color value in the view’s hierarchy, ascending from and starting with the view itself.
+      retVal = _tintColor;
+    } else {
+      retVal = _getFromViewOnly(tintColor);
+    }
   } else {
     if (_flags.layerBacked) {
-      return _tintColor;
+      retVal = _tintColor;
     } else {
-      return ASDisplayNodeGetPendingState(self).tintColor;
+      retVal = ASDisplayNodeGetPendingState(self).tintColor;
     }
   }
+  __instanceLock__.unlock();
+  return retVal ?: self.supernode.tintColor;
 }
 
 - (void)setTintColor:(UIColor *)color
 {
-  _bridge_prologue_write;
+  // Handle locking manually since we unlock to notify subclasses when tint color changes
+  __instanceLock__.lock();
   if (_loaded(self)) {
     if (_flags.layerBacked) {
       if (![_tintColor isEqual:color]) {
         _tintColor = color;
         // Tint color has changed. Unlock here before calling subclasses and exit-early
-        AS::MutexLocker unlock(__instanceLock__);
+        __instanceLock__.unlock();
         [self tintColorDidChange];
         return;
       }
@@ -834,6 +838,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       ASDisplayNodeGetPendingState(self).tintColor = color;
     }
   }
+  __instanceLock__.unlock();
 }
 
 - (void)tintColorDidChange
