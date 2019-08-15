@@ -795,47 +795,37 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (UIColor *)tintColor
 {
   __instanceLock__.lock();
-  UIColor *retVal;
-  if (_loaded(self)) {
-    if (_flags.layerBacked) {
-      // The first nondefault tint color value in the view’s hierarchy, ascending from and starting with the view itself.
-      retVal = _tintColor;
-    } else {
-      retVal = _getFromViewOnly(tintColor);
-    }
+  UIColor *retVal = nil;
+  BOOL shouldAscend = NO;
+  if (_flags.layerBacked) {
+    retVal = _tintColor;
+    // The first nondefault tint color value in the node’s hierarchy, ascending from and starting with the node itself.
+    shouldAscend = (retVal == nil);
   } else {
-    if (_flags.layerBacked) {
-      retVal = _tintColor;
-    } else {
-      retVal = ASDisplayNodeGetPendingState(self).tintColor;
-    }
+    ASDisplayNodeAssertThreadAffinity(self);
+    retVal = _getFromViewOnly(tintColor);
   }
   __instanceLock__.unlock();
-  return retVal ?: self.supernode.tintColor;
+  return shouldAscend ? self.supernode.tintColor : retVal;
 }
 
 - (void)setTintColor:(UIColor *)color
 {
   // Handle locking manually since we unlock to notify subclasses when tint color changes
   __instanceLock__.lock();
-  if (_loaded(self)) {
-    if (_flags.layerBacked) {
-      if (![_tintColor isEqual:color]) {
-        _tintColor = color;
+  if (_flags.layerBacked) {
+    if (![_tintColor isEqual:color]) {
+      _tintColor = color;
+
+      if (_loaded(self)) {
         // Tint color has changed. Unlock here before calling subclasses and exit-early
         __instanceLock__.unlock();
         [self tintColorDidChange];
         return;
       }
-    } else {
-      _setToViewOnly(tintColor, color);
     }
   } else {
-    if (_flags.layerBacked) {
-      _tintColor = color;
-    } else {
-      ASDisplayNodeGetPendingState(self).tintColor = color;
-    }
+    _setToViewOnly(tintColor, color);
   }
   __instanceLock__.unlock();
 }
