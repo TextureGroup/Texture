@@ -253,6 +253,9 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
   UIEdgeInsets _fallbackSafeAreaInsets;
 
+  // Tinting support
+  UIColor *_tintColor;
+
 #pragma mark - ASDisplayNode (Debugging)
   ASLayout *_unflattenedLayout;
 

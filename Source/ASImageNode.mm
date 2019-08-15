@@ -143,6 +143,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   UIImage *_image;
   ASWeakMapEntry *_weakCacheEntry;  // Holds a reference that keeps our contents in cache.
   UIColor *_placeholderColor;
+  UIColor *_tintColor; // Used to cache color information for layer backed nodes. View backed will use UIViewBridge
 
   void (^_displayCompletionBlock)(BOOL canceled);
   

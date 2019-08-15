@@ -52,7 +52,13 @@
   ASLockScopeSelf();
   if (!_titleNode) {
     _titleNode = [[ASTextNode alloc] init];
-    // Intentionally not layer-backing the image node since tintColor may be applied
+    #if TARGET_OS_TV
+      // tvOS needs access to the underlying view
+      // of the button node to add a touch handler.
+      [_titleNode setLayerBacked:NO];
+    #else
+      [_titleNode setLayerBacked:YES];
+    #endif
     _titleNode.style.flexShrink = 1.0;
     _titleNode.textColorFollowsTintColor = YES;
   }
@@ -66,7 +72,7 @@
   ASLockScopeSelf();
   if (!_imageNode) {
     _imageNode = [[ASImageNode alloc] init];
-    // Intentionally not layer-backing the image node since tintColor may be applied
+    [_imageNode setLayerBacked:YES];
   }
   return _imageNode;
 }

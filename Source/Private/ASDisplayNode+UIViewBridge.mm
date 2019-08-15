@@ -794,16 +794,50 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
 - (UIColor *)tintColor
 {
-  _bridge_prologue_read;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  return _getFromViewOnly(tintColor);
+  __instanceLock__.lock();
+  UIColor *retVal;
+  if (_loaded(self)) {
+    if (_flags.layerBacked) {
+      // The first nondefault tint color value in the view’s hierarchy, ascending from and starting with the view itself.
+      retVal = _tintColor;
+    } else {
+      retVal = _getFromViewOnly(tintColor);
+    }
+  } else {
+    if (_flags.layerBacked) {
+      retVal = _tintColor;
+    } else {
+      retVal = ASDisplayNodeGetPendingState(self).tintColor;
+    }
+  }
+  __instanceLock__.unlock();
+  return retVal ?: self.supernode.tintColor;
 }
 
 - (void)setTintColor:(UIColor *)color
 {
-  _bridge_prologue_write;
-  ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
-  _setToViewOnly(tintColor, color);
+  // Handle locking manually since we unlock to notify subclasses when tint color changes
+  __instanceLock__.lock();
+  if (_loaded(self)) {
+    if (_flags.layerBacked) {
+      if (![_tintColor isEqual:color]) {
+        _tintColor = color;
+        // Tint color has changed. Unlock here before calling subclasses and exit-early
+        __instanceLock__.unlock();
+        [self tintColorDidChange];
+        return;
+      }
+    } else {
+      _setToViewOnly(tintColor, color);
+    }
+  } else {
+    if (_flags.layerBacked) {
+      _tintColor = color;
+    } else {
+      ASDisplayNodeGetPendingState(self).tintColor = color;
+    }
+  }
+  __instanceLock__.unlock();
 }
 
 - (void)tintColorDidChange
