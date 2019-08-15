@@ -9,9 +9,7 @@
 
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
 #import <AsyncDisplayKit/ASCollectionView.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 
 #define kDefaultItemSize CGSizeMake(50, 50)

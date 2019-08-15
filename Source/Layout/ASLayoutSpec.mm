@@ -14,13 +14,7 @@
 
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <objc/runtime.h>
-#import <map>
-#import <vector>
 
 @implementation ASLayoutSpec
 

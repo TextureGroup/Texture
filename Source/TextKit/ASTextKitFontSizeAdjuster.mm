@@ -13,7 +13,6 @@
 #if AS_ENABLE_TEXTNODE
 
 #import <tgmath.h>
-#import <mutex>
 
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASTextKitContext.h>

@@ -10,7 +10,6 @@
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
 
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>

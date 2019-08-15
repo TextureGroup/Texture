@@ -13,7 +13,6 @@
 
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _removeFromSupernodeIfEqualTo:
-#import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
 
