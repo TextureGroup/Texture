@@ -1682,7 +1682,7 @@ dispatch_semaphore_signal(_lock);
 - (ASTextRange *)textRangeAtPoint:(CGPoint)point {
   NSUInteger lineIndex = [self lineIndexForPoint:point];
   if (lineIndex == NSNotFound) return nil;
-  NSUInteger textPosition = [self textPositionForPoint:point lineIndex:[self lineIndexForPoint:point]];
+  NSUInteger textPosition = [self textPositionForPoint:point lineIndex:lineIndex];
   if (textPosition == NSNotFound) return nil;
   ASTextPosition *pos = [self closestPositionToPoint:point];
   if (!pos) return nil;

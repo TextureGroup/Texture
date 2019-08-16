@@ -631,10 +631,16 @@ static NSArray *DefaultLinkAttributeNames() {
     if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
       continue;
     }
+//    ASTextRange *range = [layout textRangeAtPoint:testPoint];
+//    if (!range || !NSLocationInRange(range.start.offset, clampedRange)) {
+//      continue;
+//    }
     for (NSString *attributeName in _linkAttributeNames) {
       NSRange effectiveRange = NSMakeRange(0, 0);
       id value = [_attributedText attribute:attributeName atIndex:pos.offset
                       longestEffectiveRange:&effectiveRange inRange:clampedRange];
+//      id value = [_attributedText attribute:attributeName atIndex:range.start.offset
+//                      longestEffectiveRange:&effectiveRange inRange:clampedRange];
       if (value == nil) {
         // Didn't find any links specified with this attribute.
         continue;
@@ -648,7 +654,9 @@ static NSArray *DefaultLinkAttributeNames() {
         continue;
       }
 
-      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+      if (rangeOut != NULL) {
+        *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+      }
 
       if (attributeNameOut != NULL) {
         *attributeNameOut = attributeName;
@@ -1334,8 +1342,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSUInteger)lineCount
 {
   ASLockScopeSelf();
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  return 0;
+  return ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, _attributedText).rowCount;
 }
 
 #pragma mark - Truncation Message

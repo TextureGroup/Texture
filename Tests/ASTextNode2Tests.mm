@@ -130,4 +130,81 @@
   XCTAssertTrue(sizeWithEmptyString.width == 0);
 }
 
+- (void)testTappingLinkWithLinkOnlyLine
+{
+  NSString *link = @"https://texturegroup.com";
+  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@", link]];
+  NSRange linkRange = [attributedText.string rangeOfString:link];
+  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
+
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = attributedText;
+  CGSize size = [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX))].size;
+
+  // Increase the text node arbitratry to simulate a flex grow
+  textNode.frame = CGRectMake(0, 0, size.width + 50, size.height);
+
+  id linkAttribute = nil;
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(2.0, 5.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute != nil);
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(size.width + 40.0, 5.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute == nil);
+}
+
+- (void)testTappingLinkAtTheBeginningSingleline
+{
+  NSString *link = @"https://texturegroup.com";
+  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ - Texture Website", link]];
+  NSRange linkRange = [attributedText.string rangeOfString:link];
+  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
+
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = attributedText;
+  [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX))];
+
+  id linkAttribute = nil;
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(2.0, 5.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute != nil);
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(2.0, -25.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute == nil);
+}
+
+- (void)testTappingLinkAtTheBeginningMultiline
+{
+  NSString *link = @"https://texturegroup.com";
+  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ - Texture Website"
+                       @"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor "
+                       @"incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud", link]];
+  NSRange linkRange = [attributedText.string rangeOfString:link];
+  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
+
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = attributedText;
+  [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(200.0, CGFLOAT_MAX))];
+
+  XCTAssertTrue(textNode.lineCount > 1);
+
+  id linkAttribute = nil;
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(2.0, 5.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute != nil);
+
+  linkAttribute = [textNode linkAttributeValueAtPoint:CGPointMake(2.0, -25.0) attributeName:nil range:nil];
+  XCTAssertTrue(linkAttribute == nil);
+}
+
+- (void)testTappingLinkInTheMiddleSingleline
+{
+
+}
+
+- (void)testTappingLinkInTheMiddleMultiline
+{
+
+}
+
 @end
