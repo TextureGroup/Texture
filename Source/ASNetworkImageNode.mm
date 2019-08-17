@@ -555,9 +555,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   if (clearAndReattempt) {
     // In this case another thread changed the _downloadIdentifierForProgressBlock before we finished registering
     // the new progress block for newDownloadIDForProgressBlock ID. Let's clear it now and reattempt to register
-    if (newDownloadIDForProgressBlock) {
-      [_downloader setProgressImageBlock:nil callbackQueue:[self callbackQueue] withDownloadIdentifier:newDownloadIDForProgressBlock];
-    }
+    [_downloader setProgressImageBlock:nil callbackQueue:[self callbackQueue] withDownloadIdentifier:newDownloadIDForProgressBlock];
     [self _updateProgressImageBlockOnDownloaderIfNeeded];
   }
 }
