@@ -41,7 +41,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
 ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array)
 {
   NSArray *allNames = ASExperimentalFeaturesGetNames(ASExperimentalFeatureAll);
-  ASExperimentalFeatures result = 0;
+  ASExperimentalFeatures result = kNilOptions;
   for (NSString *str in array) {
     NSUInteger i = [allNames indexOfObject:str];
     if (i != NSNotFound) {
