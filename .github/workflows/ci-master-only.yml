@@ -1,0 +1,16 @@
+name: CI (master-only jobs)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  cocoapods-lint:
+    name: Verify that podspec lints
+    runs-on: macOS-10.14
+    steps:
+    - name: Checkout the Git repository
+      uses: actions/checkout@v1
+    - name: Run build.sh with cocoapods-lint mode
+      run: ./build.sh cocoapods-lint

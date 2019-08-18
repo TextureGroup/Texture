@@ -110,8 +110,8 @@ if [ "$MODE" = "examples-pt1" ]; then
     #Update cocoapods repo
     pod repo update master
 
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6 | head); do
-        echo "Building (examples-pt1) $example."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6); do
+        echo "Building (examples-pt1) $example"
 
         build_example $example
     done
@@ -123,8 +123,8 @@ if [ "$MODE" = "examples-pt2" ]; then
     #Update cocoapods repo
     pod repo update master
 
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -12 | tail -6 | head); do
-        echo "Building $example (examples-pt2)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -11 | tail -5); do
+        echo "Building (examples-pt2) $example"
 
         build_example $example
     done
@@ -136,21 +136,60 @@ if [ "$MODE" = "examples-pt3" ]; then
     #Update cocoapods repo
     pod repo update master
 
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -7 | head); do
-        echo "Building $example (examples-pt3)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -16 | tail -5); do
+        echo "Building (examples-pt3) $example"
 
         build_example $example
     done
     success="1"
 fi
 
-if [ "$MODE" = "examples-extra" ]; then
+if [ "$MODE" = "examples-pt4" ]; then
     echo "Verifying that all AsyncDisplayKit examples compile."
     #Update cocoapods repo
     pod repo update master
 
-    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -7 | head); do
-        echo "Building $example (examples-extra)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | tail -n +17); do
+        echo "Building (examples-pt4) $example"
+
+        build_example $example
+    done
+    success="1"
+fi
+
+if [ "$MODE" = "examples-extra-pt1" ]; then
+    echo "Verifying that all AsyncDisplayKit examples compile."
+    #Update cocoapods repo
+    pod repo update master
+
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6); do
+        echo "Building (examples-extra-pt1) $example"
+
+        build_example $example
+    done
+    success="1"
+fi
+
+if [ "$MODE" = "examples-extra-pt2" ]; then
+    echo "Verifying that all AsyncDisplayKit examples compile."
+    #Update cocoapods repo
+    pod repo update master
+
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -11 | tail -5); do
+        echo "Building (examples-extra-pt2) $example"
+
+        build_example $example
+    done
+    success="1"
+fi
+
+if [ "$MODE" = "examples-extra-pt3" ]; then
+    echo "Verifying that all AsyncDisplayKit examples compile."
+    #Update cocoapods repo
+    pod repo update master
+
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | tail -n +12); do
+        echo "Building (examples-extra-pt3) $example"
 
         build_example $example
     done
