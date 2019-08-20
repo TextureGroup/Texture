@@ -397,6 +397,27 @@ static NSArray *DefaultLinkAttributeNames() {
   return UIAccessibilityTraitStaticText;
 }
 
+- (void)asyncTraitCollectionDidChange
+{
+  [super asyncTraitCollectionDidChange];
+   ASLockScopeSelf();
+  if (@available(iOS 13.0, *)) {
+    UIColor *textColor = nil;
+    if (self.textColorFollowsTintColor && self.tintColor) {
+      textColor = self.tintColor;
+    } else {
+      textColor = [_attributedText attribute:NSForegroundColorAttributeName atIndex:_attributedText.length - 1 effectiveRange:NULL];
+    }
+    if (textColor != nil) {
+      UIColor *darkColor = [textColor resolvedColorWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];;
+      UIColor *lightColor = [textColor resolvedColorWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];;
+      if (![darkColor isEqual:lightColor]) {
+        [self setNeedsDisplay];
+      }
+    }
+  }
+}
+
 #pragma mark - Layout and Sizing
 
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset

@@ -76,4 +76,30 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
   }
 }
 
+- (void)testUserInterfaceStyleSnapshotTesting
+{
+  self.recordMode = YES;
+  if (@available(iOS 13.0, *)) {
+    ASDisplayNode *node = [[ASDisplayNode alloc] init];
+    [node setLayerBacked:YES];
+    node.backgroundColor = [UIColor systemBackgroundColor];
+    [node setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection([UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight])];
+
+    ASTextNode *subnode = [[ASTextNode alloc] init];
+    [subnode setLayerBacked:YES];
+    subnode.backgroundColor = [UIColor clearColor];
+    subnode.attributedText = [[NSAttributedString alloc] initWithString:@"Hello" attributes:@{ NSForegroundColorAttributeName : [UIColor labelColor] }];
+    node.automaticallyManagesSubnodes = YES;
+    node.layoutSpecBlock = ^(ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
+      return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(5, 5, 5, 5) child:subnode];
+    };
+    ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+    ASSnapshotVerifyNode(node, @"user_interface_style_light");
+
+    [node setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection([UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark])];
+    ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+  }
+}
+
+
 @end

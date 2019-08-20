@@ -434,6 +434,23 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+- (void)asyncTraitCollectionDidChange
+{
+  if (@available(iOS 13.0, *)) {
+      AS::UniqueLock l(__instanceLock__);
+      if ([self isNodeLoaded]) {
+          if (self.isLayerBacked) {
+              UITraitCollection *derivedTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
+              CGColorRef oldColor = _layer.backgroundColor;
+              CGColorRef newColor = [_backgroundColor resolvedColorWithTraitCollection:derivedTraitCollection].CGColor;
+              if (!CGColorEqualToColor(oldColor, newColor)) {
+                  _layer.backgroundColor = newColor;
+              }
+          }
+      }
+  }
+}
+
 - (void)dealloc
 {
   _flags.isDeallocating = YES;

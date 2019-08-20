@@ -256,6 +256,9 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // Tinting support
   UIColor *_tintColor;
 
+  // Dynamic colors support
+  UIColor *_backgroundColor;
+
 #pragma mark - ASDisplayNode (Debugging)
   ASLayout *_unflattenedLayout;
 
