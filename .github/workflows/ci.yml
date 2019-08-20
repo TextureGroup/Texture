@@ -7,9 +7,9 @@ jobs:
     name: Build approval
     runs-on: macOS-10.14
     steps:
-    - name: Only approve a pull request from a forked repository if it's been labeled by a maintainer.
-      if: github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels, 'CI approved'))
-      run: echo You may proceed!  
+    - name: Block if a pull request is from a forked repository and it hasn't been labeled by a maintainer.
+      if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels, 'CI approved')
+      run: exit 255
   buildsh:
     strategy:
       matrix:
