@@ -11,5 +11,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Danger
       uses: danger/danger-js@9.1.8
+      with:
+        args: --dangerfile Dangerfile
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
