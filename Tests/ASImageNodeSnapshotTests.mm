@@ -189,4 +189,29 @@
   ASSnapshotVerifyNode(node, nil);
 }
 
+#if AS_AT_LEAST_IOS13
+- (void)testDynamicAssetImage
+{
+  if (@available(iOS 13.0, *)) {
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
+    [ASConfigurationManager test_resetWithConfiguration:config];
+    
+    UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
+    ASImageNode *node = [[ASImageNode alloc] init];
+    node.image = image;
+    ASDisplayNodeSizeToFitSize(node, image.size);
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_light");
+    }];
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+    }];
+    
+    NSLog(@"%@", image);
+  }
+}
+#endif // #if AS_AT_LEAST_IOS13
 @end

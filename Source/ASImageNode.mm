@@ -52,6 +52,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
   ASImageNodeDrawParametersBlock _didDrawBlock;
+  #if AS_BUILD_UIUSERINTERFACESTYLE
+  UIUserInterfaceStyle userInterfaceStyle;
+  #endif
 }
 
 @end
@@ -74,7 +77,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 @property (nonatomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
 @property (nonatomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 @property (nonatomic) asimagenode_modification_block_t imageModificationBlock;
-
+#if AS_BUILD_UIUSERINTERFACESTYLE
+@property UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
+#endif
 @end
 
 @implementation ASImageNodeContentsKey
@@ -99,6 +104,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       && [_tintColor isEqual:other.tintColor]
       && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
       && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
+#if AS_BUILD_UIUSERINTERFACESTYLE
+      && _userInterfaceStyle == other.userInterfaceStyle
+#endif
       && _imageModificationBlock == other.imageModificationBlock;
   } else {
     return NO;
@@ -135,7 +143,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 @end
-
 
 @implementation ASImageNode
 {
@@ -312,6 +319,10 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_imageModificationBlock = _imageModificationBlock;
   drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
   drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+#if AS_BUILD_UIUSERINTERFACESTYLE
+  drawParameters->userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
+#endif
+
 
   // Hack for now to retain the weak entry that was created while this drawing happened
   drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
@@ -403,6 +414,12 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return nil;
   }
 
+#if AS_BUILD_UIUSERINTERFACESTYLE
+  UIUserInterfaceStyle userInterfaceStyle = drawParameter->userInterfaceStyle;
+#endif
+
+    
+
   ASImageNodeContentsKey *contentsKey = [[ASImageNodeContentsKey alloc] init];
   contentsKey.image = image;
   contentsKey.backingSize = backingSize;
@@ -413,7 +430,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
   contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
-
+#if AS_BUILD_UIUSERINTERFACESTYLE
+  contentsKey.userInterfaceStyle = userInterfaceStyle;
+#endif
   if (isCancelled()) {
     return nil;
   }
@@ -739,6 +758,25 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   };
 }
 
+#if AS_BUILD_UIUSERINTERFACESTYLE
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
+  [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
+  
+  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+      // update image if userInterfaceStyle was changed (dark mode)
+      if (_image != nil && self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
+          // get an updated image from asset catalog
+          UIImage *updatedImage = [self.image.imageAsset imageWithTraitCollection:tc];
+          if ( updatedImage != nil ) {
+              _image = updatedImage;
+          }
+        // trigger needs display anyway, cause image might be dynamic itself (e.g. dynamic tint color)
+        [self setNeedsDisplay];
+      }
+  }
+}
+#endif
 @end
 
 #pragma mark - Extras
