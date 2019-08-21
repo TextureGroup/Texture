@@ -100,7 +100,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   @package //Expose all ivars for ASDisplayNode to bypass getters for efficiency
 
   UIViewAutoresizing autoresizingMask;
-  unsigned int edgeAntialiasingMask;
+  CAEdgeAntialiasingMask edgeAntialiasingMask;
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
   CGRect bounds;
   UIColor *backgroundColor;

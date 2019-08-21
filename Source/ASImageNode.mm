@@ -379,7 +379,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   
   
   // If we're not supposed to do any cropping, just decode image at original size
-  if (!cropEnabled || !contentModeSupported || stretchable) {
+  if (!cropEnabled || !contentModeSupported) {
     backingSize = imageSizeInPixels;
     imageDrawRect = (CGRect){.size = backingSize};
   } else {
