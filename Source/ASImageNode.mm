@@ -594,6 +594,14 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   [self setNeedsDisplay];
 }
 
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+  if (self.image.renderingMode == UIImageRenderingModeAlwaysTemplate) {
+    [self setNeedsDisplay];
+  }
+}
+
 #pragma mark Interface State
 
 - (void)clearContents
