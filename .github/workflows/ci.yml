@@ -3,16 +3,6 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build-approval:
-    name: Build approval
-    runs-on: macOS-10.14
-    steps:
-    - name: Block if a pull request from a forked repository isn't from, and isn't labeled by, a maintainer
-      if: github.event_name == 'pull_request' && !contains('OWNER, MEMBER, COLLABORATOR', github.event.pull_request.author_association) && !contains(github.event.pull_request.labels.*.name, 'CI approved')
-      run: exit 255
-    - name: Approved!
-      if: failure() == false
-      run: exit 0
   buildsh:
     strategy:
       matrix:
@@ -36,7 +26,6 @@ jobs:
             name: Build examples (examples-pt4)
     name: ${{ matrix.name }}
     runs-on: macOS-10.14
-    needs: build-approval
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
