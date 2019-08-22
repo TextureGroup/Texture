@@ -9,8 +9,7 @@ jobs:
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
-    - run: bundle install
     - name: Run Danger
-      run: bundle exec danger --verbose
+      uses: danger/danger
       env:
         DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
