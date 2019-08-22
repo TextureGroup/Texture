@@ -55,7 +55,7 @@ function full_license(partial_license, filename) {
 
 function check_file_header(files_to_check, license) {
   for (let file of files_to_check) {
-    const filename = file.replace(/^.*[\\\/]/, '');
+    const filename = file.replace(/^.*[\\\/]/, ''); // Reference: https://stackoverflow.com/a/423385
     schedule(async () => {
       const content = await danger.github.utils.fileContents(file);
       if (!content.includes("Pinterest, Inc.")) {
