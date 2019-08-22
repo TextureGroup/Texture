@@ -9,10 +9,6 @@ jobs:
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
-    # Danger JS would fail because of the below missing module.
-    # TODO: Report to Danger JS
-    - name: Install missing module
-      run: yarn add -D @babel/plugin-transform-flow-strip-types
     # TODO: Figure out why GITHUB_TOKEN isn't enough for Danger JS to create a comment.
     # Our dangerfile.js escalates any warnings as failures to get more attention.
     #
@@ -29,3 +25,4 @@ jobs:
       uses: danger/danger-js@9.1.8
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DANGER_DISABLE_TRANSPILATION: true 
