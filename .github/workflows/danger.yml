@@ -4,14 +4,13 @@ on: [pull_request]
 
 jobs:
   danger:
-    name: Danger JS
-    runs-on: ubuntu-latest
+    name: Danger
+    runs-on: macos-latest
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
-    - name: Danger
-      uses: danger/danger-js@9.1.8
-      with:
-        args: --dangerfile Dangerfile
+    - run: bundle install
+    - name: Run Danger
+      run: bundle exec danger --verbose
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
