@@ -9,20 +9,28 @@ const has_added_source_files = (Array.isArray(added_source_files) && added_sourc
 
 // Make it more obvious that a PR is a work in progress and shouldn't be merged yet
 if (danger.github.pr.title.includes("[WIP]")) {
-  fail("PR is classed as Work in Progress");
+  const msg = "PR is classed as Work in Progress";
+  console.error("FAIL: " + msg);
+  fail(msg);
 }
 
 // Warn when there is a big PR
 if (danger.github.pr.additions + danger.github.pr.deletions > 500) {
-  warn("This is a big PR, please consider splitting it up to ease code review.");
+  const msg = "This is a big PR, please consider splitting it up to ease code review.";
+  console.error("WARN: "+ msg);
+  warn(msg);
 }
 
 // Modifying the changelog will probably get overwritten.
 if (danger.git.modified_files.includes("CHANGELOG.md")) {
   if (danger.github.pr.title.includes("#changelog")) {
-    warn("PR modifies CHANGELOG.md, which is a generated file. #changelog added to the title to suppress this warning.");
+    const msg = "PR modifies CHANGELOG.md, which is a generated file. #changelog added to the title to suppress this warning.";
+    console.error("WARN: "+ msg);
+    warn(msg);
   } else {
-    fail("PR modifies CHANGELOG.md, which is a generated file. Add #changelog to the title to suppress this failure.");
+    const msg = "PR modifies CHANGELOG.md, which is a generated file. Add #changelog to the title to suppress this failure.";
+    console.error("FAIL: " + msg);
+    fail(msg);
   }
 }
 
@@ -51,7 +59,9 @@ function check_file_header(files_to_check, license) {
     schedule(async () => {
       const content = await danger.github.utils.fileContents(file);
       if (!content.includes("Pinterest, Inc.")) {
-        fail("Please ensure license is correct for " + filename +":\n```" + full_license(license, filename) + "\n```");
+        const msg = "Please ensure license is correct for " + filename +":\n```" + full_license(license, filename) + "\n```";
+        console.error("FAIL: " + msg);
+        fail(msg);
       }  
     });
   }   
