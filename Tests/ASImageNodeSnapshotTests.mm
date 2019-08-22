@@ -30,6 +30,14 @@
   return [UIImage imageWithContentsOfFile:path];
 }
 
+- (UIImage *)testGrayscaleImage
+{
+  NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"logo-square-black"
+                                                                    ofType:@"png"
+                                                               inDirectory:@"TestResources"];
+  return [UIImage imageWithContentsOfFile:path];
+}
+
 - (void)testRenderLogoSquare
 {
   // trivial test case to ensure ASSnapshotTestCase works
@@ -67,6 +75,25 @@
 - (void)testTintColorOnNodePropertyAlwaysTemplate
 {
   UIImage *test = [self testImage];
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = [test imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  node.tintColor = UIColor.redColor;
+  ASDisplayNodeSizeToFitSize(node, test.size);
+  // Tint color should change view
+  ASSnapshotVerifyNode(node, @"red_tint");
+
+  node.tintColor = UIColor.blueColor;
+  // Tint color should change view
+  ASSnapshotVerifyNode(node, @"blue_tint");
+}
+
+- (void)testTintColorOnGrayscaleNodePropertyAlwaysTemplate
+{
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalDrawingGlobal;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+
+  UIImage *test = [self testGrayscaleImage];
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = [test imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   node.tintColor = UIColor.redColor;
