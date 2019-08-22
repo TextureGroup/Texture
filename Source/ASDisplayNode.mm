@@ -434,6 +434,18 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
+{
+  if (@available(iOS 13.0, *)) {
+    __instanceLock__.lock();
+    if (self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      __instanceLock__.unlock();
+      [self setNeedsDisplay];
+    }
+  }
+}
+
 - (void)dealloc
 {
   _flags.isDeallocating = YES;

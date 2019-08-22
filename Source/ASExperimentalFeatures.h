@@ -18,19 +18,20 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   // If AS_ENABLE_TEXTNODE=0 or TextNode2 subspec is used this setting is a no op and ASTextNode2
   // will be used in all cases
-  ASExperimentalTextNode = 1 << 0,                          // exp_text_node
-  ASExperimentalInterfaceStateCoalescing = 1 << 1,          // exp_interface_state_coalesce
-  ASExperimentalUnfairLock = 1 << 2,                        // exp_unfair_lock
-  ASExperimentalLayerDefaults = 1 << 3,                     // exp_infer_layer_defaults
-  ASExperimentalCollectionTeardown = 1 << 4,                // exp_collection_teardown
-  ASExperimentalFramesetterCache = 1 << 5,                  // exp_framesetter_cache
-  ASExperimentalSkipClearData = 1 << 6,                     // exp_skip_clear_data
-  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 7,      // exp_did_enter_preload_skip_asm_layout
-  ASExperimentalDispatchApply = 1 << 8,                     // exp_dispatch_apply
-  ASExperimentalOOMBackgroundDeallocDisable = 1 << 9,       // exp_oom_bg_dealloc_disable
-  ASExperimentalRemoveTextKitInitialisingLock = 1 << 10,    // exp_remove_textkit_initialising_lock
-  ASExperimentalDrawingGlobal = 1 << 11,                    // exp_drawing_global
-  ASExperimentalOptimizeDataControllerPipeline = 1 << 12,   // exp_optimize_data_controller_pipeline
+  ASExperimentalTextNode = 1 << 0,                                          // exp_text_node
+  ASExperimentalInterfaceStateCoalescing = 1 << 1,                          // exp_interface_state_coalesce
+  ASExperimentalUnfairLock = 1 << 2,                                        // exp_unfair_lock
+  ASExperimentalLayerDefaults = 1 << 3,                                     // exp_infer_layer_defaults
+  ASExperimentalCollectionTeardown = 1 << 4,                                // exp_collection_teardown
+  ASExperimentalFramesetterCache = 1 << 5,                                  // exp_framesetter_cache
+  ASExperimentalSkipClearData = 1 << 6,                                     // exp_skip_clear_data
+  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 7,                      // exp_did_enter_preload_skip_asm_layout
+  ASExperimentalDispatchApply = 1 << 8,                                     // exp_dispatch_apply
+  ASExperimentalOOMBackgroundDeallocDisable = 1 << 9,                       // exp_oom_bg_dealloc_disable
+  ASExperimentalRemoveTextKitInitialisingLock = 1 << 10,                    // exp_remove_textkit_initialising_lock
+  ASExperimentalDrawingGlobal = 1 << 11,                                    // exp_drawing_global
+  ASExperimentalOptimizeDataControllerPipeline = 1 << 12,                   // exp_optimize_data_controller_pipeline
+  ASExperimentalTraitCollectionDidChangeWithPreviousCollection = 1 << 13,   // exp_trait_collection_did_change_with_previous_collection
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

@@ -76,4 +76,28 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
   }
 }
 
+// Enable test when background color on ASDisplayNode PR merges
+//- (void)testUserInterfaceStyleSnapshotTesting
+//{
+//  if (@available(iOS 13.0, *)) {
+//    UITraitCollection.currentTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+//
+//    ASDisplayNode *node = [[ASDisplayNode alloc] init];
+//    [node setLayerBacked:YES];
+//
+//    node.backgroundColor = [UIColor systemBackgroundColor];
+//
+//    node.style.preferredSize = CGSizeMake(100, 100);
+//    ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+//
+//    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+//      ASSnapshotVerifyNode(node, @"user_interface_style_light");
+//    }];
+//
+//    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+//      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+//    }];
+//  }
+//}
+
 @end
