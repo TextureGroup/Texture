@@ -133,10 +133,16 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   AS::UniqueLock l(__instanceLock__);
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
+    ASPrimitiveTraitCollection previousTraitCollection = _primitiveTraitCollection;
     _primitiveTraitCollection = traitCollection;
 
     l.unlock();
-    [self asyncTraitCollectionDidChange];
+    if (ASActivateExperimentalFeature(ASExperimentalTraitCollectionDidChangeWithPreviousCollection)) {
+      [self asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
+    } else {
+      [self asyncTraitCollectionDidChange];
+    }
+
   }
 }
 

@@ -434,6 +434,22 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
+{
+  if (@available(iOS 13.0, *)) {
+    __instanceLock__.lock();
+    if (self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      // When changing between light and dark mode, often the entire node needs to re-render.
+      // This change doesn't happen frequently so it's fairly safe to render nodes again
+      __instanceLock__.unlock();
+      [self setNeedsDisplay];
+      return;
+    }
+    __instanceLock__.unlock();
+  }
+}
+
 - (void)dealloc
 {
   _flags.isDeallocating = YES;
