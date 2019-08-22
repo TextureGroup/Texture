@@ -147,7 +147,7 @@
 
 
 
-#ifdef AS_AT_LEAST_IOS13
+#if AS_AT_LEAST_IOS13
 
 - (void)testUserInterfaceStyleSnapshotTesting
 {
@@ -233,6 +233,6 @@
   }
 }
 
-#endif
+#endif // #if AS_AT_LEAST_IOS13
 
 @end
