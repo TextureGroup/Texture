@@ -55,9 +55,10 @@ typedef NS_OPTIONS (NSInteger, ASTextLineStyle) {
  Text vertical alignment.
  */
 typedef NS_ENUM(NSInteger, ASTextVerticalAlignment) {
-  ASTextVerticalAlignmentTop =    0, ///< Top alignment.
-  ASTextVerticalAlignmentCenter = 1, ///< Center alignment.
-  ASTextVerticalAlignmentBottom = 2, ///< Bottom alignment.
+  ASTextVerticalAlignmentTop      = 0, ///< Top alignment.
+  ASTextVerticalAlignmentCenter   = 1, ///< Center alignment.
+  ASTextVerticalAlignmentBottom   = 2, ///< Bottom alignment.
+  ASTextVerticalAlignmentBaseline = 3, ///< Baseline alignment.
 };
 
 /**

@@ -510,6 +510,7 @@ return style. _attr_;
         delegate.descent = attachmentSize.height;
       }
     } break;
+    case ASTextVerticalAlignmentBaseline:
     default: {
       delegate.ascent = attachmentSize.height;
       delegate.descent = 0;
