@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A Boolean value that controls whether the horizontal scroll indicator is visible.
- * The default value of this property is NO.
+ * The default value of this property is YES.
  */
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
 
