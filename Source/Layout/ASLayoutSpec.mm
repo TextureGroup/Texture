@@ -127,7 +127,7 @@ ASLayoutElementLayoutCalculationDefaults
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id unowned _Nullable [_Nonnull])buffer count:(NSUInteger)len
 {
   return [_childrenArray countByEnumeratingWithState:state objects:buffer count:len];
 }

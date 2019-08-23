@@ -40,7 +40,7 @@ int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContext
 
 #if AS_TLS_AVAILABLE
 
-static _Thread_local __unsafe_unretained ASLayoutElementContext *tls_context;
+static _Thread_local unowned ASLayoutElementContext *tls_context;
 
 void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {

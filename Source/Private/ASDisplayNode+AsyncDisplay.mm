@@ -260,7 +260,7 @@ using AS::MutexLocker;
    Color the interval red if cancelled, green otherwise.
    */
 #if AS_SIGNPOST_ENABLE
-  __unsafe_unretained id ptrSelf = (id)self;
+  unowned id ptrSelf = (id)self;
   displayBlock = ^{
     ASSignpostStart(LayerDisplay, ptrSelf, "%@", ASObjectDescriptionMakeTiny(ptrSelf));
     id result = displayBlock();
