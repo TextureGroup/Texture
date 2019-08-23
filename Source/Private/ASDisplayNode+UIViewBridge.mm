@@ -788,7 +788,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   }
 }
 
-
 - (UIColor *)tintColor
 {
   __instanceLock__.lock();

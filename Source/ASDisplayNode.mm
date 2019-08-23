@@ -443,8 +443,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
       // When changing between light and dark mode, often the entire node needs to re-render.
       // This change doesn't happen frequently so it's fairly safe to render nodes again
       if (_loaded(self) && self.isLayerBacked && _backgroundColor) {
-        if (!CGColorEqualToColor(_layer.backgroundColor, _backgroundColor.CGColor)) {
-          _layer.backgroundColor = _backgroundColor.CGColor;
+        CGColorRef cgBackgroundColor = _backgroundColor.CGColor;
+        if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
+          _layer.backgroundColor = cgBackgroundColor;
         }
       }
       __instanceLock__.unlock();
