@@ -24,17 +24,15 @@ namespace AS {
   {
     // Some convenience type definitions
     typedef decltype(func(std::declval<typename T::value_type>())) value_type;
-    typedef std::vector<value_type> result_type;
 
     // Prepares an output vector of the appropriate size
-    result_type res(iterable.size());
+    std::vector<value_type> res;
+    res.reserve(iterable.size());
 
     // Let std::transform apply `func` to all elements
     // (use perfect forwarding for the function object)
-    std::transform(
-                   begin(iterable), end(iterable), res.begin(),
-                   std::forward<Func>(func)
-                   );
+    std::transform(std::begin(iterable), std::end(iterable), std::back_inserter(res),
+                   std::forward<Func>(func));
 
     return res;
   }
