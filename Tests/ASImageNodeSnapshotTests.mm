@@ -11,6 +11,18 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
+#if AS_AT_LEAST_IOS13
+static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
+  CGRect rect = CGRect{.origin = CGPointZero, .size = size};
+  UIGraphicsBeginImageContextWithOptions(size, false, 0);
+  [color setFill];
+  UIRectFill(rect);
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return image;
+}
+#endif
+
 @interface ASImageNodeSnapshotTests : ASSnapshotTestCase
 @end
 
@@ -206,6 +218,7 @@
 - (void)testDynamicAssetImage
 {
   if (@available(iOS 13.0, *)) {
+    // enable experimantal callback for traits change
     ASConfiguration *config = [ASConfiguration new];
     config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
     [ASConfigurationManager test_resetWithConfiguration:config];
@@ -222,8 +235,34 @@
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
+  }
+}
+
+- (void)testDynamicTintColor
+{
+  if (@available(iOS 13.0, *)) {
+    // enable experimental callback for traits change
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
+    [ASConfigurationManager test_resetWithConfiguration:config];
     
-    NSLog(@"%@", image);
+    UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
+    image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIColor* tintColor = UIColor.systemBackgroundColor;
+    ASImageNode *node = [[ASImageNode alloc] init];
+    
+    node.image = image;
+    node.tintColor = tintColor;
+    
+    ASDisplayNodeSizeToFitSize(node, image.size);
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_light");
+    }];
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+    }];
   }
 }
 #endif // #if AS_AT_LEAST_IOS13
