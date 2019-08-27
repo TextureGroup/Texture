@@ -36,6 +36,13 @@
 			remoteGlobalIDString = 057D02BF1AC0A66700C7AC3C;
 			remoteInfo = TextureTestHost;
 		};
+		51A5E7A123154296002D6C2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 34566C9B1BC1202A00715E6B /* Texture.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B35061D91B010EDF0018CF92;
+			remoteInfo = Texture;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -151,6 +158,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				51A5E7A223154296002D6C2A /* PBXTargetDependency */,
 			);
 			name = Sample;
 			productName = Sample;
@@ -246,6 +254,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51A5E7A223154296002D6C2A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Texture;
+			targetProxy = 51A5E7A123154296002D6C2A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		050E7C8B19D22E1A004363C2 /* Debug */ = {
