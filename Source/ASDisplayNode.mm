@@ -442,6 +442,15 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     if (self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
       // When changing between light and dark mode, often the entire node needs to re-render.
       // This change doesn't happen frequently so it's fairly safe to render nodes again
+      if (_loaded(self) && self.isLayerBacked) {
+        // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+        // instead of UIColor. We utilize the _backgroundColor instance variable to track the full dynamic color
+        // and apply any changes here when trait collection updates occur.
+        CGColorRef cgBackgroundColor = _backgroundColor.CGColor;
+        if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
+          _layer.backgroundColor = cgBackgroundColor;
+        }
+      }
       __instanceLock__.unlock();
       [self setNeedsDisplay];
       return;

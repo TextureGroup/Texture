@@ -76,28 +76,33 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
   }
 }
 
-// Enable test when background color on ASDisplayNode PR merges
-//- (void)testUserInterfaceStyleSnapshotTesting
-//{
-//  if (@available(iOS 13.0, *)) {
-//    UITraitCollection.currentTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
-//
-//    ASDisplayNode *node = [[ASDisplayNode alloc] init];
-//    [node setLayerBacked:YES];
-//
-//    node.backgroundColor = [UIColor systemBackgroundColor];
-//
-//    node.style.preferredSize = CGSizeMake(100, 100);
-//    ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
-//
-//    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
-//      ASSnapshotVerifyNode(node, @"user_interface_style_light");
-//    }];
-//
-//    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
-//      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
-//    }];
-//  }
-//}
+#if AS_AT_LEAST_IOS13
+
+- (void)testUserInterfaceStyleSnapshotTesting
+{
+  if (@available(iOS 13.0, *)) {
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
+    [ASConfigurationManager test_resetWithConfiguration:config];
+
+    ASDisplayNode *node = [[ASDisplayNode alloc] init];
+    [node setLayerBacked:YES];
+
+    node.backgroundColor = [UIColor systemBackgroundColor];
+
+    node.style.preferredSize = CGSizeMake(100, 100);
+    ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_light");
+    }];
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+    }];
+  }
+}
+
+#endif // #if AS_AT_LEAST_IOS13
 
 @end
