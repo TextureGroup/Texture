@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <Texture/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import <Texture/ASCollectionViewFlowLayoutInspector.h>
 #import <Texture/ASDataController.h>
 #import <Texture/ASSectionContext.h>

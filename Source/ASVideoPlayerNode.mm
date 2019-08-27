@@ -14,7 +14,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#import <Texture/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import <Texture/ASDefaultPlaybackButton.h>
 #import <Texture/ASDisplayNodeInternal.h>
 

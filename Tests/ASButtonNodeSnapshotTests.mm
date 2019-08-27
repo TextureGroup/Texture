@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <Texture/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 #import "ASSnapshotTestCase.h"
 
 @interface ASButtonNodeSnapshotTests : ASSnapshotTestCase

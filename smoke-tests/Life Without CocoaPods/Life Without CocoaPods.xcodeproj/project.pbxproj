@@ -15,6 +15,7 @@
 		0589691D1ABCE0E80059CE2A /* Default-736h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0589691A1ABCE0E80059CE2A /* Default-736h@3x.png */; };
 		0589692A1ABCE17C0059CE2A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 058969291ABCE17C0059CE2A /* AssetsLibrary.framework */; };
 		0589692C1ABCE1820059CE2A /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0589692B1ABCE1820059CE2A /* Photos.framework */; };
+		51A5E79C23154158002D6C2A /* Texture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51A5E78023153F1C002D6C2A /* Texture.framework */; };
 		92DD2FEC1BF4D8BB0074C9DD /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92DD2FEB1BF4D8BB0074C9DD /* MapKit.framework */; };
 		F729B8BB1D2E176700C9EDBC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F729B8BA1D2E176700C9EDBC /* main.m */; };
 		F729B8C61D2E176700C9EDBC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F729B8C51D2E176700C9EDBC /* Assets.xcassets */; };
@@ -44,6 +45,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 057D02BF1AC0A66700C7AC3C;
 			remoteInfo = TextureTestHost;
+		};
+		51A5E7942315414B002D6C2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F7CE6CA51D2CDFFB00BE4C15 /* Texture.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B35061D91B010EDF0018CF92;
+			remoteInfo = Texture;
+		};
+		51A5E79923154151002D6C2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F7CE6CA51D2CDFFB00BE4C15 /* Texture.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B35061D91B010EDF0018CF92;
+			remoteInfo = Texture;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -89,6 +104,7 @@
 			files = (
 				92DD2FEC1BF4D8BB0074C9DD /* MapKit.framework in Frameworks */,
 				0589692C1ABCE1820059CE2A /* Photos.framework in Frameworks */,
+				51A5E79C23154158002D6C2A /* Texture.framework in Frameworks */,
 				0589692A1ABCE17C0059CE2A /* AssetsLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,6 +129,7 @@
 				058968F11ABCE06E0059CE2A /* Life Without CocoaPods */,
 				F729B8B81D2E176700C9EDBC /* Life With Frameworks */,
 				058968F01ABCE06E0059CE2A /* Products */,
+				51A5E79B23154158002D6C2A /* Frameworks */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -162,6 +179,13 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		51A5E79B23154158002D6C2A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F729B8B81D2E176700C9EDBC /* Life With Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -195,6 +219,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				51A5E79A23154151002D6C2A /* PBXTargetDependency */,
 			);
 			name = "Life Without CocoaPods";
 			productName = "Life Without CocoaPods";
@@ -213,6 +238,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				51A5E7952315414B002D6C2A /* PBXTargetDependency */,
 			);
 			name = "Life With Frameworks";
 			productName = "Life With Frameworks";
@@ -330,6 +356,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51A5E7952315414B002D6C2A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Texture;
+			targetProxy = 51A5E7942315414B002D6C2A /* PBXContainerItemProxy */;
+		};
+		51A5E79A23154151002D6C2A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Texture;
+			targetProxy = 51A5E79923154151002D6C2A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		F729B8C71D2E176700C9EDBC /* LaunchScreen.storyboard */ = {
