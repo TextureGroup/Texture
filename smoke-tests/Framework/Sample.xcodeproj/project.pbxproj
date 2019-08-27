@@ -15,33 +15,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		34566CA21BC1202A00715E6B /* PBXContainerItemProxy */ = {
+		51A5E78B23153F8C002D6C2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */;
+			containerPortal = 34566C9B1BC1202A00715E6B /* Texture.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 058D09AC195D04C000B7D73C;
-			remoteInfo = AsyncDisplayKit;
+			remoteGlobalIDString = B35061DA1B010EDF0018CF92;
+			remoteInfo = Texture;
 		};
-		34566CA41BC1202A00715E6B /* PBXContainerItemProxy */ = {
+		51A5E78D23153F8C002D6C2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */;
+			containerPortal = 34566C9B1BC1202A00715E6B /* Texture.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 058D09BC195D04C000B7D73C;
-			remoteInfo = AsyncDisplayKitTests;
+			remoteInfo = TextureTests;
 		};
-		34566CA61BC1202A00715E6B /* PBXContainerItemProxy */ = {
+		51A5E78F23153F8C002D6C2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */;
+			containerPortal = 34566C9B1BC1202A00715E6B /* Texture.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 057D02BF1AC0A66700C7AC3C;
-			remoteInfo = AsyncDisplayKitTestHost;
-		};
-		34566CAC1BC1204100715E6B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = B35061D91B010EDF0018CF92;
-			remoteInfo = "AsyncDisplayKit-iOS";
+			remoteInfo = TextureTestHost;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -64,7 +57,7 @@
 		050E7C7319D22E19004363C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		050E7C7519D22E19004363C2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		05DDD8DA19D2336300013C30 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
-		34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = AsyncDisplayKit.xcodeproj; path = ../../AsyncDisplayKit.xcodeproj; sourceTree = "<group>"; };
+		34566C9B1BC1202A00715E6B /* Texture.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Texture.xcodeproj; path = ../../Texture.xcodeproj; sourceTree = "<group>"; };
 		34566CAF1BC1208200715E6B /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		34566CB11BC1208700715E6B /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		6C5053D919EE266A00E385DE /* Default-667h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-667h@2x.png"; sourceTree = SOURCE_ROOT; };
@@ -85,7 +78,7 @@
 		050E7C6519D22E19004363C2 = {
 			isa = PBXGroup;
 			children = (
-				34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */,
+				34566C9B1BC1202A00715E6B /* Texture.xcodeproj */,
 				050E7C7019D22E19004363C2 /* Sample */,
 				050E7C6F19D22E19004363C2 /* Products */,
 				092C2001FE124604891D6E90 /* Frameworks */,
@@ -133,12 +126,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		34566C9C1BC1202A00715E6B /* Products */ = {
+		51A5E78623153F8C002D6C2A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				34566CA31BC1202A00715E6B /* AsyncDisplayKit.framework */,
-				34566CA51BC1202A00715E6B /* AsyncDisplayKitTests.xctest */,
-				34566CA71BC1202A00715E6B /* AsyncDisplayKitTestHost.app */,
+				51A5E78C23153F8C002D6C2A /* Texture.framework */,
+				51A5E78E23153F8C002D6C2A /* TextureTests.xctest */,
+				51A5E79023153F8C002D6C2A /* TextureTestHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -158,7 +151,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				34566CAD1BC1204100715E6B /* PBXTargetDependency */,
 			);
 			name = Sample;
 			productName = Sample;
@@ -195,8 +187,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 34566C9C1BC1202A00715E6B /* Products */;
-					ProjectRef = 34566C9B1BC1202A00715E6B /* AsyncDisplayKit.xcodeproj */;
+					ProductGroup = 51A5E78623153F8C002D6C2A /* Products */;
+					ProjectRef = 34566C9B1BC1202A00715E6B /* Texture.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -207,25 +199,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		34566CA31BC1202A00715E6B /* AsyncDisplayKit.framework */ = {
+		51A5E78C23153F8C002D6C2A /* Texture.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = AsyncDisplayKit.framework;
-			remoteRef = 34566CA21BC1202A00715E6B /* PBXContainerItemProxy */;
+			path = Texture.framework;
+			remoteRef = 51A5E78B23153F8C002D6C2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34566CA51BC1202A00715E6B /* AsyncDisplayKitTests.xctest */ = {
+		51A5E78E23153F8C002D6C2A /* TextureTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = AsyncDisplayKitTests.xctest;
-			remoteRef = 34566CA41BC1202A00715E6B /* PBXContainerItemProxy */;
+			path = TextureTests.xctest;
+			remoteRef = 51A5E78D23153F8C002D6C2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		34566CA71BC1202A00715E6B /* AsyncDisplayKitTestHost.app */ = {
+		51A5E79023153F8C002D6C2A /* TextureTestHost.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = AsyncDisplayKitTestHost.app;
-			remoteRef = 34566CA61BC1202A00715E6B /* PBXContainerItemProxy */;
+			path = TextureTestHost.app;
+			remoteRef = 51A5E78F23153F8C002D6C2A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -254,14 +246,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		34566CAD1BC1204100715E6B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "AsyncDisplayKit-iOS";
-			targetProxy = 34566CAC1BC1204100715E6B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		050E7C8B19D22E1A004363C2 /* Debug */ = {
