@@ -11,7 +11,7 @@ Texture may be added to your project via CocoaPods or Carthage. Do not forget to
 <div class = "highlight-group">
 <div class = "code">
 <pre lang="objc" class="objcCode">
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 </pre>
 </div>
 </div>

@@ -121,7 +121,7 @@ Our custom node looks like this:
 
 <div class = "code">
   <pre lang="objc" class="objcCode">
-#import <AsyncDisplayKit/AsyncDisplayKit+Subclasses.h>
+#import <Texture/AsyncDisplayKit+Subclasses.h>
 
 ...
 
