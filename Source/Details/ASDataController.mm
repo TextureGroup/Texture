@@ -9,26 +9,20 @@
 
 #import <Texture/ASDataController.h>
 
-#include <atomic>
-
 #import <Texture/_ASHierarchyChangeSet.h>
 #import <Texture/_ASScopeTimer.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASCellNode.h>
 #import <Texture/ASCollectionElement.h>
 #import <Texture/ASCollectionLayoutContext.h>
-#import <Texture/ASCollectionLayoutState.h>
 #import <Texture/ASDispatch.h>
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASElementMap.h>
 #import <Texture/ASLayout.h>
-#import <Texture/ASLog.h>
 #import <Texture/ASSignpost.h>
 #import <Texture/ASMainSerialQueue.h>
 #import <Texture/ASMutableElementMap.h>
 #import <Texture/ASRangeManagingNode.h>
 #import <Texture/ASThread.h>
-#import <Texture/ASTwoDimensionalArrayUtils.h>
 #import <Texture/ASSection.h>
 
 #import <Texture/ASInternalHelpers.h>
@@ -560,13 +554,15 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   } else {
     os_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
-  
-  NSTimeInterval transactionQueueFlushDuration = 0.0f;
-  {
-    AS::ScopeTimer t(transactionQueueFlushDuration);
-    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+
+  if (!ASActivateExperimentalFeature(ASExperimentalOptimizeDataControllerPipeline)) {
+    NSTimeInterval transactionQueueFlushDuration = 0.0f;
+    {
+      AS::ScopeTimer t(transactionQueueFlushDuration);
+      dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+    }
   }
-  
+
   // If the initial reloadData has not been called, just bail because we don't have our old data source counts.
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.

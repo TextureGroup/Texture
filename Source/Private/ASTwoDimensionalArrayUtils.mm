@@ -16,7 +16,6 @@
 
 // Import UIKit to get [NSIndexPath indexPathForItem:inSection:] which uses
 // tagged pointers.
-#import <UIKit/UIKit.h>
 
 #pragma mark - Public Methods
 

@@ -9,8 +9,6 @@
 
 #import <Texture/ASImageNode.h>
 
-#import <Texture/ASAssert.h>
-#import <Texture/ASBaseDefines.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASDisplayNodeInternal.h>
@@ -20,7 +18,6 @@
 #import <Texture/ASImageProtocols.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASNetworkImageNode.h>
-#import <Texture/ASThread.h>
 #import <Texture/ASWeakProxy.h>
 
 #define ASAnimatedImageDebug  0
@@ -247,13 +244,10 @@
   NSLog(@"starting animation: %p", self);
 #endif
 
-  // Get frame interval before holding display link lock to avoid deadlock
-  NSUInteger frameInterval = self.animatedImage.frameInterval;
   AS::MutexLocker l(_displayLinkLock);
   if (_displayLink == nil) {
     _playHead = 0;
     _displayLink = [CADisplayLink displayLinkWithTarget:[ASWeakProxy weakProxyWithTarget:self] selector:@selector(displayLinkFired:)];
-    _displayLink.frameInterval = frameInterval;
     _lastSuccessfulFrameIndex = NSUIntegerMax;
     
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];

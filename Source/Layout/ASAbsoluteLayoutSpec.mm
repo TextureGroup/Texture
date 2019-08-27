@@ -12,7 +12,6 @@
 #import <Texture/ASCollections.h>
 #import <Texture/ASLayout.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>
-#import <Texture/ASLayoutSpecUtilities.h>
 #import <Texture/ASLayoutElementStylePrivate.h>
 
 #pragma mark - ASAbsoluteLayoutSpec

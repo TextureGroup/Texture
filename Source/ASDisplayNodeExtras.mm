@@ -9,7 +9,6 @@
 
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASDisplayNodeInternal.h>
-#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <Texture/ASDisplayNode+Ancestry.h>
 
 #import <queue>

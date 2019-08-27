@@ -10,12 +10,9 @@
 #import <Texture/ASAvailability.h>
 #import <Texture/ASConfigurationInternal.h>
 #import <Texture/ASLog.h>
-#import <Texture/ASObjectDescriptionHelpers.h>
 #import <Texture/ASRunLoopQueue.h>
 #import <Texture/ASThread.h>
 #import <Texture/ASSignpost.h>
-#import <QuartzCore/QuartzCore.h>
-#import <cstdlib>
 #import <deque>
 #import <vector>
 
@@ -149,8 +146,8 @@ static void runLoopSourceCallback(void *info) {
     }
     
     // Self is guaranteed to outlive the observer.  Without the high cost of a weak pointer,
-    // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
-    __unsafe_unretained __typeof__(self) weakSelf = self;
+    // unowned(__unsafe_unretained) allows us to avoid flagging the memory cycle detector.
+    unowned __typeof__(self) weakSelf = self;
     void (^handlerBlock) (CFRunLoopObserverRef observer, CFRunLoopActivity activity) = ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       [weakSelf processQueue];
     };
@@ -233,7 +230,7 @@ static void runLoopSourceCallback(void *info) {
        * object will be added to the autorelease pool. If the queue is strong,
        * it will retain the object until we transfer it (retain it) in itemsToProcess.
        */
-      __unsafe_unretained id ptr = (__bridge id)[_internalQueue pointerAtIndex:i];
+      unowned id ptr = (__bridge id)[_internalQueue pointerAtIndex:i];
       if (ptr != nil) {
         foundItemCount++;
         if (hasExecutionBlock) {
@@ -263,7 +260,7 @@ static void runLoopSourceCallback(void *info) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     const auto itemsEnd = itemsToProcess.cend();
     for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
-      __unsafe_unretained id value = *iterator;
+      unowned id value = *iterator;
       _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
     }
@@ -378,8 +375,8 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
     }
 
     // Self is guaranteed to outlive the observer.  Without the high cost of a weak pointer,
-    // __unsafe_unretained allows us to avoid flagging the memory cycle detector.
-    __unsafe_unretained __typeof__(self) weakSelf = self;
+    // unowned(__unsafe_unretained) allows us to avoid flagging the memory cycle detector.
+    unowned __typeof__(self) weakSelf = self;
     _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
       while (!weakSelf->_internalQueue.empty()) {
         [weakSelf processQueue];

@@ -9,7 +9,6 @@
 
 #import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <Texture/ASLayoutSpec.h>
 #import <Texture/ASLayoutSpecPrivate.h>
 
 #pragma mark - ASNullLayoutSpec

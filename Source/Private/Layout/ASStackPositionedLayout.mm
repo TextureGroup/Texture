@@ -12,7 +12,6 @@
 #import <tgmath.h>
 #import <numeric>
 
-#import <Texture/ASDimension.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASLayoutSpecUtilities.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>

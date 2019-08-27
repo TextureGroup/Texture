@@ -9,7 +9,6 @@
 #import "ASIntegerMap.h"
 #import <Texture/ASAssert.h>
 #import <unordered_map>
-#import <Texture/NSIndexSet+ASHelpers.h>
 #import <Texture/ASObjectDescriptionHelpers.h>
 
 /**

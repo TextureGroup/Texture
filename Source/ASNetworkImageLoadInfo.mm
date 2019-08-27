@@ -7,7 +7,6 @@
 //
 
 #import <Texture/ASNetworkImageLoadInfo.h>
-#import <Texture/ASNetworkImageLoadInfo+Private.h>
 
 @implementation ASNetworkImageLoadInfo
 

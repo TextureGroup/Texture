@@ -9,7 +9,6 @@
 
 #import <Texture/ASOverlayLayoutSpec.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASCollections.h>
 
 static NSUInteger const kUnderlayChildIndex = 0;

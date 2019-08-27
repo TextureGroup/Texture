@@ -8,9 +8,7 @@
 //
 
 #import <Texture/ASDisplayNodeInternal.h>
-#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <Texture/ASNodeController+Beta.h>
-#import <Texture/ASThread.h>
 
 #define _node (_shouldInvertStrongReference ? _weakNode : _strongNode)
 

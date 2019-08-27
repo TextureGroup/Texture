@@ -107,4 +107,27 @@
   XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
 }
 
+- (void)testSupportsLayerBacking
+{
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertTrue(textNode.supportsLayerBacking);
+
+  NSString *link = @"https://texturegroup.com";
+  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Texture Website: %@", link]];
+  NSRange linkRange = [attributedText.string rangeOfString:link];
+  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
+  textNode.attributedText = attributedText;
+  XCTAssertFalse(textNode.supportsLayerBacking);
+}
+
+- (void)testEmptyStringSize
+{
+  CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
+  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@""];
+  CGSize sizeWithEmptyString = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(ASIsCGSizeValidForSize(sizeWithEmptyString));
+  XCTAssertTrue(sizeWithEmptyString.width == 0);
+}
+
 @end

@@ -13,8 +13,6 @@
 
 #import <Texture/IGListAdapter+AsyncDisplayKit.h>
 #import <Texture/ASIGListAdapterBasedDataSource.h>
-#import <Texture/ASAssert.h>
-#import <objc/runtime.h>
 
 @implementation IGListAdapter (AsyncDisplayKit)
 

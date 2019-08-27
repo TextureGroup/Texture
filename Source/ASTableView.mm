@@ -12,7 +12,6 @@
 #import <Texture/_ASCoreAnimationExtras.h>
 #import <Texture/_ASDisplayLayer.h>
 #import <Texture/_ASHierarchyChangeSet.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASBatchFetching.h>
 #import <Texture/ASCellNode+Internal.h>
 #import <Texture/ASCollectionElement.h>
@@ -26,9 +25,7 @@
 #import <Texture/ASLayout.h>
 #import <Texture/ASTableNode+Beta.h>
 #import <Texture/ASRangeController.h>
-#import <Texture/ASEqualityHelpers.h>
 #import <Texture/ASTableLayoutController.h>
-#import <Texture/ASTableView+Undeprecated.h>
 #import <Texture/ASBatchContext.h>
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";

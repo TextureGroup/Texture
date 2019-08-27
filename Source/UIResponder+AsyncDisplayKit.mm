@@ -10,7 +10,6 @@
 #import "UIResponder+AsyncDisplayKit.h"
 
 #import <Texture/ASAssert.h>
-#import <Texture/ASBaseDefines.h>
 #import <Texture/ASResponderChainEnumerator.h>
 
 @implementation UIResponder (AsyncDisplayKit)

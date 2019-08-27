@@ -30,8 +30,8 @@ class MosaicCollectionViewLayout: UICollectionViewFlowLayout {
     self.numberOfColumns = 2
     self.columnSpacing = 10.0
     self.headerHeight = 44.0 //viewcontroller
-    self._sectionInset = UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
-    self.interItemSpacing = UIEdgeInsets(top: 10.0, left: 0, bottom: 10.0, right: 0)
+    self._sectionInset = UIEdgeInsets.init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+    self.interItemSpacing = UIEdgeInsets.init(top: 10.0, left: 0, bottom: 10.0, right: 0)
     super.init()
     self.scrollDirection = .vertical
   }

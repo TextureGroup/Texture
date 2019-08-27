@@ -1,4 +1,0 @@
-ci_service: travis_ci
-coverage_service: coveralls
-xcodeproj: Texture.xcodeproj
-source_directory: Texture

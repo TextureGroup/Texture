@@ -11,7 +11,6 @@
 
 #import <Texture/ASLayoutSpec+Subclasses.h>
 
-#import <Texture/ASAssert.h>
 #import <Texture/ASCollections.h>
 
 static NSUInteger const kForegroundChildIndex = 0;

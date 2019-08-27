@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL shouldAggressivelyRecoverFromStall;
 
 @property (readonly) ASVideoNodePlayerState playerState;
-//! Defaults to 1000
+//! Defaults to 10000
 @property int32_t periodicTimeObserverTimescale;
 
 //! Defaults to AVLayerVideoGravityResizeAspect

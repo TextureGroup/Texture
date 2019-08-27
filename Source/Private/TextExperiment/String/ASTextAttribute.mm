@@ -8,7 +8,6 @@
 //
 
 #import "ASTextAttribute.h"
-#import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 #import <Texture/NSAttributedString+ASText.h>
 

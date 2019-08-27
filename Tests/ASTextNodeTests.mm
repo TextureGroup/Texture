@@ -262,6 +262,15 @@
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
 }
 
+- (void)testEmptyStringSize
+{
+  CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
+  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@""];
+  CGSize sizeWithEmptyString = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(ASIsCGSizeValidForSize(sizeWithEmptyString));
+  XCTAssertTrue(sizeWithEmptyString.width == 0);
+}
+
 #if AS_ENABLE_TEXTNODE
 - (void)testThatTheExperimentWorksCorrectly
 {

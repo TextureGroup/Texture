@@ -9,11 +9,6 @@
 
 #import <Texture/ASInternalHelpers.h>
 
-#import <UIKit/UIKit.h>
-
-#import <objc/runtime.h>
-#import <cmath>
-
 #import <Texture/ASConfigurationInternal.h>
 #import <Texture/ASRunLoopQueue.h>
 #import <Texture/ASSignpost.h>

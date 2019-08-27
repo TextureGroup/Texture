@@ -20,15 +20,9 @@
 #import <Texture/ASHighlightOverlayLayer.h>
 
 #import <Texture/ASTextKitRenderer+Positioning.h>
-#import <Texture/ASTextKitShadower.h>
 #import <Texture/ASEqualityHelpers.h>
 
-#import <Texture/ASInternalHelpers.h>
-
-#import <Texture/CoreGraphics+ASConvenience.h>
-#import <Texture/ASObjectDescriptionHelpers.h>
 #import <Texture/ASTextLayout.h>
-#import <Texture/ASThread.h>
 
 @interface ASTextCacheValue : NSObject {
   @package
@@ -137,23 +131,23 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
   return layout;
 }
 
+static const NSTimeInterval ASTextNodeHighlightFadeOutDuration = 0.15;
+static const NSTimeInterval ASTextNodeHighlightFadeInDuration = 0.1;
 static const CGFloat ASTextNodeHighlightLightOpacity = 0.11;
 static const CGFloat ASTextNodeHighlightDarkOpacity = 0.22;
 static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncationAttribute";
 
 #if AS_ENABLE_TEXTNODE
-@interface ASTextNode2 () <UIGestureRecognizerDelegate>
+#define AS_TN2_CLASSNAME ASTextNode2
 #else
-@interface ASTextNode () <UIGestureRecognizerDelegate>
+#define AS_TN2_CLASSNAME ASTextNode
 #endif
+
+@interface AS_TN2_CLASSNAME () <UIGestureRecognizerDelegate>
 
 @end
 
-#if AS_ENABLE_TEXTNODE
-@implementation ASTextNode2 {
-#else
-@implementation ASTextNode {
-#endif
+@implementation AS_TN2_CLASSNAME {
   ASTextContainer *_textContainer;
   
   CGSize _shadowOffset;
@@ -164,7 +158,6 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
   NSAttributedString *_additionalTruncationMessage;
-  NSAttributedString *_composedTruncationText;
   NSArray<NSNumber *> *_pointSizeScaleFactors;
   NSLineBreakMode _truncationMode;
   
@@ -178,6 +171,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   ASTextNodeHighlightStyle _highlightStyle;
   BOOL _longPressCancelsTouches;
   BOOL _passthroughNonlinkTouches;
+  BOOL _alwaysHandleTruncationTokenTap;
 }
 @dynamic placeholderEnabled;
 
@@ -292,7 +286,10 @@ static NSArray *DefaultLinkAttributeNames() {
   for (NSString *linkAttributeName in _linkAttributeNames) {
     __block BOOL hasLink = NO;
     [attributedText enumerateAttribute:linkAttributeName inRange:range options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-      hasLink = (value != nil);
+      if (value == nil) {
+        return;
+      }
+      hasLink = YES;
       *stop = YES;
     }];
     if (hasLink) {
@@ -513,6 +510,19 @@ static NSArray *DefaultLinkAttributeNames() {
     shadow.shadowOffset = _shadowOffset;
     shadow.shadowBlurRadius = _shadowRadius;
     [attributedString addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, attributedString.length)];
+  }
+
+  // Apply tint color if needed and foreground color is not already specified
+  if (self.textColorFollowsTintColor && attributedString.length > 0) {
+    // Apply tint color if specified and if foreground color is undefined for attributedString
+    NSRange limit = NSMakeRange(0, attributedString.length);
+    // Look for previous attributes that define foreground color
+    UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
+    UIColor *tintColor = self.tintColor;
+    if (attributeValue == nil && tintColor) {
+      // None are found, apply tint color if available. Fallback to "black" text color
+      [attributedString addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+    }
   }
 }
 
@@ -778,17 +788,114 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
+  ASDisplayNodeAssertMainThread();
   ASLockScopeSelf(); // Protect usage of _highlight* ivars.
 
   // Set these so that link tapping works.
   _highlightedLinkAttributeName = highlightedAttributeName;
   _highlightedLinkAttributeValue = highlightedAttributeValue;
-  _highlightRange = highlightRange;
 
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  // Much of the code from original ASTextNode is probably usable here.
+  if (!NSEqualRanges(highlightRange, _highlightRange) && ((0 != highlightRange.length) || (0 != _highlightRange.length))) {
 
-  return;
+    _highlightRange = highlightRange;
+
+    if (_activeHighlightLayer) {
+      if (animated) {
+        __weak CALayer *weakHighlightLayer = _activeHighlightLayer;
+        _activeHighlightLayer = nil;
+
+        weakHighlightLayer.opacity = 0.0;
+
+        CFTimeInterval beginTime = CACurrentMediaTime();
+        CABasicAnimation *possibleFadeIn = (CABasicAnimation *)[weakHighlightLayer animationForKey:@"opacity"];
+        if (possibleFadeIn) {
+          // Calculate when we should begin fading out based on the end of the fade in animation,
+          // Also check to make sure that the new begin time hasn't already passed
+          CGFloat newBeginTime = (possibleFadeIn.beginTime + possibleFadeIn.duration);
+          if (newBeginTime > beginTime) {
+            beginTime = newBeginTime;
+          }
+        }
+
+        CABasicAnimation *fadeOut = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        fadeOut.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        fadeOut.fromValue = possibleFadeIn.toValue ? : @(((CALayer *)weakHighlightLayer.presentationLayer).opacity);
+        fadeOut.toValue = @0.0;
+        fadeOut.fillMode = kCAFillModeBoth;
+        fadeOut.duration = ASTextNodeHighlightFadeOutDuration;
+        fadeOut.beginTime = beginTime;
+
+        dispatch_block_t prev = [CATransaction completionBlock];
+        [CATransaction setCompletionBlock:^{
+          [weakHighlightLayer removeFromSuperlayer];
+        }];
+
+        [weakHighlightLayer addAnimation:fadeOut forKey:fadeOut.keyPath];
+
+        [CATransaction setCompletionBlock:prev];
+
+      } else {
+        [_activeHighlightLayer removeFromSuperlayer];
+        _activeHighlightLayer = nil;
+      }
+    }
+    if (0 != highlightRange.length) {
+      // Find layer in hierarchy that allows us to draw highlighting on.
+      CALayer *highlightTargetLayer = self.layer;
+      while (highlightTargetLayer != nil) {
+        if (highlightTargetLayer.as_allowsHighlightDrawing) {
+          break;
+        }
+        highlightTargetLayer = highlightTargetLayer.superlayer;
+      }
+
+      if (highlightTargetLayer != nil) {
+        // TODO: The copy and application of size shouldn't be required, but it is currently.
+        // See discussion in https://github.com/TextureGroup/Texture/pull/396
+        ASTextContainer *textContainerCopy = [_textContainer copy];
+        textContainerCopy.size = self.calculatedSize;
+        ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(textContainerCopy, _attributedText);
+
+        NSArray<ASTextSelectionRect *> *highlightRects = [layout selectionRectsWithoutStartAndEndForRange:[ASTextRange rangeWithRange:highlightRange]];
+        NSMutableArray *converted = [NSMutableArray arrayWithCapacity:highlightRects.count];
+
+        CALayer *layer = self.layer;
+        UIEdgeInsets shadowPadding = self.shadowPadding;
+        for (ASTextSelectionRect *rectValue in highlightRects) {
+          // Adjust shadow padding
+          CGRect rendererRect = ASTextNodeAdjustRenderRectForShadowPadding(rectValue.rect, shadowPadding);
+          CGRect highlightedRect = [layer convertRect:rendererRect toLayer:highlightTargetLayer];
+
+          // We set our overlay layer's frame to the bounds of the highlight target layer.
+          // Offset highlight rects to avoid double-counting target layer's bounds.origin.
+          highlightedRect.origin.x -= highlightTargetLayer.bounds.origin.x;
+          highlightedRect.origin.y -= highlightTargetLayer.bounds.origin.y;
+          [converted addObject:[NSValue valueWithCGRect:highlightedRect]];
+        }
+
+        ASHighlightOverlayLayer *overlayLayer = [[ASHighlightOverlayLayer alloc] initWithRects:converted];
+        overlayLayer.highlightColor = [[self class] _highlightColorForStyle:self.highlightStyle];
+        overlayLayer.frame = highlightTargetLayer.bounds;
+        overlayLayer.masksToBounds = NO;
+        overlayLayer.opacity = [[self class] _highlightOpacityForStyle:self.highlightStyle];
+        [highlightTargetLayer addSublayer:overlayLayer];
+
+        if (animated) {
+          CABasicAnimation *fadeIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
+          fadeIn.fromValue = @0.0;
+          fadeIn.toValue = @(overlayLayer.opacity);
+          fadeIn.duration = ASTextNodeHighlightFadeInDuration;
+          fadeIn.beginTime = CACurrentMediaTime();
+
+          [overlayLayer addAnimation:fadeIn forKey:fadeIn.keyPath];
+        }
+
+        [overlayLayer setNeedsDisplay];
+
+        _activeHighlightLayer = overlayLayer;
+      }
+    }
+  }
 }
 
 - (void)_clearHighlightIfNecessary
@@ -811,6 +918,12 @@ static NSArray *DefaultLinkAttributeNames() {
 }
 
 #pragma mark - Text rects
+
+static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UIEdgeInsets shadowPadding) {
+  rendererRect.origin.x -= shadowPadding.left;
+  rendererRect.origin.y -= shadowPadding.top;
+  return rendererRect;
+}
 
 - (NSArray *)rectsForTextRange:(NSRange)textRange
 {
@@ -862,9 +975,14 @@ static NSArray *DefaultLinkAttributeNames() {
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   ASDisplayNodeAssertMainThread();
-  
+  ASLockScopeSelf(); // Protect usage of _passthroughNonlinkTouches and _alwaysHandleTruncationTokenTap ivars.
+
   if (!_passthroughNonlinkTouches) {
     return [super pointInside:point withEvent:event];
+  }
+
+  if (_alwaysHandleTruncationTokenTap) {
+    return YES;
   }
   
   NSRange range = NSMakeRange(0, 0);
@@ -1012,6 +1130,18 @@ static NSArray *DefaultLinkAttributeNames() {
   return [ASLockedSelf(_highlightedLinkAttributeName) isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
+- (BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  return _alwaysHandleTruncationTokenTap;
+}
+
+- (void)setAlwaysHandleTruncationTokenTap:(BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  _alwaysHandleTruncationTokenTap = alwaysHandleTruncationTokenTap;
+}
+  
 #pragma mark - Shadow Properties
 
 /**
@@ -1252,22 +1382,20 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSAttributedString *)_locked_composedTruncationText
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (_composedTruncationText == nil) {
-    if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
-      NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
-      [newComposedTruncationString.mutableString appendString:@" "];
-      [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
-      _composedTruncationText = newComposedTruncationString;
-    } else if (_truncationAttributedText != nil) {
-      _composedTruncationText = _truncationAttributedText;
-    } else if (_additionalTruncationMessage != nil) {
-      _composedTruncationText = _additionalTruncationMessage;
-    } else {
-      _composedTruncationText = DefaultTruncationAttributedString();
-    }
-    _composedTruncationText = [self _locked_prepareTruncationStringForDrawing:_composedTruncationText];
+  NSAttributedString *composedTruncationText = nil;
+  if (_truncationAttributedText != nil && _additionalTruncationMessage != nil) {
+    NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
+    [newComposedTruncationString.mutableString appendString:@" "];
+    [newComposedTruncationString appendAttributedString:_additionalTruncationMessage];
+    composedTruncationText = newComposedTruncationString;
+  } else if (_truncationAttributedText != nil) {
+    composedTruncationText = _truncationAttributedText;
+  } else if (_additionalTruncationMessage != nil) {
+    composedTruncationText = _additionalTruncationMessage;
+  } else {
+    composedTruncationText = DefaultTruncationAttributedString();
   }
-  return _composedTruncationText;
+  return [self _locked_prepareTruncationStringForDrawing:composedTruncationText];
 }
 
 /**

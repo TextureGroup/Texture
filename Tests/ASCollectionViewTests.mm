@@ -8,7 +8,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <Texture/Texture.h>
+#import <Texture/AsyncDisplayKit.h>
 #import <Texture/ASCollectionViewFlowLayoutInspector.h>
 #import <Texture/ASDataController.h>
 #import <Texture/ASSectionContext.h>
@@ -16,7 +16,9 @@
 #import <OCMock/OCMock.h>
 #import <Texture/ASCollectionView+Undeprecated.h>
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>
+
 #import "ASDisplayNodeTestsHelper.h"
+#import "ASTestCase.h"
 
 @interface ASTextCellNodeWithSetSelectedCounter : ASTextCellNode
 
@@ -166,11 +168,19 @@
 
 @end
 
-@interface ASCollectionViewTests : XCTestCase
+@interface ASCollectionViewTests : ASTestCase
 
 @end
 
 @implementation ASCollectionViewTests
+
+- (void)setUp
+{
+  [super setUp];
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+}
 
 - (void)tearDown
 {

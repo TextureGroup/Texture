@@ -71,7 +71,7 @@
   return count;
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id  _Nonnull *)buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(unowned id  _Nonnull *)buffer count:(NSUInteger)len
 {
   return [_hashTable countByEnumeratingWithState:state objects:buffer count:len];
 }

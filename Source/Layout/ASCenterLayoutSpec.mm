@@ -9,8 +9,6 @@
 
 #import <Texture/ASCenterLayoutSpec.h>
 
-#import <Texture/ASLayout.h>
-
 @implementation ASCenterLayoutSpec
 {
   ASCenterLayoutSpecCenteringOptions _centeringOptions;

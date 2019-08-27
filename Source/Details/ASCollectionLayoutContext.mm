@@ -9,7 +9,6 @@
 #import <Texture/ASCollectionLayoutContext.h>
 #import <Texture/ASCollectionLayoutContext+Private.h>
 
-#import <Texture/ASAssert.h>
 #import <Texture/ASCollectionLayoutDelegate.h>
 #import <Texture/ASCollectionLayoutCache.h>
 #import <Texture/ASElementMap.h>

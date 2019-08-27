@@ -10,10 +10,7 @@
 #import <Texture/Texture.h>
 
 @interface RandomCoreGraphicsNode : ASCellNode
-{
-  ASTextNode *_indexPathTextNode;
-}
 
-@property NSIndexPath *indexPath;
+- (instancetype)initWithContent:(NSString *)content;
 
 @end

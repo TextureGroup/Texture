@@ -14,11 +14,9 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-#import <Texture/Texture.h>
+#import <Texture/AsyncDisplayKit.h>
 #import <Texture/ASDefaultPlaybackButton.h>
-#import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASDisplayNodeInternal.h>
-#import <Texture/ASThread.h>
 
 static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 

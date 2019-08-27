@@ -10,10 +10,8 @@
 #import <Texture/ASMutableElementMap.h>
 
 #import <Texture/ASCollectionElement.h>
-#import <Texture/ASDataController.h>
 #import <Texture/ASElementMap.h>
 #import <Texture/ASTwoDimensionalArrayUtils.h>
-#import <Texture/NSIndexSet+ASHelpers.h>
 
 typedef NSMutableArray<NSMutableArray<ASCollectionElement *> *> ASMutableCollectionElementTwoDimensionalArray;
 

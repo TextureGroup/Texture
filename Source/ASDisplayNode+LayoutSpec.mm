@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <Texture/ASAvailability.h>
 
 #import <Texture/_ASScopeTimer.h>
 #import <Texture/ASDisplayNodeInternal.h>
@@ -15,8 +14,6 @@
 #import <Texture/ASLayout.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>
 #import <Texture/ASLayoutSpecPrivate.h>
-#import <Texture/ASLog.h>
-#import <Texture/ASThread.h>
 
 
 @implementation ASDisplayNode (ASLayoutSpec)

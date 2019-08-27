@@ -17,8 +17,6 @@
 #import <Texture/ASDisplayNodeInternal.h>
 #import <Texture/ASEqualityHelpers.h>
 #import <Texture/ASInternalHelpers.h>
-#import <Texture/ASDisplayNodeExtras.h>
-#import <Texture/ASThread.h>
 
 static BOOL ASAssetIsEqual(AVAsset *asset1, AVAsset *asset2) {
   return ASObjectIsEqual(asset1, asset2)
