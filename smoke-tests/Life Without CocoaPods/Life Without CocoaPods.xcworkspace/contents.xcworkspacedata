@@ -5,6 +5,6 @@
       location = "container:Life Without CocoaPods.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../AsyncDisplayKit.xcodeproj">
+      location = "group:../../Texture.xcodeproj">
    </FileRef>
 </Workspace>

@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <Texture/Texture.h>
 
 @interface ViewController ()
 @property (nonatomic, strong) ASTextNode *textNode;
