@@ -36,7 +36,7 @@ NSOrderedSet *ASSnapshotTestCaseDefaultSuffixes(void)
   // Since the goal of this method is to just to ensure a node is rendered before snapshotting, this should be reasonable default for all callers.
 #if AS_AT_LEAST_IOS13
   if (@available(iOS 13.0, *)) {
-    node.primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection.currentTraitCollection);
+    ASTraitCollectionPropagateDown(node, ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection.currentTraitCollection));
   }
 #endif // #if AS_AT_LEAST_IOS13
   node.displaysAsynchronously = NO;
