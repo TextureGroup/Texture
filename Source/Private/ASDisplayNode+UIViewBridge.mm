@@ -746,11 +746,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
      Note: We can no longer rely simply on the layers backgroundColor value if the color is set directly on `_view`
      There is no longer a 1:1 mapping between _view.backgroundColor and _layer.backgroundColor after testing in iOS 13 / Xcode 11 so we should prefer one or the other depending on the backing type for the node (view or layer)
      */
-    if (!_flags.layerBacked) {
+    if (_flags.layerBacked) {
+      return _backgroundColor;
+    } else {
       return _view.backgroundColor;
     }
   }
-  return _backgroundColor;
+  return ASDisplayNodeGetPendingState(self).backgroundColor;
 }
 
 - (void)setBackgroundColor:(UIColor *)newBackgroundColor
