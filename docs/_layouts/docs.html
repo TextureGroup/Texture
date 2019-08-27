@@ -13,7 +13,7 @@ sectionid: docs
 	
 	<div class="content">
 		<h1>
-	      {{ page.title }}
+	        {{ page.title }}
 	    </h1>
 	    <p>{{ page.description }}</p>
 	
@@ -23,12 +23,34 @@ sectionid: docs
 
 	
 	    <div class="docs-prevnext">
-	      {% if page.prevPage %}
-	        <a href="/docs/{{ page.prevPage }}">&larr; Prev</a>
-	      {% endif %}
-	      {% if page.nextPage %}
-	        <a class="right" href="/docs/{{ page.nextPage }}">Next &rarr;</a>
-	      {% endif %}
+            {% if page.prevPage %}
+                {% comment %}
+                    If prevPage already contains the dir, either /docs/ or /development/, don't append to it.
+                    Otherwise, it's a relative path so append the dir according to the page's permalink.
+                {% endcomment %}
+
+                {% if page.prevPage contains '/docs/' or page.prevPage contains '/development/' %}
+                    <a href="{{ page.prevPage }}">&larr; Prev</a>
+                {% elsif page.permalink contains '/docs/' %}
+                    <a href="/docs/{{ page.prevPage }}">&larr; Prev</a>
+                {% else %}
+                    <a href="/development/{{ page.prevPage }}">&larr; Prev</a>
+                {% endif %}
+            {% endif %}
+
+            {% if page.nextPage %}
+                {% comment %}
+                    Same deal for nextPage.
+                {% endcomment %}
+
+                {% if page.nextPage contains '/docs/' or page.nextPage contains '/development/' %}
+                    <a class="right" href="{{ page.nextPage }}">Next &rarr;</a>
+                {% elsif page.permalink contains '/docs/' %}
+                    <a class="right" href="/docs/{{ page.nextPage }}">Next &rarr;</a>
+                {% else %}
+                    <a class="right" href="/development/{{ page.nextPage }}">Next &rarr;</a>
+                {% endif %}
+            {% endif %}
 	    </div>
 	
 	    <a id="_"></a>

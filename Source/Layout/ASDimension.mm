@@ -11,8 +11,6 @@
 
 #import <Texture/CoreGraphics+ASConvenience.h>
 
-#import <Texture/ASAssert.h>
-
 #pragma mark - ASDimension
 
 ASDimension const ASDimensionAuto = {ASDimensionUnitAuto, 0};

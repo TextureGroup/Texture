@@ -11,8 +11,6 @@
 
 #if AS_USE_PHOTOS
 
-#import <Texture/ASBaseDefines.h>
-
 NSString *const ASPhotosURLScheme = @"ph";
 
 static NSString *const _ASPhotosURLQueryKeyWidth = @"width";

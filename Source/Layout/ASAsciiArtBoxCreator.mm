@@ -10,7 +10,6 @@
 #import <Texture/ASAsciiArtBoxCreator.h>
 
 #import <CoreGraphics/CoreGraphics.h>
-#import <cmath>
 
 static const NSUInteger kDebugBoxPadding = 2;
 

@@ -65,7 +65,7 @@ static const CGFloat kInnerPadding = 10.0f;
 {
   [super layout];
   
-  _collectionNode.view.contentInset = UIEdgeInsetsMake(0.0, kOuterPadding, 0.0, kOuterPadding);
+  _collectionNode.contentInset = UIEdgeInsetsMake(0.0, kOuterPadding, 0.0, kOuterPadding);
   
   // Manually layout the divider.
   CGFloat pixelHeight = 1.0f / [[UIScreen mainScreen] scale];

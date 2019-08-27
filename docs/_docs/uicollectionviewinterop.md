@@ -2,8 +2,8 @@
 title: UICollectionViewCell Interoperability
 layout: docs
 permalink: /docs/uicollectionviewinterop.html
-prevPage: placeholder-fade-duration.html
-nextPage: accessibility.html
+prevPage: accessibility.html
+nextPage: layer-backing.html
 ---
 
 Texture's `ASCollectionNode` offers compatibility with synchronous, standard `UICollectionViewCell` objects alongside native `ASCellNodes`. 

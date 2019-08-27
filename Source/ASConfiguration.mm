@@ -7,7 +7,6 @@
 //
 
 #import <Texture/ASConfiguration.h>
-#import <Texture/ASConfigurationInternal.h>
 
 /// Not too performance-sensitive here.
 

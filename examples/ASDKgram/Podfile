@@ -5,5 +5,5 @@ target 'Sample' do
   pod 'Texture/PINRemoteImage', :path => '../..'
   pod 'Texture/Yoga', :path => '../..'
   pod 'Texture/Video', :path => '../..'
-  pod 'Weaver', :git => 'git@github.com:TextureGroup/Weaver.git', :branch => 'master'
+  pod 'Weaver', :git => 'https://github.com/TextureGroup/Weaver.git', :branch => 'master'
 end

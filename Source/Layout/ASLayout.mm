@@ -13,13 +13,11 @@
 #import <queue>
 
 #import <Texture/ASCollections.h>
-#import <Texture/ASDimension.h>
 #import <Texture/ASLayoutSpecUtilities.h>
 #import <Texture/ASLayoutSpec+Subclasses.h>
 
 #import <Texture/ASEqualityHelpers.h>
 #import <Texture/ASInternalHelpers.h>
-#import <Texture/ASObjectDescriptionHelpers.h>
 
 NSString *const ASThreadDictMaxConstraintSizeKey = @"kASThreadDictMaxConstraintSizeKey";
 

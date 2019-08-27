@@ -47,7 +47,15 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
 
       UIGraphicsImageRendererFormat *format;
       if (sourceImage) {
-        format = sourceImage.imageRendererFormat;
+        if (sourceImage.renderingMode == UIImageRenderingModeAlwaysTemplate) {
+          // Template images will be black and transparent, so if we use
+          // sourceImage.imageRenderFormat it will assume a grayscale color space.
+          // This is not good because a template image should be able to tint to any color,
+          // so we'll just use the default here.
+          format = defaultFormat;
+        } else {
+          format = sourceImage.imageRendererFormat;
+        }
         // We only want the private bits (color space and bits per component) from the image.
         // We have our own ideas about opacity and scale.
         format.opaque = opaque;

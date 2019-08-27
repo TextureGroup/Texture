@@ -13,7 +13,6 @@
 
 #import <Texture/ASLayout.h>
 #import <Texture/ASDisplayNodeInternal.h> // Required for _removeFromSupernodeIfEqualTo:
-#import <Texture/ASLog.h>
 
 #import <queue>
 

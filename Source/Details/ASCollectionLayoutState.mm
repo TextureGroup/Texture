@@ -7,9 +7,7 @@
 //
 
 #import <Texture/ASCollectionLayoutState.h>
-#import <Texture/ASCollectionLayoutState+Private.h>
 
-#import <Texture/ASAssert.h>
 #import <Texture/ASCellNode.h>
 #import <Texture/ASCollectionElement.h>
 #import <Texture/ASCollectionLayoutContext.h>

@@ -9,7 +9,6 @@
 
 #import <Texture/ASEditableTextNode.h>
 
-#import <objc/message.h>
 #import <tgmath.h>
 
 #import <Texture/ASDisplayNode+Subclasses.h>

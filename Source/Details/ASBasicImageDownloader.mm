@@ -9,7 +9,6 @@
 
 #import <Texture/ASBasicImageDownloader.h>
 
-#import <Foundation/NSURLSession.h>
 #import <objc/runtime.h>
 
 #import <Texture/ASBasicImageDownloaderInternal.h>

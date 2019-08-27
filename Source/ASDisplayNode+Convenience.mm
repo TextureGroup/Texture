@@ -9,8 +9,6 @@
 
 #import "ASDisplayNode+Convenience.h"
 
-#import <UIKit/UIViewController.h>
-
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASResponderChainEnumerator.h>
 

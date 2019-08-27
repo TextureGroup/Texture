@@ -10,7 +10,6 @@
 #import <Texture/_ASAsyncTransactionContainer.h>
 #import <Texture/_ASAsyncTransactionContainer+Private.h>
 
-#import <Texture/ASConfigurationInternal.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/_ASAsyncTransaction.h>
 #import <Texture/_ASAsyncTransactionGroup.h>
@@ -56,33 +55,18 @@
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    if (ASActivateExperimentalFeature(ASExperimentalTransactionOperationRetainCycle)) {
-      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
-        __strong CALayer *self = weakSelf;
-        if (self == nil) {
-          return;
-        }
-        [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
-        if (self.asyncdisplaykit_asyncLayerTransactions.count == 0) {
-          // Reclaim object memory.
-          self.asyncdisplaykit_asyncLayerTransactions = nil;
-        }
-        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
-      }];
-    } else {
-      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
-        __strong CALayer *self = weakSelf;
-        if (self == nil) {
-          return;
-        }
-        [transactions removeObject:completedTransaction];
-        if (transactions.count == 0) {
-          // Reclaim object memory.
-          self.asyncdisplaykit_asyncLayerTransactions = nil;
-        }
-        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
-      }];
-    }
+    transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+      __strong CALayer *self = weakSelf;
+      if (self == nil) {
+        return;
+      }
+      [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
+      if (self.asyncdisplaykit_asyncLayerTransactions.count == 0) {
+        // Reclaim object memory.
+        self.asyncdisplaykit_asyncLayerTransactions = nil;
+      }
+      [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
+    }];
     [transactions addObject:transaction];
     self.asyncdisplaykit_currentAsyncTransaction = transaction;
     [self asyncdisplaykit_asyncTransactionContainerWillBeginTransaction:transaction];

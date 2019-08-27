@@ -8,7 +8,6 @@
 //
 
 #import <Texture/ASPagerNode.h>
-#import <Texture/ASPagerNode+Beta.h>
 
 #import <Texture/ASCollectionGalleryLayoutDelegate.h>
 #import <Texture/ASCollectionNode+Beta.h>
@@ -16,9 +15,7 @@
 #import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASPagerFlowLayout.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASCellNode.h>
-#import <Texture/ASCollectionView+Undeprecated.h>
 #import <Texture/UIResponder+AsyncDisplayKit.h>
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>

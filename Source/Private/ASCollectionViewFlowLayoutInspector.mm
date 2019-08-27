@@ -9,9 +9,7 @@
 
 #import <Texture/ASCollectionViewFlowLayoutInspector.h>
 #import <Texture/ASCollectionView.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASEqualityHelpers.h>
-#import <Texture/ASCollectionView+Undeprecated.h>
 #import <Texture/ASCollectionNode.h>
 
 #define kDefaultItemSize CGSizeMake(50, 50)

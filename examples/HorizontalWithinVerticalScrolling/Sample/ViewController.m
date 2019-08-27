@@ -55,9 +55,10 @@
 
 #pragma mark - ASTableNode
 
-- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  return [[HorizontalScrollCellNode alloc] initWithElementSize:CGSizeMake(100, 100)];
+- (ASCellNodeBlock)tableNode:(ASTableNode *)tableNode nodeBlockForRowAtIndexPath:(NSIndexPath *)indexPath {
+  return ^{
+    return [[HorizontalScrollCellNode alloc] initWithElementSize:CGSizeMake(100, 100)];
+  };
 }
 
 - (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section

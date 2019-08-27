@@ -11,13 +11,10 @@
 #import <Texture/ASCollections.h>
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASDisplayNodeInternal.h>
-#import <Texture/ASDisplayNode+FrameworkPrivate.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASLayout.h>
 #import <Texture/ASLayoutElementStylePrivate.h>
-#import <Texture/ASLog.h>
-#import <Texture/ASNodeController+Beta.h>
 #import <Texture/ASDisplayNode+Yoga.h>
 #import <Texture/NSArray+Diffing.h>
 
@@ -136,10 +133,16 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   AS::UniqueLock l(__instanceLock__);
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection) == NO) {
+    ASPrimitiveTraitCollection previousTraitCollection = _primitiveTraitCollection;
     _primitiveTraitCollection = traitCollection;
 
     l.unlock();
-    [self asyncTraitCollectionDidChange];
+    if (ASActivateExperimentalFeature(ASExperimentalTraitCollectionDidChangeWithPreviousCollection)) {
+      [self asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
+    } else {
+      [self asyncTraitCollectionDidChange];
+    }
+
   }
 }
 

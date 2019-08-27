@@ -128,19 +128,19 @@ NSPointerArray *ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize c
 
 - (id)objectForPage:(ASPageCoordinate)page
 {
-  __unsafe_unretained id key = (__bridge id)(void *)page;
+  unowned id key = (__bridge id)(void *)page;
   return [self objectForKey:key];
 }
 
 - (void)setObject:(id)object forPage:(ASPageCoordinate)page
 {
-  __unsafe_unretained id key = (__bridge id)(void *)page;
+  unowned id key = (__bridge id)(void *)page;
   [self setObject:object forKey:key];
 }
 
 - (void)removeObjectForPage:(ASPageCoordinate)page
 {
-  __unsafe_unretained id key = (__bridge id)(void *)page;
+  unowned id key = (__bridge id)(void *)page;
   [self removeObjectForKey:key];
 }
 

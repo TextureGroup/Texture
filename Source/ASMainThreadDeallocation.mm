@@ -8,14 +8,10 @@
 
 #import <Texture/ASMainThreadDeallocation.h>
 
-#import <Texture/ASBaseDefines.h>
 #import <Texture/ASDisplayNodeExtras.h>
 #import <Texture/ASInternalHelpers.h>
 #import <Texture/ASLog.h>
 #import <Texture/ASThread.h>
-
-#import <objc/runtime.h>
-#import <UIKit/UIKit.h>
 
 @implementation NSObject (ASMainThreadIvarTeardown)
 

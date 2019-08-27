@@ -132,7 +132,6 @@ static inline CGFloat ASTextEmojiGetDescentWithFontSize(CGFloat fontSize) {
   } else {
     return 0.3125 * fontSize;
   }
-  return 0;
 }
 
 /**

@@ -60,7 +60,7 @@
     // FIXME: autocomplete for this line seems broken
     [_userAvatarImageNode setImageModificationBlock:^UIImage *(UIImage *image) {
       CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
-      return [image makeCircularImageWithSize:profileImageSize];
+      return [image makeCircularImageWithSize:profileImageSize backgroundColor:nil];
     }];
 
     _photoImageNode          = [[ASNetworkImageNode alloc] init];

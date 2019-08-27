@@ -10,7 +10,6 @@
 
 #import <Texture/_ASCollectionGalleryLayoutInfo.h>
 #import <Texture/_ASCollectionGalleryLayoutItem.h>
-#import <Texture/ASAssert.h>
 #import <Texture/ASCellNode.h>
 #import <Texture/ASCollectionElement.h>
 #import <Texture/ASCollections.h>
@@ -19,7 +18,6 @@
 #import <Texture/ASCollectionLayoutState.h>
 #import <Texture/ASElementMap.h>
 #import <Texture/ASLayout.h>
-#import <Texture/ASLayoutRangeType.h>
 #import <Texture/ASInsetLayoutSpec.h>
 #import <Texture/ASStackLayoutSpec.h>
 

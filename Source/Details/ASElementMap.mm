@@ -13,7 +13,6 @@
 #import <Texture/ASTwoDimensionalArrayUtils.h>
 #import <Texture/ASMutableElementMap.h>
 #import <Texture/ASSection.h>
-#import <Texture/NSIndexSet+ASHelpers.h>
 #import <Texture/ASObjectDescriptionHelpers.h>
 
 @interface ASElementMap () <ASDescriptionProvider>
@@ -194,7 +193,7 @@
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable unowned [])buffer count:(NSUInteger)len
 {
   return [_elementToIndexPathMap countByEnumeratingWithState:state objects:buffer count:len];
 }

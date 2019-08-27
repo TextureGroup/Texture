@@ -12,7 +12,6 @@
 #import <Texture/_ASAsyncTransaction.h>
 #import <Texture/_ASAsyncTransactionGroup.h>
 #import <Texture/_ASAsyncTransactionContainer.h>
-#import <Texture/_ASAsyncTransactionContainer+Private.h>
 
 @implementation _ASAsyncTransactionGroup {
   NSHashTable<id<ASAsyncTransactionContainer>> *_containers;

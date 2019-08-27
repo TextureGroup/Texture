@@ -20,11 +20,11 @@ final class TailLoadingCellNode: ASCellNode {
     addSubnode(text)
     text.attributedText = NSAttributedString(
       string: "Loading…",
-      attributes: [
-        NSFontAttributeName: UIFont.systemFont(ofSize: 12),
-        NSForegroundColorAttributeName: UIColor.lightGray,
-        NSKernAttributeName: -0.3
-      ])
+      attributes: convertToOptionalNSAttributedStringKeyDictionary([
+        convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.systemFont(ofSize: 12),
+        convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): UIColor.lightGray,
+        convertFromNSAttributedStringKey(NSAttributedString.Key.kern): -0.3
+      ]))
     addSubnode(spinner)
   }
 
@@ -47,7 +47,7 @@ final class SpinnerNode: ASDisplayNode {
   override init() {
     super.init()
     setViewBlock {
-        UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        UIActivityIndicatorView(style: .gray)
     }
     
     // Set spinner node to default size of the activitiy indicator view
@@ -59,4 +59,15 @@ final class SpinnerNode: ASDisplayNode {
     
     activityIndicatorView.startAnimating()
   }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
 }

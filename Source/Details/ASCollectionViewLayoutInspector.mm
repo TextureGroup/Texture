@@ -10,7 +10,6 @@
 #import <Texture/ASCollectionViewLayoutInspector.h>
 
 #import <Texture/ASCollectionView.h>
-#import <Texture/ASCollectionView+Undeprecated.h>
 #import <Texture/ASCollectionNode.h>
 
 #pragma mark - Helper Functions

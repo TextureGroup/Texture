@@ -10,7 +10,6 @@
 
 #import <Texture/ASCollectionElement.h>
 #import <Texture/ASLayout.h>
-#import <Texture/ASLayoutElementPrivate.h>
 #import <Texture/ASLayoutElementStylePrivate.h>
 #import <Texture/ASLayoutSpec.h>
 

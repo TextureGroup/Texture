@@ -53,7 +53,6 @@
       ASDisplayNodeFailAssert(@"Node block returned nil node!");
       node = [[ASCellNode alloc] init];
     }
-    node.owningNode = _owningNode;
     node.collectionElement = self;
     ASTraitCollectionPropagateDown(node, _traitCollection);
     node.nodeModel = _nodeModel;

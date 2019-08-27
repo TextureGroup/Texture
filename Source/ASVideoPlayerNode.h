@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// You should never set any value on the backing video node. Use exclusivively the video player node to set properties
 @property (nonatomic, readonly) ASVideoNode *videoNode;
 
-//! Defaults to 100
+//! Defaults to 10000
 @property (nonatomic) int32_t periodicTimeObserverTimescale;
 //! Defaults to AVLayerVideoGravityResizeAspect
 @property (nonatomic, copy) NSString *gravity;

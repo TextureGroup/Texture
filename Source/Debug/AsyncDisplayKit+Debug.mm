@@ -10,7 +10,6 @@
 #import <Texture/AsyncDisplayKit+Debug.h>
 #import <Texture/ASAbstractLayoutController.h>
 #import <Texture/ASLayout.h>
-#import <Texture/ASWeakSet.h>
 #import <Texture/UIImage+ASConvenience.h>
 #import <Texture/ASDisplayNode+Subclasses.h>
 #import <Texture/ASGraphicsContext.h>
@@ -455,10 +454,10 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   CGFloat leadingDisplayTuningRatio   = 0;
   CGFloat leadingPreloadTuningRatio   = 0;
 
-  if (!((displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls) == 0)) {
+  if (displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls != 0) {
     leadingDisplayTuningRatio = displayTuningParameters.leadingBufferScreenfuls / (displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls);
   }
-  if (!((preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls) == 0)) {
+  if (preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls != 0) {
     leadingPreloadTuningRatio = preloadTuningParameters.leadingBufferScreenfuls / (preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls);
   }
   

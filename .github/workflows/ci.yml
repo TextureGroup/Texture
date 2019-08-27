@@ -1,0 +1,32 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  buildsh:
+    strategy:
+      matrix:
+        mode: [tests, framework, life-without-cocoapods, carthage, examples-pt1, examples-pt2, examples-pt3, examples-pt4]
+        include:
+          - mode: tests
+            name: Build and run tests
+          - mode: framework
+            name: Build Texture as a dynamic framework
+          - mode: life-without-cocoapods
+            name: Build Texture as a static library
+          - mode: carthage
+            name: Verify that Carthage works
+          - mode: examples-pt1
+            name: Build examples (examples-pt1)
+          - mode: examples-pt2
+            name: Build examples (examples-pt2)
+          - mode: examples-pt3
+            name: Build examples (examples-pt3)
+          - mode: examples-pt4
+            name: Build examples (examples-pt4)
+    name: ${{ matrix.name }}
+    runs-on: macOS-10.14
+    steps:
+    - name: Checkout the Git repository
+      uses: actions/checkout@v1
+    - run: ./build.sh ${{ matrix.mode }}
