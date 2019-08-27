@@ -10,7 +10,7 @@
 import UIKit
 import Texture
 
-final class ViewController: ASViewController, ASCollectionDelegate, ASCollectionDataSource {
+final class ViewController: ASViewController<ASDisplayNode>, ASCollectionDelegate, ASCollectionDataSource {
 	let itemCount = 1000
 
 	let itemSize: CGSize
@@ -25,8 +25,8 @@ final class ViewController: ASViewController, ASCollectionDelegate, ASCollection
 		layout.minimumInteritemSpacing = padding
 		layout.minimumLineSpacing = padding
 		super.init(node: ASCollectionNode(collectionViewLayout: layout))
-		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Color", style: .Plain, target: self, action: #selector(didTapColorsButton))
-		navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Layout", style: .Plain, target: self, action: #selector(didTapLayoutButton))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Color", style: .plain, target: self, action: #selector(didTapColorsButton))
+		navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Layout", style: .plain, target: self, action: #selector(didTapLayoutButton))
 		collectionNode.delegate = self
 		collectionNode.dataSource = self
 		title = "Background Updating"
@@ -38,11 +38,11 @@ final class ViewController: ASViewController, ASCollectionDelegate, ASCollection
 
 	// MARK: ASCollectionDataSource
 
-	func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 		return itemCount
 	}
 
-	func collectionView(collectionView: ASCollectionView, nodeBlockForItemAtIndexPath indexPath: NSIndexPath) -> ASCellNodeBlock {
+    func collectionView(_ collectionView: ASCollectionView, nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock {
 		return {
 			let node = DemoCellNode()
 			node.backgroundColor = UIColor.random()
@@ -52,16 +52,16 @@ final class ViewController: ASViewController, ASCollectionDelegate, ASCollection
 		}
 	}
 
-	func collectionView(collectionView: ASCollectionView, constrainedSizeForNodeAtIndexPath indexPath: NSIndexPath) -> ASSizeRange {
+    func collectionView(_ collectionView: ASCollectionView, constrainedSizeForNodeAt indexPath: IndexPath) -> ASSizeRange {
 		return ASSizeRangeMake(itemSize, itemSize)
 	}
 
 	// MARK: Action Handling
 
 	@objc private func didTapColorsButton() {
-		let currentlyVisibleNodes = collectionNode.view.visibleNodes()
-		let queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
-		dispatch_async(queue) {
+		let currentlyVisibleNodes = collectionNode.visibleNodes
+        let queue = DispatchQueue.global(qos: .default)
+		queue.async() {
 			for case let node as DemoCellNode in currentlyVisibleNodes {
 				node.backgroundColor = UIColor.random()
 			}
@@ -69,9 +69,9 @@ final class ViewController: ASViewController, ASCollectionDelegate, ASCollection
 	}
 
 	@objc private func didTapLayoutButton() {
-		let currentlyVisibleNodes = collectionNode.view.visibleNodes()
-		let queue = dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)
-		dispatch_async(queue) {
+		let currentlyVisibleNodes = collectionNode.visibleNodes
+		let queue = DispatchQueue.global(qos: .default)
+        queue.async() {
 			for case let node as DemoCellNode in currentlyVisibleNodes {
 				node.state.advance()
 				node.setNeedsLayout()
@@ -83,7 +83,7 @@ final class ViewController: ASViewController, ASCollectionDelegate, ASCollection
 
 	static func computeLayoutSizesForMainScreen() -> (padding: CGFloat, itemSize: CGSize) {
 		let numberOfColumns = 4
-		let screen = UIScreen.mainScreen()
+		let screen = UIScreen.main
 		let scale = screen.scale
 		let screenWidth = Int(screen.bounds.width * screen.scale)
 		let itemWidthPx = (screenWidth - (numberOfColumns - 1)) / numberOfColumns

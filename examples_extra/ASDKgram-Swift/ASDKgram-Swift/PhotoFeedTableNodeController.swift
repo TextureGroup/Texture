@@ -14,7 +14,7 @@ class PhotoFeedTableNodeController: ASViewController<ASTableNode> {
     // MARK: Lifecycle
 	
     private lazy var activityIndicatorView: UIActivityIndicatorView = {
-        return UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        return UIActivityIndicatorView(style: .gray)
     }()
 	
 	var photoFeedModel = PhotoFeedModel(photoFeedModelType: .photoFeedModelTypePopular)
@@ -90,7 +90,7 @@ extension PhotoFeedTableNodeController: ASTableDataSource, ASTableDelegate {
 	
 	func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let photo = photoFeedModel.itemAtIndexPath(indexPath)
-		let nodeBlock: ASCellNodeBlock = { _ in
+		let nodeBlock: ASCellNodeBlock = { 
 			return PhotoTableNodeCell(photoModel: photo)
 		}
 		return nodeBlock

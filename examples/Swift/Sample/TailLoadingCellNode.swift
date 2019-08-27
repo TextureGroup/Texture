@@ -20,11 +20,11 @@ final class TailLoadingCellNode: ASCellNode {
     addSubnode(text)
     text.attributedText = NSAttributedString(
       string: "Loading…",
-      attributes: convertToOptionalNSAttributedStringKeyDictionary([
-        convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.systemFont(ofSize: 12),
-        convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): UIColor.lightGray,
-        convertFromNSAttributedStringKey(NSAttributedString.Key.kern): -0.3
-      ]))
+      attributes: [
+        NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12),
+        NSAttributedString.Key.foregroundColor: UIColor.lightGray,
+        NSAttributedString.Key.kern: -0.3
+      ])
     addSubnode(spinner)
   }
 
@@ -59,15 +59,4 @@ final class SpinnerNode: ASDisplayNode {
     
     activityIndicatorView.startAnimating()
   }
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
-	guard let input = input else { return nil }
-	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
-	return input.rawValue
 }

@@ -80,18 +80,16 @@ extension PhotoModel {
 	// MARK: - Attributed Strings
 	
 	func attributedStringForUserName(withSize size: CGFloat) -> NSAttributedString {
-		let attributes = [
-			NSForegroundColorAttributeName : UIColor.darkGray,
-			NSFontAttributeName: UIFont.boldSystemFont(ofSize: size)
-		]
+		let attributes = [NSAttributedString.Key.foregroundColor : UIColor.darkGray,
+                          NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: size)]
+
 		return NSAttributedString(string: user.userName, attributes: attributes)
 	}
 	
 	func attributedStringForDescription(withSize size: CGFloat) -> NSAttributedString {
-		let attributes = [
-			NSForegroundColorAttributeName : UIColor.darkGray,
-			NSFontAttributeName: UIFont.systemFont(ofSize: size)
-		]
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                          NSAttributedString.Key.font: UIFont.systemFont(ofSize: size)]
+
 		return NSAttributedString(string: descriptionText ?? "", attributes: attributes)
 	}
 	
@@ -100,16 +98,14 @@ extension PhotoModel {
             return NSAttributedString()
         }
 		
-        let likesAttributes = [
-            NSForegroundColorAttributeName : UIColor.mainBarTintColor,
-            NSFontAttributeName: UIFont.systemFont(ofSize: size)
-        ]
+        let likesAttributes = [NSAttributedString.Key.foregroundColor: UIColor.mainBarTintColor,
+                               NSAttributedString.Key.font: UIFont.systemFont(ofSize: size)]
+
 		let likesAttrString = NSAttributedString(string: "\(formattedLikesNumber) Likes", attributes: likesAttributes)
 		
-		let heartAttributes = [
-            NSForegroundColorAttributeName : UIColor.red,
-            NSFontAttributeName: UIFont.systemFont(ofSize: size)
-        ]
+		let heartAttributes = [NSAttributedString.Key.foregroundColor : UIColor.red,
+                               NSAttributedString.Key.font: UIFont.systemFont(ofSize: size)]
+
 		let heartAttrString = NSAttributedString(string: "♥︎ ", attributes: heartAttributes)
 		
 		let combine = NSMutableAttributedString()
@@ -123,10 +119,8 @@ extension PhotoModel {
             return NSAttributedString();
         }
 
-        let attributes = [
-			NSForegroundColorAttributeName : UIColor.mainBarTintColor,
-			NSFontAttributeName: UIFont.systemFont(ofSize: size)
-		]
+        let attributes = [NSAttributedString.Key.foregroundColor : UIColor.mainBarTintColor,
+                          NSAttributedString.Key.font: UIFont.systemFont(ofSize: size)]
 		
 		return NSAttributedString(string: Date.timeStringSince(fromConverted: date), attributes: attributes)
 	}

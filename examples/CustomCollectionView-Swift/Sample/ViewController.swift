@@ -62,8 +62,8 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
   
   func collectionNode(_ collectionNode: ASCollectionNode, nodeForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> ASCellNode {
     let textAttributes : NSDictionary = [
-      convertFromNSAttributedStringKey(NSAttributedString.Key.font): UIFont.preferredFont(forTextStyle: UIFont.TextStyle.headline),
-      convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): UIColor.gray
+      NSAttributedString.Key.font.rawValue: UIFont.preferredFont(forTextStyle: UIFont.TextStyle.headline),
+      NSAttributedString.Key.foregroundColor.rawValue: UIColor.gray
     ]
     let textInsets = UIEdgeInsets(top: 11, left: 0, bottom: 11, right: 0)
     let textCellNode = ASTextCellNode(attributes: textAttributes as! [AnyHashable : Any], insets: textInsets)
@@ -83,10 +83,4 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
   internal func collectionView(_ collectionView: UICollectionView, layout: MosaicCollectionViewLayout, originalItemSizeAtIndexPath: IndexPath) -> CGSize {
     return _sections[originalItemSizeAtIndexPath.section][originalItemSizeAtIndexPath.item].size
   }
-}
-
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
-	return input.rawValue
 }

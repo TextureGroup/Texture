@@ -1,6 +1,9 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '9.0'
-use_frameworks!
+platform :ios, '10.0'
 target 'Sample' do
-	pod 'Texture', :path => '../..'
+  use_frameworks!
+  inhibit_all_warnings!
+
+  pod 'Texture', :path => '../..'
+
 end
