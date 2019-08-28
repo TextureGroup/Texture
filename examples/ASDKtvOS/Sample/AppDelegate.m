@@ -2,8 +2,9 @@
 //  AppDelegate.m
 //  Sample
 //
-//  Created by rmalik on 8/28/19.
-//  Copyright © 2019 Texture. All rights reserved.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import "AppDelegate.h"
