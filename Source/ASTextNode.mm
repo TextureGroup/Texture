@@ -1311,6 +1311,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
   return ASLockedSelf([[self _locked_renderer] lineCount]);
 }
 
+- (BOOL)textColorFollowsTintColor
+{
+  return ASLockedSelf(_textColorFollowsTintColor);
+}
+
 #pragma mark - Truncation Message
 
 - (void)_invalidateTruncationText
