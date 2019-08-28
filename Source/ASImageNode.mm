@@ -52,9 +52,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
   ASImageNodeDrawParametersBlock _didDrawBlock;
-  #if AS_BUILD_UIUSERINTERFACESTYLE
-  UIUserInterfaceStyle userInterfaceStyle;
-  #endif
+  UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
 }
 
 @end
@@ -77,9 +75,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 @property (nonatomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
 @property (nonatomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 @property (nonatomic) asimagenode_modification_block_t imageModificationBlock;
-#if AS_BUILD_UIUSERINTERFACESTYLE
 @property UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
-#endif
 @end
 
 @implementation ASImageNodeContentsKey
@@ -96,18 +92,22 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   // overheard of our caching, so it's likely not high-impact.
   if ([object isKindOfClass:[ASImageNodeContentsKey class]]) {
     ASImageNodeContentsKey *other = (ASImageNodeContentsKey *)object;
-    return [_image isEqual:other.image]
-      && CGSizeEqualToSize(_backingSize, other.backingSize)
-      && CGRectEqualToRect(_imageDrawRect, other.imageDrawRect)
-      && _isOpaque == other.isOpaque
-      && [_backgroundColor isEqual:other.backgroundColor]
-      && [_tintColor isEqual:other.tintColor]
-      && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
-      && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
-#if AS_BUILD_UIUSERINTERFACESTYLE
-      && _userInterfaceStyle == other.userInterfaceStyle
-#endif
-      && _imageModificationBlock == other.imageModificationBlock;
+    BOOL areKeysEqual = [_image isEqual:other.image]
+    && CGSizeEqualToSize(_backingSize, other.backingSize)
+    && CGRectEqualToRect(_imageDrawRect, other.imageDrawRect)
+    && _isOpaque == other.isOpaque
+    && [_backgroundColor isEqual:other.backgroundColor]
+    && [_tintColor isEqual:other.tintColor]
+    && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
+    && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
+    && _imageModificationBlock == other.imageModificationBlock;
+    if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+      // iOS 12, tvOS 10 and later (userInterfaceStyle only available in iOS12+)
+      return areKeysEqual && _userInterfaceStyle == other.userInterfaceStyle;
+    } else {
+      // iOS 11 and earlier
+      return areKeysEqual;
+    }
   } else {
     return NO;
   }
@@ -150,7 +150,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   UIImage *_image;
   ASWeakMapEntry *_weakCacheEntry;  // Holds a reference that keeps our contents in cache.
   UIColor *_placeholderColor;
-  UIColor *_tintColor; // Used to cache color information for layer backed nodes. View backed will use UIViewBridge
 
   void (^_displayCompletionBlock)(BOOL canceled);
   
@@ -319,9 +318,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_imageModificationBlock = _imageModificationBlock;
   drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
   drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
-#if AS_BUILD_UIUSERINTERFACESTYLE
-  drawParameters->userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
-#endif
+  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+    drawParameters->userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
+  }
 
 
   // Hack for now to retain the weak entry that was created while this drawing happened
@@ -414,12 +413,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return nil;
   }
 
-#if AS_BUILD_UIUSERINTERFACESTYLE
-  UIUserInterfaceStyle userInterfaceStyle = drawParameter->userInterfaceStyle;
-#endif
-
-    
-
   ASImageNodeContentsKey *contentsKey = [[ASImageNodeContentsKey alloc] init];
   contentsKey.image = image;
   contentsKey.backingSize = backingSize;
@@ -430,9 +423,12 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
   contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
-#if AS_BUILD_UIUSERINTERFACESTYLE
-  contentsKey.userInterfaceStyle = userInterfaceStyle;
-#endif
+
+  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+    UIUserInterfaceStyle userInterfaceStyle = drawParameter->userInterfaceStyle;
+    contentsKey.userInterfaceStyle = userInterfaceStyle;
+  }
+
   if (isCancelled()) {
     return nil;
   }
@@ -758,7 +754,6 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   };
 }
 
-#if AS_BUILD_UIUSERINTERFACESTYLE
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
   
@@ -776,7 +771,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
       }
   }
 }
-#endif
+
+
 @end
 
 #pragma mark - Extras
