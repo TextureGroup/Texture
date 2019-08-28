@@ -52,7 +52,11 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
           // sourceImage.imageRenderFormat it will assume a grayscale color space.
           // This is not good because a template image should be able to tint to any color,
           // so we'll just use the default here.
-          format = defaultFormat;
+          if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+            format = [UIGraphicsImageRendererFormat preferredFormat];
+          } else {
+            format = [UIGraphicsImageRendererFormat defaultFormat];
+          }
         } else {
           format = sourceImage.imageRendererFormat;
         }

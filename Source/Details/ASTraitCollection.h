@@ -40,9 +40,8 @@ typedef struct {
   UIUserInterfaceIdiom userInterfaceIdiom;
   UIForceTouchCapability forceTouchCapability;
   UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
-#if AS_BUILD_UIUSERINTERFACESTYLE
   UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
-#endif
+
 
   // NOTE: This must be a constant. We will assert.
   unowned UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
@@ -139,9 +138,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (readonly) UIForceTouchCapability forceTouchCapability;
 @property (readonly) UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
-#if AS_BUILD_UIUSERINTERFACESTYLE
 @property (readonly) UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
-#endif
 @property (readonly) UIContentSizeCategory preferredContentSizeCategory  API_AVAILABLE(ios(10.0));
 
 @property (readonly) CGSize containerSize;
