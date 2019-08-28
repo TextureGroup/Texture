@@ -1,0 +1,47 @@
+PODS:
+  - PINCache (3.0.1-beta.7):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.7)
+    - PINCache/Core (= 3.0.1-beta.7)
+  - PINCache/Arc-exception-safe (3.0.1-beta.7):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.7):
+    - PINOperation (~> 1.1.1)
+  - PINOperation (1.1.2)
+  - PINRemoteImage/Core (3.0.0-beta.14):
+    - PINOperation
+  - PINRemoteImage/iOS (3.0.0-beta.14):
+    - PINRemoteImage/Core
+  - PINRemoteImage/PINCache (3.0.0-beta.14):
+    - PINCache (= 3.0.1-beta.7)
+    - PINRemoteImage/Core
+  - Texture/Core (2.8.1)
+  - Texture/PINRemoteImage (2.8.1):
+    - PINRemoteImage/iOS (= 3.0.0-beta.14)
+    - PINRemoteImage/PINCache
+    - Texture/Core
+  - Texture/Video (2.8.1):
+    - Texture/Core
+
+DEPENDENCIES:
+  - Texture/PINRemoteImage (from `../..`)
+  - Texture/Video (from `../..`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - PINCache
+    - PINOperation
+    - PINRemoteImage
+
+EXTERNAL SOURCES:
+  Texture:
+    :path: "../.."
+
+SPEC CHECKSUMS:
+  PINCache: 7cb9ae068c8f655717f7c644ef1dff9fd573e979
+  PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
+  PINRemoteImage: 81bbff853acc71c6de9e106e9e489a791b8bbb08
+  Texture: 6811322192a44ed35bcd53772aa8df8965d9796b
+
+PODFILE CHECKSUM: a8e25cab4e93e7226d864d21ff8b7c334b21fac0
+
+COCOAPODS: 1.7.5
