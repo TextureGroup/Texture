@@ -1,4 +1,4 @@
-name: CI
+name: Danger
 
 on: [pull_request]
 
