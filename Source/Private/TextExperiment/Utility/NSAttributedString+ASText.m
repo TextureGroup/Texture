@@ -473,14 +473,18 @@ return style. _attr_;
                                                   contentMode:(UIViewContentMode)contentMode
                                                attachmentSize:(CGSize)attachmentSize
                                                   alignToFont:(UIFont *)font
-                                                    alignment:(ASTextVerticalAlignment)alignment {
+                                                    alignment:(ASTextVerticalAlignment)alignment
+                                                contentInsets:(UIEdgeInsets)contentInsets
+                                                     userInfo:(NSDictionary *)userInfo {
   NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:ASTextAttachmentToken];
   
   ASTextAttachment *attach = [ASTextAttachment new];
   attach.content = content;
   attach.contentMode = contentMode;
+  attach.userInfo = userInfo;
+  attach.contentInsets = contentInsets;
   [atr as_setTextAttachment:attach range:NSMakeRange(0, atr.length)];
-  
+
   ASTextRunDelegate *delegate = [ASTextRunDelegate new];
   delegate.width = attachmentSize.width;
   switch (alignment) {
@@ -515,11 +519,11 @@ return style. _attr_;
       delegate.descent = 0;
     } break;
   }
-  
+
   CTRunDelegateRef delegateRef = delegate.CTRunDelegate;
   [atr as_setRunDelegate:delegateRef range:NSMakeRange(0, atr.length)];
   if (delegate) CFRelease(delegateRef);
-  
+
   return atr;
 }
 
