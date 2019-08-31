@@ -80,6 +80,13 @@ if [ "$MODE" = "tests" -o "$MODE" = "all" ]; then
     success="1"
 fi
 
+if [ "$MODE" = "danger" -o "$MODE" = "all" ]; then
+    bundle install
+    echo "Running Danger..."
+    bundle exec danger --fail-on-errors=true
+    success="1"
+fi
+
 if [ "$MODE" = "tests_listkit" ]; then
     echo "Building & testing AsyncDisplayKit+IGListKit."
     pod install --project-directory=SubspecWorkspaces/ASDKListKit
