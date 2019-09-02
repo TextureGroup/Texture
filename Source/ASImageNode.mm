@@ -756,6 +756,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
 
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+    __instanceLock__.lock();
       // update image if userInterfaceStyle was changed (dark mode)
       if (_image != nil && self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
           UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
@@ -764,9 +765,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
           if ( updatedImage != nil ) {
               _image = updatedImage;
           }
-        // trigger needs display anyway, cause image might be dynamic itself (e.g. dynamic tint color)
-        [self setNeedsDisplay];
       }
+    __instanceLock__.unlock();
   }
 }
 

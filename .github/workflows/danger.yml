@@ -3,26 +3,19 @@ name: Danger
 on: [pull_request]
 
 jobs:
-  danger:
-    name: Danger JS
-    runs-on: ubuntu-latest
+  buildsh:
+    strategy:
+      matrix:
+        mode: [danger]
+        include:
+          - mode: danger
+            name: Run Danger
+    name: ${{ matrix.name }}
+    runs-on: macOS-10.14
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
-    # TODO: Figure out why GITHUB_TOKEN isn't enough for Danger JS to create a comment.
-    # Our dangerfile.js escalates any warnings as failures to get more attention.
-    #
-    # Here is the error response from GitHub API:
-    #
-    # Request failed [403]: https://api.github.com/repos/TextureGroup/Texture/issues/1635/comments
-    # Response: {
-    #   "message": "Resource not accessible by integration",
-    #   "documentation_url": "https://developer.github.com/v3/issues/comments/#create-a-comment"
-    # }
-    #
-    # https://github.com/TextureGroup/Texture/pull/1635/checks?check_run_id=200541353
-    - name: Danger
-      uses: danger/danger-js@9.1.8
+    - name: Run build script
+      run: ./build.sh ${{ matrix.mode }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DANGER_DISABLE_TRANSPILATION: true 
+        DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}

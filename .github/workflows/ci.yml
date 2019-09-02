@@ -29,4 +29,5 @@ jobs:
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
-    - run: ./build.sh ${{ matrix.mode }}
+    - name: Run build script
+      run: ./build.sh ${{ matrix.mode }}
