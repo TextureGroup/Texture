@@ -755,19 +755,19 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
 
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    __instanceLock__.lock();
-      // update image if userInterfaceStyle was changed (dark mode)
-      if (_image != nil && self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
-          // get an updated image from asset catalog
-          UIImage *updatedImage = [self.image.imageAsset imageWithTraitCollection:tc];
-          if ( updatedImage != nil ) {
-              _image = updatedImage;
-          }
-      }
-    __instanceLock__.unlock();
-  }
+//  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+//    __instanceLock__.lock();
+//      // update image if userInterfaceStyle was changed (dark mode)
+//      if (_image != nil && self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+//          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
+//          // get an updated image from asset catalog
+//          UIImage *updatedImage = [self.image.imageAsset imageWithTraitCollection:tc];
+//          if ( updatedImage != nil ) {
+//              _image = updatedImage;
+//          }
+//      }
+//    __instanceLock__.unlock();
+//  }
 }
 
 
