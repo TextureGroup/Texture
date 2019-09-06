@@ -756,17 +756,16 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
 
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    __instanceLock__.lock();
+    AS::MutexLocker l(__instanceLock__);
       // update image if userInterfaceStyle was changed (dark mode)
-      if (_image != nil && self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:self.primitiveTraitCollection.userInterfaceStyle];
+      if (_image != nil && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
           // get an updated image from asset catalog
-          UIImage *updatedImage = [self.image.imageAsset imageWithTraitCollection:tc];
+          UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
           if ( updatedImage != nil ) {
               _image = updatedImage;
           }
       }
-    __instanceLock__.unlock();
   }
 }
 
