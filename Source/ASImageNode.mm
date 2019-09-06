@@ -300,6 +300,16 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 {
   ASLockScopeSelf();
 
+  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
+    if (_imageNodeFlags.regenerateFromImageAsset && _image != nil) {
+        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
+        UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
+        if ( updatedImage != nil ) {
+            _image = updatedImage;
+        }
+    }
+  }
+
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
   drawParameters->_image = _image;
   drawParameters->_bounds = [self threadSafeBounds];
@@ -762,16 +772,11 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
 
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
     AS::MutexLocker l(__instanceLock__);
       // update image if userInterfaceStyle was changed (dark mode)
       if (_image != nil && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-          UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-          // get an updated image from asset catalog
-          UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
-          if ( updatedImage != nil ) {
-              _image = updatedImage;
-          }
+        _imageNodeFlags.regenerateFromImageAsset = YES;
       }
   }
 }
