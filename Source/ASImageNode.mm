@@ -301,19 +301,20 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 {
   ASLockScopeSelf();
 
+  UIImage *drawImage = _image;
   if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
     if (_imageNodeFlags.regenerateFromImageAsset && _image != nil) {
       _imageNodeFlags.regenerateFromImageAsset = NO;
       UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-      UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
-      if ( updatedImage != nil ) {
-        _image = updatedImage;
+      UIImage *generatedImage = [_image.imageAsset imageWithTraitCollection:tc];
+      if ( generatedImage != nil ) {
+        drawImage = generatedImage;
       }
     }
   }
 
   ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
-  drawParameters->_image = _image;
+  drawParameters->_image = drawImage;
   drawParameters->_bounds = [self threadSafeBounds];
   drawParameters->_opaque = self.opaque;
   drawParameters->_contentsScale = _contentsScaleForDisplay;
