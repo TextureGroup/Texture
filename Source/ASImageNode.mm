@@ -303,10 +303,10 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   UIImage *drawImage = _image;
   if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-    if (_imageNodeFlags.regenerateFromImageAsset && _image != nil) {
+    if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
       _imageNodeFlags.regenerateFromImageAsset = NO;
       UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-      UIImage *generatedImage = [_image.imageAsset imageWithTraitCollection:tc];
+      UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
       if ( generatedImage != nil ) {
         drawImage = generatedImage;
       }
