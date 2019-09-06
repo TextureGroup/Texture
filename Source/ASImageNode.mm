@@ -610,7 +610,14 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)tintColorDidChange
 {
   [super tintColorDidChange];
-  if (_image.renderingMode == UIImageRenderingModeAlwaysTemplate) {
+
+  BOOL isTemplateImage = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    isTemplateImage = (_image.renderingMode == UIImageRenderingModeAlwaysTemplate);
+  }
+
+  if (isTemplateImage) {
     [self setNeedsDisplay];
   }
 }
