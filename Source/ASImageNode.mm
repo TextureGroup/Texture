@@ -52,7 +52,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
   ASImageNodeDrawParametersBlock _didDrawBlock;
-  UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
+  UIUserInterfaceStyle _userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
 }
 
 @end
@@ -317,7 +317,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
   drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    drawParameters->userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
+    drawParameters->_userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
   }
 
 
@@ -423,7 +423,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.imageModificationBlock = imageModificationBlock;
 
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    UIUserInterfaceStyle userInterfaceStyle = drawParameter->userInterfaceStyle;
+    UIUserInterfaceStyle userInterfaceStyle = drawParameter->_userInterfaceStyle;
     contentsKey.userInterfaceStyle = userInterfaceStyle;
   }
 
