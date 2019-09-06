@@ -183,6 +183,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   _imageNodeFlags.cropEnabled = YES;
   _imageNodeFlags.forceUpscaling = NO;
+  _imageNodeFlags.regenerateFromImageAsset = NO;
   _cropRect = CGRectMake(0.5, 0.5, 0, 0);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
@@ -775,7 +776,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
     AS::MutexLocker l(__instanceLock__);
       // update image if userInterfaceStyle was changed (dark mode)
-      if (_image != nil && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      if (_image != nil
+          && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
         _imageNodeFlags.regenerateFromImageAsset = YES;
       }
   }
