@@ -303,11 +303,12 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
     if (_imageNodeFlags.regenerateFromImageAsset && _image != nil) {
-        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-        UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
-        if ( updatedImage != nil ) {
-            _image = updatedImage;
-        }
+      _imageNodeFlags.regenerateFromImageAsset = NO;
+      UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
+      UIImage *updatedImage = [_image.imageAsset imageWithTraitCollection:tc];
+      if ( updatedImage != nil ) {
+        _image = updatedImage;
+      }
     }
   }
 
