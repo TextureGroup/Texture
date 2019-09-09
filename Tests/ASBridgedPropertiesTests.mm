@@ -21,6 +21,7 @@
 
 @interface ASBridgedPropertiesTestView : UIView
 @property (nonatomic, readonly) BOOL receivedSetNeedsLayout;
+@property (nonatomic, readonly) NSUInteger setNeedsDisplayCount;
 @end
 
 @implementation ASBridgedPropertiesTestView
@@ -29,6 +30,12 @@
 {
   _receivedSetNeedsLayout = YES;
   [super setNeedsLayout];
+}
+
+- (void)setNeedsDisplay
+{
+  _setNeedsDisplayCount += 1;
+  [super setNeedsDisplay];
 }
 
 @end
@@ -136,6 +143,24 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   ASDispatchSyncOnOtherThread(^{
     XCTAssertThrows(node.contentsScale);
   });
+}
+
+- (void)testThatSettingTintColorSetNeedsDisplay
+{
+  ASPendingStateController *ctrl = [ASPendingStateController sharedInstance];
+
+  ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:ASBridgedPropertiesTestView.class];
+  ASBridgedPropertiesTestView *view = (ASBridgedPropertiesTestView *)node.view;
+  XCTAssertEqual(view.setNeedsDisplayCount, 1);
+
+  ASDispatchSyncOnOtherThread(^{
+    node.tintColor = UIColor.orangeColor;
+  });
+  XCTAssertNotEqualObjects(view.tintColor, UIColor.orangeColor);
+  XCTAssertEqual(view.setNeedsDisplayCount, 1);
+  [ctrl flush];
+  XCTAssertEqualObjects(view.tintColor, UIColor.orangeColor);
+  XCTAssertEqual(view.setNeedsDisplayCount, 2);
 }
 
 - (void)testThatManuallyFlushingTheSyncControllerImmediatelyAppliesChanges
