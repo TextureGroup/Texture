@@ -151,16 +151,21 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
 
   ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:ASBridgedPropertiesTestView.class];
   ASBridgedPropertiesTestView *view = (ASBridgedPropertiesTestView *)node.view;
-  XCTAssertEqual(view.setNeedsDisplayCount, 1);
+  NSUInteger initialSetNeedsDisplayCount = view.setNeedsDisplayCount;
+#if AS_AT_LEAST_IOS13
+  XCTAssertEqual(initialSetNeedsDisplayCount, 2);
+#else
+  XCTAssertEqual(initialSetNeedsDisplayCount, 1);
+#endif
 
   ASDispatchSyncOnOtherThread(^{
     node.tintColor = UIColor.orangeColor;
   });
   XCTAssertNotEqualObjects(view.tintColor, UIColor.orangeColor);
-  XCTAssertEqual(view.setNeedsDisplayCount, 1);
+  XCTAssertEqual(view.setNeedsDisplayCount, initialSetNeedsDisplayCount);
   [ctrl flush];
   XCTAssertEqualObjects(view.tintColor, UIColor.orangeColor);
-  XCTAssertEqual(view.setNeedsDisplayCount, 2);
+  XCTAssertEqual(view.setNeedsDisplayCount, initialSetNeedsDisplayCount + 1);
 }
 
 - (void)testThatManuallyFlushingTheSyncControllerImmediatelyAppliesChanges
