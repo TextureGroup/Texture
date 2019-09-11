@@ -153,6 +153,7 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   ASBridgedPropertiesTestView *view = (ASBridgedPropertiesTestView *)node.view;
   NSUInteger initialSetNeedsDisplayCount = view.setNeedsDisplayCount;
 #if AS_AT_LEAST_IOS13
+  // This is called an extra time on iOS13 for unknown reasons. Need to Investigate.
   if (@available(iOS 13.0, *)) {
     XCTAssertEqual(initialSetNeedsDisplayCount, 2);
   } else {
