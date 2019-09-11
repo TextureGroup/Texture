@@ -323,11 +323,15 @@
 
 - (UIColor *)tintColor
 {
-    if (self.supernode == nil && self.scrollView != nil) {
-        return self.scrollView.tintColor;
-    } else {
-        return [super tintColor];
+    if (self.supernode == nil) {
+        if (_tintColor != nil) {
+            return _tintColor;
+        }
+        if (self.scrollView != nil) {
+            return self.scrollView.tintColor;
+        }
     }
+    return [super tintColor];
 }
 
 - (NSMutableArray<NSDictionary *> *)propertiesForDebugDescription
