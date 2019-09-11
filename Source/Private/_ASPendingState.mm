@@ -374,7 +374,7 @@ static CGColorRef blackColorRef = NULL;
     return _flags.allowsEdgeAntialiasing;
 }
 
-- (void)setEdgeAntialiasingMask:(unsigned int)mask
+- (void)setEdgeAntialiasingMask:(CAEdgeAntialiasingMask)mask
 {
   edgeAntialiasingMask = mask;
   _stateToApplyFlags.setEdgeAntialiasingMask = YES;

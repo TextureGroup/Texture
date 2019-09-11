@@ -929,13 +929,13 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   _setToLayer(allowsEdgeAntialiasing, allowsEdgeAntialiasing);
 }
 
-- (unsigned int)edgeAntialiasingMask
+- (CAEdgeAntialiasingMask)edgeAntialiasingMask
 {
   _bridge_prologue_read;
   return _getFromLayer(edgeAntialiasingMask);
 }
 
-- (void)setEdgeAntialiasingMask:(unsigned int)edgeAntialiasingMask
+- (void)setEdgeAntialiasingMask:(CAEdgeAntialiasingMask)edgeAntialiasingMask
 {
   _bridge_prologue_write;
   _setToLayer(edgeAntialiasingMask, edgeAntialiasingMask);
