@@ -823,6 +823,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
       }
     }
   } else {
+    _tintColor = color;
     _setToViewOnly(tintColor, color);
   }
   __instanceLock__.unlock();
