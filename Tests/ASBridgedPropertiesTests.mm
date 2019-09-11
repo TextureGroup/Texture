@@ -145,7 +145,7 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   });
 }
 
-- (void)testThatSettingTintColorSetNeedsDisplay
+- (void)testThatSettingTintColorSetNeedsDisplayOnView
 {
   ASPendingStateController *ctrl = [ASPendingStateController sharedInstance];
 
@@ -153,9 +153,11 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   ASBridgedPropertiesTestView *view = (ASBridgedPropertiesTestView *)node.view;
   NSUInteger initialSetNeedsDisplayCount = view.setNeedsDisplayCount;
 #if AS_AT_LEAST_IOS13
-  XCTAssertEqual(initialSetNeedsDisplayCount, 2);
-#else
-  XCTAssertEqual(initialSetNeedsDisplayCount, 1);
+  if (@available(iOS 13.0, *)) {
+    XCTAssertEqual(initialSetNeedsDisplayCount, 2);
+  } else {
+    XCTAssertEqual(initialSetNeedsDisplayCount, 1);
+  }
 #endif
 
   ASDispatchSyncOnOtherThread(^{
