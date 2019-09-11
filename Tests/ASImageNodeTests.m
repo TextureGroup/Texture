@@ -1,9 +1,9 @@
 //
 //  ASImageNodeTests.m
-//  AsyncDisplayKitTests
+//  Texture
 //
-//  Created by Greg Bolsinga on 9/11/19.
-//  Copyright © 2019 Pinterest. All rights reserved.
+//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
 #import <XCTest/XCTest.h>
