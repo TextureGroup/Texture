@@ -35,7 +35,7 @@
 @implementation PhotoCellNode
 {
   PhotoModel          *_photoModel;
-  ASNetworkImageNode  *_userAvatarImageNode;
+  ASImageNode  *_userAvatarImageNode;
   ASNetworkImageNode  *_photoImageNode;
   ASTextNode          *_userNameLabel;
   ASTextNode          *_photoLocationLabel;
@@ -54,15 +54,16 @@
     
     _photoModel              = photo;
     
-    _userAvatarImageNode     = [[ASNetworkImageNode alloc] init];
-    _userAvatarImageNode.URL = photo.ownerUserProfile.userPicURL;   // FIXME: make round
-    
-    // FIXME: autocomplete for this line seems broken
-    [_userAvatarImageNode setImageModificationBlock:^UIImage *(UIImage *image) {
-      CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
-      return [image makeCircularImageWithSize:profileImageSize backgroundColor:nil];
-    }];
+    _userAvatarImageNode     = [[ASImageNode alloc] init];
+//    _userAvatarImageNode.URL = photo.ownerUserProfile.userPicURL;   // FIXME: make round
 
+    // FIXME: autocomplete for this line seems broken
+//    [_userAvatarImageNode setImageModificationBlock:^UIImage *(UIImage *image) {
+//      CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
+//      return [[image makeCircularImageWithSize:profileImageSize backgroundColor:nil] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//    }];
+//
+    _userAvatarImageNode.image = [[UIImage as_imageNamed:@"profile"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     _photoImageNode          = [[ASNetworkImageNode alloc] init];
     _photoImageNode.delegate = self;
     _photoImageNode.URL      = photo.URL;

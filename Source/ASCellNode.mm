@@ -321,6 +321,15 @@
                   withCellFrame:cellFrame];
 }
 
+- (UIColor *)tintColor
+{
+    if (self.supernode == nil && self.scrollView != nil) {
+        return self.scrollView.tintColor;
+    } else {
+        return [super tintColor];
+    }
+}
+
 - (NSMutableArray<NSDictionary *> *)propertiesForDebugDescription
 {
   NSMutableArray *result = [super propertiesForDebugDescription];

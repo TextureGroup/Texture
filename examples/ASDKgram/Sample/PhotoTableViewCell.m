@@ -435,7 +435,7 @@ static NSURL *UserProfileURLForPhotoModel(PhotoModel *photoModel) {
     }
 
     CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
-    _userAvatarImageView.image = [image makeCircularImageWithSize:profileImageSize backgroundColor:[UIColor backgroundColor]];
+    _userAvatarImageView.image = [[image makeCircularImageWithSize:profileImageSize backgroundColor:[UIColor backgroundColor]] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   }];
 }
 

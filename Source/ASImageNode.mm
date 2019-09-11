@@ -188,7 +188,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
   _animatedImageRunLoopMode = ASAnimatedImageDefaultRunLoopMode;
-
   return self;
 }
 
@@ -296,6 +295,15 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 }
 
 #pragma mark - Drawing
+
+//- (void)didEnterHierarchy
+//{
+//    [super didEnterHierarchy];
+//    if (self.interfaceState & ASInterfaceStateDisplay) {
+//        [self tintColorDidChange];
+//    }
+//}
+
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {

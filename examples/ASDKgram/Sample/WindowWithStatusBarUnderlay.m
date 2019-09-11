@@ -22,6 +22,7 @@
     _statusBarOpaqueUnderlayView                 = [[UIView alloc] init];
     _statusBarOpaqueUnderlayView.backgroundColor = [UIColor darkBlueColor];
     [self addSubview:_statusBarOpaqueUnderlayView];
+    self.tintColor = [UIColor systemRedColor];
   }
   return self;
 }

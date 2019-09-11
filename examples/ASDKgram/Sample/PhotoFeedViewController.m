@@ -74,6 +74,10 @@ static NSString *TableViewCellIdentifier = @"PhotoCell";
 
 #pragma mark - UITableViewDataSource methods
 
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return [self.photoFeed numberOfItemsInFeed];
