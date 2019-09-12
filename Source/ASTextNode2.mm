@@ -674,11 +674,17 @@ static NSArray *DefaultLinkAttributeNames() {
       
       CTLineRef truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
       CFIndex truncationTokenLineGlyphCount = truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
-      CFRelease(truncationTokenLine);
+      
+      if (truncationTokenLine) {
+        CFRelease(truncationTokenLine);
+      }
       
       CTLineRef additionalTruncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
-      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
-      CFRelease(additionalTruncationTokenLine);
+      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;
+      
+      if (additionalTruncationTokenLine) {
+        CFRelease(additionalTruncationTokenLine);
+      }
 
       switch (_textContainer.truncationType) {
         case ASTextTruncationTypeStart: {
