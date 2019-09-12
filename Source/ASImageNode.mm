@@ -620,10 +620,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   [self setNeedsDisplay];
 }
 
-- (void)tintColorDidChange
+- (void)_setNeedsDisplayOnTemplatedImages
 {
-  [super tintColorDidChange];
-
   BOOL isTemplateImage = NO;
   {
     AS::MutexLocker l(__instanceLock__);
@@ -635,7 +633,21 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   }
 }
 
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTemplatedImages];
+}
+
 #pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTemplatedImages];
+}
 
 - (void)clearContents
 {
