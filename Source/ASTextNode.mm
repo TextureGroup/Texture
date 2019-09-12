@@ -183,6 +183,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGSize _shadowOffset;
   CGColorRef _shadowColor;
   UIColor *_cachedShadowUIColor;
+  UIColor *_cachedTintColor;
   UIColor *_placeholderColor;
   CGFloat _shadowOpacity;
   CGFloat _shadowRadius;
@@ -382,7 +383,7 @@ static NSArray *DefaultLinkAttributeNames() {
     .shadowColor = _cachedShadowUIColor,
     .shadowOpacity = _shadowOpacity,
     .shadowRadius = _shadowRadius,
-    .tintColor = self.textColorFollowsTintColor ? self.tintColor : nil
+    .tintColor = _cachedTintColor
   };
 }
 
@@ -543,7 +544,11 @@ static NSArray *DefaultLinkAttributeNames() {
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
   ASLockScopeSelf();
-  
+  if (_textColorFollowsTintColor) {
+    _cachedTintColor = self.tintColor;
+  } else {
+    _cachedTintColor = nil;
+  }
   return [[ASTextNodeDrawParameter alloc] initWithRendererAttributes:[self _locked_rendererAttributes]
                                                      backgroundColor:self.backgroundColor
                                                  textContainerInsets:_textContainerInset
@@ -943,6 +948,39 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   
   CGRect frame = [[self _locked_renderer] frameForTextRange:textRange];
   return ASTextNodeAdjustRenderRectForShadowPadding(frame, self.shadowPadding);
+}
+
+#pragma mark - Tint Colors
+
+
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
+- (void)_setNeedsDisplayOnTintedTextColor
+{
+  BOOL textColorFollowsTintColor = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    textColorFollowsTintColor = _textColorFollowsTintColor;
+  }
+
+  if (textColorFollowsTintColor) {
+    [self setNeedsDisplay];
+  }
+}
+
+
+#pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTintedTextColor];
 }
 
 #pragma mark - Placeholders
