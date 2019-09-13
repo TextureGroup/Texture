@@ -122,10 +122,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     self.clipsToBounds = node.clipsToBounds;
 
     // If the cell node has been explicitly configured with a tint color, we can apply that directly to the cell view to preserve the previous behavior
-    UIColor *nodeTintColor = node->_tintColor;
-    if (nodeTintColor != nil) {
-      self.tintColor = nodeTintColor;
-    }
+    self.tintColor = node->_tintColor;
   }
   
   [node __setSelectedFromUIKit:self.selected];
