@@ -15,7 +15,8 @@
 
 #define __shouldSetNeedsDisplayForView(view) (flags.needsDisplay \
   || (flags.setOpaque && _flags.opaque != (view).opaque)\
-  || (flags.setBackgroundColor && ![backgroundColor isEqual:(view).backgroundColor]))
+  || (flags.setBackgroundColor && ![backgroundColor isEqual:(view).backgroundColor])\
+  || (flags.setTintColor && ![tintColor isEqual:(view).tintColor]))
 
 #define __shouldSetNeedsDisplayForLayer(layer) (flags.needsDisplay \
   || (flags.setOpaque && _flags.opaque != (layer).opaque)\
@@ -104,6 +105,7 @@ static constexpr ASPendingStateFlags kZeroFlags = {0};
   CGRect frame;   // Frame is only to be used for synchronous views wrapped by nodes (see setFrame:)
   CGRect bounds;
   UIColor *backgroundColor;
+  UIColor *tintColor;
   CGFloat alpha;
   CGFloat cornerRadius;
   UIViewContentMode contentMode;
@@ -374,7 +376,7 @@ static CGColorRef blackColorRef = NULL;
     return _flags.allowsEdgeAntialiasing;
 }
 
-- (void)setEdgeAntialiasingMask:(unsigned int)mask
+- (void)setEdgeAntialiasingMask:(CAEdgeAntialiasingMask)mask
 {
   edgeAntialiasingMask = mask;
   _stateToApplyFlags.setEdgeAntialiasingMask = YES;
@@ -428,8 +430,16 @@ static CGColorRef blackColorRef = NULL;
   _stateToApplyFlags.setBackgroundColor = YES;
 }
 
+- (UIColor *)tintColor
+{
+  return tintColor;
+}
+
 - (void)setTintColor:(UIColor *)newTintColor
 {
+  if ([newTintColor isEqual:tintColor]) {
+    return;
+  }
   tintColor = newTintColor;
   _stateToApplyFlags.setTintColor = YES;
 }
@@ -1097,7 +1107,7 @@ static CGColorRef blackColorRef = NULL;
   }
 
   if (flags.setTintColor)
-    view.tintColor = self.tintColor;
+    view.tintColor = tintColor;
 
   if (flags.setOpaque) {
     view.opaque = _flags.opaque;

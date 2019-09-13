@@ -466,7 +466,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(NO, node.needsDisplayOnBoundsChange, @"default needsDisplayOnBoundsChange broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.allowsGroupOpacity, @"default allowsGroupOpacity broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.allowsEdgeAntialiasing, @"default allowsEdgeAntialiasing broken %@", hasLoadedView);
-  XCTAssertEqual((unsigned int)(kCALayerLeftEdge | kCALayerRightEdge | kCALayerBottomEdge | kCALayerTopEdge), node.edgeAntialiasingMask, @"default edgeAntialisingMask broken %@", hasLoadedView);
+  XCTAssertEqual((kCALayerLeftEdge | kCALayerRightEdge | kCALayerBottomEdge | kCALayerTopEdge), node.edgeAntialiasingMask, @"default edgeAntialisingMask broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.hidden, @"default hidden broken %@", hasLoadedView);
   XCTAssertEqual(1.0f, node.alpha, @"default alpha broken %@", hasLoadedView);
   XCTAssertTrue(CGRectEqualToRect(CGRectZero, node.bounds), @"default bounds broken %@", hasLoadedView);
@@ -516,9 +516,15 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     XCTAssertEqual(NO, node.preservesSuperviewLayoutMargins, @"default preservesSuperviewLayoutMargins broken %@", hasLoadedView);
     XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, node.safeAreaInsets), @"default safeAreaInsets broken %@", hasLoadedView);
     XCTAssertEqual(YES, node.insetsLayoutMarginsFromSafeArea, @"default insetsLayoutMarginsFromSafeArea broken %@", hasLoadedView);
+    if (node.nodeLoaded) {
+      XCTAssertNotNil(node.tintColor, @"default tintColor broken %@", hasLoadedView); // It has been populated by the UIView.
+    } else {
+      XCTAssertNil(node.tintColor, @"default tintColor broken %@", hasLoadedView);
+    }
   } else {
     XCTAssertEqual(NO, node.userInteractionEnabled, @"layer-backed nodes do not support userInteractionEnabled %@", hasLoadedView);
     XCTAssertEqual(NO, node.exclusiveTouch, @"layer-backed nodes do not support exclusiveTouch %@", hasLoadedView);
+    XCTAssertNil(node.tintColor, @"default tintColor broken %@", hasLoadedView);
   }
 }
 
@@ -580,7 +586,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(YES, node.needsDisplayOnBoundsChange, @"needsDisplayOnBoundsChange broken %@", hasLoadedView);
   XCTAssertEqual(NO, node.allowsGroupOpacity, @"allowsGroupOpacity broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.allowsEdgeAntialiasing, @"allowsEdgeAntialiasing broken %@", hasLoadedView);
-  XCTAssertTrue((unsigned int)(kCALayerLeftEdge | kCALayerTopEdge) == node.edgeAntialiasingMask, @"edgeAntialiasingMask broken: %@", hasLoadedView);
+  XCTAssertTrue((kCALayerLeftEdge | kCALayerTopEdge) == node.edgeAntialiasingMask, @"edgeAntialiasingMask broken: %@", hasLoadedView);
   XCTAssertEqual(YES, node.hidden, @"hidden broken %@", hasLoadedView);
   XCTAssertEqual(.5f, node.alpha, @"alpha broken %@", hasLoadedView);
   XCTAssertTrue(CGRectEqualToRect(CGRectMake(10, 15, 42, 115.2), node.bounds), @"bounds broken %@", hasLoadedView);
@@ -590,6 +596,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DMakeScale(0.5, 0.5, 1.0), node.transform), @"transform broken %@", hasLoadedView);
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DMakeTranslation(1337, 7357, 7007), node.subnodeTransform), @"subnodeTransform broken %@", hasLoadedView);
   XCTAssertEqualObjects([UIColor clearColor], node.backgroundColor, @"backgroundColor broken %@", hasLoadedView);
+  XCTAssertEqualObjects([UIColor orangeColor], node.tintColor, @"tintColor broken %@", hasLoadedView);
   XCTAssertEqual(UIViewContentModeBottom, node.contentMode, @"contentMode broken %@", hasLoadedView);
   XCTAssertEqual([[UIColor cyanColor] CGColor], node.shadowColor, @"shadowColor broken %@", hasLoadedView);
   XCTAssertEqual(.5f, node.shadowOpacity, @"shadowOpacity broken %@", hasLoadedView);
@@ -664,6 +671,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.transform = CATransform3DMakeScale(0.5, 0.5, 1.0);
     node.subnodeTransform = CATransform3DMakeTranslation(1337, 7357, 7007);
     node.backgroundColor = [UIColor clearColor];
+    node.tintColor = [UIColor orangeColor];
     node.contentMode = UIViewContentModeBottom;
     node.shadowColor = [[UIColor cyanColor] CGColor];
     node.shadowOpacity = .5f;
@@ -754,6 +762,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
       return view;
     }];
     node.backgroundColor = [UIColor blueColor];
+    node.tintColor = [UIColor orangeColor];
     node.frame = CGRectMake(10, 20, 30, 40);
     node.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     node.userInteractionEnabled = YES;
@@ -773,6 +782,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   [node view];
 
   node.backgroundColor = [UIColor blueColor];
+  node.tintColor = [UIColor orangeColor];
   node.frame = CGRectMake(10, 20, 30, 40);
   node.autoresizingMask = UIViewAutoresizingFlexibleWidth;
   node.userInteractionEnabled = YES;
@@ -785,6 +795,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   UIView *view = node.view;
 
   XCTAssertEqualObjects([UIColor blueColor], view.backgroundColor, @"backgroundColor not propagated to view");
+  XCTAssertEqualObjects([UIColor orangeColor], view.tintColor, @"tintColor not propagated to view");
   XCTAssertTrue(CGRectEqualToRect(CGRectMake(10, 20, 30, 40), view.frame), @"frame not propagated to view");
   XCTAssertEqual(UIViewAutoresizingFlexibleWidth, view.autoresizingMask, @"autoresizingMask not propagated to view");
   XCTAssertEqual(YES, view.userInteractionEnabled, @"userInteractionEnabled not propagated to view");

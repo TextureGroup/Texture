@@ -734,7 +734,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @property            BOOL allowsGroupOpacity;
 @property            BOOL allowsEdgeAntialiasing;
-@property            unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
+@property            CAEdgeAntialiasingMask edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
 
 @property            BOOL needsDisplayOnBoundsChange;       // default==NO
 @property            BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)

@@ -28,6 +28,7 @@
     unsigned int animatedImagePaused:1;
     unsigned int cropEnabled:1; // Defaults to YES.
     unsigned int forceUpscaling:1; //Defaults to NO.
+    unsigned int regenerateFromImageAsset:1; //Defaults to NO.
   } _imageNodeFlags;
 }
 
