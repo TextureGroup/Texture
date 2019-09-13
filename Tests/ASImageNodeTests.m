@@ -8,8 +8,8 @@
 
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
-#import <AsyncDisplayKit/ASImageNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <Texture/ASImageNode.h>
+#import <Texture/ASDisplayNode+Subclasses.h>
 
 @interface ASImageTestNode : ASImageNode
 @property (nonatomic, readonly) NSUInteger setNeedsDisplayCount;
