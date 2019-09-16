@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASAvailability.h>
 
 NS_AVAILABLE_IOS(10)
 NS_INLINE void ASConfigureExtendedRange(UIGraphicsImageRendererFormat *format)
@@ -93,4 +94,21 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
   }
   UIGraphicsEndImageContext();
   return image;
+}
+
+UIImage *ASGraphicsCreateImageWithTraitCollectionAndOptions(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * sourceImage, void (NS_NOESCAPE ^work)()) {
+#if AS_AT_LEAST_IOS13
+  if (@available(iOS 13.0, *)) {
+    UITraitCollection *uiTraitCollection = ASPrimitiveTraitCollectionToUITraitCollection(traitCollection);
+    return ASGraphicsCreateImageWithOptions(size, opaque, scale, sourceImage, nil, ^{
+      [uiTraitCollection performAsCurrentTraitCollection:^{
+        work();
+      }];
+    });
+  } else {
+    return ASGraphicsCreateImageWithOptions(size, opaque, scale, sourceImage, nil, work);
+  }
+#else
+  return ASGraphicsCreateImageWithOptions(size, opaque, scale, sourceImage, nil, work);
+#endif
 }

@@ -60,6 +60,11 @@ AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault(void)
  */
 AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
 
+/**
+ * Creates a UITraitCollection from a given ASPrimitiveTraitCollection.
+ */
+AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection);
+
 
 /**
  * Compares two ASPrimitiveTraitCollection to determine if they are the same.
