@@ -451,7 +451,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
           // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
           // instead of UIColor. We utilize the _backgroundColor instance variable to track the full dynamic color
           // and apply any changes here when trait collection updates occur.
-          CGColorRef cgBackgroundColor = _backgroundColor.CGColor;
+          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
           if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
             _layer.backgroundColor = cgBackgroundColor;
           }
