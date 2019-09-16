@@ -33,7 +33,7 @@ AS_EXTERN UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CG
 /**
 * A wrapper for the UIKit drawing APIs.
 *
-* @param traitCollection trait collection. `work` block will be executed with this trait collection, so it will affect dynamic colors, etc.
+* @param traitCollection Trait collection. The `work` block will be executed with this trait collection, so it will affect dynamic colors, etc.
 * @param size The size of the context.
 * @param opaque Whether the context should be opaque or not.
 * @param scale The scale of the context. 0 uses main screen scale.
