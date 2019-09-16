@@ -511,19 +511,6 @@ static NSArray *DefaultLinkAttributeNames() {
     shadow.shadowBlurRadius = _shadowRadius;
     [attributedString addAttribute:NSShadowAttributeName value:shadow range:NSMakeRange(0, attributedString.length)];
   }
-
-  // Apply tint color if needed and foreground color is not already specified
-  if (self.textColorFollowsTintColor && attributedString.length > 0) {
-    // Apply tint color if specified and if foreground color is undefined for attributedString
-    NSRange limit = NSMakeRange(0, attributedString.length);
-    // Look for previous attributes that define foreground color
-    UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
-    UIColor *tintColor = self.tintColor;
-    if (attributeValue == nil && tintColor) {
-      // None are found, apply tint color if available. Fallback to "black" text color
-      [attributedString addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
-    }
-  }
 }
 
 #pragma mark - Drawing
@@ -540,7 +527,20 @@ static NSArray *DefaultLinkAttributeNames() {
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
   [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
-  
+
+  // After all other attributes are set, apply tint color if needed and foreground color is not already specified
+  if (self.textColorFollowsTintColor && mutableText.length > 0) {
+    // Apply tint color if specified and if foreground color is undefined for attributedString
+    NSRange limit = NSMakeRange(0, mutableText.length);
+    // Look for previous attributes that define foreground color
+    UIColor *attributeValue = (UIColor *)[mutableText attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
+    UIColor *tintColor = self.tintColor;
+    if (attributeValue == nil && tintColor) {
+      // None are found, apply tint color if available. Fallback to "black" text color
+      [mutableText addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+    }
+  }
+
   return @{
     @"container": copiedContainer,
     @"text": mutableText,
@@ -575,6 +575,38 @@ static NSArray *DefaultLinkAttributeNames() {
   ASDisplayNodeAssert(context, @"This is no good without a context.");
   
   [layout drawInContext:context size:bounds.size point:bounds.origin view:nil layer:nil debug:[ASTextDebugOption sharedDebugOption] cancel:isCancelledBlock];
+}
+
+#pragma mark - Tint Color
+
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
+- (void)_setNeedsDisplayOnTintedTextColor
+{
+  BOOL textColorFollowsTintColor = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    textColorFollowsTintColor = _textColorFollowsTintColor;
+  }
+
+  if (textColorFollowsTintColor) {
+    [self setNeedsDisplay];
+  }
+}
+
+
+#pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTintedTextColor];
 }
 
 #pragma mark - Attributes

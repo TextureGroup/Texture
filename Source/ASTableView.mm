@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASDelegateProxy.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
@@ -27,6 +28,7 @@
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASTableLayoutController.h>
 #import <AsyncDisplayKit/ASBatchContext.h>
+
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
@@ -113,12 +115,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     self.selectionStyle = node.selectionStyle; 
     self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
-    self.tintColor = node.tintColor;
     
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
     // This is actually a workaround for a bug we are seeing in some rare cases (selected background view
     // overlaps other cells if size of ASCellNode has changed.)
     self.clipsToBounds = node.clipsToBounds;
+
+    // If the cell node has been explicitly configured with a tint color, we can apply that directly to the cell view to preserve the previous behavior
+    self.tintColor = node->_tintColor;
   }
   
   [node __setSelectedFromUIKit:self.selected];
