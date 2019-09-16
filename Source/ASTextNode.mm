@@ -140,6 +140,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGFloat _contentScale;
   BOOL _opaque;
   CGRect _bounds;
+  ASPrimitiveTraitCollection _traitCollection;
 }
 @end
 
@@ -151,6 +152,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
                               contentScale:(CGFloat)contentScale
                                     opaque:(BOOL)opaque
                                     bounds:(CGRect)bounds
+                           traitCollection: (ASPrimitiveTraitCollection)traitCollection
 {
   self = [super init];
   if (self != nil) {
@@ -160,6 +162,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
     _contentScale = contentScale;
     _opaque = opaque;
     _bounds = bounds;
+    _traitCollection = traitCollection;
   }
   return self;
 }
@@ -554,7 +557,8 @@ static NSArray *DefaultLinkAttributeNames() {
                                                  textContainerInsets:_textContainerInset
                                                         contentScale:_contentsScaleForDisplay
                                                               opaque:self.isOpaque
-                                                              bounds:[self threadSafeBounds]];
+                                                              bounds:[self threadSafeBounds]
+                                                     traitCollection:self.primitiveTraitCollection];
 }
 
 + (UIImage *)displayWithParameters:(id<NSObject>)parameters isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
@@ -569,7 +573,7 @@ static NSArray *DefaultLinkAttributeNames() {
   UIEdgeInsets textContainerInsets = drawParameter ? drawParameter->_textContainerInsets : UIEdgeInsetsZero;
   ASTextKitRenderer *renderer = [drawParameter rendererForBounds:drawParameter->_bounds];
 
-  UIImage *result = ASGraphicsCreateImageWithOptions(CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, nil, ^{
+  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameter->_traitCollection, CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, ^{
     CGContextRef context = UIGraphicsGetCurrentContext();
     ASDisplayNodeAssert(context, @"This is no good without a context.");
     

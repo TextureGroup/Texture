@@ -140,7 +140,7 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
 
-      UIImage *debugHighlightImage = ASGraphicsCreateImageWithOptions(imgRect.size, NO, 1, nil, nil, ^{
+      UIImage *debugHighlightImage = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, ^{
         [fillColor setFill];
         UIRectFill(imgRect);
 

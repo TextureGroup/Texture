@@ -221,7 +221,7 @@
                     
                     CGRect finalImageRect = CGRectMake(0, 0, image.size.width, image.size.height);
                     
-                    image = ASGraphicsCreateImageWithOptions(image.size, YES, image.scale, image, nil, ^{
+                    image = ASGraphicsCreateImageWithTraitCollectionAndOptions(strongSelf.primitiveTraitCollection, image.size, YES, image.scale, image, ^{
                       [image drawAtPoint:CGPointZero];
 
                       UIImage *pinImage;
