@@ -333,7 +333,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (instancetype)initWithCompletionBlock:(void(^)(_ASAsyncTransaction *, BOOL))completionBlock
 {
-  if ((self = [self init])) {
+  if ((self = [super init])) {
     _completionBlock = completionBlock;
     self.state = ASAsyncTransactionStateOpen;
   }
