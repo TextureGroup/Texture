@@ -148,14 +148,6 @@
   [self setNeedsDisplay];
 }
 
-#pragma mark Interface State
-
-- (void)didEnterHierarchy
-{
-  [super didEnterHierarchy];
-  [self setNeedsDisplay];
-}
-
 - (void)updateImage
 {
   [self lock];
