@@ -445,7 +445,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
       BOOL needsClippingCornerUpdate = NO;
       CGFloat cornerRadius = _cornerRadius;
       ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
-      UIColor *backgroundColor = self.backgroundColor;
+      UIColor *backgroundColor = _backgroundColor;
       if (_loaded(self)) {
         if (self.isLayerBacked) {
           // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
