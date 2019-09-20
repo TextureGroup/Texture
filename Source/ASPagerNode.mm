@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASPagerFlowLayout.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {
