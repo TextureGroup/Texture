@@ -78,10 +78,25 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
         ASConfigureExtendedRange(format);
       }
 
-      return [[[UIGraphicsImageRenderer alloc] initWithSize:size format:format] imageWithActions:^(UIGraphicsImageRendererContext *rendererContext) {
-        ASDisplayNodeCAssert(UIGraphicsGetCurrentContext(), @"Should have a context!");
-        work();
-      }];
+      // Avoid using the imageWithActions: method because it does not support cancellation at the
+      // last moment i.e. before actually creating the resulting image.
+      __block UIImage *image;
+      NSError *error;
+      [[[UIGraphicsImageRenderer alloc] initWithSize:size format:format]
+          runDrawingActions:^(UIGraphicsImageRendererContext *rendererContext) {
+            ASDisplayNodeCAssert(UIGraphicsGetCurrentContext(), @"Should have a context!");
+            work();
+          }
+          completionActions:^(UIGraphicsImageRendererContext *rendererContext) {
+            if (isCancelled == nil || !isCancelled()) {
+              image = rendererContext.currentImage;
+            }
+          }
+          error:&error];
+      if (error) {
+        NSCAssert(NO, @"Error drawing: %@", error);
+      }
+      return image;
     }
   }
 
