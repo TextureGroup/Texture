@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (BOOL)isPlaying;
 - (void)resetToPlaceholder;
+- (void)setPlayer:(AVPlayer *)player;
 
 // TODO: copy
 @property (nullable) AVAsset *asset;
