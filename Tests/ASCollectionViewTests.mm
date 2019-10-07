@@ -1152,6 +1152,31 @@
   }
 }
 
+- (void)testASPrimitiveTraitCollectionToUITraitCollection {
+  ASPrimitiveTraitCollection collection = ASPrimitiveTraitCollectionMakeDefault();
+  collection.displayGamut = UIDisplayGamutSRGB;
+  collection.displayScale = 11;
+  collection.forceTouchCapability = UIForceTouchCapabilityAvailable;
+  collection.horizontalSizeClass = UIUserInterfaceSizeClassRegular;
+  collection.layoutDirection = UITraitEnvironmentLayoutDirectionRightToLeft;
+  collection.preferredContentSizeCategory = UIContentSizeCategoryMedium;
+  collection.userInterfaceIdiom = UIUserInterfaceIdiomTV;
+  if (@available(iOS 12.0, *)) {
+    collection.userInterfaceStyle = UIUserInterfaceStyleDark;
+  }
+  collection.verticalSizeClass = UIUserInterfaceSizeClassRegular;
+  
+  // create `UITraitCollection` from `ASPrimitiveTraitCollection`
+  UITraitCollection *uiCollection = ASPrimitiveTraitCollectionToUITraitCollection(collection);
+  
+  // now convert it back to `ASPrimitiveTraitCollection`
+  ASPrimitiveTraitCollection newCollection = ASPrimitiveTraitCollectionFromUITraitCollection(uiCollection);
+  
+  // compare
+  XCTAssert(ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(collection, newCollection));
+}
+
+
 /**
  * This tests an issue where, since subnode insertions aren't applied until the UIKit layout pass,
  * which we trigger during the display phase, subnodes like network image nodes are not preloading

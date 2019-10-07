@@ -331,4 +331,27 @@
   ASSnapshotVerifyNode(textNode, nil);
 }
 
+
+- (void)testTintColorHierarchyChange
+{
+  ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  containerNode.tintColor = [UIColor greenColor];
+
+  ASTextNode *node = [[ASTextNode alloc] init];
+  [containerNode addSubnode:node];
+  [node setLayerBacked:YES];
+  node.textColorFollowsTintColor = YES;
+  node.attributedText = [[NSAttributedString alloc] initWithString:@"Hello" attributes:@{}];
+  ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  containerNode.style.preferredSize = node.bounds.size;
+  ASSnapshotVerifyNode(node, @"green_tint_from_parent");
+
+  ASDisplayNode *containerNode2 = [[ASDisplayNode alloc] init];
+  containerNode2.tintColor = [UIColor redColor];
+  [containerNode2 addSubnode:node];
+  containerNode2.style.preferredSize = node.bounds.size;
+  ASSnapshotVerifyNode(node, @"red_tint_from_parent");
+}
+
+
 @end

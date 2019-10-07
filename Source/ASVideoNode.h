@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)videoNode:(ASVideoNode *)videoNode willChangePlayerState:(ASVideoNodePlayerState)state toState:(ASVideoNodePlayerState)toState;
 /**
- * @abstract Ssks delegate if state change is allowed
+ * @abstract Asks delegate if state change is allowed
  * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused.
  * asks delegate if state change is allowed.
  * @param videoNode The video node.

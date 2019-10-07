@@ -61,18 +61,49 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
 
 - (void)testClippingCornerRounding
 {
+#if AS_AT_LEAST_IOS13
+  if (@available(iOS 13.0, *)) {
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
+    [ASConfigurationManager test_resetWithConfiguration:config];
+  }
+#endif
+
   for (CACornerMask c = 1; c <= kASCACornerAllCorners; c |= (c << 1)) {
     auto node = [[ASImageNode alloc] init];
     auto bounds = CGRectMake(0, 0, 100, 100);
     node.image = BlueImageMake(bounds);
     node.frame = bounds;
     node.cornerRoundingType = ASCornerRoundingTypeClipping;
+#if AS_AT_LEAST_IOS13
+    if (@available(iOS 13.0, *)) {
+      node.backgroundColor = UIColor.systemBackgroundColor;
+    } else {
+      node.backgroundColor = UIColor.greenColor;
+    }
+#else
     node.backgroundColor = UIColor.greenColor;
+#endif
     node.maskedCorners = c;
     node.cornerRadius = 15;
     // A layout pass is required, because that's where we lay out the clip layers.
     [node.layer layoutIfNeeded];
+
+#if AS_AT_LEAST_IOS13
+    if (@available(iOS 13.0, *)) {
+      [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d-light", (int)c]));
+      }];
+
+      [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d-dark", (int)c]));
+      }];
+    } else {
+      ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d", (int)c]));
+    }
+#else
     ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d", (int)c]));
+#endif
   }
 }
 

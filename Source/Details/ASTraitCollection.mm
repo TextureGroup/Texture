@@ -64,6 +64,28 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   return environmentTraitCollection;
 }
 
+AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection) {
+  NSMutableArray *collections = [[NSMutableArray alloc] initWithArray:@[
+    [UITraitCollection traitCollectionWithHorizontalSizeClass:traitCollection.horizontalSizeClass],
+    [UITraitCollection traitCollectionWithVerticalSizeClass:traitCollection.verticalSizeClass],
+    [UITraitCollection traitCollectionWithDisplayScale:traitCollection.displayScale],
+    [UITraitCollection traitCollectionWithUserInterfaceIdiom:traitCollection.userInterfaceIdiom],
+    [UITraitCollection traitCollectionWithForceTouchCapability:traitCollection.forceTouchCapability],
+  ]];
+  
+  if (AS_AVAILABLE_IOS(10)) {
+    [collections addObject:[UITraitCollection traitCollectionWithDisplayGamut:traitCollection.displayGamut]];
+    [collections addObject:[UITraitCollection traitCollectionWithLayoutDirection:traitCollection.layoutDirection]];
+    [collections addObject:[UITraitCollection traitCollectionWithPreferredContentSizeCategory:traitCollection.preferredContentSizeCategory]];
+  }
+  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
+    [collections addObject:[UITraitCollection traitCollectionWithUserInterfaceStyle:traitCollection.userInterfaceStyle]];
+  }
+  
+  UITraitCollection *result = [UITraitCollection traitCollectionWithTraitsFromCollections:collections];
+  return result;
+}
+
 BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrimitiveTraitCollection lhs, ASPrimitiveTraitCollection rhs) {
   return !memcmp(&lhs, &rhs, sizeof(ASPrimitiveTraitCollection));
 }
