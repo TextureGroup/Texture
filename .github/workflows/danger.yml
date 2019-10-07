@@ -4,6 +4,8 @@ on: [pull_request]
 
 jobs:
   buildsh:
+    env: 
+        DEVELOPER_DIR: /Applications/Xcode_11.app/Contents/Developer
     strategy:
       matrix:
         mode: [danger]
@@ -11,7 +13,7 @@ jobs:
           - mode: danger
             name: Run Danger
     name: ${{ matrix.name }}
-    runs-on: macOS-10.14
+    runs-on: macOS-latest
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1

@@ -34,8 +34,9 @@
   window.rootViewController = [[UINavigationController alloc] initWithRootViewController:vc];
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
+  
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
-  XCTAssertNotEqual(scrollNode.view.contentInset.top, 0);
+  XCTAssertEqual(scrollNode.view.contentInset.top, 0);
 }
 
 - (void)testThatViewControllerFrameIsRightAfterCustomTransitionWithNonextendedEdges

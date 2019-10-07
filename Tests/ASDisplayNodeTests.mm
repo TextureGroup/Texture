@@ -472,7 +472,11 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertTrue(CGRectEqualToRect(CGRectZero, node.frame), @"default frame broken %@", hasLoadedView);
   XCTAssertTrue(CGPointEqualToPoint(CGPointZero, node.position), @"default position broken %@", hasLoadedView);
   XCTAssertEqual((CGFloat)0.0, node.zPosition, @"default zPosition broken %@", hasLoadedView);
-  XCTAssertEqual(1.0f, node.contentsScale, @"default contentsScale broken %@", hasLoadedView);
+  if (node.isNodeLoaded && !isLayerBacked) {
+    XCTAssertEqual(2, node.contentsScale, @"default contentsScale broken %@", hasLoadedView);
+  } else {
+    XCTAssertEqual(1, node.contentsScale, @"default contentsScale broken %@", hasLoadedView);
+  }
   XCTAssertEqual([UIScreen mainScreen].scale, node.contentsScaleForDisplay, @"default contentsScaleForDisplay broken %@", hasLoadedView);
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DIdentity, node.transform), @"default transform broken %@", hasLoadedView);
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DIdentity, node.subnodeTransform), @"default subnodeTransform broken %@", hasLoadedView);
@@ -2688,7 +2692,9 @@ static bool stringContainsPointer(NSString *description, id p) {
   UIWindow *window = [[UIWindow alloc] init];
   window.rootViewController = viewController;
   [window setHidden:NO];
-  [window layoutIfNeeded];
+
+  [window.rootViewController.view setNeedsLayout];
+  [window.rootViewController.view layoutIfNeeded];
 
   UIEdgeInsets expectedRootNodeSafeArea = UIEdgeInsetsMake(10, 10, 10, 10);
   UIEdgeInsets expectedSubnodeSafeArea = UIEdgeInsetsMake(9, 8, 7, 6);
@@ -2747,6 +2753,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testLayerActionForKeyIsCalled
 {
   UIWindow *window = [[UIWindow alloc] init];
+  [window makeKeyAndVisible];
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
 
   id mockNode = OCMPartialMock(node);
