@@ -12,7 +12,7 @@
 
 #import "ASDisplayNodeTestsHelper.h"
 
-static NSTimeInterval const kRunLoopRunTime = 0.001; // Allow the RunLoop to run for one millisecond each time.
+static NSTimeInterval const kRunLoopRunTime = 0.01; // Allow the RunLoop to run for 1/100 second each time.
 
 @interface QueueObject : NSObject <ASCATransactionQueueObserving>
 @property (nonatomic) BOOL queueObjectProcessed;

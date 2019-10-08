@@ -7,8 +7,10 @@ on:
 
 jobs:
   cocoapods-lint:
+    env: 
+        DEVELOPER_DIR: /Applications/Xcode_11.app/Contents/Developer
     name: Verify that podspec lints
-    runs-on: macOS-10.14
+    runs-on: macOS-latest
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v1
