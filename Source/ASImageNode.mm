@@ -52,7 +52,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
   ASDisplayNodeContextModifier _didDisplayNodeContentWithRenderingContext;
   ASImageNodeDrawParametersBlock _didDrawBlock;
-  UIUserInterfaceStyle _userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
+  ASPrimitiveTraitCollection _traitCollection;
 }
 
 @end
@@ -209,7 +209,10 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return nil;
   }
 
-  return ASGraphicsCreateImageWithOptions(size, NO, 1, nil, nil, ^{
+  __instanceLock__.lock();
+  ASPrimitiveTraitCollection tc = _primitiveTraitCollection;
+  __instanceLock__.unlock();
+  return ASGraphicsCreateImageWithTraitCollectionAndOptions(tc, size, NO, 1, nil, ^{
     AS::MutexLocker l(__instanceLock__);
     [_placeholderColor setFill];
     UIRectFill(CGRectMake(0, 0, size.width, size.height));
@@ -329,9 +332,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   drawParameters->_imageModificationBlock = _imageModificationBlock;
   drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
   drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    drawParameters->_userInterfaceStyle = self.primitiveTraitCollection.userInterfaceStyle;
-  }
+  drawParameters->_traitCollection = _primitiveTraitCollection;
 
 
   // Hack for now to retain the weak entry that was created while this drawing happened
@@ -436,8 +437,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.imageModificationBlock = imageModificationBlock;
 
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    UIUserInterfaceStyle userInterfaceStyle = drawParameter->_userInterfaceStyle;
-    contentsKey.userInterfaceStyle = userInterfaceStyle;
+    contentsKey.userInterfaceStyle = drawParameter->_traitCollection.userInterfaceStyle;
   }
 
   if (isCancelled()) {
@@ -492,18 +492,20 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   }
 }
 
-+ (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)drawParameters isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
++ (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  // The following `ASGraphicsCreateImageWithOptions` call will sometimes take take longer than 5ms on an
+  // The following `ASGraphicsCreateImageWithTraitCollectionAndOptions` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
   // Check for cancellation before we call it.
   if (isCancelled()) {
     return nil;
   }
+  
+  ASImageNodeDrawParameters *drawParameters = (ASImageNodeDrawParameters *)parameter;
 
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  UIImage *result = ASGraphicsCreateImageWithOptions(key.backingSize, key.isOpaque, 1.0, key.image, isCancelled, ^{
+  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameters->_traitCollection, key.backingSize, key.isOpaque, 1.0, key.image, ^{
     BOOL contextIsClean = YES;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
