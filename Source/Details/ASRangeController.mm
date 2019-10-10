@@ -20,6 +20,7 @@
 
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 #define AS_RANGECONTROLLER_LOG_UPDATE_FREQ 0
 

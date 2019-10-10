@@ -28,6 +28,7 @@
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASTableLayoutController.h>
 #import <AsyncDisplayKit/ASBatchContext.h>
+#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
