@@ -117,6 +117,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
 {
   // ASDisplayNode visibility does not change if modifying a hierarchy that is not in a window.  So create one and add the superview to it.
   UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectZero];
+  [window makeKeyAndVisible];
 
   DeclareNodeNamed(n);
   DeclareViewNamed(superview);
@@ -154,6 +155,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
 {
   // ASDisplayNode visibility does not change if modifying a hierarchy that is not in a window.  So create one and add the superview to it.
   UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectZero];
+  [window makeKeyAndVisible];
 
   DeclareNodeNamed(parent);
   DeclareNodeNamed(a);
@@ -253,6 +255,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   layerBackedNode.layerBacked = YES;
 
   UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectZero];
+  [window makeKeyAndVisible];
   [parentSynchronousNode addSubnode:layerBackedNode];
   [parentSynchronousNode addSubnode:viewBackedNode];
 
@@ -291,6 +294,7 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
 - (void)checkMoveAcrossHierarchyLayerBacked:(BOOL)isLayerBacked useManualCalls:(BOOL)useManualDisable useNodeAPI:(BOOL)useNodeAPI
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectZero];
+  [window makeKeyAndVisible];
 
   DeclareNodeNamed(parentA);
   DeclareNodeNamed(parentB);
@@ -374,6 +378,8 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   // Make sure that we don't leave these unbalanced
   XCTAssertFalse([child __visibilityNotificationsDisabled], @"Unbalanced visibility notifications calls");
   XCTAssertFalse([child __selfOrParentHasVisibilityNotificationsDisabled], @"Should not have re-enabled yet");
+  [parentA removeFromSupernode];
+  [parentB removeFromSupernode];
 }
 
 - (void)testMoveAcrossHierarchyLayer

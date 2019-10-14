@@ -11,6 +11,7 @@
 #import <Texture/ASCollectionView.h>
 #import <Texture/ASEqualityHelpers.h>
 #import <Texture/ASCollectionNode.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
 
 #define kDefaultItemSize CGSizeMake(50, 50)
 

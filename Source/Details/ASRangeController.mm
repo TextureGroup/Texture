@@ -20,6 +20,7 @@
 
 #import <Texture/ASCellNode+Internal.h>
 #import <Texture/AsyncDisplayKit+Debug.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
 
 #define AS_RANGECONTROLLER_LOG_UPDATE_FREQ 0
 

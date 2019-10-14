@@ -11,6 +11,7 @@
 
 #import <Texture/ASCollectionView.h>
 #import <Texture/ASCollectionNode.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
 
 #pragma mark - Helper Functions
 

@@ -32,7 +32,7 @@ Texture's layout system is centered around two basic concepts:
 
 A layout spec, short for "layout specification", has no physical presence. Instead, layout specs act as containers for other layout elements by understanding how these children layout elements relate to each other.
 
-Texture provides several <a hfref = "layout2-layoutspec-types.html">subclasses</a> of `ASLayoutSpec`, from a simple layout specification that insets a single child, to a more complex layout specification that arranges multiple children in varying stack configurations.
+Texture provides several <a href = "layout2-layoutspec-types.html">subclasses</a> of `ASLayoutSpec`, from a simple layout specification that insets a single child, to a more complex layout specification that arranges multiple children in varying stack configurations.
 
 ### Layout Elements 
 

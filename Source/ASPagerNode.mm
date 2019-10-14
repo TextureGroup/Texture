@@ -17,6 +17,7 @@
 #import <Texture/ASPagerFlowLayout.h>
 #import <Texture/ASCellNode.h>
 #import <Texture/UIResponder+AsyncDisplayKit.h>
+#import <Texture/ASCollectionView+Undeprecated.h>
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {

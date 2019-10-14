@@ -28,6 +28,7 @@
 #import <Texture/ASRangeController.h>
 #import <Texture/ASTableLayoutController.h>
 #import <Texture/ASBatchContext.h>
+#import <Texture/ASTableView+Undeprecated.h>
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 

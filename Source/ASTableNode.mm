@@ -20,6 +20,7 @@
 #import <Texture/ASDisplayNode+Beta.h>
 #import <Texture/ASRangeController.h>
 #import <Texture/ASAbstractLayoutController+FrameworkPrivate.h>
+#import <Texture/ASTableView+Undeprecated.h>
 
 #pragma mark - _ASTablePendingState
 
