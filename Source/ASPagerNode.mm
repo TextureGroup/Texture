@@ -221,7 +221,7 @@
 	if (_allowsAutomaticInsetsAdjustment == NO) {
 		UIViewController *vc = [self.view asdk_associatedViewController];
 		if (vc.automaticallyAdjustsScrollViewInsets) {
-			NSLog(@"AsyncDisplayKit: ASPagerNode is setting automaticallyAdjustsScrollViewInsets=NO on its owning view controller %@. This automatic behavior will be disabled in the future. Set allowsAutomaticInsetsAdjustment=YES on the pager node to suppress this behavior.", vc);
+			NSLog(@"Texture: ASPagerNode is setting automaticallyAdjustsScrollViewInsets=NO on its owning view controller %@. This automatic behavior will be disabled in the future. Set allowsAutomaticInsetsAdjustment=YES on the pager node to suppress this behavior.", vc);
 			vc.automaticallyAdjustsScrollViewInsets = NO;
 		}
 	}

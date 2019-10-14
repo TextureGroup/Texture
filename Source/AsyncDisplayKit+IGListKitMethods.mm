@@ -11,7 +11,7 @@
 
 #if AS_IG_LIST_KIT
 
-#import "AsyncDisplayKit+IGListKitMethods.h"
+#import <Texture/AsyncDisplayKit+IGListKitMethods.h>
 #import <Texture/ASAssert.h>
 #import <Texture/_ASCollectionViewCell.h>
 #import <Texture/_ASCollectionReusableView.h>

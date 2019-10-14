@@ -8,10 +8,10 @@
 
 
 #import <XCTest/XCTest.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <Texture/ASGraphicsContext.h>
+#import <Texture/ASBaseDefines.h>
+#import <Texture/ASAvailability.h>
+#import <Texture/ASConfigurationInternal.h>
 
 @interface ASGraphicsContextTests : XCTestCase
 @end
