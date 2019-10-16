@@ -209,7 +209,7 @@ using AS::MutexLocker;
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
 
-      UIImage *image = ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, ^{
+      UIImage *image = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, ^{
         for (dispatch_block_t block in displayBlocks) {
           if (isCancelledBlock()) return;
           block();
@@ -247,7 +247,7 @@ using AS::MutexLocker;
       };
 
       if (shouldCreateGraphicsContext) {
-        return ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, workWithContext);
+        return ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, workWithContext);
       } else {
         workWithContext();
         return image;
