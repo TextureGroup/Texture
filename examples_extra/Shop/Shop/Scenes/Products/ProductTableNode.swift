@@ -9,7 +9,7 @@
 import UIKit
 
 class ProductTableNode: ASCellNode {
-
+    
     // MARK: - Variables
     
     private lazy var imageSize: CGSize = {
@@ -64,7 +64,7 @@ class ProductTableNode: ASCellNode {
     }
     
     private var titleTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.black, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 16)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)]
     }
     
     private func setupSubtitleNode() {
@@ -74,7 +74,7 @@ class ProductTableNode: ASCellNode {
     }
     
     private var subtitleTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.darkGray, NSFontAttributeName: UIFont.systemFont(ofSize: 14)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.darkGray, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)]
     }
     
     private func setupPriceNode() {
@@ -82,7 +82,7 @@ class ProductTableNode: ASCellNode {
     }
     
     private var priceTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.red, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 15)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)]
     }
     
     private func setupSeparatorNode() {
@@ -117,7 +117,7 @@ class ProductTableNode: ASCellNode {
         let contentSpec = ASStackLayoutSpec(direction: .vertical, spacing: 4.0, justifyContent: .start, alignItems: .stretch, children: [titlePriceSpec, self.subtitleNode, self.starRatingNode])
         contentSpec.style.flexShrink = 1
         let finalSpec = ASStackLayoutSpec(direction: .horizontal, spacing: 10.0, justifyContent: .start, alignItems: .start, children: [self.imageNode, contentSpec])
-        return ASInsetLayoutSpec(insets: UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0), child: finalSpec)
+        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0), child: finalSpec)
     }
     
 }
