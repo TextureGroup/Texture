@@ -623,10 +623,11 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
   ++_editingTransactionGroupCount;
-  dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
+  // Make sure we have group.enter, group.leave to avoid deadlock
+  dispatch_group_enter(_editingTransactionGroup);
+  dispatch_async(_editingTransactionQueue, ^{
     __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
     as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
-
     // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
     if (canDelegate) {
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
@@ -660,6 +661,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       }];
     }];
     --_editingTransactionGroupCount;
+    // Leave the group
+    dispatch_group_leave(_editingTransactionGroup);
   });
 
   // We've now dispatched node allocation and layout to a concurrent background queue.
@@ -860,7 +863,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   ASDisplayNodeAssertMainThread();
   // Aggressively repopulate all supplemtary elements
   // Assuming this method is run on the main serial queue, _pending and _visible maps are synced and can be manipulated directly.
-  ASDisplayNodeAssert(_visibleMap == _pendingMap, @"Expected visible and pending maps to be synchronized: %@", self);
+  // ASDisplayNodeAssert(_visibleMap == _pendingMap, @"Expected visible and pending maps to be synchronized: %@", self);
 
   ASMutableElementMap *newMap = [_pendingMap mutableCopy];
   [self _updateSupplementaryNodesIntoMap:newMap
@@ -927,8 +930,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (void)_scheduleBlockOnMainSerialQueue:(dispatch_block_t)block
 {
   ASDisplayNodeAssertMainThread();
-  dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
-  [_mainSerialQueue performBlockOnMainThread:block];
+  dispatch_group_notify(_editingTransactionGroup, dispatch_get_main_queue(), ^{
+      [_mainSerialQueue performBlockOnMainThread:block];
+  });
 }
 
 @end
