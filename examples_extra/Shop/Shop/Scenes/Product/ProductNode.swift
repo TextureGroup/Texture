@@ -60,7 +60,7 @@ class ProductNode: ASDisplayNode {
     }
     
     private var titleTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.black, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 16)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16)]
     }
     
     private func setupDescriptionNode() {
@@ -69,7 +69,7 @@ class ProductNode: ASDisplayNode {
     }
     
     private var descriptionTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.darkGray, NSFontAttributeName: UIFont.systemFont(ofSize: 14)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.darkGray, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)]
     }
     
     private func setupPriceNode() {
@@ -77,7 +77,7 @@ class ProductNode: ASDisplayNode {
     }
     
     private var priceTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.red, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 15)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)]
     }
     
     private func setupReviewsNode() {
@@ -85,7 +85,7 @@ class ProductNode: ASDisplayNode {
     }
     
     private var reviewsTextAttributes = {
-        return [NSForegroundColorAttributeName: UIColor.lightGray, NSFontAttributeName: UIFont.systemFont(ofSize: 14)]
+        return [NSAttributedString.Key.foregroundColor: UIColor.lightGray, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14)]
     }
     
     // MARK: - Build node hierarchy
@@ -110,7 +110,7 @@ class ProductNode: ASDisplayNode {
         let starRatingReviewsSpec = ASStackLayoutSpec(direction: .horizontal, spacing: 25.0, justifyContent: .start, alignItems: .center, children: [self.starRatingNode, self.reviewsNode])
         let contentSpec = ASStackLayoutSpec(direction: .vertical, spacing: 8.0, justifyContent: .start, alignItems: .stretch, children: [titlePriceSpec, starRatingReviewsSpec, self.descriptionNode])
         contentSpec.style.flexShrink = 1
-        let insetSpec = ASInsetLayoutSpec(insets: UIEdgeInsetsMake(12.0, 12.0, 12.0, 12.0), child: contentSpec)
+        let insetSpec = ASInsetLayoutSpec(insets: UIEdgeInsets(top: 12.0, left: 12.0, bottom: 12.0, right: 12.0), child: contentSpec)
         let finalSpec = ASStackLayoutSpec(direction: .vertical, spacing: 5.0, justifyContent: .start, alignItems: .center, children: [self.imageNode, insetSpec])
         return finalSpec
     }
