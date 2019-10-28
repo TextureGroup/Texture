@@ -386,7 +386,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
   // Figure out previous and pending layouts for layout transition
   ASDisplayNodeLayout nextLayout = _pendingDisplayNodeLayout;
-  #define layoutSizeDifferentFromBounds !CGSizeEqualToSize(nextLayout.layout.size, boundsSizeForLayout)
+  BOOL isLayoutSizeDifferentFromBounds = !CGSizeEqualToSize(nextLayout.layout.size, boundsSizeForLayout);
 
   // nextLayout was likely created by a call to layoutThatFits:, check if it is valid and can be applied.
   // If our bounds size is different than it, or invalid, recalculate.  Use #define to avoid nullptr->
@@ -395,7 +395,7 @@ ASLayoutElementStyleExtensibilityForwarding
     as_log_verbose(ASLayoutLog(), "No pending layout.");
   } else if (!nextLayout.isValid(_layoutVersion)) {
     as_log_verbose(ASLayoutLog(), "Pending layout is stale.");
-  } else if (layoutSizeDifferentFromBounds) {
+  } else if (isLayoutSizeDifferentFromBounds) {
     as_log_verbose(ASLayoutLog(), "Pending layout size %@ doesn't match bounds size.", NSStringFromCGSize(nextLayout.layout.size));
   } else {
     as_log_verbose(ASLayoutLog(), "Using pending layout %@.", nextLayout.layout);
