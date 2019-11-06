@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NS_ENUM(NSInteger, ASImageCacheType) {
   ASImageCacheTypeAsynchronous = 0,
   ASImageCacheTypeSynchronous,
-
 };
 
 typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable imageFromCache, ASImageCacheType cacheType);
