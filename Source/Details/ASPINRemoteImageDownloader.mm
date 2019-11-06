@@ -231,15 +231,15 @@ static dispatch_once_t shared_init_predicate;
 {
   [[self sharedPINRemoteImageManager] imageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode completion:^(PINRemoteImageManagerResult * _Nonnull result) {
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
-      const BOOL isFromMemoryCache = result.resultType == PINRemoteImageResultTypeMemoryCache;
+      ASImageCacheType source = (result.resultType == PINRemoteImageResultTypeMemoryCache ? ASImageCacheTypeSynchronous : ASImageCacheTypeAsynchronous);
 #if PIN_ANIMATED_AVAILABLE
       if (result.alternativeRepresentation) {
-        completion(result.alternativeRepresentation, isFromMemoryCache);
+        completion(result.alternativeRepresentation, source);
       } else {
-        completion(result.image, isFromMemoryCache);
+        completion(result.image, source);
       }
 #else
-      completion(result.image, isFromMemoryCache);
+      completion(result.image, source);
 #endif
     }];
   }];
