@@ -99,6 +99,9 @@
       _viewControllerDidLoadBlock(self);
       _viewControllerDidLoadBlock = nil;
     }
+    
+    // Release the controller now that the block has executed
+    _viewController = nil;
   }
 }
 
