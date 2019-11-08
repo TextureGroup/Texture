@@ -645,36 +645,53 @@ static NSArray *DefaultLinkAttributeNames() {
 
   NSRange visibleRange = layout.visibleRange;
   NSRange clampedRange = NSIntersectionRange(visibleRange, NSMakeRange(0, _attributedText.length));
-  ASTextRange *range = [layout textRangeAtPoint:point];
-  // return nil when the point is outside.
-  if (range == nil) {
-    return nil;
-  }
-  NSRange effectiveRange = NSMakeRange(0, 0);
-  for (__strong NSString *attributedName in self.linkAttributeNames) {
-    id value =  [self.attributedText attribute:attributedName
-                                       atIndex:range.start.offset
-                         longestEffectiveRange:&effectiveRange
-                                       inRange:clampedRange];
-    if (value == nil) {
-      // Didn't find any links specified with this attribute.
+  
+  // Search the 9 points of a 44x44 square around the touch until we find a link.
+  // Start from center, then do sides, then do top/bottom, then do corners.
+  static constexpr CGSize kRectOffsets[9] = {
+    { 0, 0 },
+    { -22, 0 }, { 22, 0 },
+    { 0, -22 }, { 0, 22 },
+    { -22, -22 }, { -22, 22 },
+    { 22, -22 }, { 22, 22 }
+  };
+
+  for (const CGSize &offset : kRectOffsets) {
+    const CGPoint testPoint = CGPointMake(point.x + offset.width,
+                                          point.y + offset.height);
+    ASTextRange *range = [layout textRangeAtPoint:testPoint];
+    if (range == nil) {
       continue;
     }
-    // If highlighting, check with delegate first. If not implemented, assume YES.
-    if (highlighting
-        && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-        && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributedName
-                          value:value atPoint:point]) {
-      continue;
-    }
-    if (value != nil || attributedName != nil) {
-      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
-      if (attributeNameOut != nil) {
-        *attributeNameOut = attributedName;
+    for (NSString *attributeName in _linkAttributeNames) {
+      NSRange effectiveRange = NSMakeRange(0, 0);
+      id value = [_attributedText attribute:attributeName
+                                    atIndex:range.start.offset
+                      longestEffectiveRange:&effectiveRange
+                                    inRange:clampedRange];
+      if (value == nil) {
+        // Didn't find any links specified with this attribute.
+        continue;
       }
+
+      // If highlighting, check with delegate first. If not implemented, assume YES.
+      if (highlighting
+          && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+          && ![_delegate textNode:(ASTextNode *)self shouldHighlightLinkAttribute:attributeName
+                            value:value atPoint:point]) {
+        continue;
+      }
+
+      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+
+      if (attributeNameOut != NULL) {
+        *attributeNameOut = attributeName;
+      }
+
       return value;
     }
   }
+
   return nil;
 }
 
