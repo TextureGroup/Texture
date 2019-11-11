@@ -80,7 +80,6 @@ NS_INLINE ASCATransactionQueue *ASCATransactionQueueGet(void) {
 
 @interface ASDeallocQueue : NSObject
 
-@property (class, readonly) ASDeallocQueue *sharedDeallocationQueue;
 + (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
 
 - (void)drain;
