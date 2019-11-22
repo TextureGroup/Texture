@@ -302,44 +302,48 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASLockScopeSelf();
-
-  UIImage *drawImage = _image;
-  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-    if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
-      _imageNodeFlags.regenerateFromImageAsset = NO;
-      UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-      UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
-      if ( generatedImage != nil ) {
-        drawImage = generatedImage;
+  ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
+  
+  {
+    ASLockScopeSelf();
+    UIImage *drawImage = _image;
+    if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
+      if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
+        _imageNodeFlags.regenerateFromImageAsset = NO;
+        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
+        UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
+        if ( generatedImage != nil ) {
+          drawImage = generatedImage;
+        }
       }
     }
+
+    drawParameters->_image = drawImage;
+    drawParameters->_bounds = [self threadSafeBounds];
+    drawParameters->_opaque = self.opaque;
+    drawParameters->_contentsScale = _contentsScaleForDisplay;
+    drawParameters->_backgroundColor = self.backgroundColor;
+    drawParameters->_contentMode = self.contentMode;
+    drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
+    drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
+    drawParameters->_forcedSize = _forcedSize;
+    drawParameters->_cropRect = _cropRect;
+    drawParameters->_cropDisplayBounds = _cropDisplayBounds;
+    drawParameters->_imageModificationBlock = _imageModificationBlock;
+    drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
+    drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+    drawParameters->_traitCollection = _primitiveTraitCollection;
+
+    // Hack for now to retain the weak entry that was created while this drawing happened
+    drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
+      ASLockScopeSelf();
+      _weakCacheEntry = entry;
+    };
   }
 
-  ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
-  drawParameters->_image = drawImage;
-  drawParameters->_bounds = [self threadSafeBounds];
-  drawParameters->_opaque = self.opaque;
-  drawParameters->_contentsScale = _contentsScaleForDisplay;
-  drawParameters->_backgroundColor = self.backgroundColor;
+  // we need to unlock before we access the tintColor.
+  // this is to avoid dead locking by walking up the tree
   drawParameters->_tintColor = self.tintColor;
-  drawParameters->_contentMode = self.contentMode;
-  drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
-  drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
-  drawParameters->_forcedSize = _forcedSize;
-  drawParameters->_cropRect = _cropRect;
-  drawParameters->_cropDisplayBounds = _cropDisplayBounds;
-  drawParameters->_imageModificationBlock = _imageModificationBlock;
-  drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
-  drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
-  drawParameters->_traitCollection = _primitiveTraitCollection;
-
-
-  // Hack for now to retain the weak entry that was created while this drawing happened
-  drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
-    ASLockScopeSelf();
-    _weakCacheEntry = entry;
-  };
 
   return drawParameters;
 }
