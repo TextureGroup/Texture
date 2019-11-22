@@ -319,11 +319,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     }
 
     drawParameters->_image = drawImage;
-    drawParameters->_bounds = [self threadSafeBounds];
-    drawParameters->_opaque = self.opaque;
     drawParameters->_contentsScale = _contentsScaleForDisplay;
-    drawParameters->_backgroundColor = self.backgroundColor;
-    drawParameters->_contentMode = self.contentMode;
     drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
     drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
     drawParameters->_forcedSize = _forcedSize;
@@ -340,9 +336,13 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       _weakCacheEntry = entry;
     };
   }
-
-  // we need to unlock before we access the tintColor.
-  // this is to avoid dead locking by walking up the tree
+  
+  // We need to unlock before we access the other accessor.
+  // Especially tintColor because it needs to walk up the view hierarchy
+  drawParameters->_bounds = [self threadSafeBounds];
+  drawParameters->_opaque = self.opaque;
+  drawParameters->_backgroundColor = self.backgroundColor;
+  drawParameters->_contentMode = self.contentMode;
   drawParameters->_tintColor = self.tintColor;
 
   return drawParameters;
