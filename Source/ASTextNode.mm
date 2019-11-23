@@ -546,9 +546,11 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  /// have to access tintColor outside of the lock to prevent dead lock when accessing up the view hierarchy
+  UIColor *tintColor = self.tintColor;
   ASLockScopeSelf();
   if (_textColorFollowsTintColor) {
-    _cachedTintColor = self.tintColor;
+    _cachedTintColor = tintColor;
   } else {
     _cachedTintColor = nil;
   }
