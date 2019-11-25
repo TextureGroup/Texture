@@ -37,6 +37,17 @@ AS_SUBCLASSING_RESTRICTED
                          constrainedSize:(CGSize)constrainedSize;
 
 /**
+ Exposed for testing purposes only.
+ */
+- (instancetype)initWithAttributedString:(NSAttributedString *)attributedString
+           tintColor:(UIColor *)tintColor
+       lineBreakMode:(NSLineBreakMode)lineBreakMode
+maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
+      exclusionPaths:(NSArray *)exclusionPaths
+     constrainedSize:(CGSize)constrainedSize
+                        enableGlobalLock:(BOOL)enableGlobalLock;
+
+/**
  All operations on TextKit values MUST occur within this locked context.  Simultaneous access (even non-mutative) to
  TextKit components may cause crashes.
 

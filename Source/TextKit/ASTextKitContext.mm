@@ -14,6 +14,8 @@
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+static AS::Mutex globalTextMutex;
+
 @implementation ASTextKitContext
 {
   // All TextKit operations (even non-mutative ones) must be executed serially.
@@ -30,19 +32,33 @@
                     maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
                           exclusionPaths:(NSArray *)exclusionPaths
                          constrainedSize:(CGSize)constrainedSize
+{
+  static bool useGlobalTextMutex;
+  static dispatch_once_t onceToken;
+  // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
+  dispatch_once(&onceToken, ^{
+      useGlobalTextMutex = !ASActivateExperimentalFeature(ASExperimentalRemoveTextKitInitialisingLock);
+  });
+  return [self initWithAttributedString:attributedString
+                              tintColor:tintColor
+                          lineBreakMode:lineBreakMode
+                   maximumNumberOfLines:maximumNumberOfLines
+                         exclusionPaths:exclusionPaths
+                        constrainedSize:constrainedSize
+                       enableGlobalLock:useGlobalTextMutex];
+}
 
+- (instancetype)initWithAttributedString:(NSAttributedString *)attributedString
+                               tintColor:(UIColor *)tintColor
+                           lineBreakMode:(NSLineBreakMode)lineBreakMode
+                    maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
+                          exclusionPaths:(NSArray *)exclusionPaths
+                         constrainedSize:(CGSize)constrainedSize
+                        enableGlobalLock:(BOOL)enableGlobalLock
 {
   if (self = [super init]) {
-    static AS::Mutex *mutex = NULL;
-    static dispatch_once_t onceToken;
-    // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-    dispatch_once(&onceToken, ^{
-      if (!ASActivateExperimentalFeature(ASExperimentalRemoveTextKitInitialisingLock)) {
-        mutex = new AS::Mutex();
-      }
-    });
-    if (mutex != NULL) {
-      mutex->lock();
+    if (enableGlobalLock) {
+      globalTextMutex.lock();
     }
     
     __instanceLock__ = std::make_shared<AS::Mutex>();
@@ -78,8 +94,8 @@
     _textContainer.exclusionPaths = exclusionPaths;
     [_layoutManager addTextContainer:_textContainer];
     
-    if (mutex != NULL) {
-      mutex->unlock();
+    if (enableGlobalLock) {
+      globalTextMutex.unlock();
     }
   }
   return self;
