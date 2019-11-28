@@ -23,7 +23,6 @@
 
 // Initial capacities for dispatch tables.
 #define kASControlNodeEventDispatchTableInitialCapacity 4
-#define kASControlNodeActionDispatchTableInitialCapacity 4
 
 @interface ASControlNode ()
 {
