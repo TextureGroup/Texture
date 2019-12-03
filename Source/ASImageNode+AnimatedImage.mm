@@ -9,6 +9,7 @@
 
 #import <AsyncDisplayKit/ASImageNode.h>
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>

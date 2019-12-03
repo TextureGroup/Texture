@@ -19,6 +19,7 @@
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>

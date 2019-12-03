@@ -13,6 +13,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>

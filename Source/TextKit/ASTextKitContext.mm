@@ -11,6 +11,7 @@
 
 #if AS_ENABLE_TEXTNODE
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 

@@ -15,10 +15,8 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 {
@@ -104,9 +102,6 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #define DISABLED_ASAssertUnlocked(m)
 
 namespace AS {
-  
-  // Set once in Mutex constructor. Linker fails if this is a member variable. ??
-  static bool gMutex_unfair;
 
 // Silence unguarded availability warnings in here, because
 // perf is critical and we will check availability once
@@ -134,12 +129,6 @@ namespace AS {
         case Recursive:
           _recursive.~recursive_mutex();
           break;
-        case Unfair:
-          // nop
-          break;
-        case RecursiveUnfair:
-          // nop
-          break;
       }
     }
 
@@ -154,12 +143,6 @@ namespace AS {
           break;
         case Recursive:
           success = _recursive.try_lock();
-          break;
-        case Unfair:
-          success = os_unfair_lock_trylock(&_unfair);
-          break;
-        case RecursiveUnfair:
-          success = ASRecursiveUnfairLockTryLock(&_runfair);
           break;
       }
       if (success) {
@@ -176,12 +159,6 @@ namespace AS {
         case Recursive:
           _recursive.lock();
           break;
-        case Unfair:
-          os_unfair_lock_lock(&_unfair);
-          break;
-        case RecursiveUnfair:
-          ASRecursiveUnfairLockLock(&_runfair);
-          break;
       }
       DidLock();
     }
@@ -195,12 +172,6 @@ namespace AS {
         case Recursive:
           _recursive.unlock();
           break;
-        case Unfair:
-          os_unfair_lock_unlock(&_unfair);
-          break;
-        case RecursiveUnfair:
-          ASRecursiveUnfairLockUnlock(&_runfair);
-          break;
       }
     }
 
@@ -213,31 +184,13 @@ namespace AS {
     }
     
     explicit Mutex (bool recursive) {
-      
-      // Check if we can use unfair lock and store in static var.
-      static dispatch_once_t onceToken;
-      dispatch_once(&onceToken, ^{
-        if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-          gMutex_unfair = ASActivateExperimentalFeature(ASExperimentalUnfairLock);
-        }
-      });
-      
+
       if (recursive) {
-        if (gMutex_unfair) {
-          _type = RecursiveUnfair;
-          _runfair = AS_RECURSIVE_UNFAIR_LOCK_INIT;
-        } else {
           _type = Recursive;
           new (&_recursive) std::recursive_mutex();
-        }
       } else {
-        if (gMutex_unfair) {
-          _type = Unfair;
-          _unfair = OS_UNFAIR_LOCK_INIT;
-        } else {
           _type = Plain;
           new (&_plain) std::mutex();
-        }
       }
     }
     
@@ -245,8 +198,6 @@ namespace AS {
     enum Type {
       Plain,
       Recursive,
-      Unfair,
-      RecursiveUnfair
     };
 
     void WillUnlock() {
@@ -278,8 +229,6 @@ namespace AS {
     
     Type _type;
     union {
-      os_unfair_lock _unfair;
-      ASRecursiveUnfairLock _runfair;
       std::mutex _plain;
       std::recursive_mutex _recursive;
     };

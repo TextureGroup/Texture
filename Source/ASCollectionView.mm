@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/ASCollectionViewLayoutController.h>
 #import <AsyncDisplayKit/ASCollectionViewLayoutFacilitatorProtocol.h>
 #import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
