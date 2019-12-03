@@ -10,6 +10,7 @@
 #import "ASTestCase.h"
 #import "ASSnapshotTestCase.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 @interface ASTextNode2SnapshotTests : ASSnapshotTestCase
 

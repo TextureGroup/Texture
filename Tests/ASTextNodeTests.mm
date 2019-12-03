@@ -17,6 +17,7 @@
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 #import "ASTestCase.h"
 

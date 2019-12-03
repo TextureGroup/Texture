@@ -9,6 +9,7 @@
 
 #import "ASSnapshotTestCase.h"
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 @interface ASTextNodeSnapshotTests : ASSnapshotTestCase
 

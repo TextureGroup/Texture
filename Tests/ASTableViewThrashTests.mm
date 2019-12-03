@@ -9,6 +9,7 @@
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <stdatomic.h>

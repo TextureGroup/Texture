@@ -14,6 +14,7 @@
 #pragma clang diagnostic pop
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASTableView.h>
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>

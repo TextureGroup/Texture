@@ -9,6 +9,7 @@
 #import "ASTestCase.h"
 
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 
 #import "ASDisplayNodeTestsHelper.h"
 
