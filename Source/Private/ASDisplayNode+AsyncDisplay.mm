@@ -10,13 +10,10 @@
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
 using AS::MutexLocker;
 
@@ -212,7 +209,7 @@ using AS::MutexLocker;
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
 
-      UIImage *image = ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, ^{
+      UIImage *image = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, ^{
         for (dispatch_block_t block in displayBlocks) {
           if (isCancelledBlock()) return;
           block();
@@ -250,7 +247,7 @@ using AS::MutexLocker;
       };
 
       if (shouldCreateGraphicsContext) {
-        return ASGraphicsCreateImageWithOptions(bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, workWithContext);
+        return ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, workWithContext);
       } else {
         workWithContext();
         return image;
@@ -263,7 +260,7 @@ using AS::MutexLocker;
    Color the interval red if cancelled, green otherwise.
    */
 #if AS_SIGNPOST_ENABLE
-  __unsafe_unretained id ptrSelf = (id)self;
+  unowned id ptrSelf = (id)self;
   displayBlock = ^{
     ASSignpostStart(LayerDisplay, ptrSelf, "%@", ASObjectDescriptionMakeTiny(ptrSelf));
     id result = displayBlock();

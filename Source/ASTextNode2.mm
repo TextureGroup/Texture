@@ -20,15 +20,9 @@
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
-#import <AsyncDisplayKit/ASTextKitShadower.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASTextLayout.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 @interface ASTextCacheValue : NSObject {
   @package
@@ -177,6 +171,7 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   ASTextNodeHighlightStyle _highlightStyle;
   BOOL _longPressCancelsTouches;
   BOOL _passthroughNonlinkTouches;
+  BOOL _alwaysHandleTruncationTokenTap;
 }
 @dynamic placeholderEnabled;
 
@@ -522,21 +517,45 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASLockScopeSelf();
-  [self _ensureTruncationText];
+  ASTextContainer *copiedContainer;
+  NSMutableAttributedString *mutableText;
+  BOOL needsTintColor;
+  id bgColor;
+  {
+    // Wrapping all the other access here, because we can't lock while accessing tintColor.
+    ASLockScopeSelf();
+    [self _ensureTruncationText];
 
-  // Unlike layout, here we must copy the container since drawing is asynchronous.
-  ASTextContainer *copiedContainer = [_textContainer copy];
-  copiedContainer.size = self.bounds.size;
-  [copiedContainer makeImmutable];
-  NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
+    // Unlike layout, here we must copy the container since drawing is asynchronous.
+    copiedContainer = [_textContainer copy];
+    copiedContainer.size = self.bounds.size;
+    [copiedContainer makeImmutable];
+    mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
-  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
+    [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
+    needsTintColor = self.textColorFollowsTintColor && mutableText.length > 0;
+    bgColor = self.backgroundColor ?: [NSNull null];
+  }
   
+  // After all other attributes are set, apply tint color if needed and foreground color is not already specified
+  if (needsTintColor) {
+    // Apply tint color if specified and if foreground color is undefined for attributedString
+    NSRange limit = NSMakeRange(0, mutableText.length);
+    // Look for previous attributes that define foreground color
+    UIColor *attributeValue = (UIColor *)[mutableText attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
+    
+    // we need to unlock before accessing tintColor
+    UIColor *tintColor = self.tintColor;
+    if (attributeValue == nil && tintColor) {
+      // None are found, apply tint color if available. Fallback to "black" text color
+      [mutableText addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+    }
+  }
+
   return @{
     @"container": copiedContainer,
     @"text": mutableText,
-    @"bgColor": self.backgroundColor ?: [NSNull null]
+    @"bgColor": bgColor
   };
 }
 
@@ -567,6 +586,38 @@ static NSArray *DefaultLinkAttributeNames() {
   ASDisplayNodeAssert(context, @"This is no good without a context.");
   
   [layout drawInContext:context size:bounds.size point:bounds.origin view:nil layer:nil debug:[ASTextDebugOption sharedDebugOption] cancel:isCancelledBlock];
+}
+
+#pragma mark - Tint Color
+
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
+- (void)_setNeedsDisplayOnTintedTextColor
+{
+  BOOL textColorFollowsTintColor = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    textColorFollowsTintColor = _textColorFollowsTintColor;
+  }
+
+  if (textColorFollowsTintColor) {
+    [self setNeedsDisplay];
+  }
+}
+
+
+#pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTintedTextColor];
 }
 
 #pragma mark - Attributes
@@ -666,11 +717,17 @@ static NSArray *DefaultLinkAttributeNames() {
       
       CTLineRef truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_truncationAttributedText);
       CFIndex truncationTokenLineGlyphCount = truncationTokenLine ? CTLineGetGlyphCount(truncationTokenLine) : 0;
-      CFRelease(truncationTokenLine);
+      
+      if (truncationTokenLine) {
+        CFRelease(truncationTokenLine);
+      }
       
       CTLineRef additionalTruncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)_additionalTruncationMessage);
-      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;   
-      CFRelease(additionalTruncationTokenLine);
+      CFIndex additionalTruncationTokenLineGlyphCount = additionalTruncationTokenLine ? CTLineGetGlyphCount(additionalTruncationTokenLine) : 0;
+      
+      if (additionalTruncationTokenLine) {
+        CFRelease(additionalTruncationTokenLine);
+      }
 
       switch (_textContainer.truncationType) {
         case ASTextTruncationTypeStart: {
@@ -967,9 +1024,14 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   ASDisplayNodeAssertMainThread();
-  
+  ASLockScopeSelf(); // Protect usage of _passthroughNonlinkTouches and _alwaysHandleTruncationTokenTap ivars.
+
   if (!_passthroughNonlinkTouches) {
     return [super pointInside:point withEvent:event];
+  }
+
+  if (_alwaysHandleTruncationTokenTap) {
+    return YES;
   }
   
   NSRange range = NSMakeRange(0, 0);
@@ -1117,6 +1179,18 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   return [ASLockedSelf(_highlightedLinkAttributeName) isEqualToString:ASTextNodeTruncationTokenAttributeName];
 }
 
+- (BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  return _alwaysHandleTruncationTokenTap;
+}
+
+- (void)setAlwaysHandleTruncationTokenTap:(BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  _alwaysHandleTruncationTokenTap = alwaysHandleTruncationTokenTap;
+}
+  
 #pragma mark - Shadow Properties
 
 /**

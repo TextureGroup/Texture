@@ -10,14 +10,9 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
-
-#import <objc/runtime.h>
-#include <string>
 
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
@@ -26,28 +21,19 @@
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/_ASScopeTimer.h>
-#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
-#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASWeakProxy.h>
 #import <AsyncDisplayKit/ASResponderChainEnumerator.h>
-#import <AsyncDisplayKit/ASTipsController.h>
 
 // Conditionally time these scopes to our debug ivars (only exist in debug/profile builds)
 #if TIME_DISPLAYNODE_OPS
@@ -448,6 +434,43 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
+{
+  if (@available(iOS 13.0, *)) {
+    __instanceLock__.lock();
+    if (self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      // When changing between light and dark mode, often the entire node needs to re-render.
+      // This change doesn't happen frequently so it's fairly safe to render nodes again
+      BOOL needsClippingCornerUpdate = NO;
+      CGFloat cornerRadius = _cornerRadius;
+      ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
+      UIColor *backgroundColor = _backgroundColor;
+      if (_loaded(self)) {
+        CGColorRef cgBackgroundColor = backgroundColor.CGColor;
+        if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
+          // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+          // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
+          // We utilize the _backgroundColor instance variable to track the full dynamic color
+          // and apply any changes here when trait collection updates occur.
+          _layer.backgroundColor = cgBackgroundColor;
+        }
+        // If we have clipping corners, re-render the clipping corner layer upon user interface style change
+        if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
+          needsClippingCornerUpdate = YES;
+        }
+      }
+      __instanceLock__.unlock();
+      if (needsClippingCornerUpdate) {
+        [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
+      }
+      [self setNeedsDisplay];
+      return;
+    }
+    __instanceLock__.unlock();
+  }
+}
+
 - (void)dealloc
 {
   _flags.isDeallocating = YES;
@@ -544,7 +567,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)_locked_loadViewOrLayer
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  
   if (_flags.layerBacked) {
     TIME_SCOPED(_debugTimeToCreateView);
     _layer = [self _locked_layerToLoad];
@@ -1477,7 +1499,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIImage *newContents = ASGraphicsCreateImageWithOptions(size, NO, self.contentsScaleForDisplay, nil, nil, ^{
+      UIImage *newContents = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, ^{
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         if (isRight == YES) {
           CGContextTranslateCTM(ctx, -radius + 1, 0);

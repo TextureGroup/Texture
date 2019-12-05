@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/ASBasicImageDownloader.h>
 
-#import <Foundation/NSURLSession.h>
 #import <objc/runtime.h>
 
 #import <AsyncDisplayKit/ASBasicImageDownloaderInternal.h>

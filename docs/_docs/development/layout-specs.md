@@ -2,6 +2,8 @@
 title: Layout specs
 layout: docs
 permalink: /development/layout-specs.html
+prevPage: node-lifecycle.html
+nextPage: collection-asynchronous-updates.html
 ---
 
 # Layout specs
@@ -67,7 +69,7 @@ Looking at the example project:
 
 This is the function that will recursively call through its underlying tree of nodes.
 
-![layoutcallstack1](/docs/static/images/development/layoutspecs1.png)
+![layoutcallstack1](/static/images/development/layoutspecs1.png)
 
 This is what a typical call stack will look like for the layout of an `ASViewController` with a simple view hierarchy. Here we clicked on the "Photo with outset icon overlay" in the Layout Specs Examples project. Breakpointing on the `-[PhotoWithOutsetIconOverlay layoutSpecThatFits:]` reveals that call stack.
 
@@ -120,7 +122,7 @@ However, at this point between the above call stack and the below call stack, th
 
 Where these layout specs are used in the rendering operation is during the UIKit `layoutIfNeeded` phase. See `-[ASDisplayNode(UIViewBridge) layoutIfNeeded]`.
 
-![layoutcallstack2](/docs/static/images/development/layoutspecs2.png)
+![layoutcallstack2](/static/images/development/layoutspecs2.png)
 
 This is where pending layout is consumed in order to determine the frames and bounds of the soon to be displayed nodes. There are a few different steps to the sizing and placing process. However, you can see one of the core methods here `-[ASDisplayNode(Layout) _layoutSublayouts]` and look at the callers if you are curious.
 

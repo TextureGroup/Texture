@@ -213,8 +213,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  @abstract if YES will not intercept touches for non-link areas of the text. Default is NO.
+ @discussion If you still want to handle tap truncation action when passthroughNonlinkTouches is YES,
+ you should set the alwaysHandleTruncationTokenTap to YES.
  */
 @property (nonatomic) BOOL passthroughNonlinkTouches;
+
+/**
+ @abstract Always handle tap truncationAction, even the passthroughNonlinkTouches is YES. Default is NO.
+ @discussion if this is set to YES, the [ASTextNodeDelegate textNodeTappedTruncationToken:] callback will be called.
+ */
+@property (nonatomic) BOOL alwaysHandleTruncationTokenTap;
+
+/**
+ @abstract if YES will use the value of `self.tintColor` if the foreground color of text is not defined. 
+ @discussion This is mainly used from ASButtonNode since by default text nodes do not respect tintColor settings unless contained within a interactive control
+ */
+@property (nonatomic) BOOL textColorFollowsTintColor;
 
 @end
 

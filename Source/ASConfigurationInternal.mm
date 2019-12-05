@@ -8,7 +8,6 @@
 
 #import "ASConfigurationInternal.h"
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationDelegate.h>
 #import <stdatomic.h>
 
@@ -81,7 +80,7 @@ NS_INLINE ASConfigurationManager *ASConfigurationManagerGet() {
   
   // Notify delegate if needed.
   if (newlyTriggered != 0) {
-    __unsafe_unretained id<ASConfigurationDelegate> del = _config.delegate;
+    unowned id<ASConfigurationDelegate> del = _config.delegate;
     dispatch_async(_delegateQueue, ^{
       [del textureDidActivateExperimentalFeatures:newlyTriggered];
     });

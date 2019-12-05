@@ -1,7 +1,9 @@
 ---
-title: Develop and debug
+title: How to debug issues in Texture
 layout: docs
 permalink: /development/how-to-debug.html
+prevPage: how-to-develop.html
+nextPage: threading.html
 ---
 
 # Debug
@@ -39,7 +41,7 @@ The crash count had risen suddenly in recent versions, so this indicated that a 
 
 This change ensured that the collection view should clear out its data when the data source was being nilled out. This release would occur in situations like when the collection view is being deallocated. Something very important to note is Texture has the capability to asynchronously deallocate objects by "stealing" the pointer from the reference counter, and using a run loop timer to batch release the pointer triggering the actual work to deallocate via child objects's `dealloc`.
 
-![crashlog1](/docs/static/images/development/crashingcallstack.png)
+![crashlog1](/static/images/development/crashingcallstack.png)
 
 __Analyzing section *A*__
 
@@ -94,7 +96,7 @@ Using `if (ASActivateExperimentalFeature(ASExperimentalSkipClearData)) {` you ca
 
 Now this is where things get a little bit fun. Let's look at another crash with nearly the same call stack.
 
-![crashlog2](/docs/static/images/development/crashingcallstack2.png)
+![crashlog2](/static/images/development/crashingcallstack2.png)
 
 Trying to understand what's going on in those top UIKit frames would indicate another solution which could hopefully eliminate this family of erroneous states.
 

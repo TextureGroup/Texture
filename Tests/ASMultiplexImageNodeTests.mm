@@ -112,7 +112,7 @@
   OCMExpect([mockCache cachedImageWithURL:[self _testImageURL] callbackQueue:OCMOCK_ANY completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv) {
     ASImageCacherCompletion completionBlock = [inv as_argumentAtIndexAsObject:4];
-    completionBlock([self _testImage]);
+    completionBlock([self _testImage], ASImageCacheTypeAsynchronous);
   });
 
   imageNode.imageIdentifiers = @[imageIdentifier];
@@ -217,7 +217,7 @@
   OCMExpect([mockCache cachedImageWithURL:[self _testImageURL] callbackQueue:OCMOCK_ANY completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv){
     ASImageCacherCompletion completion = [inv as_argumentAtIndexAsObject:4];
-    completion(nil);
+    completion(nil, ASImageCacheTypeAsynchronous);
   });
 
   // Mock a 50%-progress URL download.

@@ -2,7 +2,13 @@
 title: Overview and Structure
 layout: docs
 permalink: /development/overview.html
+prevPage: /docs/multiplex-image-node.html
+nextPage: how-to-develop.html
 ---
+
+## Components
+
+For a quick overview of Texture's components, please see the [Getting Started Guide](/docs/getting-started.html).
 
 # Framework dependencies:
 

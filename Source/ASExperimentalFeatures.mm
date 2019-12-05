@@ -24,7 +24,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_oom_bg_dealloc_disable",
                                       @"exp_remove_textkit_initialising_lock",
                                       @"exp_drawing_global",
-                                      @"exp_optimize_data_controller_pipeline"]));
+                                      @"exp_optimize_data_controller_pipeline",
+                                      @"exp_trait_collection_did_change_with_previous_collection"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
@@ -41,7 +42,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
 ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array)
 {
   NSArray *allNames = ASExperimentalFeaturesGetNames(ASExperimentalFeatureAll);
-  ASExperimentalFeatures result = 0;
+  ASExperimentalFeatures result = kNilOptions;
   for (NSString *str in array) {
     NSUInteger i = [allNames indexOfObject:str];
     if (i != NSNotFound) {

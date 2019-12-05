@@ -2,6 +2,7 @@
 title: Collections and asynchronous updates
 layout: docs
 permalink: /development/collection-asynchronous-updates.html
+prevPage: layout-specs.html
 ---
 
 # At a glance
@@ -22,7 +23,7 @@ It's worth noting that at the beginning of its lifecycle, UICollectionView needs
 
 # Change set processing pipeline
 
-ASDataController doesn't accept nor process individual edit operations. In fact, the main data-updating method ASDataController exposes is `-updateWithChangeSet:(_ASHierarchyChangeSet *)` and edit operations must be wrapped in change sets before being submitted via this method. In this sense, you can consider it as a change set processing pipeline.
+ASDataController doesn't accept nor process individual edit operations. In fact, the main data-updating method ASDataController exposes is `-updateWithChangeSet:(_ASHierarchyChangeSet *)changeSet` and edit operations must be wrapped in change sets before being submitted via this method. In this sense, you can consider it as a change set processing pipeline.
 
 The pipeline starts processing a change set on the main thread then switches to a background thread to perform expensive operations like allocating and measuring new items, and finally gets back to main thread to forward the result to the backing UICollectionView.
 
@@ -53,7 +54,7 @@ Each change set is processed in 5 steps:
 
 4. Schedule the next step (step 5) in a block and add it to the queue on the main thread via `_mainSerialQueue`. If there are any other blocks scheduled to the queue before this point which are not yet consumed, they will be executed before step 5.
 
-5. Notify ASRangeController, collection view's layout facilitator and, more importantly, the collection view itself about the new change set. ASCollectionView calls its superclass to perform a batch update in which ASDataController's pending map is deployed as the visible map. UICollectionView requires the new data set to be deployed within the `updates` block of `-[UICollectionView performBatchUpdates:completion:`. It also requires edit operations to be in a specific order which is validated by the change set before step 1 (see `-[_ASHierarchyChangeSet markCompletedWithNewItemCounts:]`). The order is strictly followed by ASCollectionView when it relays the edits to UICollectionView.
+5. Notify ASRangeController, collection view's layout facilitator and, more importantly, the collection view itself about the new change set. ASCollectionView calls its superclass to perform a batch update in which ASDataController's pending map is deployed as the visible map. UICollectionView requires the new data set to be deployed within the `updates` block of `-[UICollectionView performBatchUpdates:completion:]`. It also requires edit operations to be in a specific order which is validated by the change set before step 1 (see `-[_ASHierarchyChangeSet markCompletedWithNewItemCounts:]`). The order is strictly followed by ASCollectionView when it relays the edits to UICollectionView.
 
 # Animations
 

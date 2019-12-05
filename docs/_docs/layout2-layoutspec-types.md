@@ -48,7 +48,7 @@ You may also subclass <a href="layout2-layoutspec-types.html#aslayoutspec">`ASLa
 {
   _subnode.style.preferredSize = CGSizeMake(constrainedSize.max.width,
                                             constrainedSize.max.height / 2.0);
-  return [ASWrapperLayoutSpec wrapperWithLayoutElement:subnode];
+  return [ASWrapperLayoutSpec wrapperWithLayoutElement:_subnode];
 }
 </pre>
 

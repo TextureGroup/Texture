@@ -147,6 +147,11 @@ static constexpr CACornerMask kASCACornerAllCorners =
   ASCornerRoundingType _cornerRoundingType;
   ASDisplayNodePerformanceMeasurementOptions _measurementOptions;
   ASDisplayNodeMethodOverrides _methodOverrides;
+  // Tinting support
+  UIColor *_tintColor;
+
+  // Dynamic colors support
+  UIColor *_backgroundColor;
 
 @protected
   ASDisplayNode * __weak _supernode;
@@ -252,6 +257,8 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
   UIEdgeInsets _fallbackSafeAreaInsets;
+
+
 
 #pragma mark - ASDisplayNode (Debugging)
   ASLayout *_unflattenedLayout;

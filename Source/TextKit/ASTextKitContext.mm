@@ -14,8 +14,6 @@
 #import <AsyncDisplayKit/ASLayoutManager.h>
 #import <AsyncDisplayKit/ASThread.h>
 
-#include <memory>
-
 @implementation ASTextKitContext
 {
   // All TextKit operations (even non-mutative ones) must be executed serially.
@@ -27,6 +25,7 @@
 }
 
 - (instancetype)initWithAttributedString:(NSAttributedString *)attributedString
+                               tintColor:(UIColor *)tintColor
                            lineBreakMode:(NSLineBreakMode)lineBreakMode
                     maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
                           exclusionPaths:(NSArray *)exclusionPaths
@@ -49,7 +48,6 @@
     __instanceLock__ = std::make_shared<AS::Mutex>();
     
     // Create the TextKit component stack with our default configuration.
-    
     _textStorage = [[NSTextStorage alloc] init];
     _layoutManager = [[ASLayoutManager alloc] init];
     _layoutManager.usesFontLeading = NO;
@@ -57,8 +55,19 @@
     
     // Instead of calling [NSTextStorage initWithAttributedString:], setting attributedString just after calling addlayoutManager can fix CJK language layout issues.
     // See https://github.com/facebook/AsyncDisplayKit/issues/2894
-    if (attributedString) {
+    if (attributedString && attributedString.length > 0) {
       [_textStorage setAttributedString:attributedString];
+
+      // Apply tint color if specified and if foreground color is undefined for attributedString
+      NSRange limit = NSMakeRange(0, attributedString.length);
+      // Look for previous attributes that define foreground color
+      UIColor *attributeValue = (UIColor *)[attributedString attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
+      if (attributeValue == nil) {
+        // None are found, apply tint color if available. Fallback to "black" text color
+        if (tintColor) {
+          [_textStorage addAttributes:@{ NSForegroundColorAttributeName : tintColor } range:limit];
+        }
+      }
     }
     
     _textContainer = [[NSTextContainer alloc] initWithSize:constrainedSize];

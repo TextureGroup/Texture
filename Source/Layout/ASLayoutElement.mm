@@ -8,14 +8,8 @@
 //
 
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <atomic>
 
 using AS::MutexLocker;
 
@@ -46,7 +40,7 @@ int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContext
 
 #if AS_TLS_AVAILABLE
 
-static _Thread_local __unsafe_unretained ASLayoutElementContext *tls_context;
+static _Thread_local unowned ASLayoutElementContext *tls_context;
 
 void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
