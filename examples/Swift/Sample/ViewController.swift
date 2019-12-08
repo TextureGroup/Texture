@@ -29,7 +29,7 @@ final class ViewController: ASViewController<ASDisplayNode>, ASTableDataSource, 
 
   fileprivate(set) var state: State = .empty
 
-  init() {
+  override init() {
     super.init(node: ASTableNode())
     tableNode.delegate = self
     tableNode.dataSource = self
