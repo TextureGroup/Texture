@@ -25,7 +25,7 @@ DEPENDENCIES:
   - PINRemoteImage (= 3.0.0-beta.14)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - FBSnapshotTestCase
     - OCMock
     - PINCache
@@ -52,4 +52,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 445046ac151568c694ff286684322273f0b597d6
 
-COCOAPODS: 1.6.0
+COCOAPODS: 1.8.4
