@@ -107,7 +107,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASCellNode *node = element.node;
   
   if (node) {
-    self.backgroundColor = node.backgroundColor;
+    self.backgroundColor = node.cellBackgroundColor;
     self.selectedBackgroundView = node.selectedBackgroundView;
     self.backgroundView = node.backgroundView;
 #if TARGET_OS_IOS
