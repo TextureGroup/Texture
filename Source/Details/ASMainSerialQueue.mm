@@ -11,38 +11,29 @@
 
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <queue>
 
 @interface ASMainSerialQueue ()
 {
   AS::Mutex _serialQueueLock;
-  NSMutableArray *_blocks;
+  std::queue<dispatch_block_t> _blocks;
 }
 
 @end
 
 @implementation ASMainSerialQueue
 
-- (instancetype)init
-{
-  if (!(self = [super init])) {
-    return nil;
-  }
-  
-  _blocks = [[NSMutableArray alloc] init];
-  return self;
-}
-
 - (NSUInteger)numberOfScheduledBlocks
 {
   AS::MutexLocker l(_serialQueueLock);
-  return _blocks.count;
+  return _blocks.size();
 }
 
 - (void)performBlockOnMainThread:(dispatch_block_t)block
 {
   {
     AS::MutexLocker l(_serialQueueLock);
-    [_blocks addObject:block];
+    _blocks.push(block);
   }
 
   [self runBlocks];
@@ -53,13 +44,11 @@
   dispatch_block_t mainThread = ^{
     AS::UniqueLock l(self->_serialQueueLock);
     do {
-      dispatch_block_t block;
-      if (self->_blocks.count > 0) {
-        block = _blocks[0];
-        [self->_blocks removeObjectAtIndex:0];
-      } else {
+      if (_blocks.empty()) {
         break;
       }
+      dispatch_block_t block = _blocks.front();
+      _blocks.pop();
       {
         l.unlock();
         block();
@@ -73,7 +62,15 @@
 
 - (NSString *)description
 {
-  return [[super description] stringByAppendingFormat:@" Blocks: %@", _blocks];
+  NSString *desc = [super description];
+  std::queue<dispatch_block_t> blocks = _blocks;
+  [desc stringByAppendingString:@" Blocks: "];
+  while (!blocks.empty()) {
+      dispatch_block_t block = blocks.front();
+      [desc stringByAppendingFormat:@"%@", block];
+      blocks.pop();
+  }
+  return desc;
 }
 
 @end
