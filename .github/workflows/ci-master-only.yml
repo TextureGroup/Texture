@@ -2,9 +2,7 @@ name: CI (master-only jobs)
 
 on:
   push:
-    branches:
-      - master
-
+    
 jobs:
   cocoapods-lint:
     env: 
