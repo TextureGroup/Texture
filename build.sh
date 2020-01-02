@@ -35,7 +35,7 @@ function build_example {
             -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
-            build | xcpretty $FORMATTER
+            build | xcpretty -s
     elif [ -f "${example}/Cartfile" ]; then
         echo "Using Carthage"
         local_repo=`pwd`
@@ -50,7 +50,7 @@ function build_example {
             -scheme Sample \
             -sdk "$SDK" \
             -destination "$PLATFORM" \
-            build | xcpretty $FORMATTER
+            build | xcpretty -s
 
         cd ../..
     fi
@@ -66,12 +66,6 @@ MODE="$1"
 
 cleanup
 
-if type xcpretty-travis-formatter &> /dev/null; then
-    FORMATTER="-f $(xcpretty-travis-formatter)"
-  else
-    FORMATTER="-s"
-fi
-
 case "$MODE" in
 tests|all)
     echo "Building & testing AsyncDisplayKit."
@@ -81,7 +75,7 @@ tests|all)
         -scheme AsyncDisplayKit \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
+        build-for-testing test | xcpretty -s
     success="1"
     ;;
 
@@ -100,7 +94,7 @@ tests_listkit)
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
+        build-for-testing test | xcpretty -s
     success="1"
     ;;
 
@@ -199,7 +193,7 @@ life-without-cocoapods|all)
         -scheme "Life Without CocoaPods" \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build | xcpretty -s
     success="1"
     ;;
 
@@ -211,7 +205,7 @@ framework|all)
         -scheme Sample \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build | xcpretty -s
     success="1"
     ;;
 
