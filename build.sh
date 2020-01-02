@@ -218,7 +218,7 @@ framework|all)
 cocoapods-lint|all)
     echo "Verifying that podspec lints."
 
-    set -o pipefail && pod env && pod lib lint --allow-warnings --no-clean
+    set -o pipefail && pod env && pod lib lint --allow-warnings --no-clean --verbose
     success="1"
     ;;
 
