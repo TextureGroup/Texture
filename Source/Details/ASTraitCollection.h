@@ -47,8 +47,10 @@ typedef struct {
   unowned UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
 
   CGSize containerSize;
-  
-  UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0));
+
+#if TARGET_OS_IOS
+  UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(tvos);
+#endif
   UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
   UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 } ASPrimitiveTraitCollection;
@@ -152,7 +154,10 @@ AS_SUBCLASSING_RESTRICTED
 
 @property (readonly) CGSize containerSize;
 
-@property (readonly) UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0));
+#if TARGET_OS_IOS
+@property (readonly) UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(tvos);
+#endif
+
 @property (readonly) UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
 @property (readonly) UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 

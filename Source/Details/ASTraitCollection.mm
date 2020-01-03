@@ -41,8 +41,14 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
     tc.userInterfaceStyle = UIUserInterfaceStyleUnspecified;
   }
+
+#if TARGET_OS_IOS
   if(AS_AVAILABLE_IOS(13)){
     tc.userInterfaceLevel = UIUserInterfaceLevelUnspecified;
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
     tc.accessibilityContrast = UIAccessibilityContrastUnspecified;
     tc.legibilityWeight = UILegibilityWeightUnspecified;
   }
@@ -66,8 +72,14 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
     environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
   }
+
+#if TARGET_OS_IOS
   if(AS_AVAILABLE_IOS(13)){
     environmentTraitCollection.userInterfaceLevel = traitCollection.userInterfaceLevel;
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
     environmentTraitCollection.accessibilityContrast = traitCollection.accessibilityContrast;
     environmentTraitCollection.legibilityWeight = traitCollection.legibilityWeight;
   }
@@ -180,7 +192,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfa
 }
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-API_AVAILABLE(ios(13))
+API_AVAILABLE(ios(13)) API_UNAVAILABLE(tvos)
 ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(UIUserInterfaceLevel userInterfaceLevel) {
   switch (userInterfaceLevel) {
     case UIUserInterfaceLevelBase:
@@ -235,8 +247,14 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
     [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
     [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
   }
+
+#if TARGET_OS_IOS
   if (AS_AVAILABLE_IOS(13)){
     [props addObject:@{ @"userInterfaceLevel": AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(traits.userInterfaceLevel) }];
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
     [props addObject:@{ @"accessibilityContrast": AS_NSStringFromUITraitEnvironmentAccessibilityContrast(traits.accessibilityContrast) }];
     [props addObject:@{ @"legibilityWeight": AS_NSStringFromUITraitEnvironmentLegibilityWeight(traits.legibilityWeight) }];
   }
@@ -300,14 +318,19 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 {
   return _prim.preferredContentSizeCategory;
 }
+
+#if TARGET_OS_IOS
 - (UIUserInterfaceLevel)userInterfaceLevel
 {
   return _prim.userInterfaceLevel;
 }
+#endif
+
 - (UIAccessibilityContrast)accessibilityContrast
 {
   return _prim.accessibilityContrast;
 }
+
 - (UILegibilityWeight)legibilityWeight
 {
   return _prim.legibilityWeight;
