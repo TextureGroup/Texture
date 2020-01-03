@@ -56,6 +56,11 @@ function build_example {
     fi
 }
 
+# Lint subspec
+function lint_subspec {
+    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
+}
+
 function cleanup {
     # remove all Pods directories
     find . -name Pods -type d -exec rm -rf {} +
@@ -213,6 +218,28 @@ cocoapods-lint|all)
     echo "Verifying that podspec lints."
 
     set -o pipefail && pod env && pod lib lint --allow-warnings
+    success="1"
+    ;;
+
+cocoapods-lint-default-subspecs)
+    echo "Verifying that default subspecs lint."
+
+    for subspec in 'Core' 'PINRemoteImage' 'Video' 'MapKit' 'AssetsLibrary' 'Photos'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
+    success="1"
+    ;;
+
+cocoapods-lint-other-subspecs)
+    echo "Verifying that other subspecs lint."
+
+    for subspec in 'IGListKit' 'Yoga' 'TextNode2'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
     success="1"
     ;;
 
