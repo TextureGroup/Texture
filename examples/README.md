@@ -83,7 +83,7 @@ Featuring:
 
 ### CustomCollectionView [ObjC+Swift]
 
-![CustomCollectionView Example App gif](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/CustomCollectionView.git)
+![CustomCollectionView Example App gif](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/CustomCollectionView.gif)
  
 Featuring:
 - custom collection view layout
