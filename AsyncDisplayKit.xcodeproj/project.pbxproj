@@ -32,6 +32,7 @@
 		05EA6FE71AC0966E00E35788 /* ASSnapshotTestCase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05EA6FE61AC0966E00E35788 /* ASSnapshotTestCase.mm */; };
 		0FAFDF7520EC1C90003A51C0 /* ASLayout+IGListKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FAFDF7320EC1C8F003A51C0 /* ASLayout+IGListKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0FAFDF7620EC1C90003A51C0 /* ASLayout+IGListKit.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0FAFDF7420EC1C90003A51C0 /* ASLayout+IGListKit.mm */; };
+		17CACC2623C915D100088DF6 /* ASCellNodeTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 17CACC2523C915D100088DF6 /* ASCellNodeTests.mm */; };
 		18C2ED7F1B9B7DE800F627B3 /* ASCollectionNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 18C2ED7C1B9B7DE800F627B3 /* ASCollectionNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		18C2ED831B9B7DE800F627B3 /* ASCollectionNode.mm in Sources */ = {isa = PBXBuildFile; fileRef = 18C2ED7D1B9B7DE800F627B3 /* ASCollectionNode.mm */; };
 		1A6C000D1FAB4E2100D05926 /* ASCornerLayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A6C000B1FAB4E2000D05926 /* ASCornerLayoutSpec.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -100,8 +101,8 @@
 		3917EBD41E9C2FC400D04A01 /* _ASCollectionReusableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 3917EBD21E9C2FC400D04A01 /* _ASCollectionReusableView.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3917EBD51E9C2FC400D04A01 /* _ASCollectionReusableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3917EBD31E9C2FC400D04A01 /* _ASCollectionReusableView.mm */; };
 		3C9C128519E616EF00E942A0 /* ASTableViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C9C128419E616EF00E942A0 /* ASTableViewTests.mm */; };
-		4080D66C2350384400CDC199 /* ASPINRemoteImageDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 68355B391CB57A5A001D4E68 /* ASPINRemoteImageDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		407B8BAE2310E2ED00CB979E /* ASLayoutSpecUtilitiesTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 407B8BAD2310E2ED00CB979E /* ASLayoutSpecUtilitiesTests.mm */; };
+		4080D66C2350384400CDC199 /* ASPINRemoteImageDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 68355B391CB57A5A001D4E68 /* ASPINRemoteImageDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		471D04B1224CB98600649215 /* ASImageNodeBackingSizeTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 471D04B0224CB98600649215 /* ASImageNodeBackingSizeTests.mm */; };
 		4E9127691F64157600499623 /* ASRunLoopQueueTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4E9127681F64157600499623 /* ASRunLoopQueueTests.mm */; };
 		509E68601B3AED8E009B9150 /* ASScrollDirection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E111B371BD7007741D0 /* ASScrollDirection.mm */; };
@@ -625,6 +626,7 @@
 		05F20AA31A15733C00DCA68A /* ASImageProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASImageProtocols.h; sourceTree = "<group>"; };
 		0FAFDF7320EC1C8F003A51C0 /* ASLayout+IGListKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASLayout+IGListKit.h"; sourceTree = "<group>"; };
 		0FAFDF7420EC1C90003A51C0 /* ASLayout+IGListKit.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "ASLayout+IGListKit.mm"; sourceTree = "<group>"; };
+		17CACC2523C915D100088DF6 /* ASCellNodeTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCellNodeTests.mm; sourceTree = "<group>"; };
 		18C2ED7C1B9B7DE800F627B3 /* ASCollectionNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionNode.h; sourceTree = "<group>"; };
 		18C2ED7D1B9B7DE800F627B3 /* ASCollectionNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionNode.mm; sourceTree = "<group>"; };
 		1950C4481A3BB5C1005C8279 /* ASEqualityHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASEqualityHelpers.h; sourceTree = "<group>"; };
@@ -1310,9 +1312,10 @@
 				242995D21B29743C00090100 /* ASBasicImageDownloaderTests.mm */,
 				296A0A341A951ABF005ACEAA /* ASBatchFetchingTests.mm */,
 				CC3B208F1C3F892D00798563 /* ASBridgedPropertiesTests.mm */,
-				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
 				81FF150622EB5F410039311A /* ASButtonNodeSnapshotTests.mm */,
+				F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */,
 				CC051F1E1D7A286A006434CB /* ASCALayerTests.mm */,
+				17CACC2523C915D100088DF6 /* ASCellNodeTests.mm */,
 				ACF6ED531B178DC700DA7C62 /* ASCenterLayoutSpecSnapshotTests.mm */,
 				CCDD148A1EEDCD9D0020834E /* ASCollectionModernDataSourceTests.mm */,
 				CC35CEC520DD87280006448D /* ASCollectionsTests.mm */,
@@ -1347,6 +1350,7 @@
 				ACF6ED571B178DC700DA7C62 /* ASLayoutSpecSnapshotTestsHelper.h */,
 				ACF6ED581B178DC700DA7C62 /* ASLayoutSpecSnapshotTestsHelper.mm */,
 				699B83501E3C1BA500433FA4 /* ASLayoutSpecTests.mm */,
+				407B8BAD2310E2ED00CB979E /* ASLayoutSpecUtilitiesTests.mm */,
 				CCE4F9B61F0DBA5000062E4E /* ASLayoutTestNode.h */,
 				CCE4F9B71F0DBA5000062E4E /* ASLayoutTestNode.mm */,
 				052EE0651A159FEF002C6279 /* ASMultiplexImageNodeTests.mm */,
@@ -1390,7 +1394,6 @@
 				83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */,
 				CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.mm */,
 				695BE2541DC1245C008E6EA5 /* ASWrapperSpecSnapshotTests.mm */,
-				407B8BAD2310E2ED00CB979E /* ASLayoutSpecUtilitiesTests.mm */,
 				057D02C01AC0A66700C7AC3C /* AsyncDisplayKitTestHost */,
 				CC583ABF1EF9BAB400134156 /* Common */,
 				058D09C6195D04C000B7D73C /* Supporting Files */,
@@ -2314,6 +2317,7 @@
 				058D0A38195D057000B7D73C /* ASDisplayLayerTests.mm in Sources */,
 				2538B6F31BC5D2A2003CA0B4 /* ASCollectionViewFlowLayoutInspectorTests.mm in Sources */,
 				CC583AD61EF9BDBE00134156 /* ASTestCase.mm in Sources */,
+				17CACC2623C915D100088DF6 /* ASCellNodeTests.mm in Sources */,
 				058D0A39195D057000B7D73C /* ASDisplayNodeAppearanceTests.mm in Sources */,
 				CCB2F34D1D63CCC6004E6DE9 /* ASDisplayNodeSnapshotTests.mm in Sources */,
 				AE6987C11DD04E1000B9E458 /* ASPagerNodeTests.mm in Sources */,
