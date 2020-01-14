@@ -754,6 +754,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface ASTableNode (UIGestureRecognizerDelegate) <UIGestureRecognizerDelegate>
+
+@end
+
 @interface ASTableNode (Deprecated)
 
 - (void)waitUntilAllUpdatesAreCommitted ASDISPLAYNODE_DEPRECATED_MSG("This method has been renamed to -waitUntilAllUpdatesAreProcessed.");
