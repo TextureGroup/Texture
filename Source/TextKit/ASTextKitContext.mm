@@ -37,9 +37,7 @@
     static dispatch_once_t onceToken;
     // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
     dispatch_once(&onceToken, ^{
-      if (!ASActivateExperimentalFeature(ASExperimentalRemoveTextKitInitialisingLock)) {
         mutex = new AS::Mutex();
-      }
     });
     if (mutex != NULL) {
       mutex->lock();
