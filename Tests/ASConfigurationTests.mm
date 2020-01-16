@@ -28,7 +28,6 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDidEnterPreloadSkipASMLayout,
   ASExperimentalDispatchApply,
   ASExperimentalOOMBackgroundDeallocDisable,
-  ASExperimentalRemoveTextKitInitialisingLock,
   ASExperimentalDrawingGlobal,
   ASExperimentalOptimizeDataControllerPipeline
 };
@@ -53,7 +52,6 @@ static ASExperimentalFeatures features[] = {
     @"exp_did_enter_preload_skip_asm_layout",
     @"exp_dispatch_apply",
     @"exp_oom_bg_dealloc_disable",
-    @"exp_remove_textkit_initialising_lock",
     @"exp_drawing_global",
     @"exp_optimize_data_controller_pipeline"
   ];
