@@ -244,7 +244,9 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   }
   if (AS_AVAILABLE_IOS(10)) {
     [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
-    [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
+    if (traits.preferredContentSizeCategory != nil) {
+      [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
+    }
     [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
   }
 
