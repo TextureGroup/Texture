@@ -16,8 +16,9 @@
 
 #import <queue>
 
-#if AS_IG_LIST_DIFF_KIT
-#import <AsyncDisplayKit/ASLayout+IGListDiffKit.h>
+#if AS_IG_LIST_KIT
+#import <IGListKit/IGListKit.h>
+#import <AsyncDisplayKit/ASLayout+IGListKit.h>
 #endif
 
 using AS::MutexLocker;
@@ -159,7 +160,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   ASLayout *pendingLayout = _pendingLayout.layout;
 
   if (previousLayout) {
-#if AS_IG_LIST_DIFF_KIT
+#if AS_IG_LIST_KIT
     // IGListDiff completes in linear time O(m+n), so use it if we have it:
     IGListIndexSetResult *result = IGListDiff(previousLayout.sublayouts, pendingLayout.sublayouts, IGListDiffEquality);
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
