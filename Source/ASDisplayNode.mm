@@ -453,11 +453,10 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
           CGFloat cornerRadius = _cornerRadius;
           ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
           UIColor *backgroundColor = _backgroundColor;
-          ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
           __instanceLock__.unlock();
-          UITraitCollection *traitCollection = ASPrimitiveTraitCollectionToUITraitCollection(primitiveTraitCollection);
-          UIColor *resolvedBackgroundColor = [backgroundColor resolvedColorWithTraitCollection:traitCollection];
-          CGColorRef cgBackgroundColor = resolvedBackgroundColor.CGColor;
+          // TODO: we should resolve color using node's trait collection
+          // but Texture changes it from many places, so we may receive the wrong one.
+          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
           if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
             // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
             // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
