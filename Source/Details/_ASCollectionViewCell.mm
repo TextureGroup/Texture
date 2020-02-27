@@ -106,7 +106,8 @@
    * superclass hitTest:withEvent: implementation. If this returns a valid value we can go on with
    * checking the node as it's expected to not be in one of these states.
    */
-  if (![super hitTest:self.bounds.origin withEvent:event]) {
+  CGPoint originPointOnView = [self convertPoint:self.node.view.bounds.origin fromView:self.node.view];
+  if (![super hitTest:originPointOnView withEvent:event]) {
     return nil;
   }
 
