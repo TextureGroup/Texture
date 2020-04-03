@@ -525,9 +525,6 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
       UITraitCollection *tempTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:key.userInterfaceStyle];
       backgroundColor = [backgroundColor resolvedColorWithTraitCollection:tempTraitCollection];
       tintColor = [tintColor resolvedColorWithTraitCollection:tempTraitCollection];
-
-    } else {
-      // Fallback on earlier versions
     }
 
     // if view is opaque, fill the context with background color
