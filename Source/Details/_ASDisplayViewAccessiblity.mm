@@ -261,7 +261,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   ASDisplayNodeAssertMainThread();
   // While it looks very strange to ignore the accessibilyElements param and set _accessibilityElements to nil, it is actually on purpose.
   // _ASDisplayView's accessibilityElements method will always defer to the node for accessibilityElements when _accessibilityElements is
-  // nil. Calling setAccessibilityElements on _ASDisplayView is basically us clearing the cache and forcing _ASDisplayView to ask the node
+  // nil. Calling setAccessibilityElements on _ASDisplayView is basically clearing the cache and forcing _ASDisplayView to ask the node
   // for its accessibilityElements the next time they are requested.
   _accessibilityElements = nil;
 }
