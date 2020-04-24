@@ -259,6 +259,10 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
   ASDisplayNodeAssertMainThread();
+  // While it looks very strange to ignore the accessibilyElements param and set _accessibilityElements to nil, it is actually on purpose.
+  // _ASDisplayView's accessibilityElements method will always defer to the node for accessibilityElements when _accessibilityElements is
+  // nil. Calling setAccessibilityElements on _ASDisplayView is basically clearing the cache and forcing _ASDisplayView to ask the node
+  // for its accessibilityElements the next time they are requested.
   _accessibilityElements = nil;
 }
 
@@ -283,6 +287,14 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
 
 - (NSArray *)accessibilityElements
 {
+  // NSObject implements the informal accessibility protocol. This means that all ASDisplayNodes already have an accessibilityElements
+  // property. If an ASDisplayNode subclass has explicitly set the property, let's use that instead of traversing the node tree to try
+  // to create the elements automatically
+  NSArray *elements = [super accessibilityElements];
+  if (elements.count) {
+    return elements;
+  }
+  
   if (!self.isNodeLoaded) {
     ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
     return @[];
