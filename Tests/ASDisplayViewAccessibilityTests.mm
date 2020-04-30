@@ -12,6 +12,8 @@
 
 #import <XCTest/XCTest.h>
 
+#import <AsyncDisplayKit/_ASDisplayView.h>
+#import <AsyncDisplayKit/ASButtonNode.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode.h>
@@ -191,6 +193,62 @@
   [view accessibilityPerformMagicTap];
 
   OCMVerifyAll(mockNode);
+}
+
+#pragma mark -
+#pragma mark AccessibilityElements
+
+// dummy action for a button
+- (void)fakeSelector:(id)sender { }
+
+- (void)testThatAccessibilityElementsWorks {
+  ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  containerNode.frame = CGRectMake(0, 0, 100, 200);
+
+  ASTextNode *label = [[ASTextNode alloc] init];
+  label.attributedText = [[NSAttributedString alloc] initWithString:@"test label"];
+  label.frame = CGRectMake(0, 0, 100, 20);
+  
+  ASButtonNode *button = [[ASButtonNode alloc] init];
+  [button setTitle:@"tap me" withFont:[UIFont systemFontOfSize:17] withColor:nil forState:UIControlStateNormal];
+  [button addTarget:self action:@selector(fakeSelector:) forControlEvents:ASControlNodeEventTouchUpInside];
+  button.frame = CGRectMake(0, 25, 100, 20);
+  
+  [containerNode addSubnode:label];
+  [containerNode addSubnode:button];
+  
+  // force load
+  __unused UIView *view = containerNode.view;
+  
+  NSArray *elements = [containerNode accessibilityElements];
+  XCTAssertTrue(elements.count == 2);
+  XCTAssertEqual([elements.firstObject asyncdisplaykit_node], label);
+  XCTAssertEqual([elements.lastObject asyncdisplaykit_node], button);
+}
+
+- (void)testThatAccessibilityElementsOverrideWorks {
+  ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  containerNode.frame = CGRectMake(0, 0, 100, 200);
+
+  ASTextNode *label = [[ASTextNode alloc] init];
+  label.attributedText = [[NSAttributedString alloc] initWithString:@"test label"];
+  label.frame = CGRectMake(0, 0, 100, 20);
+  
+  ASButtonNode *button = [[ASButtonNode alloc] init];
+  [button setTitle:@"tap me" withFont:[UIFont systemFontOfSize:17] withColor:nil forState:UIControlStateNormal];
+  [button addTarget:self action:@selector(fakeSelector:) forControlEvents:ASControlNodeEventTouchUpInside];
+  button.frame = CGRectMake(0, 25, 100, 20);
+  
+  [containerNode addSubnode:label];
+  [containerNode addSubnode:button];
+  containerNode.accessibilityElements = @[ label ];
+  
+  // force load
+  __unused UIView *view = containerNode.view;
+  
+  NSArray *elements = [containerNode accessibilityElements];
+  XCTAssertTrue(elements.count == 1);
+  XCTAssertEqual(elements.firstObject, label);
 }
 
 @end
