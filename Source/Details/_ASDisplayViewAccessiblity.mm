@@ -22,9 +22,11 @@
 
 #pragma mark - UIAccessibilityElement
 
-static ASSortAccessibilityElementsComparator _userDefinedComparator = nil;
+static ASSortAccessibilityElementsComparator currentAccessibilityComparator = nil;
+static ASSortAccessibilityElementsComparator defaultComparator = nil;
+
 void setUserDefinedAccessibilitySortComparator(ASSortAccessibilityElementsComparator userDefinedComparator) {
-  _userDefinedComparator = userDefinedComparator;
+  currentAccessibilityComparator = userDefinedComparator ?: defaultComparator;
 }
 
 /// Sort accessiblity elements first by y and than by x origin.
@@ -32,7 +34,6 @@ void SortAccessibilityElements(NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
   
-  static ASSortAccessibilityElementsComparator defaultComparator = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     defaultComparator = ^NSComparisonResult(NSObject *a, NSObject *b) {
@@ -55,13 +56,13 @@ void SortAccessibilityElements(NSMutableArray *elements)
       }
       return (originA.y < originB.y) ? NSOrderedAscending : NSOrderedDescending;
     };
+    
+    if (!currentAccessibilityComparator) {
+      currentAccessibilityComparator = defaultComparator;
+    }
   });
   
-  if (_userDefinedComparator) {
-    [elements sortUsingComparator:_userDefinedComparator];
-  } else {
-    [elements sortUsingComparator:defaultComparator];
-  }
+  [elements sortUsingComparator:currentAccessibilityComparator];
 }
 
 static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
