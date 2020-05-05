@@ -23,10 +23,10 @@
 #pragma mark - UIAccessibilityElement
 
 static ASSortAccessibilityElementsComparator currentAccessibilityComparator = nil;
-static ASSortAccessibilityElementsComparator defaultComparator = nil;
+static ASSortAccessibilityElementsComparator defaultAccessibilityComparator = nil;
 
 void setUserDefinedAccessibilitySortComparator(ASSortAccessibilityElementsComparator userDefinedComparator) {
-  currentAccessibilityComparator = userDefinedComparator ?: defaultComparator;
+  currentAccessibilityComparator = userDefinedComparator ?: defaultAccessibilityComparator;
 }
 
 /// Sort accessiblity elements first by y and than by x origin.
@@ -36,7 +36,7 @@ void SortAccessibilityElements(NSMutableArray *elements)
   
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    defaultComparator = ^NSComparisonResult(NSObject *a, NSObject *b) {
+    defaultAccessibilityComparator = ^NSComparisonResult(NSObject *a, NSObject *b) {
       CGPoint originA = a.accessibilityFrame.origin;
       CGPoint originB = b.accessibilityFrame.origin;
       if (originA.y == originB.y) {
@@ -58,7 +58,7 @@ void SortAccessibilityElements(NSMutableArray *elements)
     };
     
     if (!currentAccessibilityComparator) {
-      currentAccessibilityComparator = defaultComparator;
+      currentAccessibilityComparator = defaultAccessibilityComparator;
     }
   });
   

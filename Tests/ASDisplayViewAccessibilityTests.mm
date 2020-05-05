@@ -348,9 +348,9 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
   NSArray *elements = [node accessibilityElements];
   XCTAssertTrue(elements.count == 3);
-  XCTAssertEqual(elements[0], label.view);
-  XCTAssertEqual(elements[1], partiallyOnScreenNodeX.view);
-  XCTAssertEqual(elements[2], partiallyOnScreenNodeY.view);
+  XCTAssertTrue([elements containsObject:label.view]);
+  XCTAssertTrue([elements containsObject:partiallyOnScreenNodeX.view]);
+  XCTAssertTrue([elements containsObject:partiallyOnScreenNodeY.view]);
 }
 
 - (void)testAccessibilitySort {
