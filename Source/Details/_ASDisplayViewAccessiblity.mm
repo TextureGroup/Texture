@@ -244,7 +244,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     }
     // If a subnode is outside of the view's window, exclude it
     CGRect nodeInWindowCoords = [node convertRect:subnode.frame toNode:nil];
-    if (!CGRectIntersectsRect(view.window.frame, nodeInWindowCoords)) {
+    if (view.window && !CGRectIntersectsRect(view.window.frame, nodeInWindowCoords)) {
       continue;
     }
     

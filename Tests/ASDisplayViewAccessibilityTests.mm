@@ -325,7 +325,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
   ASTextNode *partiallyOnScreenNodeX = [[ASTextNode alloc] init];
   partiallyOnScreenNodeX.attributedText = [[NSAttributedString alloc] initWithString:@"partially on screen x"];
-  partiallyOnScreenNodeX.frame = CGRectMake(0, 100, windowSize.width - 10, 20);
+  partiallyOnScreenNodeX.frame = CGRectMake(windowSize.width - 10, 100, 100, 20);
 
   ASTextNode *offScreenNodeY = [[ASTextNode alloc] init];
   offScreenNodeY.attributedText = [[NSAttributedString alloc] initWithString:@"off screen y"];
