@@ -305,7 +305,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
 - (void)testAccessibilityElementsNotInAppWindow {
   
-  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
