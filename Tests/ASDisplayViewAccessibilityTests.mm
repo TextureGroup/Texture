@@ -123,6 +123,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   NSArray<UIAccessibilityElement *> *accessibilityElements = container.view.accessibilityElements;
   XCTAssertEqual(accessibilityElements.count, 2);
   XCTAssertEqualObjects(accessibilityElements[1].accessibilityLabel, @"hello, world");
+
 }
 
 - (void)testAccessibilityNonLayerbackedNodesOperationInNonContainer
