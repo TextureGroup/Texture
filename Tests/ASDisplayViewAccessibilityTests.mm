@@ -38,6 +38,11 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *subnode = nil;
   node = [[ASDisplayNode alloc] init];
   subnode = [[ASDisplayNode alloc] init];
+  
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+
   NSString *label = @"foo";
   subnode.isAccessibilityElement = YES;
   subnode.accessibilityLabel = label;
@@ -59,6 +64,10 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   node = [[ASDisplayNode alloc] init];
   innerNode1 = [[ASDisplayNode alloc] init];
   innerNode2 = [[ASDisplayNode alloc] init];
+
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
 
   // Initialize nodes with relevant accessibility data
   node.isAccessibilityContainer = YES;
@@ -82,6 +91,10 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   node = [[ASDisplayNode alloc] init];
   innerNode = [[ASDisplayNode alloc] init];
 
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:node];
+  [window makeKeyAndVisible];
+
   // Initialize nodes with relevant accessibility data
   node.isAccessibilityContainer = YES;
   node.accessibilityLabel = @"hello";
@@ -98,6 +111,10 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 - (void)testAccessibilityLayerBackedContainerWithinAccessibilityContainer
 {
   ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:container];
+  [window makeKeyAndVisible];
+
   container.frame = CGRectMake(50, 50, 200, 600);
   container.isAccessibilityContainer = YES;
 
@@ -206,7 +223,12 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 - (void)fakeSelector:(id)sender { }
 
 - (void)testThatAccessibilityElementsWorks {
+  
   ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:containerNode];
+  [window makeKeyAndVisible];
+  
   containerNode.frame = CGRectMake(0, 0, 100, 200);
 
   ASTextNode *label = [[ASTextNode alloc] init];
@@ -257,6 +279,10 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
 - (void)testHiddenAccessibilityElements {
   ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:containerNode];
+  [window makeKeyAndVisible];
+
   containerNode.frame = CGRectMake(0, 0, 100, 200);
 
   ASTextNode *label = [[ASTextNode alloc] init];
@@ -281,6 +307,9 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
 - (void)testTransparentAccessibilityElements {
   ASDisplayNode *containerNode = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:containerNode];
+  [window makeKeyAndVisible];
   containerNode.frame = CGRectMake(0, 0, 100, 200);
 
   ASTextNode *label = [[ASTextNode alloc] init];

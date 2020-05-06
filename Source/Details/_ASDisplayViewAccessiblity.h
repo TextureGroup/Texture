@@ -22,8 +22,8 @@
 // and return NSOrderedSame.
 //
 // In general this seems to work fairly well. However, if you want to provide a custom sort you can do so via
-// setUserDefinedComparator(). The two elements you are comparing are NSObjects, which conforms to the informal
-// UIAccessibility protocol, so you can safely compare properties like accessibilityFrame.
+// setUserDefinedAccessibilitySortComparator(). The two elements you are comparing are NSObjects, which conforms to the
+// informal UIAccessibility protocol, so you can safely compare properties like accessibilityFrame.
 typedef NSComparisonResult (^ASSortAccessibilityElementsComparator)(NSObject *, NSObject *);
 
 // Use this method to supply your own custom sort comparator used to determine the order of the accessibility elements
