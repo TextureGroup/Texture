@@ -19,6 +19,8 @@
 // Until an ASNodeController can be provided in place of an ASCellNode, some apps may prefer to have
 // nodes keep their controllers alive (and a weak reference from controller to node)
 
+@property (readonly) ASNodeContext *nodeContext;
+
 @property (nonatomic) BOOL shouldInvertStrongReference;
 
 - (void)loadNode;

@@ -337,6 +337,9 @@
 		CC0F88631E4281E700576FED /* ASSupplementaryNodeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = CCE04B2B1E314A32006AEBBB /* ASSupplementaryNodeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC0F886C1E4286FA00576FED /* ReferenceImages_64 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F88691E4286FA00576FED /* ReferenceImages_64 */; };
 		CC0F886D1E4286FA00576FED /* ReferenceImages_iOS_10 in Resources */ = {isa = PBXBuildFile; fileRef = CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */; };
+		CC1122C5229F79320061BD2C /* ASNodeContext.h in Headers */ = {isa = PBXBuildFile; fileRef = CC1122C3229F79320061BD2C /* ASNodeContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CC1122C6229F79320061BD2C /* ASNodeContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC1122C4229F79320061BD2C /* ASNodeContext.mm */; };
+		CC1122C9229F7C990061BD2C /* ASNodeContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CC1122C8229F7C990061BD2C /* ASNodeContext+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		CC11F97A1DB181180024D77B /* ASNetworkImageNodeTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.mm */; };
 		CC18248C200D49C800875940 /* ASTextNodeCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = CC18248B200D49C800875940 /* ASTextNodeCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC224E962066CA6D00BBA57F /* configuration.json in Resources */ = {isa = PBXBuildFile; fileRef = CC224E952066CA6D00BBA57F /* configuration.json */; };
@@ -362,6 +365,7 @@
 		CC3B208C1C3F7A5400798563 /* ASWeakSet.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3B20881C3F7A5400798563 /* ASWeakSet.mm */; };
 		CC3B208E1C3F7D0A00798563 /* ASWeakSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.mm */; };
 		CC3B20901C3F892D00798563 /* ASBridgedPropertiesTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3B208F1C3F892D00798563 /* ASBridgedPropertiesTests.mm */; };
+		CC3F59C022CAACAD002C3824 /* ASNodeContextTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC3F59BF22CAACAD002C3824 /* ASNodeContextTests.mm */; };
 		CC4981B31D1A02BE004E13CC /* ASTableViewThrashTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC4981B21D1A02BE004E13CC /* ASTableViewThrashTests.mm */; };
 		CC4E8DAF232C2883007C3182 /* ASGraphicsContextTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = CC4E8DAE232C2882007C3182 /* ASGraphicsContextTests.mm */; };
 		CC54A81C1D70079800296A24 /* ASDispatch.h in Headers */ = {isa = PBXBuildFile; fileRef = CC54A81B1D70077A00296A24 /* ASDispatch.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -866,6 +870,9 @@
 		CC0F885E1E4280B800576FED /* _ASCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASCollectionViewCell.h; sourceTree = "<group>"; };
 		CC0F88691E4286FA00576FED /* ReferenceImages_64 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_64; sourceTree = "<group>"; };
 		CC0F886A1E4286FA00576FED /* ReferenceImages_iOS_10 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ReferenceImages_iOS_10; sourceTree = "<group>"; };
+		CC1122C3229F79320061BD2C /* ASNodeContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASNodeContext.h; sourceTree = "<group>"; };
+		CC1122C4229F79320061BD2C /* ASNodeContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNodeContext.mm; sourceTree = "<group>"; };
+		CC1122C8229F7C990061BD2C /* ASNodeContext+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASNodeContext+Private.h"; sourceTree = "<group>"; };
 		CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNetworkImageNodeTests.mm; sourceTree = "<group>"; };
 		CC18248B200D49C800875940 /* ASTextNodeCommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASTextNodeCommon.h; sourceTree = "<group>"; };
 		CC224E952066CA6D00BBA57F /* configuration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = configuration.json; sourceTree = "<group>"; };
@@ -888,6 +895,7 @@
 		CC3B20881C3F7A5400798563 /* ASWeakSet.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASWeakSet.mm; sourceTree = "<group>"; };
 		CC3B208D1C3F7D0A00798563 /* ASWeakSetTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASWeakSetTests.mm; sourceTree = "<group>"; };
 		CC3B208F1C3F892D00798563 /* ASBridgedPropertiesTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASBridgedPropertiesTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		CC3F59BF22CAACAD002C3824 /* ASNodeContextTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNodeContextTests.mm; sourceTree = "<group>"; };
 		CC4981B21D1A02BE004E13CC /* ASTableViewThrashTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTableViewThrashTests.mm; sourceTree = "<group>"; };
 		CC4981BA1D1C7F65004E13CC /* NSIndexSet+ASHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexSet+ASHelpers.h"; sourceTree = "<group>"; };
 		CC4981BB1D1C7F65004E13CC /* NSIndexSet+ASHelpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSIndexSet+ASHelpers.mm"; sourceTree = "<group>"; };
@@ -1245,6 +1253,8 @@
 				CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.mm */,
 				055B9FA61A1C154B00035D6D /* ASNetworkImageNode.h */,
 				055B9FA71A1C154B00035D6D /* ASNetworkImageNode.mm */,
+				CC1122C3229F79320061BD2C /* ASNodeContext.h */,
+				CC1122C4229F79320061BD2C /* ASNodeContext.mm */,
 				698371D91E4379CD00437585 /* ASNodeController+Beta.h */,
 				698371DA1E4379CD00437585 /* ASNodeController+Beta.mm */,
 				DBDB83921C6E879900D0098C /* ASPagerFlowLayout.h */,
@@ -1353,6 +1363,7 @@
 				058D0A32195D057000B7D73C /* ASMutableAttributedStringBuilderTests.mm */,
 				BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.mm */,
 				CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.mm */,
+				CC3F59BF22CAACAD002C3824 /* ASNodeContextTests.mm */,
 				ACF6ED591B178DC700DA7C62 /* ASOverlayLayoutSpecSnapshotTests.mm */,
 				AE6987C01DD04E1000B9E458 /* ASPagerNodeTests.mm */,
 				CC8B05D41D73836400F54286 /* ASPerformanceTestContext.h */,
@@ -1564,6 +1575,7 @@
 				CC2F65EC1E5FFB1600DA57C9 /* ASMutableElementMap.h */,
 				CC2F65ED1E5FFB1600DA57C9 /* ASMutableElementMap.mm */,
 				CCED5E402020D41600395C40 /* ASNetworkImageLoadInfo+Private.h */,
+				CC1122C8229F7C990061BD2C /* ASNodeContext+Private.h */,
 				CC3B20811C3F76D600798563 /* ASPendingStateController.h */,
 				CC3B20821C3F76D600798563 /* ASPendingStateController.mm */,
 				CC55A70F1E52A0F200594372 /* ASResponderChainEnumerator.h */,
@@ -1941,7 +1953,9 @@
 				CCB1F95C1EFB6350009C7475 /* ASSignpost.h in Headers */,
 				C018DF21216BF26700181FDA /* ASAbstractLayoutController+FrameworkPrivate.h in Headers */,
 				34EFC7611B701C9C00AD841F /* ASBackgroundLayoutSpec.h in Headers */,
+				CC1122C5229F79320061BD2C /* ASNodeContext.h in Headers */,
 				B35062591B010F070018CF92 /* ASBaseDefines.h in Headers */,
+				CC1122C9229F7C990061BD2C /* ASNodeContext+Private.h in Headers */,
 				B35062131B010EFD0018CF92 /* ASBasicImageDownloader.h in Headers */,
 				B35062151B010EFD0018CF92 /* ASBatchContext.h in Headers */,
 				B35061F31B010EFD0018CF92 /* ASCellNode.h in Headers */,
@@ -2357,6 +2371,7 @@
 				254C6B541BF8FF2A003EC431 /* ASTextKitTests.mm in Sources */,
 				05EA6FE71AC0966E00E35788 /* ASSnapshotTestCase.mm in Sources */,
 				CC35CEC620DD87280006448D /* ASCollectionsTests.mm in Sources */,
+				CC3F59C022CAACAD002C3824 /* ASNodeContextTests.mm in Sources */,
 				ACF6ED631B178DC700DA7C62 /* ASStackLayoutSpecSnapshotTests.mm in Sources */,
 				CCE4F9BA1F0DBB5000062E4E /* ASLayoutTestNode.mm in Sources */,
 				D99F9158232990F30083CC8E /* ASImageNodeTests.m in Sources */,
@@ -2540,6 +2555,7 @@
 				254C6B871BF94F8A003EC431 /* ASTextKitEntityAttribute.mm in Sources */,
 				34566CB31BC1213700715E6B /* ASPhotosFrameworkImageRequest.mm in Sources */,
 				254C6B831BF94F8A003EC431 /* ASTextKitCoreTextAdditions.mm in Sources */,
+				CC1122C6229F79320061BD2C /* ASNodeContext.mm in Sources */,
 				CCCCCCE21EC3EF060087FE10 /* ASTextUtilities.mm in Sources */,
 				CC55A70E1E529FA200594372 /* UIResponder+AsyncDisplayKit.mm in Sources */,
 				CC56013C1F06E9A700DC4FBE /* ASIntegerMap.mm in Sources */,

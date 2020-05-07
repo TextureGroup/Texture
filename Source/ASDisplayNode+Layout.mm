@@ -18,6 +18,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 using AS::MutexLocker;
 
 @interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>

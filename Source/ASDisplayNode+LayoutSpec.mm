@@ -15,6 +15,7 @@
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
 
 @implementation ASDisplayNode (ASLayoutSpec)
 

@@ -148,7 +148,10 @@ static const CGFloat kHorizontalSectionPadding = 10.0f;
 - (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   return ^{
-    return [[ItemNode alloc] init];
+    ASNodeContextPush([[ASNodeContext alloc] init]);
+    ItemNode *result = [[ItemNode alloc] init];
+    ASNodeContextPop();
+    return result;
   };
 }
 
@@ -159,10 +162,15 @@ static const CGFloat kHorizontalSectionPadding = 10.0f;
 
 - (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
+  ASNodeContext *ctx = [[ASNodeContext alloc] init];
   if ([kind isEqualToString:UICollectionElementKindSectionHeader] && indexPath.section == 0) {
-    return [[BlurbNode alloc] init];
+    return ASNodeContextPerform(ctx, ^{
+      return [[BlurbNode alloc] init];
+    });
   } else if ([kind isEqualToString:UICollectionElementKindSectionFooter] && indexPath.section == 0) {
-    return [[LoadingNode alloc] init];
+    return ASNodeContextPerform(ctx, ^{
+      return [[LoadingNode alloc] init];
+    });
   }
   return nil;
 }

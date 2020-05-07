@@ -15,6 +15,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASPendingStateController.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 /**
  * The following macros are conveniences to help in the common tasks related to the bridging that ASDisplayNode does to UIView and CALayer.
  * In general, a property can either be:

@@ -18,6 +18,8 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#define __instanceLock__ _mutexOrPtr.get()
+
 static BOOL ASAssetIsEqual(AVAsset *asset1, AVAsset *asset2) {
   return ASObjectIsEqual(asset1, asset2)
   || ([asset1 isKindOfClass:[AVURLAsset class]]

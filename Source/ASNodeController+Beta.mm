@@ -14,9 +14,24 @@
 
 @implementation ASNodeController
 {
+  ASNodeContext *_nodeContext;
   ASDisplayNode *_strongNode;
   __weak ASDisplayNode *_weakNode;
-  AS::RecursiveMutex __instanceLock__;
+  AS::MutexOrPointer _mutexOrPtr;
+}
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    _nodeContext = ASNodeContextGet();
+    if (_nodeContext) {
+      new (&_mutexOrPtr) AS::MutexOrPointer(&_nodeContext->_mutex);
+    } else {
+      new (&_mutexOrPtr) AS::MutexOrPointer(nullptr);
+      _mutexOrPtr.get().SetDebugNameWithObject(self);
+    }
+  }
+  return self;
 }
 
 - (void)loadNode
@@ -29,7 +44,9 @@
 {
   ASLockScopeSelf();
   if (_node == nil) {
+    ASNodeContextPush(_nodeContext);
     [self loadNode];
+    ASNodeContextPop();
   }
   return _node;
 }
@@ -109,20 +126,7 @@
 
 #pragma mark NSLocking
 
-- (void)lock
-{
-  __instanceLock__.lock();
-}
-
-- (void)unlock
-{
-  __instanceLock__.unlock();
-}
-
-- (BOOL)tryLock
-{
-  return __instanceLock__.try_lock();
-}
+ASSynthesizeLockingMethodsWithMutex(_mutexOrPtr.get());
 
 @end
 
