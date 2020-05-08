@@ -31,7 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 AS_EXTERN UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, asdisplaynode_iscancelled_block_t NS_NOESCAPE _Nullable isCancelled, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImageWithTraitCollectionAndOptions instead");
 
 /**
-* A wrapper for the UIKit drawing APIs.
+* A wrapper for the UIKit drawing APIs. If you are in ASExperimentalDrawingGlobal, and you have iOS >= 10, we will create
+* a UIGraphicsRenderer with an appropriate format. Otherwise, we will use UIGraphicsBeginImageContext et al.
 *
 * @param traitCollection Trait collection. The `work` block will be executed with this trait collection, so it will affect dynamic colors, etc.
 * @param size The size of the context.
