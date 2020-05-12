@@ -24,7 +24,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_oom_bg_dealloc_disable",
                                       @"exp_drawing_global",
                                       @"exp_optimize_data_controller_pipeline",
-                                      @"exp_trait_collection_did_change_with_previous_collection"]));
+                                      @"exp_trait_collection_did_change_with_previous_collection",
+                                      @"exp_do_not_cache_accessibility_elements"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }

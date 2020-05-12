@@ -29,7 +29,9 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDispatchApply,
   ASExperimentalOOMBackgroundDeallocDisable,
   ASExperimentalDrawingGlobal,
-  ASExperimentalOptimizeDataControllerPipeline
+  ASExperimentalOptimizeDataControllerPipeline,
+  ASExperimentalTraitCollectionDidChangeWithPreviousCollection,
+  ASExperimentalDoNotCacheAccessibilityElements,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -53,7 +55,9 @@ static ASExperimentalFeatures features[] = {
     @"exp_dispatch_apply",
     @"exp_oom_bg_dealloc_disable",
     @"exp_drawing_global",
-    @"exp_optimize_data_controller_pipeline"
+    @"exp_optimize_data_controller_pipeline",
+    @"exp_trait_collection_did_change_with_previous_collection",
+    @"exp_do_not_cache_accessibility_elements",
   ];
 }
 

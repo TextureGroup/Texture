@@ -31,6 +31,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDrawingGlobal = 1 << 10,                                    // exp_drawing_global
   ASExperimentalOptimizeDataControllerPipeline = 1 << 11,                   // exp_optimize_data_controller_pipeline
   ASExperimentalTraitCollectionDidChangeWithPreviousCollection = 1 << 12,   // exp_trait_collection_did_change_with_previous_collection
+  ASExperimentalDoNotCacheAccessibilityElements = 1 << 13,                  // exp_do_not_cache_accessibility_elements
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
