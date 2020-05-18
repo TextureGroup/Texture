@@ -1030,6 +1030,10 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
     return [super pointInside:point withEvent:event];
   }
     
+  if (!CGRectContainsPoint(self.bounds, point)){
+    return [super pointInside:point withEvent:event];
+  }
+    
   NSRange range = NSMakeRange(0, 0);
   NSString *linkAttributeName = nil;
   BOOL inAdditionalTruncationMessage = NO;
