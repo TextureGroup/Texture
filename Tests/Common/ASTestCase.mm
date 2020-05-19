@@ -64,12 +64,12 @@ static __weak ASTestCase *currentTestCase;
 
   for (OCMockObject *mockObject in registeredMockObjects) {
     OCMVerifyAll(mockObject);
-    [mockObject stopMocking];
+   // [mockObject stopMocking];
 
     // Invocations retain arguments, which may cause retain cycles.
     // Manually clear them all out.
-    NSMutableArray *invocations = object_getIvar(mockObject, class_getInstanceVariable(OCMockObject.class, "invocations"));
-    [invocations removeAllObjects];
+    //NSMutableArray *invocations = object_getIvar(mockObject, class_getInstanceVariable(OCMockObject.class, "invocations"));
+    //[invocations removeAllObjects];
   }
 
   // Go ahead and spin the run loop before finishing, so the system
