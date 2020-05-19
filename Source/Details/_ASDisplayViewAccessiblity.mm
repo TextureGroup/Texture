@@ -257,14 +257,14 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   for (ASDisplayNode *subnode in node.subnodes) {
     // If a node is hidden or has an alpha of 0.0 we should not include it
     if (subnode.hidden || subnode.alpha == 0.0) {
-        continue;
+      continue;
     }
     
     // If a subnode is outside of the view's window, exclude it UNLESS it is a subview of an UIScrollView.
     // In this case UIKit will return the element even if it is outside of the window or the scrollView's visible rect (contentOffset + contentSize)
     CGRect nodeInWindowCoords = [node convertRect:subnode.frame toNode:nil];
     if (!CGRectIntersectsRect(view.window.frame, nodeInWindowCoords) && !recusivelyCheckSuperviewsForScrollView(view)) {
-        continue;
+      continue;
     }
     
     if (subnode.isAccessibilityElement) {
