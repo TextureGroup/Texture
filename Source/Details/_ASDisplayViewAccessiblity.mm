@@ -237,6 +237,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }));
 
   UIView *view = node.view;
+  
   // If we don't have a window, let's just bail out
   if (!view.window) {
     return;
