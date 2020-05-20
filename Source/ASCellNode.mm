@@ -137,7 +137,7 @@
   if (ASLockedSelfCompareAssign(_selected, selected)) {
     if (!_suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
-        [_interactionDelegate nodeSelectedStateDidChange:self];
+        [self->_interactionDelegate nodeSelectedStateDidChange:self];
       });
     }
   }
@@ -153,7 +153,7 @@
   if (ASLockedSelfCompareAssign(_highlighted, highlighted)) {
     if (!_suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
-        [_interactionDelegate nodeHighlightedStateDidChange:self];
+        [self->_interactionDelegate nodeHighlightedStateDidChange:self];
       });
     }
   }

@@ -44,11 +44,11 @@
   dispatch_block_t mainThread = ^{
     AS::UniqueLock l(self->_serialQueueLock);
     do {
-      if (_blocks.empty()) {
+      if (self->_blocks.empty()) {
         break;
       }
-      dispatch_block_t block = _blocks.front();
-      _blocks.pop();
+      dispatch_block_t block = self->_blocks.front();
+      self->_blocks.pop();
       {
         l.unlock();
         block();
