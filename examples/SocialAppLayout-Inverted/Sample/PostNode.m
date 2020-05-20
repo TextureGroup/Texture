@@ -108,7 +108,7 @@
             _mediaNode.cornerRadius = 4.0;
             _mediaNode.URL = [NSURL URLWithString:_post.media];
             _mediaNode.delegate = self;
-            _mediaNode.imageModificationBlock = ^UIImage *(UIImage *image) {
+            _mediaNode.imageModificationBlock = ^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {
                 
                 UIImage *modifiedImage;
                 CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
@@ -134,7 +134,7 @@
         _avatarNode.style.height = ASDimensionMakeWithPoints(44);
         _avatarNode.cornerRadius = 22.0;
         _avatarNode.URL = [NSURL URLWithString:_post.photo];
-        _avatarNode.imageModificationBlock = ^UIImage *(UIImage *image) {
+        _avatarNode.imageModificationBlock = ^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {
             
             UIImage *modifiedImage;
             CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
