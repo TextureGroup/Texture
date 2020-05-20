@@ -60,6 +60,6 @@ AS_EXTERN UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollect
 *
 * @return The rendered image. You can also render intermediary images using UIGraphicsGetImageFromCurrentImageContext.
 */
-AS_EXTERN UIImage *ASGraphicsCreateImageWithTraitCollectionAndOptions(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, void (NS_NOESCAPE ^work)(void));
+AS_EXTERN UIImage *ASGraphicsCreateImageWithTraitCollectionAndOptions(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImage instead");
 
 NS_ASSUME_NONNULL_END
