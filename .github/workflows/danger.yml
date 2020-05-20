@@ -17,6 +17,7 @@ jobs:
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v2
+      fetch-depth: 0
     - name: Run build script
       run: ./build.sh ${{ matrix.mode }}
       env:
