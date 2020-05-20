@@ -26,14 +26,12 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
-  ASExperimentalDisableAccessibilityCache,
   ASExperimentalDispatchApply,
-  ASExperimentalImageDownloaderPriority,
-  ASExperimentalTextDrawing,
   ASExperimentalOOMBackgroundDeallocDisable,
-  ASExperimentalTransactionOperationRetainCycle,
-  ASExperimentalRemoveTextKitInitialisingLock,
-  ASExperimentalDrawingGlobal
+  ASExperimentalDrawingGlobal,
+  ASExperimentalOptimizeDataControllerPipeline,
+  ASExperimentalTraitCollectionDidChangeWithPreviousCollection,
+  ASExperimentalDoNotCacheAccessibilityElements,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -54,18 +52,17 @@ static ASExperimentalFeatures features[] = {
     @"exp_framesetter_cache",
     @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
-    @"exp_disable_a11y_cache",
     @"exp_dispatch_apply",
-    @"exp_image_downloader_priority",
-    @"exp_text_drawing",
     @"exp_oom_bg_dealloc_disable",
-    @"exp_transaction_operation_retain_cycle",
-    @"exp_remove_textkit_initialising_lock",
-    @"exp_drawing_global"
+    @"exp_drawing_global",
+    @"exp_optimize_data_controller_pipeline",
+    @"exp_trait_collection_did_change_with_previous_collection",
+    @"exp_do_not_cache_accessibility_elements",
   ];
 }
 
-- (ASExperimentalFeatures)allFeatures {
+- (ASExperimentalFeatures)allFeatures
+{
   ASExperimentalFeatures allFeatures = 0;
   for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
     allFeatures |= features[i];

@@ -705,7 +705,13 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 @property (nullable, copy) UIColor *backgroundColor;           // default=nil
 
 @property (null_resettable, copy) UIColor *tintColor;          // default=Blue
-- (void)tintColorDidChange;                                    // Notifies the node when the tintColor has changed.
+
+/**
+ * Notifies the node when the tintColor has changed.
+ *
+ * @note This method is guaranteed to be called if the tintColor is changed after the node loaded.
+ */
+- (void)tintColorDidChange;
 
 /**
  * @abstract A flag used to determine how a node lays out its content when its bounds change.
@@ -728,7 +734,7 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @property            BOOL allowsGroupOpacity;
 @property            BOOL allowsEdgeAntialiasing;
-@property            unsigned int edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
+@property            CAEdgeAntialiasingMask edgeAntialiasingMask;     // default==all values from CAEdgeAntialiasingMask
 
 @property            BOOL needsDisplayOnBoundsChange;       // default==NO
 @property            BOOL autoresizesSubviews;              // default==YES (undefined for layer-backed nodes)

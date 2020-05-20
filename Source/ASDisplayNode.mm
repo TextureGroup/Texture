@@ -10,14 +10,9 @@
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
-
-#import <objc/runtime.h>
-#include <string>
 
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
@@ -26,28 +21,19 @@
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/_ASPendingState.h>
 #import <AsyncDisplayKit/_ASScopeTimer.h>
-#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+InterfaceState.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
-#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASMainThreadDeallocation.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASWeakProxy.h>
 #import <AsyncDisplayKit/ASResponderChainEnumerator.h>
-#import <AsyncDisplayKit/ASTipsController.h>
 
 // Conditionally time these scopes to our debug ivars (only exist in debug/profile builds)
 #if TIME_DISPLAYNODE_OPS
@@ -170,24 +156,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(touchesEnded:withEvent:))) {
     overrides |= ASDisplayNodeMethodOverrideTouchesEnded;
   }
-  
-  // Responder chain
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canBecomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(becomeFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideBecomeFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(canResignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideCanResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(resignFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideResignFirstResponder;
-  }
-  if (ASDisplayNodeSubclassOverridesSelector(c, @selector(isFirstResponder))) {
-    overrides |= ASDisplayNodeMethodOverrideIsFirstResponder;
-  }
-  
+
   // Layout related methods
   if (ASDisplayNodeSubclassOverridesSelector(c, @selector(layoutSpecThatFits:))) {
     overrides |= ASDisplayNodeMethodOverrideLayoutSpecThatFits;
@@ -465,6 +434,49 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
+{
+  if (@available(iOS 13.0, *)) {
+    // When changing between light and dark mode, often the entire node needs to re-render.
+    // This change doesn't happen frequently so it's fairly safe to render nodes again
+    __instanceLock__.lock();
+    BOOL loaded = _loaded(self);
+    ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
+    __instanceLock__.unlock();
+    if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      if (loaded) {
+        // we need to run that on main thread, cause accessing CALayer properties.
+        // It seems than in iOS 13 sometimes it causes deadlock.
+        ASPerformBlockOnMainThread(^{
+          __instanceLock__.lock();
+          CGFloat cornerRadius = _cornerRadius;
+          ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
+          UIColor *backgroundColor = _backgroundColor;
+          __instanceLock__.unlock();
+          // TODO: we should resolve color using node's trait collection
+          // but Texture changes it from many places, so we may receive the wrong one.
+          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
+          if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
+            // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+            // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
+            // We utilize the _backgroundColor instance variable to track the full dynamic color
+            // and apply any changes here when trait collection updates occur.
+            _layer.backgroundColor = cgBackgroundColor;
+          }
+
+          // If we have clipping corners, re-render the clipping corner layer upon user interface style change
+          if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
+            [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
+          }
+          
+          [self setNeedsDisplay];
+        });
+      }
+    }
+  }
+}
+
 - (void)dealloc
 {
   _flags.isDeallocating = YES;
@@ -561,7 +573,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)_locked_loadViewOrLayer
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  
   if (_flags.layerBacked) {
     TIME_SCOPED(_debugTimeToCreateView);
     _layer = [self _locked_layerToLoad];
@@ -895,6 +906,18 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   _flags.automaticallyRelayoutOnLayoutMarginsChanges = flag;
 }
 
+- (BOOL)placeholderEnabled
+{
+  MutexLocker l(__instanceLock__);
+  return _flags.placeholderEnabled;
+}
+
+- (void)setPlaceholderEnabled:(BOOL)flag
+{
+  MutexLocker l(__instanceLock__);
+  _flags.placeholderEnabled = flag;
+}
+
 - (void)__setNodeController:(ASNodeController *)controller
 {
   // See docs for why we don't lock.
@@ -906,26 +929,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     _strongNodeController = nil;
   }
 }
-
-#pragma mark - UIResponder
-
-#define HANDLE_NODE_RESPONDER_METHOD(__sel) \
-  /* All responder methods should be called on the main thread */ \
-  ASDisplayNodeAssertMainThread(); \
-  if (checkFlag(Synchronous)) { \
-    /* If the view is not a _ASDisplayView subclass (Synchronous) just call through to the view as we
-     expect it's a non _ASDisplayView subclass that will respond */ \
-    return [_view __sel]; \
-  } else { \
-    if (ASSubclassOverridesSelector([_ASDisplayView class], _viewClass, @selector(__sel))) { \
-    /* If the subclass overwrites canBecomeFirstResponder just call through
-       to it as we expect it will handle it */ \
-      return [_view __sel]; \
-    } else { \
-      /* Call through to _ASDisplayView's superclass to get it handled */ \
-      return [(_ASDisplayView *)_view __##__sel]; \
-    } \
-  } \
 
 - (void)checkResponderCompatibility
 {
@@ -942,60 +945,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self.class, @selector(isFirstResponder)), ([NSString stringWithFormat:message, @"isFirstResponder"]));
   }
 #endif
-}
-
-- (BOOL)__canBecomeFirstResponder
-{
-  if (_view == nil) {
-    // By default we return NO if not view is created yet
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canBecomeFirstResponder);
-}
-
-- (BOOL)__becomeFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canBecomeFirstResponder]) {
-    return NO;
-  }
-
-  HANDLE_NODE_RESPONDER_METHOD(becomeFirstResponder);
-}
-
-- (BOOL)__canResignFirstResponder
-{
-  if (_view == nil) {
-    // By default we return YES if no view is created yet
-    return YES;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(canResignFirstResponder);
-}
-
-- (BOOL)__resignFirstResponder
-{
-  // Note: This implicitly loads the view if it hasn't been loaded yet.
-  [self view];
-
-  if (![self canResignFirstResponder]) {
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(resignFirstResponder);
-}
-
-- (BOOL)__isFirstResponder
-{
-  if (_view == nil) {
-    // If no view is created yet we can just return NO as it's unlikely it's the first responder
-    return NO;
-  }
-  
-  HANDLE_NODE_RESPONDER_METHOD(isFirstResponder);
 }
 
 #pragma mark <ASDebugNameProvider>
@@ -1387,6 +1336,8 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   [_pendingDisplayNodes removeObject:node];
 
   if (_pendingDisplayNodes.isEmpty) {
+    // Reclaim object memory.
+    _pendingDisplayNodes = nil;
     
     [self hierarchyDisplayDidFinish];
     [self enumerateInterfaceStateDelegates:^(id<ASInterfaceStateDelegate> delegate) {
@@ -1554,7 +1505,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIImage *newContents = ASGraphicsCreateImageWithOptions(size, NO, self.contentsScaleForDisplay, nil, nil, ^{
+      UIImage *newContents = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, ^{
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         if (isRight == YES) {
           CGContextTranslateCTM(ctx, -radius + 1, 0);
@@ -1811,10 +1762,14 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
-  if (event == kCAOnOrderIn) {
-    [self __enterHierarchy];
-  } else if (event == kCAOnOrderOut) {
-    [self __exitHierarchy];
+  // Only drive __enterHierarchy and __exitHierarchy if the node is layer-backed.
+  // View-backed nodes handle them in _ASDisplayView's -willMoveToWindow: and -didMoveToWindow.
+  if (self.isLayerBacked) {
+    if (event == kCAOnOrderIn) {
+      [self __enterHierarchy];
+    } else if (event == kCAOnOrderOut) {
+      [self __exitHierarchy];
+    }
   }
 
   return [self layerActionForKey:event];

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=10.2,name=iPhone 7}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator11.4}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.0,name=iPhone 8}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.0}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -27,10 +27,6 @@ function build_example {
     
     if [ -f "${example}/Podfile" ]; then
         echo "Using CocoaPods"
-        if [ -f "${example}/Podfile.lock" ]; then
-            rm "$example/Podfile.lock"
-        fi
-        rm -rf "$example/Pods"
         pod install --project-directory=$example
 
         set -o pipefail && xcodebuild \
@@ -39,7 +35,7 @@ function build_example {
             -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
-            build | xcpretty $FORMATTER
+            build | xcpretty -s
     elif [ -f "${example}/Cartfile" ]; then
         echo "Using Carthage"
         local_repo=`pwd`
@@ -54,21 +50,29 @@ function build_example {
             -scheme Sample \
             -sdk "$SDK" \
             -destination "$PLATFORM" \
-            build | xcpretty $FORMATTER
+            build | xcpretty -s
 
         cd ../..
     fi
 }
 
+# Lint subspec
+function lint_subspec {
+    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
+}
+
+function cleanup {
+    # remove all Pods directories
+    find . -name Pods -type d -exec rm -rf {} +
+    find . -name Podfile.lock -type f -delete
+}
+
 MODE="$1"
 
-if type xcpretty-travis-formatter &> /dev/null; then
-    FORMATTER="-f $(xcpretty-travis-formatter)"
-  else
-    FORMATTER="-s"
-fi
+cleanup
 
-if [ "$MODE" = "tests" -o "$MODE" = "all" ]; then
+case "$MODE" in
+tests|all)
     echo "Building & testing AsyncDisplayKit."
     pod install
     set -o pipefail && xcodebuild \
@@ -76,11 +80,18 @@ if [ "$MODE" = "tests" -o "$MODE" = "all" ]; then
         -scheme AsyncDisplayKit \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
+        build-for-testing test | xcpretty -s
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "tests_listkit" ]; then
+danger|all)
+    bundle install
+    echo "Running Danger..."
+    bundle exec danger --fail-on-errors=true
+    success="1"
+    ;;
+
+tests_listkit)
     echo "Building & testing AsyncDisplayKit+IGListKit."
     pod install --project-directory=SubspecWorkspaces/ASDKListKit
     set -o pipefail && xcodebuild \
@@ -88,86 +99,98 @@ if [ "$MODE" = "tests_listkit" ]; then
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
+        build-for-testing test | xcpretty -s
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "examples" -o "$MODE" = "all" ]; then
+examples|all)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
-
     for example in examples/*/; do
         echo "Building (examples) $example."
 
         build_example $example
     done
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "examples-pt1" ]; then
+examples-pt1)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
-
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6 | head); do
-        echo "Building (examples-pt1) $example."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6); do
+        echo "Building (examples-pt1) $example"
 
         build_example $example
     done
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "examples-pt2" ]; then
+examples-pt2)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
-
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -12 | tail -6 | head); do
-        echo "Building $example (examples-pt2)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -11 | tail -5); do
+        echo "Building (examples-pt2) $example"
 
         build_example $example
     done
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "examples-pt3" ]; then
+examples-pt3)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
-
-    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -7 | head); do
-        echo "Building $example (examples-pt3)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | head -16 | tail -5); do
+        echo "Building (examples-pt3) $example"
 
         build_example $example
     done
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "examples-extra" ]; then
+examples-pt4)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
-
-    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -7 | head); do
-        echo "Building $example (examples-extra)."
+    for example in $((find ./examples -type d -maxdepth 1 \( ! -iname ".*" \)) | tail -n +17); do
+        echo "Building (examples-pt4) $example"
 
         build_example $example
     done
     success="1"
-fi
+    ;;
 
-# Support building a specific example: sh build.sh example examples/ASDKLayoutTransition
-if [ "$MODE" = "example" ]; then
+examples-extra-pt1)
     echo "Verifying that all AsyncDisplayKit examples compile."
-    #Update cocoapods repo
-    pod repo update master
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -6); do
+        echo "Building (examples-extra-pt1) $example"
 
+        build_example $example
+    done
+    success="1"
+    ;;
+
+examples-extra-pt2)
+    echo "Verifying that all AsyncDisplayKit examples compile."
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | head -11 | tail -5); do
+        echo "Building (examples-extra-pt2) $example"
+
+        build_example $example
+    done
+    success="1"
+    ;;
+
+examples-extra-pt3)
+    echo "Verifying that all AsyncDisplayKit examples compile."
+    for example in $((find ./examples_extra -type d -maxdepth 1 \( ! -iname ".*" \)) | tail -n +12); do
+        echo "Building (examples-extra-pt3) $example"
+
+        build_example $example
+    done
+    success="1"
+    ;;
+
+example)
+    # Support building a specific example: sh build.sh example examples/ASDKLayoutTransition
+    echo "Verifying $2 compiles."
     build_example $2
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "life-without-cocoapods" -o "$MODE" = "all" ]; then
+life-without-cocoapods|all)
     echo "Verifying that AsyncDisplayKit functions as a static library."
 
     set -o pipefail && xcodebuild \
@@ -175,11 +198,11 @@ if [ "$MODE" = "life-without-cocoapods" -o "$MODE" = "all" ]; then
         -scheme "Life Without CocoaPods" \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build | xcpretty -s
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "framework" -o "$MODE" = "all" ]; then
+framework|all)
     echo "Verifying that AsyncDisplayKit functions as a dynamic framework (for Swift/Carthage users)."
 
     set -o pipefail && xcodebuild \
@@ -187,26 +210,52 @@ if [ "$MODE" = "framework" -o "$MODE" = "all" ]; then
         -scheme Sample \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build | xcpretty -s
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "cocoapods-lint" -o "$MODE" = "all" ]; then
+cocoapods-lint|all)
     echo "Verifying that podspec lints."
 
     set -o pipefail && pod env && pod lib lint --allow-warnings
     success="1"
-fi
+    ;;
 
-if [ "$MODE" = "carthage" -o "$MODE" = "all" ]; then
+cocoapods-lint-default-subspecs)
+    echo "Verifying that default subspecs lint."
+
+    for subspec in 'Core' 'PINRemoteImage' 'Video' 'MapKit' 'AssetsLibrary' 'Photos'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
+    success="1"
+    ;;
+
+cocoapods-lint-other-subspecs)
+    echo "Verifying that other subspecs lint."
+
+    for subspec in 'IGListKit' 'Yoga' 'TextNode2'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
+    success="1"
+    ;;
+
+carthage|all)
     echo "Verifying carthage works."
     
     set -o pipefail && carthage update && carthage build --no-skip-current
-fi
+    success="1"
+    ;;
+
+*)
+    echo "Unrecognized mode '$MODE'."
+    ;;
+esac
 
 if [ "$success" = "1" ]; then 
   trap - EXIT
   exit 0
 fi
-
-echo "Unrecognised mode '$MODE'."

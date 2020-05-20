@@ -67,7 +67,9 @@
     NSIndexPath *path = [NSIndexPath indexPathForRow:row inSection:section];
     [indexPaths addObject:path];
   }
+  [self.tableView beginUpdates];
   [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  [self.tableView endUpdates];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle

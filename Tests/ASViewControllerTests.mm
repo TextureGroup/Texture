@@ -24,6 +24,8 @@
 - (void)testThatAutomaticSubnodeManagementScrollViewInsetsAreApplied
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [window makeKeyAndVisible];
+  
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   ASScrollNode *scrollNode = [[ASScrollNode alloc] init];
@@ -34,13 +36,16 @@
   window.rootViewController = [[UINavigationController alloc] initWithRootViewController:vc];
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
+  
   XCTAssertEqualObjects(NSStringFromCGRect(window.bounds), NSStringFromCGRect(node.frame));
-  XCTAssertNotEqual(scrollNode.view.contentInset.top, 0);
+  XCTAssertEqual(scrollNode.view.contentInset.top, 0);
 }
 
 - (void)testThatViewControllerFrameIsRightAfterCustomTransitionWithNonextendedEdges
 {
   UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  [window makeKeyAndVisible];
+  
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
 
   ASViewController *vc = [[ASViewController alloc] initWithNode:node];
@@ -72,8 +77,9 @@
   nav.delegate = navDelegate;
   window.rootViewController = nav;
   [window makeKeyAndVisible];
-  [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate date]];
+  [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
   [nav pushViewController:vc animated:YES];
+  [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
 
   [self waitForExpectationsWithTimeout:2 handler:nil];
  

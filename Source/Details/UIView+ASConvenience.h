@@ -39,10 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) CGFloat borderWidth;
 @property (nonatomic, getter = isOpaque) BOOL opaque;
 @property (nonatomic) __attribute__((NSObject)) CGColorRef borderColor;
-@property (nonatomic) __attribute__((NSObject)) CGColorRef backgroundColor;
+@property (nonatomic) UIColor *backgroundColor;
 @property (nonatomic) BOOL allowsGroupOpacity;
 @property (nonatomic) BOOL allowsEdgeAntialiasing;
-@property (nonatomic) unsigned int edgeAntialiasingMask;
+@property (nonatomic) CAEdgeAntialiasingMask edgeAntialiasingMask;
 @property (nonatomic, nullable, copy) NSDictionary<NSString *, id<CAAction>> *actions;
 
 - (void)setNeedsDisplay;

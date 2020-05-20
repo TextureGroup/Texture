@@ -7,9 +7,7 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState+Private.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>

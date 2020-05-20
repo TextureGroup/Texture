@@ -34,6 +34,11 @@
 
 - (void)setUp {
   [super setUp];
+
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+
   // Default is 2 sections: 2 items in first, 1 item in second.
   sections = [NSMutableArray array];
   [sections addObject:[ASTestSection new]];

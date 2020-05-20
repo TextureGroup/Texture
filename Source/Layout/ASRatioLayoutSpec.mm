@@ -15,7 +15,6 @@
 
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #pragma mark - ASRatioLayoutSpec

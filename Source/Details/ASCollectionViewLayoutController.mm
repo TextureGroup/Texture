@@ -12,8 +12,6 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
 
 struct ASRangeGeometry {
   CGRect rangeBounds;
@@ -83,7 +81,7 @@ typedef struct ASRangeGeometry ASRangeGeometry;
     }
     
     // Avoid excessive retains and releases, as well as property calls. We know the element is kept alive by map.
-    __unsafe_unretained ASCollectionElement *e = [map elementForLayoutAttributes:la];
+    unowned ASCollectionElement *e = [map elementForLayoutAttributes:la];
     if (e != nil && intersectsDisplay) {
       [display addObject:e];
     }

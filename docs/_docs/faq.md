@@ -3,7 +3,7 @@ title: FAQ
 layout: docs
 permalink: /docs/faq.html
 prevPage: subclassing.html
-nextPage: containers-asviewcontroller.html
+nextPage: layout2-quickstart.html
 ---
 
 ### Common Developer Mistakes

@@ -109,7 +109,7 @@
 
 - (void)cachedImageWithURL:(NSURL *)URL callbackQueue:(dispatch_queue_t)callbackQueue completion:(ASImageCacherCompletion)completion
 {
-  completion(nil);
+  completion(nil, ASImageCacheTypeAsynchronous);
 }
 
 @end

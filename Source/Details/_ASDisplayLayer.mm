@@ -9,34 +9,19 @@
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 
-#import <objc/runtime.h>
-
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASLog.h>
 
 @implementation _ASDisplayLayer
 {
   BOOL _attemptedDisplayWhileZeroSized;
-
-  struct {
-    BOOL delegateDidChangeBounds:1;
-  } _delegateFlags;
 }
 
 @dynamic displaysAsynchronously;
 
 #pragma mark - Properties
-
-- (void)setDelegate:(id)delegate
-{
-  [super setDelegate:delegate];
-  _delegateFlags.delegateDidChangeBounds = [delegate respondsToSelector:@selector(layer:didChangeBoundsWithOldValue:newValue:)];
-}
 
 - (void)setDisplaySuspended:(BOOL)displaySuspended
 {
@@ -59,12 +44,11 @@
   if (!valid) {
     return;
   }
-  if (_delegateFlags.delegateDidChangeBounds) {
+  if ([self.delegate respondsToSelector:@selector(layer:didChangeBoundsWithOldValue:newValue:)]) {
     CGRect oldBounds = self.bounds;
     [super setBounds:bounds];
     self.asyncdisplaykit_node.threadSafeBounds = bounds;
     [(id<ASCALayerExtendedDelegate>)self.delegate layer:self didChangeBoundsWithOldValue:oldBounds newValue:bounds];
-    
   } else {
     [super setBounds:bounds];
     self.asyncdisplaykit_node.threadSafeBounds = bounds;

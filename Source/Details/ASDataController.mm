@@ -9,26 +9,20 @@
 
 #import <AsyncDisplayKit/ASDataController.h>
 
-#include <atomic>
-
 #import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 #import <AsyncDisplayKit/_ASScopeTimer.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASDispatch.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASMainSerialQueue.h>
 #import <AsyncDisplayKit/ASMutableElementMap.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
 #import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASSection.h>
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
@@ -560,13 +554,15 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   } else {
     os_log_debug(ASCollectionLog(), "performBatchUpdates %@ %@", ASViewToDisplayNode(ASDynamicCast(self.dataSource, UIView)), changeSet);
   }
-  
-  NSTimeInterval transactionQueueFlushDuration = 0.0f;
-  {
-    AS::ScopeTimer t(transactionQueueFlushDuration);
-    dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+
+  if (!ASActivateExperimentalFeature(ASExperimentalOptimizeDataControllerPipeline)) {
+    NSTimeInterval transactionQueueFlushDuration = 0.0f;
+    {
+      AS::ScopeTimer t(transactionQueueFlushDuration);
+      dispatch_group_wait(_editingTransactionGroup, DISPATCH_TIME_FOREVER);
+    }
   }
-  
+
   // If the initial reloadData has not been called, just bail because we don't have our old data source counts.
   // See ASUICollectionViewTests.testThatIssuingAnUpdateBeforeInitialReloadIsUnacceptable
   // for the issue that UICollectionView has that we're choosing to workaround.

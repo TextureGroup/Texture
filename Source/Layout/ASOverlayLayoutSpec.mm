@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/ASOverlayLayoutSpec.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCollections.h>
 
 static NSUInteger const kUnderlayChildIndex = 0;

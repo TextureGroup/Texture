@@ -13,13 +13,11 @@
 
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for _removeFromSupernodeIfEqualTo:
-#import <AsyncDisplayKit/ASLog.h>
 
 #import <queue>
 
-#if AS_IG_LIST_KIT
-#import <IGListKit/IGListKit.h>
-#import <AsyncDisplayKit/ASLayout+IGListKit.h>
+#if AS_IG_LIST_DIFF_KIT
+#import <AsyncDisplayKit/ASLayout+IGListDiffKit.h>
 #endif
 
 using AS::MutexLocker;
@@ -161,13 +159,13 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   ASLayout *pendingLayout = _pendingLayout.layout;
 
   if (previousLayout) {
-#if AS_IG_LIST_KIT
+#if AS_IG_LIST_DIFF_KIT
     // IGListDiff completes in linear time O(m+n), so use it if we have it:
     IGListIndexSetResult *result = IGListDiff(previousLayout.sublayouts, pendingLayout.sublayouts, IGListDiffEquality);
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, result.inserts, &_insertedSubnodes);
     findNodesInLayoutAtIndexes(previousLayout, result.deletes, &_removedSubnodes);
     for (IGListMoveIndex *move in result.moves) {
-      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[move.from].layoutElement, move.to));
+      _subnodeMoves.emplace_back(previousLayout.sublayouts[move.from].layoutElement, move.to);
     }
 
     // Sort by ascending order of move destinations, this will allow easy loop of `insertSubnode:AtIndex` later.
@@ -189,8 +187,8 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
     _removedSubnodes = [previousNodes objectsAtIndexes:deletions];
     // These should arrive sorted in ascending order of move destinations.
     for (NSIndexPath *move in moves) {
-      _subnodeMoves.push_back(std::make_pair(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
-              [move indexAtPosition:1]));
+      _subnodeMoves.emplace_back(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
+              [move indexAtPosition:1]);
     }
 #endif
   } else {

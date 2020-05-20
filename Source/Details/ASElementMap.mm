@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 #import <AsyncDisplayKit/ASMutableElementMap.h>
 #import <AsyncDisplayKit/ASSection.h>
-#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
 @interface ASElementMap () <ASDescriptionProvider>
@@ -194,7 +193,7 @@
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable __unsafe_unretained [])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id  _Nullable unowned [])buffer count:(NSUInteger)len
 {
   return [_elementToIndexPathMap countByEnumeratingWithState:state objects:buffer count:len];
 }

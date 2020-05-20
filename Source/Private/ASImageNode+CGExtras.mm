@@ -9,8 +9,6 @@
 
 #import <AsyncDisplayKit/ASImageNode+CGExtras.h>
 
-#import <cmath>
-
 // TODO rewrite these to be closer to the intended use -- take UIViewContentMode as param, CGRect destinationBounds, CGSize sourceSize.
 static CGSize _ASSizeFillWithAspectRatio(CGFloat aspectRatio, CGSize constraints);
 static CGSize _ASSizeFitWithAspectRatio(CGFloat aspectRatio, CGSize constraints);

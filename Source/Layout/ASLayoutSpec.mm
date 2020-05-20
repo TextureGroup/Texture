@@ -14,13 +14,7 @@
 
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <objc/runtime.h>
-#import <map>
-#import <vector>
 
 @implementation ASLayoutSpec
 
@@ -133,7 +127,7 @@ ASLayoutElementLayoutCalculationDefaults
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id unowned _Nullable [_Nonnull])buffer count:(NSUInteger)len
 {
   return [_childrenArray countByEnumeratingWithState:state objects:buffer count:len];
 }

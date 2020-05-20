@@ -14,7 +14,6 @@
 #import <AsyncDisplayKit/ASThread.h>
 #import <list>
 #import <map>
-#import <mutex>
 
 #ifndef __STRICT_ANSI__
   #warning "Texture must be compiled with std=c++11 to prevent layout issues. gnu++ is not supported. This is hopefully temporary."
@@ -269,10 +268,7 @@ void ASAsyncTransactionQueue::GroupImpl::notify(dispatch_queue_t queue, dispatch
   if (_pendingOperations == 0) {
     dispatch_async(queue, block);
   } else {
-    GroupNotify notify;
-    notify._block = block;
-    notify._queue = queue;
-    _notifyList.push_back(notify);
+    _notifyList.push_back({block, queue});
   }
 }
 
@@ -334,7 +330,7 @@ ASAsyncTransactionQueue & ASAsyncTransactionQueue::instance()
 
 - (instancetype)initWithCompletionBlock:(void(^)(_ASAsyncTransaction *, BOOL))completionBlock
 {
-  if ((self = [self init])) {
+  if ((self = [super init])) {
     _completionBlock = completionBlock;
     self.state = ASAsyncTransactionStateOpen;
   }

@@ -10,7 +10,7 @@
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
 
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
 
@@ -49,31 +49,24 @@
 {
   _ASAsyncTransaction *transaction = self.asyncdisplaykit_currentAsyncTransaction;
   if (transaction == nil) {
-    NSHashTable *transactions = self.asyncdisplaykit_asyncLayerTransactions;
+    NSMutableSet<_ASAsyncTransaction *> *transactions = self.asyncdisplaykit_asyncLayerTransactions;
     if (transactions == nil) {
-      transactions = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
+      transactions = ASCreatePointerBasedMutableSet();
       self.asyncdisplaykit_asyncLayerTransactions = transactions;
     }
     __weak CALayer *weakSelf = self;
-    if (ASActivateExperimentalFeature(ASExperimentalTransactionOperationRetainCycle)) {
-      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
-        __strong CALayer *self = weakSelf;
-        if (self == nil) {
-          return;
-        }
-        [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
-        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
-      }];
-    } else {
-      transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
-        __strong CALayer *self = weakSelf;
-        if (self == nil) {
-          return;
-        }
-        [transactions removeObject:completedTransaction];
-        [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
-      }];
-    }
+    transaction = [[_ASAsyncTransaction alloc] initWithCompletionBlock:^(_ASAsyncTransaction *completedTransaction, BOOL cancelled) {
+      __strong CALayer *self = weakSelf;
+      if (self == nil) {
+        return;
+      }
+      [self.asyncdisplaykit_asyncLayerTransactions removeObject:completedTransaction];
+      if (self.asyncdisplaykit_asyncLayerTransactions.count == 0) {
+        // Reclaim object memory.
+        self.asyncdisplaykit_asyncLayerTransactions = nil;
+      }
+      [self asyncdisplaykit_asyncTransactionContainerDidCompleteTransaction:completedTransaction];
+    }];
     [transactions addObject:transaction];
     self.asyncdisplaykit_currentAsyncTransaction = transaction;
     [self asyncdisplaykit_asyncTransactionContainerWillBeginTransaction:transaction];

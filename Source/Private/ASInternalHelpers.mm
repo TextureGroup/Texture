@@ -9,11 +9,6 @@
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-#import <UIKit/UIKit.h>
-
-#import <objc/runtime.h>
-#import <cmath>
-
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>
@@ -257,3 +252,15 @@ CGFloat ASRoundPixelValue(CGFloat f)
 }
 
 @end
+
+NSMutableSet *ASCreatePointerBasedMutableSet()
+{
+  static CFSetCallBacks callbacks;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    callbacks = kCFTypeSetCallBacks;
+    callbacks.equal = nullptr;
+    callbacks.hash = nullptr;
+  });
+  return (__bridge_transfer NSMutableSet *)CFSetCreateMutable(NULL, 0, &callbacks);
+}

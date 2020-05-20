@@ -11,8 +11,6 @@
 
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
-
 #pragma mark - ASDimension
 
 ASDimension const ASDimensionAuto = {ASDimensionUnitAuto, 0};

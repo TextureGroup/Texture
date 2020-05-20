@@ -8,15 +8,11 @@
 //
 
 #import <AsyncDisplayKit/ASViewController.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASExperimentalFeatures.h>
 
 @implementation ASViewController
 {
@@ -63,6 +59,17 @@
   }
   
   _node = node;
+  [self _initializeInstance];
+
+  return self;
+}
+
+- (instancetype)init
+{
+  if (!(self = [super initWithNibName:nil bundle:nil])) {
+    return nil;
+  }
+
   [self _initializeInstance];
 
   return self;

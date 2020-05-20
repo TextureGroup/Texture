@@ -18,26 +18,20 @@
 #import <mutex>
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 
 #import <AsyncDisplayKit/ASTextKitCoreTextAdditions.h>
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
 #import <AsyncDisplayKit/ASTextKitShadower.h>
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASLayout.h>
-
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASHashing.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASThread.h>
 
 /**
  * If set, we will record all values set to attributedText into an array
@@ -146,6 +140,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGFloat _contentScale;
   BOOL _opaque;
   CGRect _bounds;
+  ASPrimitiveTraitCollection _traitCollection;
 }
 @end
 
@@ -157,6 +152,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
                               contentScale:(CGFloat)contentScale
                                     opaque:(BOOL)opaque
                                     bounds:(CGRect)bounds
+                           traitCollection: (ASPrimitiveTraitCollection)traitCollection
 {
   self = [super init];
   if (self != nil) {
@@ -166,6 +162,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
     _contentScale = contentScale;
     _opaque = opaque;
     _bounds = bounds;
+    _traitCollection = traitCollection;
   }
   return self;
 }
@@ -189,6 +186,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGSize _shadowOffset;
   CGColorRef _shadowColor;
   UIColor *_cachedShadowUIColor;
+  UIColor *_cachedTintColor;
   UIColor *_placeholderColor;
   CGFloat _shadowOpacity;
   CGFloat _shadowRadius;
@@ -215,6 +213,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   ASTextNodeHighlightStyle _highlightStyle;
   BOOL _longPressCancelsTouches;
   BOOL _passthroughNonlinkTouches;
+  BOOL _alwaysHandleTruncationTokenTap;
 }
 @dynamic placeholderEnabled;
 
@@ -257,6 +256,10 @@ static NSArray *DefaultLinkAttributeNames() {
     // on the special placeholder behavior of ASTextNode.
     _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
     _placeholderInsets = UIEdgeInsetsMake(1.0, 0.0, 1.0, 0.0);
+
+    // Tint color is applied when text nodes are within controls and indicate user action
+    // Most text nodes do not require interaction and this matches the default value of UILabel
+    _textColorFollowsTintColor = NO;
   }
 
   return self;
@@ -382,7 +385,8 @@ static NSArray *DefaultLinkAttributeNames() {
     .shadowOffset = _shadowOffset,
     .shadowColor = _cachedShadowUIColor,
     .shadowOpacity = _shadowOpacity,
-    .shadowRadius = _shadowRadius
+    .shadowRadius = _shadowRadius,
+    .tintColor = _cachedTintColor
   };
 }
 
@@ -542,14 +546,21 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  /// have to access tintColor outside of the lock to prevent dead lock when accessing up the view hierarchy
+  UIColor *tintColor = self.tintColor;
   ASLockScopeSelf();
-  
+  if (_textColorFollowsTintColor) {
+    _cachedTintColor = tintColor;
+  } else {
+    _cachedTintColor = nil;
+  }
   return [[ASTextNodeDrawParameter alloc] initWithRendererAttributes:[self _locked_rendererAttributes]
                                                      backgroundColor:self.backgroundColor
                                                  textContainerInsets:_textContainerInset
                                                         contentScale:_contentsScaleForDisplay
                                                               opaque:self.isOpaque
-                                                              bounds:[self threadSafeBounds]];
+                                                              bounds:[self threadSafeBounds]
+                                                     traitCollection:self.primitiveTraitCollection];
 }
 
 + (UIImage *)displayWithParameters:(id<NSObject>)parameters isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
@@ -559,40 +570,12 @@ static NSArray *DefaultLinkAttributeNames() {
   if (drawParameter->_bounds.size.width <= 0 || drawParameter->_bounds.size.height <= 0) {
     return nil;
   }
-    
-  UIImage *result = nil;
+  
   UIColor *backgroundColor = drawParameter->_backgroundColor;
   UIEdgeInsets textContainerInsets = drawParameter ? drawParameter->_textContainerInsets : UIEdgeInsetsZero;
   ASTextKitRenderer *renderer = [drawParameter rendererForBounds:drawParameter->_bounds];
-  BOOL renderedWithGraphicsRenderer = NO;
-  
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    if (ASActivateExperimentalFeature(ASExperimentalTextDrawing)) {
-      renderedWithGraphicsRenderer = YES;
-      UIGraphicsImageRenderer *graphicsRenderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height)];
-      result = [graphicsRenderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
-        CGContextRef context = rendererContext.CGContext;
-        ASDisplayNodeAssert(context, @"This is no good without a context.");
-        
-        CGContextSaveGState(context);
-        CGContextTranslateCTM(context, textContainerInsets.left, textContainerInsets.top);
-        
-        // Fill background
-        if (backgroundColor != nil) {
-          [backgroundColor setFill];
-          UIRectFillUsingBlendMode(CGContextGetClipBoundingBox(context), kCGBlendModeCopy);
-        }
-        
-        // Draw text
-        [renderer drawInContext:context bounds:drawParameter->_bounds];
-        CGContextRestoreGState(context);
-      }];
-    }
-  }
-  
-  if (!renderedWithGraphicsRenderer) {
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale);
-      
+
+  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameter->_traitCollection, CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, ^{
     CGContextRef context = UIGraphicsGetCurrentContext();
     ASDisplayNodeAssert(context, @"This is no good without a context.");
     
@@ -604,14 +587,12 @@ static NSArray *DefaultLinkAttributeNames() {
       [backgroundColor setFill];
       UIRectFillUsingBlendMode(CGContextGetClipBoundingBox(context), kCGBlendModeCopy);
     }
-    
+
+
     // Draw text
     [renderer drawInContext:context bounds:drawParameter->_bounds];
     CGContextRestoreGState(context);
-    
-    result = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-  }
+  });
 
   return result;
 }
@@ -796,6 +777,7 @@ static NSArray *DefaultLinkAttributeNames() {
 - (void)_setHighlightRange:(NSRange)highlightRange forAttributeName:(NSString *)highlightedAttributeName value:(id)highlightedAttributeValue animated:(BOOL)animated
 {
   ASDisplayNodeAssertMainThread();
+  ASLockScopeSelf();
 
   _highlightedLinkAttributeName = highlightedAttributeName;
   _highlightedLinkAttributeValue = highlightedAttributeValue;
@@ -855,7 +837,6 @@ static NSArray *DefaultLinkAttributeNames() {
       }
 
       if (highlightTargetLayer != nil) {
-        ASLockScopeSelf();
         ASTextKitRenderer *renderer = [self _locked_renderer];
 
         NSArray *highlightRects = [renderer rectsForTextRange:highlightRange measureOption:ASTextKitRendererMeasureOptionBlock];
@@ -975,6 +956,39 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   return ASTextNodeAdjustRenderRectForShadowPadding(frame, self.shadowPadding);
 }
 
+#pragma mark - Tint Colors
+
+
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
+- (void)_setNeedsDisplayOnTintedTextColor
+{
+  BOOL textColorFollowsTintColor = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    textColorFollowsTintColor = _textColorFollowsTintColor;
+  }
+
+  if (textColorFollowsTintColor) {
+    [self setNeedsDisplay];
+  }
+}
+
+
+#pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
 #pragma mark - Placeholders
 
 - (UIColor *)placeholderColor
@@ -1029,9 +1043,14 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   ASDisplayNodeAssertMainThread();
-  
+  ASLockScopeSelf(); // Protect usage of _passthroughNonlinkTouches and _alwaysHandleTruncationTokenTap ivars.
+
   if (!_passthroughNonlinkTouches) {
     return [super pointInside:point withEvent:event];
+  }
+
+  if (_alwaysHandleTruncationTokenTap) {
+    return YES;
   }
 
   NSRange range = NSMakeRange(0, 0);
@@ -1167,6 +1186,18 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   ASLockScopeSelf();
   
   return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
+}
+
+- (BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  return _alwaysHandleTruncationTokenTap;
+}
+
+- (void)setAlwaysHandleTruncationTokenTap:(BOOL)alwaysHandleTruncationTokenTap
+{
+  ASLockScopeSelf();
+  _alwaysHandleTruncationTokenTap = alwaysHandleTruncationTokenTap;
 }
 
 #pragma mark - Shadow Properties
@@ -1322,6 +1353,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSUInteger)lineCount
 {
   return ASLockedSelf([[self _locked_renderer] lineCount]);
+}
+
+- (BOOL)textColorFollowsTintColor
+{
+  return ASLockedSelf(_textColorFollowsTintColor);
 }
 
 #pragma mark - Truncation Message
