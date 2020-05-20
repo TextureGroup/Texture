@@ -1505,7 +1505,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIImage *newContents = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, ^{
+      UIImage *newContents = ASGraphicsCreateImage(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, nil, ^{
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         if (isRight == YES) {
           CGContextTranslateCTM(ctx, -radius + 1, 0);
