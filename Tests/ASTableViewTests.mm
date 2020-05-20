@@ -8,7 +8,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
 #import <JGMethodSwizzler/JGMethodSwizzler.h>
+#pragma clang diagnostic pop
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASTableView.h>
@@ -19,6 +22,7 @@
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#import "ASTestCase.h"
 #import "ASXCTExtensions.h"
 
 #define NumberOfSections 10
@@ -54,7 +58,7 @@
 - (instancetype)__initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
   
-  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil eventLog:nil];
+  return [super _initWithFrame:frame style:style dataControllerClass:[ASTestDataController class] owningNode:nil];
 }
 
 - (ASTestDataController *)testDataController
@@ -186,6 +190,7 @@
     ASTestTextCellNode *textCellNode = [ASTestTextCellNode new];
     textCellNode.text = [NSString stringWithFormat:@"{%d, %d}", (int)indexPath.section, (int)indexPath.row];
     textCellNode.backgroundColor = [UIColor whiteColor];
+    textCellNode.tintColor = [UIColor yellowColor];
     return textCellNode;
   };
 }
@@ -214,11 +219,19 @@
 
 @end
 
-@interface ASTableViewTests : XCTestCase
+@interface ASTableViewTests : ASTestCase
 @property (nonatomic, retain) ASTableView *testTableView;
 @end
 
 @implementation ASTableViewTests
+
+- (void)setUp
+{
+  [super setUp];
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+}
 
 - (void)testDataSourceImplementsNecessaryMethods
 {
@@ -872,6 +885,26 @@
   // Check that numberOfRows in section 0 is 2
   XCTAssertEqual([node numberOfRowsInSection:0], 2);
   XCTAssertEqual([node.view numberOfRowsInSection:0], 2);
+}
+
+
+- (void)testTintColorIsPropagatedToTableViewCell
+{
+  // If a tint color is explicitly defined on an ASCellNode, we should
+  CGSize tableViewSize = CGSizeMake(100, 500);
+  ASTestTableView *tableView = [[ASTestTableView alloc] initWithFrame:CGRectMake(0, 0, tableViewSize.width, tableViewSize.height)
+                                                                style:UITableViewStylePlain];
+  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+
+  tableView.asyncDelegate = dataSource;
+  tableView.asyncDataSource = dataSource;
+
+  [tableView reloadData];
+  [tableView waitUntilAllUpdatesAreCommitted];
+  NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+  UITableViewCell *uikitCell = [tableView cellForRowAtIndexPath:indexPath];
+  BOOL areColorsEqual = CGColorEqualToColor(uikitCell.tintColor.CGColor, UIColor.yellowColor.CGColor);
+  XCTAssertTrue(areColorsEqual);
 }
 
 @end

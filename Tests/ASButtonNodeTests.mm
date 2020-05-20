@@ -10,6 +10,7 @@
 
 #import <AsyncDisplayKit/ASButtonNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASTextNode.h>
 
 @interface ASButtonNodeTests : XCTestCase
 @end
@@ -49,6 +50,29 @@
                 @"Default accessibility traits should return disabled button accessibility trait, "
                 @"instead returns %llu",
                 buttonNode.defaultAccessibilityTraits);
+}
+
+/// Test the accessbility label consistency for buttons that do not have a title
+/// In this test case, the button is empty but its titleNode is not nil.
+/// If we give this button an accessibility label and then change its state,
+/// we still want the accessbility unchanged, instead of going back to the default accessibility label.
+- (void)testAccessibilityWithoutATitle
+{
+  ASButtonNode *buttonNode = [[ASButtonNode alloc] init];
+  buttonNode.accessibilityLabel = @"My Test";
+  // Make sure the title node is not nil.
+  buttonNode.titleNode.placeholderColor = [UIColor whiteColor];
+  buttonNode.selected = YES;
+  XCTAssertTrue([buttonNode.accessibilityLabel isEqualToString:@"My Test"]);
+}
+
+- (void)testUpdateTitle
+{
+  NSAttributedString *title = [[NSAttributedString alloc] initWithString:@"MyTitle"];
+  ASButtonNode *buttonNode = [[ASButtonNode alloc] init];
+  [buttonNode setAttributedTitle:title forState:UIControlStateNormal];
+  XCTAssertTrue([[buttonNode attributedTitleForState:UIControlStateNormal] isEqualToAttributedString:title]);
+  XCTAssert([buttonNode.titleNode.attributedText isEqualToAttributedString:title]);
 }
 
 @end

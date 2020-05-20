@@ -10,10 +10,8 @@
 #import <AsyncDisplayKit/ASMutableElementMap.h>
 
 #import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASDataController.h>
 #import <AsyncDisplayKit/ASElementMap.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
-#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
 
 typedef NSMutableArray<NSMutableArray<ASCollectionElement *> *> ASMutableCollectionElementTwoDimensionalArray;
 
@@ -29,7 +27,7 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
 {
   if (self = [super init]) {
     _sections = [sections mutableCopy];
-    _sectionsOfItems = (id)ASTwoDimensionalArrayDeepMutableCopy(items);
+    _sectionsOfItems = (ASMutableCollectionElementTwoDimensionalArray *)ASTwoDimensionalArrayDeepMutableCopy(items);
     _supplementaryElements = [ASMutableElementMap deepMutableCopyOfElementsDictionary:supplementaryElements];
   }
   return self;

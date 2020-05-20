@@ -8,12 +8,10 @@
 //
 
 #import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASControlNode+Private.h>
 #import <AsyncDisplayKit/ASControlNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASImageNode.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASControlTargetAction.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASThread.h>
@@ -25,7 +23,6 @@
 
 // Initial capacities for dispatch tables.
 #define kASControlNodeEventDispatchTableInitialCapacity 4
-#define kASControlNodeActionDispatchTableInitialCapacity 4
 
 @interface ASControlNode ()
 {

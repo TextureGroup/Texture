@@ -23,7 +23,9 @@
   XCTestExpectation *secondExpectation = [self expectationWithDescription:@"Second ASBasicImageDownloader completion handler should be called within 3 seconds"];
 
   ASBasicImageDownloader *downloader = [ASBasicImageDownloader sharedImageDownloader];
-  NSURL *URL = [NSURL URLWithString:@"http://wrongPath/wrongResource.png"];
+  NSURL *URL = [[NSBundle bundleForClass:[self class]] URLForResource:@"logo-square"
+                                                        withExtension:@"png"
+                                                         subdirectory:@"TestResources"];
 
   [downloader downloadImageWithURL:URL
                      callbackQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)

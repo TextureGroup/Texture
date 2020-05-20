@@ -85,7 +85,10 @@ NSString *ASObjectDescriptionMake(__autoreleasing id object, NSArray<NSDictionar
 }
 
 NSString *ASObjectDescriptionMakeTiny(__autoreleasing id object) {
-  return ASObjectDescriptionMake(object, nil);
+  static constexpr int kBufSize = 64;
+  char buf[kBufSize];
+  int len = snprintf(buf, kBufSize, "<%s: %p>", object_getClassName(object), object);
+  return (__bridge_transfer NSString *)CFStringCreateWithBytes(NULL, (const UInt8 *)buf, len, kCFStringEncodingASCII, false);
 }
 
 NSString *ASStringWithQuotesIfMultiword(NSString *string) {

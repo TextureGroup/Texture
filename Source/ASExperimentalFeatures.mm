@@ -12,20 +12,20 @@
 
 NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags)
 {
-  NSArray *allNames = ASCreateOnce((@[@"exp_graphics_contexts",
-                                      @"exp_text_node",
+  NSArray *allNames = ASCreateOnce((@[@"exp_text_node",
                                       @"exp_interface_state_coalesce",
                                       @"exp_unfair_lock",
                                       @"exp_infer_layer_defaults",
-                                      @"exp_network_image_queue",
                                       @"exp_collection_teardown",
                                       @"exp_framesetter_cache",
                                       @"exp_skip_clear_data",
                                       @"exp_did_enter_preload_skip_asm_layout",
-                                      @"exp_disable_a11y_cache",
-                                      @"exp_skip_a11y_wait",
-                                      @"exp_new_default_cell_layout_mode"]));
-  
+                                      @"exp_dispatch_apply",
+                                      @"exp_oom_bg_dealloc_disable",
+                                      @"exp_drawing_global",
+                                      @"exp_optimize_data_controller_pipeline",
+                                      @"exp_trait_collection_did_change_with_previous_collection",
+                                      @"exp_do_not_cache_accessibility_elements"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
@@ -42,7 +42,7 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
 ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array)
 {
   NSArray *allNames = ASExperimentalFeaturesGetNames(ASExperimentalFeatureAll);
-  ASExperimentalFeatures result = 0;
+  ASExperimentalFeatures result = kNilOptions;
   for (NSString *str in array) {
     NSUInteger i = [allNames indexOfObject:str];
     if (i != NSNotFound) {

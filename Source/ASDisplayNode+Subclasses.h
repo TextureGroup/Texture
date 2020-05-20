@@ -10,6 +10,7 @@
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
+#import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASLayoutSpec, _ASDisplayLayer;
 
@@ -206,7 +207,20 @@ AS_CATEGORY_IMPLEMENTABLE
  * @discussion Subclasses can override this method to react to a trait collection change.
  */
 AS_CATEGORY_IMPLEMENTABLE
-- (void)asyncTraitCollectionDidChange;
+- (void)asyncTraitCollectionDidChange ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use asyncTraitCollectionDidChangeWithPreviousTraitCollection: instead.");
+
+
+/**
+ * @abstract Called when the node's ASTraitCollection changes
+ *
+ * @discussion Subclasses can override this method to react to a trait collection change.
+ *
+ * @param previousTraitCollection The ASPrimitiveTraitCollection object before the interface environment changed.
+ *
+ * @note Enable  `ASExperimentalTraitCollectionDidChangeWithPreviousCollection` experiment to have this method called instead of `asyncTraitCollectionDidChange`.
+ */
+AS_CATEGORY_IMPLEMENTABLE
+- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection ASDISPLAYNODE_REQUIRES_SUPER;
 
 #pragma mark - Drawing
 /** @name Drawing */
@@ -376,6 +390,13 @@ AS_CATEGORY_IMPLEMENTABLE
  */
 @property (readonly) CGFloat contentsScaleForDisplay;
 
+/**
+ * Called as part of actionForLayer:forKey:. Gives the node a chance to provide a custom action for its layer.
+ *
+ * The default implementation returns NSNull, indicating that no action should be taken.
+ */
+AS_CATEGORY_IMPLEMENTABLE
+- (nullable id<CAAction>)layerActionForKey:(NSString *)event;
 
 #pragma mark - Touch handling
 /** @name Touch handling */

@@ -12,7 +12,6 @@
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionGroup.h>
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
 
 @implementation _ASAsyncTransactionGroup {
   NSHashTable<id<ASAsyncTransactionContainer>> *_containers;

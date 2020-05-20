@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class ASRangeController;
 
 @interface ASCollectionView ()
-- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(nullable ASCollectionNode *)owningNode eventLog:(nullable ASEventLog *)eventLog;
+- (instancetype)_initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator owningNode:(nullable ASCollectionNode *)owningNode;
 
 @property (nonatomic, weak) ASCollectionNode *collectionNode;
 @property (nonatomic, readonly) ASDataController *dataController;

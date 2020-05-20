@@ -13,14 +13,11 @@
 #import <vector>
 
 #import <AsyncDisplayKit/ASCollections.h>
-#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASStackPositionedLayout.h>
-#import <AsyncDisplayKit/ASStackUnpositionedLayout.h>
 
 @implementation ASStackLayoutSpec
 
@@ -193,6 +190,13 @@
     case ASStackLayoutDirectionHorizontal:
       [result insertObject:@{ (id)kCFNull: @"horizontal" } atIndex:0];
       break;
+#if YOGA
+    case ASStackLayoutDirectionVerticalReverse:
+    case ASStackLayoutDirectionHorizontalReverse:
+      // Currently not handled.
+      ASDisplayNodeFailAssert(@"Reverse directions not implemented.");
+      break;
+#endif
   }
 
   return result;

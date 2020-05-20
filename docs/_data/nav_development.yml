@@ -1,9 +1,8 @@
 - title: Introduction
   items:
   - overview
-  - structure
-  - components
-  - how-to-develop-and-debug
+  - how-to-develop
+  - how-to-debug
 - title: Threading
   items:
   - threading
@@ -13,10 +12,6 @@
 - title: Layout System
   items:
   - layout-specs
-  - automatic-subnode-layout
-  - layout-transitions
 - title: Collections
   items:
   - collection-asynchronous-updates
-  - collection-animations
-  - cell-node-lifecycle

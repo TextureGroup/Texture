@@ -130,7 +130,7 @@ override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec
 
 To create this layout, we will use a:
 
-- `ASAbsoluteLayoutSpec` to place the photo and icon which have been individually sized and positioned using their `ASLayoutable` properties
+- `ASCornerLayoutSpec` to position the icon in corner of the photo
 
 <div class = "highlight-group">
 <span class="language-toggle">
@@ -141,30 +141,18 @@ To create this layout, we will use a:
   <pre lang="objc" class="objcCode">
 - (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
 {
-  _iconNode.style.preferredSize = CGSizeMake(40, 40);
-  _iconNode.style.layoutPosition = CGPointMake(150, 0);
-  
+  _iconNode.style.preferredSize = CGSizeMake(40, 40);  
   _photoNode.style.preferredSize = CGSizeMake(150, 150);
-  _photoNode.style.layoutPosition = CGPointMake(40 / 2.0, 40 / 2.0);
-  
-  return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithSizing:ASAbsoluteLayoutSpecSizingSizeToFit
-                                                   children:@[_photoNode, _iconNode]];
+
+  return [ASCornerLayoutSpec cornerLayoutSpecWithChild:_photoNode corner:_iconNode location:ASCornerLayoutLocationTopRight];
 }
   </pre>
   <pre lang="swift" class = "swiftCode hidden">
 override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-  iconNode.style.preferredSize = CGSize(width: 40, height: 40);
-  iconNode.style.layoutPosition = CGPoint(x: 150, y: 0);
+  iconNode.style.preferredSize = CGSize(width: 40, height: 40)
+  photoNode.style.preferredSize = CGSize(width: 150, height: 150)
 
-  photoNode.style.preferredSize = CGSize(width: 150, height: 150);
-  photoNode.style.layoutPosition = CGPoint(x: 40 / 2.0, y: 40 / 2.0);
-
-  let absoluteSpec = ASAbsoluteLayoutSpec(children: [photoNode, iconNode])
-
-  // ASAbsoluteLayoutSpec's .sizing property recreates the behavior of Texture Layout API 1.0's "ASStaticLayoutSpec"
-  absoluteSpec.sizing = .sizeToFit
-
-  return absoluteSpec;
+  return ASCornerLayoutSpec(child: photoNode, corner: iconNode, location: .topRight)
 }
   </pre>
 </div>

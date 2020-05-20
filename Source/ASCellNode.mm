@@ -19,7 +19,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
-#import <AsyncDisplayKit/ASTableNode.h>
 
 #import <AsyncDisplayKit/ASViewController.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
@@ -34,10 +33,11 @@
   ASDisplayNodeDidLoadBlock _viewControllerDidLoadBlock;
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
+  UICollectionViewLayoutAttributes *_layoutAttributes;
   BOOL _suspendInteractionDelegate;
   BOOL _selected;
   BOOL _highlighted;
-  UICollectionViewLayoutAttributes *_layoutAttributes;
+  BOOL _neverShowPlaceholders;
 }
 
 @end
@@ -200,6 +200,11 @@
   return _viewController;
 }
 
+- (id<ASRangeManagingNode>)owningNode
+{
+  return self.collectionElement.owningNode;
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-missing-super-calls"
 
@@ -305,7 +310,7 @@
   // in which case it is not valid to perform a convertRect (this actually crashes on iOS 8).
   UIScrollView *scrollView = (_scrollView != nil && view.superview != nil && [view isDescendantOfView:_scrollView]) ? _scrollView : nil;
   if (scrollView) {
-    cellFrame = [view convertRect:view.bounds toView:_scrollView];
+    cellFrame = [view convertRect:view.bounds toView:scrollView];
   }
   
   // If we did not convert, we'll pass along CGRectZero and a nil scrollView.  The EventInvisible call is thus equivalent to
@@ -322,7 +327,7 @@
   
   UIScrollView *scrollView = self.scrollView;
   
-  ASDisplayNode *owningNode = scrollView.asyncdisplaykit_node;
+  id<ASRangeManagingNode> owningNode = self.owningNode;
   if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
     NSIndexPath *ip = [(ASCollectionNode *)owningNode indexPathForNode:self];
     if (ip != nil) {

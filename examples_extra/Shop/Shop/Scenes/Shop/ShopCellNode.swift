@@ -28,7 +28,7 @@ class ShopCellNode: ASCellNode {
     // MARK: - Layout
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        return ASInsetLayoutSpec(insets: UIEdgeInsetsMake(5, 10, 5, 10), child: self.containerNode)
+        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10), child: self.containerNode)
     }
     
 }
@@ -60,7 +60,7 @@ class ContainerNode: ASDisplayNode {
     // MARK: - Layout
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        return ASInsetLayoutSpec(insets: UIEdgeInsetsMake(8, 8, 8, 8), child: self.contentNode)
+        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8), child: self.contentNode)
     }
     
 }
@@ -80,11 +80,11 @@ class CategoryNode: ASDisplayNode {
         imageNode.url = URL(string: category.imageURL)
         
         titleNode = ASTextNode()
-        let title = NSAttributedString(string: category.title, attributes: [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 17)])
+        let title = NSAttributedString(string: category.title, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 17)])
         titleNode.attributedText = title
         
         subtitleNode = ASTextNode()
-        let subtitle = NSAttributedString(string: "\(category.numberOfProducts) products", attributes: [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 15)])
+        let subtitle = NSAttributedString(string: "\(category.numberOfProducts) products", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)])
         subtitleNode.attributedText = subtitle
         
         super.init()
@@ -98,7 +98,7 @@ class CategoryNode: ASDisplayNode {
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let textNodesStack = ASStackLayoutSpec(direction: .vertical, spacing: 5, justifyContent: .end, alignItems: .stretch, children: [self.titleNode, self.subtitleNode])
-        let insetStack = ASInsetLayoutSpec(insets: UIEdgeInsetsMake(CGFloat.infinity, 10, 10, 10), child: textNodesStack)
+        let insetStack = ASInsetLayoutSpec(insets: UIEdgeInsets(top: CGFloat.infinity, left: 10, bottom: 10, right: 10), child: textNodesStack)
         return ASOverlayLayoutSpec(child: self.imageNode, overlay: insetStack)
     }
     

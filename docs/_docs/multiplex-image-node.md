@@ -3,6 +3,7 @@ title: ASMultiplexImageNode
 layout: docs
 permalink: /docs/multiplex-image-node.html
 prevPage: editable-text-node.html
+nextPage: /development/overview.html
 ---
 
 Let's say your API is out of your control and the images in your app can't be progressive jpegs but you can retrieve a few different sizes of the image asset you want to display. This is where you would use an `ASMultiplexImageNode` instead of an <a href = "/docs/network-image-node.html">ASNetworkImageNode</a>.

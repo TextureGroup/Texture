@@ -31,11 +31,11 @@ nextPage: layout2-api-sizing.html
   </tr>
   <tr>
     <td><b><code>CGFloat .style.flexGrow</code></b></td>
-    <td>If the sum of childrens' stack dimensions is less than the minimum size, should this object grow?</td> 
+    <td>If the sum of children's stack dimensions is less than the minimum size, should this object grow?</td> 
   </tr>
   <tr>
     <td><b><code>CGFloat .style.flexShrink</code></b></td>
-    <td>If the sum of childrens' stack dimensions is greater than the maximum size, should this object shrink?</td> 
+    <td>If the sum of children's stack dimensions is greater than the maximum size, should this object shrink?</td> 
   </tr>
   <tr>
     <td><b><code><a href="layout2-api-sizing.html#values-cgfloat-asdimension">ASDimension</a> .style.flexBasis</code></b></td>

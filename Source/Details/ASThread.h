@@ -16,6 +16,8 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/ASRecursiveUnfairLock.h>
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
@@ -38,14 +40,14 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASDisplayNodeThreadIsMain()
 
 /// Same as ASLockScope(1) but lock isn't retained (be careful).
 #define ASLockScopeUnowned(nsLocking) \
-  __unsafe_unretained id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
+  unowned id<NSLocking> __lockToken __attribute__((cleanup(_ASLockScopeUnownedCleanup))) = nsLocking; \
   [__lockToken lock];
 
 ASDISPLAYNODE_INLINE void _ASLockScopeCleanup(id<NSLocking> __strong * const lockPtr) {
   [*lockPtr unlock];
 }
 
-ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> __unsafe_unretained * const lockPtr) {
+ASDISPLAYNODE_INLINE void _ASLockScopeUnownedCleanup(id<NSLocking> unowned * const lockPtr) {
   [*lockPtr unlock];
 }
 
@@ -98,10 +100,10 @@ ASDISPLAYNODE_INLINE void _ASUnlockScopeCleanup(id<NSLocking> __strong *lockPtr)
 #include <thread>
 
 // These macros are here for legacy reasons. We may get rid of them later.
-#define ASAssertLocked(m) m.AssertHeld()
-#define ASAssertUnlocked(m) m.AssertNotHeld()
+#define DISABLED_ASAssertLocked(m)
+#define DISABLED_ASAssertUnlocked(m)
 
-namespace ASDN {
+namespace AS {
   
   // Set once in Mutex constructor. Linker fails if this is a member variable. ??
   static bool gMutex_unfair;
@@ -116,6 +118,12 @@ namespace ASDN {
   public:
     /// Constructs a plain mutex (the default).
     Mutex () : Mutex (false) {}
+
+    void SetDebugNameWithObject(id object) {
+#if ASEnableVerboseLogging && ASDISPLAYNODE_ASSERTIONS_ENABLED
+      _debug_name = std::string(ASObjectDescriptionMakeTiny(object).UTF8String);
+#endif
+    }
 
     ~Mutex () {
       // Manually destroy since unions can't do it.
@@ -243,6 +251,11 @@ namespace ASDN {
 
     void WillUnlock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
+#if ASEnableVerboseLogging
+      if (!_debug_name.empty()) {
+        as_log_verbose(ASLockingLog(), "unlock %s, count is %d", _debug_name.c_str(), (int)(_count - 1));
+      }
+#endif
       if (--_count == 0) {
         _owner = std::thread::id();
       }
@@ -251,6 +264,11 @@ namespace ASDN {
     
     void DidLock() {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
+#if ASEnableVerboseLogging
+      if (!_debug_name.empty()) {
+        as_log_verbose(ASLockingLog(), "lock %s, count is %d", _debug_name.c_str(), (int)(_count + 1));
+      }
+#endif
       if (++_count == 1) {
         // New owner.
         _owner = std::this_thread::get_id();
@@ -265,6 +283,10 @@ namespace ASDN {
       std::mutex _plain;
       std::recursive_mutex _recursive;
     };
+#if ASEnableVerboseLogging
+    std::string _debug_name;
+#endif
+
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
     std::thread::id _owner = std::thread::id();
     int _count = 0;
@@ -290,6 +312,6 @@ namespace ASDN {
   typedef std::lock_guard<Mutex> MutexLocker;
   typedef std::unique_lock<Mutex> UniqueLock;
 
-} // namespace ASDN
+} // namespace AS
 
 #endif /* __cplusplus */

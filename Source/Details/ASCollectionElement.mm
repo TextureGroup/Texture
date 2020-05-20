@@ -9,7 +9,7 @@
 
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <mutex>
+#import <AsyncDisplayKit/ASThread.h>
 
 @interface ASCollectionElement ()
 
@@ -19,7 +19,7 @@
 @end
 
 @implementation ASCollectionElement {
-  std::mutex _lock;
+  AS::Mutex _lock;
   ASCellNode *_node;
 }
 
@@ -45,7 +45,7 @@
 
 - (ASCellNode *)node
 {
-  std::lock_guard<std::mutex> l(_lock);
+  AS::MutexLocker l(_lock);
   if (_nodeBlock != nil) {
     ASCellNode *node = _nodeBlock();
     _nodeBlock = nil;
@@ -53,7 +53,6 @@
       ASDisplayNodeFailAssert(@"Node block returned nil node!");
       node = [[ASCellNode alloc] init];
     }
-    node.owningNode = _owningNode;
     node.collectionElement = self;
     ASTraitCollectionPropagateDown(node, _traitCollection);
     node.nodeModel = _nodeModel;
@@ -64,7 +63,7 @@
 
 - (ASCellNode *)nodeIfAllocated
 {
-  std::lock_guard<std::mutex> l(_lock);
+  AS::MutexLocker l(_lock);
   return _node;
 }
 
@@ -73,7 +72,7 @@
   ASCellNode *nodeIfNeedsPropagation;
   
   {
-    std::lock_guard<std::mutex> l(_lock);
+    AS::MutexLocker l(_lock);
     if (! ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(_traitCollection, traitCollection)) {
       _traitCollection = traitCollection;
       nodeIfNeedsPropagation = _node;

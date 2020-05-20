@@ -16,8 +16,6 @@
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
-#import <pthread.h>
-
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
 typedef struct {
@@ -383,7 +381,7 @@ dispatch_semaphore_signal(_lock);
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"lines: %ld, visibleRange:%@, textBoundingRect:%@",
-                                    [self.lines count],
+                                    (long)[self.lines count],
                                     NSStringFromRange(self.visibleRange),
                                     NSStringFromCGRect(self.textBoundingRect)];
 }
@@ -834,7 +832,8 @@ dispatch_semaphore_signal(_lock);
             }
           }
           int i = 0;
-          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants text preceding truncated content.
+          if (type != kCTLineTruncationStart) { // Middle or End/Tail wants to collect some text (at least one line's
+              // worth) preceding the truncated content, with which to construct a "truncated line".
             i = (int)removedLines.count - 1;
             while (atLeastOneLine < truncatedWidth && i >= 0) {
               if (lastLineText.length > 0 && [lastLineText.string characterAtIndex:lastLineText.string.length - 1] == '\n') { // Explicit newlines are always "long enough".
@@ -846,7 +845,8 @@ dispatch_semaphore_signal(_lock);
             }
             [lastLineText appendAttributedString:truncationToken];
           }
-          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants text following truncated content.
+          if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants to collect some
+              // text following the truncated content.
             i = 0;
             atLeastOneLine = removedLines[i].width;
             while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
@@ -860,7 +860,9 @@ dispatch_semaphore_signal(_lock);
                 [lastLineText appendAttributedString:nextLine];
               }
             }
-            [lastLineText insertAttributedString:truncationToken atIndex:0];
+            if (type == kCTLineTruncationStart) {
+              [lastLineText insertAttributedString:truncationToken atIndex:0];
+            }
           }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
@@ -967,15 +969,16 @@ dispatch_semaphore_signal(_lock);
       [truncationToken enumerateAttributesInRange:NSMakeRange(0, truncationToken.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     }
   }
-  
-  attachments = [NSMutableArray new];
-  attachmentRanges = [NSMutableArray new];
-  attachmentRects = [NSMutableArray new];
-  attachmentContentsSet = [NSMutableSet new];
   for (NSUInteger i = 0, max = lines.count; i < max; i++) {
     ASTextLine *line = lines[i];
     if (truncatedLine && line.index == truncatedLine.index) line = truncatedLine;
     if (line.attachments.count > 0) {
+      if (!attachments) {
+        attachments = [[NSMutableArray alloc] init];
+        attachmentRanges = [[NSMutableArray alloc] init];
+        attachmentRects = [[NSMutableArray alloc] init];
+        attachmentContentsSet = [[NSMutableSet alloc] init];
+      }
       [attachments addObjectsFromArray:line.attachments];
       [attachmentRanges addObjectsFromArray:line.attachmentRanges];
       [attachmentRects addObjectsFromArray:line.attachmentRects];
@@ -985,9 +988,6 @@ dispatch_semaphore_signal(_lock);
         }
       }
     }
-  }
-  if (attachments.count == 0) {
-    attachments = attachmentRanges = attachmentRects = nil;
   }
 
   layout.frame = ctFrame;
@@ -2142,7 +2142,9 @@ dispatch_semaphore_signal(_lock);
       if (isVertical) {
         topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
       } else {
-        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset, startLine.height);
+        // TODO: Fixes highlighting first row only to the end of the text and not highlight
+        //       the while line to the end. Needs to brought over to multiline support
+        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
       }
     }
     [rects addObject:topRect];

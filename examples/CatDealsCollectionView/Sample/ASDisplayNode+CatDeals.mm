@@ -14,16 +14,16 @@ struct CatDealsNodeContext {
   NSString *loggingID = nil;
 };
 
-// Convenience to cast _context into our struct reference.
+// Convenience to cast _displayNodeContext into our struct reference.
 NS_INLINE CatDealsNodeContext &GetNodeContext(ASDisplayNode *node) {
-  return *static_cast<CatDealsNodeContext *>(node->_context);
+  return *static_cast<CatDealsNodeContext *>(node->_displayNodeContext);
 }
 
 @implementation ASDisplayNode (CatDeals)
 
 - (void)baseDidInit
 {
-  _context = new CatDealsNodeContext;
+  _displayNodeContext = new CatDealsNodeContext;
 }
 
 - (void)baseWillDealloc

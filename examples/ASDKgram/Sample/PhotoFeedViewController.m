@@ -14,11 +14,12 @@
 
 #define AUTO_TAIL_LOADING_NUM_SCREENFULS  2.5
 
+static NSString *TableViewCellIdentifier = @"PhotoCell";
+
 @interface PhotoFeedViewController () <UITableViewDelegate, UITableViewDataSource>
 @end
 
-@implementation PhotoFeedViewController
-{
+@implementation PhotoFeedViewController {
   UITableView *_tableView;
 }
 
@@ -45,10 +46,16 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  
+
   [self.view addSubview:_tableView];
+  [_tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:TableViewCellIdentifier];
+}
+
+- (void)viewDidLayoutSubviews
+{
+  [super viewDidLayoutSubviews];
+
   _tableView.frame = self.view.bounds;
-  [_tableView registerClass:[PhotoTableViewCell class] forCellReuseIdentifier:@"photoCell"];
 }
 
 #pragma mark - Subclassing
@@ -74,7 +81,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell" forIndexPath:indexPath];
+  PhotoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:TableViewCellIdentifier forIndexPath:indexPath];
   [cell updateCellWithPhotoObject:[self.photoFeed objectAtIndex:indexPath.row]];
   
   return cell;
@@ -83,13 +90,13 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   PhotoModel *photo = [self.photoFeed objectAtIndex:indexPath.row];
-  return [PhotoTableViewCell heightForPhotoModel:photo withWidth:self.view.bounds.size.width];
+  return [PhotoTableViewCell heightForPhotoModel:photo withWidth:CGRectGetWidth(tableView.bounds)];
 }
 
 #pragma mark - UITableViewDelegate methods
 
 // table automatic tail loading
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   CGFloat currentOffSetY = scrollView.contentOffset.y;
   CGFloat contentHeight  = scrollView.contentSize.height;

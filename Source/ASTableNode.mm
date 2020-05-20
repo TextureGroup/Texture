@@ -15,14 +15,12 @@
 #import <AsyncDisplayKit/ASTableViewInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
-#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 
 #pragma mark - _ASTablePendingState
 
@@ -43,7 +41,7 @@
 @property (nonatomic) CGPoint contentOffset;
 @property (nonatomic) BOOL animatesContentOffset;
 @property (nonatomic) BOOL automaticallyAdjustsContentOffset;
-
+@property (nonatomic) BOOL pagingEnabled;
 @end
 
 @implementation _ASTablePendingState
@@ -66,6 +64,7 @@
     _contentOffset = CGPointZero;
     _animatesContentOffset = NO;
     _automaticallyAdjustsContentOffset = NO;
+    _pagingEnabled = NO;
   }
   return self;
 }
@@ -100,7 +99,7 @@
 
 @interface ASTableNode ()
 {
-  ASDN::RecursiveMutex _environmentStateLock;
+  AS::RecursiveMutex _environmentStateLock;
   id<ASBatchFetchingDelegate> _batchFetchingDelegate;
 }
 
@@ -119,7 +118,7 @@
     [self setViewBlock:^{
       // Variable will be unused if event logging is off.
       __unused __typeof__(self) strongSelf = weakSelf;
-      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil owningNode:strongSelf eventLog:ASDisplayNodeGetEventLog(strongSelf)];
+      return [[ASTableView alloc] _initWithFrame:CGRectZero style:style dataControllerClass:nil owningNode:strongSelf];
     }];
   }
   return self;
@@ -164,6 +163,9 @@
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
     view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
+#if !TARGET_OS_TV
+    view.pagingEnabled                        = pendingState.pagingEnabled;
+#endif
 
     UIEdgeInsets contentInset = pendingState.contentInset;
     if (!UIEdgeInsetsEqualToEdgeInsets(contentInset, UIEdgeInsetsZero)) {
@@ -365,6 +367,30 @@
     return self.view.automaticallyAdjustsContentOffset;
   }
 }
+
+#if !TARGET_OS_TV
+- (void)setPagingEnabled:(BOOL)pagingEnabled
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    pendingState.pagingEnabled = pagingEnabled;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded],
+                        @"ASCollectionNode should be loaded if pendingState doesn't exist");
+    self.view.pagingEnabled = pagingEnabled;
+  }
+}
+
+- (BOOL)isPagingEnabled
+{
+  _ASTablePendingState *pendingState = self.pendingState;
+  if (pendingState) {
+    return pendingState.pagingEnabled;
+  } else {
+    return self.view.isPagingEnabled;
+  }
+}
+#endif
 
 - (void)setDelegate:(id <ASTableDelegate>)delegate
 {
