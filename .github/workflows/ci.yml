@@ -18,14 +18,6 @@ jobs:
             name: Build Texture as a static library
           - mode: carthage
             name: Verify that Carthage works
-          - mode: examples-pt1
-            name: Build examples (examples-pt1)
-          - mode: examples-pt2
-            name: Build examples (examples-pt2)
-          - mode: examples-pt3
-            name: Build examples (examples-pt3)
-          - mode: examples-pt4
-            name: Build examples (examples-pt4)
     name: ${{ matrix.name }}
     runs-on: macOS-latest
     steps:
