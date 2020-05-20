@@ -172,7 +172,7 @@
     _iconNode = [[ASNetworkImageNode alloc] init];
     _iconNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png"];
     
-    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
+    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
       CGSize profileImageSize = CGSizeMake(60, 60);
       return [image makeCircularImageWithSize:profileImageSize withBorderWidth:10];
     }];
