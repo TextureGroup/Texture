@@ -15,6 +15,9 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: macOS-latest
     steps:
+    - name: Checkout the Git repository/master
+      uses: actions/checkout@v2
+      ref: +refs/heads/master
     - name: Checkout the Git repository
       uses: actions/checkout@v2
     - name: Run build script
