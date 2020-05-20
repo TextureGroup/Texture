@@ -236,13 +236,13 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   _data = data;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section
 {
     return self.data[section].items.count;
 }
 
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSInteger)numberOfSectionsInTableNode:(ASTableNode *)tableNode
 {
     return self.data.count;
 }
@@ -297,7 +297,7 @@ static atomic_uint ASThrashTestSectionNextID = 1;
   return node;
 }
 
-- (ASCellNode *)tableView:(ASTableView *)tableView nodeForRowAtIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)tableNode:(ASTableNode *)tableNode nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     ASThrashTestNode *node = [[ASThrashTestNode alloc] init];
     node.item = self.data[indexPath.section].items[indexPath.item];
