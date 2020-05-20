@@ -182,18 +182,6 @@
   [ASConfigurationManager test_resetWithConfiguration:config];
 }
 
-- (void)tearDown
-{
-  // We can't prevent the system from retaining windows, but we can at least clear them out to avoid
-  // pollution between test cases.
-  for (UIWindow *window in [UIApplication sharedApplication].windows) {
-    for (UIView *subview in window.subviews) {
-      [subview removeFromSuperview];
-    }
-  }
-  [super tearDown];
-}
-
 - (void)testDataSourceImplementsNecessaryMethods
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
