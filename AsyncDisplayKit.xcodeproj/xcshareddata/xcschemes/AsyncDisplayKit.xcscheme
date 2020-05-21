@@ -27,6 +27,15 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "B35061D91B010EDF0018CF92"
+            BuildableName = "AsyncDisplayKit.framework"
+            BlueprintName = "AsyncDisplayKit"
+            ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -39,22 +48,14 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "ASCALayerTests">
+               </Test>
+               <Test
                   Identifier = "ASTextNodePerformanceTests">
                </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B35061D91B010EDF0018CF92"
-            BuildableName = "AsyncDisplayKit.framework"
-            BlueprintName = "AsyncDisplayKit"
-            ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -82,8 +83,6 @@
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
