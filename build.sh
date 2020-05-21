@@ -35,7 +35,7 @@ function build_example {
             -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
-            build | xcpretty -s
+            build
     elif [ -f "${example}/Cartfile" ]; then
         echo "Using Carthage"
         local_repo=`pwd`
@@ -50,7 +50,7 @@ function build_example {
             -scheme Sample \
             -sdk "$SDK" \
             -destination "$PLATFORM" \
-            build | xcpretty -s
+            build
 
         cd ../..
     fi
@@ -80,7 +80,7 @@ tests|all)
         -scheme AsyncDisplayKit \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty -s
+        build-for-testing test
     success="1"
     ;;
 
@@ -99,7 +99,7 @@ tests_listkit)
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty -s
+        build-for-testing test
     success="1"
     ;;
 
@@ -198,7 +198,7 @@ life-without-cocoapods|all)
         -scheme "Life Without CocoaPods" \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty -s
+        build
     success="1"
     ;;
 
@@ -210,7 +210,7 @@ framework|all)
         -scheme Sample \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty -s
+        build
     success="1"
     ;;
 
