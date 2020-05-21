@@ -8,11 +8,11 @@ on:
 jobs:
   cocoapods-lint:
     env: 
-        DEVELOPER_DIR: /Applications/Xcode_11.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_11.4.1.app/Contents/Developer
     name: Verify that podspec lints
     runs-on: macOS-latest
     steps:
     - name: Checkout the Git repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Run build.sh with cocoapods-lint mode
       run: ./build.sh cocoapods-lint
