@@ -1,7 +1,15 @@
 #!/bin/bash
+# echo ************* diagnostics
+# echo available devices
+# instruments -s devices
+# echo available sdk
+# xcodebuild -showsdks
+# echo available Xcode
+# ls -ld /Applications/Xcode*
+# echo ************* diagnostics end
 
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.0,name=iPhone 8}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.0}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.4.1,name=iPhone 8}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.4}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
