@@ -1,11 +1,9 @@
 PODS:
   - FBSnapshotTestCase/Core (2.1.4)
-  - JGMethodSwizzler (2.0.1)
   - OCMock (3.6)
 
 DEPENDENCIES:
   - FBSnapshotTestCase/Core (~> 2.1)
-  - JGMethodSwizzler (from `https://github.com/JonasGessner/JGMethodSwizzler`, branch `master`)
   - OCMock (~> 3.6)
 
 SPEC REPOS:
@@ -13,21 +11,10 @@ SPEC REPOS:
     - FBSnapshotTestCase
     - OCMock
 
-EXTERNAL SOURCES:
-  JGMethodSwizzler:
-    :branch: master
-    :git: https://github.com/JonasGessner/JGMethodSwizzler
-
-CHECKOUT OPTIONS:
-  JGMethodSwizzler:
-    :commit: 8791eccc5342224bd293b5867348657e3a240c7f
-    :git: https://github.com/JonasGessner/JGMethodSwizzler
-
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  JGMethodSwizzler: 7328146117fffa8a4038c42eb7cd3d4c75006f97
   OCMock: 5ea90566be239f179ba766fd9fbae5885040b992
 
-PODFILE CHECKSUM: 7e86f0142d0db2230d763087056ba6d9eb2afd54
+PODFILE CHECKSUM: 6c5ab754458e18efcf3a8b39a3b97bf96c3d2237
 
 COCOAPODS: 1.9.1
