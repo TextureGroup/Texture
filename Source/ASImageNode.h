@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, ASPrimitiveTraitCollection traitCollection);
 
-
 /**
  * @abstract Draws images.
  * @discussion Supports cropping, tinting, and arbitrary image modification blocks.
