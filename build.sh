@@ -32,7 +32,7 @@ function build_example {
     example="$1"
 
     clean_derived_data
-    
+
     if [ -f "${example}/Podfile" ]; then
         echo "Using CocoaPods"
         pod install --project-directory=$example
@@ -89,13 +89,6 @@ tests|all)
         -sdk "$SDK" \
         -destination "$PLATFORM" \
         build-for-testing test
-    success="1"
-    ;;
-
-danger|all)
-    bundle install
-    echo "Running Danger..."
-    bundle exec danger --fail-on-errors=true
     success="1"
     ;;
 
@@ -253,7 +246,7 @@ cocoapods-lint-other-subspecs)
 
 carthage|all)
     echo "Verifying carthage works."
-    
+
     set -o pipefail && carthage update && carthage build --no-skip-current
     success="1"
     ;;
@@ -263,7 +256,7 @@ carthage|all)
     ;;
 esac
 
-if [ "$success" = "1" ]; then 
+if [ "$success" = "1" ]; then
   trap - EXIT
   exit 0
 fi
