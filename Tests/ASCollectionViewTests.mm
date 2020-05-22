@@ -147,8 +147,7 @@
     // Populate these immediately so that they're not unexpectedly nil during tests.
     self.asyncDelegate = [[ASCollectionViewTestDelegate alloc] initWithNumberOfSections:10 numberOfItemsInSection:10];
     id realLayout = [UICollectionViewFlowLayout new];
-    id mockLayout = [OCMockObject partialMockForObject:realLayout];
-    self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:mockLayout];
+    self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:realLayout];
     self.collectionView = self.collectionNode.view;
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.collectionNode.dataSource = self.asyncDelegate;
@@ -636,14 +635,14 @@
 - (void)testThatNodeCalculatedSizesAreUpdatedBeforeFirstPrepareLayoutAfterRotation
 {
   updateValidationTestPrologue
-  id layout = cv.collectionViewLayout;
+  id collectionViewLayoutMock = OCMPartialMock(cv.collectionViewLayout);
   CGSize initialItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
   CGSize initialCVSize = cv.bounds.size;
 
   // Capture the node size before first call to prepareLayout after frame change.
   __block CGSize itemSizeAtFirstLayout = CGSizeZero;
   __block CGSize boundsSizeAtFirstLayout = CGSizeZero;
-  [[[[layout expect] andDo:^(NSInvocation *) {
+  [[[[collectionViewLayoutMock expect] andDo:^(NSInvocation *) {
     itemSizeAtFirstLayout = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
     boundsSizeAtFirstLayout = [cv bounds].size;
   }] andForwardToRealObject] prepareLayout];
@@ -658,10 +657,12 @@
   XCTAssertNotEqualObjects(NSStringFromCGSize(initialCVSize),  NSStringFromCGSize(boundsSizeAtFirstLayout));
   XCTAssertEqualObjects(NSStringFromCGSize(itemSizeAtFirstLayout), NSStringFromCGSize(finalItemSize));
   XCTAssertEqualObjects(NSStringFromCGSize(boundsSizeAtFirstLayout), NSStringFromCGSize(finalCVSize));
-  [layout verify];
+  [collectionViewLayoutMock verify];
 
   // Teardown
   [[UIDevice currentDevice] setValue:@(oldDeviceOrientation) forKey:@"orientation"];
+
+  [collectionViewLayoutMock stopMocking];
 }
 
 /**
