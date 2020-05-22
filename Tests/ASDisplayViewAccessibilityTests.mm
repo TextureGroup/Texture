@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import <AsyncDisplayKit/ASScrollNode.h>
 #import <AsyncDisplayKit/ASViewController.h>
 #import <OCMock/OCMock.h>
 #import "ASDisplayNodeTestsHelper.h"
@@ -380,6 +381,60 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   XCTAssertTrue([elements containsObject:label.view]);
   XCTAssertTrue([elements containsObject:partiallyOnScreenNodeX.view]);
   XCTAssertTrue([elements containsObject:partiallyOnScreenNodeY.view]);
+}
+
+- (void)testAccessibilityElementsNotInAppWindowButInScrollView {
+  
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
+  ASScrollNode *node = [[ASScrollNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+  
+  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  window.rootViewController = vc;
+  [window makeKeyAndVisible];
+  [window layoutIfNeeded];
+
+  CGSize windowSize = window.frame.size;
+  node.view.contentSize = CGSizeMake(window.frame.size.width, window.frame.size.height * 2.0);
+  ASTextNode *label = [[ASTextNode alloc] init];
+  label.attributedText = [[NSAttributedString alloc] initWithString:@"on screen"];
+  label.frame = CGRectMake(0, 0, 100, 20);
+
+  ASTextNode *partiallyOnScreenNodeY = [[ASTextNode alloc] init];
+  partiallyOnScreenNodeY.attributedText = [[NSAttributedString alloc] initWithString:@"partially on screen y"];
+  partiallyOnScreenNodeY.frame = CGRectMake(0, windowSize.height - 10, 100, 20);
+
+  ASTextNode *partiallyOnScreenNodeX = [[ASTextNode alloc] init];
+  partiallyOnScreenNodeX.attributedText = [[NSAttributedString alloc] initWithString:@"partially on screen x"];
+  partiallyOnScreenNodeX.frame = CGRectMake(windowSize.width - 10, 100, 100, 20);
+
+  ASTextNode *offScreenNodeY = [[ASTextNode alloc] init];
+  offScreenNodeY.attributedText = [[NSAttributedString alloc] initWithString:@"off screen y"];
+  offScreenNodeY.frame = CGRectMake(0, windowSize.height + 10, 100, 20);
+
+  ASTextNode *offScreenNodeX = [[ASTextNode alloc] init];
+  offScreenNodeX.attributedText = [[NSAttributedString alloc] initWithString:@"off screen x"];
+  offScreenNodeX.frame = CGRectMake(windowSize.width + 1, 200, 100, 20);
+
+  ASTextNode *offScreenNode = [[ASTextNode alloc] init];
+  offScreenNode.attributedText = [[NSAttributedString alloc] initWithString:@"off screen"];
+  offScreenNode.frame = CGRectMake(windowSize.width + 1, windowSize.height + 1, 100, 20);
+
+  [node addSubnode:label];
+  [node addSubnode:partiallyOnScreenNodeY];
+  [node addSubnode:partiallyOnScreenNodeX];
+  [node addSubnode:offScreenNodeY];
+  [node addSubnode:offScreenNodeX];
+  [node addSubnode:offScreenNode];
+
+  NSArray *elements = [node accessibilityElements];
+  XCTAssertTrue(elements.count == 6);
+  XCTAssertTrue([elements containsObject:label.view]);
+  XCTAssertTrue([elements containsObject:partiallyOnScreenNodeX.view]);
+  XCTAssertTrue([elements containsObject:partiallyOnScreenNodeY.view]);
+  XCTAssertTrue([elements containsObject:offScreenNodeY.view]);
+  XCTAssertTrue([elements containsObject:offScreenNodeX.view]);
+  XCTAssertTrue([elements containsObject:offScreenNode.view]);
 }
 
 - (void)testAccessibilitySort {
