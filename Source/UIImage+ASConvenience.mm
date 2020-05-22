@@ -82,6 +82,38 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
 + (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
                                           cornerColor:(UIColor *)cornerColor
                                             fillColor:(UIColor *)fillColor
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED
+{
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:nil
+                                            borderWidth:1.0
+                                         roundedCorners:UIRectCornerAllCorners
+                                                  scale:0.0
+                                        traitCollection:traitCollection];
+}
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
+                                          borderColor:(UIColor *)borderColor
+                                          borderWidth:(CGFloat)borderWidth
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED {
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:borderColor
+                                            borderWidth:borderWidth
+                                         roundedCorners:UIRectCornerAllCorners
+                                                  scale:0.0
+                                        traitCollection:traitCollection];
+}
+
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
                                           borderColor:(UIColor *)borderColor
                                           borderWidth:(CGFloat)borderWidth NS_RETURNS_RETAINED
 {
@@ -100,7 +132,27 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
                                           borderColor:(UIColor *)borderColor
                                           borderWidth:(CGFloat)borderWidth
                                        roundedCorners:(UIRectCorner)roundedCorners
-                                                scale:(CGFloat)scale NS_RETURNS_RETAINED
+                                                scale:(CGFloat)scale NS_RETURNS_RETAINED {
+
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:borderColor
+                                            borderWidth:borderWidth
+                                         roundedCorners:roundedCorners
+                                                  scale:scale
+                                        traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+}
+
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
+                                          borderColor:(UIColor *)borderColor
+                                          borderWidth:(CGFloat)borderWidth
+                                       roundedCorners:(UIRectCorner)roundedCorners
+                                                scale:(CGFloat)scale
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED
 {
   static NSCache *__pathCache = nil;
   static dispatch_once_t onceToken;
@@ -134,7 +186,7 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
   
   // We should probably check if the background color has any alpha component but that
   // might be expensive due to needing to check mulitple color spaces.
-  UIImage *result = ASGraphicsCreateImageWithOptions(bounds.size, cornerColor != nil, scale, nil, nil, ^{
+  UIImage *result = ASGraphicsCreateImage(traitCollection, bounds.size, cornerColor != nil, scale, nil, nil, ^{
     BOOL contextIsClean = YES;
     if (cornerColor) {
       contextIsClean = NO;
