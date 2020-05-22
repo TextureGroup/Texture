@@ -729,13 +729,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
 - (ASImageNode *)createRangeNodeWithColor:(UIColor *)color
 {
     ASImageNode *rangeBarImageNode = [[ASImageNode alloc] init];
+    ASPrimitiveTraitCollection primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection);
     rangeBarImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:RANGE_BAR_CORNER_RADIUS
                                                                     cornerColor:[UIColor clearColor]
                                                                       fillColor:[color colorWithAlphaComponent:0.5]
                                                                     borderColor:[[UIColor blackColor] colorWithAlphaComponent:0.9]
                                                                     borderWidth:RANGE_BAR_BORDER_WIDTH
                                                                  roundedCorners:UIRectCornerAllCorners
-                                                                          scale:[[UIScreen mainScreen] scale]];
+                                                                          scale:[[UIScreen mainScreen] scale]
+                                                                traitCollection:primitiveTraitCollection];
     [self addSubnode:rangeBarImageNode];
   
     return rangeBarImageNode;
