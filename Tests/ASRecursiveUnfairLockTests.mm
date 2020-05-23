@@ -62,7 +62,7 @@
   ASRecursiveUnfairLockLock(&lock);
   XCTestExpectation *e1 = [self expectationWithDescription:@"Other thread tried lock."];
   [NSThread detachNewThreadWithBlock:^{
-    XCTAssertThrows(ASRecursiveUnfairLockUnlock(&lock));
+    XCTAssertThrows(ASRecursiveUnfairLockUnlock(&self->lock));
     [e1 fulfill];
   }];
   [self waitForExpectationsWithTimeout:10 handler:nil];
@@ -93,7 +93,7 @@ dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
 {
   __block int value = 0;
   [self measureBlock:^{
-    CHAOS_TEST_BODY(YES, ASRecursiveUnfairLockLock(&lock), {}, ASRecursiveUnfairLockUnlock(&lock));
+    CHAOS_TEST_BODY(YES, ASRecursiveUnfairLockLock(&self->lock), {}, ASRecursiveUnfairLockUnlock(&self->lock));
   }];
   XCTAssertEqual(value, 0);
 }
@@ -102,7 +102,7 @@ dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
 {
   __block int value = 0;
   [self measureBlock:^{
-    CHAOS_TEST_BODY(NO, ASRecursiveUnfairLockLock(&lock), {}, ASRecursiveUnfairLockUnlock(&lock));
+    CHAOS_TEST_BODY(NO, ASRecursiveUnfairLockLock(&self->lock), {}, ASRecursiveUnfairLockUnlock(&self->lock));
   }];
   XCTAssertEqual(value, 0);
 }
