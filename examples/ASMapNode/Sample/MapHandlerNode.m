@@ -49,13 +49,15 @@
   
   UIImage *backgroundImage = [UIImage as_resizableRoundedImageWithCornerRadius:5
                                                                    cornerColor:[UIColor whiteColor]
-                                                                     fillColor:[UIColor lightGrayColor]];
+                                                                     fillColor:[UIColor lightGrayColor]
+                                                               traitCollection:self.primitiveTraitCollection];
   
   UIImage *backgroundHiglightedImage = [UIImage as_resizableRoundedImageWithCornerRadius:5
                                                                              cornerColor:[UIColor whiteColor]
                                                                                fillColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.4]
                                                                              borderColor:[UIColor lightGrayColor]
-                                                                             borderWidth:2.0];
+                                                                             borderWidth:2.0
+                                                                         traitCollection:self.primitiveTraitCollection];
   
   [_updateRegionButton setBackgroundImage:backgroundImage forState:UIControlStateNormal];
   [_updateRegionButton setBackgroundImage:backgroundHiglightedImage forState:UIControlStateHighlighted];

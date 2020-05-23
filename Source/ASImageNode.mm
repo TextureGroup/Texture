@@ -212,7 +212,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   __instanceLock__.lock();
   ASPrimitiveTraitCollection tc = _primitiveTraitCollection;
   __instanceLock__.unlock();
-  return ASGraphicsCreateImageWithTraitCollectionAndOptions(tc, size, NO, 1, nil, ^{
+  return ASGraphicsCreateImage(tc, size, NO, 1, nil, nil, ^{
     AS::MutexLocker l(__instanceLock__);
     [_placeholderColor setFill];
     UIRectFill(CGRectMake(0, 0, size.width, size.height));
@@ -382,7 +382,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   BOOL stretchable = !UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero);
   if (stretchable) {
     if (imageModificationBlock != NULL) {
-      image = imageModificationBlock(image);
+      image = imageModificationBlock(image, drawParameter->_traitCollection);
     }
     return image;
   }
@@ -498,7 +498,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  // The following `ASGraphicsCreateImageWithTraitCollectionAndOptions` call will sometimes take take longer than 5ms on an
+  // The following `ASGraphicsCreateImage` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
   // Check for cancellation before we call it.
   if (isCancelled()) {
@@ -509,7 +509,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameters->_traitCollection, key.backingSize, key.isOpaque, 1.0, key.image, ^{
+  UIImage *result = ASGraphicsCreateImage(drawParameters->_traitCollection, key.backingSize, key.isOpaque, 1.0, key.image, isCancelled, ^{
     BOOL contextIsClean = YES;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -561,7 +561,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   }
 
   if (key.imageModificationBlock) {
-    result = key.imageModificationBlock(result);
+    result = key.imageModificationBlock(result, drawParameters->_traitCollection);
   }
 
   return result;
@@ -810,8 +810,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
-  return ^(UIImage *originalImage) {
-    return ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+  return ^(UIImage *originalImage, ASPrimitiveTraitCollection traitCollection) {
+    return ASGraphicsCreateImage(traitCollection, originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
       UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
 
       // Make the image round
@@ -832,8 +832,8 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
 
 asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
-  return ^(UIImage *originalImage) {
-    UIImage *modifiedImage = ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+  return ^(UIImage *originalImage, ASPrimitiveTraitCollection traitCollection) {
+    UIImage *modifiedImage = ASGraphicsCreateImage(traitCollection, originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
       // Set color and render template
       [color setFill];
       UIImage *templateImage = [originalImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];

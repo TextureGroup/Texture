@@ -140,7 +140,7 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
 
-      UIImage *debugHighlightImage = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, ^{
+      UIImage *debugHighlightImage = ASGraphicsCreateImage(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, nil, ^{
         [fillColor setFill];
         UIRectFill(imgRect);
 
@@ -729,13 +729,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
 - (ASImageNode *)createRangeNodeWithColor:(UIColor *)color
 {
     ASImageNode *rangeBarImageNode = [[ASImageNode alloc] init];
+    ASPrimitiveTraitCollection primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection);
     rangeBarImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:RANGE_BAR_CORNER_RADIUS
                                                                     cornerColor:[UIColor clearColor]
                                                                       fillColor:[color colorWithAlphaComponent:0.5]
                                                                     borderColor:[[UIColor blackColor] colorWithAlphaComponent:0.9]
                                                                     borderWidth:RANGE_BAR_BORDER_WIDTH
                                                                  roundedCorners:UIRectCornerAllCorners
-                                                                          scale:[[UIScreen mainScreen] scale]];
+                                                                          scale:[[UIScreen mainScreen] scale]
+                                                                traitCollection:primitiveTraitCollection];
     [self addSubnode:rangeBarImageNode];
   
     return rangeBarImageNode;

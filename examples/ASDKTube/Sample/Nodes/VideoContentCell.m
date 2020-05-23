@@ -45,7 +45,7 @@
     _avatarNode = [[ASNetworkImageNode alloc] init];
     _avatarNode.URL = _videoModel.avatarUrl;
 
-    [_avatarNode setImageModificationBlock:^UIImage *(UIImage *image) {
+    [_avatarNode setImageModificationBlock:^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {
       CGSize profileImageSize = CGSizeMake(AVATAR_IMAGE_HEIGHT, AVATAR_IMAGE_HEIGHT);
       return [image makeCircularImageWithSize:profileImageSize];
     }];
