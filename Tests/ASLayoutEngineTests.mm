@@ -63,7 +63,7 @@
   allNodes = @[ nodeA, nodeB, nodeC, nodeD, nodeE ];
   ASSetDebugNames(nodeA, nodeB, nodeC, nodeD, nodeE);
   ASLayoutSpecBlock b = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, nodeC, nodeD ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeC, self->nodeD ]];
   };
   fixture1and3and5NodeALayoutSpecBlock = b;
   fixture1 = [self createFixture1];
@@ -294,7 +294,7 @@
       // are common to both fixture2 and fixture4 are available from the cache.
     } else {
       // Incorrect behavior: nodeC will get measured against its new bounds on main.
-      const auto cPendingSize = [self->fixture2 layoutForNode:nodeC].size;
+      const auto cPendingSize = [self->fixture2 layoutForNode:self->nodeC].size;
       OCMExpect([self->nodeC.mock calculateLayoutThatFits:ASSizeRangeMake(cPendingSize)]).onMainThread();
     }
     [self->window layoutIfNeeded];
@@ -456,7 +456,7 @@
   fixture.layout = layoutA;
 
   ASLayoutSpecBlock specBlockA = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, nodeC, nodeE ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeC, self->nodeE ]];
   };
   [fixture.layoutSpecBlocks setObject:specBlockA forKey:nodeA];
   return fixture;
@@ -535,7 +535,7 @@
   fixture.layout = layoutA;
 
   ASLayoutSpecBlock specBlockA = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, nodeD, nodeE ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeD, self->nodeE ]];
   };
   [fixture.layoutSpecBlocks setObject:specBlockA forKey:nodeA];
   return fixture;
