@@ -20,7 +20,6 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalTextNode,
 #endif
   ASExperimentalInterfaceStateCoalescing,
-  ASExperimentalUnfairLock,
   ASExperimentalLayerDefaults,
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
@@ -46,7 +45,6 @@ static ASExperimentalFeatures features[] = {
   return @[
     @"exp_text_node",
     @"exp_interface_state_coalesce",
-    @"exp_unfair_lock",
     @"exp_infer_layer_defaults",
     @"exp_collection_teardown",
     @"exp_framesetter_cache",
