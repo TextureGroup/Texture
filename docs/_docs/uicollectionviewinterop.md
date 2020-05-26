@@ -77,6 +77,9 @@ For this example, the data source method `collectionNode:nodeBlockForItemAtIndex
                         nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock! {
         return optionalNode
     }
+
+  // Click the "Edit on GitHub" button at the bottom of this  
+  // page to contribute the swift code for this section. Thanks!
   </pre>
 </div>
 </div>
