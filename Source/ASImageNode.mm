@@ -30,8 +30,6 @@
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
-static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
-
 typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 @interface ASImageNodeDrawParameters : NSObject {
@@ -247,7 +245,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return;
   }
 
-  UIImage *oldImage = _image;
   _image = image;
 
   if (image != nil) {
@@ -267,16 +264,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     }
   } else {
     self.contents = nil;
-  }
-
-  // Destruction of bigger images on the main thread can be expensive
-  // and can take some time, so we dispatch onto a bg queue to
-  // actually dealloc.
-  CGSize oldImageSize = oldImage.size;
-  BOOL shouldReleaseImageOnBackgroundThread = oldImageSize.width > kMinReleaseImageOnBackgroundSize.width
-                                              || oldImageSize.height > kMinReleaseImageOnBackgroundSize.height;
-  if (shouldReleaseImageOnBackgroundThread && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
-    ASPerformBackgroundDeallocation(&oldImage);
   }
 }
 
