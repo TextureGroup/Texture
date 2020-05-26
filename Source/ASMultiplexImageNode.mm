@@ -742,7 +742,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
     PHAsset *imageAsset = nil;
     
     // Try to get the asset immediately from the data source.
-    if (_dataSourceFlags.asset) {
+    if (strongSelf->_dataSourceFlags.asset) {
       imageAsset = [strongSelf.dataSource multiplexImageNode:strongSelf assetForLocalIdentifier:request.assetIdentifier];
     }
     

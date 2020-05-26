@@ -260,9 +260,9 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
       // holding the lock while calling addSubnode.
       dispatch_async(dispatch_get_main_queue(), ^{
-        _debugLabelNode = [[ASTextNode alloc] init];
-        _debugLabelNode.layerBacked = YES;
-        [self addSubnode:_debugLabelNode];
+        self->_debugLabelNode = [[ASTextNode alloc] init];
+        self->_debugLabelNode.layerBacked = YES;
+        [self addSubnode:self->_debugLabelNode];
       });
     }
   } else {
@@ -333,7 +333,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     // Hack for now to retain the weak entry that was created while this drawing happened
     drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
       ASLockScopeSelf();
-      _weakCacheEntry = entry;
+      self->_weakCacheEntry = entry;
     };
   }
   

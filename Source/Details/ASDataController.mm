@@ -533,13 +533,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _synchronized = NO;
 
   [changeSet addCompletionHandler:^(BOOL finished) {
-    _synchronized = YES;
+    self->_synchronized = YES;
     [self onDidFinishProcessingUpdates:^{
-      if (_synchronized) {
-        for (ASDataControllerSynchronizationBlock block in _onDidFinishSynchronizingBlocks) {
+      if (self->_synchronized) {
+        for (ASDataControllerSynchronizationBlock block in self->_onDidFinishSynchronizingBlocks) {
           block();
         }
-        [_onDidFinishSynchronizingBlocks removeAllObjects];
+        [self->_onDidFinishSynchronizingBlocks removeAllObjects];
       }
     }];
   }];
@@ -646,9 +646,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     }
 
     // Step 4: Inform the delegate on main thread
-    [_mainSerialQueue performBlockOnMainThread:^{
+    [self->_mainSerialQueue performBlockOnMainThread:^{
       as_activity_scope_leave(&preparationScope);
-      [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
+      [self->_delegate dataController:self updateWithChangeSet:changeSet updates:^{
         // Step 5: Deploy the new data as "completed"
         //
         // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
@@ -659,7 +659,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
         self.visibleMap = newMap;
       }];
     }];
-    --_editingTransactionGroupCount;
+    --self->_editingTransactionGroupCount;
   });
 
   // We've now dispatched node allocation and layout to a concurrent background queue.
@@ -898,7 +898,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (void)environmentDidChange
 {
   ASPerformBlockOnMainThread(^{
-    if (!_initialReloadDataHasBeenCalled) {
+    if (!self->_initialReloadDataHasBeenCalled) {
       return;
     }
 
@@ -906,7 +906,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     // i.e there might be some elements that were allocated using the old trait collection but haven't been added to _visibleMap
     [self _scheduleBlockOnMainSerialQueue:^{
       ASPrimitiveTraitCollection newTraitCollection = [self.node primitiveTraitCollection];
-      for (ASCollectionElement *element in _visibleMap) {
+      for (ASCollectionElement *element in self->_visibleMap) {
         element.traitCollection = newTraitCollection;
       }
     }];
