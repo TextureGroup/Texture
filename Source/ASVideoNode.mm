@@ -289,7 +289,7 @@ static NSString * const kRate = @"rate";
 - (void)imageAtTime:(CMTime)imageTime completionHandler:(void(^)(UIImage *image))completionHandler
 {
   ASPerformBlockOnBackgroundThread(^{
-    AVAsset *asset = self.asset;
+    AVAsset *asset = self->_asset;
 
     // Skip the asset image generation if we don't have any tracks available that are capable of supporting it
     NSArray<AVAssetTrack *>* visualAssetArray = [asset tracksWithMediaCharacteristic:AVMediaCharacteristicVisual];
@@ -300,7 +300,7 @@ static NSString * const kRate = @"rate";
 
     AVAssetImageGenerator *previewImageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:asset];
     previewImageGenerator.appliesPreferredTrackTransform = YES;
-    previewImageGenerator.videoComposition = _videoComposition;
+    previewImageGenerator.videoComposition = self->_videoComposition;
 
     [previewImageGenerator generateCGImagesAsynchronouslyForTimes:@[[NSValue valueWithCMTime:imageTime]]
                                                 completionHandler:^(CMTime requestedTime, CGImageRef image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error) {
@@ -415,7 +415,7 @@ static NSString * const kRate = @"rate";
   NSArray<NSString *> *requestedKeys = @[@"playable"];
   [asset loadValuesAsynchronouslyForKeys:requestedKeys completionHandler:^{
     ASPerformBlockOnMainThread(^{
-      if (_delegateFlags.delegateVideoNodeDidFinishInitialLoading) {
+      if (self->_delegateFlags.delegateVideoNodeDidFinishInitialLoading) {
         [self.delegate videoNodeDidFinishInitialLoading:self];
       }
       [self prepareToPlayAsset:asset withKeys:requestedKeys];

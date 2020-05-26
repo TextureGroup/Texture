@@ -140,7 +140,7 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
 
-      UIImage *debugHighlightImage = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, ^{
+      UIImage *debugHighlightImage = ASGraphicsCreateImage(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, nil, ^{
         [fillColor setFill];
         UIRectFill(imgRect);
 
@@ -424,10 +424,10 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   }
   
   [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-    _animating = YES;
+    self->_animating = YES;
     [self layoutToFitAllBarsExcept:0];
   } completion:^(BOOL finished) {
-    _animating = NO;
+    self->_animating = NO;
   }];
 }
 
@@ -653,15 +653,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   
   BOOL animate = !_firstLayoutOfRects;
   [UIView animateWithDuration:animate ? 0.3 : 0.0 delay:0.0 options:UIViewAnimationOptionLayoutSubviews animations:^{
-    _visibleRect.frame    = CGRectMake(HORIZONTAL_INSET + visiblePoint,    rect.origin.y, visibleDimension,    subCellHeight);
-    _displayRect.frame    = CGRectMake(HORIZONTAL_INSET + displayPoint,    rect.origin.y, displayDimension,    subCellHeight);
-    _preloadRect.frame    = CGRectMake(HORIZONTAL_INSET + preloadPoint,  rect.origin.y, preloadDimension,  subCellHeight);
+    self->_visibleRect.frame    = CGRectMake(HORIZONTAL_INSET + visiblePoint,    rect.origin.y, visibleDimension,    subCellHeight);
+    self->_displayRect.frame    = CGRectMake(HORIZONTAL_INSET + displayPoint,    rect.origin.y, displayDimension,    subCellHeight);
+    self->_preloadRect.frame    = CGRectMake(HORIZONTAL_INSET + preloadPoint,  rect.origin.y, preloadDimension,  subCellHeight);
   } completion:^(BOOL finished) {}];
   
   if (!animate) {
     _visibleRect.alpha = _displayRect.alpha = _preloadRect.alpha = 0;
     [UIView animateWithDuration:0.3 animations:^{
-      _visibleRect.alpha = _displayRect.alpha = _preloadRect.alpha = 1;
+      self->_visibleRect.alpha = self->_displayRect.alpha = self->_preloadRect.alpha = 1;
     }];
   }
   
@@ -729,13 +729,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
 - (ASImageNode *)createRangeNodeWithColor:(UIColor *)color
 {
     ASImageNode *rangeBarImageNode = [[ASImageNode alloc] init];
+    ASPrimitiveTraitCollection primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection);
     rangeBarImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:RANGE_BAR_CORNER_RADIUS
                                                                     cornerColor:[UIColor clearColor]
                                                                       fillColor:[color colorWithAlphaComponent:0.5]
                                                                     borderColor:[[UIColor blackColor] colorWithAlphaComponent:0.9]
                                                                     borderWidth:RANGE_BAR_BORDER_WIDTH
                                                                  roundedCorners:UIRectCornerAllCorners
-                                                                          scale:[[UIScreen mainScreen] scale]];
+                                                                          scale:[[UIScreen mainScreen] scale]
+                                                                traitCollection:primitiveTraitCollection];
     [self addSubnode:rangeBarImageNode];
   
     return rangeBarImageNode;

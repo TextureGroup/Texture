@@ -194,7 +194,31 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   UIRectFill(CGRectMake(0, 0, 100, 100));
   UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result);
+  
+  ASPrimitiveTraitCollection traitCollection;
+  
+  if (@available(iOS 13.0, *)) {
+    traitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection.currentTraitCollection);
+  } else {
+    traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  }
+  
+  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result, traitCollection);
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = rounded;
+  ASDisplayNodeSizeToFitSize(node, rounded.size);
+  ASSnapshotVerifyNode(node, nil);
+}
+
+- (void)testTintColorBlock
+{
+  UIGraphicsBeginImageContext(CGSizeMake(100, 100));
+  [[UIColor blueColor] setFill];
+  UIRectFill(CGRectMake(0, 0, 100, 100));
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  UIImage *rounded = ASImageNodeTintColorModificationBlock([UIColor redColor])(result, ASPrimitiveTraitCollectionMakeDefault());
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = rounded;
   ASDisplayNodeSizeToFitSize(node, rounded.size);

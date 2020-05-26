@@ -10,6 +10,7 @@
 #ifndef ASDK_ACCESSIBILITY_DISABLE
 
 #import <AsyncDisplayKit/_ASDisplayView.h>
+#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
@@ -21,35 +22,47 @@
 
 #pragma mark - UIAccessibilityElement
 
-@protocol ASAccessibilityElementPositioning
+static ASSortAccessibilityElementsComparator currentAccessibilityComparator = nil;
+static ASSortAccessibilityElementsComparator defaultAccessibilityComparator = nil;
 
-@property (nonatomic, readonly) CGRect accessibilityFrame;
-
-@end
-
-typedef NSComparisonResult (^SortAccessibilityElementsComparator)(id<ASAccessibilityElementPositioning>, id<ASAccessibilityElementPositioning>);
+void setUserDefinedAccessibilitySortComparator(ASSortAccessibilityElementsComparator userDefinedComparator) {
+  currentAccessibilityComparator = userDefinedComparator ?: defaultAccessibilityComparator;
+}
 
 /// Sort accessiblity elements first by y and than by x origin.
-static void SortAccessibilityElements(NSMutableArray *elements)
+void SortAccessibilityElements(NSMutableArray *elements)
 {
   ASDisplayNodeCAssertNotNil(elements, @"Should pass in a NSMutableArray");
-
-  static SortAccessibilityElementsComparator comparator = nil;
+  
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-      comparator = ^NSComparisonResult(id<ASAccessibilityElementPositioning> a, id<ASAccessibilityElementPositioning> b) {
-        CGPoint originA = a.accessibilityFrame.origin;
-        CGPoint originB = b.accessibilityFrame.origin;
-        if (originA.y == originB.y) {
-          if (originA.x == originB.x) {
-            return NSOrderedSame;
+    defaultAccessibilityComparator = ^NSComparisonResult(NSObject *a, NSObject *b) {
+      CGPoint originA = a.accessibilityFrame.origin;
+      CGPoint originB = b.accessibilityFrame.origin;
+      if (originA.y == originB.y) {
+        if (originA.x == originB.x) {
+          // if we have the same origin, favor shorter items. If heights are the same, favor thinner items. If size is the same ¯\_(ツ)_/¯
+          CGSize sizeA = a.accessibilityFrame.size;
+          CGSize sizeB = b.accessibilityFrame.size;
+          if (sizeA.height == sizeB.height) {
+            if (sizeA.width == sizeB.width) {
+              return NSOrderedSame;
+            }
+            return (sizeA.width < sizeB.width) ? NSOrderedAscending : NSOrderedDescending;
           }
-          return (originA.x < originB.x) ? NSOrderedAscending : NSOrderedDescending;
+          return (sizeA.height < sizeB.height) ? NSOrderedAscending : NSOrderedDescending;
         }
-        return (originA.y < originB.y) ? NSOrderedAscending : NSOrderedDescending;
-      };
+        return (originA.x < originB.x) ? NSOrderedAscending : NSOrderedDescending;
+      }
+      return (originA.y < originB.y) ? NSOrderedAscending : NSOrderedDescending;
+    };
+    
+    if (!currentAccessibilityComparator) {
+      currentAccessibilityComparator = defaultAccessibilityComparator;
+    }
   });
-  [elements sortUsingComparator:comparator];
+  
+  [elements sortUsingComparator:currentAccessibilityComparator];
 }
 
 static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
@@ -57,7 +70,7 @@ static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
   return [layer convertRect:node.bounds toLayer:ASFindWindowOfLayer(layer).layer];
 }
 
-@interface ASAccessibilityElement : UIAccessibilityElement<ASAccessibilityElementPositioning>
+@interface ASAccessibilityElement : UIAccessibilityElement
 
 @property (nonatomic) ASDisplayNode *node;
 
@@ -93,7 +106,7 @@ static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
 
 #pragma mark - _ASDisplayView / UIAccessibilityContainer
 
-@interface ASAccessibilityCustomAction : UIAccessibilityCustomAction<ASAccessibilityElementPositioning>
+@interface ASAccessibilityCustomAction : UIAccessibilityCustomAction
 
 @property (nonatomic) ASDisplayNode *node;
 
@@ -197,6 +210,17 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
   [elements addObject:accessiblityElement];
 }
 
+/// Check if a view is a subviews of an UIScrollView. This is used to determine whether to enforce that
+/// accessibility elements must be on screen
+static BOOL recusivelyCheckSuperviewsForScrollView(UIView *view) {
+    if (!view) {
+        return NO;
+    } else if ([view isKindOfClass:[UIScrollView class]]) {
+        return YES;
+    }
+    return recusivelyCheckSuperviewsForScrollView(view.superview);
+}
+
 /// Collect all accessibliity elements for a given view and view node
 static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *elements)
 {
@@ -213,6 +237,11 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }));
 
   UIView *view = node.view;
+  
+  // If we don't have a window, let's just bail out
+  if (!view.window) {
+    return;
+  }
 
   if (node.isAccessibilityContainer && !anySubNodeIsCollection) {
     CollectAccessibilityElementsForContainer(node, view, elements);
@@ -224,8 +253,20 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     CollectUIAccessibilityElementsForNode(node, node, view, elements);
     return;
   }
-
+  
   for (ASDisplayNode *subnode in node.subnodes) {
+    // If a node is hidden or has an alpha of 0.0 we should not include it
+    if (subnode.hidden || subnode.alpha == 0.0) {
+      continue;
+    }
+    
+    // If a subnode is outside of the view's window, exclude it UNLESS it is a subview of an UIScrollView.
+    // In this case UIKit will return the element even if it is outside of the window or the scrollView's visible rect (contentOffset + contentSize)
+    CGRect nodeInWindowCoords = [node convertRect:subnode.frame toNode:nil];
+    if (!CGRectIntersectsRect(view.window.frame, nodeInWindowCoords) && !recusivelyCheckSuperviewsForScrollView(view)) {
+      continue;
+    }
+    
     if (subnode.isAccessibilityElement) {
       // An accessiblityElement can either be a UIView or a UIAccessibilityElement
       if (subnode.isLayerBacked) {
@@ -275,7 +316,9 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return @[];
   }
 
-  if (_accessibilityElements == nil) {
+  // when items become hidden/visible we have to manually clear the _accessibilityElements in order to get an updated version
+  // Instead, let's try computing the elements every time and see how badly it affects performance.
+  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements)) {
     _accessibilityElements = [viewNode accessibilityElements];
   }
   return _accessibilityElements;

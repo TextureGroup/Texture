@@ -151,10 +151,10 @@
     @autoreleasepool {
       dispatch_async(dispatch_get_main_queue(), ^{
         NSArray *sections = [ASThrashTestSection sectionsWithCount:kInitialSectionCount];
-        _update = [[ASThrashUpdate alloc] initWithData:sections];
+        self->_update = [[ASThrashUpdate alloc] initWithData:sections];
         ASThrashDataSource *ds = [[ASThrashDataSource alloc] initCollectionViewDataSourceWithData:sections];
 
-        [self applyUpdateUsingBatchUpdates:_update
+        [self applyUpdateUsingBatchUpdates:self->_update
                               toDataSource:ds
                                   animated:NO
                              useXCTestWait:NO];

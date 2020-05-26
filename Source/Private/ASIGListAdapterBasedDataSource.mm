@@ -86,6 +86,21 @@ typedef struct {
   [self.delegate collectionView:collectionNode.view didSelectItemAtIndexPath:indexPath];
 }
 
+- (void)collectionNode:(ASCollectionNode *)collectionNode didDeselectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didDeselectItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didHighlightItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didHighlightItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self.delegate collectionView:collectionNode.view didUnhighlightItemAtIndexPath:indexPath];
+}
+
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   [self.delegate scrollViewDidScroll:scrollView];
@@ -145,6 +160,32 @@ typedef struct {
   ASIGSectionController *ctrl = self.sectionControllerForBatchFetching;
   self.sectionControllerForBatchFetching = nil;
   [ctrl beginBatchFetchWithContext:context];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node
+{
+  NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
+  UIView *contentView = node.view.superview;
+  UICollectionViewCell *cell = contentView.superview;
+
+  if (cell == nil || indexPath == nil) {
+    return;
+  }
+
+  [self.delegate collectionView:collectionNode.view willDisplayCell:cell forItemAtIndexPath:indexPath];
+}
+
+- (void)collectionNode:(ASCollectionNode *)collectionNode didEndDisplayingItemWithNode:(ASCellNode *)node
+{
+  NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
+  UIView *contentView = node.view.superview;
+  UICollectionViewCell *cell = contentView.superview;
+
+  if (cell == nil || indexPath == nil) {
+    return;
+  }
+
+  [self.delegate collectionView:collectionNode.view didEndDisplayingCell:cell forItemAtIndexPath:indexPath];
 }
 
 /**

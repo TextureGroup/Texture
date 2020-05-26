@@ -105,14 +105,6 @@
   }
 }
 
-- (void)dealloc
-{
-  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable)) {
-    return;
-  }
-  ASPerformBackgroundDeallocation(&_node);
-}
-
 - (void)loadView
 {
   // Apple applies a frame and autoresizing masks we need.  Allocating a view is not

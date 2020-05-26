@@ -290,7 +290,7 @@ static const void *ContextKey() {
     [context addCallbackData:[[NSDictionary alloc] initWithDictionary:callbackData]];
 
     // Create new task if necessary
-    NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [_session downloadTaskWithURL:URL];}];
+    NSURLSessionDownloadTask *task = (NSURLSessionDownloadTask *)[context createSessionTaskIfNecessaryWithBlock:^(){return [self->_session downloadTaskWithURL:URL];}];
 
     if (task) {
       task.priority = NSURLSessionTaskPriorityWithImageDownloaderPriority(priority);

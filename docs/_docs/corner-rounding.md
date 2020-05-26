@@ -183,7 +183,8 @@ _photoImageNode.willDisplayNodeContentWithRenderingContext = ^(CGContextRef cont
     CGFloat radius = cornerRadius * screenScale; 
     UIImage *overlay = [UIImage as_resizableRoundedImageWithCornerRadius:radius
                                                              cornerColor:[UIColor clearColor]
-                                                               fillColor:[UIColor clearColor]];
+                                                               fillColor:[UIColor clearColor]
+                                                               traitCollection:self.primitiveTraitCollection];
     [overlay drawInRect:bounds];
     [[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:radius] addClip];
 };
