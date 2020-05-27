@@ -241,7 +241,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     class_addMethod(self, @selector(didEnterVisibleState), noArgsImp, "v@:");
     class_addMethod(self, @selector(didExitVisibleState), noArgsImp, "v@:");
     class_addMethod(self, @selector(hierarchyDisplayDidFinish), noArgsImp, "v@:");
-    class_addMethod(self, @selector(asyncTraitCollectionDidChange), noArgsImp, "v@:");
     class_addMethod(self, @selector(calculatedLayoutDidChange), noArgsImp, "v@:");
     
     auto type0 = "v@:" + std::string(@encode(ASSizeRange));

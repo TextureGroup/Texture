@@ -22,7 +22,6 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_dispatch_apply",
                                       @"exp_drawing_global",
                                       @"exp_optimize_data_controller_pipeline",
-                                      @"exp_trait_collection_did_change_with_previous_collection",
                                       @"exp_do_not_cache_accessibility_elements"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;

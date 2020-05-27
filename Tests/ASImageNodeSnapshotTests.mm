@@ -242,11 +242,6 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testDynamicAssetImage
 {
   if (@available(iOS 13.0, *)) {
-    // enable experimantal callback for traits change
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-    
     UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     ASImageNode *node = [[ASImageNode alloc] init];
     node.image = image;
@@ -265,11 +260,6 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testDynamicTintColor
 {
   if (@available(iOS 13.0, *)) {
-    // enable experimental callback for traits change
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-    
     UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
     image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     UIColor* tintColor = UIColor.systemBackgroundColor;
