@@ -137,12 +137,7 @@ ASLayoutElementStyleExtensibilityForwarding
     _primitiveTraitCollection = traitCollection;
 
     l.unlock();
-    if (ASActivateExperimentalFeature(ASExperimentalTraitCollectionDidChangeWithPreviousCollection)) {
       [self asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
-    } else {
-      [self asyncTraitCollectionDidChange];
-    }
-
   }
 }
 

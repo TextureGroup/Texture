@@ -16,13 +16,6 @@
 
 @implementation ASDisplayNodeSnapshotTests
 
-- (void)setUp {
-  [super setUp];
-  ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-  [ASConfigurationManager test_resetWithConfiguration:config];
-}
-
 - (void)testBasicHierarchySnapshotTesting
 {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
@@ -68,14 +61,6 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
 
 - (void)testClippingCornerRounding
 {
-#if AS_AT_LEAST_IOS13
-  if (@available(iOS 13.0, *)) {
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-  }
-#endif
-
   for (CACornerMask c = 1; c <= kASCACornerAllCorners; c |= (c << 1)) {
     auto node = [[ASImageNode alloc] init];
     auto bounds = CGRectMake(0, 0, 100, 100);
