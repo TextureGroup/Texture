@@ -102,6 +102,7 @@
 		4080D66C2350384400CDC199 /* ASPINRemoteImageDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 68355B391CB57A5A001D4E68 /* ASPINRemoteImageDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		471D04B1224CB98600649215 /* ASImageNodeBackingSizeTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 471D04B0224CB98600649215 /* ASImageNodeBackingSizeTests.mm */; };
 		4E9127691F64157600499623 /* ASRunLoopQueueTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4E9127681F64157600499623 /* ASRunLoopQueueTests.mm */; };
+		4EE3813FF44E20C399ACB962 /* Pods_AsyncDisplayKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5039B74209A895E07057081C /* Pods_AsyncDisplayKitTests.framework */; };
 		509E68601B3AED8E009B9150 /* ASScrollDirection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E111B371BD7007741D0 /* ASScrollDirection.mm */; };
 		509E68611B3AEDA0009B9150 /* ASAbstractLayoutController.h in Headers */ = {isa = PBXBuildFile; fileRef = 205F0E171B37339C007741D0 /* ASAbstractLayoutController.h */; };
 		509E68621B3AEDA5009B9150 /* ASAbstractLayoutController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 205F0E181B37339C007741D0 /* ASAbstractLayoutController.mm */; };
@@ -177,7 +178,6 @@
 		83A7D95B1D44547700BF333E /* ASWeakMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D9591D44542100BF333E /* ASWeakMap.mm */; };
 		83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 83A7D9581D44542100BF333E /* ASWeakMap.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		83A7D95E1D446A6E00BF333E /* ASWeakMapTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */; };
-		8B9AFE34C419D8E229D886F1 /* Pods_AsyncDisplayKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5039B74209A895E07057081C /* Pods_AsyncDisplayKitTests.framework */; };
 		8BBBAB8C1CEBAF1700107FC6 /* ASDefaultPlaybackButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0768B11CE752EC002E1453 /* ASDefaultPlaybackButton.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B0768B21CE752EC002E1453 /* ASDefaultPlaybackButton.mm */; };
 		8BDA5FC71CDBDF91007D13B2 /* ASVideoPlayerNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BDA5FC31CDBDDE1007D13B2 /* ASVideoPlayerNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1083,7 +1083,7 @@
 				058D09BE195D04C000B7D73C /* XCTest.framework in Frameworks */,
 				058D09C1195D04C000B7D73C /* UIKit.framework in Frameworks */,
 				058D09BF195D04C000B7D73C /* Foundation.framework in Frameworks */,
-				8B9AFE34C419D8E229D886F1 /* Pods_AsyncDisplayKitTests.framework in Frameworks */,
+				4EE3813FF44E20C399ACB962 /* Pods_AsyncDisplayKitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
