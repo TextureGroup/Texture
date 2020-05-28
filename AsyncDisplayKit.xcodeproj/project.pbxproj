@@ -177,6 +177,7 @@
 		83A7D95B1D44547700BF333E /* ASWeakMap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D9591D44542100BF333E /* ASWeakMap.mm */; };
 		83A7D95C1D44548100BF333E /* ASWeakMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 83A7D9581D44542100BF333E /* ASWeakMap.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		83A7D95E1D446A6E00BF333E /* ASWeakMapTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83A7D95D1D446A6E00BF333E /* ASWeakMapTests.mm */; };
+		89DA454A9BB6CF35A02F9DD2 /* Pods_AsyncDisplayKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA42D0ECAA484A6B9934110F /* Pods_AsyncDisplayKitTests.framework */; };
 		8BBBAB8C1CEBAF1700107FC6 /* ASDefaultPlaybackButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B0768B11CE752EC002E1453 /* ASDefaultPlaybackButton.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		8BBBAB8D1CEBAF1E00107FC6 /* ASDefaultPlaybackButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8B0768B21CE752EC002E1453 /* ASDefaultPlaybackButton.mm */; };
 		8BDA5FC71CDBDF91007D13B2 /* ASVideoPlayerNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BDA5FC31CDBDDE1007D13B2 /* ASVideoPlayerNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -456,7 +457,6 @@
 		D933F041224AD17F00FF495E /* ASTransactionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D933F040224AD17F00FF495E /* ASTransactionTests.mm */; };
 		D99F9158232990F30083CC8E /* ASImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D99F9157232990F30083CC8E /* ASImageNodeTests.m */; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */; };
 		DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = DB55C2601C6408D6004EDCF5 /* _ASTransitionContext.mm */; };
 		DBABFAFC1C6A8D2F0039EA4A /* _ASTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C25F1C6408D6004EDCF5 /* _ASTransitionContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		DBC452DE1C5C6A6A00B16017 /* ArrayDiffingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBC452DD1C5C6A6A00B16017 /* ArrayDiffingTests.mm */; };
@@ -792,6 +792,7 @@
 		9F98C0241DBDF2A300476D92 /* ASControlTargetAction.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASControlTargetAction.mm; sourceTree = "<group>"; };
 		A32FEDD31C501B6A004F642A /* ASTextKitFontSizeAdjuster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASTextKitFontSizeAdjuster.h; path = TextKit/ASTextKitFontSizeAdjuster.h; sourceTree = "<group>"; };
 		A373200E1C571B050011FC94 /* ASTextNode+Beta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASTextNode+Beta.h"; sourceTree = "<group>"; };
+		AA42D0ECAA484A6B9934110F /* Pods_AsyncDisplayKitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AsyncDisplayKitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC026B571BD3F61800BBC17E /* ASAbsoluteLayoutSpecSnapshotTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASAbsoluteLayoutSpecSnapshotTests.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		AC026B6D1BD57DBF00BBC17E /* _ASHierarchyChangeSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASHierarchyChangeSet.h; sourceTree = "<group>"; };
 		AC026B6E1BD57DBF00BBC17E /* _ASHierarchyChangeSet.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = _ASHierarchyChangeSet.mm; sourceTree = "<group>"; };
@@ -1055,7 +1056,6 @@
 		E5E281751E71C845006B67C2 /* ASCollectionLayoutState.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionLayoutState.mm; sourceTree = "<group>"; };
 		E5E2D72D1EA780C4005C24C6 /* ASCollectionGalleryLayoutDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionGalleryLayoutDelegate.h; sourceTree = "<group>"; };
 		E5E2D72F1EA780DF005C24C6 /* ASCollectionGalleryLayoutDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; path = ASCollectionGalleryLayoutDelegate.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AsyncDisplayKitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F325E48B21745F9E00AC93A4 /* ASButtonNodeTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASButtonNodeTests.mm; sourceTree = "<group>"; };
 		F325E48F217460B000AC93A4 /* ASTextNode2Tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTextNode2Tests.mm; sourceTree = "<group>"; };
 		F3F698D1211CAD4600800CB1 /* ASDisplayViewAccessibilityTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDisplayViewAccessibilityTests.mm; sourceTree = "<group>"; };
@@ -1083,7 +1083,7 @@
 				058D09BE195D04C000B7D73C /* XCTest.framework in Frameworks */,
 				058D09C1195D04C000B7D73C /* UIKit.framework in Frameworks */,
 				058D09BF195D04C000B7D73C /* Foundation.framework in Frameworks */,
-				DB7121BCD50849C498C886FB /* libPods-AsyncDisplayKitTests.a in Frameworks */,
+				89DA454A9BB6CF35A02F9DD2 /* Pods_AsyncDisplayKitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1170,7 +1170,7 @@
 				058D09AF195D04C000B7D73C /* Foundation.framework */,
 				058D09BD195D04C000B7D73C /* XCTest.framework */,
 				058D09C0195D04C000B7D73C /* UIKit.framework */,
-				EFA731F0396842FF8AB635EE /* libPods-AsyncDisplayKitTests.a */,
+				AA42D0ECAA484A6B9934110F /* Pods_AsyncDisplayKitTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2156,6 +2156,7 @@
 				058D09B8195D04C000B7D73C /* Sources */,
 				058D09B9195D04C000B7D73C /* Frameworks */,
 				058D09BA195D04C000B7D73C /* Resources */,
+				F7D0C9EDE1FC3D066B45EE7C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2274,6 +2275,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F7D0C9EDE1FC3D066B45EE7C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/FBSnapshotTestCase/FBSnapshotTestCase.framework",
+				"${BUILT_PRODUCTS_DIR}/OCMock/OCMock.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSnapshotTestCase.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OCMock.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
