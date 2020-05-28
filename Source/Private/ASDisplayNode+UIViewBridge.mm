@@ -1137,6 +1137,18 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 @implementation ASDisplayNode (UIViewBridgeAccessibility)
 
+// Walks up the view tree to nil out all the cached accsesibilityElements. This is required when changing
+// accessibility properties like accessibilityViewIsModal.
+// NOTE: If we ship ASExperimentalDoNotCacheAccessibilityElements this is not required.
+- (void)invalidateAccessibilityElements
+{
+  BOOL loaded = _loaded(self);
+  if (loaded && ASDisplayNodeThreadIsMain()) {
+    self.view.accessibilityElements = nil;
+    [self.supernode invalidateAccessibilityElements];
+  }
+}
+
 - (BOOL)isAccessibilityElement
 {
   _bridge_prologue_read;
@@ -1306,8 +1318,15 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (void)setAccessibilityViewIsModal:(BOOL)accessibilityViewIsModal
 {
   _bridge_prologue_write;
+  BOOL oldAccessibilityViewIsModal = _getFromViewOnly(accessibilityViewIsModal);
   _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
+  
+  // if we made a change, we need to clear the view's accessibilityElements cache.
+  if (self.isNodeLoaded && oldAccessibilityViewIsModal != accessibilityViewIsModal) {
+    [self invalidateAccessibilityElements];
+  }
 }
+
 
 - (BOOL)shouldGroupAccessibilityChildren
 {
