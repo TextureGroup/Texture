@@ -1139,9 +1139,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 
 // Walks up the view tree to nil out all the cached accsesibilityElements. This is required when changing
 // accessibility properties like accessibilityViewIsModal.
-// NOTE: If we ship ASExperimentalDoNotCacheAccessibilityElements this is not required.
 - (void)invalidateAccessibilityElements
 {
+  // If we are not caching accessibilityElements we don't need to do anything here.
+  if (ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements)) {
+    return;
+  }
+  
   BOOL loaded = _loaded(self);
   if (loaded && ASDisplayNodeThreadIsMain()) {
     self.view.accessibilityElements = nil;
@@ -1322,7 +1326,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   _setAccessibilityToViewAndProperty(_flags.accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal, accessibilityViewIsModal);
   
   // if we made a change, we need to clear the view's accessibilityElements cache.
-  if (self.isNodeLoaded && oldAccessibilityViewIsModal != accessibilityViewIsModal) {
+  if (!ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements) && self.isNodeLoaded && oldAccessibilityViewIsModal != accessibilityViewIsModal) {
     [self invalidateAccessibilityElements];
   }
 }
