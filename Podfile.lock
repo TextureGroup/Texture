@@ -1,20 +1,20 @@
 PODS:
-  - FBSnapshotTestCase/Core (2.1.4)
+  - iOSSnapshotTestCase/Core (6.2.0)
   - OCMock (3.6)
 
 DEPENDENCIES:
-  - FBSnapshotTestCase/Core (~> 2.1)
+  - iOSSnapshotTestCase/Core (~> 6.2)
   - OCMock (~> 3.6)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - FBSnapshotTestCase
+    - iOSSnapshotTestCase
     - OCMock
 
 SPEC CHECKSUMS:
-  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  iOSSnapshotTestCase: 9ab44cb5aa62b84d31847f40680112e15ec579a6
   OCMock: 5ea90566be239f179ba766fd9fbae5885040b992
 
-PODFILE CHECKSUM: 9f751863f64737ce61a8b6aaa6a8bfe0aadcc165
+PODFILE CHECKSUM: ff1a1777e31f49e6e4b7b148d0f10e504db7fa26
 
 COCOAPODS: 1.9.1
