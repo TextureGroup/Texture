@@ -40,14 +40,19 @@ typedef struct {
   UIUserInterfaceIdiom userInterfaceIdiom;
   UIForceTouchCapability forceTouchCapability;
   UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
-#if AS_BUILD_UIUSERINTERFACESTYLE
   UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
-#endif
+
 
   // NOTE: This must be a constant. We will assert.
   unowned UIContentSizeCategory preferredContentSizeCategory API_AVAILABLE(ios(10.0));
 
   CGSize containerSize;
+
+#if TARGET_OS_IOS
+  UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(tvos);
+#endif
+  UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
+  UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 } ASPrimitiveTraitCollection;
 #pragma clang diagnostic pop
 
@@ -60,6 +65,11 @@ AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault(void)
  * Creates a ASPrimitiveTraitCollection from a given UITraitCollection.
  */
 AS_EXTERN ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection *traitCollection);
+
+/**
+ * Creates a UITraitCollection from a given ASPrimitiveTraitCollection.
+ */
+AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection);
 
 
 /**
@@ -139,12 +149,17 @@ AS_SUBCLASSING_RESTRICTED
 @property (readonly) UIUserInterfaceIdiom userInterfaceIdiom;
 @property (readonly) UIForceTouchCapability forceTouchCapability;
 @property (readonly) UITraitEnvironmentLayoutDirection layoutDirection API_AVAILABLE(ios(10.0));
-#if AS_BUILD_UIUSERINTERFACESTYLE
 @property (readonly) UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
-#endif
 @property (readonly) UIContentSizeCategory preferredContentSizeCategory  API_AVAILABLE(ios(10.0));
 
 @property (readonly) CGSize containerSize;
+
+#if TARGET_OS_IOS
+@property (readonly) UIUserInterfaceLevel userInterfaceLevel API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(tvos);
+#endif
+
+@property (readonly) UIAccessibilityContrast accessibilityContrast API_AVAILABLE(ios(13.0));
+@property (readonly) UILegibilityWeight legibilityWeight API_AVAILABLE(ios(13.0));
 
 - (BOOL)isEqualToTraitCollection:(ASTraitCollection *)traitCollection;
 

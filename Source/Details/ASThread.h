@@ -218,7 +218,7 @@ namespace AS {
       static dispatch_once_t onceToken;
       dispatch_once(&onceToken, ^{
         if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-          gMutex_unfair = ASActivateExperimentalFeature(ASExperimentalUnfairLock);
+          gMutex_unfair = YES;
         }
       });
       

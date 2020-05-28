@@ -16,7 +16,6 @@
                     "exp_graphics_contexts",
                     "exp_text_node",
                     "exp_interface_state_coalesce",
-                    "exp_unfair_lock",
                     "exp_infer_layer_defaults",
                     "exp_collection_teardown",
                     "exp_framesetter_cache",
@@ -24,7 +23,7 @@
                     "exp_did_enter_preload_skip_asm_layout",
                     "exp_dispatch_apply",
                     "exp_oom_bg_dealloc_disable",
-                    "exp_remove_textkit_initialising_lock"
+                    "exp_do_not_cache_accessibility_elements",
                 ]
     		}
 		}

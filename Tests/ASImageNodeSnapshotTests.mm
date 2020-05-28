@@ -11,6 +11,18 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
+#if AS_AT_LEAST_IOS13
+static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
+  CGRect rect = CGRect{.origin = CGPointZero, .size = size};
+  UIGraphicsBeginImageContextWithOptions(size, false, 0);
+  [color setFill];
+  UIRectFill(rect);
+  UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return image;
+}
+#endif
+
 @interface ASImageNodeSnapshotTests : ASSnapshotTestCase
 @end
 
@@ -182,7 +194,31 @@
   UIRectFill(CGRectMake(0, 0, 100, 100));
   UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result);
+  
+  ASPrimitiveTraitCollection traitCollection;
+  
+  if (@available(iOS 13.0, *)) {
+    traitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection.currentTraitCollection);
+  } else {
+    traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  }
+  
+  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result, traitCollection);
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = rounded;
+  ASDisplayNodeSizeToFitSize(node, rounded.size);
+  ASSnapshotVerifyNode(node, nil);
+}
+
+- (void)testTintColorBlock
+{
+  UIGraphicsBeginImageContext(CGSizeMake(100, 100));
+  [[UIColor blueColor] setFill];
+  UIRectFill(CGRectMake(0, 0, 100, 100));
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  UIImage *rounded = ASImageNodeTintColorModificationBlock([UIColor redColor])(result, ASPrimitiveTraitCollectionMakeDefault());
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = rounded;
   ASDisplayNodeSizeToFitSize(node, rounded.size);
@@ -206,10 +242,6 @@
 - (void)testDynamicAssetImage
 {
   if (@available(iOS 13.0, *)) {
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-    
     UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     ASImageNode *node = [[ASImageNode alloc] init];
     node.image = image;
@@ -222,8 +254,29 @@
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
+  }
+}
+
+- (void)testDynamicTintColor
+{
+  if (@available(iOS 13.0, *)) {
+    UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
+    image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIColor* tintColor = UIColor.systemBackgroundColor;
+    ASImageNode *node = [[ASImageNode alloc] init];
     
-    NSLog(@"%@", image);
+    node.image = image;
+    node.tintColor = tintColor;
+    
+    ASDisplayNodeSizeToFitSize(node, image.size);
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_light");
+    }];
+
+    [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
+      ASSnapshotVerifyNode(node, @"user_interface_style_dark");
+    }];
   }
 }
 #endif // #if AS_AT_LEAST_IOS13

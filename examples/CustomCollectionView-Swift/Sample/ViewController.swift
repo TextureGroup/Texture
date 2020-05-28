@@ -17,7 +17,7 @@ class ViewController: ASViewController<ASCollectionNode>, MosaicCollectionViewLa
   let _layoutInspector = MosaicCollectionViewLayoutInspector()
   let kNumberOfImages: UInt = 14
 
-  init() {
+  override init() {
     let layout = MosaicCollectionViewLayout()
     layout.numberOfColumns = 3;
     layout.headerHeight = 44;

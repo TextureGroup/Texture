@@ -36,7 +36,7 @@ static UIEdgeInsets insetsForCombination(NSUInteger combination, CGFloat insetVa
 
 static NSString *nameForInsets(UIEdgeInsets insets)
 {
-  return [NSString stringWithFormat:@"%.f-%.f-%.f-%.f", insets.top, insets.left, insets.bottom, insets.right];
+  return [NSString stringWithFormat:@"%.f_%.f_%.f_%.f", insets.top, insets.left, insets.bottom, insets.right];
 }
 
 @interface ASInsetLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase

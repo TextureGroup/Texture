@@ -11,6 +11,7 @@
 
 #import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 #pragma mark - Helper Functions
 

@@ -63,7 +63,7 @@
 
 // ASCellLayoutMode is an NSUInteger-based NS_OPTIONS field. Be careful with BOOL handling on the
 // 32-bit Objective-C runtime, and pattern after ASInterfaceStateIncludesVisible() & friends.
-#define ASCellLayoutModeIncludes(layoutMode) ((_cellLayoutMode & layoutMode) == layoutMode)
+#define ASCellLayoutModeIncludes(layoutMode) ((self->_cellLayoutMode & layoutMode) == layoutMode)
 
 /// What, if any, invalidation should we perform during the next -layoutSubviews.
 typedef NS_ENUM(NSUInteger, ASCollectionViewInvalidationStyle) {
@@ -330,12 +330,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (!ASActivateExperimentalFeature(ASExperimentalCollectionTeardown)) {
     [self setAsyncDelegate:nil];
     [self setAsyncDataSource:nil];
-  }
-
-  // Data controller & range controller may own a ton of nodes, let's deallocate those off-main.
-  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
-    ASPerformBackgroundDeallocation(&_dataController);
-    ASPerformBackgroundDeallocation(&_rangeController);
   }
 }
 
@@ -1875,14 +1869,14 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
-      os_log_debug(ASCollectionLog(), "Beginning batch fetch for %@ with context %@", collectionNode, _batchContext);
-      [_asyncDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:_batchContext];
+      os_log_debug(ASCollectionLog(), "Beginning batch fetch for %@ with context %@", collectionNode, self->_batchContext);
+      [self->_asyncDelegate collectionNode:collectionNode willBeginBatchFetchWithContext:self->_batchContext];
     });
   } else if (_asyncDelegateFlags.collectionViewWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-      [_asyncDelegate collectionView:self willBeginBatchFetchWithContext:_batchContext];
+      [self->_asyncDelegate collectionView:self willBeginBatchFetchWithContext:self->_batchContext];
 #pragma clang diagnostic pop
     });
   }
@@ -2248,20 +2242,20 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   ASPerformBlockWithoutAnimation(!changeSet.animated, ^{
     as_activity_scope(as_activity_create("Commit collection update", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
     if (changeSet.includesReloadData) {
-      _superIsPendingDataLoad = YES;
+      self->_superIsPendingDataLoad = YES;
       updates();
       [self _superReloadData:nil completion:nil];
       os_log_debug(ASCollectionLog(), "Did reloadData %@", self.collectionNode);
       [changeSet executeCompletionHandlerWithFinished:YES];
     } else {
-      [_layoutFacilitator collectionViewWillPerformBatchUpdates];
+      [self->_layoutFacilitator collectionViewWillPerformBatchUpdates];
       
       __block NSUInteger numberOfUpdates = 0;
       const auto completion = ^(BOOL finished) {
         as_activity_scope(as_activity_create("Handle collection update completion", changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
         as_log_verbose(ASCollectionLog(), "Update animation finished %{public}@", self.collectionNode);
         // Flush any range changes that happened as part of the update animations ending.
-        [_rangeController updateIfNeeded];
+        [self->_rangeController updateIfNeeded];
         [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
         [changeSet executeCompletionHandlerWithFinished:finished];
       };
@@ -2317,7 +2311,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       
       // Flush any range changes that happened as part of submitting the update.
       as_activity_scope(changeSet.rootActivity);
-      [_rangeController updateIfNeeded];
+      [self->_rangeController updateIfNeeded];
     }
   });
 }

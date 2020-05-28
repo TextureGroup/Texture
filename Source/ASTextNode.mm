@@ -140,6 +140,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGFloat _contentScale;
   BOOL _opaque;
   CGRect _bounds;
+  ASPrimitiveTraitCollection _traitCollection;
 }
 @end
 
@@ -151,6 +152,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
                               contentScale:(CGFloat)contentScale
                                     opaque:(BOOL)opaque
                                     bounds:(CGRect)bounds
+                           traitCollection: (ASPrimitiveTraitCollection)traitCollection
 {
   self = [super init];
   if (self != nil) {
@@ -160,6 +162,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
     _contentScale = contentScale;
     _opaque = opaque;
     _bounds = bounds;
+    _traitCollection = traitCollection;
   }
   return self;
 }
@@ -183,6 +186,7 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   CGSize _shadowOffset;
   CGColorRef _shadowColor;
   UIColor *_cachedShadowUIColor;
+  UIColor *_cachedTintColor;
   UIColor *_placeholderColor;
   CGFloat _shadowOpacity;
   CGFloat _shadowRadius;
@@ -382,7 +386,7 @@ static NSArray *DefaultLinkAttributeNames() {
     .shadowColor = _cachedShadowUIColor,
     .shadowOpacity = _shadowOpacity,
     .shadowRadius = _shadowRadius,
-    .tintColor = self.textColorFollowsTintColor ? self.tintColor : nil
+    .tintColor = _cachedTintColor
   };
 }
 
@@ -542,14 +546,21 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  /// have to access tintColor outside of the lock to prevent dead lock when accessing up the view hierarchy
+  UIColor *tintColor = self.tintColor;
   ASLockScopeSelf();
-  
+  if (_textColorFollowsTintColor) {
+    _cachedTintColor = tintColor;
+  } else {
+    _cachedTintColor = nil;
+  }
   return [[ASTextNodeDrawParameter alloc] initWithRendererAttributes:[self _locked_rendererAttributes]
                                                      backgroundColor:self.backgroundColor
                                                  textContainerInsets:_textContainerInset
                                                         contentScale:_contentsScaleForDisplay
                                                               opaque:self.isOpaque
-                                                              bounds:[self threadSafeBounds]];
+                                                              bounds:[self threadSafeBounds]
+                                                     traitCollection:self.primitiveTraitCollection];
 }
 
 + (UIImage *)displayWithParameters:(id<NSObject>)parameters isCancelled:(NS_NOESCAPE asdisplaynode_iscancelled_block_t)isCancelled
@@ -564,7 +575,7 @@ static NSArray *DefaultLinkAttributeNames() {
   UIEdgeInsets textContainerInsets = drawParameter ? drawParameter->_textContainerInsets : UIEdgeInsetsZero;
   ASTextKitRenderer *renderer = [drawParameter rendererForBounds:drawParameter->_bounds];
 
-  UIImage *result = ASGraphicsCreateImageWithOptions(CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, nil, ^{
+  UIImage *result = ASGraphicsCreateImage(drawParameter->_traitCollection, CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, nil, ^{
     CGContextRef context = UIGraphicsGetCurrentContext();
     ASDisplayNodeAssert(context, @"This is no good without a context.");
     
@@ -945,6 +956,39 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   return ASTextNodeAdjustRenderRectForShadowPadding(frame, self.shadowPadding);
 }
 
+#pragma mark - Tint Colors
+
+
+- (void)tintColorDidChange
+{
+  [super tintColorDidChange];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
+- (void)_setNeedsDisplayOnTintedTextColor
+{
+  BOOL textColorFollowsTintColor = NO;
+  {
+    AS::MutexLocker l(__instanceLock__);
+    textColorFollowsTintColor = _textColorFollowsTintColor;
+  }
+
+  if (textColorFollowsTintColor) {
+    [self setNeedsDisplay];
+  }
+}
+
+
+#pragma mark Interface State
+
+- (void)didEnterHierarchy
+{
+  [super didEnterHierarchy];
+
+  [self _setNeedsDisplayOnTintedTextColor];
+}
+
 #pragma mark - Placeholders
 
 - (UIColor *)placeholderColor
@@ -1309,6 +1353,11 @@ static NSAttributedString *DefaultTruncationAttributedString()
 - (NSUInteger)lineCount
 {
   return ASLockedSelf([[self _locked_renderer] lineCount]);
+}
+
+- (BOOL)textColorFollowsTintColor
+{
+  return ASLockedSelf(_textColorFollowsTintColor);
 }
 
 #pragma mark - Truncation Message

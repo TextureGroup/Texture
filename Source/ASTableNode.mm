@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASRangeController.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
 
 #pragma mark - _ASTablePendingState
 

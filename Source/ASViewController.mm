@@ -64,6 +64,17 @@
   return self;
 }
 
+- (instancetype)init
+{
+  if (!(self = [super initWithNibName:nil bundle:nil])) {
+    return nil;
+  }
+
+  [self _initializeInstance];
+
+  return self;
+}
+
 - (void)_initializeInstance
 {
   if (_node == nil) {
@@ -92,14 +103,6 @@
       }
     }];
   }
-}
-
-- (void)dealloc
-{
-  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable)) {
-    return;
-  }
-  ASPerformBackgroundDeallocation(&_node);
 }
 
 - (void)loadView
