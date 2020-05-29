@@ -1421,13 +1421,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (NSInteger)accessibilityElementCount
 {
   _bridge_prologue_read;
-  NSInteger count = 0;
-  if _loaded(self) {
-    count = _view.accessibilityElementCount;
-  } else {
-    count = ASDisplayNodeGetPendingState(self).accessibilityElementCount;
-  }
-  return count;
+  return _getFromViewOnly(accessibilityElementCount);
 }
 
 @end
