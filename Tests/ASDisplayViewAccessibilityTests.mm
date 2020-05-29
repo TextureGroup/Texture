@@ -511,14 +511,19 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   
   ASDisplayNode *modalNode = [[ASDisplayNode alloc] init];
   modalNode.frame = CGRectInset(CGRectUnion(label1.frame, label2.frame), -8, -8);
-  [node addSubnode:modalNode];
+  
+  // This is kind of cheating. When voice over is activated, the modal node will end up reporting that it
+  // has 1 accessibilityElement. But getting that to happen in a unit test doesn't seem possible.
+  id modalMock = OCMPartialMock(modalNode);
+  OCMStub([modalMock accessibilityElementCount]).andReturn(1);
+  [node addSubnode:modalMock];
   
   ASTextNode *label3 = [[ASTextNode alloc] init];
   label3.attributedText = [[NSAttributedString alloc] initWithString:@"label6"];
   label3.frame = CGRectMake(8, 4, 200, 20);
+
   [modalNode addSubnode:label3];
   modalNode.accessibilityViewIsModal = YES;
-
   NSArray *elements = [node.view accessibilityElements];
   XCTAssertTrue(elements.count == 1);
   XCTAssertTrue([elements containsObject:modalNode.view]);
@@ -548,6 +553,11 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *modalNode1 = [[ASDisplayNode alloc] init];
   modalNode1.frame = CGRectInset(CGRectUnion(label1.frame, label2.frame), -8, -8);
   
+  // This is kind of cheating. When voice over is activated, the modal node will end up reporting that it
+  // has 1 accessibilityElement. But getting that to happen in a unit test doesn't seem possible.
+  id modalMock1 = OCMPartialMock(modalNode1);
+  OCMStub([modalMock1 accessibilityElementCount]).andReturn(1);
+
   ASTextNode *label3 = [[ASTextNode alloc] init];
   label3.attributedText = [[NSAttributedString alloc] initWithString:@"label6"];
   label3.frame = CGRectMake(8, 4, 200, 20);
@@ -556,7 +566,9 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
 
   ASDisplayNode *modalNode2 = [[ASDisplayNode alloc] init];
   modalNode2.frame = CGRectOffset(modalNode1.frame, 0, modalNode1.frame.size.height + 10);
-  
+  id modalMock2 = OCMPartialMock(modalNode2);
+  OCMStub([modalMock2 accessibilityElementCount]).andReturn(1);
+
   ASTextNode *label4 = [[ASTextNode alloc] init];
   label4.attributedText = [[NSAttributedString alloc] initWithString:@"label6"];
   label4.frame = CGRectMake(8, 4, 200, 20);
@@ -565,8 +577,8 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   
   // add modalNode1 last, and assert that it is the one that appears in accessibilityElements
   // (UIKit uses the last modal subview in subviews as the modal element).
-  [node addSubnode:modalNode2];
-  [node addSubnode:modalNode1];
+  [node addSubnode:modalMock2];
+  [node addSubnode:modalMock1];
 
   NSArray *elements = [node.view accessibilityElements];
   XCTAssertTrue(elements.count == 1);

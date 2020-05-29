@@ -294,7 +294,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     } else if (subnode.isLayerBacked) {
       // Go down the hierarchy of the layer backed subnode and collect all of the UIAccessibilityElement
       CollectUIAccessibilityElementsForNode(subnode, node, view, elements);
-    } else if (subnode.accessibilityElements.count > 0) {
+    } else if (subnode.accessibilityElementCount > 0) {
       // UIView is itself a UIAccessibilityContainer just add it
       [elements addObject:subnode.view];
     }
