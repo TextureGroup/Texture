@@ -1146,8 +1146,8 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
     return;
   }
   
-  BOOL loaded = _loaded(self);
-  if (loaded && ASDisplayNodeThreadIsMain()) {
+  // we want to check if we are on the main thread first, since _loaded checks the layer and can only be done on main
+  if (ASDisplayNodeThreadIsMain() && _loaded(self)) {
     self.view.accessibilityElements = nil;
     [self.supernode invalidateAccessibilityElements];
   }
@@ -1421,7 +1421,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (NSInteger)accessibilityElementCount
 {
   _bridge_prologue_read;
-  return _getFromViewOnly(accessibilityElementCount);
+  NSInteger count = 0;
+  if _loaded(self) {
+    count = _view.accessibilityElementCount;
+  } else {
+    count = ASDisplayNodeGetPendingState(self).accessibilityElementCount;
+  }
+  return count;
 }
 
 @end
