@@ -1205,4 +1205,88 @@
 
 }
 
+#pragma mark - #collectionView:layout:minimumLineSpacingForSectionAtIndex:
+
+- (void)testMinimumLineSpacingFromUICollectionViewDelegateFlowLayout
+{
+  // given
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  
+  id delegate = [OCMockObject niceMockForProtocol:@protocol(UICollectionViewDelegateFlowLayout)];
+  [[[delegate stub] andReturnValue:[NSNumber numberWithFloat:10.0]] collectionView:collectionView layout:layout minimumLineSpacingForSectionAtIndex:0];
+  
+  collectionView.asyncDelegate = delegate;
+  
+  // when
+  CGFloat minimumLineSpacing = [delegate collectionView:collectionView layout:layout minimumLineSpacingForSectionAtIndex:0];
+  
+  // then
+  XCTAssert(minimumLineSpacing == 10.0, @"should be return minimumLineSpacing");
+  
+  collectionView.asyncDelegate = nil;
+}
+
+- (void)testMinimumLineSpacingFromASCollectionDelegateFlowLayout
+{
+  // given
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  
+  id delegate = [OCMockObject niceMockForProtocol:@protocol(ASCollectionDelegateFlowLayout)];
+  [[[delegate stub] andReturnValue:[NSNumber numberWithFloat:20.0]] collectionView:collectionView layout:layout minimumLineSpacingForSectionAtIndex:0];
+  
+  collectionView.asyncDelegate = delegate;
+  
+  // when
+  CGFloat minimumLineSpacing = [delegate collectionView:collectionView layout:layout minimumLineSpacingForSectionAtIndex:0];
+  
+  // then
+  XCTAssert(minimumLineSpacing == 20.0, @"should be return minimumLineSpacing");
+  
+  collectionView.asyncDelegate = nil;
+}
+
+#pragma mark - #collectionView:layout:minimumInteritemSpacingForSectionAtIndex:
+
+- (void)testMinimumInteritemSpacingFromUICollectionViewDelegateFlowLayout
+{
+  // given
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  
+  id delegate = [OCMockObject niceMockForProtocol:@protocol(UICollectionViewDelegateFlowLayout)];
+  [[[delegate stub] andReturnValue:[NSNumber numberWithFloat:20.0]] collectionView:collectionView layout:layout minimumInteritemSpacingForSectionAtIndex:0];
+  
+  collectionView.asyncDelegate = delegate;
+  
+  // when
+  CGFloat minimumInteritemSpacing = [delegate collectionView:collectionView layout:layout minimumInteritemSpacingForSectionAtIndex:0];
+  
+  // then
+  XCTAssert(minimumInteritemSpacing == 20.0, @"should return minimumInteritemSpacing");
+  
+  collectionView.asyncDelegate = nil;
+}
+
+- (void)testMinimumInteritemSpacingFromASCollectionDelegateFlowLayout
+{
+  // given
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionView *collectionView = [[ASCollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+  
+  id delegate = [OCMockObject niceMockForProtocol:@protocol(ASCollectionDelegateFlowLayout)];
+  [[[delegate stub] andReturnValue:[NSNumber numberWithFloat:20.0]] collectionView:collectionView layout:layout minimumInteritemSpacingForSectionAtIndex:0];
+  
+  collectionView.asyncDelegate = delegate;
+  
+  // when
+  CGFloat minimumInteritemSpacing = [delegate collectionView:collectionView layout:layout minimumInteritemSpacingForSectionAtIndex:0];
+  
+  // then
+  XCTAssert(minimumInteritemSpacing == 20.0, @"should be return minimumInteritemSpacing");
+  
+  collectionView.asyncDelegate = nil;
+}
+
 @end
