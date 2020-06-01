@@ -1310,7 +1310,13 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 - (void)setAccessibilityElementsHidden:(BOOL)accessibilityElementsHidden
 {
   _bridge_prologue_write;
+  BOOL oldHiddenValue = _getFromViewOnly(accessibilityElementsHidden);
   _setAccessibilityToViewAndProperty(_flags.accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden, accessibilityElementsHidden);
+
+  // if we made a change, we need to clear the view's accessibilityElements cache.
+  if (!ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements) && self.isNodeLoaded && oldHiddenValue != accessibilityElementsHidden) {
+    [self invalidateAccessibilityElements];
+  }
 }
 
 - (BOOL)accessibilityViewIsModal
