@@ -254,7 +254,21 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return;
   }
   
-  for (ASDisplayNode *subnode in node.subnodes) {
+  // see if one of the subnodes is modal. If it is, then we only need to collect accessibilityElements from that
+  // node. If more than one subnode is modal, UIKit uses the last view in subviews as the modal view (it appears to
+  // be based on the index in the subviews array, not the location on screen). Let's do the same.
+  ASDisplayNode *modalSubnode = nil;
+  for (ASDisplayNode *subnode in node.subnodes.reverseObjectEnumerator) {
+    if (subnode.accessibilityViewIsModal) {
+      modalSubnode = subnode;
+      break;
+    }
+  }
+  
+  // If we have a modal subnode, just use that. Otherwise, use all subnodes
+  NSArray *subnodes = modalSubnode ? @[ modalSubnode ] : node.subnodes;
+  
+  for (ASDisplayNode *subnode in subnodes) {
     // If a node is hidden or has an alpha of 0.0 we should not include it
     if (subnode.hidden || subnode.alpha == 0.0) {
       continue;

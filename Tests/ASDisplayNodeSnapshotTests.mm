@@ -84,11 +84,11 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
 #if AS_AT_LEAST_IOS13
     if (@available(iOS 13.0, *)) {
       [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight] performAsCurrentTraitCollection:^{
-        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d-light", (int)c]));
+        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d_light", (int)c]));
       }];
 
       [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
-        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d-dark", (int)c]));
+        ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d_dark", (int)c]));
       }];
     } else {
       ASSnapshotVerifyNode(node, ([NSString stringWithFormat:@"%d", (int)c]));
