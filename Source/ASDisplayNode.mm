@@ -596,7 +596,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
     if ([self supernode] == nil) {
-      // Move to supernode wil propagateDown other way
+      // Only update traitCollection for root node, and propagate down later
+      // Subnode will sync traitCollection with parent when _setSupernode called
         _primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(_view.traitCollection);
     }
     _view.asyncdisplaykit_node = self;
