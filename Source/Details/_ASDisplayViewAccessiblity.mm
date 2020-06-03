@@ -222,6 +222,11 @@ static BOOL recusivelyCheckSuperviewsForScrollView(UIView *view) {
     return recusivelyCheckSuperviewsForScrollView(view.superview);
 }
 
+/// returns YES if this node should be considered "hidden" from the screen reader.
+static BOOL nodeIsHiddenFromAcessibility(ASDisplayNode *node) {
+  return node.isHidden || node.alpha == 0.0 || node.accessibilityElementsHidden;
+}
+
 /// Collect all accessibliity elements for a given view and view node
 static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *elements)
 {
@@ -255,7 +260,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return;
   }
   
-  if (node.accessibilityElementsHidden) {
+  if (nodeIsHiddenFromAcessibility(node)) {
     return;
   }
   
@@ -275,7 +280,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   
   for (ASDisplayNode *subnode in subnodes) {
     // If a node is hidden or has an alpha of 0.0 we should not include it
-    if (subnode.hidden || subnode.alpha == 0.0 || subnode.accessibilityElementsHidden) {
+    if (nodeIsHiddenFromAcessibility(subnode)) {
       continue;
     }
     
