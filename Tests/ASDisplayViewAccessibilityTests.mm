@@ -591,5 +591,42 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   XCTAssertTrue([elements containsObject:modalNode2.view]);
 }
 
+- (void)testAccessibilityElementsHidden {
+  
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 568)];
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.automaticallyManagesSubnodes = YES;
+  
+  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  window.rootViewController = vc;
+  [window makeKeyAndVisible];
+  [window layoutIfNeeded];
+
+  ASTextNode *label1 = [[ASTextNode alloc] init];
+  label1.attributedText = [[NSAttributedString alloc] initWithString:@"on screen"];
+  label1.frame = CGRectMake(0, 0, 100, 20);
+
+  ASTextNode *label2 = [[ASTextNode alloc] init];
+  label2.attributedText = [[NSAttributedString alloc] initWithString:@"partially on screen y"];
+  label2.frame = CGRectMake(0, 20, 100, 20);
+  
+  [node addSubnode:label1];
+  [node addSubnode:label2];
+  
+  NSArray *elements = [node.view accessibilityElements];
+  XCTAssertTrue(elements.count == 2);
+  XCTAssertTrue([elements containsObject:label1.view]);
+  XCTAssertTrue([elements containsObject:label2.view]);
+  
+  node.accessibilityElementsHidden = YES;
+  elements = [node.view accessibilityElements];
+  XCTAssertTrue(elements.count == 0);
+
+  node.accessibilityElementsHidden = NO;
+  elements = [node.view accessibilityElements];
+  XCTAssertTrue(elements.count == 2);
+  XCTAssertTrue([elements containsObject:label1.view]);
+  XCTAssertTrue([elements containsObject:label2.view]);
+}
 
 @end
