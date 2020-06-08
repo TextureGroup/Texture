@@ -517,23 +517,34 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASLockScopeSelf();
-  [self _ensureTruncationText];
+  ASTextContainer *copiedContainer;
+  NSMutableAttributedString *mutableText;
+  BOOL needsTintColor;
+  id bgColor;
+  {
+    // Wrapping all the other access here, because we can't lock while accessing tintColor.
+    ASLockScopeSelf();
+    [self _ensureTruncationText];
 
-  // Unlike layout, here we must copy the container since drawing is asynchronous.
-  ASTextContainer *copiedContainer = [_textContainer copy];
-  copiedContainer.size = self.bounds.size;
-  [copiedContainer makeImmutable];
-  NSMutableAttributedString *mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
+    // Unlike layout, here we must copy the container since drawing is asynchronous.
+    copiedContainer = [_textContainer copy];
+    copiedContainer.size = self.bounds.size;
+    [copiedContainer makeImmutable];
+    mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
-  [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
-
+    [self prepareAttributedString:mutableText isForIntrinsicSize:NO];
+    needsTintColor = self.textColorFollowsTintColor && mutableText.length > 0;
+    bgColor = self.backgroundColor ?: [NSNull null];
+  }
+  
   // After all other attributes are set, apply tint color if needed and foreground color is not already specified
-  if (self.textColorFollowsTintColor && mutableText.length > 0) {
+  if (needsTintColor) {
     // Apply tint color if specified and if foreground color is undefined for attributedString
     NSRange limit = NSMakeRange(0, mutableText.length);
     // Look for previous attributes that define foreground color
     UIColor *attributeValue = (UIColor *)[mutableText attribute:NSForegroundColorAttributeName atIndex:limit.location effectiveRange:NULL];
+    
+    // we need to unlock before accessing tintColor
     UIColor *tintColor = self.tintColor;
     if (attributeValue == nil && tintColor) {
       // None are found, apply tint color if available. Fallback to "black" text color
@@ -544,7 +555,7 @@ static NSArray *DefaultLinkAttributeNames() {
   return @{
     @"container": copiedContainer,
     @"text": mutableText,
-    @"bgColor": self.backgroundColor ?: [NSNull null]
+    @"bgColor": bgColor
   };
 }
 

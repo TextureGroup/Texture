@@ -41,6 +41,17 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
     tc.userInterfaceStyle = UIUserInterfaceStyleUnspecified;
   }
+
+#if TARGET_OS_IOS
+  if(AS_AVAILABLE_IOS(13)){
+    tc.userInterfaceLevel = UIUserInterfaceLevelUnspecified;
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
+    tc.accessibilityContrast = UIAccessibilityContrastUnspecified;
+    tc.legibilityWeight = UILegibilityWeightUnspecified;
+  }
   return tc;
 }
 
@@ -60,6 +71,17 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   }
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
     environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
+  }
+
+#if TARGET_OS_IOS
+  if(AS_AVAILABLE_IOS(13)){
+    environmentTraitCollection.userInterfaceLevel = traitCollection.userInterfaceLevel;
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
+    environmentTraitCollection.accessibilityContrast = traitCollection.accessibilityContrast;
+    environmentTraitCollection.legibilityWeight = traitCollection.legibilityWeight;
   }
   return environmentTraitCollection;
 }
@@ -169,6 +191,47 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfa
   }
 }
 
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+API_AVAILABLE(ios(13)) API_UNAVAILABLE(tvos)
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(UIUserInterfaceLevel userInterfaceLevel) {
+  switch (userInterfaceLevel) {
+    case UIUserInterfaceLevelBase:
+      return @"Base";
+    case UIUserInterfaceLevelElevated:
+      return @"Elevated";
+    default:
+      return @"Unspecified";
+  }
+}
+
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+API_AVAILABLE(ios(13))
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentAccessibilityContrast(UIAccessibilityContrast accessibilityContrast) {
+  switch (accessibilityContrast) {
+    case UIAccessibilityContrastNormal:
+      return @"Normal";
+    case UIAccessibilityContrastHigh:
+      return @"High";
+    default:
+      return @"Unspecified";
+  }
+}
+
+// Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
+API_AVAILABLE(ios(13))
+ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentLegibilityWeight(UILegibilityWeight legibilityWeight) {
+  switch (legibilityWeight) {
+    case UILegibilityWeightRegular:
+      return @"Regular";
+    case UILegibilityWeightBold:
+      return @"Bold";
+    default:
+      return @"Unspecified";
+  }
+}
+
+
+
 NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits) {
   NSMutableArray<NSDictionary *> *props = [NSMutableArray array];
   [props addObject:@{ @"verticalSizeClass": AS_NSStringFromUIUserInterfaceSizeClass(traits.verticalSizeClass) }];
@@ -181,8 +244,21 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   }
   if (AS_AVAILABLE_IOS(10)) {
     [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
-    [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
+    if (traits.preferredContentSizeCategory != nil) {
+      [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
+    }
     [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
+  }
+
+#if TARGET_OS_IOS
+  if (AS_AVAILABLE_IOS(13)){
+    [props addObject:@{ @"userInterfaceLevel": AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(traits.userInterfaceLevel) }];
+  }
+#endif
+
+  if (AS_AVAILABLE_IOS(13)) {
+    [props addObject:@{ @"accessibilityContrast": AS_NSStringFromUITraitEnvironmentAccessibilityContrast(traits.accessibilityContrast) }];
+    [props addObject:@{ @"legibilityWeight": AS_NSStringFromUITraitEnvironmentLegibilityWeight(traits.legibilityWeight) }];
   }
   [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
   return ASObjectDescriptionMakeWithoutObject(props);
@@ -244,6 +320,24 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 {
   return _prim.preferredContentSizeCategory;
 }
+
+#if TARGET_OS_IOS
+- (UIUserInterfaceLevel)userInterfaceLevel
+{
+  return _prim.userInterfaceLevel;
+}
+#endif
+
+- (UIAccessibilityContrast)accessibilityContrast
+{
+  return _prim.accessibilityContrast;
+}
+
+- (UILegibilityWeight)legibilityWeight
+{
+  return _prim.legibilityWeight;
+}
+
 - (NSUInteger)hash {
   return ASHashBytes(&_prim, sizeof(ASPrimitiveTraitCollection));
 }

@@ -97,7 +97,7 @@ class PhotoWithOutsetIconOverlay : LayoutExampleNode {
 
     iconNode.url = URL(string: "http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png")
 
-    iconNode.imageModificationBlock = { image in
+    iconNode.imageModificationBlock = { (image, traitCollection) -> UIImage in
       let profileImageSize = CGSize(width: 60, height: 60)
       return image.makeCircularImage(size: profileImageSize, borderWidth: 10)
     }

@@ -867,7 +867,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
         as_log_verbose(ASImageLoadingLog(), "Decaching image for %@ url: %@", self, URL);
         
-        ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer) {
+        ASImageCacherCompletion completion = ^(id <ASImageContainerProtocol> imageContainer, ASImageCacheType cacheType) {
           // If the cache sentinel changed, that means this request was cancelled.
           if (ASLockedSelf(self->_cacheSentinel != cacheSentinel)) {
             return;
@@ -887,8 +887,8 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
             if (delegateDidLoadImageFromCache) {
               [delegate imageNodeDidLoadImageFromCache:self];
             }
-            as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@", self, [imageContainer asdk_image], URL);
-            finished(imageContainer, nil, nil, ASNetworkImageSourceAsynchronousCache, nil);
+            as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@ cacheType: %@", self, [imageContainer asdk_image], URL, cacheType);
+            finished(imageContainer, nil, nil, cacheType == ASImageCacheTypeSynchronous ? ASNetworkImageSourceSynchronousCache : ASNetworkImageSourceAsynchronousCache, nil);
           }
         };
         

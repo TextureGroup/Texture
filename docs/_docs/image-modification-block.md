@@ -59,7 +59,7 @@ In the following example we assume we have an avatar node that will be setup in 
 - (instancetype)init
 {
 // ...
-  _userAvatarImageNode.imageModificationBlock = ^UIImage *(UIImage *image) {
+  _userAvatarImageNode.imageModificationBlock = ^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {
     CGSize profileImageSize = CGSizeMake(USER_IMAGE_HEIGHT, USER_IMAGE_HEIGHT);
     return [image makeCircularImageWithSize:profileImageSize];
   };

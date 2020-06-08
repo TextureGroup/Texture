@@ -546,9 +546,11 @@ static NSArray *DefaultLinkAttributeNames() {
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
+  /// have to access tintColor outside of the lock to prevent dead lock when accessing up the view hierarchy
+  UIColor *tintColor = self.tintColor;
   ASLockScopeSelf();
   if (_textColorFollowsTintColor) {
-    _cachedTintColor = self.tintColor;
+    _cachedTintColor = tintColor;
   } else {
     _cachedTintColor = nil;
   }
@@ -573,7 +575,7 @@ static NSArray *DefaultLinkAttributeNames() {
   UIEdgeInsets textContainerInsets = drawParameter ? drawParameter->_textContainerInsets : UIEdgeInsetsZero;
   ASTextKitRenderer *renderer = [drawParameter rendererForBounds:drawParameter->_bounds];
 
-  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameter->_traitCollection, CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, ^{
+  UIImage *result = ASGraphicsCreateImage(drawParameter->_traitCollection, CGSizeMake(drawParameter->_bounds.size.width, drawParameter->_bounds.size.height), drawParameter->_opaque, drawParameter->_contentScale, nil, nil, ^{
     CGContextRef context = UIGraphicsGetCurrentContext();
     ASDisplayNodeAssert(context, @"This is no good without a context.");
     

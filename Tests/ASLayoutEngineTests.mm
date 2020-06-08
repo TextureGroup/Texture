@@ -63,7 +63,7 @@
   allNodes = @[ nodeA, nodeB, nodeC, nodeD, nodeE ];
   ASSetDebugNames(nodeA, nodeB, nodeC, nodeD, nodeE);
   ASLayoutSpecBlock b = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ nodeB, nodeC, nodeD ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeC, self->nodeD ]];
   };
   fixture1and3and5NodeALayoutSpecBlock = b;
   fixture1 = [self createFixture1];
@@ -162,10 +162,10 @@
   injectedMainThreadWork = ^{
     injectedMainThreadWorkDone = YES;
 
-    [window layoutIfNeeded];
+    [self->window layoutIfNeeded];
 
     // Ensure we're still on the old layout. We should stay on this until the transition completes.
-    [self verifyFixture:fixture1];
+    [self verifyFixture:self->fixture1];
   };
 
   measurementCompletionBlock = ^{
@@ -286,7 +286,7 @@
     as_log_verbose(OS_LOG_DEFAULT, "Begin injectedMainThreadWork");
     injectedMainThreadWorkDone = YES;
 
-    [fixture4 apply];
+    [self->fixture4 apply];
     as_log_verbose(OS_LOG_DEFAULT, "Did apply new fixture");
 
     if (enforceCorrectBehavior) {
@@ -294,10 +294,10 @@
       // are common to both fixture2 and fixture4 are available from the cache.
     } else {
       // Incorrect behavior: nodeC will get measured against its new bounds on main.
-      const auto cPendingSize = [fixture2 layoutForNode:nodeC].size;
-      OCMExpect([nodeC.mock calculateLayoutThatFits:ASSizeRangeMake(cPendingSize)]).onMainThread();
+      const auto cPendingSize = [self->fixture2 layoutForNode:self->nodeC].size;
+      OCMExpect([self->nodeC.mock calculateLayoutThatFits:ASSizeRangeMake(cPendingSize)]).onMainThread();
     }
-    [window layoutIfNeeded];
+    [self->window layoutIfNeeded];
     as_log_verbose(OS_LOG_DEFAULT, "End injectedMainThreadWork");
   };
 
@@ -342,7 +342,7 @@
     OCMExpect([nodeB.mock calculateLayoutThatFits:[fixture3 firstSizeRangeForNode:nodeB]]);
 
     [fixture1 withSizeRangesForNode:nodeA block:^(ASSizeRange sizeRange) {
-      OCMExpect([nodeA.mock calculateLayoutThatFits:sizeRange]);
+      OCMExpect([self->nodeA.mock calculateLayoutThatFits:sizeRange]);
     }];
 
     [window layoutIfNeeded];
@@ -456,7 +456,7 @@
   fixture.layout = layoutA;
 
   ASLayoutSpecBlock specBlockA = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ nodeB, nodeC, nodeE ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeC, self->nodeE ]];
   };
   [fixture.layoutSpecBlocks setObject:specBlockA forKey:nodeA];
   return fixture;
@@ -535,7 +535,7 @@
   fixture.layout = layoutA;
 
   ASLayoutSpecBlock specBlockA = ^ASLayoutSpec * _Nonnull(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {
-    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ nodeB, nodeD, nodeE ]];
+    return [ASStackLayoutSpec stackLayoutSpecWithDirection:ASStackLayoutDirectionHorizontal spacing:0 justifyContent:ASStackLayoutJustifyContentSpaceBetween alignItems:ASStackLayoutAlignItemsStart children:@[ self->nodeB, self->nodeD, self->nodeE ]];
   };
   [fixture.layoutSpecBlocks setObject:specBlockA forKey:nodeA];
   return fixture;
@@ -576,7 +576,7 @@
   [fixture withSizeRangesForAllNodesUsingBlock:^(ASLayoutTestNode * _Nonnull node, ASSizeRange sizeRange) {
     OCMExpect([node.mock calculateLayoutThatFits:sizeRange]).onMainThread();
 
-    if (!stubbedCalculatedLayoutDidChange) {
+    if (!self->stubbedCalculatedLayoutDidChange) {
       OCMExpect([node.mock calculatedLayoutDidChange]).onMainThread();
     }
   }];

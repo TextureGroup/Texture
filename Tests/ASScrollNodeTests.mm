@@ -170,6 +170,10 @@
 
 - (void)testASScrollNodeAccessibility {
   ASDisplayNode *scrollNode = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:scrollNode];
+  [window makeKeyAndVisible];
+
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.isAccessibilityContainer = YES;
   node.accessibilityLabel = @"node";

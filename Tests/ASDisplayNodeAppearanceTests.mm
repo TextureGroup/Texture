@@ -82,11 +82,11 @@ static dispatch_block_t modifyMethodByAddingPrologueBlockAndReturnCleanupBlock(C
   _didExitHierarchyCounts = [[NSCountedSet alloc] init];
 
   dispatch_block_t cleanupBlock = modifyMethodByAddingPrologueBlockAndReturnCleanupBlock([ASDisplayNode class], @selector(willEnterHierarchy), ^(id blockSelf){
-    [_willEnterHierarchyCounts addObject:blockSelf];
+    [self->_willEnterHierarchyCounts addObject:blockSelf];
   });
   [_swizzleCleanupBlocks addObject:cleanupBlock];
   cleanupBlock = modifyMethodByAddingPrologueBlockAndReturnCleanupBlock([ASDisplayNode class], @selector(didExitHierarchy), ^(id blockSelf){
-    [_didExitHierarchyCounts addObject:blockSelf];
+    [self->_didExitHierarchyCounts addObject:blockSelf];
   });
   [_swizzleCleanupBlocks addObject:cleanupBlock];
 }

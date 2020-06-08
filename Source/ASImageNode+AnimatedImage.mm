@@ -79,11 +79,6 @@
   // not fire e.g. while scrolling down
   CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^(void) {
     [self animatedImageSet:animatedImage previousAnimatedImage:previousAnimatedImage];
-
-    // Animated image can take while to dealloc, do it off the main queue
-    if (previousAnimatedImage != nil && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
-      ASPerformBackgroundDeallocation(&previousAnimatedImage);
-    }
   });
   // Don't need to wakeup the runloop as the current is already running
   // CFRunLoopWakeUp(runLoop); // Should not be necessary

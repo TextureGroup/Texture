@@ -1,7 +1,15 @@
 #!/bin/bash
+# echo ************* diagnostics
+# echo available devices
+# instruments -s devices
+# echo available sdk
+# xcodebuild -showsdks
+# echo available Xcode
+# ls -ld /Applications/Xcode*
+# echo ************* diagnostics end
 
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.0,name=iPhone 8}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.0}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.4.1,name=iPhone 8}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.4}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -24,7 +32,7 @@ function build_example {
     example="$1"
 
     clean_derived_data
-    
+
     if [ -f "${example}/Podfile" ]; then
         echo "Using CocoaPods"
         pod install --project-directory=$example
@@ -35,7 +43,7 @@ function build_example {
             -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
-            build | xcpretty $FORMATTER
+            build
     elif [ -f "${example}/Cartfile" ]; then
         echo "Using Carthage"
         local_repo=`pwd`
@@ -50,10 +58,15 @@ function build_example {
             -scheme Sample \
             -sdk "$SDK" \
             -destination "$PLATFORM" \
-            build | xcpretty $FORMATTER
+            build
 
         cd ../..
     fi
+}
+
+# Lint subspec
+function lint_subspec {
+    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
 }
 
 function cleanup {
@@ -66,12 +79,6 @@ MODE="$1"
 
 cleanup
 
-if type xcpretty-travis-formatter &> /dev/null; then
-    FORMATTER="-f $(xcpretty-travis-formatter)"
-  else
-    FORMATTER="-s"
-fi
-
 case "$MODE" in
 tests|all)
     echo "Building & testing AsyncDisplayKit."
@@ -81,14 +88,7 @@ tests|all)
         -scheme AsyncDisplayKit \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
-    success="1"
-    ;;
-
-danger|all)
-    bundle install
-    echo "Running Danger..."
-    bundle exec danger --fail-on-errors=true
+        build-for-testing test
     success="1"
     ;;
 
@@ -100,7 +100,7 @@ tests_listkit)
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty $FORMATTER
+        build-for-testing test
     success="1"
     ;;
 
@@ -199,7 +199,7 @@ life-without-cocoapods|all)
         -scheme "Life Without CocoaPods" \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build
     success="1"
     ;;
 
@@ -211,7 +211,7 @@ framework|all)
         -scheme Sample \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty $FORMATTER
+        build
     success="1"
     ;;
 
@@ -222,9 +222,31 @@ cocoapods-lint|all)
     success="1"
     ;;
 
+cocoapods-lint-default-subspecs)
+    echo "Verifying that default subspecs lint."
+
+    for subspec in 'Core' 'PINRemoteImage' 'Video' 'MapKit' 'AssetsLibrary' 'Photos'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
+    success="1"
+    ;;
+
+cocoapods-lint-other-subspecs)
+    echo "Verifying that other subspecs lint."
+
+    for subspec in 'IGListKit' 'Yoga' 'TextNode2'; do
+        echo "Verifying that $subspec subspec lints."
+
+        lint_subspec $subspec
+    done
+    success="1"
+    ;;
+
 carthage|all)
     echo "Verifying carthage works."
-    
+
     set -o pipefail && carthage update && carthage build --no-skip-current
     success="1"
     ;;
@@ -234,7 +256,7 @@ carthage|all)
     ;;
 esac
 
-if [ "$success" = "1" ]; then 
+if [ "$success" = "1" ]; then
   trap - EXIT
   exit 0
 fi

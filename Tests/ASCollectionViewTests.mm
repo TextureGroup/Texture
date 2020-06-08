@@ -78,7 +78,7 @@
   return self;
 }
 
-- (ASCellNode *)collectionView:(ASCollectionView *)collectionView nodeForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForItemAtIndexPath:(NSIndexPath *)indexPath {
   ASTextCellNodeWithSetSelectedCounter *textCellNode = [ASTextCellNodeWithSetSelectedCounter new];
   textCellNode.text = indexPath.description;
 
@@ -86,7 +86,7 @@
 }
 
 
-- (ASCellNodeBlock)collectionView:(ASCollectionView *)collectionView nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath {
+- (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath {
   return ^{
     ASTextCellNodeWithSetSelectedCounter *textCellNode = [ASTextCellNodeWithSetSelectedCounter new];
     textCellNode.text = indexPath.description;
@@ -94,11 +94,11 @@
   };
 }
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+- (NSInteger)numberOfSectionsInCollectionNode:(ASCollectionNode *)collectionNode {
   return _itemCounts.size();
 }
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+- (NSInteger)collectionNode:(ASCollectionNode *)collectionNode numberOfItemsInSection:(NSInteger)section {
   return _itemCounts[section];
 }
 
@@ -115,7 +115,7 @@
   return CGSizeMake(100, 100);
 }
 
-- (ASCellNode *)collectionView:(ASCollectionView *)collectionView nodeForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASCellNode *)collectionNode:(ASCollectionNode *)collectionNode nodeForSupplementaryElementOfKind:(nonnull NSString *)kind atIndexPath:(nonnull NSIndexPath *)indexPath
 {
   return [[ASTextCellNodeWithSetSelectedCounter alloc] init];
 }
@@ -147,8 +147,7 @@
     // Populate these immediately so that they're not unexpectedly nil during tests.
     self.asyncDelegate = [[ASCollectionViewTestDelegate alloc] initWithNumberOfSections:10 numberOfItemsInSection:10];
     id realLayout = [UICollectionViewFlowLayout new];
-    id mockLayout = [OCMockObject partialMockForObject:realLayout];
-    self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:mockLayout];
+    self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:realLayout];
     self.collectionView = self.collectionNode.view;
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.collectionNode.dataSource = self.asyncDelegate;
@@ -180,18 +179,6 @@
   ASConfiguration *config = [ASConfiguration new];
   config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
   [ASConfigurationManager test_resetWithConfiguration:config];
-}
-
-- (void)tearDown
-{
-  // We can't prevent the system from retaining windows, but we can at least clear them out to avoid
-  // pollution between test cases.
-  for (UIWindow *window in [UIApplication sharedApplication].windows) {
-    for (UIView *subview in window.subviews) {
-      [subview removeFromSuperview];
-    }
-  }
-  [super tearDown];
 }
 
 - (void)testDataSourceImplementsNecessaryMethods
@@ -648,14 +635,14 @@
 - (void)testThatNodeCalculatedSizesAreUpdatedBeforeFirstPrepareLayoutAfterRotation
 {
   updateValidationTestPrologue
-  id layout = cv.collectionViewLayout;
+  id collectionViewLayoutMock = OCMPartialMock(cv.collectionViewLayout);
   CGSize initialItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
   CGSize initialCVSize = cv.bounds.size;
 
   // Capture the node size before first call to prepareLayout after frame change.
   __block CGSize itemSizeAtFirstLayout = CGSizeZero;
   __block CGSize boundsSizeAtFirstLayout = CGSizeZero;
-  [[[[layout expect] andDo:^(NSInvocation *) {
+  [[[[collectionViewLayoutMock expect] andDo:^(NSInvocation *) {
     itemSizeAtFirstLayout = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
     boundsSizeAtFirstLayout = [cv bounds].size;
   }] andForwardToRealObject] prepareLayout];
@@ -670,10 +657,12 @@
   XCTAssertNotEqualObjects(NSStringFromCGSize(initialCVSize),  NSStringFromCGSize(boundsSizeAtFirstLayout));
   XCTAssertEqualObjects(NSStringFromCGSize(itemSizeAtFirstLayout), NSStringFromCGSize(finalItemSize));
   XCTAssertEqualObjects(NSStringFromCGSize(boundsSizeAtFirstLayout), NSStringFromCGSize(finalCVSize));
-  [layout verify];
+  [collectionViewLayoutMock verify];
 
   // Teardown
   [[UIDevice currentDevice] setValue:@(oldDeviceOrientation) forKey:@"orientation"];
+
+  [collectionViewLayoutMock stopMocking];
 }
 
 /**

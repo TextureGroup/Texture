@@ -30,8 +30,6 @@
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
-static const CGSize kMinReleaseImageOnBackgroundSize = {20.0, 20.0};
-
 typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 @interface ASImageNodeDrawParameters : NSObject {
@@ -212,7 +210,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   __instanceLock__.lock();
   ASPrimitiveTraitCollection tc = _primitiveTraitCollection;
   __instanceLock__.unlock();
-  return ASGraphicsCreateImageWithTraitCollectionAndOptions(tc, size, NO, 1, nil, ^{
+  return ASGraphicsCreateImage(tc, size, NO, 1, nil, nil, ^{
     AS::MutexLocker l(__instanceLock__);
     [_placeholderColor setFill];
     UIRectFill(CGRectMake(0, 0, size.width, size.height));
@@ -247,7 +245,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
     return;
   }
 
-  UIImage *oldImage = _image;
   _image = image;
 
   if (image != nil) {
@@ -260,23 +257,13 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       // do not use ASPerformBlockOnMainThread here, if it performs the block synchronously it will continue
       // holding the lock while calling addSubnode.
       dispatch_async(dispatch_get_main_queue(), ^{
-        _debugLabelNode = [[ASTextNode alloc] init];
-        _debugLabelNode.layerBacked = YES;
-        [self addSubnode:_debugLabelNode];
+        self->_debugLabelNode = [[ASTextNode alloc] init];
+        self->_debugLabelNode.layerBacked = YES;
+        [self addSubnode:self->_debugLabelNode];
       });
     }
   } else {
     self.contents = nil;
-  }
-
-  // Destruction of bigger images on the main thread can be expensive
-  // and can take some time, so we dispatch onto a bg queue to
-  // actually dealloc.
-  CGSize oldImageSize = oldImage.size;
-  BOOL shouldReleaseImageOnBackgroundThread = oldImageSize.width > kMinReleaseImageOnBackgroundSize.width
-                                              || oldImageSize.height > kMinReleaseImageOnBackgroundSize.height;
-  if (shouldReleaseImageOnBackgroundThread && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
-    ASPerformBackgroundDeallocation(&oldImage);
   }
 }
 
@@ -302,44 +289,48 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
 - (NSObject *)drawParametersForAsyncLayer:(_ASDisplayLayer *)layer
 {
-  ASLockScopeSelf();
-
-  UIImage *drawImage = _image;
-  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-    if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
-      _imageNodeFlags.regenerateFromImageAsset = NO;
-      UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-      UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
-      if ( generatedImage != nil ) {
-        drawImage = generatedImage;
+  ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
+  
+  {
+    ASLockScopeSelf();
+    UIImage *drawImage = _image;
+    if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
+      if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
+        _imageNodeFlags.regenerateFromImageAsset = NO;
+        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
+        UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
+        if ( generatedImage != nil ) {
+          drawImage = generatedImage;
+        }
       }
     }
-  }
 
-  ASImageNodeDrawParameters *drawParameters = [[ASImageNodeDrawParameters alloc] init];
-  drawParameters->_image = drawImage;
+    drawParameters->_image = drawImage;
+    drawParameters->_contentsScale = _contentsScaleForDisplay;
+    drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
+    drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
+    drawParameters->_forcedSize = _forcedSize;
+    drawParameters->_cropRect = _cropRect;
+    drawParameters->_cropDisplayBounds = _cropDisplayBounds;
+    drawParameters->_imageModificationBlock = _imageModificationBlock;
+    drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
+    drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+    drawParameters->_traitCollection = _primitiveTraitCollection;
+
+    // Hack for now to retain the weak entry that was created while this drawing happened
+    drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
+      ASLockScopeSelf();
+      self->_weakCacheEntry = entry;
+    };
+  }
+  
+  // We need to unlock before we access the other accessor.
+  // Especially tintColor because it needs to walk up the view hierarchy
   drawParameters->_bounds = [self threadSafeBounds];
   drawParameters->_opaque = self.opaque;
-  drawParameters->_contentsScale = _contentsScaleForDisplay;
   drawParameters->_backgroundColor = self.backgroundColor;
-  drawParameters->_tintColor = self.tintColor;
   drawParameters->_contentMode = self.contentMode;
-  drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
-  drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
-  drawParameters->_forcedSize = _forcedSize;
-  drawParameters->_cropRect = _cropRect;
-  drawParameters->_cropDisplayBounds = _cropDisplayBounds;
-  drawParameters->_imageModificationBlock = _imageModificationBlock;
-  drawParameters->_willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
-  drawParameters->_didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
-  drawParameters->_traitCollection = _primitiveTraitCollection;
-
-
-  // Hack for now to retain the weak entry that was created while this drawing happened
-  drawParameters->_didDrawBlock = ^(ASWeakMapEntry *entry){
-    ASLockScopeSelf();
-    _weakCacheEntry = entry;
-  };
+  drawParameters->_tintColor = self.tintColor;
 
   return drawParameters;
 }
@@ -378,7 +369,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   BOOL stretchable = !UIEdgeInsetsEqualToEdgeInsets(image.capInsets, UIEdgeInsetsZero);
   if (stretchable) {
     if (imageModificationBlock != NULL) {
-      image = imageModificationBlock(image);
+      image = imageModificationBlock(image, drawParameter->_traitCollection);
     }
     return image;
   }
@@ -494,7 +485,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 + (UIImage *)createContentsForkey:(ASImageNodeContentsKey *)key drawParameters:(id)parameter isCancelled:(asdisplaynode_iscancelled_block_t)isCancelled
 {
-  // The following `ASGraphicsCreateImageWithTraitCollectionAndOptions` call will sometimes take take longer than 5ms on an
+  // The following `ASGraphicsCreateImage` call will sometimes take take longer than 5ms on an
   // A5 processor for a 400x800 backingSize.
   // Check for cancellation before we call it.
   if (isCancelled()) {
@@ -505,7 +496,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
   // Use contentsScale of 1.0 and do the contentsScale handling in boundsSizeInPixels so ASCroppedImageBackingSizeAndDrawRectInBounds
   // will do its rounding on pixel instead of point boundaries
-  UIImage *result = ASGraphicsCreateImageWithTraitCollectionAndOptions(drawParameters->_traitCollection, key.backingSize, key.isOpaque, 1.0, key.image, ^{
+  UIImage *result = ASGraphicsCreateImage(drawParameters->_traitCollection, key.backingSize, key.isOpaque, 1.0, key.image, isCancelled, ^{
     BOOL contextIsClean = YES;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -557,7 +548,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
   }
 
   if (key.imageModificationBlock) {
-    result = key.imageModificationBlock(result);
+    result = key.imageModificationBlock(result, drawParameters->_traitCollection);
   }
 
   return result;
@@ -806,8 +797,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 
 asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor *borderColor)
 {
-  return ^(UIImage *originalImage) {
-    return ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+  return ^(UIImage *originalImage, ASPrimitiveTraitCollection traitCollection) {
+    return ASGraphicsCreateImage(traitCollection, originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
       UIBezierPath *roundOutline = [UIBezierPath bezierPathWithOvalInRect:(CGRect){CGPointZero, originalImage.size}];
 
       // Make the image round
@@ -828,8 +819,8 @@ asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat
 
 asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color)
 {
-  return ^(UIImage *originalImage) {
-    UIImage *modifiedImage = ASGraphicsCreateImageWithOptions(originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
+  return ^(UIImage *originalImage, ASPrimitiveTraitCollection traitCollection) {
+    UIImage *modifiedImage = ASGraphicsCreateImage(traitCollection, originalImage.size, NO, originalImage.scale, originalImage, nil, ^{
       // Set color and render template
       [color setFill];
       UIImage *templateImage = [originalImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];

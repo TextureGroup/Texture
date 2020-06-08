@@ -205,19 +205,8 @@ AS_CATEGORY_IMPLEMENTABLE
  * @abstract Called when the node's ASTraitCollection changes
  *
  * @discussion Subclasses can override this method to react to a trait collection change.
- */
-AS_CATEGORY_IMPLEMENTABLE
-- (void)asyncTraitCollectionDidChange ASDISPLAYNODE_REQUIRES_SUPER ASDISPLAYNODE_DEPRECATED_MSG("Use asyncTraitCollectionDidChangeWithPreviousTraitCollection: instead.");
-
-
-/**
- * @abstract Called when the node's ASTraitCollection changes
- *
- * @discussion Subclasses can override this method to react to a trait collection change.
  *
  * @param previousTraitCollection The ASPrimitiveTraitCollection object before the interface environment changed.
- *
- * @note Enable  `ASExperimentalTraitCollectionDidChangeWithPreviousCollection` experiment to have this method called instead of `asyncTraitCollectionDidChange`.
  */
 AS_CATEGORY_IMPLEMENTABLE
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection ASDISPLAYNODE_REQUIRES_SUPER;

@@ -241,7 +241,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     class_addMethod(self, @selector(didEnterVisibleState), noArgsImp, "v@:");
     class_addMethod(self, @selector(didExitVisibleState), noArgsImp, "v@:");
     class_addMethod(self, @selector(hierarchyDisplayDidFinish), noArgsImp, "v@:");
-    class_addMethod(self, @selector(asyncTraitCollectionDidChange), noArgsImp, "v@:");
     class_addMethod(self, @selector(calculatedLayoutDidChange), noArgsImp, "v@:");
     
     auto type0 = "v@:" + std::string(@encode(ASSizeRange));
@@ -438,36 +437,42 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
 {
   if (@available(iOS 13.0, *)) {
+    // When changing between light and dark mode, often the entire node needs to re-render.
+    // This change doesn't happen frequently so it's fairly safe to render nodes again
     __instanceLock__.lock();
-    if (self.primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-      // When changing between light and dark mode, often the entire node needs to re-render.
-      // This change doesn't happen frequently so it's fairly safe to render nodes again
-      BOOL needsClippingCornerUpdate = NO;
-      CGFloat cornerRadius = _cornerRadius;
-      ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
-      UIColor *backgroundColor = _backgroundColor;
-      if (_loaded(self)) {
-        CGColorRef cgBackgroundColor = backgroundColor.CGColor;
-        if (!CGColorEqualToColor(_layer.backgroundColor, cgBackgroundColor)) {
-          // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
-          // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
-          // We utilize the _backgroundColor instance variable to track the full dynamic color
-          // and apply any changes here when trait collection updates occur.
-          _layer.backgroundColor = cgBackgroundColor;
-        }
-        // If we have clipping corners, re-render the clipping corner layer upon user interface style change
-        if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
-          needsClippingCornerUpdate = YES;
-        }
-      }
-      __instanceLock__.unlock();
-      if (needsClippingCornerUpdate) {
-        [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
-      }
-      [self setNeedsDisplay];
-      return;
-    }
+    BOOL loaded = _loaded(self);
+    ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
     __instanceLock__.unlock();
+    if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+      if (loaded) {
+        // we need to run that on main thread, cause accessing CALayer properties.
+        // It seems than in iOS 13 sometimes it causes deadlock.
+        ASPerformBlockOnMainThread(^{
+          self->__instanceLock__.lock();
+          CGFloat cornerRadius = self->_cornerRadius;
+          ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
+          UIColor *backgroundColor = self->_backgroundColor;
+          self->__instanceLock__.unlock();
+          // TODO: we should resolve color using node's trait collection
+          // but Texture changes it from many places, so we may receive the wrong one.
+          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
+          if (!CGColorEqualToColor(self->_layer.backgroundColor, cgBackgroundColor)) {
+            // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+            // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
+            // We utilize the _backgroundColor instance variable to track the full dynamic color
+            // and apply any changes here when trait collection updates occur.
+            self->_layer.backgroundColor = cgBackgroundColor;
+          }
+
+          // If we have clipping corners, re-render the clipping corner layer upon user interface style change
+          if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
+            [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
+          }
+          
+          [self setNeedsDisplay];
+        });
+      }
+    }
   }
 }
 
@@ -1343,7 +1348,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
     __instanceLock__.lock();
     if (_placeholderLayer.superlayer && !placeholderShouldPersist) {
       void (^cleanupBlock)() = ^{
-        [_placeholderLayer removeFromSuperlayer];
+        [self->_placeholderLayer removeFromSuperlayer];
       };
 
       if (_placeholderFadeDuration > 0.0 && ASInterfaceStateIncludesVisible(self.interfaceState)) {
@@ -1489,7 +1494,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   ASPerformBlockOnMainThread(^{
     for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
       // Skip corners that aren't clipped (we have already set up & torn down layers based on maskedCorners.)
-      if (_clipCornerLayers[idx] == nil) {
+      if (self->_clipCornerLayers[idx] == nil) {
         continue;
       }
 
@@ -1499,7 +1504,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       BOOL isRight = (idx == 1 || idx == 3);
 
       CGSize size = CGSizeMake(radius + 1, radius + 1);
-      UIImage *newContents = ASGraphicsCreateImageWithTraitCollectionAndOptions(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, ^{
+      UIImage *newContents = ASGraphicsCreateImage(self.primitiveTraitCollection, size, NO, self.contentsScaleForDisplay, nil, nil, ^{
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         if (isRight == YES) {
           CGContextTranslateCTM(ctx, -radius + 1, 0);
@@ -1515,7 +1520,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
       });
 
       // No lock needed, as _clipCornerLayers is only modified on the main thread.
-      unowned CALayer *clipCornerLayer = _clipCornerLayers[idx];
+      unowned CALayer *clipCornerLayer = self->_clipCornerLayers[idx];
       clipCornerLayer.contents = (id)(newContents.CGImage);
       clipCornerLayer.bounds = CGRectMake(0.0, 0.0, size.width, size.height);
       clipCornerLayer.anchorPoint = CGPointMake(isRight ? 1.0 : 0.0, isTop ? 0.0 : 1.0);
@@ -1530,7 +1535,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
     ASDisplayNodeAssertMainThread();
     for (int idx = 0; idx < NUM_CLIP_CORNER_LAYERS; idx++) {
       BOOL visible = (0 != (visibleCornerLayers & (1 << idx)));
-      if (visible == (_clipCornerLayers[idx] != nil)) {
+      if (visible == (self->_clipCornerLayers[idx] != nil)) {
         continue;
       } else if (visible) {
         static ASDisplayNodeCornerLayerDelegate *clipCornerLayers;
@@ -1538,15 +1543,15 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
         dispatch_once(&onceToken, ^{
           clipCornerLayers = [[ASDisplayNodeCornerLayerDelegate alloc] init];
         });
-        _clipCornerLayers[idx] = [[CALayer alloc] init];
-        _clipCornerLayers[idx].zPosition = 99999;
-        _clipCornerLayers[idx].delegate = clipCornerLayers;
+        self->_clipCornerLayers[idx] = [[CALayer alloc] init];
+        self->_clipCornerLayers[idx].zPosition = 99999;
+        self->_clipCornerLayers[idx].delegate = clipCornerLayers;
       } else {
-        [_clipCornerLayers[idx] removeFromSuperlayer];
-        _clipCornerLayers[idx] = nil;
+        [self->_clipCornerLayers[idx] removeFromSuperlayer];
+        self->_clipCornerLayers[idx] = nil;
       }
     }
-    [self _updateClipCornerLayerContentsWithRadius:_cornerRadius backgroundColor:self.backgroundColor];
+    [self _updateClipCornerLayerContentsWithRadius:self->_cornerRadius backgroundColor:self.backgroundColor];
   });
 }
 
@@ -2803,13 +2808,13 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   if (ASInterfaceStateIncludesVisible(self.pendingInterfaceState)) {
     void(^exitVisibleInterfaceState)(void) = ^{
       // This block intentionally retains self.
-      __instanceLock__.lock();
-      unsigned isStillInHierarchy = _flags.isInHierarchy;
-      BOOL isVisible = ASInterfaceStateIncludesVisible(_pendingInterfaceState);
-      ASInterfaceState newState = (_pendingInterfaceState & ~ASInterfaceStateVisible);
+      self->__instanceLock__.lock();
+      unsigned isStillInHierarchy = self->_flags.isInHierarchy;
+      BOOL isVisible = ASInterfaceStateIncludesVisible(self->_pendingInterfaceState);
+      ASInterfaceState newState = (self->_pendingInterfaceState & ~ASInterfaceStateVisible);
       // layer may be thrashed, we need to remember the state so we can reset if it enters in same runloop later.
-      _preExitingInterfaceState = _pendingInterfaceState;
-      __instanceLock__.unlock();
+      self->_preExitingInterfaceState = self->_pendingInterfaceState;
+      self->__instanceLock__.unlock();
       if (!isStillInHierarchy && isVisible) {
 #if ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
         if (![self supportsRangeManagedInterfaceState]) {
@@ -2968,9 +2973,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
         [self setDisplaySuspended:YES];
         //schedule clear contents on next runloop
         dispatch_async(dispatch_get_main_queue(), ^{
-          __instanceLock__.lock();
-          ASInterfaceState interfaceState = _interfaceState;
-          __instanceLock__.unlock();
+          self->__instanceLock__.lock();
+          ASInterfaceState interfaceState = self->_interfaceState;
+          self->__instanceLock__.unlock();
           if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
             [self clearContents];
           }
@@ -2988,9 +2993,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
             [[self asyncLayer] cancelAsyncDisplay];
             //schedule clear contents on next runloop
             dispatch_async(dispatch_get_main_queue(), ^{
-              __instanceLock__.lock();
-              ASInterfaceState interfaceState = _interfaceState;
-              __instanceLock__.unlock();
+              self->__instanceLock__.lock();
+              ASInterfaceState interfaceState = self->_interfaceState;
+              self->__instanceLock__.unlock();
               if (ASInterfaceStateIncludesDisplay(interfaceState) == NO) {
                 [self clearContents];
               }

@@ -20,7 +20,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable imageFromCache);
+typedef NS_ENUM(NSInteger, ASImageCacheType) {
+  ASImageCacheTypeAsynchronous = 0,
+  ASImageCacheTypeSynchronous,
+};
+
+typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable imageFromCache, ASImageCacheType cacheType);
 
 @protocol ASImageCacheProtocol <NSObject>
 

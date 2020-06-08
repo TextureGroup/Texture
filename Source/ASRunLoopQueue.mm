@@ -13,7 +13,6 @@
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <deque>
 #import <vector>
 
 #define ASRunLoopQueueLoggingEnabled 0
