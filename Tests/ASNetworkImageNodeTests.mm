@@ -20,6 +20,9 @@
 @interface ASTestImageCache : NSObject <ASImageCacheProtocol>
 @end
 
+@interface ASTestAnimatedImage : NSObject <ASAnimatedImageProtocol>
+@end
+
 @implementation ASNetworkImageNodeTests {
   ASNetworkImageNode *node;
   id downloader;
@@ -71,6 +74,18 @@
   [[downloader expect] setProgressImageBlock:[OCMArg isNotNil] callbackQueue:OCMOCK_ANY withDownloadIdentifier:@1];
   node.URL = [NSURL URLWithString:@"http://imageB"];
   [downloader verifyWithDelay:5];
+}
+
+- (void)testThatAnimatedImageClearedCorrectlyOnChangeURL
+{
+  [node layer];
+  [node enterInterfaceState:ASInterfaceStateInHierarchy];
+
+  // Set URL while visible, should set progress block
+  node.animatedImage = [ASTestAnimatedImage new];
+  [node setURL:[NSURL URLWithString:@"http://imageA"] resetToDefault:YES];
+
+  XCTAssertEqualObjects(nil, node.animatedImage);
 }
 
 - (void)testThatSettingAnImageWillStayForEnteringAndExitingPreloadState
@@ -132,4 +147,62 @@
 {
   // nop
 }
+@end
+
+@implementation ASTestAnimatedImage
+@synthesize playbackReadyCallback;
+
+- (UIImage *)coverImage
+{
+  return [UIImage new];
+}
+
+- (BOOL)coverImageReady
+{
+  return YES;
+}
+
+- (CFTimeInterval)totalDuration
+{
+  return 1;
+}
+
+- (NSUInteger)frameInterval
+{
+  return 0.2;
+}
+
+- (size_t)loopCount
+{
+  return 0;
+}
+
+- (size_t)frameCount
+{
+  return 5;
+}
+
+- (BOOL)playbackReady
+{
+  return YES;
+}
+
+- (NSError *)error
+{
+  return nil;
+}
+
+- (CGImageRef)imageAtIndex:(NSUInteger)index
+{
+  return [[UIImage new] CGImage];
+}
+
+- (CFTimeInterval)durationAtIndex:(NSUInteger)index
+{
+  return 0.2;
+}
+
+- (void)clearAnimatedImageCache
+{}
+
 @end
