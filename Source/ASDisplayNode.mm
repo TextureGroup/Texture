@@ -452,11 +452,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
           __instanceLock__.lock();
           CGFloat cornerRadius = _cornerRadius;
           ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
-          UIColor *backgroundColor = _backgroundColor;
-          if (@available(iOS 13.0, *)) {
-             UITraitCollection *tempTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-             backgroundColor = [backgroundColor resolvedColorWithTraitCollection:tempTraitCollection];
-          }
+          UIColor *backgroundColor = UIColorResolvedWithASPrimitiveTraitCollection(_primitiveTraitCollection, _backgroundColor);
          
           __instanceLock__.unlock();
           // TODO: we should resolve color using node's trait collection
@@ -595,11 +591,6 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   } else {
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
-    if ([self supernode] == nil) {
-      // Only update traitCollection for root node, and propagate down later
-      // Subnode will sync traitCollection with parent when _setSupernode called
-        _primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(_view.traitCollection);
-    }
     _view.asyncdisplaykit_node = self;
     _layer = _view.layer;
   }
@@ -3386,7 +3377,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssert([self _locked_isNodeLoaded], @"Expected node to be loaded before applying pending state.");
 
   if (_flags.layerBacked) {
-    [_pendingViewState applyToLayer:_layer];
+    [_pendingViewState applyToLayer:_layer withASPrimitiveTraitCollection:_primitiveTraitCollection];
   } else {
     BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
     [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling];
@@ -3750,6 +3741,8 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
   if (subnode.layerBacked) {
+    ASTraitCollectionPropagateDown(subnode, ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection));
+
     // Call -addSubnode: so that we use the asyncdisplaykit_node path if possible.
     [self.layer addSubnode:subnode];
   } else {
@@ -3760,6 +3753,7 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
       if (subnode.supernode) {
         [subnode removeFromSupernode];
       }
+      ASTraitCollectionPropagateDown(subnode, ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection));
       [self addSubview:subnode.view];
     }
   }

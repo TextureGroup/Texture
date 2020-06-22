@@ -929,7 +929,7 @@ static CGColorRef blackColorRef = NULL;
   }
 }
 
-- (void)applyToLayer:(CALayer *)layer
+- (void)applyToLayer:(CALayer *)layer withASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection
 {
   ASPendingStateFlags flags = _stateToApplyFlags;
 
@@ -971,7 +971,9 @@ static CGColorRef blackColorRef = NULL;
     layer.masksToBounds = _flags.clipsToBounds;
 
   if (flags.setBackgroundColor)
-    layer.backgroundColor = backgroundColor.CGColor;
+  {
+    layer.backgroundColor = UIColorResolvedWithASPrimitiveTraitCollection(primitiveTraitCollection, backgroundColor).CGColor;
+  }
 
   if (flags.setOpaque)
     layer.opaque = _flags.opaque;
@@ -1103,7 +1105,7 @@ static CGColorRef blackColorRef = NULL;
 
   if (flags.setBackgroundColor) {
     view.backgroundColor = backgroundColor;
-    layer.backgroundColor = backgroundColor.CGColor;
+//    layer.backgroundColor = backgroundColor.CGColor;
   }
 
   if (flags.setTintColor)

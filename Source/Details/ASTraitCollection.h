@@ -83,6 +83,11 @@ AS_EXTERN BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASP
 AS_EXTERN NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits);
 
 /**
+ * Returns a color resolved with a ASPrimitiveTraitCollection.
+ */
+AS_EXTERN UIColor *UIColorResolvedWithASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits, UIColor *color);
+
+/**
  * This function will walk the layout element hierarchy and updates the layout element trait collection for every
  * layout element within the hierarchy.
  */
