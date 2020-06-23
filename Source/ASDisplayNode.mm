@@ -592,8 +592,9 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
     if ([self supernode] == nil) {
-      // Only update traitCollection for root node, and propagate down later
-      // Subnode will sync traitCollection with parent when _setSupernode called
+      // Make sure we using the right trait collection for rendering
+      // UIView might set overrideUserInterfaceStyle which might lead to different display, so we should keep the initial value is same with UIView
+      // Trait collection will be propagate down to subnodes when _setSupernode is called, so we don't need to broadcast this change
         _primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(_view.traitCollection);
     }
     _view.asyncdisplaykit_node = self;
@@ -3746,7 +3747,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
   if (subnode.layerBacked) {
-    ASTraitCollectionPropagateDown(subnode, ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection));
 
     // Call -addSubnode: so that we use the asyncdisplaykit_node path if possible.
     [self.layer addSubnode:subnode];
@@ -3758,7 +3758,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
       if (subnode.supernode) {
         [subnode removeFromSupernode];
       }
-      ASTraitCollectionPropagateDown(subnode, ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection));
       [self addSubview:subnode.view];
     }
   }
