@@ -591,6 +591,11 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   } else {
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
+    if ([self supernode] == nil) {
+      // Only update traitCollection for root node, and propagate down later
+      // Subnode will sync traitCollection with parent when _setSupernode called
+        _primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(_view.traitCollection);
+    }
     _view.asyncdisplaykit_node = self;
     _layer = _view.layer;
   }
