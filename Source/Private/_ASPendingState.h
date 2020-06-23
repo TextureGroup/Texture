@@ -26,7 +26,7 @@
 
 // Supports all of the properties included in the ASDisplayNodeViewProperties protocol
 
-- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
+- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling primitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection;
 - (void)applyToLayer:(CALayer *)layer withASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 + (_ASPendingState *)pendingViewStateFromLayer:(CALayer *)layer;

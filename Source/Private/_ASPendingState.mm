@@ -971,9 +971,7 @@ static CGColorRef blackColorRef = NULL;
     layer.masksToBounds = _flags.clipsToBounds;
 
   if (flags.setBackgroundColor)
-  {
     layer.backgroundColor = UIColorResolvedWithASPrimitiveTraitCollection(primitiveTraitCollection, backgroundColor).CGColor;
-  }
 
   if (flags.setOpaque)
     layer.opaque = _flags.opaque;
@@ -1044,7 +1042,7 @@ static CGColorRef blackColorRef = NULL;
     [layer layoutIfNeeded];
 }
 
-- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling
+- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling primitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection
 {
   /*
    Use our convenience setters blah here instead of layer.blah
@@ -1105,7 +1103,7 @@ static CGColorRef blackColorRef = NULL;
 
   if (flags.setBackgroundColor) {
     view.backgroundColor = backgroundColor;
-//    layer.backgroundColor = backgroundColor.CGColor;
+    layer.backgroundColor = UIColorResolvedWithASPrimitiveTraitCollection(primitiveTraitCollection, backgroundColor).CGColor;
   }
 
   if (flags.setTintColor)

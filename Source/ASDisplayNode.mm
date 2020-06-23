@@ -3386,7 +3386,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     [_pendingViewState applyToLayer:_layer withASPrimitiveTraitCollection:_primitiveTraitCollection];
   } else {
     BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling];
+    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling primitiveTraitCollection:_primitiveTraitCollection];
   }
 
   // _ASPendingState objects can add up very quickly when adding
