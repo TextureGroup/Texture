@@ -15,6 +15,9 @@
 #import <AsyncDisplayKit/ASControlTargetAction.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASThread.h>
+#if TARGET_OS_TV
+#import <AsyncDisplayKit/ASControlNode+Private.h>
+#endif
 
 // UIControl allows dragging some distance outside of the control itself during
 // tracking. This value depends on the device idiom (25 or 70 points), so
