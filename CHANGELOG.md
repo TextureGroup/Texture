@@ -1,4 +1,14 @@
-# Change Log
+# Changelog
+
+## [3.0.0-rc.2](https://github.com/TextureGroup/Texture/tree/3.0.0-rc.2) (2020-06-25)
+
+[Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0-rc.1...3.0.0-rc.2)
+
+**Merged pull requests:**
+
+- Fix all the warnings and re-enable on CI [\#1872](https://github.com/TextureGroup/Texture/pull/1872) ([garrettmoon](https://github.com/garrettmoon))
+- Prepare for 3.0.0-rc.1 release [\#1870](https://github.com/TextureGroup/Texture/pull/1870) ([garrettmoon](https://github.com/garrettmoon))
+- -\[ASNetworkImageNode setURL:resetToDefault:\] forget to reset animatedImage [\#1861](https://github.com/TextureGroup/Texture/pull/1861) ([IvanChan](https://github.com/IvanChan))
 
 ## [3.0.0-rc.1](https://github.com/TextureGroup/Texture/tree/3.0.0-rc.1) (2020-06-19)
 
