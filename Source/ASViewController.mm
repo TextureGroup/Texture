@@ -286,7 +286,7 @@ ASVisibilityDepthImplementation;
 
 - (UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     return super.additionalSafeAreaInsets;
   }
 
@@ -295,7 +295,7 @@ ASVisibilityDepthImplementation;
 
 - (void)setAdditionalSafeAreaInsets:(UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     [super setAdditionalSafeAreaInsets:additionalSafeAreaInsets];
   } else {
     _fallbackAdditionalSafeAreaInsets = additionalSafeAreaInsets;

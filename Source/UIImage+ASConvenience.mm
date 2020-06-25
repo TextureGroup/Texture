@@ -30,7 +30,7 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
     NSString *imageKey = imageName;
     if (traitCollection) {
       char imageKeyBuffer[256];
-      if (@available(iOS 12.0, *)) {
+      if (@available(iOS 12.0, tvOS 10.0, *)) {
         snprintf(imageKeyBuffer, sizeof(imageKeyBuffer), "%s|%ld|%ld|%ld", imageName.UTF8String, (long)traitCollection.horizontalSizeClass, (long)traitCollection.verticalSizeClass, (long)traitCollection.userInterfaceStyle);
       } else {
         // Fallback on earlier versions

@@ -436,7 +436,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
 {
-  if (@available(iOS 13.0, *)) {
+  if (@available(iOS 13.0, tvOS 10.0, *)) {
     // When changing between light and dark mode, often the entire node needs to re-render.
     // This change doesn't happen frequently so it's fairly safe to render nodes again
     __instanceLock__.lock();

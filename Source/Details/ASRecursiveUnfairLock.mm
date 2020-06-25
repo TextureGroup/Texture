@@ -18,16 +18,19 @@
 #define rul_set_thread(l, t) atomic_store_explicit(&l->_thread, t, memory_order_relaxed)
 #define rul_get_thread(l) atomic_load_explicit(&l->_thread, memory_order_relaxed)
 
+OS_UNFAIR_LOCK_AVAILABILITY
 NS_INLINE void ASRecursiveUnfairLockDidAcquire(ASRecursiveUnfairLock *l, pthread_t tid) {
   NSCAssert(pthread_equal(rul_get_thread(l), NULL) && l->_count == 0, @"Unfair lock error");
   rul_set_thread(l, tid);
 }
 
+OS_UNFAIR_LOCK_AVAILABILITY
 NS_INLINE void ASRecursiveUnfairLockWillRelease(ASRecursiveUnfairLock *l) {
   NSCAssert(pthread_equal(rul_get_thread(l), pthread_self()) && l->_count == 0, @"Unfair lock error");
   rul_set_thread(l, NULL);
 }
 
+OS_UNFAIR_LOCK_AVAILABILITY
 NS_INLINE void ASRecursiveUnfairLockAssertHeld(ASRecursiveUnfairLock *l) {
   NSCAssert(pthread_equal(rul_get_thread(l), pthread_self()) && l->_count > 0, @"Unfair lock error");
 }

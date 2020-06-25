@@ -166,7 +166,7 @@ typedef struct {
 {
   NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
   UIView *contentView = node.view.superview;
-  UICollectionViewCell *cell = contentView.superview;
+  UICollectionViewCell *cell = (UICollectionViewCell *)contentView.superview;
 
   if (cell == nil || indexPath == nil) {
     return;
@@ -179,7 +179,7 @@ typedef struct {
 {
   NSIndexPath *indexPath = [collectionNode.view indexPathForNode:node];
   UIView *contentView = node.view.superview;
-  UICollectionViewCell *cell = contentView.superview;
+  UICollectionViewCell *cell = (UICollectionViewCell *)contentView.superview;
 
   if (cell == nil || indexPath == nil) {
     return;
