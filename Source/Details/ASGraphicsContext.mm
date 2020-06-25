@@ -15,7 +15,7 @@
 
 #if AS_AT_LEAST_IOS13
 #define ASPerformBlockWithTraitCollection(work, traitCollection) \
-    if (@available(iOS 13.0, *)) { \
+    if (@available(iOS 13.0, tvOS 13.0, *)) { \
       UITraitCollection *uiTraitCollection = ASPrimitiveTraitCollectionToUITraitCollection(traitCollection); \
       [uiTraitCollection performAsCurrentTraitCollection:^{ \
         work(); \

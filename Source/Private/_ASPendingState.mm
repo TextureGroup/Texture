@@ -1182,7 +1182,7 @@ static CGColorRef blackColorRef = NULL;
   if (flags.setPreservesSuperviewLayoutMargins)
     view.preservesSuperviewLayoutMargins = _flags.preservesSuperviewLayoutMargins;
 
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     if (flags.setInsetsLayoutMarginsFromSafeArea) {
       view.insetsLayoutMarginsFromSafeArea = _flags.insetsLayoutMarginsFromSafeArea;
     }
