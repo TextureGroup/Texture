@@ -8,7 +8,7 @@ on:
 jobs:
   cocoapods-lint:
     env: 
-        DEVELOPER_DIR: /Applications/Xcode_11.4.1.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     name: Verify that podspec lints
     runs-on: macOS-latest
     steps:
