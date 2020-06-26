@@ -74,11 +74,11 @@
  */
 #pragma mark - Main Thread Assertions Disabling
 
-AS_EXTERN BOOL ASMainThreadAssertionsAreDisabled(void);
+ASDK_EXTERN BOOL ASMainThreadAssertionsAreDisabled(void);
 
-AS_EXTERN void ASPushMainThreadAssertionsDisabled(void);
+ASDK_EXTERN void ASPushMainThreadAssertionsDisabled(void);
 
-AS_EXTERN void ASPopMainThreadAssertionsDisabled(void);
+ASDK_EXTERN void ASPopMainThreadAssertionsDisabled(void);
 
 #pragma mark - Non-Fatal Assertions
 

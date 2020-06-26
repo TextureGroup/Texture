@@ -30,7 +30,7 @@
  * are at the `debug` log level, which the system
  * disables in production.
  */
-AS_EXTERN void ASDisableLogging(void);
+ASDK_EXTERN void ASDisableLogging(void);
 
 /**
  * Restore logging that has been runtime-disabled via ASDisableLogging().
@@ -40,38 +40,38 @@ AS_EXTERN void ASDisableLogging(void);
  * configuration. This can be used in conjunction with ASDisableLogging()
  * to allow logging to be toggled off and back on at runtime.
  */
-AS_EXTERN void ASEnableLogging(void);
+ASDK_EXTERN void ASEnableLogging(void);
 
 /// Log for general node events e.g. interfaceState, didLoad.
 #define ASNodeLogEnabled 1
-AS_EXTERN os_log_t ASNodeLog(void);
+ASDK_EXTERN os_log_t ASNodeLog(void);
 
 /// Log for layout-specific events e.g. calculateLayout.
 #define ASLayoutLogEnabled 1
-AS_EXTERN os_log_t ASLayoutLog(void);
+ASDK_EXTERN os_log_t ASLayoutLog(void);
 
 /// Log for display-specific events e.g. display queue batches.
 #define ASDisplayLogEnabled 1
-AS_EXTERN os_log_t ASDisplayLog(void);
+ASDK_EXTERN os_log_t ASDisplayLog(void);
 
 /// Log for collection events e.g. reloadData, performBatchUpdates.
 #define ASCollectionLogEnabled 1
-AS_EXTERN os_log_t ASCollectionLog(void);
+ASDK_EXTERN os_log_t ASCollectionLog(void);
 
 /// Log for ASNetworkImageNode and ASMultiplexImageNode events.
 #define ASImageLoadingLogEnabled 1
-AS_EXTERN os_log_t ASImageLoadingLog(void);
+ASDK_EXTERN os_log_t ASImageLoadingLog(void);
 
 /// Specialized log for our main thread deallocation trampoline.
 #define ASMainThreadDeallocationLogEnabled 0
-AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
+ASDK_EXTERN os_log_t ASMainThreadDeallocationLog(void);
 
 #define ASLockingLogEnabled 0
-AS_EXTERN os_log_t ASLockingLog(void);
+ASDK_EXTERN os_log_t ASLockingLog(void);
 
 #if AS_HAS_OS_SIGNPOST
 /// Uses the special POI category for Instruments. Used by ASSignpost.h.
-AS_EXTERN os_log_t ASPointsOfInterestLog(void);
+ASDK_EXTERN os_log_t ASPointsOfInterestLog(void);
 #endif
 
 /**

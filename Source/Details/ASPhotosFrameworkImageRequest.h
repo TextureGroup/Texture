@@ -17,7 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_EXTERN NSString *const ASPhotosURLScheme;
+ASDK_EXTERN NSString *const ASPhotosURLScheme;
 
 /**
  @abstract Use ASPhotosFrameworkImageRequest to encapsulate all the information needed to request an image from

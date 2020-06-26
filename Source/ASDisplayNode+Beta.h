@@ -19,8 +19,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
-AS_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
+ASDK_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
+ASDK_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
 /**
  * Bitmask to indicate what performance measurements the cell should record.

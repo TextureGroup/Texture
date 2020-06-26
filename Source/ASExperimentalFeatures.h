@@ -33,9 +33,9 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
 };
 
 /// Convert flags -> name array.
-AS_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
+ASDK_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
 
 /// Convert name array -> flags.
-AS_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
+ASDK_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
 
 NS_ASSUME_NONNULL_END

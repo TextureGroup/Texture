@@ -14,13 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class UIViewController;
 
-AS_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger visibilityDepth);
+ASDK_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger visibilityDepth);
 
 /**
  * ASVisibilityDepth
  *
  * @discussion "Visibility Depth" represents the number of user actions required to make an ASDisplayNode or 
- * ASViewController visibile. AsyncDisplayKit uses this information to intelligently manage memory and focus
+ * ASDKViewController visibile. AsyncDisplayKit uses this information to intelligently manage memory and focus
  * resources where they are most visible to the user.
  *
  * The ASVisibilityDepth protocol describes how custom view controllers can integrate with this system.
@@ -55,11 +55,11 @@ AS_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger visib
  * If implemented by a view controller container, use this method to notify child view controllers that their view
  * depth has changed @see ASNavigationController.m
  *
- * If implemented on an ASViewController, use this method to reduce or increase the resources that your
+ * If implemented on an ASDKViewController, use this method to reduce or increase the resources that your
  * view controller uses. A higher visibility depth view controller should decrease it's resource usage, a lower
  * visibility depth controller should pre-warm resources in preperation for a display at 0 depth.
  *
- * ASViewController implements this method and reduces / increases range mode of supporting nodes (such as ASCollectionNode
+ * ASDKViewController implements this method and reduces / increases range mode of supporting nodes (such as ASCollectionNode
  * and ASTableNode).
  *
  * @see visibilityDepth

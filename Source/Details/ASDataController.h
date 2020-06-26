@@ -32,8 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSUInteger ASDataControllerAnimationOptions;
 
-AS_EXTERN NSString * const ASDataControllerRowNodeKind;
-AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
+ASDK_EXTERN NSString * const ASDataControllerRowNodeKind;
+ASDK_EXTERN NSString * const ASCollectionInvalidUpdateException;
 
 /**
  Data source for data controller

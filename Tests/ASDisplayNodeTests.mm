@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 
 #import "ASXCTExtensions.h"
 #import "ASDisplayNodeTestsHelper.h"
@@ -274,7 +274,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 }
 @end
 
-@interface ASTestViewController: ASViewController<ASDisplayNode *>
+@interface ASTestViewController: ASDKViewController<ASDisplayNode *>
 @end
 @implementation ASTestViewController
 - (BOOL)prefersStatusBarHidden { return YES; }

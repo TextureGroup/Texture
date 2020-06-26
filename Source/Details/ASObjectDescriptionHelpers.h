@@ -44,13 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMutableArray<NSDictionary *> *)propertiesForDescription;
 @end
 
-AS_EXTERN NSString *ASGetDescriptionValueString(id object);
+ASDK_EXTERN NSString *ASGetDescriptionValueString(id object);
 
 /// Useful for structs etc. Returns e.g. { position = (0 0); frame = (0 0; 50 50) }
-AS_EXTERN NSString *ASObjectDescriptionMakeWithoutObject(NSArray<NSDictionary *> * _Nullable propertyGroups);
+ASDK_EXTERN NSString *ASObjectDescriptionMakeWithoutObject(NSArray<NSDictionary *> * _Nullable propertyGroups);
 
 /// Returns e.g. <MYObject: 0xFFFFFFFF; name = "Object Name"; frame = (0 0; 50 50)>
-AS_EXTERN NSString *ASObjectDescriptionMake(__autoreleasing id object, NSArray<NSDictionary *> * _Nullable propertyGroups);
+ASDK_EXTERN NSString *ASObjectDescriptionMake(__autoreleasing id object, NSArray<NSDictionary *> * _Nullable propertyGroups);
 
 /**
  * Returns e.g. <MYObject: 0xFFFFFFFF>
@@ -58,8 +58,8 @@ AS_EXTERN NSString *ASObjectDescriptionMake(__autoreleasing id object, NSArray<N
  * Note: `object` param is autoreleasing so that this function is dealloc-safe.
  *   No, unsafe_unretained isn't acceptable here – the optimizer may deallocate object early.
  */
-AS_EXTERN NSString *ASObjectDescriptionMakeTiny(__autoreleasing id _Nullable object);
+ASDK_EXTERN NSString *ASObjectDescriptionMakeTiny(__autoreleasing id _Nullable object);
 
-AS_EXTERN NSString * _Nullable ASStringWithQuotesIfMultiword(NSString * _Nullable string);
+ASDK_EXTERN NSString * _Nullable ASStringWithQuotesIfMultiword(NSString * _Nullable string);
 
 NS_ASSUME_NONNULL_END

@@ -15,7 +15,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Convenience.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 
 #pragma mark - _ASDisplayView
 
@@ -176,7 +176,7 @@
   if (superview && node.viewControllerRoot) {
     UIViewController *vc = [node closestViewController];
 
-    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASViewController class]] && ((ASViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
+    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASDKViewController class]] && ((ASDKViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
   }
 #endif
 

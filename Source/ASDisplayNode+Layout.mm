@@ -298,7 +298,7 @@ ASLayoutElementStyleExtensibilityForwarding
 // TODO
 // We should remove this logic, which is relatively new, and instead
 // rely on the parent / host of the root node to do this size change. That's always been the
-// expectation with other node containers like ASTableView, ASCollectionView, ASViewController, etc.
+// expectation with other node containers like ASTableView, ASCollectionView, ASDKViewController, etc.
 // E.g. in ASCellNode the _interactionDelegate is a Table or Collection that will resize in this
 // case. By resizing without participating with the parent, we could get cases where our parent size
 // does not match, especially if there is a size constraint that is applied at that level.

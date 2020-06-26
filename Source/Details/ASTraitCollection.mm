@@ -86,7 +86,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   return environmentTraitCollection;
 }
 
-AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection) {
+ASDK_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection) {
   NSMutableArray *collections = [[NSMutableArray alloc] initWithArray:@[
     [UITraitCollection traitCollectionWithHorizontalSizeClass:traitCollection.horizontalSizeClass],
     [UITraitCollection traitCollectionWithVerticalSizeClass:traitCollection.verticalSizeClass],

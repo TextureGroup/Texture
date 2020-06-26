@@ -1,5 +1,5 @@
 //
-//  ASViewController.h
+//  ASDKViewController.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -19,29 +19,29 @@ typedef ASTraitCollection * _Nonnull (^ASDisplayTraitsForTraitCollectionBlock)(U
 typedef ASTraitCollection * _Nonnull (^ASDisplayTraitsForTraitWindowSizeBlock)(CGSize windowSize);
 
 /**
- * ASViewController allows you to have a completely node backed hierarchy. It automatically
+ * ASDKViewController allows you to have a completely node backed hierarchy. It automatically
  * handles @c ASVisibilityDepth, automatic range mode and propogating @c ASDisplayTraits to contained nodes.
  *
  * You can opt-out of node backed hierarchy and use it like a normal UIViewController.
  * More importantly, you can use it as a base class for all of your view controllers among which some use a node hierarchy and some don't.
  * See examples/ASDKgram project for actual implementation.
  */
-@interface ASViewController<__covariant DisplayNodeType : ASDisplayNode *> : UIViewController <ASVisibilityDepth>
+@interface ASDKViewController<__covariant DisplayNodeType : ASDisplayNode *> : UIViewController <ASVisibilityDepth>
 
 /**
- * ASViewController initializer.
+ * ASDKViewController initializer.
  *
  * @param node An ASDisplayNode which will provide the root view (self.view)
- * @return An ASViewController instance whose root view will be backed by the provided ASDisplayNode.
+ * @return An ASDKViewController instance whose root view will be backed by the provided ASDisplayNode.
  *
  * @see ASVisibilityDepth
  */
 - (instancetype)initWithNode:(DisplayNodeType)node NS_DESIGNATED_INITIALIZER;
 
 /**
-* ASViewController initializer. Useful for interoperability with normal UIViewControllers.
+* ASDKViewController initializer. Useful for interoperability with normal UIViewControllers.
 *
-* @return An ASViewController instance with a nil node whose root view will be backed by a standard UIView as with a normal UIViewController.
+* @return An ASDKViewController instance with a nil node whose root view will be backed by a standard UIView as with a normal UIViewController.
 *
 * @see ASVisibilityDepth
 */
@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface ASViewController (ASRangeControllerUpdateRangeProtocol)
+@interface ASDKViewController (ASRangeControllerUpdateRangeProtocol)
 
 /**
  * Automatically adjust range mode based on view events. If you set this to YES, the view controller or its node
