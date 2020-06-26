@@ -13,7 +13,7 @@
 @protocol PhotoFeedControllerProtocol;
 @class PhotoFeedModel;
 
-@interface PhotoFeedBaseController : ASViewController <PhotoFeedControllerProtocol>
+@interface PhotoFeedBaseController : ASDKViewController <PhotoFeedControllerProtocol>
 
 @property (nonatomic, strong, readonly) PhotoFeedModel *photoFeed;
 @property (nonatomic, strong, readonly) UITableView *tableView;

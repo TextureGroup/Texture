@@ -71,7 +71,7 @@ This is the function that will recursively call through its underlying tree of n
 
 ![layoutcallstack1](/static/images/development/layoutspecs1.png)
 
-This is what a typical call stack will look like for the layout of an `ASViewController` with a simple view hierarchy. Here we clicked on the "Photo with outset icon overlay" in the Layout Specs Examples project. Breakpointing on the `-[PhotoWithOutsetIconOverlay layoutSpecThatFits:]` reveals that call stack.
+This is what a typical call stack will look like for the layout of an `ASDKViewController` with a simple view hierarchy. Here we clicked on the "Photo with outset icon overlay" in the Layout Specs Examples project. Breakpointing on the `-[PhotoWithOutsetIconOverlay layoutSpecThatFits:]` reveals that call stack.
 
 The first significant branch of logic is the top level `-[ASDisplayNode calculateLayoutThatFits]` where it will choose between the Texture Layout and the Yoga engine.
 

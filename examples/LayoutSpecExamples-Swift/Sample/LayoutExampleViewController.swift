@@ -9,7 +9,7 @@
 
 import AsyncDisplayKit
 
-class LayoutExampleViewController: ASViewController<ASDisplayNode> {
+class LayoutExampleViewController: ASDKViewController<ASDisplayNode> {
 
   let customNode: LayoutExampleNode
 
