@@ -36,12 +36,12 @@ Featuring:
 
 ![ASTableViewStressTest Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/ASTableViewStressTest.png)
 
-### ASViewController [ObjC]
+### ASDKViewController [ObjC]
 
-![ASViewController Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/ASViewController.png)
+![ASDKViewController Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/ASDKViewController.png)
  
 Featuring:
-- ASViewController
+- ASDKViewController
 - ASTableView
 - ASMultiplexImageNode
 - ASLayoutSpec
@@ -56,7 +56,7 @@ Featuring:
  
 Featuring:
 - ASDK Swift compatibility
-- ASViewController
+- ASDKViewController
 - ASCollectionView
 - thread affinity
 - ASLayoutSpec
@@ -150,7 +150,7 @@ Featuring:
 ![Swift Example App Screenshot](https://github.com/AsyncDisplayKit/Documentation/raw/master/docs/static/images/example-app-screenshots/Swift.png)
 
 Featuring:
-- ASViewController with ASTableNode
+- ASDKViewController with ASTableNode
 
 ### SynchronousConcurrency [ObjC]
 
@@ -169,7 +169,7 @@ The internal features are:
 
 Also provided are two such implementations:
 -[ASCellNode setNeverShowPlaceholders:], which integrates with both Tables and Collections
--[ASViewController setNeverShowPlaceholders:], which should work with Nav and Tab controllers.
+-[ASDKViewController setNeverShowPlaceholders:], which should work with Nav and Tab controllers.
 
 Lastly, on ASDisplayNode, a new property .shouldBypassEnsureDisplay allows individual node types
 to exempt themselves from blocking the main thread on their display.

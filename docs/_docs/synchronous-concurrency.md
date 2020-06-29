@@ -6,7 +6,7 @@ prevPage: subtree-rasterization.html
 nextPage: corner-rounding.html
 ---
 
-Both `ASViewController` and `ASCellNode` have a property called `neverShowPlaceholders`.  
+Both `ASDKViewController` and `ASCellNode` have a property called `neverShowPlaceholders`.  
 
 By setting this property to YES, the main thread will be blocked until display has completed for the cell or view controller's view.
 
@@ -27,6 +27,6 @@ node.neverShowPlaceholders = true
 </div>
 <br>
 
-Usually, if a cell hasn't finished its display pass before it has reached the screen it will show placeholders until it has drawing its content.  Setting this option to YES makes your scrolling node or ASViewController act more like UIKit, and in fact makes Texture scrolling visually indistinguishable from UIKit's, except that it's faster.
+Usually, if a cell hasn't finished its display pass before it has reached the screen it will show placeholders until it has drawing its content.  Setting this option to YES makes your scrolling node or ASDKViewController act more like UIKit, and in fact makes Texture scrolling visually indistinguishable from UIKit's, except that it's faster.
 
 <img src="/static/images/synchronous-concurrency.jpg" width="50%">

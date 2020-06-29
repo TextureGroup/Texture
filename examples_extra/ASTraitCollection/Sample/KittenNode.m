@@ -143,7 +143,7 @@ static const CGFloat kInnerPadding = 10.0f;
   return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(kOuterPadding, kOuterPadding, kOuterPadding, kOuterPadding) child:stackSpec];
 }
 
-+ (void)defaultImageTappedAction:(ASViewController *)sourceViewController
++ (void)defaultImageTappedAction:(ASDKViewController *)sourceViewController
 {
   OverrideViewController *overrideVC = [[OverrideViewController alloc] init];
   

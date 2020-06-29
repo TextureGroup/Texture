@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return The rendered image. You can also render intermediary images using UIGraphicsGetImageFromCurrentImageContext.
  */
-AS_EXTERN UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, asdisplaynode_iscancelled_block_t NS_NOESCAPE _Nullable isCancelled, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImageWithTraitCollectionAndOptions instead");
+ASDK_EXTERN UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, asdisplaynode_iscancelled_block_t NS_NOESCAPE _Nullable isCancelled, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImageWithTraitCollectionAndOptions instead");
 
 /**
 * A wrapper for the UIKit drawing APIs. If you are in ASExperimentalDrawingGlobal, and you have iOS >= 10, we will create
@@ -45,7 +45,7 @@ AS_EXTERN UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CG
 *
 * @return The rendered image. You can also render intermediary images using UIGraphicsGetImageFromCurrentImageContext.
 */
-AS_EXTERN UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, asdisplaynode_iscancelled_block_t _Nullable NS_NOESCAPE isCancelled, void (NS_NOESCAPE ^work)(void));
+ASDK_EXTERN UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, asdisplaynode_iscancelled_block_t _Nullable NS_NOESCAPE isCancelled, void (NS_NOESCAPE ^work)(void));
 
 /**
 * A wrapper for the UIKit drawing APIs.
@@ -60,6 +60,6 @@ AS_EXTERN UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollect
 *
 * @return The rendered image. You can also render intermediary images using UIGraphicsGetImageFromCurrentImageContext.
 */
-AS_EXTERN UIImage *ASGraphicsCreateImageWithTraitCollectionAndOptions(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImage instead");
+ASDK_EXTERN UIImage *ASGraphicsCreateImageWithTraitCollectionAndOptions(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * _Nullable sourceImage, void (NS_NOESCAPE ^work)(void)) ASDISPLAYNODE_DEPRECATED_MSG("Use ASGraphicsCreateImage instead");
 
 NS_ASSUME_NONNULL_END

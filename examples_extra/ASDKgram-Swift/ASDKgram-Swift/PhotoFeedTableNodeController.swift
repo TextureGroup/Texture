@@ -9,7 +9,7 @@
 
 import AsyncDisplayKit
 
-class PhotoFeedTableNodeController: ASViewController<ASTableNode> {
+class PhotoFeedTableNodeController: ASDKViewController<ASTableNode> {
     
     // MARK: Lifecycle
 	

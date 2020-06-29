@@ -34,12 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Internal function. Use the macro without the underbar.
  */
-AS_EXTERN BOOL _ASActivateExperimentalFeature(ASExperimentalFeatures option);
+ASDK_EXTERN BOOL _ASActivateExperimentalFeature(ASExperimentalFeatures option);
 
 /**
  * Notify the configuration delegate that the framework initialized, if needed.
  */
-AS_EXTERN void ASNotifyInitialized(void);
+ASDK_EXTERN void ASNotifyInitialized(void);
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASConfigurationManager : NSObject

@@ -21,7 +21,7 @@
 #import <AsyncDisplayKit/ASConfiguration.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASScrollNode.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import <OCMock/OCMock.h>
 #import "ASDisplayNodeTestsHelper.h"
 
@@ -339,7 +339,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = vc;
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
@@ -389,7 +389,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASScrollNode *node = [[ASScrollNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = vc;
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
@@ -494,7 +494,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = vc;
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
@@ -535,7 +535,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = vc;
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
@@ -597,7 +597,7 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.automaticallyManagesSubnodes = YES;
   
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = vc;
   [window makeKeyAndVisible];
   [window layoutIfNeeded];

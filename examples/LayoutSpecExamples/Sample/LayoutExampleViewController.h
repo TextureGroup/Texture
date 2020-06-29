@@ -9,7 +9,7 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface LayoutExampleViewController : ASViewController
+@interface LayoutExampleViewController : ASDKViewController
 - (instancetype)initWithLayoutExampleClass:(Class)layoutExampleClass NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithNode:(ASDisplayNode *)node NS_UNAVAILABLE;
 @end

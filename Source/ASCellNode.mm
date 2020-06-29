@@ -20,7 +20,7 @@
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
 
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
@@ -79,8 +79,8 @@
     _viewController = _viewControllerBlock();
     _viewControllerBlock = nil;
 
-    if ([_viewController isKindOfClass:[ASViewController class]]) {
-      ASViewController *asViewController = (ASViewController *)_viewController;
+    if ([_viewController isKindOfClass:[ASDKViewController class]]) {
+      ASDKViewController *asViewController = (ASDKViewController *)_viewController;
       _viewControllerNode = asViewController.node;
       [_viewController loadViewIfNeeded];
     } else {

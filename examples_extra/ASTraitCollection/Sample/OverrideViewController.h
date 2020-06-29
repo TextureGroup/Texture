@@ -22,6 +22,6 @@
  * This is a fairly stupid VC that's main purpose is to show how to override ASDisplayTraits.
  * Take a look at `defaultImageTappedAction` in KittenNode to see how this is accomplished.
  */
-@interface OverrideViewController : ASViewController<OverrideNode *>
+@interface OverrideViewController : ASDKViewController<OverrideNode *>
 @property (nonatomic, copy) dispatch_block_t closeBlock;
 @end

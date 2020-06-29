@@ -9,6 +9,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface ViewController : ASViewController<ASPagerNode *>
+@interface ViewController : ASDKViewController<ASPagerNode *>
 
 @end

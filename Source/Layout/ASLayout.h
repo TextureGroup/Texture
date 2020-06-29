@@ -14,18 +14,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_EXTERN CGPoint const ASPointNull; // {NAN, NAN}
+ASDK_EXTERN CGPoint const ASPointNull; // {NAN, NAN}
 
-AS_EXTERN BOOL ASPointIsNull(CGPoint point);
+ASDK_EXTERN BOOL ASPointIsNull(CGPoint point);
 
-AS_EXTERN NSString *const ASThreadDictMaxConstraintSizeKey;
+ASDK_EXTERN NSString *const ASThreadDictMaxConstraintSizeKey;
 
 /**
  * Safely calculates the layout of the given root layoutElement by guarding against nil nodes.
  * @param rootLayoutElement The root node to calculate the layout for.
  * @param sizeRange The size range to calculate the root layout within.
  */
-AS_EXTERN ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange);
+ASDK_EXTERN ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange);
 
 /**
  * Safely computes the layout of the given node by guarding against nil nodes.
@@ -33,7 +33,7 @@ AS_EXTERN ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement,
  * @param sizeRange The size range to calculate the node layout within.
  * @param parentSize The parent size of the node to calculate the layout for.
  */
-AS_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
+ASDK_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
 
 /**
  * A node in the layout tree that represents the size and position of the object that created it (ASLayoutElement).

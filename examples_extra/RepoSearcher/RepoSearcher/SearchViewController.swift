@@ -12,7 +12,7 @@ import IGListKit
 
 class SearchToken: NSObject {}
 
-final class SearchViewController: ASViewController<ASCollectionNode> {
+final class SearchViewController: ASDKViewController<ASCollectionNode> {
     
     lazy var adapter: ListAdapter = {
         return ListAdapter(updater: ListAdapterUpdater(), viewController: self, workingRangeSize: 0)
