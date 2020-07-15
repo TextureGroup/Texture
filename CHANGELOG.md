@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/TextureGroup/Texture/tree/3.0.0) (2020-07-15)
+
+[Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0-rc.2...3.0.0)
+
+**Merged pull requests:**
+
+- Improve ThreeMigrationGuide.md [\#1878](https://github.com/TextureGroup/Texture/pull/1878) ([rogerluan](https://github.com/rogerluan))
+- Upgrade to Xcode 11.5 [\#1877](https://github.com/TextureGroup/Texture/pull/1877) ([garrettmoon](https://github.com/garrettmoon))
+- Renames AS\_EXTERN and ASViewController [\#1876](https://github.com/TextureGroup/Texture/pull/1876) ([garrettmoon](https://github.com/garrettmoon))
+- Add a 3.0 migration guide [\#1875](https://github.com/TextureGroup/Texture/pull/1875) ([garrettmoon](https://github.com/garrettmoon))
+
 ## [3.0.0-rc.2](https://github.com/TextureGroup/Texture/tree/3.0.0-rc.2) (2020-06-25)
 
 [Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0-rc.1...3.0.0-rc.2)

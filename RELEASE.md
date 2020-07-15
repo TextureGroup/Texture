@@ -8,7 +8,7 @@ This document describes the process for a public Texture release.
 ### Process
 - Run `github_changelog_generator` in Texture project directory: `github_changelog_generator --token <generated personal token> --user TextureGroup --project Texture`. To avoid hitting rate limit, the generator will replace the entire file with just the changes from this version – revert that giant deletion to get the entire new changelog.
 - Update `spec.version` within `Texture.podspec` and the `since-tag` and `future-release` fields in `.github_changelog_generator`.
-- Create a new PR with the updated `Texture.podspec` and the newly generated changelog, add `#changelog` to the PR message so the CI will not prevent merging it.
+- Create a new PR with the updated `Texture.podspec` and the newly generated changelog.
 - After merging in the PR, [create a new GitHub release](https://github.com/TextureGroup/Texture/releases/new). Use the generated changelog for the new release.
 - Push to Cocoapods with `pod trunk push`
 
