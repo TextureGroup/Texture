@@ -28,7 +28,6 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDispatchApply = 1 << 7,                                     // exp_dispatch_apply
   ASExperimentalDrawingGlobal = 1 << 8,                                     // exp_drawing_global
   ASExperimentalOptimizeDataControllerPipeline = 1 << 9,                    // exp_optimize_data_controller_pipeline
-  ASExperimentalDoNotCacheAccessibilityElements = 1 << 10,                  // exp_do_not_cache_accessibility_elements
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
