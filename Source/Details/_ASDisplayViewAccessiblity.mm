@@ -311,24 +311,15 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }
 }
 
-@interface _ASDisplayView () {
-  NSArray *_accessibilityElements;
-}
-
-@end
-
 @implementation _ASDisplayView (UIAccessibilityContainer)
 
 #pragma mark - UIAccessibility
 
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
-  ASDisplayNodeAssertMainThread();
-  // While it looks very strange to ignore the accessibilyElements param and set _accessibilityElements to nil, it is actually on purpose.
-  // _ASDisplayView's accessibilityElements method will always defer to the node for accessibilityElements when _accessibilityElements is
-  // nil. Calling setAccessibilityElements on _ASDisplayView is basically clearing the cache and forcing _ASDisplayView to ask the node
-  // for its accessibilityElements the next time they are requested.
-  _accessibilityElements = nil;
+  // this is a no-op. You should not be setting accessibilityElements directly on _ASDisplayView.
+  // if you wish to set accessibilityElements, do so in your node. UIKit will call _ASDisplayView's
+  // accessibilityElements which will in turn ask its node for its elements.
 }
 
 - (NSArray *)accessibilityElements
@@ -340,12 +331,12 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return @[];
   }
 
-  // when items become hidden/visible we have to manually clear the _accessibilityElements in order to get an updated version
-  // Instead, let's try computing the elements every time and see how badly it affects performance.
-  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements)) {
-    _accessibilityElements = [viewNode accessibilityElements];
-  }
-  return _accessibilityElements;
+  // we no longer cache accessibilityElements. When caching, in order to provide correct element when items become hidden/visible
+  // we had to manually clear _accessibilityElements. This seemed like a heavy burden to place on a user, and one that is also
+  // not immediately obvious. While recomputing accessibilityElements may be expensive, this will only affect users that have
+  // voice over enabled (we checked to ensure performance did not suffer by not caching for an overall user base). For those
+  // users with voice over on, being correct is almost certainly more important than being performant.
+  return [viewNode accessibilityElements];
 }
 
 @end
