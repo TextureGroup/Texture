@@ -15,16 +15,16 @@ typedef struct {
   CGFloat trailingBufferScreenfuls;
 } ASRangeTuningParameters;
 
-AS_EXTERN ASRangeTuningParameters const ASRangeTuningParametersZero;
+ASDK_EXTERN ASRangeTuningParameters const ASRangeTuningParametersZero;
 
-AS_EXTERN BOOL ASRangeTuningParametersEqualToRangeTuningParameters(ASRangeTuningParameters lhs, ASRangeTuningParameters rhs);
+ASDK_EXTERN BOOL ASRangeTuningParametersEqualToRangeTuningParameters(ASRangeTuningParameters lhs, ASRangeTuningParameters rhs);
 
 /**
  * Each mode has a complete set of tuning parameters for range types.
  * Depending on some conditions (including interface state and direction of the scroll view, state of rendering engine, etc),
  * a range controller can choose which mode it should use at a given time.
  */
-typedef NS_ENUM(NSInteger, ASLayoutRangeMode) {
+typedef NS_ENUM(char, ASLayoutRangeMode) {
   ASLayoutRangeModeUnspecified = -1,
   
   /**

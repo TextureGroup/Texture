@@ -175,6 +175,23 @@
   XCTAssertTrue([_textNode.accessibilityLabel isEqualToString:_attributedText.string], @"Accessibility label is incorrectly set to \n%@\n when it should be \n%@\n", _textNode.accessibilityLabel, _attributedText.string);
 }
 
+- (void)testRespectingAccessibilitySetting
+{
+  ASTextNode *textNode = [ASTextNode new];
+  
+  textNode.attributedText = _attributedText;
+  textNode.isAccessibilityElement = NO;
+  
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
+  XCTAssertFalse(textNode.isAccessibilityElement);
+  
+  // Ensure removing string on an accessible text node updates the setting.
+  ASTextNode *accessibleTextNode = [ASTextNode new];
+  accessibleTextNode.attributedText = _attributedText;
+  accessibleTextNode.attributedText = nil;
+  XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
+}
+
 - (void)testLinkAttribute
 {
   NSString *linkAttributeName = @"MockLinkAttributeName";
@@ -243,6 +260,15 @@
   CGSize sizeWithExclusionPaths = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
 
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
+}
+
+- (void)testEmptyStringSize
+{
+  CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
+  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@""];
+  CGSize sizeWithEmptyString = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(ASIsCGSizeValidForSize(sizeWithEmptyString));
+  XCTAssertTrue(sizeWithEmptyString.width == 0);
 }
 
 #if AS_ENABLE_TEXTNODE

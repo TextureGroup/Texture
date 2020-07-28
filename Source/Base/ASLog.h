@@ -30,7 +30,7 @@
  * are at the `debug` log level, which the system
  * disables in production.
  */
-AS_EXTERN void ASDisableLogging(void);
+ASDK_EXTERN void ASDisableLogging(void);
 
 /**
  * Restore logging that has been runtime-disabled via ASDisableLogging().
@@ -40,31 +40,39 @@ AS_EXTERN void ASDisableLogging(void);
  * configuration. This can be used in conjunction with ASDisableLogging()
  * to allow logging to be toggled off and back on at runtime.
  */
-AS_EXTERN void ASEnableLogging(void);
+ASDK_EXTERN void ASEnableLogging(void);
 
 /// Log for general node events e.g. interfaceState, didLoad.
 #define ASNodeLogEnabled 1
-AS_EXTERN os_log_t ASNodeLog(void);
+ASDK_EXTERN os_log_t ASNodeLog(void);
 
 /// Log for layout-specific events e.g. calculateLayout.
 #define ASLayoutLogEnabled 1
-AS_EXTERN os_log_t ASLayoutLog(void);
+ASDK_EXTERN os_log_t ASLayoutLog(void);
 
 /// Log for display-specific events e.g. display queue batches.
 #define ASDisplayLogEnabled 1
-AS_EXTERN os_log_t ASDisplayLog(void);
+ASDK_EXTERN os_log_t ASDisplayLog(void);
 
 /// Log for collection events e.g. reloadData, performBatchUpdates.
 #define ASCollectionLogEnabled 1
-AS_EXTERN os_log_t ASCollectionLog(void);
+ASDK_EXTERN os_log_t ASCollectionLog(void);
 
 /// Log for ASNetworkImageNode and ASMultiplexImageNode events.
 #define ASImageLoadingLogEnabled 1
-AS_EXTERN os_log_t ASImageLoadingLog(void);
+ASDK_EXTERN os_log_t ASImageLoadingLog(void);
 
 /// Specialized log for our main thread deallocation trampoline.
 #define ASMainThreadDeallocationLogEnabled 0
-AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
+ASDK_EXTERN os_log_t ASMainThreadDeallocationLog(void);
+
+#define ASLockingLogEnabled 0
+ASDK_EXTERN os_log_t ASLockingLog(void);
+
+#if AS_HAS_OS_SIGNPOST
+/// Uses the special POI category for Instruments. Used by ASSignpost.h.
+ASDK_EXTERN os_log_t ASPointsOfInterestLog(void);
+#endif
 
 /**
  * The activity tracing system changed a lot between iOS 9 and 10.
@@ -76,8 +84,11 @@ AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
  * reflected in the log whereas activities described by the newer
  * os_activity_scope are. So unfortunately we must use these iOS 10
  * APIs to get meaningful logging data.
+ * 
+ * NOTE: Creating and tearing down activities require inter-process communication and can
+ * take dozens of microseconds on an A8. We do it quite often. Enable activities only during debugging.
  */
-#if OS_LOG_TARGET_HAS_10_12_FEATURES
+#if DEBUG && OS_LOG_TARGET_HAS_10_12_FEATURES
 
 #define OS_ACTIVITY_NULLABLE                                              nullable
 #define AS_ACTIVITY_CURRENT                                               OS_ACTIVITY_CURRENT
@@ -113,51 +124,8 @@ AS_EXTERN os_log_t ASMainThreadDeallocationLog(void);
 #define as_activity_create_for_scope(description) \
   as_activity_scope(as_activity_create(description, AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT))
 
-/**
- * The logging macros are not guarded by deployment-target checks like the activity macros are, but they are
- * only available on iOS >= 9 at runtime, so just make them conditional.
- */
-
-#define as_log_create(subsystem, category) ({     \
-os_log_t __val;                                   \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  __val = os_log_create(subsystem, category);     \
-} else {                                          \
-  __val = (os_log_t)0;                            \
-}                                                 \
-__val;                                            \
-})
-
-#define as_log_debug(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_debug(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_info(log, format, ...)             \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_info(log, format, ##__VA_ARGS__);        \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_error(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_error(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
-#define as_log_fault(log, format, ...)            \
-if (AS_AVAILABLE_IOS_TVOS(9, 9)) {                \
-  os_log_fault(log, format, ##__VA_ARGS__);       \
-} else {                                          \
-  (void)0;                                        \
-}                                                 \
-
 #if ASEnableVerboseLogging
-  #define as_log_verbose(log, format, ...)  as_log_debug(log, format, ##__VA_ARGS__)
+  #define as_log_verbose(log, format, ...)  os_log_debug(log, format, ##__VA_ARGS__)
 #else
   #define as_log_verbose(log, format, ...)
 #endif

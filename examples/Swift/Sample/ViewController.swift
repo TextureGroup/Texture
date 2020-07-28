@@ -10,7 +10,7 @@
 import UIKit
 import AsyncDisplayKit
 
-final class ViewController: ASViewController<ASDisplayNode>, ASTableDataSource, ASTableDelegate {
+final class ViewController: ASDKViewController<ASDisplayNode>, ASTableDataSource, ASTableDelegate {
 
   struct State {
     var itemCount: Int
@@ -29,7 +29,7 @@ final class ViewController: ASViewController<ASDisplayNode>, ASTableDataSource, 
 
   fileprivate(set) var state: State = .empty
 
-  init() {
+  override init() {
     super.init(node: ASTableNode())
     tableNode.delegate = self
     tableNode.dataSource = self
@@ -41,21 +41,24 @@ final class ViewController: ASViewController<ASDisplayNode>, ASTableDataSource, 
 
   // MARK: ASTableNode data source and delegate.
 
-  func tableNode(_ tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath) -> ASCellNode {
+  func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
     // Should read the row count directly from table view but
     // https://github.com/facebook/AsyncDisplayKit/issues/1159
     let rowCount = self.tableNode(tableNode, numberOfRowsInSection: 0)
 
     if state.fetchingMore && indexPath.row == rowCount - 1 {
-      let node = TailLoadingCellNode()
-      node.style.height = ASDimensionMake(44.0)
-      return node;
+      return {
+        let node = TailLoadingCellNode()
+        node.style.height = ASDimensionMake(44.0)
+        return node;
+      }
     }
-
-    let node = ASTextCellNode()
-    node.text = String(format: "[%ld.%ld] says hello!", indexPath.section, indexPath.row)
-
-    return node
+    
+    return {
+      let node = ASTextCellNode()
+      node.text = String(format: "[%ld.%ld] says hello!", indexPath.section, indexPath.row)
+      return node
+    }
   }
 
   func numberOfSections(in tableNode: ASTableNode) -> Int {

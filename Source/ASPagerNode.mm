@@ -8,7 +8,6 @@
 //
 
 #import <AsyncDisplayKit/ASPagerNode.h>
-#import <AsyncDisplayKit/ASPagerNode+Beta.h>
 
 #import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
 #import <AsyncDisplayKit/ASCollectionNode+Beta.h>
@@ -16,10 +15,9 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASPagerFlowLayout.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {
@@ -29,6 +27,7 @@
     unsigned nodeBlockAtIndex:1;
     unsigned nodeAtIndex:1;
   } _pagerDataSourceFlags;
+    BOOL _allowsAutomaticInsetsAdjustment;
 
   __weak id <ASPagerDelegate> _pagerDelegate;
   ASPagerNodeProxy *_proxyDelegate;

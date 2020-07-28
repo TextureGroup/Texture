@@ -11,18 +11,16 @@
 
 #import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h> // Required for interfaceState and hierarchyState setter methods.
 #import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
-#import <AsyncDisplayKit/ASWeakSet.h>
 
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
+#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
 
 #define AS_RANGECONTROLLER_LOG_UPDATE_FREQ 0
 
@@ -224,7 +222,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   auto visibleElements = [_dataSource visibleElementsForRangeController:self];
   NSHashTable *newVisibleNodes = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
 
-  ASSignpostStart(ASSignpostRangeControllerUpdate);
+  ASSignpostStart(RangeControllerUpdate, _dataSource, "%@", ASObjectDescriptionMakeTiny(_dataSource));
 
   // Get the scroll direction. Default to using the previous one, if they're not scrolling.
   ASScrollDirection scrollDirection = [_dataSource scrollDirectionForRangeController:self];
@@ -242,6 +240,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
       [newVisibleNodes addObject:element.node];
     }
     [self _setVisibleNodes:newVisibleNodes];
+    ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
     return; // don't do anything for this update, but leave _rangeIsValid == NO to make sure we update it later
   }
 
@@ -280,7 +279,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   } else {
     if (emptyDisplayRange == YES) {
       displayElements = [NSHashTable hashTableWithOptions:NSHashTableObjectPointerPersonality];
-    } if (equalDisplayVisible == YES) {
+    } else if (equalDisplayVisible == YES) {
       displayElements = visibleElements;
     } else {
       // Calculating only the Display range means the Preload range is either the same as Display or Visible.
@@ -349,23 +348,20 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
         }
       }
     } else {
-      // If selfInterfaceState isn't visible, then visibleIndexPaths represents what /will/ be immediately visible at the
-      // instant we come onscreen.  So, preload and display all of those things, but don't waste resources preloading yet.
-      // We handle this as a separate case to minimize set operations for offscreen preloading, including containsObject:.
-      
-      if ([allCurrentIndexPaths containsObject:indexPath]) {
-        // DO NOT set Visible: even though these elements are in the visible range / "viewport",
-        // our overall container object is itself not visible yet.  The moment it becomes visible, we will run the condition above
-        
-        // Set Layout, Preload
+      // If selfInterfaceState isn't visible, then visibleIndexPaths represents either what /will/ be immediately visible at the
+      // instant we come onscreen, or what /will/ no longer be visible at the instant we come offscreen.
+      // So, preload and display all of those things, but don't waste resources displaying others.
+      //
+      // DO NOT set Visible: even though these elements are in the visible range / "viewport",
+      // our overall container object is itself not yet, or no longer, visible.
+      // The moment it becomes visible, we will run the condition above.
+      if ([visibleIndexPaths containsObject:indexPath]) {
         interfaceState |= ASInterfaceStatePreload;
-        
         if (rangeMode != ASLayoutRangeModeLowMemory) {
-          // Add Display.
-          // We might be looking at an indexPath that was previously in-range, but now we need to clear it.
-          // In that case we'll just set it back to MeasureLayout.  Only set Display | Preload if in allCurrentIndexPaths.
           interfaceState |= ASInterfaceStateDisplay;
         }
+      } else if ([displayIndexPaths containsObject:indexPath]) {
+        interfaceState |= ASInterfaceStatePreload;
       }
     }
 
@@ -400,10 +396,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   if (ASDisplayNode.shouldShowRangeDebugOverlay) {
     ASScrollDirection scrollableDirections = ASScrollDirectionUp | ASScrollDirectionDown;
     if ([_dataSource isKindOfClass:NSClassFromString(@"ASCollectionView")]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-      scrollableDirections = (ASScrollDirection)[_dataSource performSelector:@selector(scrollableDirections)];
-#pragma clang diagnostic pop
+        scrollableDirections = ((ASCollectionView *)_dataSource).scrollableDirections;
     }
     
     [self updateRangeController:self
@@ -429,7 +422,7 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   NSLog(@"Range update complete; modifiedIndexPaths: %@, rangeMode: %d", [self descriptionWithIndexPaths:modifiedIndexPaths], rangeMode);
 #endif
   
-  ASSignpostEnd(ASSignpostRangeControllerUpdate);
+  ASSignpostEnd(RangeControllerUpdate, _dataSource, "");
 }
 
 #pragma mark - Notification observers

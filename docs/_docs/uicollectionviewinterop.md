@@ -2,8 +2,8 @@
 title: UICollectionViewCell Interoperability
 layout: docs
 permalink: /docs/uicollectionviewinterop.html
-prevPage: placeholder-fade-duration.html
-nextPage: accessibility.html
+prevPage: accessibility.html
+nextPage: layer-backing.html
 ---
 
 Texture's `ASCollectionNode` offers compatibility with synchronous, standard `UICollectionViewCell` objects alongside native `ASCellNodes`. 
@@ -71,7 +71,14 @@ For this example, the data source method `collectionNode:nodeBlockForItemAtIndex
   </pre>
 
   <pre lang="swift" class = "swiftCode hidden">
-  // Click the "Edit on GitHub" button at the bottom of this 
+  // Setting the return type to implicitly unwrapped optional
+  // helps overcome compiler error when trying to return nil
+  func collectionNode(_ collectionNode: ASCollectionNode,
+                        nodeBlockForItemAt indexPath: IndexPath) -> ASCellNodeBlock! {
+        return optionalNode
+    }
+
+  // Click the "Edit on GitHub" button at the bottom of this  
   // page to contribute the swift code for this section. Thanks!
   </pre>
 </div>

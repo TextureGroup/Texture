@@ -9,14 +9,14 @@
 #import <Foundation/Foundation.h>
 
 /**
- * Interface state is available on ASDisplayNode and ASViewController, and
+ * Interface state is available on ASDisplayNode and ASDKViewController, and
  * allows checking whether a node is in an interface situation where it is prudent to trigger certain
  * actions: measurement, data loading, display, and visibility (the latter for animations or other onscreen-only effects).
  *
  * The defualt state, ASInterfaceStateNone, means that the element is not predicted to be onscreen soon and
  * preloading should not be performed. Swift: use [] for the default behavior.
  */
-typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
+typedef NS_OPTIONS(unsigned char, ASInterfaceState)
 {
     /** The element is not predicted to be onscreen soon and preloading should not be performed */
     ASInterfaceStateNone          = 0,
@@ -126,5 +126,23 @@ typedef NS_OPTIONS(NSUInteger, ASInterfaceState)
  * called.
  */
 - (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize;
+
+/**
+ * @abstract Called when the node's layer is about to enter the hierarchy.
+ * @discussion May be called more than once if the layer is participating in a higher-level
+ * animation, such as a UIViewController transition. These animations can cause the layer to get
+ * re-parented multiple times, and each time will trigger this call.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)didEnterHierarchy;
+
+/**
+ * @abstract Called when the node's layer has exited the hierarchy.
+ * @discussion May be called more than once if the layer is participating in a higher-level
+ * animation, such as a UIViewController transition. These animations can cause the layer to get
+ * re-parented multiple times, and each time will trigger this call.
+ * @note This method is guaranteed to be called on main.
+ */
+- (void)didExitHierarchy;
 
 @end

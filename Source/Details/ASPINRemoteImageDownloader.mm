@@ -34,6 +34,19 @@
 #import <PINRemoteImage/NSData+ImageDetectors.h>
 #import <PINRemoteImage/PINRemoteImageCaching.h>
 
+static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASImageDownloaderPriority(ASImageDownloaderPriority priority) {
+  switch (priority) {
+    case ASImageDownloaderPriorityPreload:
+      return PINRemoteImageManagerPriorityLow;
+
+    case ASImageDownloaderPriorityImminent:
+      return PINRemoteImageManagerPriorityDefault;
+
+    case ASImageDownloaderPriorityVisible:
+      return PINRemoteImageManagerPriorityHigh;
+  }
+}
+
 #if PIN_ANIMATED_AVAILABLE
 
 @interface ASPINRemoteImageDownloader () <PINRemoteImageManagerAlternateRepresentationProvider>
@@ -218,14 +231,15 @@ static dispatch_once_t shared_init_predicate;
 {
   [[self sharedPINRemoteImageManager] imageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode completion:^(PINRemoteImageManagerResult * _Nonnull result) {
     [ASPINRemoteImageDownloader _performWithCallbackQueue:callbackQueue work:^{
+      ASImageCacheType cacheType = (result.resultType == PINRemoteImageResultTypeMemoryCache ? ASImageCacheTypeSynchronous : ASImageCacheTypeAsynchronous);
 #if PIN_ANIMATED_AVAILABLE
       if (result.alternativeRepresentation) {
-        completion(result.alternativeRepresentation);
+        completion(result.alternativeRepresentation, cacheType);
       } else {
-        completion(result.image);
+        completion(result.image, cacheType);
       }
 #else
-      completion(result.image);
+      completion(result.image, cacheType);
 #endif
     }];
   }];
@@ -245,6 +259,21 @@ static dispatch_once_t shared_init_predicate;
                    downloadProgress:(ASImageDownloaderProgress)downloadProgress
                          completion:(ASImageDownloaderCompletion)completion;
 {
+  return [self downloadImageWithURL:URL
+                           priority:ASImageDownloaderPriorityImminent // maps to default priority
+                      callbackQueue:callbackQueue
+                   downloadProgress:downloadProgress
+                         completion:completion];
+}
+
+- (nullable id)downloadImageWithURL:(NSURL *)URL
+                           priority:(ASImageDownloaderPriority)priority
+                      callbackQueue:(dispatch_queue_t)callbackQueue
+                   downloadProgress:(ASImageDownloaderProgress)downloadProgress
+                         completion:(ASImageDownloaderCompletion)completion
+{
+  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityWithASImageDownloaderPriority(priority);
+
   PINRemoteImageManagerProgressDownload progressDownload = ^(int64_t completedBytes, int64_t totalBytes) {
     if (downloadProgress == nil) { return; }
 
@@ -274,6 +303,7 @@ static dispatch_once_t shared_init_predicate;
   // check the cache as part of this download.
   return [[self sharedPINRemoteImageManager] downloadImageWithURL:URL
                                                           options:PINRemoteImageManagerDownloadOptionsSkipDecode | PINRemoteImageManagerDownloadOptionsIgnoreCache
+                                                         priority:pi_priority
                                                     progressImage:nil
                                                  progressDownload:progressDownload
                                                        completion:imageCompletion];
@@ -310,20 +340,7 @@ static dispatch_once_t shared_init_predicate;
 {
   ASDisplayNodeAssert([downloadIdentifier isKindOfClass:[NSUUID class]], @"downloadIdentifier must be NSUUID");
 
-  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityDefault;
-  switch (priority) {
-    case ASImageDownloaderPriorityPreload:
-      pi_priority = PINRemoteImageManagerPriorityLow;
-      break;
-
-    case ASImageDownloaderPriorityImminent:
-      pi_priority = PINRemoteImageManagerPriorityDefault;
-      break;
-
-    case ASImageDownloaderPriorityVisible:
-      pi_priority = PINRemoteImageManagerPriorityHigh;
-      break;
-  }
+  PINRemoteImageManagerPriority pi_priority = PINRemoteImageManagerPriorityWithASImageDownloaderPriority(priority);
   [[self sharedPINRemoteImageManager] setPriority:pi_priority ofTaskWithUUID:downloadIdentifier];
 }
 
@@ -332,7 +349,7 @@ static dispatch_once_t shared_init_predicate;
 - (id)alternateRepresentationWithData:(NSData *)data options:(PINRemoteImageManagerDownloadOptions)options
 {
 #if PIN_ANIMATED_AVAILABLE
-  if ([data pin_isGIF]) {
+  if ([data pin_isAnimatedGIF]) {
     return data;
   }
 #if PIN_WEBP_AVAILABLE

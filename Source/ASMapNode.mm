@@ -16,7 +16,6 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
@@ -222,39 +221,38 @@
                     
                     CGRect finalImageRect = CGRectMake(0, 0, image.size.width, image.size.height);
                     
-                    ASGraphicsBeginImageContextWithOptions(image.size, YES, image.scale);
-                    [image drawAtPoint:CGPointZero];
-                    
-                    UIImage *pinImage;
-                    CGPoint pinCenterOffset = CGPointZero;
-                    
-                    // Get a standard annotation view pin if there is no custom annotation block.
-                    if (!strongSelf.imageForStaticMapAnnotationBlock) {
-                      pinImage = [strongSelf.class defaultPinImageWithCenterOffset:&pinCenterOffset];
-                    }
-                    
-                    for (id<MKAnnotation> annotation in annotations) {
-                      if (strongSelf.imageForStaticMapAnnotationBlock) {
-                        // Get custom annotation image from custom annotation block.
-                        pinImage = strongSelf.imageForStaticMapAnnotationBlock(annotation, &pinCenterOffset);
-                        if (!pinImage) {
-                          // just for case block returned nil, which can happen
-                          pinImage = [strongSelf.class defaultPinImageWithCenterOffset:&pinCenterOffset];
+                    image = ASGraphicsCreateImage(strongSelf.primitiveTraitCollection, image.size, YES, image.scale, image, nil, ^{
+                      [image drawAtPoint:CGPointZero];
+
+                      UIImage *pinImage;
+                      CGPoint pinCenterOffset = CGPointZero;
+
+                      // Get a standard annotation view pin if there is no custom annotation block.
+                      if (!strongSelf.imageForStaticMapAnnotationBlock) {
+                        pinImage = [strongSelf.class defaultPinImageWithCenterOffset:&pinCenterOffset];
+                      }
+
+                      for (id<MKAnnotation> annotation in annotations) {
+                        if (strongSelf.imageForStaticMapAnnotationBlock) {
+                          // Get custom annotation image from custom annotation block.
+                          pinImage = strongSelf.imageForStaticMapAnnotationBlock(annotation, &pinCenterOffset);
+                          if (!pinImage) {
+                            // just for case block returned nil, which can happen
+                            pinImage = [strongSelf.class defaultPinImageWithCenterOffset:&pinCenterOffset];
+                          }
+                        }
+
+                        CGPoint point = [snapshot pointForCoordinate:annotation.coordinate];
+                        if (CGRectContainsPoint(finalImageRect, point)) {
+                          CGSize pinSize = pinImage.size;
+                          point.x -= pinSize.width / 2.0;
+                          point.y -= pinSize.height / 2.0;
+                          point.x += pinCenterOffset.x;
+                          point.y += pinCenterOffset.y;
+                          [pinImage drawAtPoint:point];
                         }
                       }
-                      
-                      CGPoint point = [snapshot pointForCoordinate:annotation.coordinate];
-                      if (CGRectContainsPoint(finalImageRect, point)) {
-                        CGSize pinSize = pinImage.size;
-                        point.x -= pinSize.width / 2.0;
-                        point.y -= pinSize.height / 2.0;
-                        point.x += pinCenterOffset.x;
-                        point.y += pinCenterOffset.y;
-                        [pinImage drawAtPoint:point];
-                      }
-                    }
-                    
-                    image = ASGraphicsGetImageAndEndCurrentContext();
+                    });
                   }
                   
                   strongSelf.image = image;

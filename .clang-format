@@ -1,0 +1,53 @@
+BasedOnStyle:  Google
+
+## Indentation
+ColumnLimit: 120
+IndentWidth: 2
+
+## Line Break
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass:      true
+  AfterControlStatement: false
+  AfterEnum:       false
+  AfterFunction:   true
+  AfterNamespace:  true
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      true
+  BeforeCatch:     false
+  BeforeElse:      false
+  IndentBraces:    false
+  SplitEmptyFunction: false
+
+## ObjC
+ObjCBinPackProtocolList: Always
+ObjCSpaceAfterProperty: false
+
+## Comments
+AlignTrailingComments: true
+
+## Arguments / Parameters
+
+# If false, a function call’s or function definition’s arguments will either
+# all be on the same line or will have one line each.
+BinPackArguments: false
+
+# If false, a function call’s or function definition’s parameters will either
+# all be on the same line or will have one line each.
+BinPackParameters: false
+
+# Allow putting all parameters of a function declaration onto the next line even
+# if BinPackParameters is false.
+# For example this should be ok:
+# someFunction(foo,
+#             bar,
+#             baz);
+AllowAllParametersOfDeclarationOnNextLine: true
+
+## Single Line
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+

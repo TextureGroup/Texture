@@ -10,17 +10,12 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
-typedef NS_OPTIONS(NSUInteger, ASCellLayoutMode) {
+typedef NS_OPTIONS(unsigned short, ASCellLayoutMode) {
   /**
    * No options set. If cell layout mode is set to ASCellLayoutModeNone, the default values for
    * each flag listed below is used.
    */
   ASCellLayoutModeNone = 0,
-  /**
-   * If ASCellLayoutModeSyncForSmallContent is enabled it will cause ASDataController to wait on the
-   * background queue if the amount of new content is small.
-   */
-  ASCellLayoutModeSyncForSmallContent = 1 << 1,
   /**
    * If ASCellLayoutModeAlwaysSync is enabled it will cause the ASDataController to wait on the
    * background queue, and this ensures that any new / changed cells are in the hierarchy by the
@@ -31,26 +26,26 @@ typedef NS_OPTIONS(NSUInteger, ASCellLayoutMode) {
    * default behavior is synchronous when there are 0 or 1 ASCellNodes in the data source, and
    * asynchronous when there are 2 or more.
   */
-  ASCellLayoutModeAlwaysSync = 1 << 2,                // Default OFF
-  ASCellLayoutModeAlwaysAsync = 1 << 3,               // Default OFF
-  ASCellLayoutModeForceIfNeeded = 1 << 4,             // Deprecated, default OFF.
-  ASCellLayoutModeAlwaysPassthroughDelegate = 1 << 5, // Deprecated, default ON.
+  ASCellLayoutModeAlwaysSync = 1 << 1,                // Default OFF
+  ASCellLayoutModeAlwaysAsync = 1 << 2,               // Default OFF
+  ASCellLayoutModeForceIfNeeded = 1 << 3,             // Deprecated, default OFF.
+  ASCellLayoutModeAlwaysPassthroughDelegate = 1 << 4, // Deprecated, default ON.
   /** Instead of using performBatchUpdates: prefer using reloadData for changes for collection view */
-  ASCellLayoutModeAlwaysReloadData = 1 << 6,          // Default OFF
+  ASCellLayoutModeAlwaysReloadData = 1 << 5,          // Default OFF
   /** If flag is enabled nodes are *not* gonna be range managed. */
-  ASCellLayoutModeDisableRangeController = 1 << 7,    // Default OFF
-  ASCellLayoutModeAlwaysLazy = 1 << 8,                // Deprecated, default OFF.
+  ASCellLayoutModeDisableRangeController = 1 << 6,    // Default OFF
+  ASCellLayoutModeAlwaysLazy = 1 << 7,                // Deprecated, default OFF.
   /**
    * Defines if the node creation should happen serialized and not in parallel within the
    * data controller
    */
-  ASCellLayoutModeSerializeNodeCreation = 1 << 9,     // Default OFF
+  ASCellLayoutModeSerializeNodeCreation = 1 << 8,     // Default OFF
   /**
    * When set, the performBatchUpdates: API (including animation) is used when handling Section
    * Reload operations. This is useful only when ASCellLayoutModeAlwaysReloadData is enabled and
    * cell height animations are desired.
    */
-  ASCellLayoutModeAlwaysBatchUpdateSectionReload = 1 << 10 // Default OFF
+  ASCellLayoutModeAlwaysBatchUpdateSectionReload = 1 << 9, // Default OFF
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -100,6 +95,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)collectionView:(UICollectionView *)collectionView canPerformAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender ASDISPLAYNODE_DEPRECATED_MSG("Implement collectionNode:canPerformAction:forItemAtIndexPath:withSender: instead.");
 - (void)collectionView:(UICollectionView *)collectionView performAction:(SEL)action forItemAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender ASDISPLAYNODE_DEPRECATED_MSG("Implement collectionNode:performAction:forItemAtIndexPath:withSender: instead.");
 
+- (nullable UIContextMenuConfiguration *)collectionView:(UICollectionView *)collectionView contextMenuConfigurationForItemAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(watchos, tvos);
+
+- (nullable UITargetedPreview *)collectionView:(UICollectionView *)collectionView previewForHighlightingContextMenuWithConfiguration:(UIContextMenuConfiguration *)configuration API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(watchos, tvos);
+
+- (nullable UITargetedPreview *)collectionView:(UICollectionView *)collectionView previewForDismissingContextMenuWithConfiguration:(UIContextMenuConfiguration *)configuration API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(watchos, tvos);
+
+- (void)collectionView:(UICollectionView *)collectionView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator API_AVAILABLE(ios(13.0)) API_UNAVAILABLE(watchos, tvos);
 @end
 
 NS_ASSUME_NONNULL_END

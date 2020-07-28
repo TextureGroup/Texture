@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProductsCollectionViewController: ASViewController<ASCollectionNode> {
+class ProductsCollectionViewController: ASDKViewController<ASCollectionNode> {
 
     // MARK: - Variables
     

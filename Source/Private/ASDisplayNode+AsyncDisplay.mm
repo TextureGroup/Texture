@@ -10,14 +10,12 @@
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASAsyncTransaction.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 
+using AS::MutexLocker;
 
 @interface ASDisplayNode () <_ASDisplayLayerDelegate>
 @end
@@ -210,15 +208,13 @@
 
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
-      
-      ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
 
-      for (dispatch_block_t block in displayBlocks) {
-        CHECK_CANCELLED_AND_RETURN_NIL(ASGraphicsEndImageContext());
-        block();
-      }
-      
-      UIImage *image = ASGraphicsGetImageAndEndCurrentContext();
+      UIImage *image = ASGraphicsCreateImage(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, ^{
+        for (dispatch_block_t block in displayBlocks) {
+          if (isCancelledBlock()) return;
+          block();
+        }
+      });
 
       ASDN_DELAY_FOR_DISPLAY();
       return image;
@@ -227,33 +223,35 @@
     displayBlock = ^id{
       CHECK_CANCELLED_AND_RETURN_NIL();
 
-      if (shouldCreateGraphicsContext) {
-        ASGraphicsBeginImageContextWithOptions(bounds.size, opaque, contentsScaleForDisplay);
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
-      }
+      __block UIImage *image = nil;
+      void (^workWithContext)() = ^{
+        CGContextRef currentContext = UIGraphicsGetCurrentContext();
 
-      CGContextRef currentContext = UIGraphicsGetCurrentContext();
-      UIImage *image = nil;
-      
-      // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
-      // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
-      [self __willDisplayNodeContentWithRenderingContext:currentContext drawParameters:drawParameters];
-      
-      if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
-        image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
-      } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
-        [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
-      }
-      
-      [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
-      
-      if (shouldCreateGraphicsContext) {
-        CHECK_CANCELLED_AND_RETURN_NIL( ASGraphicsEndImageContext(); );
-        image = ASGraphicsGetImageAndEndCurrentContext();
-      }
+        if (shouldCreateGraphicsContext && !currentContext) {
+          ASDisplayNodeAssert(NO, @"Failed to create a CGContext (size: %@)", NSStringFromCGSize(bounds.size));
+          return;
+        }
 
-      ASDN_DELAY_FOR_DISPLAY();
-      return image;
+        // For -display methods, we don't have a context, and thus will not call the _willDisplayNodeContentWithRenderingContext or
+        // _didDisplayNodeContentWithRenderingContext blocks. It's up to the implementation of -display... to do what it needs.
+        [self __willDisplayNodeContentWithRenderingContext:currentContext drawParameters:drawParameters];
+
+        if (usesImageDisplay) {                                   // If we are using a display method, we'll get an image back directly.
+          image = [self.class displayWithParameters:drawParameters isCancelled:isCancelledBlock];
+        } else if (usesDrawRect) {                                // If we're using a draw method, this will operate on the currentContext.
+          [self.class drawRect:bounds withParameters:drawParameters isCancelled:isCancelledBlock isRasterizing:rasterizing];
+        }
+
+        [self __didDisplayNodeContentWithRenderingContext:currentContext image:&image drawParameters:drawParameters backgroundColor:backgroundColor borderWidth:borderWidth borderColor:borderColor];
+        ASDN_DELAY_FOR_DISPLAY();
+      };
+
+      if (shouldCreateGraphicsContext) {
+        return ASGraphicsCreateImage(self.primitiveTraitCollection, bounds.size, opaque, contentsScaleForDisplay, nil, isCancelledBlock, workWithContext);
+      } else {
+        workWithContext();
+        return image;
+      }
     };
   }
 
@@ -261,12 +259,12 @@
    If we're profiling, wrap the display block with signpost start and end.
    Color the interval red if cancelled, green otherwise.
    */
-#if AS_KDEBUG_ENABLE
-  __unsafe_unretained id ptrSelf = self;
+#if AS_SIGNPOST_ENABLE
+  unowned id ptrSelf = (id)self;
   displayBlock = ^{
-    ASSignpostStartCustom(ASSignpostLayerDisplay, ptrSelf, 0);
+    ASSignpostStart(LayerDisplay, ptrSelf, "%@", ASObjectDescriptionMakeTiny(ptrSelf));
     id result = displayBlock();
-    ASSignpostEndCustom(ASSignpostLayerDisplay, ptrSelf, 0, isCancelledBlock() ? ASSignpostColorRed : ASSignpostColorGreen);
+    ASSignpostEnd(LayerDisplay, ptrSelf, "(%d %d), canceled: %d", (int)bounds.size.width, (int)bounds.size.height, (int)isCancelledBlock());
     return result;
   };
 #endif
@@ -281,13 +279,15 @@
       ASCornerRoundingType cornerRoundingType = _cornerRoundingType;
       CGFloat cornerRadius = _cornerRadius;
       ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext = _willDisplayNodeContentWithRenderingContext;
+      CACornerMask maskedCorners = _maskedCorners;
     __instanceLock__.unlock();
 
     if (cornerRoundingType == ASCornerRoundingTypePrecomposited && cornerRadius > 0.0) {
       ASDisplayNodeAssert(context == UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
       // TODO: This clip path should be removed if we are rasterizing.
       CGRect boundingBox = CGContextGetClipBoundingBox(context);
-      [[UIBezierPath bezierPathWithRoundedRect:boundingBox cornerRadius:cornerRadius] addClip];
+      CGSize radii = CGSizeMake(cornerRadius, cornerRadius);
+      [[UIBezierPath bezierPathWithRoundedRect:boundingBox byRoundingCorners:maskedCorners cornerRadii:radii] addClip];
     }
     
     if (willDisplayNodeContentWithRenderingContext) {
@@ -307,6 +307,7 @@
     CGFloat cornerRadius = _cornerRadius;
     CGFloat contentsScale = _contentsScaleForDisplay;
     ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext = _didDisplayNodeContentWithRenderingContext;
+    CACornerMask maskedCorners = _maskedCorners;
   __instanceLock__.unlock();
   
   if (context != NULL) {
@@ -323,7 +324,7 @@
       bounds.size.height *= contentsScale;
       CGFloat white = 0.0f, alpha = 0.0f;
       [backgroundColor getWhite:&white alpha:&alpha];
-      ASGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
+      UIGraphicsBeginImageContextWithOptions(bounds.size, (alpha == 1.0f), contentsScale);
       [*image drawInRect:bounds];
     } else {
       bounds = CGContextGetClipBoundingBox(context);
@@ -332,7 +333,10 @@
     ASDisplayNodeAssert(UIGraphicsGetCurrentContext(), @"context is expected to be pushed on UIGraphics stack %@", self);
     
     UIBezierPath *roundedHole = [UIBezierPath bezierPathWithRect:bounds];
-    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:cornerRadius * contentsScale]];
+    CGSize radii = CGSizeMake(cornerRadius * contentsScale, cornerRadius * contentsScale);
+    [roundedHole appendPath:[UIBezierPath bezierPathWithRoundedRect:bounds
+                                                  byRoundingCorners:maskedCorners
+                                                        cornerRadii:radii]];
     roundedHole.usesEvenOddFillRule = YES;
     
     UIBezierPath *roundedPath = nil;
@@ -353,7 +357,10 @@
     [roundedPath stroke];  // Won't do anything if borderWidth is 0 and roundedPath is nil.
     
     if (*image) {
-      *image = ASGraphicsGetImageAndEndCurrentContext();
+      *image = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    if (context == NULL) {
+      UIGraphicsEndImageContext();
     }
   }
 }
@@ -462,25 +469,25 @@
 
 - (ASDisplayNodeContextModifier)willDisplayNodeContentWithRenderingContext
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _willDisplayNodeContentWithRenderingContext;
 }
 
 - (ASDisplayNodeContextModifier)didDisplayNodeContentWithRenderingContext
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   return _didDisplayNodeContentWithRenderingContext;
 }
 
 - (void)setWillDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _willDisplayNodeContentWithRenderingContext = contextModifier;
 }
 
 - (void)setDidDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier;
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  MutexLocker l(__instanceLock__);
   _didDisplayNodeContentWithRenderingContext = contextModifier;
 }
 

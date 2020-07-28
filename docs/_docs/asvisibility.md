@@ -3,7 +3,7 @@ title: ASVisibility
 layout: docs
 permalink: /docs/asvisibility.html
 prevPage: debug-tool-ASRangeController.html
-nextPage: asenvironment.html
+nextPage: asrunloopqueue.html
 ---
 
 `ASNavigationController` and `ASTabBarController` both implement the `ASVisibility` protocol. These classes can be used even without `ASDisplayNodes`, making them suitable base classes for your inheritance hierarchy. For any child view controllers that are <a href="containers-asviewcontroller.html">`ASViewControllers`</a>, these classes know the exact number of user taps it would take to make the view controller visible (0 if currently visible).

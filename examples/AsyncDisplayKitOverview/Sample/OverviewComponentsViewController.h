@@ -17,7 +17,7 @@
 
 @end
 
-@interface OverviewComponentsViewController : ASViewController
+@interface OverviewComponentsViewController : ASDKViewController
 
 
 @end

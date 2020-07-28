@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASLayout;
 
-AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
+ASDK_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
 
 @interface ASDisplayNode (Yoga)
 
@@ -29,9 +29,20 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 @property BOOL yogaLayoutInProgress;
 // TODO: Make this atomic (lock).
 @property (nullable, nonatomic) ASLayout *yogaCalculatedLayout;
+@property (nonatomic) BOOL willApplyNextYogaCalculatedLayout;
 
 // Will walk up the Yoga tree and returns the root node
 - (ASDisplayNode *)yogaRoot;
+
+
+@end
+
+@interface ASDisplayNode (YogaLocking)
+/**
+ * @discussion Attempts(spinning) to lock all node up to root node when yoga is enabled.
+ * This will lock self when yoga is not enabled;
+ */
+- (ASLockSet)lockToRootIfNeededForLayout;
 
 @end
 
@@ -44,9 +55,14 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 /// For internal usage only
 - (ASLayout *)calculateLayoutYoga:(ASSizeRange)constrainedSize;
 /// For internal usage only
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
+- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize willApply:(BOOL)willApply;
 /// For internal usage only
 - (void)invalidateCalculatedYogaLayout;
+/**
+ * @discussion return true only when yoga enabled and the node is in yoga tree and the node is
+ * not leaf that implemented measure function.
+ */
+- (BOOL)locked_shouldLayoutFromYogaRoot;
 
 @end
 
@@ -79,4 +95,9 @@ AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullab
 
 NS_ASSUME_NONNULL_END
 
+// When Yoga is enabled, there are several points where we want to lock the tree to the root but otherwise (without Yoga)
+// will want to simply lock self.
+#define ASScopedLockSelfOrToRoot() ASScopedLockSet lockSet = [self lockToRootIfNeededForLayout]
+#else
+#define ASScopedLockSelfOrToRoot() ASLockScopeSelf()
 #endif

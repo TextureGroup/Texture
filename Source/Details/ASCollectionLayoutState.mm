@@ -7,9 +7,7 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState+Private.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASCellNode.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
@@ -32,7 +30,7 @@
 @end
 
 @implementation ASCollectionLayoutState {
-  ASDN::Mutex __instanceLock__;
+  AS::Mutex __instanceLock__;
   CGSize _contentSize;
   ASCollectionLayoutContext *_context;
   NSMapTable<ASCollectionElement *, UICollectionViewLayoutAttributes *> *_elementToLayoutAttributesTable;
@@ -182,7 +180,7 @@ elementToLayoutAttributesTable:[NSMapTable elementToLayoutAttributesTable]];
   CGSize pageSize = _context.viewportSize;
   CGSize contentSize = _contentSize;
 
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (_unmeasuredPageToLayoutAttributesTable.count == 0 || CGRectIsNull(rect) || CGRectIsEmpty(rect) || CGSizeEqualToSize(CGSizeZero, contentSize) || CGSizeEqualToSize(CGSizeZero, pageSize)) {
     return nil;
   }

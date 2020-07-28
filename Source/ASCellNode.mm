@@ -19,9 +19,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASTextNode.h>
 #import <AsyncDisplayKit/ASCollectionNode.h>
-#import <AsyncDisplayKit/ASTableNode.h>
 
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
@@ -34,10 +33,11 @@
   ASDisplayNodeDidLoadBlock _viewControllerDidLoadBlock;
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
+  UICollectionViewLayoutAttributes *_layoutAttributes;
   BOOL _suspendInteractionDelegate;
   BOOL _selected;
   BOOL _highlighted;
-  UICollectionViewLayoutAttributes *_layoutAttributes;
+  BOOL _neverShowPlaceholders;
 }
 
 @end
@@ -79,8 +79,8 @@
     _viewController = _viewControllerBlock();
     _viewControllerBlock = nil;
 
-    if ([_viewController isKindOfClass:[ASViewController class]]) {
-      ASViewController *asViewController = (ASViewController *)_viewController;
+    if ([_viewController isKindOfClass:[ASDKViewController class]]) {
+      ASDKViewController *asViewController = (ASDKViewController *)_viewController;
       _viewControllerNode = asViewController.node;
       [_viewController loadViewIfNeeded];
     } else {
@@ -137,7 +137,7 @@
   if (ASLockedSelfCompareAssign(_selected, selected)) {
     if (!_suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
-        [_interactionDelegate nodeSelectedStateDidChange:self];
+        [self->_interactionDelegate nodeSelectedStateDidChange:self];
       });
     }
   }
@@ -153,7 +153,7 @@
   if (ASLockedSelfCompareAssign(_highlighted, highlighted)) {
     if (!_suspendInteractionDelegate) {
       ASPerformBlockOnMainThread(^{
-        [_interactionDelegate nodeHighlightedStateDidChange:self];
+        [self->_interactionDelegate nodeHighlightedStateDidChange:self];
       });
     }
   }
@@ -198,6 +198,11 @@
     [self view];
   }
   return _viewController;
+}
+
+- (id<ASRangeManagingNode>)owningNode
+{
+  return self.collectionElement.owningNode;
 }
 
 #pragma clang diagnostic push
@@ -305,7 +310,7 @@
   // in which case it is not valid to perform a convertRect (this actually crashes on iOS 8).
   UIScrollView *scrollView = (_scrollView != nil && view.superview != nil && [view isDescendantOfView:_scrollView]) ? _scrollView : nil;
   if (scrollView) {
-    cellFrame = [view convertRect:view.bounds toView:_scrollView];
+    cellFrame = [view convertRect:view.bounds toView:scrollView];
   }
   
   // If we did not convert, we'll pass along CGRectZero and a nil scrollView.  The EventInvisible call is thus equivalent to
@@ -322,7 +327,7 @@
   
   UIScrollView *scrollView = self.scrollView;
   
-  ASDisplayNode *owningNode = scrollView.asyncdisplaykit_node;
+  id<ASRangeManagingNode> owningNode = self.owningNode;
   if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
     NSIndexPath *ip = [(ASCollectionNode *)owningNode indexPathForNode:self];
     if (ip != nil) {

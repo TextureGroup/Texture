@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Script uses clang-format to format all of the source files in a
+# default format.
+#
+
+# The absolute path of the directory containing this script.
+DIR="$( cd "$( dirname "$0" )" && pwd)"
+# Define top level project directory
+PROJECT_DIR="${DIR}"
+
+METHOD="GIT"
+if [ -n "$1" ]; then
+ METHOD=$1
+fi
+
+# Paths to format
+MONITOR=()
+MONITOR+=( "${PROJECT_DIR}/Source" )
+
+if [ "$METHOD" == "ALL" ]; then
+    # Format all Source files
+    for FILE in $(find ${MONITOR[*]} -type f \( -iname "*.mm" -o -iname "*.m" -o -iname "*.h" \))
+    do
+        clang-format -style=file -i "$FILE" &
+    done
+elif [ "$METHOD" == "GIT" ]; then
+    # Gather all added or modified files from git and format them
+    CHANGED_FILES=$(git ls-files --other --modified --exclude-standard | grep ".*[\.m|\.mm|\.h|\.hpp]$")
+    for CHANGED_FILE in $CHANGED_FILES
+    do
+        clang-format -style=file -i "${PROJECT_DIR}/$CHANGED_FILE" &
+    done
+else
+    echo "Usage: $0 [GIT|ALL]";
+    echo "GIT: Only format added or modified files"
+    echo "ALL: Format all files"
+fi
+
+
+# Wait until all clang-format invoctations are done
+wait

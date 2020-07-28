@@ -11,57 +11,61 @@
 #import <stdatomic.h>
 
 /**
- * For our atomic _thread, we use acquire/release memory order so that we can have
- * the minimum possible constraint on the hardware. The default, `memory_order_seq_cst`
- * demands that there be a total order of all such modifications as seen by all threads.
- * Acquire/release only requires that modifications to this specific atomic are
- * synchronized across acquire/release pairs.
- * http://en.cppreference.com/w/cpp/atomic/memory_order
- *
- * Note also that the unfair_lock involves a thread fence as well, so we don't need to
- * take care of synchronizing other values. Just the thread value.
+ * Since the lock itself is a memory barrier, we only need memory_order_relaxed for our
+ * thread atomic. That guarantees we won't have torn writes, but otherwise no ordering
+ * is required.
  */
-#define rul_set_thread(l, t) atomic_store_explicit(&l->_thread, t, memory_order_release)
-#define rul_get_thread(l) atomic_load_explicit(&l->_thread, memory_order_acquire)
+#define rul_set_thread(l, t) atomic_store_explicit(&l->_thread, t, memory_order_relaxed)
+#define rul_get_thread(l) atomic_load_explicit(&l->_thread, memory_order_relaxed)
+
+OS_UNFAIR_LOCK_AVAILABILITY
+NS_INLINE void ASRecursiveUnfairLockDidAcquire(ASRecursiveUnfairLock *l, pthread_t tid) {
+  NSCAssert(pthread_equal(rul_get_thread(l), NULL) && l->_count == 0, @"Unfair lock error");
+  rul_set_thread(l, tid);
+}
+
+OS_UNFAIR_LOCK_AVAILABILITY
+NS_INLINE void ASRecursiveUnfairLockWillRelease(ASRecursiveUnfairLock *l) {
+  NSCAssert(pthread_equal(rul_get_thread(l), pthread_self()) && l->_count == 0, @"Unfair lock error");
+  rul_set_thread(l, NULL);
+}
+
+OS_UNFAIR_LOCK_AVAILABILITY
+NS_INLINE void ASRecursiveUnfairLockAssertHeld(ASRecursiveUnfairLock *l) {
+  NSCAssert(pthread_equal(rul_get_thread(l), pthread_self()) && l->_count > 0, @"Unfair lock error");
+}
 
 void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l)
 {
   // Try to lock without blocking. If we fail, check what thread owns it.
-  // Note that the owning thread CAN CHANGE freely, but it can't become `self`
-  // because only we are `self`. And if it's already `self` then we already have
-  // the lock, because we reset it to NULL before we unlock. So (thread == self) is
-  // invariant.
-  
+  // Note that the owning thread CAN CHANGE freely, but if the thread is specifically `self` then we know
+  // it is a recursive call, because we clear it before unlocking, and only `self` can set it
+  // to `self`.
+
   const pthread_t s = pthread_self();
-  if (os_unfair_lock_trylock(&l->_lock)) {
-    // Owned by nobody. We now have the lock. Assign self.
-    rul_set_thread(l, s);
-  } else if (rul_get_thread(l) == s) {
-    // Owned by self (recursive lock). nop.
+  if (pthread_equal(rul_get_thread(l), s)) {
+    // Owned by self (recursive lock.) nop.
+    ASRecursiveUnfairLockAssertHeld(l);
   } else {
-    // Owned by other thread. Block and then set thread to self.
     os_unfair_lock_lock(&l->_lock);
-    rul_set_thread(l, s);
+    ASRecursiveUnfairLockDidAcquire(l, s);
   }
-  
+
   l->_count++;
 }
 
-BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l)
-{
+BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l) {
   // Same as Lock above. See comments there.
-  
   const pthread_t s = pthread_self();
-  if (os_unfair_lock_trylock(&l->_lock)) {
-    // Owned by nobody. We now have the lock. Assign self.
-    rul_set_thread(l, s);
-  } else if (rul_get_thread(l) == s) {
-    // Owned by self (recursive lock). nop.
+  if (pthread_equal(rul_get_thread(l), s)) {
+    ASRecursiveUnfairLockAssertHeld(l);
+  } else if (os_unfair_lock_trylock(&l->_lock)) {
+    ASRecursiveUnfairLockDidAcquire(l, s);
   } else {
     // Owned by other thread. Fail.
     return NO;
   }
-  
+
   l->_count++;
   return YES;
 }
@@ -70,14 +74,14 @@ void ASRecursiveUnfairLockUnlock(ASRecursiveUnfairLock *l)
 {
   // Ensure we have the lock. This check may miss some pathological cases,
   // but it'll catch 99.999999% of this serious programmer error.
-  NSCAssert(rul_get_thread(l) == pthread_self(), @"Unlocking from a different thread than locked.");
+  NSCAssert(pthread_equal(rul_get_thread(l), pthread_self()), @"Unlocking from a different thread than locked.");
   
   if (0 == --l->_count) {
     // Note that we have to clear this before unlocking because, if another thread
     // succeeds in locking above, but hasn't managed to update _thread, and we
     // try to re-lock, and fail the -tryLock, and read _thread, then we'll mistakenly
     // think that we still own the lock and proceed without blocking.
-    rul_set_thread(l, NULL);
+    ASRecursiveUnfairLockWillRelease(l);
     os_unfair_lock_unlock(&l->_lock);
   }
 }

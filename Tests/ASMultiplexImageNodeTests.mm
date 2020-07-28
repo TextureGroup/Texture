@@ -112,7 +112,7 @@
   OCMExpect([mockCache cachedImageWithURL:[self _testImageURL] callbackQueue:OCMOCK_ANY completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv) {
     ASImageCacherCompletion completionBlock = [inv as_argumentAtIndexAsObject:4];
-    completionBlock([self _testImage]);
+    completionBlock([self _testImage], ASImageCacheTypeAsynchronous);
   });
 
   imageNode.imageIdentifiers = @[imageIdentifier];
@@ -217,19 +217,19 @@
   OCMExpect([mockCache cachedImageWithURL:[self _testImageURL] callbackQueue:OCMOCK_ANY completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv){
     ASImageCacherCompletion completion = [inv as_argumentAtIndexAsObject:4];
-    completion(nil);
+    completion(nil, ASImageCacheTypeAsynchronous);
   });
 
   // Mock a 50%-progress URL download.
   const CGFloat mockedProgress = 0.5;
-  OCMExpect([mockDownloader downloadImageWithURL:[self _testImageURL] callbackQueue:OCMOCK_ANY downloadProgress:[OCMArg isNotNil] completion:[OCMArg isNotNil]])
+  OCMExpect([mockDownloader downloadImageWithURL:[self _testImageURL] priority:ASImageDownloaderPriorityPreload callbackQueue:OCMOCK_ANY downloadProgress:[OCMArg isNotNil] completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv){
     // Simulate progress.
-    ASImageDownloaderProgress progressBlock = [inv as_argumentAtIndexAsObject:4];
+    ASImageDownloaderProgress progressBlock = [inv as_argumentAtIndexAsObject:5];
     progressBlock(mockedProgress);
 
     // Simulate completion.
-    ASImageDownloaderCompletion completionBlock = [inv as_argumentAtIndexAsObject:5];
+    ASImageDownloaderCompletion completionBlock = [inv as_argumentAtIndexAsObject:6];
     completionBlock([self _testImage], nil, nil, nil);
   });
 

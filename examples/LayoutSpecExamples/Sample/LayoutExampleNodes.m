@@ -172,7 +172,7 @@
     _iconNode = [[ASNetworkImageNode alloc] init];
     _iconNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png"];
     
-    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
+    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
       CGSize profileImageSize = CGSizeMake(60, 60);
       return [image makeCircularImageWithSize:profileImageSize withBorderWidth:10];
     }];
@@ -222,7 +222,10 @@
     self.backgroundColor = [UIColor whiteColor];
 
     _topSeparator = [[ASImageNode alloc] init];
-    _topSeparator.image = [UIImage as_resizableRoundedImageWithCornerRadius:1.0 cornerColor:[UIColor blackColor] fillColor:[UIColor blackColor]];
+    _topSeparator.image = [UIImage as_resizableRoundedImageWithCornerRadius:1.0
+                                                                cornerColor:[UIColor blackColor]
+                                                                  fillColor:[UIColor blackColor]
+                                                            traitCollection:self.primitiveTraitCollection];
     
     _textNode = [[ASTextNode alloc] init];
     _textNode.attributedText = [NSAttributedString attributedStringWithString:@"this is a long text node"
@@ -230,7 +233,10 @@
                                                                         color:[UIColor blackColor]];
     
     _bottomSeparator = [[ASImageNode alloc] init];
-    _bottomSeparator.image = [UIImage as_resizableRoundedImageWithCornerRadius:1.0 cornerColor:[UIColor blackColor] fillColor:[UIColor blackColor]];
+    _bottomSeparator.image = [UIImage as_resizableRoundedImageWithCornerRadius:1.0
+                                                                   cornerColor:[UIColor blackColor]
+                                                                     fillColor:[UIColor blackColor]
+                                                               traitCollection:self.primitiveTraitCollection];
   }
   
   return self;
@@ -297,7 +303,8 @@ static CGFloat const kSampleBadgeCornerRadius = 12;
         _badgeImageNode = [ASImageNode new];
         _badgeImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:kSampleBadgeCornerRadius
                                                                       cornerColor:UIColor.clearColor
-                                                                        fillColor:UIColor.redColor];
+                                                                        fillColor:UIColor.redColor
+                                                                  traitCollection:self.primitiveTraitCollection];
         
         _photoNode2 = [ASImageNode new];
         _photoNode2.image = avatarImage;

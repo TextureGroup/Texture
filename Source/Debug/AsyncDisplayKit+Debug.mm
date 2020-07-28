@@ -9,11 +9,10 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASAbstractLayoutController.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASWeakSet.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASTextNode.h>
@@ -140,16 +139,14 @@ static BOOL __enableHitTestDebug = NO;
       UIColor *borderColor      = [[UIColor orangeColor] colorWithAlphaComponent:0.8];
       UIColor *clipsBorderColor = [UIColor colorWithRed:30/255.0 green:90/255.0 blue:50/255.0 alpha:0.7];
       CGRect imgRect            = CGRectMake(0, 0, 2.0 * borderWidth + 1.0, 2.0 * borderWidth + 1.0);
-      
-      ASGraphicsBeginImageContextWithOptions(imgRect.size, NO, 1);
-      
-      [fillColor setFill];
-      UIRectFill(imgRect);
-      
-      [self drawEdgeIfClippedWithEdges:clippedEdges color:clipsBorderColor borderWidth:borderWidth imgRect:imgRect];
-      [self drawEdgeIfClippedWithEdges:clipsToBoundsClippedEdges color:borderColor borderWidth:borderWidth imgRect:imgRect];
-      
-      UIImage *debugHighlightImage = ASGraphicsGetImageAndEndCurrentContext();
+
+      UIImage *debugHighlightImage = ASGraphicsCreateImage(self.primitiveTraitCollection, imgRect.size, NO, 1, nil, nil, ^{
+        [fillColor setFill];
+        UIRectFill(imgRect);
+
+        [self drawEdgeIfClippedWithEdges:clippedEdges color:clipsBorderColor borderWidth:borderWidth imgRect:imgRect];
+        [self drawEdgeIfClippedWithEdges:clipsToBoundsClippedEdges color:borderColor borderWidth:borderWidth imgRect:imgRect];
+      });
       
       UIEdgeInsets edgeInsets = UIEdgeInsetsMake(borderWidth, borderWidth, borderWidth, borderWidth);
       debugOverlay.image = [debugHighlightImage resizableImageWithCapInsets:edgeInsets resizingMode:UIImageResizingModeStretch];
@@ -427,10 +424,10 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   }
   
   [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-    _animating = YES;
+    self->_animating = YES;
     [self layoutToFitAllBarsExcept:0];
   } completion:^(BOOL finished) {
-    _animating = NO;
+    self->_animating = NO;
   }];
 }
 
@@ -457,10 +454,10 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   CGFloat leadingDisplayTuningRatio   = 0;
   CGFloat leadingPreloadTuningRatio   = 0;
 
-  if (!((displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls) == 0)) {
+  if (displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls != 0) {
     leadingDisplayTuningRatio = displayTuningParameters.leadingBufferScreenfuls / (displayTuningParameters.leadingBufferScreenfuls + displayTuningParameters.trailingBufferScreenfuls);
   }
-  if (!((preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls) == 0)) {
+  if (preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls != 0) {
     leadingPreloadTuningRatio = preloadTuningParameters.leadingBufferScreenfuls / (preloadTuningParameters.leadingBufferScreenfuls + preloadTuningParameters.trailingBufferScreenfuls);
   }
   
@@ -656,15 +653,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   
   BOOL animate = !_firstLayoutOfRects;
   [UIView animateWithDuration:animate ? 0.3 : 0.0 delay:0.0 options:UIViewAnimationOptionLayoutSubviews animations:^{
-    _visibleRect.frame    = CGRectMake(HORIZONTAL_INSET + visiblePoint,    rect.origin.y, visibleDimension,    subCellHeight);
-    _displayRect.frame    = CGRectMake(HORIZONTAL_INSET + displayPoint,    rect.origin.y, displayDimension,    subCellHeight);
-    _preloadRect.frame    = CGRectMake(HORIZONTAL_INSET + preloadPoint,  rect.origin.y, preloadDimension,  subCellHeight);
+    self->_visibleRect.frame    = CGRectMake(HORIZONTAL_INSET + visiblePoint,    rect.origin.y, visibleDimension,    subCellHeight);
+    self->_displayRect.frame    = CGRectMake(HORIZONTAL_INSET + displayPoint,    rect.origin.y, displayDimension,    subCellHeight);
+    self->_preloadRect.frame    = CGRectMake(HORIZONTAL_INSET + preloadPoint,  rect.origin.y, preloadDimension,  subCellHeight);
   } completion:^(BOOL finished) {}];
   
   if (!animate) {
     _visibleRect.alpha = _displayRect.alpha = _preloadRect.alpha = 0;
     [UIView animateWithDuration:0.3 animations:^{
-      _visibleRect.alpha = _displayRect.alpha = _preloadRect.alpha = 1;
+      self->_visibleRect.alpha = self->_displayRect.alpha = self->_preloadRect.alpha = 1;
     }];
   }
   
@@ -732,13 +729,15 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
 - (ASImageNode *)createRangeNodeWithColor:(UIColor *)color
 {
     ASImageNode *rangeBarImageNode = [[ASImageNode alloc] init];
+    ASPrimitiveTraitCollection primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(self.traitCollection);
     rangeBarImageNode.image = [UIImage as_resizableRoundedImageWithCornerRadius:RANGE_BAR_CORNER_RADIUS
                                                                     cornerColor:[UIColor clearColor]
                                                                       fillColor:[color colorWithAlphaComponent:0.5]
                                                                     borderColor:[[UIColor blackColor] colorWithAlphaComponent:0.9]
                                                                     borderWidth:RANGE_BAR_BORDER_WIDTH
                                                                  roundedCorners:UIRectCornerAllCorners
-                                                                          scale:[[UIScreen mainScreen] scale]];
+                                                                          scale:[[UIScreen mainScreen] scale]
+                                                                traitCollection:primitiveTraitCollection];
     [self addSubnode:rangeBarImageNode];
   
     return rangeBarImageNode;

@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface CollectionViewController : ASViewController
+@interface CollectionViewController : ASDKViewController
 @end

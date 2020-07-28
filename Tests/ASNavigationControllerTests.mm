@@ -16,8 +16,8 @@
 @implementation ASNavigationControllerTests
 
 - (void)testSetViewControllers {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController, secondController];
   ASNavigationController *navigationController = [ASNavigationController new];
   [navigationController setViewControllers:@[firstController, secondController]];
@@ -27,8 +27,8 @@
 }
 
 - (void)testPopViewController {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController];
   ASNavigationController *navigationController = [ASNavigationController new];
   [navigationController setViewControllers:@[firstController, secondController]];
@@ -39,8 +39,8 @@
 }
 
 - (void)testPushViewController {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController, secondController];
   ASNavigationController *navigationController = [[ASNavigationController new] initWithRootViewController:firstController];
   [navigationController pushViewController:secondController animated:false];

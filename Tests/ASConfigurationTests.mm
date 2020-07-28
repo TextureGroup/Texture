@@ -16,21 +16,18 @@
 #import "ASTestCase.h"
 
 static ASExperimentalFeatures features[] = {
-  ASExperimentalGraphicsContexts,
 #if AS_ENABLE_TEXTNODE
   ASExperimentalTextNode,
 #endif
   ASExperimentalInterfaceStateCoalescing,
-  ASExperimentalUnfairLock,
   ASExperimentalLayerDefaults,
-  ASExperimentalNetworkImageQueue,
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
-  ASExperimentalDisableAccessibilityCache,
-  ASExperimentalSkipAccessibilityWait,
-  ASExperimentalNewDefaultCellLayoutMode
+  ASExperimentalDispatchApply,
+  ASExperimentalDrawingGlobal,
+  ASExperimentalOptimizeDataControllerPipeline,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -43,23 +40,21 @@ static ASExperimentalFeatures features[] = {
 
 + (NSArray *)names {
   return @[
-    @"exp_graphics_contexts",
     @"exp_text_node",
     @"exp_interface_state_coalesce",
-    @"exp_unfair_lock",
     @"exp_infer_layer_defaults",
-    @"exp_network_image_queue",
     @"exp_collection_teardown",
     @"exp_framesetter_cache",
     @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
-    @"exp_disable_a11y_cache",
-    @"exp_skip_a11y_wait",
-    @"exp_new_default_cell_layout_mode"
+    @"exp_dispatch_apply",
+    @"exp_drawing_global",
+    @"exp_optimize_data_controller_pipeline",
   ];
 }
 
-- (ASExperimentalFeatures)allFeatures {
+- (ASExperimentalFeatures)allFeatures
+{
   ASExperimentalFeatures allFeatures = 0;
   for (int i = 0; i < sizeof(features)/sizeof(ASExperimentalFeatures); i++) {
     allFeatures |= features[i];
@@ -73,7 +68,7 @@ static ASExperimentalFeatures features[] = {
 {
   // Set the config
   ASConfiguration *config = [[ASConfiguration alloc] initWithDictionary:nil];
-  config.experimentalFeatures = ASExperimentalGraphicsContexts;
+  config.experimentalFeatures = ASExperimentalLayerDefaults;
   config.delegate = self;
   [ASConfigurationManager test_resetWithConfiguration:config];
   
@@ -86,7 +81,7 @@ static ASExperimentalFeatures features[] = {
   };
   
   // Now activate the graphics experiment and expect it works.
-  XCTAssertTrue(ASActivateExperimentalFeature(ASExperimentalGraphicsContexts));
+  XCTAssertTrue(ASActivateExperimentalFeature(ASExperimentalLayerDefaults));
   // We should get a callback here
   // Now activate text node and expect it fails.
   XCTAssertFalse(ASActivateExperimentalFeature(ASExperimentalTextNode));

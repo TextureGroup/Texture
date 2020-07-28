@@ -48,6 +48,7 @@
 #import <AsyncDisplayKit/ASSectionContext.h>
 
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASCollectionLayoutContext.h>
 #import <AsyncDisplayKit/ASCollectionLayoutState.h>
 #import <AsyncDisplayKit/ASCollectionFlowLayoutDelegate.h>
@@ -63,7 +64,7 @@
 #import <AsyncDisplayKit/ASPagerNode+Beta.h>
 
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import <AsyncDisplayKit/ASNavigationController.h>
 #import <AsyncDisplayKit/ASTabBarController.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
@@ -100,7 +101,6 @@
 #import <AsyncDisplayKit/ASControlNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASEventLog.h>
 #import <AsyncDisplayKit/ASHashing.h>
 #import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
@@ -120,7 +120,6 @@
 #import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 #import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
@@ -130,4 +129,5 @@
 
 #import <AsyncDisplayKit/IGListAdapter+AsyncDisplayKit.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+IGListKitMethods.h>
-#import <AsyncDisplayKit/ASLayout+IGListKit.h>
+#import <AsyncDisplayKit/ASLayout+IGListDiffKit.h>
+#import <AsyncDisplayKit/ASGraphicsContext.h>

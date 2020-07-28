@@ -9,5 +9,5 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface CollectionViewController : ASViewController<ASCollectionNode *>
+@interface CollectionViewController : ASDKViewController<ASCollectionNode *>
 @end

@@ -30,6 +30,7 @@ AS_SUBCLASSING_RESTRICTED
  Initialization of TextKit components is a globally locking operation so be careful of bottlenecks with this class.
  */
 - (instancetype)initWithAttributedString:(NSAttributedString *)attributedString
+                               tintColor:(UIColor *)tintColor
                            lineBreakMode:(NSLineBreakMode)lineBreakMode
                     maximumNumberOfLines:(NSUInteger)maximumNumberOfLines
                           exclusionPaths:(NSArray *)exclusionPaths

@@ -8,60 +8,14 @@
 //
 
 #import <AsyncDisplayKit/_ASDisplayView.h>
-#import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 
 #import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Convenience.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASViewController.h>
-
-#pragma mark - _ASDisplayViewMethodOverrides
-
-typedef NS_OPTIONS(NSUInteger, _ASDisplayViewMethodOverrides)
-{
-  _ASDisplayViewMethodOverrideNone                          = 0,
-  _ASDisplayViewMethodOverrideCanBecomeFirstResponder       = 1 << 0,
-  _ASDisplayViewMethodOverrideBecomeFirstResponder          = 1 << 1,
-  _ASDisplayViewMethodOverrideCanResignFirstResponder       = 1 << 2,
-  _ASDisplayViewMethodOverrideResignFirstResponder          = 1 << 3,
-  _ASDisplayViewMethodOverrideIsFirstResponder              = 1 << 4,
-};
-
-/**
- *  Returns _ASDisplayViewMethodOverrides for the given class
- *
- *  @param c the class, required.
- *
- *  @return _ASDisplayViewMethodOverrides.
- */
-static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
-{
-  ASDisplayNodeCAssertNotNil(c, @"class is required");
-  
-  _ASDisplayViewMethodOverrides overrides = _ASDisplayViewMethodOverrideNone;
-  if (ASSubclassOverridesSelector([_ASDisplayView class], c, @selector(canBecomeFirstResponder))) {
-    overrides |= _ASDisplayViewMethodOverrideCanBecomeFirstResponder;
-  }
-  if (ASSubclassOverridesSelector([_ASDisplayView class], c, @selector(becomeFirstResponder))) {
-    overrides |= _ASDisplayViewMethodOverrideBecomeFirstResponder;
-  }
-  if (ASSubclassOverridesSelector([_ASDisplayView class], c, @selector(canResignFirstResponder))) {
-    overrides |= _ASDisplayViewMethodOverrideCanResignFirstResponder;
-  }
-  if (ASSubclassOverridesSelector([_ASDisplayView class], c, @selector(resignFirstResponder))) {
-    overrides |= _ASDisplayViewMethodOverrideResignFirstResponder;
-  }
-  if (ASSubclassOverridesSelector([_ASDisplayView class], c, @selector(isFirstResponder))) {
-    overrides |= _ASDisplayViewMethodOverrideIsFirstResponder;
-  }
-  return overrides;
-}
+#import <AsyncDisplayKit/ASDKViewController.h>
 
 #pragma mark - _ASDisplayView
 
@@ -74,53 +28,26 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 
 @implementation _ASDisplayView
 {
-  BOOL _inHitTest;
-  BOOL _inPointInside;
+  struct _ASDisplayViewInternalFlags {
+    unsigned inHitTest:1;
+    unsigned inPointInside:1;
+
+    unsigned inCanBecomeFirstResponder:1;
+    unsigned inBecomeFirstResponder:1;
+    unsigned inCanResignFirstResponder:1;
+    unsigned inResignFirstResponder:1;
+    unsigned inIsFirstResponder:1;
+  } _internalFlags;
 
   NSArray *_accessibilityElements;
   CGRect _lastAccessibilityElementsFrame;
-  
-  _ASDisplayViewMethodOverrides _methodOverrides;
 }
 
 #pragma mark - Class
 
-+ (void)initialize
-{
-  __unused Class initializeSelf = self;
-  IMP staticInitialize = imp_implementationWithBlock(^(_ASDisplayView *view) {
-    ASDisplayNodeAssert(view.class == initializeSelf, @"View class %@ does not have a matching _staticInitialize method; check to ensure [super initialize] is called within any custom +initialize implementations!  Overridden methods will not be called unless they are also implemented by superclass %@", view.class, initializeSelf);
-    view->_methodOverrides = GetASDisplayViewMethodOverrides(view.class);
-  });
-  
-  class_replaceMethod(self, @selector(_staticInitialize), staticInitialize, "v:@");
-}
-
 + (Class)layerClass
 {
   return [_ASDisplayLayer class];
-}
-
-#pragma mark - NSObject Overrides
-
-- (instancetype)init
-{
-  if (!(self = [super init]))
-    return nil;
-  
-  [self _initializeInstance];
-  
-  return self;
-}
-
-- (void)_initializeInstance
-{
-  [self _staticInitialize];
-}
-
-- (void)_staticInitialize
-{
-  ASDisplayNodeAssert(NO, @"_staticInitialize must be overridden");
 }
 
 // e.g. <MYPhotoNodeView: 0xFFFFFF; node = <MYPhotoNode: 0xFFFFFE>; frame = ...>
@@ -152,6 +79,21 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 }
 
 #pragma mark - UIView Overrides
+
+- (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
+{
+  id<CAAction> uikitAction = [super actionForLayer:layer forKey:event];
+
+  // Even though the UIKit action will take precedence, we still unconditionally forward to the node so that it can
+  // track events like kCAOnOrderIn.
+  id<CAAction> nodeAction = [_asyncdisplaykit_node actionForLayer:layer forKey:event];
+
+  // If UIKit specifies an action, that takes precedence. That's an animation block so it's explicit.
+  if (uikitAction && uikitAction != (id)kCFNull) {
+    return uikitAction;
+  }
+  return nodeAction;
+}
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
 {
@@ -210,7 +152,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeUpdate) {
       // -removeFromSupernode is called by -addSubnode:, if it is needed.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [newSuperview.asyncdisplaykit_node _addSubnode:node];
+      [newSuperview.asyncdisplaykit_node addSubnode:node];
     }
   }
 }
@@ -234,7 +176,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   if (superview && node.viewControllerRoot) {
     UIViewController *vc = [node closestViewController];
 
-    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASViewController class]] && ((ASViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
+    ASDisplayNodeAssert(vc != nil && [vc isKindOfClass:[ASDKViewController class]] && ((ASDKViewController*)vc).node == node, @"This node was once used as a view controller's node. You should not reuse it without its view controller.");
   }
 #endif
 
@@ -271,7 +213,7 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
     if (needsSupernodeRemoval) {
       // The node will only disconnect from its supernode, not removeFromSuperview, in this condition.
       // FIXME: Needs rethinking if automaticallyManagesSubnodes=YES
-      [node _removeFromSupernode];
+      [node removeFromSupernode];
     }
   }
 }
@@ -412,10 +354,10 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
   // hitTest:, it will call it on the view, which is _ASDisplayView.  After calling into the node, any additional calls
   // should use the UIView implementation of hitTest:
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inHitTest) {
-    _inHitTest = YES;
+  if (!_internalFlags.inHitTest) {
+    _internalFlags.inHitTest = YES;
     UIView *hitView = [node hitTest:point withEvent:event];
-    _inHitTest = NO;
+    _internalFlags.inHitTest = NO;
     return hitView;
   } else {
     return [super hitTest:point withEvent:event];
@@ -426,10 +368,10 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 {
   // See comments in -hitTest:withEvent: for the strategy here.
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  if (!_inPointInside) {
-    _inPointInside = YES;
+  if (!_internalFlags.inPointInside) {
+    _internalFlags.inPointInside = YES;
     BOOL result = [node pointInside:point withEvent:event];
-    _inPointInside = NO;
+    _internalFlags.inPointInside = NO;
     return result;
   } else {
     return [super pointInside:point withEvent:event];
@@ -452,48 +394,70 @@ static _ASDisplayViewMethodOverrides GetASDisplayViewMethodOverrides(Class c)
 
 #pragma mark UIResponder Handling
 
-#define IMPLEMENT_RESPONDER_METHOD(__sel, __nodeMethodOverride, __viewMethodOverride) \
-- (BOOL)__sel\
-{\
-  ASDisplayNode *node = _asyncdisplaykit_node; /* Create strong reference to weak ivar. */ \
-  /* Check if we can call through to ASDisplayNode subclass directly */ \
-  if (node.methodOverrides & __nodeMethodOverride) { \
-    return [node __sel]; \
-  } else { \
-    /* Prevent an infinite loop in here if [super __sel] was called on a \
-     / _ASDisplayView subclass */ \
-    if (self->_methodOverrides & __viewMethodOverride) { \
-      /* Call through to views superclass as we expect super was called from the
-        _ASDisplayView subclass and a node subclass does not overwrite __sel */ \
-      return [self __##__sel]; \
-    } else { \
-      /* Call through to internal node __sel method that will consider the view in responding */ \
-      return [node __##__sel]; \
-    } \
-  } \
-}\
-/* All __ prefixed methods are called from ASDisplayNode to let the view decide in what UIResponder state they \
-are not overridden by a ASDisplayNode subclass */ \
-- (BOOL)__##__sel \
-{ \
-  return [super __sel]; \
-} \
+- (BOOL)canBecomeFirstResponder
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (!_internalFlags.inCanBecomeFirstResponder) {
+    _internalFlags.inCanBecomeFirstResponder = YES;
+    BOOL result = [node canBecomeFirstResponder];
+    _internalFlags.inCanBecomeFirstResponder = NO;
+    return result;
+  } else {
+    return [super canBecomeFirstResponder];
+  }
+}
 
-IMPLEMENT_RESPONDER_METHOD(canBecomeFirstResponder,
-                             ASDisplayNodeMethodOverrideCanBecomeFirstResponder,
-                             _ASDisplayViewMethodOverrideCanBecomeFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(becomeFirstResponder,
-                             ASDisplayNodeMethodOverrideBecomeFirstResponder,
-                             _ASDisplayViewMethodOverrideBecomeFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(canResignFirstResponder,
-                             ASDisplayNodeMethodOverrideCanResignFirstResponder,
-                             _ASDisplayViewMethodOverrideCanResignFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(resignFirstResponder,
-                             ASDisplayNodeMethodOverrideResignFirstResponder,
-                             _ASDisplayViewMethodOverrideResignFirstResponder);
-IMPLEMENT_RESPONDER_METHOD(isFirstResponder,
-                             ASDisplayNodeMethodOverrideIsFirstResponder,
-                             _ASDisplayViewMethodOverrideIsFirstResponder);
+- (BOOL)becomeFirstResponder
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (!_internalFlags.inBecomeFirstResponder) {
+    _internalFlags.inBecomeFirstResponder = YES;
+    BOOL result = [node becomeFirstResponder];
+    _internalFlags.inBecomeFirstResponder = NO;
+    return result;
+  } else {
+    return [super becomeFirstResponder];
+  }
+}
+
+- (BOOL)canResignFirstResponder
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (!_internalFlags.inCanResignFirstResponder) {
+    _internalFlags.inCanResignFirstResponder = YES;
+    BOOL result = [node canResignFirstResponder];
+    _internalFlags.inCanResignFirstResponder = NO;
+    return result;
+  } else {
+    return [super canResignFirstResponder];
+  }
+}
+
+- (BOOL)resignFirstResponder
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (!_internalFlags.inResignFirstResponder) {
+    _internalFlags.inResignFirstResponder = YES;
+    BOOL result = [node resignFirstResponder];
+    _internalFlags.inResignFirstResponder = NO;
+    return result;
+  } else {
+    return [super resignFirstResponder];
+  }
+}
+
+- (BOOL)isFirstResponder
+{
+  ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
+  if (!_internalFlags.inIsFirstResponder) {
+    _internalFlags.inIsFirstResponder = YES;
+    BOOL result = [node isFirstResponder];
+    _internalFlags.inIsFirstResponder = NO;
+    return result;
+  } else {
+    return [super isFirstResponder];
+  }
+}
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender
 {

@@ -14,13 +14,7 @@
 
 #import <AsyncDisplayKit/ASCollections.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-
-#import <objc/runtime.h>
-#import <map>
-#import <vector>
 
 @implementation ASLayoutSpec
 
@@ -62,7 +56,7 @@
 
 - (ASLayoutElementStyle *)style
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (_style == nil) {
     _style = [[ASLayoutElementStyle alloc] init];
   }
@@ -133,7 +127,7 @@ ASLayoutElementLayoutCalculationDefaults
 
 #pragma mark - NSFastEnumeration
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id unowned _Nullable [_Nonnull])buffer count:(NSUInteger)len
 {
   return [_childrenArray countByEnumeratingWithState:state objects:buffer count:len];
 }
@@ -142,11 +136,21 @@ ASLayoutElementLayoutCalculationDefaults
 
 - (ASTraitCollection *)asyncTraitCollection
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
 }
 
-ASPrimitiveTraitCollectionDefaults
+- (ASPrimitiveTraitCollection)primitiveTraitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  return _primitiveTraitCollection;
+}
+
+- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+{
+  AS::MutexLocker l(__instanceLock__);
+  _primitiveTraitCollection = traitCollection;
+}
 
 #pragma mark - ASLayoutElementStyleExtensibility
 
@@ -221,13 +225,13 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (NSString *)debugName
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   return _debugName;
 }
 
 - (void)setDebugName:(NSString *)debugName
 {
-  ASDN::MutexLocker l(__instanceLock__);
+  AS::MutexLocker l(__instanceLock__);
   if (!ASObjectIsEqual(_debugName, debugName)) {
     _debugName = [debugName copy];
   }

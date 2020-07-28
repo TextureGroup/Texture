@@ -25,13 +25,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** A constant that indicates that the parent's size is not yet determined in a given dimension. */
-AS_EXTERN CGFloat const ASLayoutElementParentDimensionUndefined;
+ASDK_EXTERN CGFloat const ASLayoutElementParentDimensionUndefined;
 
 /** A constant that indicates that the parent's size is not yet determined in either dimension. */
-AS_EXTERN CGSize const ASLayoutElementParentSizeUndefined;
+ASDK_EXTERN CGSize const ASLayoutElementParentSizeUndefined;
 
 /** Type of ASLayoutElement  */
-typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
+typedef NS_ENUM(unsigned char, ASLayoutElementType) {
   ASLayoutElementTypeLayoutSpec,
   ASLayoutElementTypeDisplayNode
 };
@@ -117,7 +117,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * The base implementation of -layoutThatFits:parentSize: does the following for you:
  * 1. First, it uses the parentSize parameter to resolve the nodes's size (the one assigned to the size property).
  * 2. Then, it intersects the resolved size with the constrainedSize parameter. If the two don't intersect,
- *    constrainedSize wins. This allows a component to always override its childrens' sizes when computing its layout.
+ *    constrainedSize wins. This allows a component to always override its children's sizes when computing its layout.
  *    (The analogy for UIView: you might return a certain size from -sizeThatFits:, but a parent view can always override
  *    that size and set your frame to any size.)
  * 3. It caches it result for reuse
@@ -144,24 +144,24 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 
 #pragma mark - ASLayoutElementStyle
 
-AS_EXTERN NSString * const ASLayoutElementStyleWidthProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleMinWidthProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleMaxWidthProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleWidthProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleMinWidthProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleMaxWidthProperty;
 
-AS_EXTERN NSString * const ASLayoutElementStyleHeightProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleMinHeightProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleMaxHeightProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleHeightProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleMinHeightProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleMaxHeightProperty;
 
-AS_EXTERN NSString * const ASLayoutElementStyleSpacingBeforeProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleSpacingAfterProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleFlexGrowProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleFlexShrinkProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleFlexBasisProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleAlignSelfProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleAscenderProperty;
-AS_EXTERN NSString * const ASLayoutElementStyleDescenderProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleSpacingBeforeProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleSpacingAfterProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleFlexGrowProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleFlexShrinkProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleFlexBasisProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleAlignSelfProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleAscenderProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleDescenderProperty;
 
-AS_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
 
 @protocol ASLayoutElementStyleDelegate <NSObject>
 - (void)style:(__kindof ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName;

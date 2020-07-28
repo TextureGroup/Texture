@@ -9,7 +9,7 @@
 import UIKit
 
 class ProductCollectionNode: ASCellNode {
-
+    
     // MARK: - Variables
     
     private let containerNode: ContainerNode
@@ -26,7 +26,7 @@ class ProductCollectionNode: ASCellNode {
     // MARK: - Layout
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        let insets = UIEdgeInsetsMake(2, 2, 2, 2)
+        let insets = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
         return ASInsetLayoutSpec(insets: insets, child: self.containerNode)
     }
     
@@ -47,11 +47,11 @@ class ProductContentNode: ASDisplayNode {
         imageNode.url = URL(string: product.imageURL)
         
         titleNode = ASTextNode()
-        let title = NSAttributedString(string: product.title, attributes: [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 17)])
+        let title = NSAttributedString(string: product.title, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 17)])
         titleNode.attributedText = title
         
         subtitleNode = ASTextNode()
-        let subtitle = NSAttributedString(string: product.currency + " \(product.price)", attributes: [NSForegroundColorAttributeName: UIColor.white, NSFontAttributeName: UIFont.boldSystemFont(ofSize: 15)])
+        let subtitle = NSAttributedString(string: product.currency + " \(product.price)", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)])
         subtitleNode.attributedText = subtitle
         
         super.init()
@@ -65,7 +65,7 @@ class ProductContentNode: ASDisplayNode {
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let textNodesStack = ASStackLayoutSpec(direction: .vertical, spacing: 5, justifyContent: .end, alignItems: .stretch, children: [self.titleNode, self.subtitleNode])
-        let insetStack = ASInsetLayoutSpec(insets: UIEdgeInsetsMake(CGFloat.infinity, 10, 10, 10), child: textNodesStack)
+        let insetStack = ASInsetLayoutSpec(insets: UIEdgeInsets(top: CGFloat.infinity, left: 10, bottom: 10, right: 10), child: textNodesStack)
         return ASOverlayLayoutSpec(child: self.imageNode, overlay: insetStack)
     }
     

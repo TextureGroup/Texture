@@ -10,7 +10,7 @@
 import UIKit
 import AsyncDisplayKit
 
-final class ViewController: ASViewController, ASCollectionDelegate, ASCollectionDataSource {
+final class ViewController: ASDKViewController, ASCollectionDelegate, ASCollectionDataSource {
 	let itemCount = 1000
 
 	let itemSize: CGSize

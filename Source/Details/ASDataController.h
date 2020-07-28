@@ -12,18 +12,11 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASEventLog.h>
 #ifdef __cplusplus
 #import <vector>
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
-
-#if ASEVENTLOG_ENABLE
-#define ASDataControllerLogEvent(dataController, ...) [dataController.eventLog logEventWithBacktrace:(AS_SAVE_EVENT_BACKTRACES ? [NSThread callStackSymbols] : nil) format:__VA_ARGS__]
-#else
-#define ASDataControllerLogEvent(dataController, ...)
-#endif
 
 @class ASCellNode;
 @class ASCollectionElement;
@@ -39,8 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSUInteger ASDataControllerAnimationOptions;
 
-AS_EXTERN NSString * const ASDataControllerRowNodeKind;
-AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
+ASDK_EXTERN NSString * const ASDataControllerRowNodeKind;
+ASDK_EXTERN NSString * const ASCollectionInvalidUpdateException;
 
 /**
  Data source for data controller
@@ -163,7 +156,7 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  */
 @interface ASDataController : NSObject
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource node:(nullable id<ASRangeManagingNode>)node NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -226,13 +219,6 @@ AS_EXTERN NSString * const ASCollectionInvalidUpdateException;
  * This must be called on the main thread.
  */
 @property (nonatomic, readonly) BOOL initialReloadDataHasBeenCalled;
-
-#if ASEVENTLOG_ENABLE
-/*
- * @abstract The primitive event tracing object. You shouldn't directly use it to log event. Use the ASDataControllerLogEvent macro instead.
- */
-@property (nonatomic, readonly) ASEventLog *eventLog;
-#endif
 
 /** @name Data Updating */
 

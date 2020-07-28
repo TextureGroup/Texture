@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_OPTIONS(NSInteger, ASScrollDirection) {
+typedef NS_OPTIONS(unsigned char, ASScrollDirection) {
   ASScrollDirectionNone  = 0,
   ASScrollDirectionRight = 1 << 0,
   ASScrollDirectionLeft  = 1 << 1,
@@ -22,16 +22,16 @@ typedef NS_OPTIONS(NSInteger, ASScrollDirection) {
   ASScrollDirectionDown  = 1 << 3
 };
 
-AS_EXTERN const ASScrollDirection ASScrollDirectionHorizontalDirections;
-AS_EXTERN const ASScrollDirection ASScrollDirectionVerticalDirections;
+ASDK_EXTERN const ASScrollDirection ASScrollDirectionHorizontalDirections;
+ASDK_EXTERN const ASScrollDirection ASScrollDirectionVerticalDirections;
 
-AS_EXTERN BOOL ASScrollDirectionContainsVerticalDirection(ASScrollDirection scrollDirection);
-AS_EXTERN BOOL ASScrollDirectionContainsHorizontalDirection(ASScrollDirection scrollDirection);
+ASDK_EXTERN BOOL ASScrollDirectionContainsVerticalDirection(ASScrollDirection scrollDirection);
+ASDK_EXTERN BOOL ASScrollDirectionContainsHorizontalDirection(ASScrollDirection scrollDirection);
 
-AS_EXTERN BOOL ASScrollDirectionContainsRight(ASScrollDirection scrollDirection);
-AS_EXTERN BOOL ASScrollDirectionContainsLeft(ASScrollDirection scrollDirection);
-AS_EXTERN BOOL ASScrollDirectionContainsUp(ASScrollDirection scrollDirection);
-AS_EXTERN BOOL ASScrollDirectionContainsDown(ASScrollDirection scrollDirection);
-AS_EXTERN ASScrollDirection ASScrollDirectionApplyTransform(ASScrollDirection scrollDirection, CGAffineTransform transform);
+ASDK_EXTERN BOOL ASScrollDirectionContainsRight(ASScrollDirection scrollDirection);
+ASDK_EXTERN BOOL ASScrollDirectionContainsLeft(ASScrollDirection scrollDirection);
+ASDK_EXTERN BOOL ASScrollDirectionContainsUp(ASScrollDirection scrollDirection);
+ASDK_EXTERN BOOL ASScrollDirectionContainsDown(ASScrollDirection scrollDirection);
+ASDK_EXTERN ASScrollDirection ASScrollDirectionApplyTransform(ASScrollDirection scrollDirection, CGAffineTransform transform);
 
 NS_ASSUME_NONNULL_END

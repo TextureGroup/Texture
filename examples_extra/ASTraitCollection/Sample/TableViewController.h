@@ -9,6 +9,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface TableViewController : ASViewController<ASTableNode *>
+@interface TableViewController : ASDKViewController<ASTableNode *>
 
 @end

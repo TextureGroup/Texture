@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL shouldAggressivelyRecoverFromStall;
 
 @property (readonly) ASVideoNodePlayerState playerState;
-//! Defaults to 1000
+//! Defaults to 10000
 @property int32_t periodicTimeObserverTimescale;
 
 //! Defaults to AVLayerVideoGravityResizeAspect
@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)videoNode:(ASVideoNode *)videoNode willChangePlayerState:(ASVideoNodePlayerState)state toState:(ASVideoNodePlayerState)toState;
 /**
- * @abstract Ssks delegate if state change is allowed
+ * @abstract Asks delegate if state change is allowed
  * ASVideoNodePlayerStatePlaying or ASVideoNodePlayerStatePaused.
  * asks delegate if state change is allowed.
  * @param videoNode The video node.

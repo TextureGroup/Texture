@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  cancelled below the point they are enabled.  They continue to the leaves of the hierarchy.
  */
 
-typedef NS_OPTIONS(NSUInteger, ASHierarchyState)
+typedef NS_OPTIONS(unsigned char, ASHierarchyState)
 {
   /** The node may or may not have a supernode, but no supernode has a special hierarchy-influencing option enabled. */
   ASHierarchyStateNormal                  = 0,
@@ -115,11 +115,6 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 #undef HIERARCHY_STATE_DELTA
 
 @interface ASDisplayNode () <ASDescriptionProvider, ASDebugDescriptionProvider>
-{
-@protected
-  ASInterfaceState _interfaceState;
-  ASHierarchyState _hierarchyState;
-}
 
 // The view class to use when creating a new display node instance. Defaults to _ASDisplayView.
 + (Class)viewClass;
@@ -160,6 +155,11 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 @property (nonatomic) ASHierarchyState hierarchyState;
 
 /**
+ * Represent the current custom action in representation for the node
+ */
+@property (nonatomic, weak) UIAccessibilityCustomAction *accessibilityCustomAction;
+
+/**
  * @abstract Return if the node is range managed or not
  *
  * @discussion Currently only set interface state on nodes in table and collection views. For other nodes, if they are
@@ -174,7 +174,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  * @abstract Ensure that all rendering is complete for this node and its descendants.
  *
  * @discussion Calling this method on the main thread after a node is added to the view hierarchy will ensure that
- * placeholder states are never visible to the user.  It is used by ASTableView, ASCollectionView, and ASViewController
+ * placeholder states are never visible to the user.  It is used by ASTableView, ASCollectionView, and ASDKViewController
  * to implement their respective ".neverShowPlaceholders" option.
  *
  * If all nodes have layer.contents set and/or their layer does not have -needsDisplay set, the method will return immediately.
@@ -242,10 +242,10 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 /**
  * @abstract Indicates if this node is a view controller's root node. Defaults to NO.
  *
- * @discussion Set to YES in -[ASViewController initWithNode:].
+ * @discussion Set to YES in -[ASDKViewController initWithNode:].
  *
- * YES here only means that this node is used as an ASViewController node. It doesn't mean that this node is a root of
- * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASViewController.
+ * YES here only means that this node is used as an ASDKViewController node. It doesn't mean that this node is a root of
+ * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASDKViewController.
  */
 @property (nonatomic, getter=isViewControllerRoot) BOOL viewControllerRoot;
 
@@ -311,6 +311,14 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 - (void)_pendingLayoutTransitionDidComplete;
 
 @end
+
+/**
+ * Defines interactive accessibility traits which will be exposed as UIAccessibilityCustomActions
+ * for nodes within nodes that have isAccessibilityContainer is YES
+ */
+NS_INLINE UIAccessibilityTraits ASInteractiveAccessibilityTraitsMask() {
+  return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
+}
 
 @interface ASDisplayNode (AccessibilityInternal)
 - (NSArray *)accessibilityElements;

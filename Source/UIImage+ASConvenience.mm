@@ -9,8 +9,6 @@
 
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASAssert.h>
 
 #pragma mark - ASDKFastImageNamed
 
@@ -32,7 +30,12 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
     NSString *imageKey = imageName;
     if (traitCollection) {
       char imageKeyBuffer[256];
-      snprintf(imageKeyBuffer, sizeof(imageKeyBuffer), "%s|%ld|%ld", imageName.UTF8String, (long)traitCollection.horizontalSizeClass, (long)traitCollection.verticalSizeClass);
+      if (@available(iOS 12.0, tvOS 10.0, *)) {
+        snprintf(imageKeyBuffer, sizeof(imageKeyBuffer), "%s|%ld|%ld|%ld", imageName.UTF8String, (long)traitCollection.horizontalSizeClass, (long)traitCollection.verticalSizeClass, (long)traitCollection.userInterfaceStyle);
+      } else {
+        // Fallback on earlier versions
+        snprintf(imageKeyBuffer, sizeof(imageKeyBuffer), "%s|%ld|%ld", imageName.UTF8String, (long)traitCollection.horizontalSizeClass, (long)traitCollection.verticalSizeClass);
+      }
       imageKey = [NSString stringWithUTF8String:imageKeyBuffer];
     }
 
@@ -79,6 +82,38 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
 + (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
                                           cornerColor:(UIColor *)cornerColor
                                             fillColor:(UIColor *)fillColor
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED
+{
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:nil
+                                            borderWidth:1.0
+                                         roundedCorners:UIRectCornerAllCorners
+                                                  scale:0.0
+                                        traitCollection:traitCollection];
+}
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
+                                          borderColor:(UIColor *)borderColor
+                                          borderWidth:(CGFloat)borderWidth
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED {
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:borderColor
+                                            borderWidth:borderWidth
+                                         roundedCorners:UIRectCornerAllCorners
+                                                  scale:0.0
+                                        traitCollection:traitCollection];
+}
+
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
                                           borderColor:(UIColor *)borderColor
                                           borderWidth:(CGFloat)borderWidth NS_RETURNS_RETAINED
 {
@@ -97,7 +132,27 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
                                           borderColor:(UIColor *)borderColor
                                           borderWidth:(CGFloat)borderWidth
                                        roundedCorners:(UIRectCorner)roundedCorners
-                                                scale:(CGFloat)scale NS_RETURNS_RETAINED
+                                                scale:(CGFloat)scale NS_RETURNS_RETAINED {
+
+  return [self as_resizableRoundedImageWithCornerRadius:cornerRadius
+                                            cornerColor:cornerColor
+                                              fillColor:fillColor
+                                            borderColor:borderColor
+                                            borderWidth:borderWidth
+                                         roundedCorners:roundedCorners
+                                                  scale:scale
+                                        traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+}
+
+
++ (UIImage *)as_resizableRoundedImageWithCornerRadius:(CGFloat)cornerRadius
+                                          cornerColor:(UIColor *)cornerColor
+                                            fillColor:(UIColor *)fillColor
+                                          borderColor:(UIColor *)borderColor
+                                          borderWidth:(CGFloat)borderWidth
+                                       roundedCorners:(UIRectCorner)roundedCorners
+                                                scale:(CGFloat)scale
+                                      traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED
 {
   static NSCache *__pathCache = nil;
   static dispatch_once_t onceToken;
@@ -131,37 +186,35 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
   
   // We should probably check if the background color has any alpha component but that
   // might be expensive due to needing to check mulitple color spaces.
-  ASGraphicsBeginImageContextWithOptions(bounds.size, cornerColor != nil, scale);
-  
-  BOOL contextIsClean = YES;
-  if (cornerColor) {
-    contextIsClean = NO;
-    [cornerColor setFill];
-    // Copy "blend" mode is extra fast because it disregards any value currently in the buffer and overrides directly.
-    UIRectFillUsingBlendMode(bounds, kCGBlendModeCopy);
-  }
-  
-  BOOL canUseCopy = contextIsClean || (CGColorGetAlpha(fillColor.CGColor) == 1);
-  [fillColor setFill];
-  [path fillWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
-  
-  if (borderColor) {
-    [borderColor setStroke];
-    
-    // Inset border fully inside filled path (not halfway on each side of path)
-    CGRect strokeRect = CGRectInset(bounds, borderWidth / 2.0, borderWidth / 2.0);
-    
-    // It is rarer to have a stroke path, and our cache key only handles rounded rects for the exact-stretchable
-    // size calculated by cornerRadius, so we won't bother caching this path.  Profiling validates this decision.
-    UIBezierPath *strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
-                                                     byRoundingCorners:roundedCorners
-                                                           cornerRadii:cornerRadii];
-    [strokePath setLineWidth:borderWidth];
-    BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
-    [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
-  }
-  
-  UIImage *result = ASGraphicsGetImageAndEndCurrentContext();
+  UIImage *result = ASGraphicsCreateImage(traitCollection, bounds.size, cornerColor != nil, scale, nil, nil, ^{
+    BOOL contextIsClean = YES;
+    if (cornerColor) {
+      contextIsClean = NO;
+      [cornerColor setFill];
+      // Copy "blend" mode is extra fast because it disregards any value currently in the buffer and overrides directly.
+      UIRectFillUsingBlendMode(bounds, kCGBlendModeCopy);
+    }
+
+    BOOL canUseCopy = contextIsClean || (CGColorGetAlpha(fillColor.CGColor) == 1);
+    [fillColor setFill];
+    [path fillWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
+
+    if (borderColor) {
+      [borderColor setStroke];
+
+      // Inset border fully inside filled path (not halfway on each side of path)
+      CGRect strokeRect = CGRectInset(bounds, borderWidth / 2.0, borderWidth / 2.0);
+
+      // It is rarer to have a stroke path, and our cache key only handles rounded rects for the exact-stretchable
+      // size calculated by cornerRadius, so we won't bother caching this path.  Profiling validates this decision.
+      UIBezierPath *strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
+                                                       byRoundingCorners:roundedCorners
+                                                             cornerRadii:cornerRadii];
+      [strokePath setLineWidth:borderWidth];
+      BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
+      [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
+    }
+  });
   
   UIEdgeInsets capInsets = UIEdgeInsetsMake(cornerRadius, cornerRadius, cornerRadius, cornerRadius);
   result = [result resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
