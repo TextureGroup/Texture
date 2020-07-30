@@ -32,8 +32,7 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @discussion You may pass @c nil for the handler if you simply want the objects to
  * be retained at enqueue time, and released during the run loop step. This is useful
- * for creating a "main deallocation queue", as @c ASDeallocQueue creates its own 
- * worker thread with its own run loop.
+ * for creating a "main deallocation queue".
  */
 - (instancetype)initWithRunLoop:(CFRunLoopRef)runloop
                   retainObjects:(BOOL)retainsObjects
