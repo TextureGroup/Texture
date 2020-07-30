@@ -140,11 +140,6 @@ void ASPerformBlockOnBackgroundThread(void (^block)(void))
   }
 }
 
-void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object)
-{
-  [[ASDeallocQueue sharedDeallocationQueue] releaseObjectInBackground:object];
-}
-
 Class _Nullable ASGetClassFromType(const char  * _Nullable type)
 {
   // Class types all start with @"

@@ -34,9 +34,6 @@ ASDK_EXTERN void ASPerformBlockOnMainThread(void (^block)(void));
 /// Dispatches the given block to a background queue with priority of DISPATCH_QUEUE_PRIORITY_DEFAULT if not already run on a background queue
 ASDK_EXTERN void ASPerformBlockOnBackgroundThread(void (^block)(void)); // DISPATCH_QUEUE_PRIORITY_DEFAULT
 
-/// For deallocation of objects on a background thread without GCD overhead / thread explosion
-ASDK_EXTERN void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object);
-
 ASDK_EXTERN CGFloat ASScreenScale(void);
 
 ASDK_EXTERN CGSize ASFloorSizeValues(CGSize s);

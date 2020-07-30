@@ -78,14 +78,4 @@ NS_INLINE ASCATransactionQueue *ASCATransactionQueueGet(void) {
   return _ASSharedCATransactionQueue;
 }
 
-@interface ASDeallocQueue : NSObject
-
-+ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
-
-- (void)drain;
-
-- (void)releaseObjectInBackground:(id __strong _Nullable * _Nonnull)objectPtr;
-
-@end
-
 NS_ASSUME_NONNULL_END
