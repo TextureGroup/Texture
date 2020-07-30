@@ -75,10 +75,6 @@ Here is the collection view's `dealloc`
     [self setAsyncDelegate:nil];
     [self setAsyncDataSource:nil];
   }
-
-  // Data controller & range controller may own a ton of nodes, let's deallocate those off-main.
-  ASPerformBackgroundDeallocation(&_dataController);
-  ASPerformBackgroundDeallocation(&_rangeController);
 }
 ```
 
