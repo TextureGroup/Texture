@@ -323,6 +323,7 @@
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+    view.leadingScreensForBatching      = pendingState.leadingScreensForBatching;
 #if !TARGET_OS_TV
     view.pagingEnabled                  = pendingState.pagingEnabled;
 #endif
