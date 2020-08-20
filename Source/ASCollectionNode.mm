@@ -77,11 +77,12 @@
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
+    _contentInset = UIEdgeInsetsZero;
+    _contentOffset = CGPointZero;
+    _leadingScreensForBatching = 2;
     _flags.allowsSelection = YES;
     _flags.allowsMultipleSelection = NO;
     _flags.inverted = NO;
-    _contentInset = UIEdgeInsetsZero;
-    _contentOffset = CGPointZero;
     _flags.animatesContentOffset = NO;
     _flags.showsVerticalScrollIndicator = YES;
     _flags.showsHorizontalScrollIndicator = YES;
