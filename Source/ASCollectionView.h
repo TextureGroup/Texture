@@ -81,6 +81,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT;
 
+#pragma mark - Collection Crash Logging
+
+/**
+ * A callback property that is going to be called during texture assertion of invalid section issue.
+ *
+ * This callback is used to determine the things that will be done during collection perform update crash issue,
+ * in which to log the current View Controller that is currently crashing.
+ *
+ * The default value is nil.
+*/
+@property (nonatomic, copy, nullable) void (^temporaryCallbackOnAssert)(void);
+
 @end
 
 @interface ASCollectionView (Deprecated)

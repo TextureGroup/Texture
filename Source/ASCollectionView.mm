@@ -920,6 +920,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   
   if (_batchUpdateCount == 0) {
     _changeSet = [[_ASHierarchyChangeSet alloc] initWithOldData:[_dataController itemCountsFromDataSource]];
+    _changeSet.callbackOnAssert = _temporaryCallbackOnAssert;
     _changeSet.rootActivity = as_activity_create("Perform async collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT);
     _changeSet.submitActivity = as_activity_create("Submit changes for collection update", _changeSet.rootActivity, OS_ACTIVITY_FLAG_DEFAULT);
   }

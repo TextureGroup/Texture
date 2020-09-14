@@ -199,6 +199,16 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 /// Returns all item indexes affected by changes of the given type in the given section.
 - (NSIndexSet *)indexesForItemChangesOfType:(_ASHierarchyChangeType)changeType inSection:(NSUInteger)section;
 
+/**
+ * A callback property that is going to be called during texture assertion of invalid section issue.
+ *
+ * This callback is used to determine the things that will be done during collection perform update crash issue,
+ * in which to log the current View Controller that is currently crashing.
+ *
+ * The default value is nil.
+*/
+@property (nonatomic, copy, nullable) void (^callbackOnAssert)(void);
+
 - (void)reloadData;
 - (void)deleteSections:(NSIndexSet *)sections animationOptions:(ASDataControllerAnimationOptions)options;
 - (void)insertSections:(NSIndexSet *)sections animationOptions:(ASDataControllerAnimationOptions)options;

@@ -150,6 +150,7 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     _originalDeleteSectionChanges = [[NSMutableArray alloc] init];
     _deleteSectionChanges = [[NSMutableArray alloc] init];
     _reloadSectionChanges = [[NSMutableArray alloc] init];
+    _callbackOnAssert = nil;
   }
   return self;
 }
@@ -535,6 +536,10 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   NSInteger deletedSectionCount = _deletedSections.count;
   // Assert that the new section count is correct.
   if (newSectionCount != oldSectionCount + insertedSectionCount - deletedSectionCount) {
+    if (_callbackOnAssert != nil) {
+        _callbackOnAssert();
+    }
+
     ASFailUpdateValidation(@"Invalid number of sections. The number of sections after the update (%ld) must be equal to the number of sections before the update (%ld) plus or minus the number of sections inserted or deleted (%ld inserted, %ld deleted)", (long)newSectionCount, (long)oldSectionCount, (long)insertedSectionCount, (long)deletedSectionCount);
     return;
   }

@@ -65,6 +65,8 @@
 @property (nonatomic) BOOL showsVerticalScrollIndicator;
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic) BOOL pagingEnabled;
+@property (nonatomic, copy, nullable) void (^callbackOnAssert)(void);
+
 @end
 
 @implementation _ASCollectionPendingState
@@ -86,6 +88,7 @@
     _flags.showsVerticalScrollIndicator = YES;
     _flags.showsHorizontalScrollIndicator = YES;
     _flags.pagingEnabled = NO;
+    _callbackOnAssert = nil;
   }
   return self;
 }
@@ -1163,6 +1166,15 @@
   ASDisplayNodeAssertMainThread();
   if (self.nodeLoaded) {
     [self.view moveItemAtIndexPath:indexPath toIndexPath:newIndexPath];
+  }
+}
+
+#pragma mark - Collection Crash Logging
+
+-(void)setCallbackOnAssert:(nullable void (^)(void))callbackOnAssert
+{
+  if (callbackOnAssert != nil) {
+      self.view.temporaryCallbackOnAssert = callbackOnAssert;
   }
 }
 
