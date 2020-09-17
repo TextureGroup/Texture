@@ -1,0 +1,12 @@
+[submodule "Carthage/Checkouts/PINOperation"]
+	path = Carthage/Checkouts/PINOperation
+	url = https://github.com/pinterest/PINOperation.git
+[submodule "Carthage/Checkouts/libwebp"]
+	path = Carthage/Checkouts/libwebp
+	url = https://chromium.googlesource.com/webm/libwebp
+[submodule "Carthage/Checkouts/PINCache"]
+	path = Carthage/Checkouts/PINCache
+	url = https://github.com/pinterest/PINCache.git
+[submodule "Carthage/Checkouts/PINRemoteImage"]
+	path = Carthage/Checkouts/PINRemoteImage
+	url = https://github.com/pinterest/PINRemoteImage.git
