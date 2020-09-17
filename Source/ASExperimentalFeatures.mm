@@ -21,7 +21,8 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_did_enter_preload_skip_asm_layout",
                                       @"exp_dispatch_apply",
                                       @"exp_drawing_global",
-                                      @"exp_optimize_data_controller_pipeline"]));
+                                      @"exp_optimize_data_controller_pipeline",
+                                    @"exp_disable_global_textkit_lock"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }
