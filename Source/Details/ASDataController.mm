@@ -33,8 +33,6 @@
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
 
-#define ASSERT_ON_EDITING_QUEUE ASDisplayNodeAssertNotNil(dispatch_get_specific(&kASDataControllerEditingQueueKey), @"%@ must be called on the editing transaction queue.", NSStringFromSelector(_cmd))
-
 const static char * kASDataControllerEditingQueueKey = "kASDataControllerEditingQueueKey";
 const static char * kASDataControllerEditingQueueContext = "kASDataControllerEditingQueueContext";
 
@@ -133,8 +131,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 - (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements
 {
-  ASSERT_ON_EDITING_QUEUE;
-  
   NSUInteger nodeCount = elements.count;
   __weak id<ASDataControllerSource> weakDataSource = _dataSource;
   if (nodeCount == 0 || weakDataSource == nil) {
