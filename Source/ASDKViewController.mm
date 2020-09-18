@@ -1,5 +1,5 @@
 //
-//  ASViewController.mm
+//  ASDKViewController.mm
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 
-@implementation ASViewController
+@implementation ASDKViewController
 {
   BOOL _ensureDisplayed;
   BOOL _automaticallyAdjustRangeModeBasedOnViewEvents;
@@ -105,14 +105,6 @@
   }
 }
 
-- (void)dealloc
-{
-  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable)) {
-    return;
-  }
-  ASPerformBackgroundDeallocation(&_node);
-}
-
 - (void)loadView
 {
   // Apple applies a frame and autoresizing masks we need.  Allocating a view is not
@@ -193,7 +185,7 @@ ASVisibilityDidMoveToParentViewController;
 
 - (void)viewWillAppear:(BOOL)animated
 {
-  as_activity_create_for_scope("ASViewController will appear");
+  as_activity_create_for_scope("ASDKViewController will appear");
   os_log_debug(ASNodeLog(), "View controller %@ will appear", self);
 
   [super viewWillAppear:animated];
@@ -294,7 +286,7 @@ ASVisibilityDepthImplementation;
 
 - (UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     return super.additionalSafeAreaInsets;
   }
 
@@ -303,7 +295,7 @@ ASVisibilityDepthImplementation;
 
 - (void)setAdditionalSafeAreaInsets:(UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     [super setAdditionalSafeAreaInsets:additionalSafeAreaInsets];
   } else {
     _fallbackAdditionalSafeAreaInsets = additionalSafeAreaInsets;
@@ -331,13 +323,13 @@ ASVisibilityDepthImplementation;
   ASPrimitiveTraitCollection oldTraitCollection = self.node.primitiveTraitCollection;
   
   if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, oldTraitCollection) == NO) {
-    as_activity_scope_verbose(as_activity_create("Propagate ASViewController trait collection", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+    as_activity_scope_verbose(as_activity_create("Propagate ASDKViewController trait collection", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
     os_log_debug(ASNodeLog(), "Propagating new traits for %@: %@", self, NSStringFromASPrimitiveTraitCollection(traitCollection));
     ASTraitCollectionPropagateDown(self.node, traitCollection);
     
     // Once we've propagated all the traits, layout this node.
     // Remeasure the node with the latest constrained size – old constrained size may be incorrect.
-    as_activity_scope_verbose(as_activity_create("Layout ASViewController node with new traits", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+    as_activity_scope_verbose(as_activity_create("Layout ASDKViewController node with new traits", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
     [_node layoutThatFits:[self nodeConstrainedSize]];
   }
 }

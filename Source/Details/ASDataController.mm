@@ -33,8 +33,6 @@
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
 
-#define ASSERT_ON_EDITING_QUEUE ASDisplayNodeAssertNotNil(dispatch_get_specific(&kASDataControllerEditingQueueKey), @"%@ must be called on the editing transaction queue.", NSStringFromSelector(_cmd))
-
 const static char * kASDataControllerEditingQueueKey = "kASDataControllerEditingQueueKey";
 const static char * kASDataControllerEditingQueueContext = "kASDataControllerEditingQueueContext";
 
@@ -133,8 +131,6 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
 - (void)_allocateNodesFromElements:(NSArray<ASCollectionElement *> *)elements
 {
-  ASSERT_ON_EDITING_QUEUE;
-  
   NSUInteger nodeCount = elements.count;
   __weak id<ASDataControllerSource> weakDataSource = _dataSource;
   if (nodeCount == 0 || weakDataSource == nil) {
@@ -533,13 +529,13 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _synchronized = NO;
 
   [changeSet addCompletionHandler:^(BOOL finished) {
-    _synchronized = YES;
+    self->_synchronized = YES;
     [self onDidFinishProcessingUpdates:^{
-      if (_synchronized) {
-        for (ASDataControllerSynchronizationBlock block in _onDidFinishSynchronizingBlocks) {
+      if (self->_synchronized) {
+        for (ASDataControllerSynchronizationBlock block in self->_onDidFinishSynchronizingBlocks) {
           block();
         }
-        [_onDidFinishSynchronizingBlocks removeAllObjects];
+        [self->_onDidFinishSynchronizingBlocks removeAllObjects];
       }
     }];
   }];
@@ -622,12 +618,9 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   os_log_debug(ASCollectionLog(), "New content: %@", newMap.smallDescription);
 
   Class<ASDataControllerLayoutDelegate> layoutDelegateClass = [self.layoutDelegate class];
-  ++_editingTransactionGroupCount;
-  dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
-    __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
-    as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
 
-    // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
+  // Step 3: Call the layout delegate if possible. Otherwise, allocate and layout all elements
+  dispatch_block_t step3 = ^{
     if (canDelegate) {
       [layoutDelegateClass calculateLayoutWithContext:layoutContext];
     } else {
@@ -644,11 +637,34 @@ typedef void (^ASDataControllerSynchronizationBlock)();
       }
       [self _allocateNodesFromElements:elementsToProcess];
     }
+  };
+
+  // Step 3 can be done on the main thread or on _editingTransactionQueue
+  // depending on an experiment.
+  BOOL mainThreadOnly = ASActivateExperimentalFeature(ASExperimentalMainThreadOnlyDataController);
+  if (mainThreadOnly) {
+    // We'll still dispatch to _editingTransactionQueue only to schedule a block
+    // to _mainSerialQueue to execute next steps. This is not optimized because
+    // in theory we can skip _editingTransactionQueue entirely, but it's much safer
+    // because change sets will still flow through the pipeline in pretty the same way
+    // (main thread -> _editingTransactionQueue -> _mainSerialQueue) and so
+    // any methods that block on _editingTransactionQueue will still work.
+    step3();
+  }
+
+  ++_editingTransactionGroupCount;
+  dispatch_group_async(_editingTransactionGroup, _editingTransactionQueue, ^{
+    __block __unused os_activity_scope_state_s preparationScope = {}; // unused if deployment target < iOS10
+    as_activity_scope_enter(as_activity_create("Prepare nodes for collection update", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT), &preparationScope);
+
+    if (!mainThreadOnly) {
+      step3();
+    }
 
     // Step 4: Inform the delegate on main thread
-    [_mainSerialQueue performBlockOnMainThread:^{
+    [self->_mainSerialQueue performBlockOnMainThread:^{
       as_activity_scope_leave(&preparationScope);
-      [_delegate dataController:self updateWithChangeSet:changeSet updates:^{
+      [self->_delegate dataController:self updateWithChangeSet:changeSet updates:^{
         // Step 5: Deploy the new data as "completed"
         //
         // Note that since the backing collection view might be busy responding to user events (e.g scrolling),
@@ -659,7 +675,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
         self.visibleMap = newMap;
       }];
     }];
-    --_editingTransactionGroupCount;
+    --self->_editingTransactionGroupCount;
   });
 
   // We've now dispatched node allocation and layout to a concurrent background queue.
@@ -898,7 +914,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (void)environmentDidChange
 {
   ASPerformBlockOnMainThread(^{
-    if (!_initialReloadDataHasBeenCalled) {
+    if (!self->_initialReloadDataHasBeenCalled) {
       return;
     }
 
@@ -906,7 +922,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
     // i.e there might be some elements that were allocated using the old trait collection but haven't been added to _visibleMap
     [self _scheduleBlockOnMainSerialQueue:^{
       ASPrimitiveTraitCollection newTraitCollection = [self.node primitiveTraitCollection];
-      for (ASCollectionElement *element in _visibleMap) {
+      for (ASCollectionElement *element in self->_visibleMap) {
         element.traitCollection = newTraitCollection;
       }
     }];

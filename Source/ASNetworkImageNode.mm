@@ -216,6 +216,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     if (reset || hadURL) {
       [self _setCurrentImageQuality:(hadURL ? 0.0 : 1.0)];
       [self _locked__setImage:_defaultImage];
+      [self _locked_setAnimatedImage:nil];
     }
   }
 

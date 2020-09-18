@@ -8,10 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
 #import <CoreGraphics/CoreGraphics.h>
-#import <tgmath.h>
-
 #import <AsyncDisplayKit/ASBaseDefines.h>
 
 
@@ -45,7 +42,7 @@ ASDISPLAYNODE_INLINE CGFloat ASCGFloatFromNumber(NSNumber *number)
 
 ASDISPLAYNODE_INLINE BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
 {
-  return fabs(size1.width - size2.width) < delta && fabs(size1.height - size2.height) < delta;
+  return ABS(size1.width - size2.width) < delta && ABS(size1.height - size2.height) < delta;
 };
 
 NS_ASSUME_NONNULL_END

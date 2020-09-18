@@ -20,25 +20,23 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   // will be used in all cases
   ASExperimentalTextNode = 1 << 0,                                          // exp_text_node
   ASExperimentalInterfaceStateCoalescing = 1 << 1,                          // exp_interface_state_coalesce
-  ASExperimentalUnfairLock = 1 << 2,                                        // exp_unfair_lock
-  ASExperimentalLayerDefaults = 1 << 3,                                     // exp_infer_layer_defaults
-  ASExperimentalCollectionTeardown = 1 << 4,                                // exp_collection_teardown
-  ASExperimentalFramesetterCache = 1 << 5,                                  // exp_framesetter_cache
-  ASExperimentalSkipClearData = 1 << 6,                                     // exp_skip_clear_data
-  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 7,                      // exp_did_enter_preload_skip_asm_layout
-  ASExperimentalDispatchApply = 1 << 8,                                     // exp_dispatch_apply
-  ASExperimentalOOMBackgroundDeallocDisable = 1 << 9,                       // exp_oom_bg_dealloc_disable
-  ASExperimentalDrawingGlobal = 1 << 10,                                    // exp_drawing_global
-  ASExperimentalOptimizeDataControllerPipeline = 1 << 11,                   // exp_optimize_data_controller_pipeline
-  ASExperimentalTraitCollectionDidChangeWithPreviousCollection = 1 << 12,   // exp_trait_collection_did_change_with_previous_collection
-  ASExperimentalDoNotCacheAccessibilityElements = 1 << 13,                  // exp_do_not_cache_accessibility_elements
+  ASExperimentalLayerDefaults = 1 << 2,                                     // exp_infer_layer_defaults
+  ASExperimentalCollectionTeardown = 1 << 3,                                // exp_collection_teardown
+  ASExperimentalFramesetterCache = 1 << 4,                                  // exp_framesetter_cache
+  ASExperimentalSkipClearData = 1 << 5,                                     // exp_skip_clear_data
+  ASExperimentalDidEnterPreloadSkipASMLayout = 1 << 6,                      // exp_did_enter_preload_skip_asm_layout
+  ASExperimentalDispatchApply = 1 << 7,                                     // exp_dispatch_apply
+  ASExperimentalDrawingGlobal = 1 << 8,                                     // exp_drawing_global
+  ASExperimentalOptimizeDataControllerPipeline = 1 << 9,                    // exp_optimize_data_controller_pipeline
+  ASExperimentalDisableGlobalTextkitLock = 1 << 10,                         // exp_disable_global_textkit_lock
+  ASExperimentalMainThreadOnlyDataController = 1 << 11,                     // exp_main_thread_only_data_controller
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
 /// Convert flags -> name array.
-AS_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
+ASDK_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
 
 /// Convert name array -> flags.
-AS_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
+ASDK_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
 
 NS_ASSUME_NONNULL_END

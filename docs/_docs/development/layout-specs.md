@@ -28,7 +28,7 @@ Here is an example from the project `LayoutSpecExamples` where an `ASDisplayNode
     _iconNode = [[ASNetworkImageNode alloc] init];
     _iconNode.URL = [NSURL URLWithString:@"http://texturegroup.org/static/images/layout-examples-photo-with-outset-icon-overlay-icon.png"];
 
-    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
+    [_iconNode setImageModificationBlock:^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {   // FIXME: in framework autocomplete for setImageModificationBlock line seems broken
       CGSize profileImageSize = CGSizeMake(60, 60);
       return [image makeCircularImageWithSize:profileImageSize withBorderWidth:10];
     }];
@@ -71,7 +71,7 @@ This is the function that will recursively call through its underlying tree of n
 
 ![layoutcallstack1](/static/images/development/layoutspecs1.png)
 
-This is what a typical call stack will look like for the layout of an `ASViewController` with a simple view hierarchy. Here we clicked on the "Photo with outset icon overlay" in the Layout Specs Examples project. Breakpointing on the `-[PhotoWithOutsetIconOverlay layoutSpecThatFits:]` reveals that call stack.
+This is what a typical call stack will look like for the layout of an `ASDKViewController` with a simple view hierarchy. Here we clicked on the "Photo with outset icon overlay" in the Layout Specs Examples project. Breakpointing on the `-[PhotoWithOutsetIconOverlay layoutSpecThatFits:]` reveals that call stack.
 
 The first significant branch of logic is the top level `-[ASDisplayNode calculateLayoutThatFits]` where it will choose between the Texture Layout and the Yoga engine.
 

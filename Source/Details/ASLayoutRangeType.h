@@ -15,9 +15,9 @@ typedef struct {
   CGFloat trailingBufferScreenfuls;
 } ASRangeTuningParameters;
 
-AS_EXTERN ASRangeTuningParameters const ASRangeTuningParametersZero;
+ASDK_EXTERN ASRangeTuningParameters const ASRangeTuningParametersZero;
 
-AS_EXTERN BOOL ASRangeTuningParametersEqualToRangeTuningParameters(ASRangeTuningParameters lhs, ASRangeTuningParameters rhs);
+ASDK_EXTERN BOOL ASRangeTuningParametersEqualToRangeTuningParameters(ASRangeTuningParameters lhs, ASRangeTuningParameters rhs);
 
 /**
  * Each mode has a complete set of tuning parameters for range types.

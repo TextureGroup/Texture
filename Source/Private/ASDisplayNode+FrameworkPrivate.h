@@ -174,7 +174,7 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
  * @abstract Ensure that all rendering is complete for this node and its descendants.
  *
  * @discussion Calling this method on the main thread after a node is added to the view hierarchy will ensure that
- * placeholder states are never visible to the user.  It is used by ASTableView, ASCollectionView, and ASViewController
+ * placeholder states are never visible to the user.  It is used by ASTableView, ASCollectionView, and ASDKViewController
  * to implement their respective ".neverShowPlaceholders" option.
  *
  * If all nodes have layer.contents set and/or their layer does not have -needsDisplay set, the method will return immediately.
@@ -242,10 +242,10 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyStateChange(ASHierarc
 /**
  * @abstract Indicates if this node is a view controller's root node. Defaults to NO.
  *
- * @discussion Set to YES in -[ASViewController initWithNode:].
+ * @discussion Set to YES in -[ASDKViewController initWithNode:].
  *
- * YES here only means that this node is used as an ASViewController node. It doesn't mean that this node is a root of
- * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASViewController.
+ * YES here only means that this node is used as an ASDKViewController node. It doesn't mean that this node is a root of
+ * ASDisplayNode hierarchy, e.g. when its view controller is parented by another ASDKViewController.
  */
 @property (nonatomic, getter=isViewControllerRoot) BOOL viewControllerRoot;
 

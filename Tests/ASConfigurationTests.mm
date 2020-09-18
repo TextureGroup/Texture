@@ -20,18 +20,14 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalTextNode,
 #endif
   ASExperimentalInterfaceStateCoalescing,
-  ASExperimentalUnfairLock,
   ASExperimentalLayerDefaults,
   ASExperimentalCollectionTeardown,
   ASExperimentalFramesetterCache,
   ASExperimentalSkipClearData,
   ASExperimentalDidEnterPreloadSkipASMLayout,
   ASExperimentalDispatchApply,
-  ASExperimentalOOMBackgroundDeallocDisable,
   ASExperimentalDrawingGlobal,
   ASExperimentalOptimizeDataControllerPipeline,
-  ASExperimentalTraitCollectionDidChangeWithPreviousCollection,
-  ASExperimentalDoNotCacheAccessibilityElements,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -46,18 +42,16 @@ static ASExperimentalFeatures features[] = {
   return @[
     @"exp_text_node",
     @"exp_interface_state_coalesce",
-    @"exp_unfair_lock",
     @"exp_infer_layer_defaults",
     @"exp_collection_teardown",
     @"exp_framesetter_cache",
     @"exp_skip_clear_data",
     @"exp_did_enter_preload_skip_asm_layout",
     @"exp_dispatch_apply",
-    @"exp_oom_bg_dealloc_disable",
     @"exp_drawing_global",
     @"exp_optimize_data_controller_pipeline",
-    @"exp_trait_collection_did_change_with_previous_collection",
-    @"exp_do_not_cache_accessibility_elements",
+    @"exp_disable_global_textkit_lock",
+    @"exp_main_thread_only_data_controller"
   ];
 }
 

@@ -17,7 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-AS_EXTERN ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionView);
+ASDK_EXTERN ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionView);
 
 @protocol ASCollectionViewLayoutInspecting <NSObject>
 

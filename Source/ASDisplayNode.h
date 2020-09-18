@@ -76,7 +76,7 @@ typedef NS_ENUM(unsigned char, ASCornerRoundingType) {
 /**
  * Default drawing priority for display node
  */
-AS_EXTERN NSInteger const ASDefaultDrawingPriority;
+ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 /**
  * An `ASDisplayNode` is an abstraction over `UIView` and `CALayer` that allows you to perform calculations about a view
@@ -649,8 +649,8 @@ AS_EXTERN NSInteger const ASDefaultDrawingPriority;
  * thus works best for ASImageNodes or containers showing a background around their children.
  *
  * - ASCornerRoundingTypeClipping: overlays 4 separate opaque corners on top of the content that needs
- * corner rounding. Requires .backgroundColor and .cornerRadius to be set. Use clip corners in situations 
- * in which is movement through the corner, with an opaque background (no movement underneath the corner).
+ * corner rounding. Requires .backgroundColor and .cornerRadius to be set. Use clip corners in situations
+ * where there is movement through the corner, with an opaque background (no movement underneath the corner).
  * Clipped corners are ideal for animating / resizing views, and still outperform CALayer.
  *
  * For more information and examples, see http://texturegroup.org/docs/corner-rounding.html

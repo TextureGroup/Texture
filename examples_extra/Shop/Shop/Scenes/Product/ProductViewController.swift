@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ProductViewController: ASViewController<ASTableNode> {
+class ProductViewController: ASDKViewController<ASTableNode> {
 
     // MARK: - Variables
     

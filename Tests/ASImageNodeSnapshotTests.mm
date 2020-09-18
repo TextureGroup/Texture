@@ -194,7 +194,31 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   UIRectFill(CGRectMake(0, 0, 100, 100));
   UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result);
+  
+  ASPrimitiveTraitCollection traitCollection;
+  
+  if (@available(iOS 13.0, *)) {
+    traitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(UITraitCollection.currentTraitCollection);
+  } else {
+    traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  }
+  
+  UIImage *rounded = ASImageNodeRoundBorderModificationBlock(2, [UIColor redColor])(result, traitCollection);
+  ASImageNode *node = [[ASImageNode alloc] init];
+  node.image = rounded;
+  ASDisplayNodeSizeToFitSize(node, rounded.size);
+  ASSnapshotVerifyNode(node, nil);
+}
+
+- (void)testTintColorBlock
+{
+  UIGraphicsBeginImageContext(CGSizeMake(100, 100));
+  [[UIColor blueColor] setFill];
+  UIRectFill(CGRectMake(0, 0, 100, 100));
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  
+  UIImage *rounded = ASImageNodeTintColorModificationBlock([UIColor redColor])(result, ASPrimitiveTraitCollectionMakeDefault());
   ASImageNode *node = [[ASImageNode alloc] init];
   node.image = rounded;
   ASDisplayNodeSizeToFitSize(node, rounded.size);
@@ -218,11 +242,6 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testDynamicAssetImage
 {
   if (@available(iOS 13.0, *)) {
-    // enable experimantal callback for traits change
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-    
     UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     ASImageNode *node = [[ASImageNode alloc] init];
     node.image = image;
@@ -241,11 +260,6 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testDynamicTintColor
 {
   if (@available(iOS 13.0, *)) {
-    // enable experimental callback for traits change
-    ASConfiguration *config = [ASConfiguration new];
-    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
-    [ASConfigurationManager test_resetWithConfiguration:config];
-    
     UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
     image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     UIColor* tintColor = UIColor.systemBackgroundColor;

@@ -27,22 +27,22 @@
 @end
 
 // pre-order, depth-first
-AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
+ASDK_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node));
 
 #pragma mark - Yoga Type Conversion Helpers
 
-AS_EXTERN YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems);
-AS_EXTERN YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent);
-AS_EXTERN YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf);
-AS_EXTERN YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction);
-AS_EXTERN float yogaFloatForCGFloat(CGFloat value);
-AS_EXTERN float yogaDimensionToPoints(ASDimension dimension);
-AS_EXTERN float yogaDimensionToPercent(ASDimension dimension);
-AS_EXTERN ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
+ASDK_EXTERN YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems);
+ASDK_EXTERN YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent);
+ASDK_EXTERN YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf);
+ASDK_EXTERN YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction);
+ASDK_EXTERN float yogaFloatForCGFloat(CGFloat value);
+ASDK_EXTERN float yogaDimensionToPoints(ASDimension dimension);
+ASDK_EXTERN float yogaDimensionToPercent(ASDimension dimension);
+ASDK_EXTERN ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets);
 
-AS_EXTERN void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
-AS_EXTERN float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height);
-AS_EXTERN YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
+ASDK_EXTERN void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement);
+ASDK_EXTERN float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height);
+ASDK_EXTERN YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode,
                                       float width, YGMeasureMode widthMode,
                                       float height, YGMeasureMode heightMode);
 

@@ -1005,7 +1005,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_read;
 
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     if (!_flags.layerBacked && _loaded(self)) {
       return self.view.safeAreaInsets;
     }
@@ -1029,7 +1029,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
     _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
-    if (AS_AVAILABLE_IOS(11.0)) {
+    if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
       if (!_flags.layerBacked) {
         _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
       }
@@ -1106,7 +1106,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (AS_AVAILABLE_IOS(11.0)) {
+  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
     if (!_flags.layerBacked) {
       return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
     }

@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import <AsyncDisplayKit/ASTabBarController.h>
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 
 @interface ASTabBarControllerTests: XCTestCase
 
@@ -17,8 +17,8 @@
 @implementation ASTabBarControllerTests
 
 - (void)testTabBarControllerSelectIndex {
-  ASViewController *firstViewController = [ASViewController new];
-  ASViewController *secondViewController = [ASViewController new];
+  ASDKViewController *firstViewController = [ASDKViewController new];
+  ASDKViewController *secondViewController = [ASDKViewController new];
   NSArray *viewControllers = @[firstViewController, secondViewController];
   ASTabBarController *tabBarController = [ASTabBarController new];
   [tabBarController setViewControllers:viewControllers];
@@ -28,8 +28,8 @@
 }
 
 - (void)testTabBarControllerSelectViewController {
-  ASViewController *firstViewController = [ASViewController new];
-  ASViewController *secondViewController = [ASViewController new];
+  ASDKViewController *firstViewController = [ASDKViewController new];
+  ASDKViewController *secondViewController = [ASDKViewController new];
   NSArray *viewControllers = @[firstViewController, secondViewController];
   ASTabBarController *tabBarController = [ASTabBarController new];
   [tabBarController setViewControllers:viewControllers];

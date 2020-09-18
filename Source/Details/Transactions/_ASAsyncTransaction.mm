@@ -19,7 +19,7 @@
   #warning "Texture must be compiled with std=c++11 to prevent layout issues. gnu++ is not supported. This is hopefully temporary."
 #endif
 
-AS_EXTERN NSRunLoopMode const UITrackingRunLoopMode;
+ASDK_EXTERN NSRunLoopMode const UITrackingRunLoopMode;
 
 NSInteger const ASDefaultTransactionPriority = 0;
 

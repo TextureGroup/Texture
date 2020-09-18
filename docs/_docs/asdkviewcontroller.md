@@ -1,16 +1,16 @@
 ---
-title: ASViewController
+title: ASDKViewController
 layout: docs
-permalink: /docs/asviewcontroller.html
+permalink: /docs/ASDKViewController.html
 prevPage: 
 nextPage: aspagernode.html
 ---
 
-`ASViewController` is a direct subclass of `UIViewController`.  For the most part, it can be used in place of any `UIViewController` relatively easily.  
+`ASDKViewController` is a direct subclass of `UIViewController`.  For the most part, it can be used in place of any `UIViewController` relatively easily.  
 
 The main difference is that you construct and return the node you'd like managed as opposed to the way `UIViewController` provides a view of its own.
 
-Consider the following `ASViewController` subclass that would like to use a custom table node as its managed node.
+Consider the following `ASDKViewController` subclass that would like to use a custom table node as its managed node.
 
 <div class = "highlight-group">
 <span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
@@ -52,4 +52,4 @@ The most important line is:
 
 `if (!(self = [super initWithNode:tableNode])) { return nil; }`
 
-As you can see, `ASViewController`'s are initialized with a node of your choosing.   
+As you can see, `ASDKViewController`'s are initialized with a node of your choosing.   

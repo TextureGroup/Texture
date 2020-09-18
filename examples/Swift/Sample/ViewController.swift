@@ -10,7 +10,7 @@
 import UIKit
 import AsyncDisplayKit
 
-final class ViewController: ASViewController<ASDisplayNode>, ASTableDataSource, ASTableDelegate {
+final class ViewController: ASDKViewController<ASDisplayNode>, ASTableDataSource, ASTableDelegate {
 
   struct State {
     var itemCount: Int

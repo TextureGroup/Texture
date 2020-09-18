@@ -1,7 +1,15 @@
 #!/bin/bash
+# echo ************* diagnostics
+# echo available devices
+# instruments -s devices
+# echo available sdk
+# xcodebuild -showsdks
+# echo available Xcode
+# ls -ld /Applications/Xcode*
+# echo ************* diagnostics end
 
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.0,name=iPhone 8}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.0}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.5,name=iPhone 8}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.5}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -24,7 +32,7 @@ function build_example {
     example="$1"
 
     clean_derived_data
-    
+
     if [ -f "${example}/Podfile" ]; then
         echo "Using CocoaPods"
         pod install --project-directory=$example
@@ -35,7 +43,7 @@ function build_example {
             -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
-            build | xcpretty -s
+            build
     elif [ -f "${example}/Cartfile" ]; then
         echo "Using Carthage"
         local_repo=`pwd`
@@ -50,7 +58,7 @@ function build_example {
             -scheme Sample \
             -sdk "$SDK" \
             -destination "$PLATFORM" \
-            build | xcpretty -s
+            build
 
         cd ../..
     fi
@@ -58,7 +66,7 @@ function build_example {
 
 # Lint subspec
 function lint_subspec {
-    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
+    set -o pipefail && pod env && pod lib lint --subspec="$1"
 }
 
 function cleanup {
@@ -80,14 +88,7 @@ tests|all)
         -scheme AsyncDisplayKit \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty -s
-    success="1"
-    ;;
-
-danger|all)
-    bundle install
-    echo "Running Danger..."
-    bundle exec danger --fail-on-errors=true
+        build-for-testing test
     success="1"
     ;;
 
@@ -99,7 +100,7 @@ tests_listkit)
         -scheme ASDKListKitTests \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build-for-testing test | xcpretty -s
+        build-for-testing test
     success="1"
     ;;
 
@@ -198,7 +199,7 @@ life-without-cocoapods|all)
         -scheme "Life Without CocoaPods" \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty -s
+        build
     success="1"
     ;;
 
@@ -210,14 +211,14 @@ framework|all)
         -scheme Sample \
         -sdk "$SDK" \
         -destination "$PLATFORM" \
-        build | xcpretty -s
+        build
     success="1"
     ;;
 
 cocoapods-lint|all)
     echo "Verifying that podspec lints."
 
-    set -o pipefail && pod env && pod lib lint --allow-warnings
+    set -o pipefail && pod env && pod lib lint
     success="1"
     ;;
 
@@ -245,7 +246,7 @@ cocoapods-lint-other-subspecs)
 
 carthage|all)
     echo "Verifying carthage works."
-    
+
     set -o pipefail && carthage update && carthage build --no-skip-current
     success="1"
     ;;
@@ -255,7 +256,7 @@ carthage|all)
     ;;
 esac
 
-if [ "$success" = "1" ]; then 
+if [ "$success" = "1" ]; then
   trap - EXIT
   exit 0
 fi

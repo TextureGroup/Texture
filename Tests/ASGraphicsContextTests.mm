@@ -28,6 +28,44 @@
 
 
 #if AS_AT_LEAST_IOS13
+- (void)testCanceled
+{
+  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
+    CGSize size = CGSize{.width=100, .height=100};
+    
+    XCTestExpectation *expectationCancelled = [self expectationWithDescription:@"canceled"];
+    
+    asdisplaynode_iscancelled_block_t isCancelledBlock =^BOOL{
+      [expectationCancelled fulfill];
+      return true;
+    };
+    
+    ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+    UIImage *canceledImage = ASGraphicsCreateImage(traitCollection, size, false, 0, nil, isCancelledBlock, ^{});
+    
+    XCTAssertNil(canceledImage);
+    
+    [self waitForExpectations:@[expectationCancelled] timeout:1];
+  }
+}
+
+- (void)testCanceledNil
+{
+  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
+    CGSize size = CGSize{.width=100, .height=100};
+    ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"normal"];
+    UIImage *image = ASGraphicsCreateImage(traitCollection, size, false, 0, nil, nil, ^{
+      [expectation fulfill];
+    });
+ 
+    XCTAssert(image);
+    
+    [self waitForExpectations:@[expectation] timeout:1];
+  }
+}
+
 - (void)testTraitCollectionPassedToWork
 {
   if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
@@ -36,7 +74,7 @@
     XCTestExpectation *expectationDark = [self expectationWithDescription:@"trait collection dark"];
     ASPrimitiveTraitCollection traitCollectionDark = ASPrimitiveTraitCollectionMakeDefault();
     traitCollectionDark.userInterfaceStyle = UIUserInterfaceStyleDark;
-    ASGraphicsCreateImageWithTraitCollectionAndOptions(traitCollectionDark, size, false, 0, nil, ^{
+    ASGraphicsCreateImage(traitCollectionDark, size, false, 0, nil, nil, ^{
       UITraitCollection *currentTraitCollection = [UITraitCollection currentTraitCollection];
       XCTAssertEqual(currentTraitCollection.userInterfaceStyle, UIUserInterfaceStyleDark);
       [expectationDark fulfill];
@@ -45,7 +83,7 @@
     XCTestExpectation *expectationLight = [self expectationWithDescription:@"trait collection light"];
     ASPrimitiveTraitCollection traitCollectionLight = ASPrimitiveTraitCollectionMakeDefault();
     traitCollectionLight.userInterfaceStyle = UIUserInterfaceStyleLight;
-    ASGraphicsCreateImageWithTraitCollectionAndOptions(traitCollectionLight, size, false, 0, nil, ^{
+    ASGraphicsCreateImage(traitCollectionLight, size, false, 0, nil, nil, ^{
       UITraitCollection *currentTraitCollection = [UITraitCollection currentTraitCollection];
       XCTAssertEqual(currentTraitCollection.userInterfaceStyle, UIUserInterfaceStyleLight);
       [expectationLight fulfill];

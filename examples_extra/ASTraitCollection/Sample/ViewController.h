@@ -9,6 +9,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface ViewController : ASViewController<ASDisplayNode *>
+@interface ViewController : ASDKViewController<ASDisplayNode *>
 
 @end

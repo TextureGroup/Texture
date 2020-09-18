@@ -5,7 +5,7 @@ permalink: /docs/subclassing.html
 prevPage: node-overview.html
 nextPage: faq.html
 ---
-The most important distinction when creating a subclass is whether you writing an ASViewController or an ASDisplayNode. This sounds obvious, but because some of these differences are subtle, it is important to keep this top of mind. 
+The most important distinction when creating a subclass is whether you writing an ASDKViewController or an ASDisplayNode. This sounds obvious, but because some of these differences are subtle, it is important to keep this top of mind. 
 
 ## ASDisplayNode
 <br>
@@ -43,17 +43,17 @@ One great use of `-layout` is for the specific case in which you want a subnode 
 subnode.frame = self.bounds;
 ```
 
-If you desire the same effect in a ASViewController, you can do the same thing in -viewWillLayoutSubviews, unless your node is the node in initWithNode: and in that case it will do this automatically.
+If you desire the same effect in a ASDKViewController, you can do the same thing in -viewWillLayoutSubviews, unless your node is the node in initWithNode: and in that case it will do this automatically.
 
-## ASViewController
+## ASDKViewController
 <br>
-An `ASViewController` is a regular `UIViewController` subclass that has special features to manage nodes. Since it is a UIViewController subclass, all methods are called on the **main thread** (and you should always create an ASViewController on the main thread). 
+An `ASDKViewController` is a regular `UIViewController` subclass that has special features to manage nodes. Since it is a UIViewController subclass, all methods are called on the **main thread** (and you should always create an ASDKViewController on the main thread). 
 
 ### `-init` 
 
-This method is called once, at the very beginning of an ASViewController's lifecycle. As with UIViewController initialization, it is best practice to **never access** `self.view` or `self.node.view` in this method as it will force the view to be created early. Instead, do any view access in -viewDidLoad. 
+This method is called once, at the very beginning of an ASDKViewController's lifecycle. As with UIViewController initialization, it is best practice to **never access** `self.view` or `self.node.view` in this method as it will force the view to be created early. Instead, do any view access in -viewDidLoad. 
 
-ASViewController's designated initializer is `initWithNode:`. A typical initializer will look something like the code below. Note how the ASViewController's node is created _before_ calling super. An ASViewController manages a node similarly to how a UIViewController manages a view, but the initialization is slightly different. 
+ASDKViewController's designated initializer is `initWithNode:`. A typical initializer will look something like the code below. Note how the ASDKViewController's node is created _before_ calling super. An ASDKViewController manages a node similarly to how a UIViewController manages a view, but the initialization is slightly different. 
 
 
 <div class = "highlight-group">
@@ -93,18 +93,18 @@ We recommend that you do not use this method because it is has no particular adv
 
 ### `-viewDidLoad`  
 
-This method is called once in a ASViewController's lifecycle, immediately after `-loadView`. This is the earliest time at which you should access the node's view. It is a great spot to put any **setup code that should only be run once and requires access to the view/layer**, such as adding a gesture recognizer. 
+This method is called once in a ASDKViewController's lifecycle, immediately after `-loadView`. This is the earliest time at which you should access the node's view. It is a great spot to put any **setup code that should only be run once and requires access to the view/layer**, such as adding a gesture recognizer. 
 
 Layout code should never be put in this method, because it will not be called again when geometry changes. Note this is equally true for UIViewController; it is bad practice to put layout code in this method even if you don't currently expect geometry changes. 
 
 ### `-viewWillLayoutSubviews`  
 
-This method is called at the exact same time as a node's `-layout` method and it may be called multiple times in a ASViewController's lifecycle; it will be called whenever the bounds of the ASViewController's node are changed (including rotation, split screen, keyboard presentation) as well as when there are changes to the hierarchy (children being added, removed, or changed in size). 
+This method is called at the exact same time as a node's `-layout` method and it may be called multiple times in a ASDKViewController's lifecycle; it will be called whenever the bounds of the ASDKViewController's node are changed (including rotation, split screen, keyboard presentation) as well as when there are changes to the hierarchy (children being added, removed, or changed in size). 
 
 For consistency, it is best practice to put all layout code in this method. Because it is not called very frequently, even code that does not directly depend on the size belongs here.  
 
 ### `-viewWillAppear:` / `-viewDidDisappear:`
 
-These methods are called just before the ASViewController's node appears on screen (the earliest time that it is visible) and just after it is removed from the view hierarchy (the earliest time that it is no longer visible). These methods provide a good opportunity to start or stop animations related to the presentation or dismissal of your controller. This is also a good place to make a log of a user action.
+These methods are called just before the ASDKViewController's node appears on screen (the earliest time that it is visible) and just after it is removed from the view hierarchy (the earliest time that it is no longer visible). These methods provide a good opportunity to start or stop animations related to the presentation or dismissal of your controller. This is also a good place to make a log of a user action.
 
 Although these methods may be called multiple times and geometry information is available, they are not called for all geometry changes and so should not be used for core layout code (beyond setup required for specific animations). 

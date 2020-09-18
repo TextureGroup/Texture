@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
               - kCTUnderlineColorAttributeName
  @result Whether attributeName is an unsupported Core Text attribute.
  */
-AS_EXTERN BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attributeName);
+ASDK_EXTERN BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attributeName);
 
 
 /**
@@ -54,14 +54,14 @@ AS_EXTERN BOOL ASAttributeWithNameIsUnsupportedCoreTextAttribute(NSString *attri
               - kCTUnderlineColorAttributeName
  @result An NSDictionary of attributes for use by NSAttributedString.
  */
-AS_EXTERN NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *coreTextAttributes);
+ASDK_EXTERN NSDictionary *NSAttributedStringAttributesForCoreTextAttributes(NSDictionary *coreTextAttributes);
 
 /**
   @abstract Returns an NSAttributedString whose Core Text attributes have been converted, where possible, to NSAttributedString attributes.
   @param dirtyAttributedString An NSAttributedString that may contain Core Text attributes.
   @result An NSAttributedString that's preserved as many CFAttributedString attributes as possible.
  */
-AS_EXTERN NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedString *dirtyAttributedString);
+ASDK_EXTERN NSAttributedString *ASCleanseAttributedStringOfCoreTextAttributes(NSAttributedString *dirtyAttributedString);
 
 #pragma mark -
 #pragma mark -

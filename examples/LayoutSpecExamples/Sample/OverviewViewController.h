@@ -10,6 +10,6 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 
-@interface OverviewViewController : ASViewController
+@interface OverviewViewController : ASDKViewController
 
 @end

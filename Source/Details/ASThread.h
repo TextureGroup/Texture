@@ -159,7 +159,11 @@ namespace AS {
           success = os_unfair_lock_trylock(&_unfair);
           break;
         case RecursiveUnfair:
-          success = ASRecursiveUnfairLockTryLock(&_runfair);
+          if (@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)) {
+            success = ASRecursiveUnfairLockTryLock(&_runfair);
+          } else {
+            success = _recursive.try_lock();
+          }
           break;
       }
       if (success) {
@@ -180,7 +184,11 @@ namespace AS {
           os_unfair_lock_lock(&_unfair);
           break;
         case RecursiveUnfair:
-          ASRecursiveUnfairLockLock(&_runfair);
+          if (@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)) {
+            ASRecursiveUnfairLockLock(&_runfair);
+          } else {
+            _recursive.lock();
+          }
           break;
       }
       DidLock();
@@ -199,7 +207,11 @@ namespace AS {
           os_unfair_lock_unlock(&_unfair);
           break;
         case RecursiveUnfair:
-          ASRecursiveUnfairLockUnlock(&_runfair);
+          if (@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)) {
+            ASRecursiveUnfairLockUnlock(&_runfair);
+          } else {
+            _recursive.unlock();
+          }
           break;
       }
     }
@@ -218,14 +230,18 @@ namespace AS {
       static dispatch_once_t onceToken;
       dispatch_once(&onceToken, ^{
         if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-          gMutex_unfair = ASActivateExperimentalFeature(ASExperimentalUnfairLock);
+          gMutex_unfair = YES;
         }
       });
       
       if (recursive) {
         if (gMutex_unfair) {
           _type = RecursiveUnfair;
-          _runfair = AS_RECURSIVE_UNFAIR_LOCK_INIT;
+          if (@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)) {
+            _runfair = AS_RECURSIVE_UNFAIR_LOCK_INIT;
+          } else {
+            new (&_recursive) std::recursive_mutex();
+          }
         } else {
           _type = Recursive;
           new (&_recursive) std::recursive_mutex();

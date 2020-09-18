@@ -21,8 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A transformed image.
  */
-typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
-
+typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, ASPrimitiveTraitCollection traitCollection);
 
 /**
  * @abstract Draws images.
@@ -196,7 +195,7 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image);
  *
  * @return An ASImageNode image modification block.
  */
-AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor * _Nullable borderColor);
+ASDK_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlock(CGFloat borderWidth, UIColor * _Nullable borderColor);
 
 /**
  * @abstract Image modification block that applies a tint color à la UIImage configured with
@@ -208,6 +207,6 @@ AS_EXTERN asimagenode_modification_block_t ASImageNodeRoundBorderModificationBlo
  *
  * @return An ASImageNode image modification block.
  */
-AS_EXTERN asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
+ASDK_EXTERN asimagenode_modification_block_t ASImageNodeTintColorModificationBlock(UIColor *color);
 
 NS_ASSUME_NONNULL_END

@@ -23,7 +23,7 @@ typedef uintptr_t ASPageCoordinate;
 /**
  * Returns a page coordinate with the given x and y values. Both of them must be less than 65,535.
  */
-AS_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_UNUSED_RESULT;
 
 /**
  * Returns coordinate of the page that contains the specified point.
@@ -33,13 +33,13 @@ AS_EXTERN ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y) AS_WARN_
  *
  * @param pageSize The size of each page.
  */
-AS_EXTERN ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN ASPageCoordinate ASPageCoordinateForPageThatContainsPoint(CGPoint point, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
-AS_EXTERN uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN uint16_t ASPageCoordinateGetX(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
 
-AS_EXTERN uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN uint16_t ASPageCoordinateGetY(ASPageCoordinate pageCoordinate) AS_WARN_UNUSED_RESULT;
 
-AS_EXTERN CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
 /**
  * Returns coordinate pointers for pages that intersect the specified rect. For each pointer, use ASPageCoordinateFromPointer() to get the original coordinate.
@@ -51,7 +51,7 @@ AS_EXTERN CGRect ASPageCoordinateGetPageRect(ASPageCoordinate pageCoordinate, CG
  *
  * @param pageSize The size of each page.
  */
-AS_EXTERN NSPointerArray * _Nullable ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize) AS_WARN_UNUSED_RESULT;
+ASDK_EXTERN NSPointerArray * _Nullable ASPageCoordinatesForPagesThatIntersectRect(CGRect rect, CGSize contentSize, CGSize pageSize) AS_WARN_UNUSED_RESULT;
 
 /**
  * An alias for an NSMapTable created to store objects using ASPageCoordinates as keys.

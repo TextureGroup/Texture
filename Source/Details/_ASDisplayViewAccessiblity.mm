@@ -89,6 +89,7 @@ static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
   accessibilityElement.accessibilityHint = node.accessibilityHint;
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
+  accessibilityElement.accessibilityElementsHidden = node.accessibilityElementsHidden;
   if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
     accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
     accessibilityElement.accessibilityAttributedHint = node.accessibilityAttributedHint;
@@ -210,6 +211,22 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
   [elements addObject:accessiblityElement];
 }
 
+/// Check if a view is a subviews of an UIScrollView. This is used to determine whether to enforce that
+/// accessibility elements must be on screen
+static BOOL recusivelyCheckSuperviewsForScrollView(UIView *view) {
+    if (!view) {
+        return NO;
+    } else if ([view isKindOfClass:[UIScrollView class]]) {
+        return YES;
+    }
+    return recusivelyCheckSuperviewsForScrollView(view.superview);
+}
+
+/// returns YES if this node should be considered "hidden" from the screen reader.
+static BOOL nodeIsHiddenFromAcessibility(ASDisplayNode *node) {
+  return node.isHidden || node.alpha == 0.0 || node.accessibilityElementsHidden;
+}
+
 /// Collect all accessibliity elements for a given view and view node
 static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *elements)
 {
@@ -226,7 +243,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }));
 
   UIView *view = node.view;
-
+  
   // If we don't have a window, let's just bail out
   if (!view.window) {
     return;
@@ -243,14 +260,34 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return;
   }
   
-  for (ASDisplayNode *subnode in node.subnodes) {
-    // If a node is hidden or has an alpha of 0.0 we should not include it
-    if (subnode.hidden || subnode.alpha == 0.0) {
-        continue;
+  if (nodeIsHiddenFromAcessibility(node)) {
+    return;
+  }
+  
+  // see if one of the subnodes is modal. If it is, then we only need to collect accessibilityElements from that
+  // node. If more than one subnode is modal, UIKit uses the last view in subviews as the modal view (it appears to
+  // be based on the index in the subviews array, not the location on screen). Let's do the same.
+  ASDisplayNode *modalSubnode = nil;
+  for (ASDisplayNode *subnode in node.subnodes.reverseObjectEnumerator) {
+    if (subnode.accessibilityViewIsModal) {
+      modalSubnode = subnode;
+      break;
     }
-    // If a subnode is outside of the view's window, exclude it
+  }
+  
+  // If we have a modal subnode, just use that. Otherwise, use all subnodes
+  NSArray *subnodes = modalSubnode ? @[ modalSubnode ] : node.subnodes;
+  
+  for (ASDisplayNode *subnode in subnodes) {
+    // If a node is hidden or has an alpha of 0.0 we should not include it
+    if (nodeIsHiddenFromAcessibility(subnode)) {
+      continue;
+    }
+    
+    // If a subnode is outside of the view's window, exclude it UNLESS it is a subview of an UIScrollView.
+    // In this case UIKit will return the element even if it is outside of the window or the scrollView's visible rect (contentOffset + contentSize)
     CGRect nodeInWindowCoords = [node convertRect:subnode.frame toNode:nil];
-    if (!CGRectIntersectsRect(view.window.frame, nodeInWindowCoords)) {
+    if (!CGRectIntersectsRect(view.window.frame, nodeInWindowCoords) && !recusivelyCheckSuperviewsForScrollView(view)) {
       continue;
     }
     
@@ -274,24 +311,15 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   }
 }
 
-@interface _ASDisplayView () {
-  NSArray *_accessibilityElements;
-}
-
-@end
-
 @implementation _ASDisplayView (UIAccessibilityContainer)
 
 #pragma mark - UIAccessibility
 
 - (void)setAccessibilityElements:(NSArray *)accessibilityElements
 {
-  ASDisplayNodeAssertMainThread();
-  // While it looks very strange to ignore the accessibilyElements param and set _accessibilityElements to nil, it is actually on purpose.
-  // _ASDisplayView's accessibilityElements method will always defer to the node for accessibilityElements when _accessibilityElements is
-  // nil. Calling setAccessibilityElements on _ASDisplayView is basically clearing the cache and forcing _ASDisplayView to ask the node
-  // for its accessibilityElements the next time they are requested.
-  _accessibilityElements = nil;
+  // this is a no-op. You should not be setting accessibilityElements directly on _ASDisplayView.
+  // if you wish to set accessibilityElements, do so in your node. UIKit will call _ASDisplayView's
+  // accessibilityElements which will in turn ask its node for its elements.
 }
 
 - (NSArray *)accessibilityElements
@@ -303,12 +331,12 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     return @[];
   }
 
-  // when items become hidden/visible we have to manually clear the _accessibilityElements in order to get an updated version
-  // Instead, let's try computing the elements every time and see how badly it affects performance.
-  if (_accessibilityElements == nil || ASActivateExperimentalFeature(ASExperimentalDoNotCacheAccessibilityElements)) {
-    _accessibilityElements = [viewNode accessibilityElements];
-  }
-  return _accessibilityElements;
+  // we no longer cache accessibilityElements. When caching, in order to provide correct element when items become hidden/visible
+  // we had to manually clear _accessibilityElements. This seemed like a heavy burden to place on a user, and one that is also
+  // not immediately obvious. While recomputing accessibilityElements may be expensive, this will only affect users that have
+  // voice over enabled (we checked to ensure performance did not suffer by not caching for an overall user base). For those
+  // users with voice over on, being correct is almost certainly more important than being performant.
+  return [viewNode accessibilityElements];
 }
 
 @end

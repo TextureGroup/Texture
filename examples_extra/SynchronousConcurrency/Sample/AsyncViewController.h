@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 
-@interface AsyncViewController : ASViewController <UITabBarControllerDelegate>
+@interface AsyncViewController : ASDKViewController <UITabBarControllerDelegate>
 
 @end

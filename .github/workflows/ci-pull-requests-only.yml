@@ -8,7 +8,7 @@ on:
 jobs:
   buildsh:
     env:
-        DEVELOPER_DIR: /Applications/Xcode_11.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     strategy:
       matrix:
         mode: [cocoapods-lint-default-subspecs, cocoapods-lint-other-subspecs]
@@ -21,6 +21,6 @@ jobs:
     runs-on: macOS-latest
     steps:
     - name: Checkout the Git repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Run build script
       run: ./build.sh ${{ matrix.mode }}

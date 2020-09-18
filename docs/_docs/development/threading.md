@@ -250,25 +250,6 @@ Since this lock is also shared, it will prevent other routines from entering unt
 
 __Method 2__
 
-An alternative method is to manage the duration of the lock hold manually rather than using the runtime and scope. You must remember to unlock.
-
-```
-@implementation ASDeallocQueue {
-  ASDN::Mutex _lock;
-}
-
-- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
-{
-  NSParameterAssert(objectPtr != NULL); // do I actually need to lock ?
-  // other conditions or non-shared tasks
-  _lock.lock();
-  sharedObject.modify(newData);
-  _lock.unlock();
-}
-```
-
-__Method 3__
-
 `ASThread` provides `ASLockScopeSelf()`. This is a convenience over `ASLockScopeUnowned(<NSLocking>)`. This will unlock itself once the scope in which the lock was created is released. Only use this when you are confident that the lock should remain until scope is complete. You can only have one lock defined for `self`, thus it will block all other branches.
 
 ```
@@ -311,7 +292,6 @@ API | Description |
 `ASDisplayNodeAssertMainThread();` | Place this at the start of the every function definition that performs work synchronously on the main thread.
 `ASPerformBlockOnMainThread(block)` | If on main thread already, run block synchronously, otherwise use `dispatch_async(dispatch_get_main_queue(block))`
 `ASPerformMainThreadDeallocation(&object)` | Schedule async deallocation of UIKit components
-`ASPerformBackgroundDeallocation(&object)` | Schedule async deallocation of __non-UIKit__ objects
 `ASPerformBlockOnBackgroundThread(block)` | Perform work on background
 
 
