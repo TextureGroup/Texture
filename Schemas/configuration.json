@@ -13,7 +13,6 @@
     		"items": {
         		"type": "string",
         		"enum": [
-                    "exp_graphics_contexts",
                     "exp_text_node",
                     "exp_interface_state_coalesce",
                     "exp_infer_layer_defaults",
@@ -22,8 +21,10 @@
                     "exp_skip_clear_data",
                     "exp_did_enter_preload_skip_asm_layout",
                     "exp_dispatch_apply",
-                    "exp_oom_bg_dealloc_disable",
-                    "exp_do_not_cache_accessibility_elements",
+                    "exp_drawing_global",
+                    "exp_optimize_data_controller_pipeline",
+                    "exp_disable_global_textkit_lock",
+                    "exp_main_thread_only_data_controller",
                 ]
     		}
 		}
