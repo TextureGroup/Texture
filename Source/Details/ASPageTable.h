@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASAssert.h"
+#import "ASBaseDefines.h"
 
 @class ASCollectionElement;
 

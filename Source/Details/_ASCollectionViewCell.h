@@ -8,8 +8,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASCellNode.h>
+#import "ASBaseDefines.h"
+#import "ASCellNode.h"
 
 @class ASCollectionElement;
 

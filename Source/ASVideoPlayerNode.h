@@ -7,15 +7,15 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if AS_USE_VIDEO
 
 #if TARGET_OS_IOS
 #import <CoreMedia/CoreMedia.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASVideoNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import "ASThread.h"
+#import "ASVideoNode.h"
+#import "ASDisplayNode+Subclasses.h"
 
 @class AVAsset;
 @class ASButtonNode;

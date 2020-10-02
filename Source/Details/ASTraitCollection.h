@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 @class ASTraitCollection;
 @protocol ASLayoutElement;

@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTipProvider.h>
+#import "ASTipProvider.h"
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASAssert.h>
+#import "ASAssert.h"
 
 // Concrete classes
-#import <AsyncDisplayKit/ASLayerBackingTipProvider.h>
+#import "ASLayerBackingTipProvider.h"
 
 @implementation ASTipProvider
 

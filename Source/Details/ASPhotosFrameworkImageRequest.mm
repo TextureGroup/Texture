@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
+#import "ASPhotosFrameworkImageRequest.h"
 
 #if AS_USE_PHOTOS
 

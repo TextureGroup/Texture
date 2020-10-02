@@ -7,20 +7,20 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASTableNode+Beta.h>
+#import "ASTableNode.h"
+#import "ASTableNode+Beta.h"
 
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASTableViewInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASRangeController.h>
-#import <AsyncDisplayKit/ASAbstractLayoutController+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASTableView+Undeprecated.h>
+#import "ASCollectionElement.h"
+#import "ASElementMap.h"
+#import "ASTableViewInternal.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASDisplayNode+FrameworkPrivate.h"
+#import "ASCellNode+Internal.h"
+#import "ASThread.h"
+#import "ASDisplayNode+Beta.h"
+#import "ASRangeController.h"
+#import "ASAbstractLayoutController+FrameworkPrivate.h"
+#import "ASTableView+Undeprecated.h"
 
 #pragma mark - _ASTablePendingState
 

@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASButtonNode.h>
+#import "ASButtonNode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

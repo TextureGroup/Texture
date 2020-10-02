@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
+#import "ASTextAttribute.h"
 
 @class ASTextRunGlyphRange;
 

@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 /**
  * Like dispatch_apply, but you can set the thread count. 0 means letting dispatch_apply determine it.

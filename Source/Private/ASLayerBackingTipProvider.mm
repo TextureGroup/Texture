@@ -11,11 +11,11 @@
 
 #if AS_ENABLE_TIPS
 
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASTip.h>
+#import "ASCellNode.h"
+#import "ASControlNode.h"
+#import "ASDisplayNode.h"
+#import "ASDisplayNodeExtras.h"
+#import "ASTip.h"
 
 @implementation ASLayerBackingTipProvider
 

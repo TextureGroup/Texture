@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
+#import "ASConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

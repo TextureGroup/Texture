@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 /**
  @abstract Correctly equates two objects, including cases where both objects are nil. The latter is a case where `isEqual:` fails.

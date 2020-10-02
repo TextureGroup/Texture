@@ -9,8 +9,8 @@
 
 #import "ASDisplayNode+Convenience.h"
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASResponderChainEnumerator.h>
+#import "ASDisplayNodeExtras.h"
+#import "ASResponderChainEnumerator.h"
 
 @implementation ASDisplayNode (Convenience)
 

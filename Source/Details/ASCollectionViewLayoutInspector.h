@@ -8,8 +8,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASScrollDirection.h>
+#import "ASDimension.h"
+#import "ASScrollDirection.h"
 
 @class ASCollectionView;
 @protocol ASCollectionDataSource;

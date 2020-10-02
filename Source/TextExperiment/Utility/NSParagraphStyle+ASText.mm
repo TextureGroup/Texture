@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
+#import "NSParagraphStyle+ASText.h"
+#import "ASTextAttribute.h"
 #import <CoreText/CoreText.h>
 
 // Dummy class for category

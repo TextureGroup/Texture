@@ -7,8 +7,8 @@
 //
 
 #import "ASConfigurationInternal.h"
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfigurationDelegate.h>
+#import "ASAssert.h"
+#import "ASConfigurationDelegate.h"
 #import <stdatomic.h>
 
 static ASConfigurationManager *ASSharedConfigurationManager;

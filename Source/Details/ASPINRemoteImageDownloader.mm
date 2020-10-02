@@ -7,32 +7,42 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
+#import "ASPINRemoteImageDownloader.h"
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
+#import "ASAssert.h"
+#import "ASThread.h"
+#import "ASImageContainerProtocolCategories.h"
 
-#if __has_include (<PINRemoteImage/PINGIFAnimatedImage.h>)
-#define PIN_ANIMATED_AVAILABLE 1
-#import <PINRemoteImage/PINCachedAnimatedImage.h>
-#import <PINRemoteImage/PINAlternateRepresentationProvider.h>
+#if !SWIFT_PACKAGE
+
+    #if __has_include (<PINRemoteImage/PINGIFAnimatedImage.h>)
+    #define PIN_ANIMATED_AVAILABLE 1
+    #import <PINRemoteImage/PINCachedAnimatedImage.h>
+    #import <PINRemoteImage/PINAlternateRepresentationProvider.h>
+    #else
+    #define PIN_ANIMATED_AVAILABLE 0
+    #endif
+
+    #if __has_include(<webp/decode.h>)
+    #define PIN_WEBP_AVAILABLE  1
+    #else
+    #define PIN_WEBP_AVAILABLE  0
+    #endif
+
+    #import <PINRemoteImage/PINRemoteImageManager.h>
+    #import <PINRemoteImage/NSData+ImageDetectors.h>
+    #import <PINRemoteImage/PINRemoteImageCaching.h>
+
 #else
-#define PIN_ANIMATED_AVAILABLE 0
-#endif
+#define PIN_ANIMATED_AVAILABLE __has_include(<webp/decode.h>)
+#define PIN_WEBP_AVAILABLE __has_include("PINRemoteImage.h")
 
-#if __has_include(<webp/decode.h>)
-#define PIN_WEBP_AVAILABLE  1
-#else
-#define PIN_WEBP_AVAILABLE  0
-#endif
+#import "PINRemoteImage.h"
 
-#import <PINRemoteImage/PINRemoteImageManager.h>
-#import <PINRemoteImage/NSData+ImageDetectors.h>
-#import <PINRemoteImage/PINRemoteImageCaching.h>
+#endif
 
 static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASImageDownloaderPriority(ASImageDownloaderPriority priority) {
   switch (priority) {

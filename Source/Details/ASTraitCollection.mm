@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASHashing.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASLayoutElement.h>
+#import "ASAvailability.h"
+#import "ASHashing.h"
+#import "ASTraitCollection.h"
+#import "ASObjectDescriptionHelpers.h"
+#import "ASLayoutElement.h"
 
 #pragma mark - ASPrimitiveTraitCollection
 

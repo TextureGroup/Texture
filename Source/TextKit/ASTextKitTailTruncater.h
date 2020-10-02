@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASTextKitTruncating.h>
+#import "ASTextKitTruncating.h"
 
 #if AS_ENABLE_TEXTNODE
 

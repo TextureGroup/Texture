@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import "ASInternalHelpers.h"
+#import "ASThread.h"
 
 #if DEBUG
   #define AS_DEDUPE_LAYOUT_SPEC_TREE 1

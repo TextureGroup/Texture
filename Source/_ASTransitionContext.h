@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <AsyncDisplayKit/ASContextTransitioning.h>
+#import "ASContextTransitioning.h"
 
 @class ASLayout;
 @class _ASTransitionContext;

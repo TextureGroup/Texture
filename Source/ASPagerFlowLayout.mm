@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPagerFlowLayout.h>
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASCollectionView.h>
+#import "ASPagerFlowLayout.h"
+#import "ASCellNode.h"
+#import "ASCollectionView.h"
 
 @interface ASPagerFlowLayout () {
   __weak ASCellNode *_currentCellNode;

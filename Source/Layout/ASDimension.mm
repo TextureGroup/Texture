@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDimension.h>
+#import "ASDimension.h"
 
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
+#import "CoreGraphics+ASConvenience.h"
 
 #pragma mark - ASDimension
 

@@ -6,13 +6,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if YOGA /* YOGA */
 
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import "ASLayout.h"
+#import "ASLog.h"
+#import "ASDisplayNode+Beta.h"
 
 // Should pass a string literal, not an NSString as the first argument to ASYogaLog
 #define ASYogaLog(x, ...) as_log_verbose(ASLayoutLog(), x, ##__VA_ARGS__);

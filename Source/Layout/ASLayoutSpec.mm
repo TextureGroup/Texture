@@ -7,14 +7,14 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
+#import "ASLayoutSpec.h"
+#import "ASLayoutSpecPrivate.h"
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import "ASLayoutSpec+Subclasses.h"
 
-#import <AsyncDisplayKit/ASCollections.h>
-#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
+#import "ASCollections.h"
+#import "ASLayoutElementStylePrivate.h"
+#import "ASEqualityHelpers.h"
 
 @implementation ASLayoutSpec
 

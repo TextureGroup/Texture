@@ -7,16 +7,16 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
-#import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
-#import <AsyncDisplayKit/ASTextNodeCommon.h>
+#import "ASControlNode.h"
+#import "ASDisplayNode+Beta.h"
+#import "ASTextNodeCommon.h"
 
 #if (!AS_ENABLE_TEXTNODE)
 
 // Pull in ASTextNode2 to replace ASTextNode with ASTextNode2
-#import <AsyncDisplayKit/ASTextNode2.h>
+#import "ASTextNode2.h"
 
 #else
 

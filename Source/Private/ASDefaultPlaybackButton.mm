@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDefaultPlaybackButton.h>
-#import <AsyncDisplayKit/_ASDisplayLayer.h>
+#import "ASDefaultPlaybackButton.h"
+#import "_ASDisplayLayer.h"
 
 @interface ASDefaultPlaybackButton()
 {

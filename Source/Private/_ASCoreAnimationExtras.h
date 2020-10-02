@@ -9,8 +9,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
+#import "ASBaseDefines.h"
+#import "ASDisplayNode.h"
 
 // This protocol defines the core properties that ASDisplayNode and CALayer share, for managing contents.
 @protocol ASResizableContents

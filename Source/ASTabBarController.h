@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASVisibilityProtocols.h>
+#import "ASVisibilityProtocols.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

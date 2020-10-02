@@ -9,14 +9,14 @@
 
 #import <Foundation/Foundation.h>
 #if TARGET_OS_TV
-#import <AsyncDisplayKit/ASImageNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import "ASImageNode.h"
+#import "ASDisplayNode+Subclasses.h"
 
 // TODO: Remove this – we don't need to link GLKit just to convert degrees to radians.
 #import <GLKit/GLKit.h>
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import "ASDisplayNodeExtras.h"
 
 @implementation ASImageNode (tvOS)
 

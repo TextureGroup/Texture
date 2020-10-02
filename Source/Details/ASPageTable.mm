@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPageTable.h>
+#import "ASPageTable.h"
 
 ASPageCoordinate ASPageCoordinateMake(uint16_t x, uint16_t y)
 {

@@ -7,17 +7,17 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASPagerNode.h>
+#import "ASPagerNode.h"
 
-#import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
-#import <AsyncDisplayKit/ASCollectionNode+Beta.h>
-#import <AsyncDisplayKit/ASDelegateProxy.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASPagerFlowLayout.h>
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/UIResponder+AsyncDisplayKit.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
+#import "ASCollectionGalleryLayoutDelegate.h"
+#import "ASCollectionNode+Beta.h"
+#import "ASDelegateProxy.h"
+#import "ASDisplayNode+FrameworkPrivate.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASPagerFlowLayout.h"
+#import "ASCellNode.h"
+#import "UIResponder+AsyncDisplayKit.h"
+#import "ASCollectionView+Undeprecated.h"
 
 @interface ASPagerNode () <ASCollectionDataSource, ASCollectionDelegate, ASCollectionDelegateFlowLayout, ASDelegateProxyInterceptor, ASCollectionGalleryLayoutPropertiesProviding>
 {

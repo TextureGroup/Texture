@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
+#import "ASStackLayoutSpec.h"
 
 typedef struct {
   ASStackLayoutDirection direction;

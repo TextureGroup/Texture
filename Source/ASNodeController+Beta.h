@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h> // for ASInterfaceState protocol
+#import "ASDisplayNode.h"
+#import "ASDisplayNode+Subclasses.h" // for ASInterfaceState protocol
 
 /* ASNodeController is currently beta and open to change in the future */
 @interface ASNodeController<__covariant DisplayNodeType : ASDisplayNode *>

@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASConfiguration.h>
+#import "ASConfiguration.h"
 
 /// Not too performance-sensitive here.
 

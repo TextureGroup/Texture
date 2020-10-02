@@ -7,8 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASLayoutElement.h>
+#import "ASBaseDefines.h"
+#import "ASLayoutElement.h"
 
 @class ASCollectionElement;
 

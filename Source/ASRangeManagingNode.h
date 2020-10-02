@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
+#import "ASTraitCollection.h"
 
 @class ASCellNode;
 

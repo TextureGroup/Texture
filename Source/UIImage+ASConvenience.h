@@ -8,8 +8,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
+#import "ASBaseDefines.h"
+#import "ASTraitCollection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -8,11 +8,11 @@
 //
 
 #import <UIKit/UICollectionView.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
-#import <AsyncDisplayKit/ASCollectionView.h>
-#import <AsyncDisplayKit/ASBlockTypes.h>
-#import <AsyncDisplayKit/ASRangeManagingNode.h>
+#import "ASDisplayNode.h"
+#import "ASRangeControllerUpdateRangeProtocol+Beta.h"
+#import "ASCollectionView.h"
+#import "ASBlockTypes.h"
+#import "ASRangeManagingNode.h"
 
 @protocol ASCollectionViewLayoutFacilitatorProtocol;
 @protocol ASCollectionDelegate;

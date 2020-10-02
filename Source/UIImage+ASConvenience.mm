@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/UIImage+ASConvenience.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
+#import "UIImage+ASConvenience.h"
+#import "ASGraphicsContext.h"
 
 #pragma mark - ASDKFastImageNamed
 

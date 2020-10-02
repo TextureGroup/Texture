@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if AS_IG_LIST_KIT
 
 #import "ASIGListAdapterBasedDataSource.h"
-#import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import "AsyncDisplayKit.h"
 #import <objc/runtime.h>
 
 typedef IGListSectionController<ASSectionController> ASIGSectionController;

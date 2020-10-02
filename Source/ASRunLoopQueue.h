@@ -8,8 +8,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASLocking.h>
+#import "ASBaseDefines.h"
+#import "ASLocking.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

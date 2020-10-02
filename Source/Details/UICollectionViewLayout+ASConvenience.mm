@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/UICollectionViewLayout+ASConvenience.h>
+#import "UICollectionViewLayout+ASConvenience.h"
 
 #import <UIKit/UICollectionViewFlowLayout.h>
 
-#import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
+#import "ASCollectionViewFlowLayoutInspector.h"
 
 @implementation UICollectionViewLayout (ASLayoutInspectorProviding)
 

@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBlockTypes.h>
-#import <AsyncDisplayKit/ASDisplayNode.h>
-#import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
-#import <AsyncDisplayKit/ASTableView.h>
-#import <AsyncDisplayKit/ASRangeManagingNode.h>
+#import "ASBlockTypes.h"
+#import "ASDisplayNode.h"
+#import "ASRangeControllerUpdateRangeProtocol+Beta.h"
+#import "ASTableView.h"
+#import "ASRangeManagingNode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -6,20 +6,20 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionGalleryLayoutDelegate.h>
+#import "ASCollectionGalleryLayoutDelegate.h"
 
-#import <AsyncDisplayKit/_ASCollectionGalleryLayoutInfo.h>
-#import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
-#import <AsyncDisplayKit/ASCellNode.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASCollections.h>
-#import <AsyncDisplayKit/ASCollectionLayoutContext.h>
-#import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
-#import <AsyncDisplayKit/ASCollectionLayoutState.h>
-#import <AsyncDisplayKit/ASElementMap.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASInsetLayoutSpec.h>
-#import <AsyncDisplayKit/ASStackLayoutSpec.h>
+#import "_ASCollectionGalleryLayoutInfo.h"
+#import "_ASCollectionGalleryLayoutItem.h"
+#import "ASCellNode.h"
+#import "ASCollectionElement.h"
+#import "ASCollections.h"
+#import "ASCollectionLayoutContext.h"
+#import "ASCollectionLayoutDefines.h"
+#import "ASCollectionLayoutState.h"
+#import "ASElementMap.h"
+#import "ASLayout.h"
+#import "ASInsetLayoutSpec.h"
+#import "ASStackLayoutSpec.h"
 
 #pragma mark - ASCollectionGalleryLayoutDelegate
 
