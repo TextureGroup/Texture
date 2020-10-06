@@ -14,19 +14,17 @@ permalink: /showcase.html
 		<tr>
 		
 		<td width="33%" align="center" valign="top">
-		<a href="https://itunes.apple.com/app/facebook/id284882215"><img class="roundrect" src="https://lh3.googleusercontent.com/ZZPdzvlpK9r_Df9C3M7j1rNRi7hhHRvPhlklJ3lfi5jk86Jd1s0Y5wcQ1QgbVaAP5Q=w300" style="width:100px;height:100px;"></a>
-		<br>
-		<b>Facebook</b>
-		<br>
-		<a href="https://code.facebook.com/posts/721586784561674/introducing-asyncdisplaykit-for-smooth-and-responsive-apps-on-ios/">Introducing AsyncDisplayKit: For smooth and responsive apps on iOS</a>
-		</td>
-		
-		<td width="33%" align="center" valign="top">
 		<a href="https://itunes.apple.com/us/app/pinterest/id429047995"><img class="roundrect" src="http://is5.mzstatic.com/image/thumb/Purple71/v4/d7/b9/67/d7b967ff-75e1-5a19-d1df-32cec9cbb007/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
 		<br>
 		<b>Pinterest</b>
 		<br>
 		<a href="https://medium.com/@Pinterest_Engineering/re-architecting-pinterest-039-s-ios-app-e0a2d34a6ac2">Re-architecting Pinterest's iOS app</a>
+		</td>
+		
+		<td width="33%" align="center" valign="top">
+		<a href="https://itunes.apple.com/us/app/nytimes-breaking-local-national/id284862083"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple71/v4/3b/be/3c/3bbe3c0b-98a9-3f18-db29-83c0b41e34b8/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<br /> 
+		<b>NYT</b>
 		</td>
 		
 		<td width="33%" align="center" valign="top">
@@ -51,9 +49,9 @@ permalink: /showcase.html
 		</td>
 		
 		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/us/app/nytimes-breaking-local-national/id284862083"><img class="roundrect" src="http://is3.mzstatic.com/image/thumb/Purple71/v4/3b/be/3c/3bbe3c0b-98a9-3f18-db29-83c0b41e34b8/source/350x350bb.jpg" style="width:100px;height:100px;"></a>
+		<a href="https://itunes.apple.com/bf/app/id527299553"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple124/v4/41/48/85/414885c3-f346-ed3b-8ee9-f82c9fbf2159/AppIcon-2-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
-		<b>NYT</b>
+		<b>App in the Air</b>
 		</td>
 		
 		<td align="center" valign="top">
@@ -271,13 +269,7 @@ permalink: /showcase.html
 		<br /> 
 		<b>Bluebird</b>
 		</td>
-		
-		<td align="center" valign="top">
-		<a href="https://itunes.apple.com/bf/app/id527299553"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple124/v4/41/48/85/414885c3-f346-ed3b-8ee9-f82c9fbf2159/AppIcon-2-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-7.png/246x0w.jpg" style="width:100px;height:100px;"></a>
-		<br /> 
-		<b>App in the Air</b>
-		</td>
-		
+				
 		<td align="center" valign="top">
 		<a href="https://apps.apple.com/us/app/longwalks-a-conversation-app/id1412531085"><img class="roundrect" src="https://is3-ssl.mzstatic.com/image/thumb/Purple123/v4/10/fb/7c/10fb7c7d-4d1b-6058-56c7-baf81d9c856e/AppIcon-0-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-10.png/230x0w.jpg" style="width:100px;height:100px;"></a>
 		<br /> 
