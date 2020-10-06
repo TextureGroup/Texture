@@ -387,6 +387,31 @@
   XCTAssert([node conformsToProtocol:@protocol(ASRangeControllerUpdateRangeProtocol)]);
 }
 
+/**
+ * Test that hit tests are correct when the collection node is inverted.
+ */
+- (void)testInvertedCollectionViewHitTest
+{
+  ASCollectionViewTestController *testController = [[ASCollectionViewTestController alloc] initWithNibName:nil bundle:nil];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  [window setRootViewController:testController];
+  [window makeKeyAndVisible];
+  
+  testController.collectionNode.inverted = true;
+  [testController.collectionNode reloadData];
+  [testController.collectionNode waitUntilAllUpdatesAreProcessed];
+  [testController.collectionView layoutIfNeeded];
+  
+  NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
+  UICollectionViewCell *cell = [testController.collectionView cellForItemAtIndexPath:indexPath];
+  ASDisplayNode *node = [testController.collectionNode nodeForItemAtIndexPath:indexPath];
+  
+  CGPoint testPointInCollectionView = CGPointMake(CGRectGetMidX(cell.frame), CGRectGetMidY(cell.frame));
+  UIView *hitTestView = [testController.collectionView hitTest:testPointInCollectionView withEvent:nil];
+  
+  XCTAssertEqualObjects(hitTestView, node.view, @"Expected node's view to be the result of the hit test.");
+}
+
 #pragma mark - Update Validations
 
 #define updateValidationTestPrologue \
