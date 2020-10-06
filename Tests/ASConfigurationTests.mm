@@ -28,6 +28,8 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalDispatchApply,
   ASExperimentalDrawingGlobal,
   ASExperimentalOptimizeDataControllerPipeline,
+  ASExperimentalDisableGlobalTextkitLock,
+  ASExperimentalMainThreadOnlyDataController,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
