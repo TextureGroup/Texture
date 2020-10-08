@@ -97,9 +97,9 @@
 #else
     #define AS_PIN_REMOTE_IMAGE 1
 
-    #define AS_IG_LIST_KIT 0
+    #define AS_IG_LIST_KIT 1
   
-    #define AS_IG_LIST_DIFF_KIT 0
+    #define AS_IG_LIST_DIFF_KIT 1
 
     #define IG_LIST_COLLECTION_VIEW 0
 #endif

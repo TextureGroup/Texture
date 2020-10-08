@@ -14,7 +14,12 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "ASBaseDefines.h"
+
+#if SWIFT_PACKAGE
+#import "IGListKit.h"
+#else
 #import <IGListKit/IGListKit.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

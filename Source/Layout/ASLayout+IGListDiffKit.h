@@ -8,7 +8,12 @@
 
 #if AS_IG_LIST_DIFF_KIT
 #import "ASLayout.h"
+
+#if SWIFT_PACKAGE
+#import "IGListDiffKit.h"
+#else
 #import <IGListDiffKit/IGListDiffKit.h>
+#endif
 
 @interface ASLayout(IGListDiffKit) <IGListDiffable>
 @end
