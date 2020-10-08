@@ -95,11 +95,17 @@
      */
     #define IG_LIST_COLLECTION_VIEW __has_include(<IGListKit/IGListCollectionView.h>)
 #else
-    #define AS_PIN_REMOTE_IMAGE 1
+    #ifndef AS_PIN_REMOTE_IMAGE
+        #define AS_PIN_REMOTE_IMAGE 1
+    #endif
 
-    #define AS_IG_LIST_KIT 1
-  
-    #define AS_IG_LIST_DIFF_KIT 1
+    #ifndef AS_IG_LIST_KIT
+        #define AS_PIN_REMOTE_IMAGE 0
+    #endif
 
+    #ifndef AS_IG_LIST_DIFF_KIT
+        #define AS_IG_LIST_DIFF_KIT 0
+    #endif
+    
     #define IG_LIST_COLLECTION_VIEW 0
 #endif

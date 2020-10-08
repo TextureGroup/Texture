@@ -17,7 +17,10 @@ Pod::Spec.new do |spec|
   # Subspecs
   spec.subspec 'Core' do |core|
     core.compiler_flags = '-fno-exceptions'
-    core.exclude_files = 'Source/Classes/include/*'
+    core.exclude_files = [
+    'Source/Classes/include/*',
+    'Source/AsyncDisplayKitIGListKit/*'
+    ]
     core.public_header_files = [
       'Source/*.h',
       'Source/Details/**/*.h',

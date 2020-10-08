@@ -17,6 +17,16 @@ let headersSearchPath: [CSetting] = [.headerSearchPath("."),
                                      .headerSearchPath("TextKit"),
                                      .headerSearchPath("tvOS"),]
 
+let sharedDefines: [CSetting] = [
+                                // Disable "old" textnode by default for SPM
+                                .define("AS_ENABLE_TEXTNODE", to: "0"),
+    
+                                // PINRemoteImage always available for Texture
+                                .define("AS_PIN_REMOTE_IMAGE", to: "1"),
+                                
+                                // always disabled
+                                .define("IG_LIST_COLLECTION_VIEW", to: "0"),]
+
 let package = Package(
     name: "Texture",
     platforms: [
@@ -30,28 +40,36 @@ let package = Package(
             name: "AsynkDisplayKit",
             type: .static,
             targets: ["AsynkDisplayKit"]),
+        .library(
+            name: "AsyncDisplayKitIGListKit",
+            type: .static,
+            targets: ["AsyncDisplayKitIGListKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/3a4oT/PINRemoteImage.git", .branch("spm")),
+        .package(url: "https://github.com/pinterest/PINRemoteImage.git", .branch("master")),
+        .package(url: "https://github.com/3a4oT/IGListKit", .branch("moreSPM")),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AsynkDisplayKit",
             dependencies: ["PINRemoteImage"],
             path: "Source",
-            exclude: ["Info.plist"],
+            exclude: ["Info.plist", "AsyncDisplayKitIGListKit"],
             publicHeadersPath: "include",
-            cSettings: headersSearchPath + [
-                // Disable "old" textnode by default for SPM
-                .define("AS_ENABLE_TEXTNODE", to: "0"),
-                
-                 // extra IGListKit
+            cSettings: headersSearchPath + sharedDefines + [
+                //  IGListKit unavailable by default
                 .define("AS_IG_LIST_KIT", to: "0"),
                 .define("AS_IG_LIST_DIFF_KIT", to: "0"),
-                // always disabled
-                .define("IG_LIST_COLLECTION_VIEW", to: "0"),
+            ]
+        ),
+        .target(
+            name: "AsyncDisplayKitIGListKit",
+            dependencies: ["AsynkDisplayKit", "IGListKit"],
+            path: "Source/AsyncDisplayKitIGListKit",
+            cSettings: headersSearchPath + sharedDefines + [                
+                 // opt-in IGListKit
+                .define("AS_IG_LIST_KIT", to: "1"),
+                .define("AS_IG_LIST_DIFF_KIT", to: "1"),
             ]
         ),
     ],
