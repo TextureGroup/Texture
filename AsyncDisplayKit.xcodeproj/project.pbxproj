@@ -455,6 +455,7 @@
 		CCF1FF5E20C4785000AAD8FC /* ASLocking.h in Headers */ = {isa = PBXBuildFile; fileRef = CCF1FF5D20C4785000AAD8FC /* ASLocking.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D933F041224AD17F00FF495E /* ASTransactionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D933F040224AD17F00FF495E /* ASTransactionTests.mm */; };
 		D99F9158232990F30083CC8E /* ASImageNodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D99F9157232990F30083CC8E /* ASImageNodeTests.m */; };
+		DA316FC8254D13CD008942BE /* ASEdgeLayoutSpec.h in Headers */ = {isa = PBXBuildFile; fileRef = DA316FC7254D128C008942BE /* ASEdgeLayoutSpec.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB55C2671C641AE4004EDCF5 /* ASContextTransitioning.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DB78412E1C6BCE1600A9E2B4 /* _ASTransitionContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = DB55C2601C6408D6004EDCF5 /* _ASTransitionContext.mm */; };
 		DBABFAFC1C6A8D2F0039EA4A /* _ASTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = DB55C25F1C6408D6004EDCF5 /* _ASTransitionContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -999,6 +1000,7 @@
 		D785F6611A74327E00291744 /* ASScrollNode.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASScrollNode.mm; sourceTree = "<group>"; };
 		D933F040224AD17F00FF495E /* ASTransactionTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTransactionTests.mm; sourceTree = "<group>"; };
 		D99F9157232990F30083CC8E /* ASImageNodeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ASImageNodeTests.m; sourceTree = "<group>"; };
+		DA316FC7254D128C008942BE /* ASEdgeLayoutSpec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ASEdgeLayoutSpec.h; sourceTree = "<group>"; };
 		DB55C25F1C6408D6004EDCF5 /* _ASTransitionContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _ASTransitionContext.h; path = ../_ASTransitionContext.h; sourceTree = "<group>"; };
 		DB55C2601C6408D6004EDCF5 /* _ASTransitionContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = _ASTransitionContext.mm; path = ../_ASTransitionContext.mm; sourceTree = "<group>"; };
 		DB55C2651C641AE4004EDCF5 /* ASContextTransitioning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASContextTransitioning.h; sourceTree = "<group>"; };
@@ -1696,6 +1698,7 @@
 				ACF6ED081B17843500DA7C62 /* ASDimension.mm */,
 				690C35631E055C7B00069B91 /* ASDimensionInternal.h */,
 				690C35601E055C5D00069B91 /* ASDimensionInternal.mm */,
+				DA316FC7254D128C008942BE /* ASEdgeLayoutSpec.h */,
 				ACF6ED091B17843500DA7C62 /* ASInsetLayoutSpec.h */,
 				ACF6ED0A1B17843500DA7C62 /* ASInsetLayoutSpec.mm */,
 				ACF6ED0B1B17843500DA7C62 /* ASLayout.h */,
@@ -2069,6 +2072,7 @@
 				CC2F65EE1E5FFB1600DA57C9 /* ASMutableElementMap.h in Headers */,
 				34EFC76A1B701CE600AD841F /* ASLayoutSpec.h in Headers */,
 				CCA282D01E9EBF6C0037E8B7 /* ASTipsWindow.h in Headers */,
+				DA316FC8254D13CD008942BE /* ASEdgeLayoutSpec.h in Headers */,
 				B350625C1B010F070018CF92 /* ASLog.h in Headers */,
 				CC3B208A1C3F7A5400798563 /* ASWeakSet.h in Headers */,
 				B35062041B010EFD0018CF92 /* ASMultiplexImageNode.h in Headers */,
