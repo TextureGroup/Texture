@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) ASEdgeLayoutLocation edgeLocation;
 
 /**
- The point which offsets from the edge location. Use this property to make delta
+ The offset from the edge location. Use this property to make delta
  distance from the default edge location. Default is 0.0.
  */
 @property (nonatomic) CGFloat offset;
