@@ -18,20 +18,26 @@ static NSUInteger const kEdgeChildIndex = 1;
 
 @implementation ASEdgeLayoutSpec
 
-- (instancetype)initWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location
+- (instancetype)initWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location offset:(CGFloat)offset
 {
   self = [super init];
   if (self) {
     self.child = child;
     self.edge = edge;
     self.edgeLocation = location;
+    self.offset = offset;
   }
   return self;
 }
 
 + (instancetype)edgeLayoutSpecWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location NS_RETURNS_RETAINED
 {
-  return [[self alloc] initWithChild:child edge:edge location:location];
+  return [[self alloc] initWithChild:child edge:edge location:location offset:0.0];
+}
+
++ (instancetype)edgeLayoutSpecWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location offset:(CGFloat)offset  NS_RETURNS_RETAINED;
+{
+  return [[self alloc] initWithChild:child edge:edge location:location offset:offset];
 }
 
 #pragma mark - Children

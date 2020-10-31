@@ -33,9 +33,21 @@ NS_ASSUME_NONNULL_BEGIN
  @param child A child that is laid out to determine the size of this spec.
  @param edge A layoutElement object that is laid out to a edge on the child.
  @param location The edge position option.
+ @param offset offset from the edge location 
  @return An ASEdgeLayoutSpec object with a given child and an layoutElement that act as edge.
  */
-- (instancetype)initWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location AS_WARN_UNUSED_RESULT;
+- (instancetype)initWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location offset:(CGFloat)offset AS_WARN_UNUSED_RESULT;
+
+/**
+ A layout spec that positions a edge element which relatives to the child element.
+
+ @param child A child that is laid out to determine the size of this spec.
+ @param edge A layoutElement object that is laid out to a edge on the child.
+ @param location The edge position option.
+ @param offset offset from the edge location
+ @return An ASEdgeLayoutSpec object with a given child and an layoutElement that act as edge.
+ */
++ (instancetype)edgeLayoutSpecWithChild:(id <ASLayoutElement>)child edge:(id <ASLayoutElement>)edge location:(ASEdgeLayoutLocation)location offset:(CGFloat)offset NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 /**
  A layout spec that positions a edge element which relatives to the child element.
