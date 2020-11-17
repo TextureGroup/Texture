@@ -52,6 +52,7 @@ let package = Package(
     targets: [
         .target(
             name: "AsyncDisplayKit",
+            dependencies: ["PINRemoteImage"],
             path: "Source",
             exclude: ["Info.plist", "AsyncDisplayKitIGListKit"],
             publicHeadersPath: "include",

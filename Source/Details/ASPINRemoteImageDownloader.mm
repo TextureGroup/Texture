@@ -40,7 +40,11 @@
 #define PIN_ANIMATED_AVAILABLE __has_include(<webp/decode.h>)
 #define PIN_WEBP_AVAILABLE __has_include("PINRemoteImage.h")
 
-#import "PINRemoteImage.h"
+    #if __has_include (<PINRemoteImage/PINRemoteImage.h>)
+    #import <PINRemoteImage/PINRemoteImage.h>
+    #else
+    #import "PINRemoteImage.h"
+    #endif
 
 #endif
 
