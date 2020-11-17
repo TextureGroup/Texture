@@ -37,22 +37,21 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "AsynkDisplayKit",
+            name: "AsyncDisplayKit",
             type: .static,
-            targets: ["AsynkDisplayKit"]),
+            targets: ["AsyncDisplayKit"]),
         .library(
             name: "AsyncDisplayKitIGListKit",
             type: .static,
             targets: ["AsyncDisplayKitIGListKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pinterest/PINRemoteImage.git", .branch("master")),
-        .package(url: "https://github.com/3a4oT/IGListKit", .branch("moreSPM")),
+        .package(url: "https://github.com/3a4oT/PINRemoteImage.git", .branch("spmInXcode")),
+        .package(url: "https://github.com/3a4oT/IGListKit", .branch("spmBrain")),
     ],
     targets: [
         .target(
-            name: "AsynkDisplayKit",
-            dependencies: ["PINRemoteImage"],
+            name: "AsyncDisplayKit",
             path: "Source",
             exclude: ["Info.plist", "AsyncDisplayKitIGListKit"],
             publicHeadersPath: "include",
@@ -64,7 +63,7 @@ let package = Package(
         ),
         .target(
             name: "AsyncDisplayKitIGListKit",
-            dependencies: ["AsynkDisplayKit", "IGListKit"],
+            dependencies: ["AsyncDisplayKit", "IGListKit"],
             path: "Source/AsyncDisplayKitIGListKit",
             cSettings: headersSearchPath + sharedDefines + [                
                  // opt-in IGListKit
@@ -73,6 +72,6 @@ let package = Package(
             ]
         ),
     ],
-    cLanguageStandard: .gnu99,
+    cLanguageStandard: .c11,
     cxxLanguageStandard: .cxx11
 )
