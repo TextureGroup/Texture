@@ -37,8 +37,8 @@
     #import <PINRemoteImage/PINRemoteImageCaching.h>
 
 #else
-#define PIN_ANIMATED_AVAILABLE __has_include(<webp/decode.h>)
-#define PIN_WEBP_AVAILABLE __has_include("PINRemoteImage.h")
+#define PIN_ANIMATED_AVAILABLE __has_include(<webp/decode.h>) || __has_include("webp/decode.h")
+#define PIN_WEBP_AVAILABLE __has_include("PINRemoteImage.h") || __has_include (<PINRemoteImage/PINRemoteImage.h>)
 
     #if __has_include (<PINRemoteImage/PINRemoteImage.h>)
     #import <PINRemoteImage/PINRemoteImage.h>
