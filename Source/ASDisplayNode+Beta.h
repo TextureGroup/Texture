@@ -13,7 +13,7 @@
 
 #if YOGA
   #import YOGA_HEADER_PATH
-  #import "ASYogaUtilities.h>
+  #import "ASYogaUtilities.h"
   #import "ASDisplayNode+Yoga.h"
 #endif
 
