@@ -5,5 +5,5 @@
 //  Created by Petro Rovenskyy on 08.10.2020.
 //
 
-import AsyncDisplayKit
-import IGListKit
+@_exported import AsyncDisplayKit
+@_exported import IGListKit

@@ -18,6 +18,7 @@ Pod::Spec.new do |spec|
   spec.subspec 'Core' do |core|
     core.compiler_flags = '-fno-exceptions'
     core.exclude_files = [
+    'Source/include/*',
     'Source/Classes/include/*',
     'Source/AsyncDisplayKitIGListKit/*'
     ]
