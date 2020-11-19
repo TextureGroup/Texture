@@ -18,8 +18,9 @@ Pod::Spec.new do |spec|
   spec.subspec 'Core' do |core|
     core.compiler_flags = '-fno-exceptions'
     core.exclude_files = [
-    'Source/include/*',
     'Source/Classes/include/*',
+    # Required only for SPM support.
+    'Source/include/*',
     'Source/AsyncDisplayKitIGListKit/*'
     ]
     core.public_header_files = [
