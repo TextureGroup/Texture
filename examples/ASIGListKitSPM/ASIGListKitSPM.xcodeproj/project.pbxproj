@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		FB32E77F25768F45000C4F42 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32E77E25768F45000C4F42 /* AppDelegate.swift */; };
 		FB32E78125768F45000C4F42 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32E78025768F45000C4F42 /* SceneDelegate.swift */; };
-		FB32E78325768F45000C4F42 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32E78225768F45000C4F42 /* ViewController.swift */; };
-		FB32E78625768F45000C4F42 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78425768F45000C4F42 /* Main.storyboard */; };
 		FB32E78825768F48000C4F42 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78725768F48000C4F42 /* Assets.xcassets */; };
 		FB32E78B25768F48000C4F42 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78925768F48000C4F42 /* LaunchScreen.storyboard */; };
 		FB32E79B2576A451000C4F42 /* MainListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32E79A2576A451000C4F42 /* MainListViewController.swift */; };
@@ -24,8 +22,6 @@
 		FB32E77B25768F45000C4F42 /* ASIGListKitSPM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ASIGListKitSPM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB32E77E25768F45000C4F42 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB32E78025768F45000C4F42 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		FB32E78225768F45000C4F42 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		FB32E78525768F45000C4F42 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FB32E78725768F48000C4F42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB32E78A25768F48000C4F42 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FB32E78C25768F48000C4F42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -74,12 +70,10 @@
 				FB38949E2576FB5C0025252E /* Texture */,
 				FB32E77E25768F45000C4F42 /* AppDelegate.swift */,
 				FB32E78025768F45000C4F42 /* SceneDelegate.swift */,
-				FB32E78225768F45000C4F42 /* ViewController.swift */,
-				FB32E78425768F45000C4F42 /* Main.storyboard */,
+				FB32E79A2576A451000C4F42 /* MainListViewController.swift */,
 				FB32E78725768F48000C4F42 /* Assets.xcassets */,
 				FB32E78925768F48000C4F42 /* LaunchScreen.storyboard */,
 				FB32E78C25768F48000C4F42 /* Info.plist */,
-				FB32E79A2576A451000C4F42 /* MainListViewController.swift */,
 			);
 			path = ASIGListKitSPM;
 			sourceTree = "<group>";
@@ -177,7 +171,6 @@
 			files = (
 				FB32E78B25768F48000C4F42 /* LaunchScreen.storyboard in Resources */,
 				FB32E78825768F48000C4F42 /* Assets.xcassets in Resources */,
-				FB32E78625768F45000C4F42 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +181,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB32E78325768F45000C4F42 /* ViewController.swift in Sources */,
 				FB32E77F25768F45000C4F42 /* AppDelegate.swift in Sources */,
 				FB3894B2257705A80025252E /* NSObject+ListDiffable.swift in Sources */,
 				FB3894AB257705190025252E /* ItemSectionController.swift in Sources */,
@@ -201,14 +193,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		FB32E78425768F45000C4F42 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FB32E78525768F45000C4F42 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		FB32E78925768F48000C4F42 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
