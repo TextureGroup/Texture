@@ -20,8 +20,7 @@ Pod::Spec.new do |spec|
     core.exclude_files = [
     'Source/Classes/include/*',
     # Required only for SPM support.
-    'Source/include/*',
-    'Source/AsyncDisplayKitIGListKit/*'
+    'Source/include/*'
     ]
     core.public_header_files = [
       'Source/*.h',

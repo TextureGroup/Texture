@@ -13,8 +13,11 @@
 		FB32E78625768F45000C4F42 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78425768F45000C4F42 /* Main.storyboard */; };
 		FB32E78825768F48000C4F42 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78725768F48000C4F42 /* Assets.xcassets */; };
 		FB32E78B25768F48000C4F42 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB32E78925768F48000C4F42 /* LaunchScreen.storyboard */; };
-		FB32E79725768FC6000C4F42 /* AsyncDisplayKitIGListKit in Frameworks */ = {isa = PBXBuildFile; productRef = FB32E79625768FC6000C4F42 /* AsyncDisplayKitIGListKit */; };
 		FB32E79B2576A451000C4F42 /* MainListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB32E79A2576A451000C4F42 /* MainListViewController.swift */; };
+		FB3894A62576FC5F0025252E /* AsyncDisplayKitIGListKit in Frameworks */ = {isa = PBXBuildFile; productRef = FB3894A52576FC5F0025252E /* AsyncDisplayKitIGListKit */; };
+		FB3894AB257705190025252E /* ItemSectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3894AA257705190025252E /* ItemSectionController.swift */; };
+		FB3894B2257705A80025252E /* NSObject+ListDiffable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3894B1257705A80025252E /* NSObject+ListDiffable.swift */; };
+		FB3894B5257705EF0025252E /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3894B4257705EF0025252E /* Item.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,8 +29,11 @@
 		FB32E78725768F48000C4F42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FB32E78A25768F48000C4F42 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FB32E78C25768F48000C4F42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FB32E79325768F8A000C4F42 /* Texture */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Texture; path = ../../..; sourceTree = "<group>"; };
 		FB32E79A2576A451000C4F42 /* MainListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainListViewController.swift; sourceTree = "<group>"; };
+		FB38949E2576FB5C0025252E /* Texture */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Texture; path = ../../..; sourceTree = "<group>"; };
+		FB3894AA257705190025252E /* ItemSectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemSectionController.swift; sourceTree = "<group>"; };
+		FB3894B1257705A80025252E /* NSObject+ListDiffable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSObject+ListDiffable.swift"; sourceTree = "<group>"; };
+		FB3894B4257705EF0025252E /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB32E79725768FC6000C4F42 /* AsyncDisplayKitIGListKit in Frameworks */,
+				FB3894A62576FC5F0025252E /* AsyncDisplayKitIGListKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +53,7 @@
 			children = (
 				FB32E77D25768F45000C4F42 /* ASIGListKitSPM */,
 				FB32E77C25768F45000C4F42 /* Products */,
-				FB32E79525768FC6000C4F42 /* Frameworks */,
+				FB38949F2576FB670025252E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,7 +68,10 @@
 		FB32E77D25768F45000C4F42 /* ASIGListKitSPM */ = {
 			isa = PBXGroup;
 			children = (
-				FB32E79325768F8A000C4F42 /* Texture */,
+				FB3894AE2577054F0025252E /* Extensions */,
+				FB3894AD2577053C0025252E /* Models */,
+				FB3894A9257704EF0025252E /* Section Controllers */,
+				FB38949E2576FB5C0025252E /* Texture */,
 				FB32E77E25768F45000C4F42 /* AppDelegate.swift */,
 				FB32E78025768F45000C4F42 /* SceneDelegate.swift */,
 				FB32E78225768F45000C4F42 /* ViewController.swift */,
@@ -75,11 +84,35 @@
 			path = ASIGListKitSPM;
 			sourceTree = "<group>";
 		};
-		FB32E79525768FC6000C4F42 /* Frameworks */ = {
+		FB38949F2576FB670025252E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FB3894A9257704EF0025252E /* Section Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FB3894AA257705190025252E /* ItemSectionController.swift */,
+			);
+			path = "Section Controllers";
+			sourceTree = "<group>";
+		};
+		FB3894AD2577053C0025252E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FB3894B4257705EF0025252E /* Item.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FB3894AE2577054F0025252E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				FB3894B1257705A80025252E /* NSObject+ListDiffable.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -99,7 +132,7 @@
 			);
 			name = ASIGListKitSPM;
 			packageProductDependencies = (
-				FB32E79625768FC6000C4F42 /* AsyncDisplayKitIGListKit */,
+				FB3894A52576FC5F0025252E /* AsyncDisplayKitIGListKit */,
 			);
 			productName = ASIGListKitSPM;
 			productReference = FB32E77B25768F45000C4F42 /* ASIGListKitSPM.app */;
@@ -157,6 +190,9 @@
 			files = (
 				FB32E78325768F45000C4F42 /* ViewController.swift in Sources */,
 				FB32E77F25768F45000C4F42 /* AppDelegate.swift in Sources */,
+				FB3894B2257705A80025252E /* NSObject+ListDiffable.swift in Sources */,
+				FB3894AB257705190025252E /* ItemSectionController.swift in Sources */,
+				FB3894B5257705EF0025252E /* Item.swift in Sources */,
 				FB32E78125768F45000C4F42 /* SceneDelegate.swift in Sources */,
 				FB32E79B2576A451000C4F42 /* MainListViewController.swift in Sources */,
 			);
@@ -360,7 +396,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FB32E79625768FC6000C4F42 /* AsyncDisplayKitIGListKit */ = {
+		FB3894A52576FC5F0025252E /* AsyncDisplayKitIGListKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AsyncDisplayKitIGListKit;
 		};

@@ -12,9 +12,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        let main = MainListViewController(flowLayout: UICollectionViewFlowLayout())
-        let nav = UINavigationController(rootViewController: main)
-        self.present(nav, animated: true, completion: nil)
     }
 
 }

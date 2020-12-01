@@ -27,6 +27,15 @@ let sharedDefines: [CSetting] = [
                                 // always disabled
                                 .define("IG_LIST_COLLECTION_VIEW", to: "0"),]
 
+func IGListKit(enabled: Bool) -> [CSetting] {
+    let state: String = enabled ? "1" : "0"
+    return [
+        .define("AS_IG_LIST_KIT", to: state),
+        .define("AS_IG_LIST_DIFF_KIT", to: state),
+    ]
+}
+
+
 let package = Package(
     name: "Texture",
     platforms: [
@@ -56,21 +65,14 @@ let package = Package(
             path: "Source",
             exclude: ["Info.plist", "AsyncDisplayKitIGListKit"],
             publicHeadersPath: "include",
-            cSettings: headersSearchPath + sharedDefines + [
-                //  IGListKit unavailable by default
-                .define("AS_IG_LIST_KIT", to: "0"),
-                .define("AS_IG_LIST_DIFF_KIT", to: "0"),
-            ]
+            cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
         ),
         .target(
             name: "AsyncDisplayKitIGListKit",
-            dependencies: ["AsyncDisplayKit", "IGListKit"],
-            path: "Source/AsyncDisplayKitIGListKit",
-            cSettings: headersSearchPath + sharedDefines + [                
-                 // opt-in IGListKit
-                .define("AS_IG_LIST_KIT", to: "1"),
-                .define("AS_IG_LIST_DIFF_KIT", to: "1"),
-            ]
+            dependencies: ["IGListKit", "PINRemoteImage"],
+            path: "AsyncDisplayKitIGListKit/Source",
+            exclude: ["Info.plist"],
+            cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: true)
         ),
     ],
     cLanguageStandard: .c11,

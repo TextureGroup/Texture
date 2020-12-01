@@ -8,27 +8,6 @@
 import UIKit
 import AsyncDisplayKitIGListKit
 
-extension NSObject: ListDiffable {
-    open func diffIdentifier() -> NSObjectProtocol {
-        return self
-    }
-    open func isEqual(toDiffableObject object: ListDiffable?) -> Bool {
-        return isEqual(object)
-    }
-}
-
-final class Item: NSObject {
-    let name: String
-    init(name: String) {
-        self.name = name
-        super.init()
-    }
-}
-
-final class ItemSectionController: ListSectionController {
-    
-}
-
 // MARK: ListAdapterDataSource
 
 extension MainListViewController: ListAdapterDataSource {
@@ -67,6 +46,7 @@ final class MainListViewController: ASDKViewController<ASCollectionNode> {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "AS+IG+SPM=💘"
         // Do any additional setup after loading the view.
     }
 }
