@@ -11,10 +11,10 @@
 
 #if AS_IG_LIST_KIT
 
-#if SWIFT_PACKAGE
+#if __has_include("IGListKit.h")
 #import "IGListKit.h"
 #else
-#import <IGListKit/IGListKit.h>
+#import <IGListKit/IGListKit.h>aa
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
