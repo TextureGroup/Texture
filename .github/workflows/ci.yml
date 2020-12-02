@@ -38,7 +38,7 @@ jobs:
     name: Build from SPM manifest
     runs-on: macOS-latest
     env: 
-      DEVELOPER_DIR: /Applications/Xcode_12.1.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
     strategy:
       matrix:
         destination: ["platform=iOS Simulator,name=iPhone 12 Pro", "platform=macOS,variant=Mac Catalyst", "platform=tvOS Simulator,name=Apple TV 4k"]
@@ -56,3 +56,15 @@ jobs:
           rm -rf AsyncDisplayKit.xcodeproj/
           rm -rf AsyncDisplayKit.xcworkspace/
           xcodebuild clean build -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}"
+
+  Xcode-SPM-Integration:
+    name: Build example project to verify Xcode's SPM integration
+    runs-on: macOS-latest
+    env: 
+      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Check xcode's spm integration
+        run: ./build.sh build_listkit_xcode_spm_integration

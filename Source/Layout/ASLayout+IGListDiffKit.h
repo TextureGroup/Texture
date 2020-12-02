@@ -9,7 +9,7 @@
 #if AS_IG_LIST_DIFF_KIT
 #import "ASLayout.h"
 
-#if __has_include("IGListDiffKit.h")
+#if !__has_include(<IGListDiffKit/IGListDiffKit.h>)
 #import "IGListDiffKit.h"
 #else
 #import <IGListDiffKit/IGListDiffKit.h>

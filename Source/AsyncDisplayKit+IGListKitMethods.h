@@ -15,7 +15,7 @@
 #import <UIKit/UIKit.h>
 #import "ASBaseDefines.h"
 
-#if __has_include("IGListKit.h")
+#if !__has_include(<IGListKit/IGListKit.h>)
 #import "IGListKit.h"
 #else
 #import <IGListKit/IGListKit.h>

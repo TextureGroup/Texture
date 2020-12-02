@@ -16,37 +16,36 @@
 #import "ASThread.h"
 #import "ASImageContainerProtocolCategories.h"
 
-#if !SWIFT_PACKAGE
-
-    #if __has_include (<PINRemoteImage/PINGIFAnimatedImage.h>)
+#if __has_include(<PINRemoteImage/PINGIFAnimatedImage.h>) || __has_include("PINGIFAnimatedImage.h")
     #define PIN_ANIMATED_AVAILABLE 1
-    #import <PINRemoteImage/PINCachedAnimatedImage.h>
-    #import <PINRemoteImage/PINAlternateRepresentationProvider.h>
+    #if __has_include(<PINRemoteImage/PINGIFAnimatedImage.h>)
+        #import <PINRemoteImage/PINCachedAnimatedImage.h>
+        #import <PINRemoteImage/PINAlternateRepresentationProvider.h>
     #else
+        #import "PINCachedAnimatedImage.h"
+        #import "PINAlternateRepresentationProvider.h"
+    #endif
+#else
     #define PIN_ANIMATED_AVAILABLE 0
-    #endif
+#endif
 
-    #if __has_include(<webp/decode.h>)
+#if __has_include(<webp/decode.h>) || __has_include("webp/decode.h")
     #define PIN_WEBP_AVAILABLE  1
-    #else
+#else
     #define PIN_WEBP_AVAILABLE  0
-    #endif
+#endif
 
+#if __has_include(<PINRemoteImage/PINRemoteImage.h>)
     #import <PINRemoteImage/PINRemoteImageManager.h>
     #import <PINRemoteImage/NSData+ImageDetectors.h>
     #import <PINRemoteImage/PINRemoteImageCaching.h>
-
 #else
-#define PIN_ANIMATED_AVAILABLE __has_include(<webp/decode.h>) || __has_include("webp/decode.h")
-#define PIN_WEBP_AVAILABLE __has_include("PINRemoteImage.h") || __has_include (<PINRemoteImage/PINRemoteImage.h>)
-
-    #if __has_include (<PINRemoteImage/PINRemoteImage.h>)
-    #import <PINRemoteImage/PINRemoteImage.h>
-    #else
-    #import "PINRemoteImage.h"
-    #endif
-
+    #import "PINRemoteImageManager.h"
+    #import "NSData+ImageDetectors.h"
+    #import "PINRemoteImageCaching.h"
 #endif
+
+
 
 static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASImageDownloaderPriority(ASImageDownloaderPriority priority) {
   switch (priority) {

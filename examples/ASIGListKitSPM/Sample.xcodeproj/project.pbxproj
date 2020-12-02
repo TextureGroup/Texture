@@ -19,7 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		FB32E77B25768F45000C4F42 /* ASIGListKitSPM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ASIGListKitSPM.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB32E77B25768F45000C4F42 /* Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB32E77E25768F45000C4F42 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB32E78025768F45000C4F42 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		FB32E78725768F48000C4F42 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -56,7 +56,7 @@
 		FB32E77C25768F45000C4F42 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FB32E77B25768F45000C4F42 /* ASIGListKitSPM.app */,
+				FB32E77B25768F45000C4F42 /* Sample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,9 +112,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FB32E77A25768F45000C4F42 /* ASIGListKitSPM */ = {
+		FB32E77A25768F45000C4F42 /* Sample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FB32E78F25768F48000C4F42 /* Build configuration list for PBXNativeTarget "ASIGListKitSPM" */;
+			buildConfigurationList = FB32E78F25768F48000C4F42 /* Build configuration list for PBXNativeTarget "Sample" */;
 			buildPhases = (
 				FB32E77725768F45000C4F42 /* Sources */,
 				FB32E77825768F45000C4F42 /* Frameworks */,
@@ -124,12 +124,12 @@
 			);
 			dependencies = (
 			);
-			name = ASIGListKitSPM;
+			name = Sample;
 			packageProductDependencies = (
 				FB3894A52576FC5F0025252E /* AsyncDisplayKitIGListKit */,
 			);
 			productName = ASIGListKitSPM;
-			productReference = FB32E77B25768F45000C4F42 /* ASIGListKitSPM.app */;
+			productReference = FB32E77B25768F45000C4F42 /* Sample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -146,7 +146,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FB32E77625768F45000C4F42 /* Build configuration list for PBXProject "ASIGListKitSPM" */;
+			buildConfigurationList = FB32E77625768F45000C4F42 /* Build configuration list for PBXProject "Sample" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -159,7 +159,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FB32E77A25768F45000C4F42 /* ASIGListKitSPM */,
+				FB32E77A25768F45000C4F42 /* Sample */,
 			);
 		};
 /* End PBXProject section */
@@ -327,6 +327,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = ASIGListKitSPM/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -345,6 +346,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = ASIGListKitSPM/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -359,7 +361,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FB32E77625768F45000C4F42 /* Build configuration list for PBXProject "ASIGListKitSPM" */ = {
+		FB32E77625768F45000C4F42 /* Build configuration list for PBXProject "Sample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FB32E78D25768F48000C4F42 /* Debug */,
@@ -368,7 +370,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FB32E78F25768F48000C4F42 /* Build configuration list for PBXNativeTarget "ASIGListKitSPM" */ = {
+		FB32E78F25768F48000C4F42 /* Build configuration list for PBXNativeTarget "Sample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FB32E79025768F48000C4F42 /* Debug */,

@@ -11,7 +11,7 @@
 
 #if AS_IG_LIST_KIT
 
-#if __has_include("IGListKit.h")
+#if !__has_include(<IGListKit/IGListKit.h>)
 #import "IGListKit.h"
 #else
 #import <IGListKit/IGListKit.h>
