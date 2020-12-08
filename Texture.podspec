@@ -24,7 +24,7 @@ Pod::Spec.new do |spec|
       'Source/Base/*.h',
       'Source/Debug/**/*.h',
       'Source/TextKit/ASTextNodeTypes.h',
-      'Source/TextKit/ASTextKitComponents.h'
+      'Source/TextKit/ASTextKitComponents.h',
       'Source/TextExperiment/**/*.h'
     ]
     
