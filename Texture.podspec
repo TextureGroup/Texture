@@ -25,6 +25,7 @@ Pod::Spec.new do |spec|
       'Source/Debug/**/*.h',
       'Source/TextKit/ASTextNodeTypes.h',
       'Source/TextKit/ASTextKitComponents.h'
+      'Source/TextExperiment/**/*.h'
     ]
     
     core.source_files = [
