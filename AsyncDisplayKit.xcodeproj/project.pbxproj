@@ -193,16 +193,16 @@
 		9644CFE02193777C00213478 /* ASThrashUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 9644CFDF2193777C00213478 /* ASThrashUtility.m */; };
 		9692B4FF219E12370060C2C3 /* ASCollectionViewThrashTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9692B4FE219E12370060C2C3 /* ASCollectionViewThrashTests.mm */; };
 		9C0BA49C2582CE35001C293B /* ASTextDebugOption.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA4882582CE35001C293B /* ASTextDebugOption.mm */; };
-		9C0BA49D2582CE35001C293B /* ASTextDebugOption.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4892582CE35001C293B /* ASTextDebugOption.h */; };
-		9C0BA49E2582CE35001C293B /* ASTextLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48A2582CE35001C293B /* ASTextLayout.h */; };
-		9C0BA49F2582CE35001C293B /* ASTextInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48B2582CE35001C293B /* ASTextInput.h */; };
+		9C0BA49D2582CE35001C293B /* ASTextDebugOption.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4892582CE35001C293B /* ASTextDebugOption.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C0BA49E2582CE35001C293B /* ASTextLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48A2582CE35001C293B /* ASTextLayout.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C0BA49F2582CE35001C293B /* ASTextInput.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48B2582CE35001C293B /* ASTextInput.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C0BA4A02582CE35001C293B /* ASTextLine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA48C2582CE35001C293B /* ASTextLine.mm */; };
-		9C0BA4A12582CE35001C293B /* ASTextLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48D2582CE35001C293B /* ASTextLine.h */; };
+		9C0BA4A12582CE35001C293B /* ASTextLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA48D2582CE35001C293B /* ASTextLine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C0BA4A22582CE35001C293B /* ASTextLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA48E2582CE35001C293B /* ASTextLayout.mm */; };
 		9C0BA4A32582CE35001C293B /* ASTextInput.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA48F2582CE35001C293B /* ASTextInput.mm */; };
 		9C0BA4A42582CE35001C293B /* ASTextAttribute.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA4912582CE35001C293B /* ASTextAttribute.mm */; };
 		9C0BA4A52582CE35001C293B /* ASTextRunDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9C0BA4922582CE35001C293B /* ASTextRunDelegate.mm */; };
-		9C0BA4A62582CE35001C293B /* ASTextAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4932582CE35001C293B /* ASTextAttribute.h */; };
+		9C0BA4A62582CE35001C293B /* ASTextAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4932582CE35001C293B /* ASTextAttribute.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C0BA4A72582CE35001C293B /* ASTextRunDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4942582CE35001C293B /* ASTextRunDelegate.h */; };
 		9C0BA4A82582CE35001C293B /* ASTextUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4962582CE35001C293B /* ASTextUtilities.h */; };
 		9C0BA4A92582CE35001C293B /* NSParagraphStyle+ASText.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0BA4972582CE35001C293B /* NSParagraphStyle+ASText.h */; };
@@ -1894,6 +1894,11 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C0BA4A62582CE35001C293B /* ASTextAttribute.h in Headers */,
+				9C0BA49F2582CE35001C293B /* ASTextInput.h in Headers */,
+				9C0BA4A12582CE35001C293B /* ASTextLine.h in Headers */,
+				9C0BA49D2582CE35001C293B /* ASTextDebugOption.h in Headers */,
+				9C0BA49E2582CE35001C293B /* ASTextLayout.h in Headers */,
 				1A6C000D1FAB4E2100D05926 /* ASCornerLayoutSpec.h in Headers */,
 				E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */,
 				E517F9C923BF14BC006E40E0 /* ASLayout+IGListDiffKit.h in Headers */,
@@ -1932,7 +1937,6 @@
 				B35062571B010F070018CF92 /* ASAssert.h in Headers */,
 				CCBBBF5D1EB161760069AA91 /* ASRangeManagingNode.h in Headers */,
 				9D302F9B2231B07E005739C3 /* ASButtonNode+Private.h in Headers */,
-				9C0BA49D2582CE35001C293B /* ASTextDebugOption.h in Headers */,
 				B35062581B010F070018CF92 /* ASAvailability.h in Headers */,
 				9019FBBF1ED8061D00C45F72 /* ASYogaUtilities.h in Headers */,
 				DE84918D1C8FFF2B003D89E9 /* ASRunLoopQueue.h in Headers */,
@@ -1950,8 +1954,6 @@
 				CC55A7111E52A0F200594372 /* ASResponderChainEnumerator.h in Headers */,
 				18C2ED7F1B9B7DE800F627B3 /* ASCollectionNode.h in Headers */,
 				B35061F51B010EFD0018CF92 /* ASCollectionView.h in Headers */,
-				9C0BA4A12582CE35001C293B /* ASTextLine.h in Headers */,
-				9C0BA49E2582CE35001C293B /* ASTextLayout.h in Headers */,
 				ACE87A2C1D73696800D7FF06 /* ASSectionContext.h in Headers */,
 				509E68631B3AEDB4009B9150 /* ASCollectionViewLayoutController.h in Headers */,
 				B35061F71B010EFD0018CF92 /* ASCollectionViewProtocols.h in Headers */,
@@ -2046,7 +2048,6 @@
 				9C0BA4AA2582CE35001C293B /* NSAttributedString+ASText.h in Headers */,
 				DEC146B71C37A16A004A0EE7 /* ASCollectionInternal.h in Headers */,
 				68B8A4E21CBDB958007E4543 /* ASWeakProxy.h in Headers */,
-				9C0BA4A62582CE35001C293B /* ASTextAttribute.h in Headers */,
 				9F98C0271DBE29FC00476D92 /* ASControlTargetAction.h in Headers */,
 				695943401D70815300B0EE1F /* ASDisplayNodeLayout.h in Headers */,
 				0442850E1BAA64EC00D16268 /* ASTwoDimensionalArrayUtils.h in Headers */,
@@ -2102,7 +2103,6 @@
 				CC0F885C1E42807F00576FED /* ASCollectionViewFlowLayoutInspector.h in Headers */,
 				764D83D51C8EA515009B4FB8 /* AsyncDisplayKit+Debug.h in Headers */,
 				CC7FD9E21BB603FF005CCB2B /* ASPhotosFrameworkImageRequest.h in Headers */,
-				9C0BA49F2582CE35001C293B /* ASTextInput.h in Headers */,
 				254C6B761BF94DF4003EC431 /* ASTextNodeTypes.h in Headers */,
 				CCA282B41E9EA7310037E8B7 /* ASTipsController.h in Headers */,
 				34EFC7711B701CFF00AD841F /* ASStackLayoutSpec.h in Headers */,
