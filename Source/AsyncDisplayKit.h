@@ -110,6 +110,7 @@
 #import <AsyncDisplayKit/ASMutableAttributedStringBuilder.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASTextKitComponents.h>
+#import <AsyncDisplayKit/ASTextLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASVisibilityProtocols.h>
