@@ -116,7 +116,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     self.selectionStyle = node.selectionStyle; 
     self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
-    
+    self.isAccessibilityElement = node.isAccessibilityElement;
+    self.accessibilityElementsHidden = node.accessibilityElementsHidden;
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
     // This is actually a workaround for a bug we are seeing in some rare cases (selected background view
     // overlaps other cells if size of ASCellNode has changed.)
