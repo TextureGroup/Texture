@@ -9,7 +9,9 @@
 
 #import "ASTextAttribute.h"
 #import <CoreText/CoreText.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <UIKit/UIKit.h>
+#import "third_party/objective_c/Texture/Source/ASDisplayNodeExtras.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/NSAttributedString+ASText.h"
 
 NSString *const ASTextBackedStringAttributeName = @"ASTextBackedString";
 NSString *const ASTextBindingAttributeName = @"ASTextBinding";
@@ -363,6 +365,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   one.contentInsets = self.contentInsets;
   one.userInfo = self.userInfo.copy;
   return one;
+}
+
+- (void)dealloc {
+  ASPerformMainThreadDeallocation(&_userInfo);
 }
 
 @end

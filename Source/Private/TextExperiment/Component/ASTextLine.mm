@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextLine.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextLine.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/ASTextUtilities.h"
 
 @implementation ASTextLine {
   CGFloat _firstGlyphPos; // first glyph position for baseline, typically 0.

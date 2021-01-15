@@ -7,16 +7,24 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextLayout.h>
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextLayout.h"
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "third_party/objective_c/Texture/Source/ASConfigurationInternal.h"
+#import "third_party/objective_c/Texture/Source/ASDisplayNode+Beta.h"
+#import "third_party/objective_c/Texture/Source/ASDisplayNode+Subclasses.h"
+#import "third_party/objective_c/Texture/Source/ASNetworkImageNode.h"
+#import "third_party/objective_c/Texture/Source/Base/ASAssert.h"
+#import "third_party/objective_c/Texture/Source/Private/ASDisplayNodeInternal.h"
+#import "third_party/objective_c/Texture/Source/Private/ASInternalHelpers.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/String/ASTextAttribute.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/ASTextUtilities.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/NSAttributedString+ASText.h"
+
+#import <pthread.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
+
+NSAttributedString *fillBaseAttributes(NSAttributedString *str, NSDictionary *attrs);
 
 typedef struct {
   CGFloat head;
@@ -401,7 +409,6 @@ dispatch_semaphore_signal(_lock);
   CGRect cgPathBox = {0};
   BOOL isVerticalForm = NO;
   BOOL rowMaySeparated = NO;
-  NSMutableDictionary *frameAttrs = nil;
   CTFramesetterRef ctSetter = NULL;
   CTFrameRef ctFrame = NULL;
   CFArrayRef ctLines = nil;
@@ -414,6 +421,7 @@ dispatch_semaphore_signal(_lock);
   NSMutableSet *attachmentContentsSet = nil;
   BOOL needTruncation = NO;
   NSAttributedString *truncationToken = nil;
+  NSMutableAttributedString *lastLineText = nil;
   ASTextLine *truncatedLine = nil;
   ASRowEdge *lineRowsEdge = NULL;
   NSUInteger *lineRowsIndex = NULL;
@@ -498,16 +506,26 @@ dispatch_semaphore_signal(_lock);
   if (!cgPath) FAIL_AND_RETURN
   
   // frame setter config
-  frameAttrs = [[NSMutableDictionary alloc] init];
-  if (container.isPathFillEvenOdd == NO) {
-    frameAttrs[(id)kCTFramePathFillRuleAttributeName] = @(kCTFramePathFillWindingNumber);
-  }
-  if (container.pathLineWidth > 0) {
-    frameAttrs[(id)kCTFramePathWidthAttributeName] = @(container.pathLineWidth);
-  }
-  if (container.isVerticalForm == YES) {
-    frameAttrs[(id)kCTFrameProgressionAttributeName] = @(kCTFrameProgressionRightToLeft);
-  }
+  NSDictionary *frameAttrs = ({
+    static constexpr NSUInteger kMaxAttrCount = 3;
+    NSUInteger count = 0;
+    id keys[kMaxAttrCount];
+    id objects[kMaxAttrCount];
+    if (container.isPathFillEvenOdd == NO) {
+      keys[count] = (id)kCTFramePathFillRuleAttributeName;
+      objects[count++] = @(kCTFramePathFillWindingNumber);
+    }
+    if (container.pathLineWidth > 0) {
+      keys[count] = (id)kCTFramePathWidthAttributeName;
+      objects[count++] = @(container.pathLineWidth);
+    }
+    if (container.isVerticalForm == YES) {
+      keys[count] = (id)kCTFrameProgressionAttributeName;
+      objects[count++] = @(kCTFrameProgressionRightToLeft);
+    }
+    // If you add new attributes, make sure to update kMaxAttrCount above.
+    count ? [[NSDictionary alloc] initWithObjects:objects forKeys:keys count:count] : nil;
+  });
   
   /*
    * Framesetter cache.
@@ -610,7 +628,7 @@ dispatch_semaphore_signal(_lock);
     CGPoint position;
     position.x = cgPathBox.origin.x + ctLineOrigin.x;
     position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
-    
+
     ASTextLine *line = [ASTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
     
     [lines addObject:line];
@@ -694,6 +712,7 @@ dispatch_semaphore_signal(_lock);
       }
       ASTextLine *lastLine = rowCount < lines.count ? lines[rowCount - 1] : lines.lastObject;
       if (!needTruncation && lastLine.range.location + lastLine.range.length < text.length) {
+        // lastLine doesn't go to the end of the text: ie it has been truncated.
         needTruncation = YES;
         while (lines.count > rowCount) {
           ASTextLine *line = lines.lastObject;
@@ -744,83 +763,67 @@ dispatch_semaphore_signal(_lock);
       }
     }
 
-    { // calculate bounding size
-      CGRect rect = textBoundingRect;
-      if (container.path) {
-        if (container.pathLineWidth > 0) {
-          CGFloat inset = container.pathLineWidth / 2;
-          rect = CGRectInset(rect, -inset, -inset);
-        }
-      } else {
-        rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
-      }
-      rect = CGRectStandardize(rect);
-      CGSize size = rect.size;
-      if (container.verticalForm) {
-        size.width += container.size.width - (rect.origin.x + rect.size.width);
-      } else {
-        size.width += rect.origin.x;
-      }
-      size.height += rect.origin.y;
-      if (size.width < 0) size.width = 0;
-      if (size.height < 0) size.height = 0;
-      size.width = ceil(size.width);
-      size.height = ceil(size.height);
-      textBoundingSize = size;
-    }
-
     visibleRange = ASTextNSRangeFromCFRange(CTFrameGetVisibleStringRange(ctFrame));
     if (needTruncation) {
       ASTextLine *lastLine = lines.lastObject;
       NSRange lastRange = lastLine.range;
-      visibleRange.length = lastRange.location + lastRange.length - visibleRange.location;
+      visibleRange.length = NSMaxRange(lastRange) - visibleRange.location;
 
       // create truncated line
       if (container.truncationType != ASTextTruncationTypeNone) {
+        CTLineTruncationType type = kCTLineTruncationEnd;
+        if (container.truncationType == ASTextTruncationTypeStart) {
+          type = kCTLineTruncationStart;
+        } else if (container.truncationType == ASTextTruncationTypeMiddle) {
+          type = kCTLineTruncationMiddle;
+        }
+
         CTLineRef truncationTokenLine = NULL;
-        if (container.truncationToken) {
-          truncationToken = container.truncationToken;
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
+        truncationToken = container.truncationToken;
+        // For Tail truncation, if the truncation token is empty or only whitespace, we simply take
+        // whatever the Framesetter already generated and go with that (e.g. last word is omitted.)
+        static dispatch_once_t nonWhitespaceCharacterSetOnce;
+        static NSCharacterSet *nonWhitespaceCharacterSet;
+        dispatch_once(&nonWhitespaceCharacterSetOnce, ^{
+          nonWhitespaceCharacterSet = NSCharacterSet.whitespaceCharacterSet.invertedSet;
+        });
+        // Truncation token is all whitespace, or just an empty string.
+        if (truncationToken && type == kCTLineTruncationEnd && NSNotFound == [truncationToken.string rangeOfCharacterFromSet:nonWhitespaceCharacterSet].location) {
+          // Don't do anything. Reset truncationToken to nil, leave truncationTokenLine as NULL.
+          truncationToken = nil;
         } else {
+          // Form a truncation token from the end of the last line.
           CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
           NSUInteger runCount = CFArrayGetCount(runs);
+          NSMutableAttributedString *string =
+              [[NSMutableAttributedString alloc] initWithString:ASTextTruncationToken];
           NSMutableDictionary *attrs = nil;
           if (runCount > 0) {
-            CTRunRef run = (CTRunRef) CFArrayGetValueAtIndex(runs, runCount - 1);
-            attrs = (id) CTRunGetAttributes(run);
-            attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+
+            // Get last line run
+            CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, runCount - 1);
+
+            // Attributes from last run
+            attrs = (id)CTRunGetAttributes(run);
+            attrs = attrs ? [attrs mutableCopy] : [[NSMutableDictionary alloc] init];
             [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
-            CTFontRef font = (__bridge CTFontRef) attrs[(id) kCTFontAttributeName];
-            CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
-            UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
-            if (uiFont) {
-              font = CTFontCreateWithName((__bridge CFStringRef) uiFont.fontName, uiFont.pointSize, NULL);
-            } else {
-              font = NULL;
+
+            if (container.truncationToken) {
+              string = [container.truncationToken mutableCopy];
             }
-            if (font) {
-              attrs[(id) kCTFontAttributeName] = (__bridge id) (font);
-              uiFont = nil;
-              CFRelease(font);
-            }
-            CGColorRef color = (__bridge CGColorRef) (attrs[(id) kCTForegroundColorAttributeName]);
+
+            // Ignore clear color
+            CGColorRef color = (__bridge CGColorRef)attrs[(id)kCTForegroundColorAttributeName];
             if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
-              // ignore clear color
-              [attrs removeObjectForKey:(id) kCTForegroundColorAttributeName];
+              [attrs removeObjectForKey:(id)kCTForegroundColorAttributeName];
             }
-            if (!attrs) attrs = [NSMutableDictionary new];
           }
-          truncationToken = [[NSAttributedString alloc] initWithString:ASTextTruncationToken attributes:attrs];
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
+          truncationToken = fillBaseAttributes(string, attrs);
+          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
         }
         if (truncationTokenLine) {
-          CTLineTruncationType type = kCTLineTruncationEnd;
-          if (container.truncationType == ASTextTruncationTypeStart) {
-            type = kCTLineTruncationStart;
-          } else if (container.truncationType == ASTextTruncationTypeMiddle) {
-            type = kCTLineTruncationMiddle;
-          }
-          NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+          // TODO: Avoid creating this unless we actually modify the last line text.
+          lastLineText = [[text attributedSubstringFromRange:lastLine.range] mutableCopy];
           CGFloat truncatedWidth = lastLine.width;
           CGFloat atLeastOneLine = lastLine.width;
           CGRect cgPathRect = CGRectZero;
@@ -832,6 +835,7 @@ dispatch_semaphore_signal(_lock);
             }
           }
           int i = 0;
+          int limit = (int) removedLines.count;
           if (type != kCTLineTruncationStart) { // Middle or End/Tail wants to collect some text (at least one line's
               // worth) preceding the truncated content, with which to construct a "truncated line".
             i = (int)removedLines.count - 1;
@@ -843,13 +847,19 @@ dispatch_semaphore_signal(_lock);
               [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
               atLeastOneLine += removedLines[i--].width;
             }
-            [lastLineText appendAttributedString:truncationToken];
+            if (type == kCTLineTruncationEnd) {
+              [lastLineText appendAttributedString:truncationToken];
+            }
+            if (type == kCTLineTruncationMiddle) { // If we are truncating Middle, we do not want
+              // to collect the same text into the truncated line more than once.
+              limit = i+1;
+            }
           }
           if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants to collect some
               // text following the truncated content.
             i = 0;
             atLeastOneLine = removedLines[i].width;
-            while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
+            while (atLeastOneLine < truncatedWidth && i < limit) {
               atLeastOneLine += removedLines[i++].width;
             }
             for (i--; i >= 0; i--) {
@@ -871,14 +881,62 @@ dispatch_semaphore_signal(_lock);
             CFRelease(ctLastLineExtend);
             if (ctTruncatedLine) {
               truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
-              truncatedLine.index = lastLine.index;
-              truncatedLine.row = lastLine.row;
+              if (!isVerticalForm) {
+
+                // 1) If truncation mode is middle or start, and the end of the string contains taller text (or taller attachments), then truncating the line may make it taller
+                //  (By pulling up the tall text that was previously in a later, clipped line, into the truncation line).
+                // 1b) There are edge cases where truncating the line makes it taller, thus it exceeds the bounds, and we in fact needed to truncate at an earlier line.
+                //  Accommodating these cases in a robust manner would require multiple passes. (TODO_NOTREALLY)
+                // 2) In all cases, truncating the line may make it shorter. (Of course)
+                // 3) If text is not left-aligned, and truncating changed the width of the last line, it also needs to change its position. (TODO: same for center-aligned)
+                BOOL adjusted = NO;
+                CGPoint adjustedPosition = truncatedLine.position;
+                 if (truncatedLine.bounds.size.height > lastLine.bounds.size.height) {
+                  adjusted = YES;
+                  adjustedPosition = {adjustedPosition.x, lastLine.position.y + (truncatedLine.bounds.size.height - lastLine.bounds.size.height)/2};
+                }
+               if ([lastLineText as_alignment] == NSTextAlignmentRight) {
+                  adjusted = YES;
+                  adjustedPosition = {lastLine.position.x - (truncatedLine.bounds.size.width - lastLine.bounds.size.width), adjustedPosition.y};
+                }
+                if (adjusted) {
+                  truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:adjustedPosition vertical:isVerticalForm];
+                }
+              }
               CFRelease(ctTruncatedLine);
             }
+            textBoundingRect = CGRectUnion(textBoundingRect, truncatedLine.bounds);
+            truncatedLine.index = lastLine.index;
+            truncatedLine.row = lastLine.row;
           }
           CFRelease(truncationTokenLine);
         }
       }
+    }
+
+    { // calculate bounding size
+      CGRect rect = textBoundingRect;
+      if (container.path) {
+        if (container.pathLineWidth > 0) {
+          CGFloat inset = container.pathLineWidth / 2;
+          rect = CGRectInset(rect, -inset, -inset);
+        }
+      } else {
+        rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
+      }
+      rect = CGRectStandardize(rect);
+      CGSize size = rect.size;
+      if (container.verticalForm) {
+        size.width += container.size.width - CGRectGetMaxX(rect);
+      } else {
+        size.width += rect.origin.x;
+      }
+      size.height += rect.origin.y;
+      if (size.width < 0) size.width = 0;
+      if (size.height < 0) size.height = 0;
+      size.width = ceil(size.width);
+      size.height = ceil(size.height);
+      textBoundingSize = size;
     }
   }
   
@@ -948,7 +1006,7 @@ dispatch_semaphore_signal(_lock);
     }
     if (truncatedLine) lineBlock(truncatedLine);
   }
-  
+
   if (visibleRange.length > 0) {
     layout.needDrawText = YES;
     
@@ -966,6 +1024,10 @@ dispatch_semaphore_signal(_lock);
     
     [layout.text enumerateAttributesInRange:visibleRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     if (truncatedLine) {
+      if (container.truncationType == ASTextTruncationTypeStart || container.truncationType == ASTextTruncationTypeMiddle) {
+        // If truncation mode is middle or start, there is another visible range not expressed in visibleRange.
+        [lastLineText enumerateAttributesInRange:NSMakeRange(0, lastLineText.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
+      }
       [truncationToken enumerateAttributesInRange:NSMakeRange(0, truncationToken.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     }
   }
@@ -3063,19 +3125,31 @@ static void ASTextDrawAttachment(ASTextLayout *layout, CGContextRef context, CGS
     UIImage *image = nil;
     UIView *view = nil;
     CALayer *layer = nil;
+    ASDisplayNode *node = nil;
     if ([a.content isKindOfClass:[UIImage class]]) {
       image = a.content;
     } else if ([a.content isKindOfClass:[UIView class]]) {
       view = a.content;
     } else if ([a.content isKindOfClass:[CALayer class]]) {
       layer = a.content;
+    } else if ([a.content isKindOfClass:[ASDisplayNode class]]) {
+      node = a.content;
     }
-    if (!image && !view && !layer) continue;
-    if (image && !context) continue;
+    if (!image && !view && !layer && !node) continue;
+    if ((image || node) && !context) continue;
     if (view && !targetView) continue;
     if (layer && !targetLayer) continue;
     if (cancel && cancel()) break;
-    
+    if (!image && node) {
+      ASNetworkImageNode *networkImage = ASDynamicCast(node, ASNetworkImageNode);
+      if ([networkImage animatedImage]) {
+        // Need to check first because [networkImage defaultImage] can return coverImage for
+        // animated image.
+        image = [[UIImage alloc] initWithCGImage:(CGImageRef)node.contents];
+      } else {
+        image = [networkImage image] ?: [networkImage defaultImage];
+      }
+    }
     CGSize asize = image ? image.size : view ? view.frame.size : layer.frame.size;
     CGRect rect = ((NSValue *)layout.attachmentRects[i]).CGRectValue;
     if (isVertical) {
@@ -3481,3 +3555,15 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
 }
 
 @end
+
+NSAttributedString *fillBaseAttributes(NSAttributedString *str, NSDictionary *attrs) {
+  NSUInteger len = str.length;
+  if (!len) return str;
+  NSMutableAttributedString *m_result;  // Do not create unless needed.
+  for (NSString *name in attrs) {
+    if ([str as_hasAttribute:name]) continue;
+    if (!m_result) m_result = [str mutableCopy];
+    [m_result addAttribute:name value:attrs[name] range:NSMakeRange(0, len)];
+  }
+  return m_result ?: str;
+}

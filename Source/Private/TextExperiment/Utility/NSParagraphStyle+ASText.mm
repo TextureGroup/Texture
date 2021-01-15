@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/NSParagraphStyle+ASText.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/String/ASTextAttribute.h"
 #import <CoreText/CoreText.h>
 
 // Dummy class for category
@@ -20,7 +20,7 @@
 + (NSParagraphStyle *)as_styleWithCTStyle:(CTParagraphStyleRef)CTStyle {
   if (CTStyle == NULL) return nil;
   
-  NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+  NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
   
 #if TARGET_OS_IOS
 #pragma clang diagnostic push

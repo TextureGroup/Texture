@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import "ASTextDebugOption.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextDebugOption.h"
 #import <pthread.h>
 
 static pthread_mutex_t _sharedDebugLock;

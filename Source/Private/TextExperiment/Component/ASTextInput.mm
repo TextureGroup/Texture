@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextInput.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextInput.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Utility/ASTextUtilities.h"
 
 
 @implementation ASTextPosition

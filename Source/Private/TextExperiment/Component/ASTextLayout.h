@@ -10,9 +10,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
-#import "ASTextDebugOption.h"
-#import "ASTextLine.h"
-#import "ASTextInput.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextDebugOption.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextLine.h"
+#import "third_party/objective_c/Texture/Source/Private/TextExperiment/Component/ASTextInput.h"
 
 @protocol ASTextLinePositionModifier;
 
@@ -224,7 +224,8 @@ AS_EXTERN const CGSize ASTextContainerMaxSize;
 @property (nonatomic, readonly) CTFrameRef frame;
 ///< Array of `ASTextLine`, no truncated
 @property (nonatomic, readonly) NSArray<ASTextLine *> *lines;
-///< ASTextLine with truncated token, or nil
+///< ASTextLine with truncated token, or nil. Note that this may be nil if no truncation token was specified.
+///< To check if the entire string was drawn, use NSEqualRanges(visibleRange, range).
 @property (nullable, nonatomic, readonly) ASTextLine *truncatedLine;
 ///< Array of `ASTextAttachment`
 @property (nullable, nonatomic, readonly) NSArray<ASTextAttachment *> *attachments;

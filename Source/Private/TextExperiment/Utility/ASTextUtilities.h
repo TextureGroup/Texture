@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
 #import <tgmath.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "third_party/objective_c/Texture/Source/Private/ASInternalHelpers.h"
 
 
 #ifndef ASTEXT_CLAMP // return the clamped value
@@ -132,6 +132,7 @@ static inline CGFloat ASTextEmojiGetDescentWithFontSize(CGFloat fontSize) {
   } else {
     return 0.3125 * fontSize;
   }
+  return 0;
 }
 
 /**
