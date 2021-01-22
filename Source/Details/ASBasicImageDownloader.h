@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A shared image downloader which can be used by @c ASNetworkImageNodes and @c ASMultiplexImageNodes.
  * The userInfo provided by this downloader is `nil`.
  *
- * This is a very basic image downloader. It does not support caching, progressive downloading and likely
+ * This is a very basic image downloader. It does not support caching, retrying, progressive downloading and likely
  * isn't something you should use in production. If you'd like something production ready, see @c ASPINRemoteImageDownloader
  *
  * @note It is strongly recommended you include PINRemoteImage and use @c ASPINRemoteImageDownloader instead.

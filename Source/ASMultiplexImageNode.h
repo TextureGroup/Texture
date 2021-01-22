@@ -131,6 +131,12 @@ typedef NS_ENUM(NSUInteger, ASMultiplexImageNodeErrorCode) {
 @property (nonatomic) BOOL shouldRenderProgressImages;
 
 /**
+ * Specifies whether the underlying image downloader should attempt to retry downloading the image if the remote
+ * host is unreachable. It will have no effect if the downloader does not support retrying. The default is YES.
+ */
+@property BOOL shouldRetryImageDownload;
+
+/**
  * @abstract The image manager that this image node should use when requesting images from the Photos framework. If this is `nil` (the default), then `PHImageManager.defaultManager` is used.
 
  * @see `+[NSURL URLWithAssetLocalIdentifier:targetSize:contentMode:options:]` below.

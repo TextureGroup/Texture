@@ -176,13 +176,14 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
   
   _downloaderFlags.downloaderImplementsSetProgress = [downloader respondsToSelector:@selector(setProgressImageBlock:callbackQueue:withDownloadIdentifier:)];
   _downloaderFlags.downloaderImplementsSetPriority = [downloader respondsToSelector:@selector(setPriority:withDownloadIdentifier:)];
-  _downloaderFlags.downloaderImplementsDownloadWithPriority = [downloader respondsToSelector:@selector(downloadImageWithURL:priority:callbackQueue:downloadProgress:completion:)];
+  _downloaderFlags.downloaderImplementsDownloadWithPriority = [downloader respondsToSelector:@selector(downloadImageWithURL:shouldRetry:priority:callbackQueue:downloadProgress:completion:)];
 
   _cacheSupportsClearing = [cache respondsToSelector:@selector(clearFetchedImageFromCacheWithURL:)];
   
   _shouldRenderProgressImages = YES;
 
   self.shouldBypassEnsureDisplay = YES;
+  self.shouldRetryImageDownload = YES;
 
   return self;
 }
@@ -862,6 +863,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
        */
       ASImageDownloaderPriority priority = ASImageDownloaderPriorityWithInterfaceState(strongSelf.interfaceState);
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
+                                                             shouldRetry:[self shouldRetryImageDownload]
                                                                 priority:priority
                                                            callbackQueue:callbackQueue
                                                         downloadProgress:downloadProgressBlock
@@ -877,6 +879,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
         and their requests are put into the same pool.
        */
       downloadIdentifier = [strongSelf->_downloader downloadImageWithURL:imageURL
+                                                             shouldRetry:[self shouldRetryImageDownload]
                                                            callbackQueue:callbackQueue
                                                         downloadProgress:downloadProgressBlock
                                                               completion:completion];
