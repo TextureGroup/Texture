@@ -364,12 +364,14 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   
   if (!self.isNodeLoaded) {
     ASDisplayNodeFailAssert(@"Cannot access accessibilityElements since node is not loaded");
-    return @[];
+    return nil;
   }
   NSMutableArray *accessibilityElements = [[NSMutableArray alloc] init];
   CollectAccessibilityElements(self, accessibilityElements);
   SortAccessibilityElements(accessibilityElements);
-  return accessibilityElements;
+  // If we did not find any accessibility elements, return nil instead of empty array. This allows a WKWebView within the node
+  // to participate in accessibility.
+  return accessibilityElements.count == 0 ? nil : accessibilityElements;
 }
 
 @end
