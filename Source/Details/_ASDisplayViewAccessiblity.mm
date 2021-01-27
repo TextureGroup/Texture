@@ -321,7 +321,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
 
 #pragma mark - UIAccessibility
 
-- (void)setAccessibilityElements:(NSArray *)accessibilityElements
+- (void)setAccessibilityElements:(nullable NSArray *)accessibilityElements
 {
   ASDisplayNodeAssertMainThread();
   // While it looks very strange to ignore the accessibilyElements param and set _accessibilityElements to nil, it is actually on purpose.
@@ -331,7 +331,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
   _accessibilityElements = nil;
 }
 
-- (NSArray *)accessibilityElements
+- (nullable NSArray *)accessibilityElements
 {
   ASDisplayNodeAssertMainThread();
 
@@ -352,7 +352,7 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
 
 @implementation ASDisplayNode (AccessibilityInternal)
 
-- (NSArray *)accessibilityElements
+- (nullable NSArray *)accessibilityElements
 {
   // NSObject implements the informal accessibility protocol. This means that all ASDisplayNodes already have an accessibilityElements
   // property. If an ASDisplayNode subclass has explicitly set the property, let's use that instead of traversing the node tree to try
