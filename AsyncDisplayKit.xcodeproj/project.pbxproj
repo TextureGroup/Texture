@@ -460,7 +460,7 @@
 		CD34409725C1BF6700F85A95 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CD34409525C1BF6700F85A95 /* Main.storyboard */; };
 		CD34409925C1BF6900F85A95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD34409825C1BF6900F85A95 /* Assets.xcassets */; };
 		CD34409C25C1BF6900F85A95 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CD34409A25C1BF6900F85A95 /* LaunchScreen.storyboard */; };
-		CD3440A925C1BF9C00F85A95 /* AsyncDisplayKitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3440A825C1BF9C00F85A95 /* AsyncDisplayKitUITests.swift */; };
+		CD3440A925C1BF9C00F85A95 /* WebViewAccessibilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3440A825C1BF9C00F85A95 /* WebViewAccessibilityTests.swift */; };
 		CD3440B325C1C01C00F85A95 /* AsyncDisplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */; };
 		CD3440B425C1C01C00F85A95 /* AsyncDisplayKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D933F041224AD17F00FF495E /* ASTransactionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = D933F040224AD17F00FF495E /* ASTransactionTests.mm */; };
@@ -1049,7 +1049,7 @@
 		CD34409B25C1BF6900F85A95 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CD34409D25C1BF6900F85A95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CD3440A625C1BF9B00F85A95 /* AsyncDisplayKitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AsyncDisplayKitUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		CD3440A825C1BF9C00F85A95 /* AsyncDisplayKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncDisplayKitUITests.swift; sourceTree = "<group>"; };
+		CD3440A825C1BF9C00F85A95 /* WebViewAccessibilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewAccessibilityTests.swift; sourceTree = "<group>"; };
 		CD3440AA25C1BF9C00F85A95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D3779BCFF841AD3EB56537ED /* Pods-AsyncDisplayKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		D785F6601A74327E00291744 /* ASScrollNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASScrollNode.h; sourceTree = "<group>"; };
@@ -1919,7 +1919,7 @@
 		CD3440A725C1BF9C00F85A95 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
-				CD3440A825C1BF9C00F85A95 /* AsyncDisplayKitUITests.swift */,
+				CD3440A825C1BF9C00F85A95 /* WebViewAccessibilityTests.swift */,
 				CD3440AA25C1BF9C00F85A95 /* Info.plist */,
 				CD34408E25C1BF6700F85A95 /* UITestsHost */,
 			);
@@ -2763,7 +2763,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CD3440A925C1BF9C00F85A95 /* AsyncDisplayKitUITests.swift in Sources */,
+				CD3440A925C1BF9C00F85A95 /* WebViewAccessibilityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
