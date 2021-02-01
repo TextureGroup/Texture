@@ -36,7 +36,7 @@ As the framework has grown, many features have been added that can save develope
 
 ## Getting Help
 
-We use Slack for real-time debugging, community updates, and general talk about Texture. [Signup](http://asdk-slack-auto-invite.herokuapp.com) yourself or email textureframework@gmail.com to get an invite.
+We use Slack for real-time debugging, community updates, and general talk about Texture. [Signup](https://asdk-slack-auto-invite.herokuapp.com) yourself or email textureframework@gmail.com to get an invite.
 
 ## Release process
 
