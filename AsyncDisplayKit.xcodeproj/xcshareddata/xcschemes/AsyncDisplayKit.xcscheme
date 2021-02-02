@@ -55,16 +55,6 @@
                </Test>
             </SkippedTests>
          </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CD3440A525C1BF9B00F85A95"
-               BuildableName = "AsyncDisplayKitUITests.xctest"
-               BlueprintName = "AsyncDisplayKitUITests"
-               ReferencedContainer = "container:AsyncDisplayKit.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
