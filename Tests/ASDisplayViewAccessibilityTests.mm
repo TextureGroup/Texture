@@ -24,6 +24,7 @@
 #import <AsyncDisplayKit/ASDKViewController.h>
 #import <OCMock/OCMock.h>
 #import "ASDisplayNodeTestsHelper.h"
+#import <WebKit/WebKit.h>
 
 extern void SortAccessibilityElements(NSMutableArray *elements);
 
@@ -185,6 +186,34 @@ extern void SortAccessibilityElements(NSMutableArray *elements);
   XCTAssertTrue(updatedElements2.count == 2);
   XCTAssertTrue([[updatedElements2.firstObject accessibilityLabel] isEqualToString:@"hello"]);
   XCTAssertTrue([[updatedElements2.lastObject accessibilityLabel] isEqualToString:@"world"]);
+}
+
+- (void)testAccessibilityElementsAreNilForWrappedWKWebView {
+  ASDisplayNode *container = [[ASDisplayNode alloc] init];
+  UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 320, 560)];
+  [window addSubnode:container];
+  [window makeKeyAndVisible];
+  
+  container.frame = CGRectMake(50, 50, 200, 600);  
+  WKWebView *webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, 200, 400)];
+  [container.view addSubview:webView];
+
+  NSString *htmlString =
+  @"<html>"
+  @"    <head>"
+  @"      <meta name='viewport' content='width=device-width' />"
+  @"    </head>"
+  @"    <body>"
+  @"      <h1>Texture is Awesome!</h1>"
+  @"      <p>Especially when web views inside nodes are accessible.</p>"
+  @"    </body>"
+  @"  </html>";
+  [webView loadHTMLString:htmlString baseURL:nil];
+
+  // Accessibility elements should be nil in this case, because
+  // WKWebView handles accessibility out of process.
+  NSArray *accessibilityElements = container.accessibilityElements;
+  XCTAssertNil(accessibilityElements);
 }
 
 #pragma mark -
