@@ -321,7 +321,7 @@ NS_INLINE UIAccessibilityTraits ASInteractiveAccessibilityTraitsMask() {
 }
 
 @interface ASDisplayNode (AccessibilityInternal)
-- (NSArray *)accessibilityElements;
+- (nullable NSArray *)accessibilityElements;
 @end;
 
 @interface UIView (ASDisplayNodeInternal)
