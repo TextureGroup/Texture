@@ -19,7 +19,7 @@ class PhotoFeedTableNodeController: ASDKViewController<ASTableNode> {
 	
 	var photoFeedModel = PhotoFeedModel(photoFeedModelType: .photoFeedModelTypePopular)
 	
-	init() {
+  override init() {
         super.init(node: ASTableNode())
 		
         navigationItem.title = "ASDK"
@@ -90,7 +90,7 @@ extension PhotoFeedTableNodeController: ASTableDataSource, ASTableDelegate {
 	
 	func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let photo = photoFeedModel.itemAtIndexPath(indexPath)
-		let nodeBlock: ASCellNodeBlock = { _ in
+    let nodeBlock: ASCellNodeBlock = { 
 			return PhotoTableNodeCell(photoModel: photo)
 		}
 		return nodeBlock
