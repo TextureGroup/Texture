@@ -1,2 +1,2 @@
-github "pinterest/PINRemoteImage" "master"
-github "pinterest/PINCache" "master"
+github "pinterest/PINRemoteImage"
+github "pinterest/PINCache"
