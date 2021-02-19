@@ -92,6 +92,7 @@ typedef NS_ENUM(NSUInteger, ASImageDownloaderPriority) {
 /**
  @abstract Downloads an image with the given URL.
  @param URL The URL of the image to download.
+ @param shouldRetry Whether to attempt to retry downloading if the remote host is currently unreachable.
  @param callbackQueue The queue to call `downloadProgressBlock` and `completion` on.
  @param downloadProgress The block to be invoked when the download of `URL` progresses.
  @param completion The block to be invoked when the download has completed, or has failed.
@@ -100,6 +101,7 @@ typedef NS_ENUM(NSUInteger, ASImageDownloaderPriority) {
  retain the identifier if you wish to use it later.
  */
 - (nullable id)downloadImageWithURL:(NSURL *)URL
+                        shouldRetry:(BOOL)shouldRetry
                       callbackQueue:(dispatch_queue_t)callbackQueue
                    downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress
                          completion:(ASImageDownloaderCompletion)completion;
@@ -117,6 +119,7 @@ typedef NS_ENUM(NSUInteger, ASImageDownloaderPriority) {
 /**
  @abstract Downloads an image with the given URL.
  @param URL The URL of the image to download.
+ @param shouldRetry Whether to attempt to retry downloading if the remote host is currently unreachable.
  @param priority The priority at which the image should be downloaded.
  @param callbackQueue The queue to call `downloadProgressBlock` and `completion` on.
  @param downloadProgress The block to be invoked when the download of `URL` progresses.
@@ -127,6 +130,7 @@ typedef NS_ENUM(NSUInteger, ASImageDownloaderPriority) {
  retain the identifier if you wish to use it later.
  */
 - (nullable id)downloadImageWithURL:(NSURL *)URL
+                        shouldRetry:(BOOL)shouldRetry
                            priority:(ASImageDownloaderPriority)priority
                       callbackQueue:(dispatch_queue_t)callbackQueue
                    downloadProgress:(nullable ASImageDownloaderProgress)downloadProgress

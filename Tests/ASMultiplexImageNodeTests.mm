@@ -222,14 +222,14 @@
 
   // Mock a 50%-progress URL download.
   const CGFloat mockedProgress = 0.5;
-  OCMExpect([mockDownloader downloadImageWithURL:[self _testImageURL] priority:ASImageDownloaderPriorityPreload callbackQueue:OCMOCK_ANY downloadProgress:[OCMArg isNotNil] completion:[OCMArg isNotNil]])
+  OCMExpect([mockDownloader downloadImageWithURL:[self _testImageURL] shouldRetry:YES priority:ASImageDownloaderPriorityPreload callbackQueue:OCMOCK_ANY downloadProgress:[OCMArg isNotNil] completion:[OCMArg isNotNil]])
   .andDo(^(NSInvocation *inv){
     // Simulate progress.
-    ASImageDownloaderProgress progressBlock = [inv as_argumentAtIndexAsObject:5];
+    ASImageDownloaderProgress progressBlock = [inv as_argumentAtIndexAsObject:6];
     progressBlock(mockedProgress);
 
     // Simulate completion.
-    ASImageDownloaderCompletion completionBlock = [inv as_argumentAtIndexAsObject:6];
+    ASImageDownloaderCompletion completionBlock = [inv as_argumentAtIndexAsObject:7];
     completionBlock([self _testImage], nil, nil, nil);
   });
 

@@ -43,7 +43,7 @@
   node.URL = [NSURL URLWithString:@"http://imageA"];
 
   // Enter preload range, wait for download start.
-  [[[downloader expect] andForwardToRealObject] downloadImageWithURL:[OCMArg isNotNil] callbackQueue:OCMOCK_ANY downloadProgress:OCMOCK_ANY completion:OCMOCK_ANY];
+  [[[downloader expect] andForwardToRealObject] downloadImageWithURL:[OCMArg isNotNil] shouldRetry:OCMOCK_ANY callbackQueue:OCMOCK_ANY downloadProgress:OCMOCK_ANY completion:OCMOCK_ANY];
   [node enterInterfaceState:ASInterfaceStatePreload];
   [downloader verifyWithDelay:5];
 
@@ -138,7 +138,7 @@
   // nop
 }
 
-- (id)downloadImageWithURL:(NSURL *)URL callbackQueue:(dispatch_queue_t)callbackQueue downloadProgress:(ASImageDownloaderProgress)downloadProgress completion:(ASImageDownloaderCompletion)completion
+- (id)downloadImageWithURL:(NSURL *)URL shouldRetry:(BOOL)shouldRetry callbackQueue:(dispatch_queue_t)callbackQueue downloadProgress:(ASImageDownloaderProgress)downloadProgress completion:(ASImageDownloaderCompletion)completion
 {
   return @(_currentDownloadID++);
 }
