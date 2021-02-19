@@ -528,7 +528,6 @@ static NSArray *DefaultLinkAttributeNames() {
 
     // Unlike layout, here we must copy the container since drawing is asynchronous.
     copiedContainer = [_textContainer copy];
-    copiedContainer.size = self.bounds.size;
     [copiedContainer makeImmutable];
     mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
