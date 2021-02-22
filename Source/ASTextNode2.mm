@@ -89,7 +89,15 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
       if (!CGRectContainsRect(maxRect, containerBounds)) {
         continue;
       }
-      if (!CGSizeEqualToSize(container.size, constrainedSize)) {
+      
+      // Check to see if the container's size is the same as the constrained size used to create this layout. If so, we can use the cached layout.
+      // If it isn't, check to see if the layout's text bounding size is the same as the container's size. When we set up the container
+      // before drawing, we set its size to the text node's bounds.size. If everything went correctly, the text node's bounds size
+      // should be the layout's textBoundingSize meaning we can use this cached layout.
+      // If they are not the same size, that means that the layout engine couldn't give the text node the amount of space it wanted. Our cached
+      // layout is invalid, and we will need to layout the text again with our new container size.
+      CGSize textBoundingSizeWithTruncation = [layout textBoundingSizeIncludingTruncatedLine:YES constrainedToWidth:container.size.width];
+      if (!CGSizeEqualToSize(container.size, constrainedSize) && !CGSizeEqualToSize(container.size, textBoundingSizeWithTruncation)) {
         continue;
       }
 
@@ -355,11 +363,7 @@ static NSArray *DefaultLinkAttributeNames() {
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
   [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, mutableText);
-  if (layout.truncatedLine != nil && layout.truncatedLine.size.width > layout.textBoundingSize.width) {
-    return (CGSize) {MIN(constrainedSize.width, layout.truncatedLine.size.width), layout.textBoundingSize.height};
-  }
-
-  return layout.textBoundingSize;
+  return [layout textBoundingSizeIncludingTruncatedLine:YES constrainedToWidth:constrainedSize.width];
 }
 
 #pragma mark - Modifying User Text
@@ -528,6 +532,11 @@ static NSArray *DefaultLinkAttributeNames() {
 
     // Unlike layout, here we must copy the container since drawing is asynchronous.
     copiedContainer = [_textContainer copy];
+    // We need to update the container size here to what our actual bounds are. We have already
+    // determined the size of the text at our constrained size (in calculateLayoutThatFits), but we need to
+    // make sure our final size ended up in that constrained size. If not our layout won't work. If it did,
+    // then we should be able to use the cached layout and not actually have to relayout the text.
+    copiedContainer.size = self.bounds.size;
     [copiedContainer makeImmutable];
     mutableText = [_attributedText mutableCopy] ?: [[NSMutableAttributedString alloc] init];
 
