@@ -96,7 +96,7 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
       // should be the layout's textBoundingSize meaning we can use this cached layout.
       // If they are not the same size, that means that the layout engine couldn't give the text node the amount of space it wanted. Our cached
       // layout is invalid, and we will need to layout the text again with our new container size.
-      CGSize textBoundingSizeWithTruncation = [layout textBoundingSizeIncludingTruncatedLine:YES constrainedToWidth:container.size.width];
+      CGSize textBoundingSizeWithTruncation = [layout textBoundingSizeUsingTruncatedLineConstrainedToWidth:container.size.width];
       if (!CGSizeEqualToSize(container.size, constrainedSize) && !CGSizeEqualToSize(container.size, textBoundingSizeWithTruncation)) {
         continue;
       }
@@ -363,7 +363,7 @@ static NSArray *DefaultLinkAttributeNames() {
   NSMutableAttributedString *mutableText = [_attributedText mutableCopy];
   [self prepareAttributedString:mutableText isForIntrinsicSize:isCalculatingIntrinsicSize];
   ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(_textContainer, mutableText);
-  return [layout textBoundingSizeIncludingTruncatedLine:YES constrainedToWidth:constrainedSize.width];
+  return [layout textBoundingSizeUsingTruncatedLineConstrainedToWidth:constrainedSize.width];
 }
 
 #pragma mark - Modifying User Text

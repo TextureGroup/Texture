@@ -495,15 +495,14 @@ ASDK_EXTERN const CGSize ASTextContainerMaxSize;
 - (NSArray<ASTextSelectionRect *> *)selectionRectsWithOnlyStartAndEndForRange:(ASTextRange *)range;
 
 /**
- Returns the textBoundingSize. If includeTruncatedLine is true, the truncatedLine's width is
+ Returns the textBoundingSize. If the layout has a truncatedLine, the truncatedLine's width is
  used as the width (clamped to constrainedWidth) if it is larger than textBoundingSize.width.
- If includeTruncatedLine is false, returns textBoundingSize
+ If the layout has no truncatedLine, textBoundingSize is returned
  
- @param includeTruncatedLine Whether or not use to use self.truncatedLine's width to determine the textBoundingSize
- @param constrainedWidth The constrained width of the layout. The min between this and the truncated line's with is used for the size
+ @param constrainedWidth The constrained width of the layout. The min between this and the truncated line's with is used for the returned width
  @return The textBoundingSize taking the truncated line into consideration
  */
-- (CGSize)textBoundingSizeIncludingTruncatedLine:(BOOL)includeTruncatedLine constrainedToWidth:(CGFloat)constrainedWidth;
+- (CGSize)textBoundingSizeUsingTruncatedLineConstrainedToWidth:(CGFloat)constrainedWidth;
 
 
 #pragma mark - Draw text layout

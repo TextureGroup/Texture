@@ -2260,8 +2260,8 @@ dispatch_semaphore_signal(_lock);
   return rects;
 }
 
-- (CGSize)textBoundingSizeIncludingTruncatedLine:(BOOL)includeTruncatedLine constrainedToWidth:(CGFloat)width {
-  if (includeTruncatedLine && self.truncatedLine != nil && self.truncatedLine.size.width > self.textBoundingSize.width) {
+- (CGSize)textBoundingSizeUsingTruncatedLineConstrainedToWidth:(CGFloat)width {
+  if (self.truncatedLine != nil && self.truncatedLine.size.width > self.textBoundingSize.width) {
     // textBoundingSize gets rounded up, so lets do the same
     return (CGSize) {ceil(MIN(width, self.truncatedLine.size.width)), ceil(self.textBoundingSize.height)};
   }
