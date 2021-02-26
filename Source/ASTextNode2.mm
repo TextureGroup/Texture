@@ -118,6 +118,10 @@ static NS_RETURNS_RETAINED ASTextLayout *ASTextNodeCompatibleLayoutWithContainer
       if (!ASObjectIsEqual(container.truncationToken, otherContainer.truncationToken)) {
         continue;
       }
+      if (!ASObjectIsEqual(container.pointSizeScaleFactors, otherContainer.pointSizeScaleFactors)) {
+        continue;
+      }
+
       // TODO: When we get a cache hit, move this entry to the front (LRU).
       return layout;
     }
@@ -166,7 +170,6 @@ static NSString *ASTextNodeTruncationTokenAttributeName = @"ASTextNodeTruncation
   NSAttributedString *_attributedText;
   NSAttributedString *_truncationAttributedText;
   NSAttributedString *_additionalTruncationMessage;
-  NSArray<NSNumber *> *_pointSizeScaleFactors;
   NSLineBreakMode _truncationMode;
   
   NSString *_highlightedLinkAttributeName;
@@ -1269,16 +1272,16 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (void)setPointSizeScaleFactors:(NSArray<NSNumber *> *)scaleFactors
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
   ASLockScopeSelf();
-  if (ASCompareAssignCopy(_pointSizeScaleFactors, scaleFactors)) {
+  if (ASCompareAssignCopy(_textContainer.pointSizeScaleFactors, scaleFactors)) {
+    _textContainer.pointSizeScaleFactors = scaleFactors;
     [self setNeedsLayout];
   }
 }
 
 - (NSArray<NSNumber *> *)pointSizeScaleFactors
 {
-  return ASLockedSelf(_pointSizeScaleFactors);
+  return ASLockedSelf(_textContainer.pointSizeScaleFactors);
 }
 
 #pragma mark - Truncation Message
