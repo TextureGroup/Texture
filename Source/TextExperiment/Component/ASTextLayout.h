@@ -65,6 +65,11 @@ ASDK_EXTERN const CGSize ASTextContainerMaxSize;
 /// The constrained size. (if the size is larger than ASTextContainerMaxSize, it will be clipped)
 @property CGSize size;
 
+/// An array of descending scale factors that will be applied to this container's text to try to make it fit within its constrained size
+/// This array should be in descending order and NOT contain the scale factor 1.0. For example, it could be @[@(.9), @(.85), @(.8)];
+/// defaults to nil (no scaling)
+@property NSArray<NSNumber *> *pointSizeScaleFactors;
+
 /// The insets for constrained size. The inset value should not be negative. Default is UIEdgeInsetsZero.
 @property UIEdgeInsets insets;
 
