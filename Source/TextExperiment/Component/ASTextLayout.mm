@@ -447,9 +447,9 @@ dispatch_semaphore_signal(_lock);
   return nil; }
   
   container = [container copy];
-  [container makeImmutable];
   if (!text || !container) return nil;
   if (range.location + range.length > text.length) return nil;
+  [container makeImmutable];
   maximumNumberOfRows = container.maximumNumberOfRows;
   
   // It may use larger constraint size when create CTFrame with
