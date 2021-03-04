@@ -822,31 +822,6 @@ dispatch_semaphore_signal(_lock);
       }
     }
 
-    { // calculate bounding size
-      CGRect rect = textBoundingRect;
-      if (container.path) {
-        if (container.pathLineWidth > 0) {
-          CGFloat inset = container.pathLineWidth / 2;
-          rect = CGRectInset(rect, -inset, -inset);
-        }
-      } else {
-        rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
-      }
-      rect = CGRectStandardize(rect);
-      CGSize size = rect.size;
-      if (container.verticalForm) {
-        size.width += container.size.width - (rect.origin.x + rect.size.width);
-      } else {
-        size.width += rect.origin.x;
-      }
-      size.height += rect.origin.y;
-      if (size.width < 0) size.width = 0;
-      if (size.height < 0) size.height = 0;
-      size.width = ceil(size.width);
-      size.height = ceil(size.height);
-      textBoundingSize = size;
-    }
-
     visibleRange = ASTextNSRangeFromCFRange(CTFrameGetVisibleStringRange(ctFrame));
     if (needTruncation) {
       ASTextLine *lastLine = lines.lastObject;
@@ -921,7 +896,9 @@ dispatch_semaphore_signal(_lock);
               [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
               atLeastOneLine += removedLines[i--].width;
             }
-            [lastLineText appendAttributedString:truncationToken];
+            if (type == kCTLineTruncationEnd) {
+              [lastLineText appendAttributedString:truncationToken];
+            }
           }
           if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants to collect some
               // text following the truncated content.
@@ -949,6 +926,34 @@ dispatch_semaphore_signal(_lock);
             CFRelease(ctLastLineExtend);
             if (ctTruncatedLine) {
               truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
+              
+              if (!isVerticalForm) {
+                
+                // 1) If truncation mode is middle or start, and the end of the string contains taller text (or taller attachments), then truncating the line may make it taller
+                //  (By pulling up the tall text that was previously in a later, clipped line, into the truncation line).
+                // 1b) There are edge cases where truncating the line makes it taller, thus it exceeds the bounds, and we in fact needed to truncate at an earlier line.
+                //  Accommodating these cases in a robust manner would require multiple passes. (TODO_NOTREALLY)
+                // 2) In all cases, truncating the line may make it shorter. (Of course)
+                // 3) If text is not left-aligned, and truncating changed the width of the last line, it also needs to change its position.
+                BOOL adjusted = NO;
+                CGPoint adjustedPosition = truncatedLine.position;
+                if (truncatedLine.bounds.size.height > lastLine.bounds.size.height) {
+                  adjusted = YES;
+                  adjustedPosition = {adjustedPosition.x, lastLine.position.y + (truncatedLine.bounds.size.height - lastLine.bounds.size.height)/2};
+                }
+                if ([lastLineText as_alignment] == NSTextAlignmentRight) {
+                  adjusted = YES;
+                  adjustedPosition = {lastLine.position.x - (truncatedLine.bounds.size.width - lastLine.bounds.size.width), adjustedPosition.y};
+                }
+                if ([lastLineText as_alignment] == NSTextAlignmentCenter) {
+                  adjusted = YES;
+                  adjustedPosition = { (truncatedWidth - truncatedLine.bounds.size.width)/2.0 , adjustedPosition.y };
+                }
+                if (adjusted) {
+                  truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:adjustedPosition vertical:isVerticalForm];
+                }
+              }
+              textBoundingRect = CGRectUnion(textBoundingRect, truncatedLine.bounds);
               truncatedLine.index = lastLine.index;
               truncatedLine.row = lastLine.row;
               CFRelease(ctTruncatedLine);
@@ -958,6 +963,31 @@ dispatch_semaphore_signal(_lock);
         }
       }
     }
+  }
+  
+  { // calculate bounding size
+    CGRect rect = textBoundingRect;
+    if (container.path) {
+      if (container.pathLineWidth > 0) {
+        CGFloat inset = container.pathLineWidth / 2;
+        rect = CGRectInset(rect, -inset, -inset);
+      }
+    } else {
+      rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
+    }
+    rect = CGRectStandardize(rect);
+    CGSize size = rect.size;
+    if (container.verticalForm) {
+      size.width += container.size.width - (rect.origin.x + rect.size.width);
+    } else {
+      size.width += rect.origin.x;
+    }
+    size.height += rect.origin.y;
+    if (size.width < 0) size.width = 0;
+    if (size.height < 0) size.height = 0;
+    size.width = ceil(size.width);
+    size.height = ceil(size.height);
+    textBoundingSize = size;
   }
   
   if (isVerticalForm) {
