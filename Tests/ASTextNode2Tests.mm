@@ -130,4 +130,30 @@
   XCTAssertTrue(sizeWithEmptyString.width == 0);
 }
 
+- (void)testCenterAlignedTruncation
+{
+  ASTextContainer *container = [[ASTextContainer alloc] init];
+  container.maximumNumberOfRows = 3;
+  container.size = CGSizeMake(400, 800);
+  container.truncationType = ASTextTruncationTypeEnd;
+  container.truncationToken = [[NSAttributedString alloc] initWithString:@"\u2026"];
+
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+  paragraphStyle.alignment = NSTextAlignmentCenter;
+
+  NSAttributedString *attributedText = self.textNode.attributedText;
+
+  ASTextLayout *layout = [ASTextLayout layoutWithContainer:container text:attributedText];
+  XCTAssertTrue(layout.lines.count == 3);
+
+  CGRect expectedBounds = CGRectMake(3.5060000000000286, 46.061999999999998, 392.98799999999994, 22.32);
+  CGRect bounds = layout.truncatedLine.bounds;
+  
+  XCTAssertTrue(fabs(bounds.origin.x - expectedBounds.origin.x) < FLT_EPSILON);
+  XCTAssertTrue(fabs(bounds.origin.y - expectedBounds.origin.y) < FLT_EPSILON);
+  XCTAssertTrue(fabs(bounds.size.width - expectedBounds.size.width) < FLT_EPSILON);
+  XCTAssertTrue(fabs(bounds.size.height - expectedBounds.size.height) < FLT_EPSILON);  
+}
+
 @end
