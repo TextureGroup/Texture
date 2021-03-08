@@ -8,7 +8,7 @@ jobs:
         DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     strategy:
       matrix:
-        mode: [tests, framework, life-without-cocoapods, carthage, examples-pt1, examples-pt2, examples-pt3, examples-pt4]
+        mode: [tests, framework, life-without-cocoapods, examples-pt1, examples-pt2, examples-pt3, examples-pt4]
         include:
           - mode: tests
             name: Build and run tests
