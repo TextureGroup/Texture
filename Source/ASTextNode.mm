@@ -1495,9 +1495,6 @@ static NSAttributedString *DefaultTruncationAttributedString()
 // All direct descendants of ASTextNode get their superclass replaced by ASTextNode2.
 + (void)initialize
 {
-  // Texture requires that node subclasses call [super initialize]
-  [super initialize];
-
   if (class_getSuperclass(self) == [ASTextNode class]
       && ASActivateExperimentalFeature(ASExperimentalTextNode)) {
 #pragma clang diagnostic push
@@ -1505,6 +1502,12 @@ static NSAttributedString *DefaultTruncationAttributedString()
     class_setSuperclass(self, [ASTextNode2 class]);
 #pragma clang diagnostic pop
   }
+  
+  // Texture requires that node subclasses call [super initialize]
+  // Note: initialize must be called AFTER swapping superclass so that we use the proper class to set up the node's _flags.
+  // ASTextNode implements displayWithParameters:isCancelled: whereas ASTextNode2 implements drawRect:withParameters:isCancelled:isRasterizing:
+  // When we set up _flags, if we use the class before switching then ASTextNode2 will think it responds to displayWithParameters:isCancelled:!
+  [super initialize];
 }
 
 // For direct allocations of ASTextNode itself, we override allocWithZone:
