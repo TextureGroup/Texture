@@ -1,1 +1,1 @@
-../Layout/ASInsetLayoutSpec.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASInsetLayoutSpec.h

@@ -1,1 +1,1 @@
-../Details/ASTraitCollection.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASTraitCollection.h

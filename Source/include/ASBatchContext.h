@@ -1,1 +1,1 @@
-../Details/ASBatchContext.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASBatchContext.h

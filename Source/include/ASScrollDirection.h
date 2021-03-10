@@ -1,1 +1,1 @@
-../Details/ASScrollDirection.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASScrollDirection.h

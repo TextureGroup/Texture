@@ -1,1 +1,1 @@
-../Layout/ASAsciiArtBoxCreator.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASAsciiArtBoxCreator.h

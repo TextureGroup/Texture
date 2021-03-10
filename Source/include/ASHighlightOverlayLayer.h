@@ -1,1 +1,1 @@
-../Details/ASHighlightOverlayLayer.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASHighlightOverlayLayer.h

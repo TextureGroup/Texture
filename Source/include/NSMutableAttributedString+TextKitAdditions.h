@@ -1,1 +1,1 @@
-../Details/NSMutableAttributedString+TextKitAdditions.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/NSMutableAttributedString+TextKitAdditions.h

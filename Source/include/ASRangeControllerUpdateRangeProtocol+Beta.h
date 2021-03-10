@@ -1,1 +1,1 @@
-../Details/ASRangeControllerUpdateRangeProtocol+Beta.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASRangeControllerUpdateRangeProtocol+Beta.h

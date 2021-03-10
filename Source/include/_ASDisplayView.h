@@ -1,1 +1,1 @@
-../Details/_ASDisplayView.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASDisplayView.h

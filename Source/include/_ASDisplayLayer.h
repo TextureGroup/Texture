@@ -1,1 +1,1 @@
-../Details/_ASDisplayLayer.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASDisplayLayer.h

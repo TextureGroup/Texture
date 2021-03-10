@@ -1,1 +1,1 @@
-../Details/ASImageContainerProtocolCategories.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASImageContainerProtocolCategories.h

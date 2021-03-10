@@ -1,1 +1,1 @@
-../Details/ASObjectDescriptionHelpers.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASObjectDescriptionHelpers.h

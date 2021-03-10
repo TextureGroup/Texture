@@ -1,1 +1,1 @@
-../Layout/ASStackLayoutSpec.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASStackLayoutSpec.h

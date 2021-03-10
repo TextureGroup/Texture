@@ -1,1 +1,1 @@
-../Details/CoreGraphics+ASConvenience.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/CoreGraphics+ASConvenience.h

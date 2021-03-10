@@ -1,1 +1,1 @@
-../Details/UICollectionViewLayout+ASConvenience.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/UICollectionViewLayout+ASConvenience.h

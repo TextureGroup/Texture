@@ -1,1 +1,1 @@
-../TextKit/ASTextKitComponents.h
+/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitComponents.h

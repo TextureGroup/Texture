@@ -1,1 +1,1 @@
-../Details/ASElementMap.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASElementMap.h

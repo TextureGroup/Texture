@@ -1,1 +1,1 @@
-../Layout/ASLayout+IGListDiffKit.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASLayout+IGListDiffKit.h

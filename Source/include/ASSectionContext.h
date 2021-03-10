@@ -1,1 +1,1 @@
-../Details/ASSectionContext.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASSectionContext.h

@@ -11,9 +11,9 @@ let headersSearchPath: [CSetting] = [.headerSearchPath("."),
                                      .headerSearchPath("Layout"),
                                      .headerSearchPath("Private"),
                                      .headerSearchPath("Private/Layout"),
-                                     .headerSearchPath("Private/TextExperiment/Component"),
-                                     .headerSearchPath("Private/TextExperiment/String"),
-                                     .headerSearchPath("Private/TextExperiment/Utility"),
+                                     .headerSearchPath("TextExperiment/Component"),
+                                     .headerSearchPath("TextExperiment/String"),
+                                     .headerSearchPath("TextExperiment/Utility"),
                                      .headerSearchPath("TextKit"),
                                      .headerSearchPath("tvOS"),]
 
@@ -55,7 +55,7 @@ let package = Package(
             targets: ["AsyncDisplayKitIGListKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/3a4oT/PINRemoteImage.git", .branch("spmInXcode")),
+        .package(url: "https://github.com/pinterest/PINRemoteImage.git", .branch("master")),
         .package(url: "https://github.com/3a4oT/IGListKit", .branch("spmBrain")),
     ],
     targets: [

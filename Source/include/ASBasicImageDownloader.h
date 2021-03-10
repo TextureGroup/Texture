@@ -1,1 +1,1 @@
-../Details/ASBasicImageDownloader.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASBasicImageDownloader.h

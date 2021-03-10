@@ -1,1 +1,1 @@
-../Details/ASLayoutRangeType.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASLayoutRangeType.h

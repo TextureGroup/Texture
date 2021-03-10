@@ -1,1 +1,1 @@
-../Details/ASGraphicsContext.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASGraphicsContext.h

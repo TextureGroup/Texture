@@ -1,1 +1,1 @@
-../Details/ASCollectionLayoutContext.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionLayoutContext.h

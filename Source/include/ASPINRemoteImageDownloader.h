@@ -1,1 +1,1 @@
-../Details/ASPINRemoteImageDownloader.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASPINRemoteImageDownloader.h

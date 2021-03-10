@@ -1,1 +1,1 @@
-../Details/ASThread.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASThread.h

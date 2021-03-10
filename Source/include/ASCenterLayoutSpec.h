@@ -1,1 +1,1 @@
-../Layout/ASCenterLayoutSpec.h
+/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASCenterLayoutSpec.h
