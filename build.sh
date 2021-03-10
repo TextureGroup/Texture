@@ -108,6 +108,8 @@ tests_listkit)
     ;;
 
 build_listkit_xcode_spm_integration)
+    echo "Regenerate SPM layout"
+    swift scripts/generate_spm_sources_layout.swift
     echo "Building AsyncDisplayKit+IGListKit via Xcode's Swift Package Manager"
     echo "Xcode 12.2+ required"
     set -o pipefail && xcodebuild clean \
