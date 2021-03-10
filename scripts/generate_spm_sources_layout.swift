@@ -52,7 +52,7 @@ let publicHeadersLayout: [SearchPath] = [
     .init(path: "Source", isDir: true, searchPattern: .currentDirOnly),
     .init(path: "Source/Details", isDir: true),
     .init(path: "Source/Layout", isDir: true),
-    .init(path: "Source/Base", isDir: true, searchPattern: .currentDirOnly),
+    .init(path: "Source/Base", isDir: true),
     .init(path: "Source/Debug", isDir: true),
     .init(path: "Source/TextKit/ASTextNodeTypes.h", isDir: false),
     .init(path: "Source/TextKit/ASTextKitComponents.h", isDir: false),
