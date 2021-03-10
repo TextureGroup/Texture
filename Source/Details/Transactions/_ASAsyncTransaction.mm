@@ -44,7 +44,7 @@ NSInteger const ASDefaultTransactionPriority = 0;
   NSAssert(_operationCompletionBlock == nil, @"Should have been called and released before -dealloc");
 }
 
-- (void)callAndReleaseCompletionBlock:(BOOL)canceled;
+- (void)callAndReleaseCompletionBlock:(BOOL)canceled
 {
   ASDisplayNodeAssertMainThread();
   if (_operationCompletionBlock) {
