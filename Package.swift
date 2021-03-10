@@ -56,22 +56,19 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pinterest/PINRemoteImage.git", .branch("master")),
-        .package(url: "https://github.com/3a4oT/IGListKit", .branch("spmBrain")),
+        .package(url: "https://github.com/3a4oT/IGListKit", .branch("spmNumber10")),
     ],
     targets: [
         .target(
             name: "AsyncDisplayKit",
             dependencies: ["PINRemoteImage"],
-            path: "Source",
-            exclude: ["Info.plist", "AsyncDisplayKitIGListKit"],
-            publicHeadersPath: "include",
+            path: "spm/Sources/AsyncDisplayKit",
             cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
         ),
         .target(
             name: "AsyncDisplayKitIGListKit",
             dependencies: ["IGListKit", "PINRemoteImage"],
-            path: "AsyncDisplayKitIGListKit/Source",
-            exclude: ["Info.plist"],
+            path: "spm/Sources/AsyncDisplayKitIGListKit/AsyncDisplayKit",
             cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: true)
         ),
     ],

@@ -351,7 +351,7 @@ typedef struct {
 {
   // Cast to NSObject will be removed after https://github.com/Instagram/IGListKit/pull/435
   if ([(id<NSObject>)updater isKindOfClass:[IGListAdapterUpdater class]]) {
-    [(IGListAdapterUpdater *)updater setAllowsBackgroundReloading:NO];
+   // [(IGListAdapterUpdater *)updater setAllowsBackgroundReloading:NO];
   } else {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
