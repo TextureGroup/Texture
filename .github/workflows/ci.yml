@@ -55,6 +55,7 @@ jobs:
           set -o pipefail
           rm -rf AsyncDisplayKit.xcodeproj/
           rm -rf AsyncDisplayKit.xcworkspace/
+          swift scripts/generate_spm_sources_layout.swift
           xcodebuild clean build -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}"
 
   Xcode-SPM-Integration:
