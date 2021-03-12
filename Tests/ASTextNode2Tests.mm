@@ -16,6 +16,10 @@
 
 #import "ASTestCase.h"
 
+@interface ASTextNode2(Beta)
+@property (nullable, nonatomic, copy) NSArray<NSNumber *> *pointSizeScaleFactors;
+@end
+
 @interface ASTextNode2Tests : XCTestCase
 
 @property(nonatomic) ASTextNode2 *textNode;
@@ -154,6 +158,26 @@
   XCTAssertTrue(fabs(bounds.origin.y - expectedBounds.origin.y) < FLT_EPSILON);
   XCTAssertTrue(fabs(bounds.size.width - expectedBounds.size.width) < FLT_EPSILON);
   XCTAssertTrue(fabs(bounds.size.height - expectedBounds.size.height) < FLT_EPSILON);  
+}
+
+- (void)testPointSizeScaleFactors
+{
+  ASTextContainer *container = [[ASTextContainer alloc] init];
+  container.maximumNumberOfRows = 1;
+  container.size = CGSizeMake(300, 800);
+  container.truncationType = ASTextTruncationTypeEnd;
+  container.truncationToken = [[NSAttributedString alloc] initWithString:@"\u2026"];
+  container.pointSizeScaleFactors = @[@0.9, @0.75];
+  
+  NSAttributedString *attributedText = [[NSAttributedString alloc] initWithString:@"This is a string that won't fit in the space that I'm giving it. Poor string. Do you think it hurts when a string gets truncated? I hope not." attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:16] }];;
+  
+  ASTextLayout *layout = [ASTextLayout layoutWithContainer:container text:attributedText];
+  [layout.text enumerateAttribute:NSFontAttributeName inRange:NSMakeRange(0, layout.text.length) options:0 usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+    // there should only be one font size for the entire string
+    XCTAssertTrue(range.length == layout.text.length);
+    XCTAssertTrue([(UIFont *)value pointSize] == 12.0);
+    XCTAssertTrue(CGSizeEqualToSize(layout.textBoundingSize, CGSizeMake(299, 14)));
+  }];
 }
 
 @end
