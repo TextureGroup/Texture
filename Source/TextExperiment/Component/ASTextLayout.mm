@@ -451,7 +451,8 @@ dispatch_semaphore_signal(_lock);
   if (range.location + range.length > text.length) return nil;
   [container makeImmutable];
   maximumNumberOfRows = container.maximumNumberOfRows;
-  
+  truncationToken = container.truncationToken;
+
   // It may use larger constraint size when create CTFrame with
   // CTFramesetterCreateFrame in iOS 10.
   BOOL needFixLayoutSizeBug = AS_AT_LEAST_IOS10;
@@ -491,19 +492,8 @@ dispatch_semaphore_signal(_lock);
     // If we have a scale factor, scale the point size of the original text
     if (pointSizeScaleFactor != 1.0) {
       // scale the fonts
-      NSMutableAttributedString *scaledText = [originalText mutableCopy];
-      [scaledText beginEditing];
-      [scaledText enumerateAttribute:NSFontAttributeName inRange:NSMakeRange(0, text.length) options:0 usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
-        if ([value isKindOfClass:[UIFont class]]) {
-          UIFont *font = (UIFont *)value;
-          CGFloat scaledPointSize = floorf(font.pointSize * pointSizeScaleFactor);
-          UIFont *scaledFont = [font fontWithSize:scaledPointSize];
-          [scaledText removeAttribute:NSFontAttributeName range:range];
-          [scaledText addAttribute:NSFontAttributeName value:scaledFont range:range];
-        }
-      }];
-      [scaledText endEditing];
-      text = [scaledText copy];
+      text = scaleAttributedString(originalText, pointSizeScaleFactor);
+      truncationToken = scaleAttributedString(container.truncationToken, pointSizeScaleFactor);
     }
     
     layout = [[ASTextLayout alloc] _init];
@@ -831,8 +821,7 @@ dispatch_semaphore_signal(_lock);
       // create truncated line
       if (container.truncationType != ASTextTruncationTypeNone) {
         CTLineRef truncationTokenLine = NULL;
-        if (container.truncationToken) {
-          truncationToken = container.truncationToken;
+        if (truncationToken) {
           truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
         } else {
           CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
@@ -3594,6 +3583,25 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
                  size:(CGSize)size
                 debug:(ASTextDebugOption *)debug {
   [self drawInContext:context size:size point:CGPointZero view:nil layer:nil debug:debug cancel:nil];
+}
+
+#pragma mark - Text Scaling
+
+static NSAttributedString * scaleAttributedString(NSAttributedString *attributedString, CGFloat scaleFactor)
+{
+  NSMutableAttributedString *scaledText = [attributedString mutableCopy];
+  [scaledText beginEditing];
+  [scaledText enumerateAttribute:NSFontAttributeName inRange:NSMakeRange(0, attributedString.length) options:0 usingBlock:^(id  _Nullable value, NSRange range, BOOL * _Nonnull stop) {
+    if ([value isKindOfClass:[UIFont class]]) {
+      UIFont *font = (UIFont *)value;
+      CGFloat scaledPointSize = floorf(font.pointSize * scaleFactor);
+      UIFont *scaledFont = [font fontWithSize:scaledPointSize];
+      [scaledText removeAttribute:NSFontAttributeName range:range];
+      [scaledText addAttribute:NSFontAttributeName value:scaledFont range:range];
+    }
+  }];
+  [scaledText endEditing];
+  return [scaledText copy];
 }
 
 @end
