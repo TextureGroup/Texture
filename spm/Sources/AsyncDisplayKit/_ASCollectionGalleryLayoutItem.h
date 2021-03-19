@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/_ASCollectionGalleryLayoutItem.h
+../../../Source/Private/_ASCollectionGalleryLayoutItem.h

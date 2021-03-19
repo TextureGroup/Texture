@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitRenderer+TextChecking.h
+../../../Source/TextKit/ASTextKitRenderer+TextChecking.h

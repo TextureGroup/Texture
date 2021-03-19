@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Base/ASAssert.mm
+../../../Source/Base/ASAssert.mm

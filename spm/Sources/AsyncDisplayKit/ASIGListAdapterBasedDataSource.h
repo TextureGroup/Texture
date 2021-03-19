@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASIGListAdapterBasedDataSource.h
+../../../Source/Private/ASIGListAdapterBasedDataSource.h

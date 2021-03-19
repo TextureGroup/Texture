@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASVideoNode.mm
+../../../Source/ASVideoNode.mm

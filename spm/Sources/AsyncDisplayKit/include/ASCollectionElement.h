@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionElement.h
+../../../../Source/Details/ASCollectionElement.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASDisplayViewAccessiblity.mm
+../../../Source/Details/_ASDisplayViewAccessiblity.mm

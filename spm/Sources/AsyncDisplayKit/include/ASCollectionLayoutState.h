@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionLayoutState.h
+../../../../Source/Details/ASCollectionLayoutState.h

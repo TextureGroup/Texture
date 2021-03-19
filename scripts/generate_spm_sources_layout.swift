@@ -171,14 +171,24 @@ func generateSPM(publicHeadersPath: String, sourcesPath: String) {
     }
     
     // 3. Create symbolic links for public headers
-    createSymLinks(for: publicHeaders, atPath: publicHeadersPath)
+    let relativeHeadersPath = publicHeaders.map { (headerPath) -> String in
+        let relativePath  = headerPath.replacingOccurrences(of: projectRoot,
+                                                            with: "../../../..")
+        return relativePath
+    }
+    createSymLinks(for: relativeHeadersPath, atPath: publicHeadersPath)
     
     // 4. Find private headers and impl files.
     let privateSources: [String] = privateHeadersAndImpl(sources: sourceFolder,
                                                          publicHeaders: publicHeaders)
+    let relativeSourcesPath = privateSources.map { (sourcePath) -> String in
+        let relativePath  = sourcePath.replacingOccurrences(of: projectRoot,
+                                                            with: "../../..")
+        return relativePath
+    }
     
     // 5. Create symbolic links for source files
-    createSymLinks(for: privateSources, atPath: sourcesPath)
+    createSymLinks(for: relativeSourcesPath, atPath: sourcesPath)
 }
 
 // MARK: Script start

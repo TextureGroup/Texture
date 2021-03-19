@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Utility/NSAttributedString+ASText.h
+../../../Source/TextExperiment/Utility/NSAttributedString+ASText.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Component/ASTextLayout.mm
+../../../Source/TextExperiment/Component/ASTextLayout.mm

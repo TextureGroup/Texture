@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTableNode+Beta.h
+../../../../Source/ASTableNode+Beta.h

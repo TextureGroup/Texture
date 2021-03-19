@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASAbstractLayoutController.mm
+../../../Source/Details/ASAbstractLayoutController.mm

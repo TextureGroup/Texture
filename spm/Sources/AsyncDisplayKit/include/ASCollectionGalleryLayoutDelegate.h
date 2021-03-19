@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionGalleryLayoutDelegate.h
+../../../../Source/Details/ASCollectionGalleryLayoutDelegate.h

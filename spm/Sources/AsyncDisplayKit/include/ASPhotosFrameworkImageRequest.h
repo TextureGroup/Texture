@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASPhotosFrameworkImageRequest.h
+../../../../Source/Details/ASPhotosFrameworkImageRequest.h

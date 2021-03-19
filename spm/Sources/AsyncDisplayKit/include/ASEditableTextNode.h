@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASEditableTextNode.h
+../../../../Source/ASEditableTextNode.h

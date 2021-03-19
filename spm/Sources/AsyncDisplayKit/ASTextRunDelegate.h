@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/String/ASTextRunDelegate.h
+../../../Source/TextExperiment/String/ASTextRunDelegate.h

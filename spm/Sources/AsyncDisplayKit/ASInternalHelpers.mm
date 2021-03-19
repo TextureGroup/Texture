@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASInternalHelpers.mm
+../../../Source/Private/ASInternalHelpers.mm

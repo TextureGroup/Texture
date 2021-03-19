@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASBasicImageDownloader.mm
+../../../Source/Details/ASBasicImageDownloader.mm

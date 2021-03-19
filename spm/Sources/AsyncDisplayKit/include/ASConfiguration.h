@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASConfiguration.h
+../../../../Source/ASConfiguration.h

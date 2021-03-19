@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASObjectDescriptionHelpers.mm
+../../../Source/Details/ASObjectDescriptionHelpers.mm

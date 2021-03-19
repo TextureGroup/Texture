@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTableViewInternal.h
+../../../../Source/ASTableViewInternal.h

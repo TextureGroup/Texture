@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASPagerNode+Beta.h
+../../../../Source/ASPagerNode+Beta.h

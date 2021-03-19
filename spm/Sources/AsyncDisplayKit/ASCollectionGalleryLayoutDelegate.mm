@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionGalleryLayoutDelegate.mm
+../../../Source/Details/ASCollectionGalleryLayoutDelegate.mm

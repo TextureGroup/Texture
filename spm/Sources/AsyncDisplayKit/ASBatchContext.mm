@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASBatchContext.mm
+../../../Source/Details/ASBatchContext.mm

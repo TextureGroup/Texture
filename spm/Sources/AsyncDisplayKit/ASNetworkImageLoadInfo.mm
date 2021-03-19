@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASNetworkImageLoadInfo.mm
+../../../Source/ASNetworkImageLoadInfo.mm

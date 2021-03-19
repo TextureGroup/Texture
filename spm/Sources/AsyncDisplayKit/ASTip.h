@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTip.h
+../../../Source/Private/ASTip.h

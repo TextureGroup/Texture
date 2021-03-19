@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASMainSerialQueue.mm
+../../../Source/Details/ASMainSerialQueue.mm

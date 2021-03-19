@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASPINRemoteImageDownloader.mm
+../../../Source/Details/ASPINRemoteImageDownloader.mm

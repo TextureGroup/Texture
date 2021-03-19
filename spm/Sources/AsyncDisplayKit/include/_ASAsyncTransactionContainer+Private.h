@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/Transactions/_ASAsyncTransactionContainer+Private.h
+../../../../Source/Details/Transactions/_ASAsyncTransactionContainer+Private.h

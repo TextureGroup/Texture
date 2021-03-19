@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASResponderChainEnumerator.h
+../../../Source/Private/ASResponderChainEnumerator.h

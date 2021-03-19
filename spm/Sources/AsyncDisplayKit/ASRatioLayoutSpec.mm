@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASRatioLayoutSpec.mm
+../../../Source/Layout/ASRatioLayoutSpec.mm

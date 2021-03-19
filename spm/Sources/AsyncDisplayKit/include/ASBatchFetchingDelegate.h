@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASBatchFetchingDelegate.h
+../../../../Source/Details/ASBatchFetchingDelegate.h

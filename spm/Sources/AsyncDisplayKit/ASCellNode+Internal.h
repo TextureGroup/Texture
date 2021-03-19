@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASCellNode+Internal.h
+../../../Source/Private/ASCellNode+Internal.h

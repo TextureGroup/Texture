@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASTableLayoutController.mm
+../../../Source/Details/ASTableLayoutController.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTipsController.h
+../../../Source/Private/ASTipsController.h

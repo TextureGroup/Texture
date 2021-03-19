@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASDisplayView.mm
+../../../Source/Details/_ASDisplayView.mm

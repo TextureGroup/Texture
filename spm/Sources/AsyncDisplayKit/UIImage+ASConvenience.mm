@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/UIImage+ASConvenience.mm
+../../../Source/UIImage+ASConvenience.mm

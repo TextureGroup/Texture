@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionViewLayoutController.mm
+../../../Source/Details/ASCollectionViewLayoutController.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Base/ASAvailability.h
+../../../../Source/Base/ASAvailability.h

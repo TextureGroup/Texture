@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTextNodeCommon.h
+../../../../Source/ASTextNodeCommon.h

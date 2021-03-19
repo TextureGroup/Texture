@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/String/ASTextAttribute.mm
+../../../Source/TextExperiment/String/ASTextAttribute.mm

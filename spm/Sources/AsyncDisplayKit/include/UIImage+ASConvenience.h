@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/UIImage+ASConvenience.h
+../../../../Source/UIImage+ASConvenience.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Component/ASTextLine.h
+../../../../Source/TextExperiment/Component/ASTextLine.h

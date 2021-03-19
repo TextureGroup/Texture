@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASNodeController+Beta.h
+../../../../Source/ASNodeController+Beta.h

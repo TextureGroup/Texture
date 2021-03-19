@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Utility/NSParagraphStyle+ASText.h
+../../../Source/TextExperiment/Utility/NSParagraphStyle+ASText.h

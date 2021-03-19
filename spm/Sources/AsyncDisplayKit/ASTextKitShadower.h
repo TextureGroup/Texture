@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitShadower.h
+../../../Source/TextKit/ASTextKitShadower.h

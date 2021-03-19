@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASNetworkImageLoadInfo+Private.h
+../../../Source/Private/ASNetworkImageLoadInfo+Private.h

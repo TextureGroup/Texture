@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASCollectionViewFlowLayoutInspector.mm
+../../../Source/Private/ASCollectionViewFlowLayoutInspector.mm

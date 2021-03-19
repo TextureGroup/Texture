@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASMutableAttributedStringBuilder.h
+../../../../Source/Details/ASMutableAttributedStringBuilder.h

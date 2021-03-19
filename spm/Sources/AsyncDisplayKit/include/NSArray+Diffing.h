@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/NSArray+Diffing.h
+../../../../Source/Details/NSArray+Diffing.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTabBarController.mm
+../../../Source/ASTabBarController.mm

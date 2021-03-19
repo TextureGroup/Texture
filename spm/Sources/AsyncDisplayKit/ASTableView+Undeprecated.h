@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTableView+Undeprecated.h
+../../../Source/Private/ASTableView+Undeprecated.h

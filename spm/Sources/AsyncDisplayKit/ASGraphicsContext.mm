@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASGraphicsContext.mm
+../../../Source/Details/ASGraphicsContext.mm

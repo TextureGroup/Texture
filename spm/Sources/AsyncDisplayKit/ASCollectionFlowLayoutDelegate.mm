@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionFlowLayoutDelegate.mm
+../../../Source/Details/ASCollectionFlowLayoutDelegate.mm

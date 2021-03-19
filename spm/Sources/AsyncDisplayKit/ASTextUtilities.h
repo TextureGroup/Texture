@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Utility/ASTextUtilities.h
+../../../Source/TextExperiment/Utility/ASTextUtilities.h

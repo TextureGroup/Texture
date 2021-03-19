@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASCollectionViewFlowLayoutInspector.h
+../../../Source/Private/ASCollectionViewFlowLayoutInspector.h

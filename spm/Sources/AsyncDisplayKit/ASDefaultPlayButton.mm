@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASDefaultPlayButton.mm
+../../../Source/Private/ASDefaultPlayButton.mm

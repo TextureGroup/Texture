@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Component/ASTextInput.h
+../../../../Source/TextExperiment/Component/ASTextInput.h

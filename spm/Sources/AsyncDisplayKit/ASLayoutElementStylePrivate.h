@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/Layout/ASLayoutElementStylePrivate.h
+../../../Source/Private/Layout/ASLayoutElementStylePrivate.h

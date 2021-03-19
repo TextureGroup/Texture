@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextNodeTypes.h
+../../../../Source/TextKit/ASTextNodeTypes.h

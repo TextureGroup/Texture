@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASRangeController.mm
+../../../Source/Details/ASRangeController.mm

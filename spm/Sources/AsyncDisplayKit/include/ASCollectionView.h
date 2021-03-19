@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASCollectionView.h
+../../../../Source/ASCollectionView.h

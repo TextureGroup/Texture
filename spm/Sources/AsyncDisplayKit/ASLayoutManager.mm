@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASLayoutManager.mm
+../../../Source/TextKit/ASLayoutManager.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASCollectionViewCell.mm
+../../../Source/Details/_ASCollectionViewCell.mm

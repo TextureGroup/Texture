@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Debug/AsyncDisplayKit+Tips.mm
+../../../Source/Debug/AsyncDisplayKit+Tips.mm

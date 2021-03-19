@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextExperiment/Component/ASTextDebugOption.mm
+../../../Source/TextExperiment/Component/ASTextDebugOption.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASSection.mm
+../../../Source/Private/ASSection.mm

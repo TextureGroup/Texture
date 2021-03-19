@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTipsWindow.mm
+../../../Source/Private/ASTipsWindow.mm

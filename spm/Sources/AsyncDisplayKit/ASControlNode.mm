@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASControlNode.mm
+../../../Source/ASControlNode.mm

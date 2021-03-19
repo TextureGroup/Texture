@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASNetworkImageNode.h
+../../../../Source/ASNetworkImageNode.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASCollectionLayoutDefines.mm
+../../../Source/Private/ASCollectionLayoutDefines.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASNavigationController.h
+../../../../Source/ASNavigationController.h

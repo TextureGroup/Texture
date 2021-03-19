@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitFontSizeAdjuster.mm
+../../../Source/TextKit/ASTextKitFontSizeAdjuster.mm

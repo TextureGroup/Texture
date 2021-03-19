@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTipsController.mm
+../../../Source/Private/ASTipsController.mm

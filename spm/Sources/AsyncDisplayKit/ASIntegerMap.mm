@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASIntegerMap.mm
+../../../Source/Details/ASIntegerMap.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASCenterLayoutSpec.mm
+../../../Source/Layout/ASCenterLayoutSpec.mm

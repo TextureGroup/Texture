@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASTipNode.mm
+../../../Source/Private/ASTipNode.mm

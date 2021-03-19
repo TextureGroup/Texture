@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASCollectionNode+Beta.h
+../../../../Source/ASCollectionNode+Beta.h

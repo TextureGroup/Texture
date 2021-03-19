@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/NSIndexSet+ASHelpers.h
+../../../../Source/Details/NSIndexSet+ASHelpers.h

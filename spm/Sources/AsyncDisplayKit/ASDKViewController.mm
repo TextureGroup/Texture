@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASDKViewController.mm
+../../../Source/ASDKViewController.mm

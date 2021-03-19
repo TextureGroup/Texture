@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitContext.h
+../../../Source/TextKit/ASTextKitContext.h

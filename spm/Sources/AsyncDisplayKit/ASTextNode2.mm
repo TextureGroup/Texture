@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTextNode2.mm
+../../../Source/ASTextNode2.mm

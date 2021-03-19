@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASBasicImageDownloaderInternal.h
+../../../Source/Private/ASBasicImageDownloaderInternal.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASRangeController.h
+../../../../Source/Details/ASRangeController.h

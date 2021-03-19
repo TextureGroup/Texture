@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Base/ASDisplayNode+Ancestry.mm
+../../../Source/Base/ASDisplayNode+Ancestry.mm

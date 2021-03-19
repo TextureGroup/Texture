@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionInternal.h
+../../../../Source/Details/ASCollectionInternal.h

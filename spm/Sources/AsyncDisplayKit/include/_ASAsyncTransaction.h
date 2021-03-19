@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/Transactions/_ASAsyncTransaction.h
+../../../../Source/Details/Transactions/_ASAsyncTransaction.h

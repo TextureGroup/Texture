@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASLayerBackingTipProvider.mm
+../../../Source/Private/ASLayerBackingTipProvider.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASVisibilityProtocols.h
+../../../../Source/ASVisibilityProtocols.h

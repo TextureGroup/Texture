@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASWeakMap.h
+../../../Source/Private/ASWeakMap.h

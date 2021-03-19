@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASScrollDirection.mm
+../../../Source/Details/ASScrollDirection.mm

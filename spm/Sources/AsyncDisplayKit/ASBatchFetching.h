@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASBatchFetching.h
+../../../Source/Private/ASBatchFetching.h

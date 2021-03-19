@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASCellNode.mm
+../../../Source/ASCellNode.mm

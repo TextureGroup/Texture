@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitCoreTextAdditions.mm
+../../../Source/TextKit/ASTextKitCoreTextAdditions.mm

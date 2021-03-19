@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASImageNode+CGExtras.h
+../../../Source/Private/ASImageNode+CGExtras.h

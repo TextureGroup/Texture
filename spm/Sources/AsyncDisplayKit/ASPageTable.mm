@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASPageTable.mm
+../../../Source/Details/ASPageTable.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASCollectionViewLayoutInspector.h
+../../../../Source/Details/ASCollectionViewLayoutInspector.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASCollectionLayoutContext+Private.h
+../../../Source/Private/ASCollectionLayoutContext+Private.h

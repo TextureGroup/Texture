@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/_ASCollectionReusableView.h
+../../../../Source/Details/_ASCollectionReusableView.h

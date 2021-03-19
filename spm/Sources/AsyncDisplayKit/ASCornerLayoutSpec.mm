@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Layout/ASCornerLayoutSpec.mm
+../../../Source/Layout/ASCornerLayoutSpec.mm

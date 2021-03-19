@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASImageNode+Private.h
+../../../Source/Private/ASImageNode+Private.h

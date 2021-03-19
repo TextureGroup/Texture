@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASHashing.h
+../../../../Source/Details/ASHashing.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASImageProtocols.h
+../../../../Source/Details/ASImageProtocols.h

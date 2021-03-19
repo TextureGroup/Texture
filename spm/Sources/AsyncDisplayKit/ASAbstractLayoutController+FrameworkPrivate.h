@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASAbstractLayoutController+FrameworkPrivate.h
+../../../Source/Private/ASAbstractLayoutController+FrameworkPrivate.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASConfigurationInternal.mm
+../../../Source/ASConfigurationInternal.mm

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Base/ASEqualityHelpers.h
+../../../../Source/Base/ASEqualityHelpers.h

@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASImageNode+AnimatedImage.mm
+../../../Source/ASImageNode+AnimatedImage.mm

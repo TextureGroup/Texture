@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASDelegateProxy.h
+../../../../Source/Details/ASDelegateProxy.h

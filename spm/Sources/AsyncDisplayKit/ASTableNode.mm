@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASTableNode.mm
+../../../Source/ASTableNode.mm

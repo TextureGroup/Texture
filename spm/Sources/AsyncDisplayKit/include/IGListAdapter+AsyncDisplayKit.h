@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/IGListAdapter+AsyncDisplayKit.h
+../../../../Source/IGListAdapter+AsyncDisplayKit.h

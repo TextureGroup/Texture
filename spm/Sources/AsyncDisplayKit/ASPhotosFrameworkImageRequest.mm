@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASPhotosFrameworkImageRequest.mm
+../../../Source/Details/ASPhotosFrameworkImageRequest.mm

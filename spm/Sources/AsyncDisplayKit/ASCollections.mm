@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASCollections.mm
+../../../Source/ASCollections.mm

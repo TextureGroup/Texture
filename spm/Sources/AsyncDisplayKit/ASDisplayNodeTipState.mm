@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Private/ASDisplayNodeTipState.mm
+../../../Source/Private/ASDisplayNodeTipState.mm

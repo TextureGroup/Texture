@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/TextKit/ASTextKitTailTruncater.h
+../../../Source/TextKit/ASTextKitTailTruncater.h

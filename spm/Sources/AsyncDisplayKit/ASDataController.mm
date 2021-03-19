@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/Details/ASDataController.mm
+../../../Source/Details/ASDataController.mm

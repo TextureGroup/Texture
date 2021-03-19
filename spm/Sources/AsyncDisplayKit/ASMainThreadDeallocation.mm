@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASMainThreadDeallocation.mm
+../../../Source/ASMainThreadDeallocation.mm

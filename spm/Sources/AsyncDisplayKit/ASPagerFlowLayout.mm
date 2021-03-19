@@ -1,1 +1,1 @@
-/Users/provenskyy/xcodeProjects/Texture/Source/ASPagerFlowLayout.mm
+../../../Source/ASPagerFlowLayout.mm
