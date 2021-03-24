@@ -24,6 +24,7 @@
 
 @property (nonatomic) NSUInteger setSelectedCounter;
 @property (nonatomic) NSUInteger applyLayoutAttributesCount;
+@property (nonatomic) NSUInteger didEnterPreloadStateCount;
 
 @end
 
@@ -38,6 +39,12 @@
 - (void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _applyLayoutAttributesCount++;
+}
+
+- (void)didEnterPreloadState
+{
+  [super didEnterPreloadState];
+  _didEnterPreloadStateCount++;
 }
 
 @end
@@ -177,7 +184,8 @@
 {
   [super setUp];
   ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline
+                              | ASExperimentalRangeUpdateOnChangesetUpdate;
   [ASConfigurationManager test_resetWithConfiguration:config];
 }
 
@@ -516,6 +524,81 @@
     [cv reloadSections:sections];
     [cv deleteSections:sections];
   } completion:nil]);
+}
+
+- (void)testItemsInsertedIntoThePreloadRangeGetPreloaded
+{
+  updateValidationTestPrologue
+  
+  ASRangeTuningParameters minimumPreloadParams = { .leadingBufferScreenfuls = 1, .trailingBufferScreenfuls = 1 };
+  [cn setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [cn updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+
+  __weak ASCollectionViewTestController *weakController = testController;
+  NSIndexPath *lastVisibleIndex = [cv indexPathsForVisibleItems].lastObject;
+  
+  NSInteger itemCount = weakController.asyncDelegate->_itemCounts[lastVisibleIndex.section];
+  BOOL isLastItemInSection = lastVisibleIndex.row == itemCount - 1;
+  NSInteger nextItemSection = isLastItemInSection ? lastVisibleIndex.section + 1 : lastVisibleIndex.section;
+  NSInteger nextItemRow = isLastItemInSection ? 0 : lastVisibleIndex.row + 1;
+  
+  XCTAssertTrue(weakController.asyncDelegate->_itemCounts.size() > nextItemSection, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  XCTAssertTrue(weakController.asyncDelegate->_itemCounts[nextItemSection] > nextItemRow, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  
+  NSIndexPath *nextItemIndexPath = [NSIndexPath indexPathForRow:nextItemRow inSection:nextItemSection];
+  ASTextCellNodeWithSetSelectedCounter *nodeBeforeUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+
+  XCTestExpectation *noChangeDone = [self expectationWithDescription:@"Batch update with no changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  __block ASTextCellNodeWithSetSelectedCounter *nodeAfterUpdate;
+  [cv performBatchUpdates:^{
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [noChangeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ noChangeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate == nodeAfterUpdate, @"Node should not have changed since no updates were made.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"Node should have been preloaded.");
+
+  XCTestExpectation *changeDone = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  [cv performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [cv deleteItemsAtIndexPaths:indexPaths];
+    [cv insertItemsAtIndexPaths:indexPaths];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [changeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdate, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"New node should have been preloaded.");
+  
+  minimumPreloadParams = { .leadingBufferScreenfuls = 0, .trailingBufferScreenfuls = 0 };
+  [cn setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [cn updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+
+  XCTestExpectation *changeDoneZeroSreenfuls = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 0 screenful."];
+  
+  nodeBeforeUpdate = nodeAfterUpdate;
+  __block ASTextCellNodeWithSetSelectedCounter *nodeAfterUpdateZeroSreenfuls;
+  [cv performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [cv deleteItemsAtIndexPaths:indexPaths];
+    [cv insertItemsAtIndexPaths:indexPaths];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdateZeroSreenfuls = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [changeDoneZeroSreenfuls fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDoneZeroSreenfuls ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdateZeroSreenfuls, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdateZeroSreenfuls.didEnterPreloadStateCount == 0, @"New node should NOT have been preloaded.");
 }
 
 - (void)testCellNodeLayoutAttributes
