@@ -970,6 +970,23 @@ dispatch_semaphore_signal(_lock);
       size.width += container.size.width - (rect.origin.x + rect.size.width);
     } else {
       size.width += rect.origin.x;
+      // When computing the x offset of centered text, the entire width of our container's size is used.
+      // Even if the text is short and will not use the entire size, it is centered as though it will.
+      // However, the textBoundingSize is only the width of the text + the text's offset. This leads to
+      // the text node being smaller than the container's width. For example, if we were trying to center
+      // "hello" we would expect the text node to look like this (where | are the left right edges of the
+      // text node's frame):
+      // |    hello    |
+      // But what we'd end up with is:
+      // |    hello|
+      // The text is technically centered in the container's size, but not within the text node's size.
+      // Ideally we'd lay this out as:
+      // |hello|
+      // but that seems like a much larger change. Instead let's change the textBoundingSize to be the same
+      // as the container's size.
+      if ([text as_alignment] == NSTextAlignmentCenter) {
+        size.width = container.size.width;
+      }
     }
     size.height += rect.origin.y;
     if (size.width < 0) size.width = 0;
