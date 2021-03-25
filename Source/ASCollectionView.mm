@@ -2311,6 +2311,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       
       // Flush any range changes that happened as part of submitting the update.
       as_activity_scope(changeSet.rootActivity);
+      if (numberOfUpdates > 0 && ASActivateExperimentalFeature(ASExperimentalRangeUpdateOnChangesetUpdate)) {
+        [self->_rangeController setNeedsUpdate];
+      }
       [self->_rangeController updateIfNeeded];
     }
   });
