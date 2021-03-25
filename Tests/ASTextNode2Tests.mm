@@ -180,4 +180,23 @@
   }];
 }
 
+- (void)testNonTruncatedCenteredText
+{
+  CGSize constrainedSize = CGSizeMake(100, 50);
+  
+  NSMutableParagraphStyle *paragraph = [[NSMutableParagraphStyle alloc] init];
+  paragraph.alignment = NSTextAlignmentCenter;
+  
+  // test that the centered text uses the entire container width
+  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"hi" attributes:@{ NSParagraphStyleAttributeName : paragraph }];
+  CGSize size = [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(size.width == 100);
+
+  // non centered text should not use the entire container width
+  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"hi"];
+  size = [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  XCTAssertTrue(size.width < 20);
+}
+
 @end
