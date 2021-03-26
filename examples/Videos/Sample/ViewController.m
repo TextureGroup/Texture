@@ -72,7 +72,7 @@
 
 #pragma mark - Getter / Setter
 
-- (ASVideoNode *)guitarVideoNode;
+- (ASVideoNode *)guitarVideoNode
 {
   if (_guitarVideoNode) {
     return _guitarVideoNode;
@@ -88,7 +88,7 @@
   return _guitarVideoNode;
 }
 
-- (ASVideoNode *)nicCageVideoNode;
+- (ASVideoNode *)nicCageVideoNode
 {
   ASVideoNode *nicCageVideoNode = [[ASVideoNode alloc] init];
   nicCageVideoNode.delegate = self;
@@ -117,7 +117,7 @@
   return simonVideoNode;
 }
 
-- (ASVideoNode *)hlsVideoNode;
+- (ASVideoNode *)hlsVideoNode
 {
   ASVideoNode *hlsVideoNode = [[ASVideoNode alloc] init];
   
@@ -134,7 +134,7 @@
   return hlsVideoNode;
 }
 
-- (ASButtonNode *)playButton;
+- (ASButtonNode *)playButton
 {
   ASButtonNode *playButtonNode = [[ASButtonNode alloc] init];
   

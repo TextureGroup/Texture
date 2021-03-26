@@ -51,7 +51,7 @@
   return [self initWithCollectionViewLayout:flowLayout];
 }
 
-- (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout;
+- (instancetype)initWithCollectionViewLayout:(ASPagerFlowLayout *)flowLayout
 {
   ASDisplayNodeAssert([flowLayout isKindOfClass:[ASPagerFlowLayout class]], @"ASPagerNode requires a flow layout.");
   ASDisplayNodeAssertTrue(flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal);

@@ -35,7 +35,7 @@
   self.imageView.contentMode = UIViewContentModeScaleAspectFill;
 }
 
-- (void)tapped;
+- (void)tapped
 {
   NSLog(@"tapped!");
 }
