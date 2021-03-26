@@ -16,12 +16,12 @@
 
 @implementation ASVideoNode
 
-- (instancetype)initWithURL:(NSURL *)URL;
+- (instancetype)initWithURL:(NSURL *)URL
 {
   return [self initWithURL:URL videoGravity:ASVideoGravityResizeAspect];
 }
 
-- (instancetype)initWithURL:(NSURL *)URL videoGravity:(ASVideoGravity)gravity;
+- (instancetype)initWithURL:(NSURL *)URL videoGravity:(ASVideoGravity)gravity
 {
   if (!(self = [super initWithLayerBlock:^CALayer *{
     AVPlayerLayer *layer = [[AVPlayerLayer alloc] init];
@@ -37,7 +37,7 @@
   return self;
 }
 
-- (void)setGravity:(ASVideoGravity)gravity;
+- (void)setGravity:(ASVideoGravity)gravity
 {
   switch (gravity) {
     case ASVideoGravityResize:
@@ -55,7 +55,7 @@
   }
 }
 
-- (ASVideoGravity)gravity;
+- (ASVideoGravity)gravity
 {
   if ([((AVPlayerLayer *)self.layer).contentsGravity isEqualToString:AVLayerVideoGravityResize]) {
     return ASVideoGravityResize;
@@ -67,12 +67,12 @@
   return ASVideoGravityResizeAspect;
 }
 
-- (void)play;
+- (void)play
 {
   [[((AVPlayerLayer *)self.layer) player] play];
 }
 
-- (void)pause;
+- (void)pause
 {
   [[((AVPlayerLayer *)self.layer) player] pause];
 }

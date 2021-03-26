@@ -142,7 +142,7 @@ static CGSize const kItemSize = (CGSize){180, 90};
 
 #pragma mark - ASCollectionDataSource
 
-- (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (ASCellNodeBlock)collectionNode:(ASCollectionNode *)collectionNode nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   NSString *text = self.data[indexPath.section][indexPath.item];
   return ^{

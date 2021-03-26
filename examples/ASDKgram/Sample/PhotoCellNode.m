@@ -46,7 +46,7 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithPhotoObject:(PhotoModel *)photo;
+- (instancetype)initWithPhotoObject:(PhotoModel *)photo
 {
   self = [super init];
   
