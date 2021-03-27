@@ -657,6 +657,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchWithContext:(ASBatchContext *)context;
 
 /**
+ * Receive a message that the tableView is near the start of its data set and more data should be fetched if necessary.
+ *
+ * @param tableNode The sender.
+ * @param context A context object that must be notified when the batch fetch is completed.
+ *
+ * @discussion You must eventually call -completeBatchFetching: with an argument of YES in order to receive future
+ * notifications to do batch fetches. This method is called on a background queue.
+ *
+ * ASTableView currently only supports batch events for tail loads. If you require a head load, consider implementing a
+ * UIRefreshControl.
+ */
+- (void)tableNode:(ASTableNode *)tableNode willBeginBatchFetchPrependWithContext:(ASBatchContext *)context;
+
+/**
  * Tell the tableView if batch fetching should begin.
  *
  * @param tableNode The sender.
@@ -668,6 +682,20 @@ NS_ASSUME_NONNULL_BEGIN
  * should occur.
  */
 - (BOOL)shouldBatchFetchForTableNode:(ASTableNode *)tableNode;
+
+/**
+ * Tell the tableView if batch fetching prepend should begin.
+ * Prepend is opposite a normal fetch (by table leading)
+ *
+ * @param tableNode The sender.
+ *
+ * @discussion Use this method to conditionally fetch batches. Example use cases are: limiting the total number of
+ * objects that can be fetched or no network connection.
+ *
+ * If not implemented, the tableView assumes that it should notify its asyncDelegate when batch fetching
+ * should occur.
+ */
+- (BOOL)shouldBatchFetchPrependForTableNode:(ASTableNode *)tableNode;
 
 /**
  * Informs the delegate that the table view will add the given node

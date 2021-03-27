@@ -233,9 +233,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeDidEndDisplayingNodeForRow:1;
     unsigned int tableViewDidEndDisplayingNodeForRow:1;
     unsigned int tableNodeWillBeginBatchFetch:1;
+    unsigned int tableNodeWillBeginBatchFetchPrepend:1;
     unsigned int tableViewWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForTableView:1;
     unsigned int shouldBatchFetchForTableNode:1;
+    unsigned int shouldBatchFetchPrependForTableNode:1;
     unsigned int tableViewConstrainedSizeForRow:1;
     unsigned int tableNodeConstrainedSizeForRow:1;
     unsigned int tableViewWillSelectRow:1;
@@ -479,8 +481,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.scrollViewDidEndDecelerating = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDecelerating:)];
     _asyncDelegateFlags.tableViewWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(tableView:willBeginBatchFetchWithContext:)];
     _asyncDelegateFlags.tableNodeWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(tableNode:willBeginBatchFetchWithContext:)];
+    _asyncDelegateFlags.tableNodeWillBeginBatchFetchPrepend = [_asyncDelegate respondsToSelector:@selector(tableNode:willBeginBatchFetchPrependWithContext:)];
     _asyncDelegateFlags.shouldBatchFetchForTableView = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableView:)];
     _asyncDelegateFlags.shouldBatchFetchForTableNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableNode:)];
+    _asyncDelegateFlags.shouldBatchFetchPrependForTableNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchPrependForTableNode:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
     _asyncDelegateFlags.tableViewConstrainedSizeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:constrainedSizeForRowAtIndexPath:)];
@@ -1455,6 +1459,18 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
 }
 
+- (BOOL)canBatchFetchPrepend
+{
+  // if the delegate does not respond to this method, there is no point in starting to fetch
+  BOOL canFetch = _asyncDelegateFlags.tableNodeWillBeginBatchFetchPrepend;
+  if (canFetch && _asyncDelegateFlags.shouldBatchFetchPrependForTableNode) {
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
+    return [_asyncDelegate shouldBatchFetchPrependForTableNode:tableNode];
+  } else {
+    return canFetch;
+  }
+}
+
 - (id<ASBatchFetchingDelegate>)batchFetchingDelegate
 {
   return self.tableNode.batchFetchingDelegate;
@@ -1486,8 +1502,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity)) {
+  ASScrollDirection scrollDirection = self.scrollDirection;
+  BOOL shouldFetchBatch = ASDisplayShouldFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+
+  if (shouldFetchBatch) {
     [self _beginBatchFetching];
+  } else if (ASDisplayIsScrollingTowardHead(scrollDirection)) {
+    BOOL shouldFetchPrependBatch = ASDisplayShouldPrependFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+    if (shouldFetchPrependBatch) {
+      [self _beginBatchFetchingPrepend];
+    }
   }
 }
 
@@ -1505,6 +1529,17 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
       [self->_asyncDelegate tableView:self willBeginBatchFetchWithContext:self->_batchContext];
 #pragma clang diagnostic pop
+    });
+  }
+}
+
+- (void)_beginBatchFetchingPrepend
+{
+  [_batchContext beginBatchFetching];
+  if (_asyncDelegateFlags.tableNodeWillBeginBatchFetchPrepend) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      GET_TABLENODE_OR_RETURN(tableNode, (void)0);
+      [_asyncDelegate tableNode:tableNode willBeginBatchFetchPrependWithContext:_batchContext];
     });
   }
 }

@@ -192,9 +192,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     unsigned int collectionNodeCanPerformActionForItem:1;
     unsigned int collectionNodePerformActionForItem:1;
     unsigned int collectionNodeWillBeginBatchFetch:1;
+    unsigned int collectionNodeWillBeginBatchFetchPrepend:1;
     unsigned int collectionNodeWillDisplaySupplementaryElement:1;
     unsigned int collectionNodeDidEndDisplayingSupplementaryElement:1;
     unsigned int shouldBatchFetchForCollectionNode:1;
+    unsigned int shouldBatchFetchPrependForCollectionNode:1;
 
     // Interop flags
     unsigned int interop:1;
@@ -546,7 +548,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     _asyncDelegateFlags.collectionNodeWillDisplayItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:willDisplayItemWithNode:)];
     _asyncDelegateFlags.collectionNodeDidEndDisplayingItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didEndDisplayingItemWithNode:)];
     _asyncDelegateFlags.collectionNodeWillBeginBatchFetch = [_asyncDelegate respondsToSelector:@selector(collectionNode:willBeginBatchFetchWithContext:)];
+    _asyncDelegateFlags.collectionNodeWillBeginBatchFetchPrepend = [_asyncDelegate respondsToSelector:@selector(collectionNode:willBeginBatchFetchPrependWithContext:)];
     _asyncDelegateFlags.shouldBatchFetchForCollectionNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForCollectionNode:)];
+    _asyncDelegateFlags.shouldBatchFetchPrependForCollectionNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchPrependForCollectionNode:)];
     _asyncDelegateFlags.collectionNodeShouldSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeDidSelectItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:didSelectItemAtIndexPath:)];
     _asyncDelegateFlags.collectionNodeShouldDeselectItem = [_asyncDelegate respondsToSelector:@selector(collectionNode:shouldDeselectItemAtIndexPath:)];
@@ -1827,6 +1831,18 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
+- (BOOL)canBatchFetchPrepend
+{
+  // if the delegate does not respond to this method, there is no point in starting to fetch
+  BOOL canFetch = _asyncDelegateFlags.collectionNodeWillBeginBatchFetchPrepend;
+  if (canFetch && _asyncDelegateFlags.shouldBatchFetchPrependForCollectionNode) {
+    GET_COLLECTIONNODE_OR_RETURN(collectionNode, NO);
+    return [_asyncDelegate shouldBatchFetchForCollectionNode:collectionNode];
+  } else {
+    return canFetch;
+  }
+}
+
 - (id<ASBatchFetchingDelegate>)batchFetchingDelegate{
   return self.collectionNode.batchFetchingDelegate;
 }
@@ -1857,8 +1873,29 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, self.scrollableDirections, contentOffset, velocity)) {
-    [self _beginBatchFetching];
+    ASScrollDirection scrollDirection = self.scrollDirection;
+    BOOL shouldFetchBatch = ASDisplayShouldFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+
+    if (shouldFetchBatch) {
+        [self _beginBatchFetching];
+    } else if (ASDisplayIsScrollingTowardHead(scrollDirection)) {
+        BOOL shouldFetchPrependBatch = ASDisplayShouldPrependFetchBatchForScrollView(self, scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity);
+        if (shouldFetchPrependBatch) {
+            [self _beginBatchFetchingPrepend];
+        }
+    }
+}
+
+- (void)_beginBatchFetchingPrepend
+{
+  as_activity_create_for_scope("Batch fetch prepend for collection node");
+  [_batchContext beginBatchFetching];
+  if (_asyncDelegateFlags.collectionNodeWillBeginBatchFetchPrepend) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      GET_COLLECTIONNODE_OR_RETURN(collectionNode, (void)0);
+      os_log_debug(ASCollectionLog(), "Beginning batch fetch prepend for %@ with context %@", collectionNode, _batchContext);
+      [_asyncDelegate collectionNode:collectionNode willBeginBatchFetchPrependWithContext:_batchContext];
+    });
   }
 }
 
