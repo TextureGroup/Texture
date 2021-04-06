@@ -702,7 +702,9 @@ static NSArray *DefaultLinkAttributeNames() {
         continue;
       }
 
-      *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+      if (rangeOut != NULL) {
+        *rangeOut = NSIntersectionRange(visibleRange, effectiveRange);
+      }
 
       if (attributeNameOut != NULL) {
         *attributeNameOut = attributeName;
