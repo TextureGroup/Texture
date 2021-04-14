@@ -67,6 +67,7 @@ ASDK_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 CGPoint targetOffset,
                                                 CGFloat leadingScreens,
                                                 BOOL visible,
+                                                BOOL shouldRenderRTLLayout,
                                                 CGPoint velocity,
                                                 _Nullable id<ASBatchFetchingDelegate> delegate);
 

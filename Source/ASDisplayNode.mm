@@ -1625,6 +1625,21 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
   });
 }
 
+- (void)updateSemanticContentAttributeWithAttribute:(UISemanticContentAttribute)attribute
+{
+  __instanceLock__.lock();
+  UISemanticContentAttribute oldAttribute = _semanticContentAttribute;
+  _semanticContentAttribute = attribute;
+  __instanceLock__.unlock();
+
+  ASPerformBlockOnMainThread(^{
+    // If the value has changed we should attempt to relayout.
+    if (attribute != oldAttribute) {
+      [self setNeedsLayout];
+    }
+  });
+}
+
 - (void)recursivelySetDisplaySuspended:(BOOL)flag
 {
   _recursivelySetDisplaySuspended(self, nil, flag);
