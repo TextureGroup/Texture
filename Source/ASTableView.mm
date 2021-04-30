@@ -1486,7 +1486,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity)) {
+  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity, NO)) {
     [self _beginBatchFetching];
   }
 }
