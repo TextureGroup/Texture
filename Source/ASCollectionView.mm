@@ -1857,7 +1857,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, self.scrollableDirections, contentOffset, velocity)) {
+  // Since we are accessing self.collectionViewLayout, we should make sure we are on main
+  ASDisplayNodeAssertMainThread();
+  
+  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, self.scrollableDirections, contentOffset, velocity, self.collectionViewLayout.flipsHorizontallyInOppositeLayoutDirection)) {
     [self _beginBatchFetching];
   }
 }
