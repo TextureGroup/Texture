@@ -15,7 +15,8 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
                                             ASScrollDirection scrollDirection,
                                             ASScrollDirection scrollableDirections,
                                             CGPoint contentOffset,
-                                            CGPoint velocity)
+                                            CGPoint velocity,
+                                            BOOL flipsHorizontallyInOppositeLayoutDirection)
 {
   // Don't fetch if the scroll view does not allow
   if (![scrollView canBatchFetch]) {
@@ -30,7 +31,7 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
   id<ASBatchFetchingDelegate> delegate = scrollView.batchFetchingDelegate;
   BOOL visible = (scrollView.window != nil);
   BOOL shouldRenderRTLLayout = [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:scrollView.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
-  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, shouldRenderRTLLayout, velocity, delegate);
+  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, shouldRenderRTLLayout, velocity, flipsHorizontallyInOppositeLayoutDirection, delegate);
 }
 
 BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
@@ -43,6 +44,7 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                          BOOL visible,
                                          BOOL shouldRenderRTLLayout,
                                          CGPoint velocity,
+                                         BOOL flipsHorizontallyInOppositeLayoutDirection,
                                          id<ASBatchFetchingDelegate> delegate)
 {
   // Do not allow fetching if a batch is already in-flight and hasn't been completed or cancelled
@@ -87,11 +89,11 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
   }
 
   CGFloat triggerDistance = viewLength * leadingScreens;
-  CGFloat remainingDistance = contentLength - viewLength - offset;
-  if (shouldRenderRTLLayout && ASScrollDirectionContainsHorizontalDirection(scrollableDirections)) {
-      remainingDistance = offset;
+  CGFloat remainingDistance = 0;
+  if (!flipsHorizontallyInOppositeLayoutDirection && shouldRenderRTLLayout && ASScrollDirectionContainsHorizontalDirection(scrollableDirections)) {
+    remainingDistance = offset;
   } else {
-      remainingDistance = contentLength - viewLength - offset;
+    remainingDistance = contentLength - viewLength - offset;
   }
   BOOL result = remainingDistance <= triggerDistance;
 
