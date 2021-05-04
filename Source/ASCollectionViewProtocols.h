@@ -23,8 +23,9 @@ typedef NS_OPTIONS(unsigned short, ASCellLayoutMode) {
    *
    * Note: Sync & Async flags force the behavior to be always one or the other, regardless of the
    * items. Default: If neither ASCellLayoutModeAlwaysSync or ASCellLayoutModeAlwaysAsync is set,
-   * default behavior is synchronous when there are 0 or 1 ASCellNodes in the data source, and
-   * asynchronous when there are 2 or more.
+   * default behavior is synchronous when there are 0 or 1 ASCellNodes in the data source, or if
+   * the current content does not fill the bounds, and asynchronous when there are 2 or more.
+   * The latter restriction about content size can be disabled using the allowAsyncUpdatesForInitialContent flag.
   */
   ASCellLayoutModeAlwaysSync = 1 << 1,                // Default OFF
   ASCellLayoutModeAlwaysAsync = 1 << 2,               // Default OFF

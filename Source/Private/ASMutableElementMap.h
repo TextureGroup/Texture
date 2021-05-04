@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/_ASHierarchyChangeSet.h>
 #import <AsyncDisplayKit/ASIntegerMap.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -53,6 +54,9 @@ AS_SUBCLASSING_RESTRICTED
  * This also deletes any supplementary elements in deleted sections.
  */
 - (void)migrateSupplementaryElementsWithSectionMapping:(ASIntegerMap *)mapping;
+
+/// changeSet must only consist of added content. No deletes are allowed.
+- (void)removeContentAddedInChangeSet:(_ASHierarchyChangeSet *)changeSet;
 
 @end
 

@@ -24,6 +24,8 @@
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
+using namespace AS;
+
 #pragma mark -
 #pragma mark ASCellNode
 
@@ -34,6 +36,7 @@
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
   UICollectionViewLayoutAttributes *_layoutAttributes;
+  __weak id<ASCellNodeInteractionDelegate> _interactionDelegate;
   BOOL _suspendInteractionDelegate;
   BOOL _selected;
   BOOL _highlighted;
@@ -43,7 +46,6 @@
 @end
 
 @implementation ASCellNode
-@synthesize interactionDelegate = _interactionDelegate;
 
 - (instancetype)init
 {
@@ -111,8 +113,8 @@
 
 - (void)_rootNodeDidInvalidateSize
 {
-  if (_interactionDelegate != nil) {
-    [_interactionDelegate nodeDidInvalidateSize:self];
+  if (auto interactionDelegate = self.interactionDelegate) {
+    [interactionDelegate nodeDidInvalidateSize:self];
   } else {
     [super _rootNodeDidInvalidateSize];
   }
@@ -120,8 +122,8 @@
 
 - (void)_layoutTransitionMeasurementDidFinish
 {
-  if (_interactionDelegate != nil) {
-    [_interactionDelegate nodeDidInvalidateSize:self];
+  if (auto interactionDelegate = self.interactionDelegate) {
+    [interactionDelegate nodeDidInvalidateSize:self];
   } else {
     [super _layoutTransitionMeasurementDidFinish];
   }
@@ -203,6 +205,18 @@
 - (id<ASRangeManagingNode>)owningNode
 {
   return self.collectionElement.owningNode;
+}
+
+- (id<ASCellNodeInteractionDelegate>)interactionDelegate
+{
+  MutexLocker l(__instanceLock__);
+  return _interactionDelegate;
+}
+
+- (void)setInteractionDelegate:(id<ASCellNodeInteractionDelegate>)interactionDelegate
+{
+  MutexLocker l(__instanceLock__);
+  _interactionDelegate = interactionDelegate;
 }
 
 #pragma clang diagnostic push

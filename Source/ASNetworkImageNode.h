@@ -14,6 +14,17 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASNetworkImageNodeDelegate, ASImageCacheProtocol, ASImageDownloaderProtocol;
 @class ASNetworkImageLoadInfo;
 
+/**
+ * Returns whether an image should be rendered upon completing download even
+ * without knowing its expected downloadIdentifier.
+ */
+BOOL ASGetEnableImageDownloadSynchronization(void);
+
+/**
+ * If set to YES, an image may be rendered upon completing download even without
+ * knowing its expected downloadIdentifier.
+ */
+void ASSetEnableImageDownloadSynchronization(BOOL enable);
 
 /**
  * ASNetworkImageNode is a simple image node that can download and display an image from the network, with support for a

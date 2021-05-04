@@ -23,11 +23,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, ASPrimitiveTraitCollection traitCollection);
 
+typedef NS_ENUM(NSUInteger, ASAnimatedImageState) {
+    ASAnimatedImageUnknown,
+    ASAnimatedImageStart,
+    ASAnimatedImageEndLoop,
+    ASAnimatedImageStopped
+};
+
 /**
  * @abstract Draws images.
  * @discussion Supports cropping, tinting, and arbitrary image modification blocks.
  */
-@interface ASImageNode : ASControlNode
+@interface ASImageNode : ASControlNode {
+ @package
+  ASAnimatedImageState _animationState;
+}
 
 /**
  * @abstract The image to display.
@@ -121,6 +131,17 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, 
  */
 - (void)setNeedsDisplayWithCompletion:(nullable void (^)(BOOL canceled))displayCompletionBlock;
 
+#if YOGA
+/**
+ * @abstract Whether the image should be reflected across the y-axis when contained within a
+ * yoga tree using RTL layout direction (https://yogalayout.com/docs/layout-direction/). This
+ * value is usually set only once at the root based on device locale, not to be confused with
+ * flex direction (https://yogalayout.com/docs/flex-direction/) which can be flipped from node to
+ * node based on an author's intent.
+ */
+@property (assign) BOOL flipsForRightToLeftLayoutDirection;
+#endif
+
 #if TARGET_OS_TV
 /** 
  * A bool to track if the current appearance of the node
@@ -174,6 +195,22 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, 
  * has been set on the node.
  */
 - (void)animatedImageSet:(nullable id <ASAnimatedImageProtocol>)newAnimatedImage previousAnimatedImage:(nullable id <ASAnimatedImageProtocol>)previousAnimatedImage ASDISPLAYNODE_REQUIRES_SUPER;
+
+/**
+ * @abstract Method called each time when animated image finish looping.
+ */
+- (void)animatedImageDidEnterState:(ASAnimatedImageState)state
+                         fromState:(ASAnimatedImageState)fromState;
+
+/**
+ * @abstract Method to start the animated image playback.
+ */
+- (void)startAnimating;
+
+/**
+ * @abstract Method to stop the animated image playback.
+ */
+- (void)stopAnimating;
 
 @end
 

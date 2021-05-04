@@ -27,6 +27,8 @@ NSString *ASGetDescriptionValueString(id object)
       return NSStringFromCGSize(value.CGSizeValue);
     } else if (strcmp(type, @encode(CGPoint)) == 0) {
       return NSStringFromCGPoint(value.CGPointValue);
+    } else if (strcmp(type, @encode(UIEdgeInsets)) == 0) {
+      return NSStringFromUIEdgeInsets(value.UIEdgeInsetsValue);
     }
     
   } else if ([object isKindOfClass:[NSIndexSet class]]) {
@@ -87,7 +89,14 @@ NSString *ASObjectDescriptionMake(__autoreleasing id object, NSArray<NSDictionar
 NSString *ASObjectDescriptionMakeTiny(__autoreleasing id object) {
   static constexpr int kBufSize = 64;
   char buf[kBufSize];
-  int len = snprintf(buf, kBufSize, "<%s: %p>", object_getClassName(object), object);
+  NSString *debugName;
+  int len;
+  if ([object respondsToSelector:@selector(debugName)] && (debugName = [object debugName])) {
+    len = snprintf(buf, kBufSize, "<%s: %p; \"%s\">", object_getClassName(object), object,
+                   debugName.UTF8String);
+  } else {
+    len = snprintf(buf, kBufSize, "<%s: %p>", object_getClassName(object), object);
+  }
   return (__bridge_transfer NSString *)CFStringCreateWithBytes(NULL, (const UInt8 *)buf, len, kCFStringEncodingASCII, false);
 }
 

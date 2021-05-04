@@ -9,6 +9,7 @@
 
 #import <AsyncDisplayKit/ASButtonNode+Private.h>
 #import <AsyncDisplayKit/ASButtonNode+Yoga.h>
+#import <AsyncDisplayKit/ASTextNode2.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>

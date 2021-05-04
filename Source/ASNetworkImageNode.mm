@@ -19,10 +19,19 @@
 #import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
 #import <AsyncDisplayKit/ASNetworkImageLoadInfo+Private.h>
+#import <AsyncDisplayKit/ASImageNode+FrameworkPrivate.h>
 
 #if AS_PIN_REMOTE_IMAGE
 #import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
 #endif
+
+static BOOL kEnableImageDownloadSynchronization = NO;
+BOOL ASGetEnableImageDownloadSynchronization(void) {
+  return kEnableImageDownloadSynchronization;
+}
+void ASSetEnableImageDownloadSynchronization(BOOL enable) {
+  kEnableImageDownloadSynchronization = enable;
+}
 
 @interface ASNetworkImageNode ()
 {
@@ -338,6 +347,14 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   return _delegate;
 }
 
+- (void)setFlipsForRightToLeftLayoutDirection:(BOOL)flipsForRightToLeftLayoutDirection {
+  ASLockScopeSelf();
+#if YOGA
+  [self _locked_setFlipsForRightToLeftLayoutDirection:flipsForRightToLeftLayoutDirection];
+#endif  // YOGA
+  [self _locked__setImage:self.image];
+}
+
 - (void)setShouldRenderProgressImages:(BOOL)shouldRenderProgressImages
 {
   if (ASLockedSelfCompareAssign(_networkImageNodeFlags.shouldRenderProgressImages, shouldRenderProgressImages)) {
@@ -620,6 +637,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 {
   ASPerformBlockOnBackgroundThread(^{
     NSURL *url;
+    NSInteger cacheSentinel;
     id downloadIdentifier;
     BOOL cancelAndReattempt = NO;
     ASInterfaceState interfaceState;
@@ -630,6 +648,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
     {
       ASLockScopeSelf();
       url = self->_URL;
+      cacheSentinel = self->_cacheSentinel;
       interfaceState = self->_interfaceState;
     }
 
@@ -682,6 +701,10 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
   
     {
       ASLockScopeSelf();
+      if (ASGetEnableImageDownloadSynchronization() && cacheSentinel != _cacheSentinel) {
+        // The original request has been cancelled/fulfilled already or a new request has started.
+        return;
+      }
       if (ASObjectIsEqual(self->_URL, url)) {
         // The download we kicked off is correct, no need to do any more work.
         self->_downloadIdentifier = downloadIdentifier;
@@ -800,9 +823,19 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
           // Grab the lock for the rest of the block
           ASLockScope(strongSelf);
           
-          //Getting a result back for a different download identifier, download must not have been successfully canceled
-          if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO && downloadIdentifier != nil) {
-            return;
+          // Getting a result back for a different download identifier, download must not have been
+          // successfully canceled
+          if (ASObjectIsEqual(strongSelf->_downloadIdentifier, downloadIdentifier) == NO &&
+              downloadIdentifier != nil) {
+            // Note that in some rare cases it's possible that _downloadIdentifier has not yet been
+            // set because of a race condition between the completion block being called and
+            // _downloadIdentifier being assigned. If flag is set, only return early for
+            // "unsuccessful cancellations" where a new download has commenced, hence
+            // _downloadIdentifier having a different non-nil value
+            if (!ASGetEnableImageDownloadSynchronization() ||
+                strongSelf->_downloadIdentifier != nil) {
+              return;
+            }
           }
           
           //No longer in preload range, no point in setting the results (they won't be cleared in exit preload range)

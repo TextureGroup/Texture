@@ -16,6 +16,8 @@
 
 @implementation ASButtonNodeSnapshotTests
 
+#ifndef YOGA
+
 - (void)setUp
 {
   [super setUp];
@@ -111,5 +113,6 @@
   __unused UIView *v2 = container2.view; // Force load
   ASSnapshotVerifyNode(node, @"green_inherited_tint");
 }
+#endif
 
 @end

@@ -27,6 +27,67 @@ static void runLoopSourceCallback(void *info) {
 #endif
 }
 
+#pragma mark - ASDeallocQueue
+
+@implementation ASDeallocQueue {
+  std::vector<CFTypeRef> _queue;
+  AS::Mutex _lock;
+}
+
++ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED
+{
+  static ASDeallocQueue *deallocQueue = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    deallocQueue = [[ASDeallocQueue alloc] init];
+  });
+  return deallocQueue;
+}
+
+- (void)dealloc
+{
+  ASDisplayNodeFailAssert(@"Singleton should not dealloc.");
+}
+
+- (void)releaseObjectInBackground:(id  _Nullable __strong *)objectPtr
+{
+  NSParameterAssert(objectPtr != NULL);
+  
+  // Cast to CFType so we can manipulate retain count manually.
+  const auto cfPtr = (CFTypeRef *)(void *)objectPtr;
+  if (!cfPtr || !*cfPtr) {
+    return;
+  }
+  
+  _lock.lock();
+  const auto isFirstEntry = _queue.empty();
+  // Push the pointer into our queue and clear their pointer.
+  // This "steals" the +1 from ARC and nils their pointer so they can't
+  // access or release the object.
+  _queue.push_back(*cfPtr);
+  *cfPtr = NULL;
+  _lock.unlock();
+  
+  if (isFirstEntry) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.100 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+      [self drain];
+    });
+  }
+}
+
+- (void)drain
+{
+  _lock.lock();
+  const auto q = std::move(_queue);
+  _lock.unlock();
+  for (CFTypeRef ref : q) {
+    // NOTE: Could check that retain count is 1 and retry later if not.
+    CFRelease(ref);
+  }
+}
+
+@end
+
 @implementation ASAbstractRunLoopQueue
 
 - (instancetype)init
@@ -134,10 +195,8 @@ static void runLoopSourceCallback(void *info) {
 
 - (void)processQueue
 {
-  BOOL hasExecutionBlock = (_queueConsumer != nil);
-
-  // If we have an execution block, this vector will be populated, otherwise remains empty.
-  // This is to avoid needlessly retaining/releasing the objects if we don't have a block.
+  // This vector is populated regardless of whether we have an execution block,
+  // because it's important that any objects we release are released while unlocked.
   std::vector<id> itemsToProcess;
 
   BOOL isQueueDrained = NO;
@@ -156,31 +215,22 @@ static void runLoopSourceCallback(void *info) {
     NSInteger maxCountToProcess = MIN(internalQueueCount, self.batchSize);
 
     /**
-     * For each item in the next batch, if it's non-nil then NULL it out
-     * and if we have an execution block then add it in.
-     * This could be written a bunch of different ways but
-     * this particular one nicely balances readability, safety, and efficiency.
+     * For each item in the next batch, if it's non-nil then dequeue it nil it out of source array.
      */
-    NSInteger foundItemCount = 0;
-    for (NSInteger i = 0; i < internalQueueCount && foundItemCount < maxCountToProcess; i++) {
-      /**
-       * It is safe to use unsafe_unretained here. If the queue is weak, the
-       * object will be added to the autorelease pool. If the queue is strong,
-       * it will retain the object until we transfer it (retain it) in itemsToProcess.
-       */
-      unowned id ptr = (__bridge id)[_internalQueue pointerAtIndex:i];
-      if (ptr != nil) {
-        foundItemCount++;
-        if (hasExecutionBlock) {
-          itemsToProcess.push_back(ptr);
-        }
+    itemsToProcess.reserve(maxCountToProcess);
+    for (NSInteger i = 0; i < internalQueueCount && itemsToProcess.size() < maxCountToProcess; i++) {
+      // Note: If this is a weak NSPointerArray, the object will end up in the autorelease pool.
+      // There is no way around this – it is fate.
+      if (id o = (__bridge id)[_internalQueue pointerAtIndex:i]) {
+        // std::move avoids retain/release.
+        itemsToProcess.push_back(std::move(o));
         [_internalQueue replacePointerAtIndex:i withPointer:NULL];
       }
     }
 
-    if (foundItemCount == 0) {
+    if (itemsToProcess.empty()) {
       // If _internalQueue holds weak references, and all of them just become NULL, then the array
-      // is never marked as needsCompletion, and compact will return early, not removing the NULL's.
+      // is never marked as needsCompaction, and compact will return early, not removing the NULL's.
       // Inserting a NULL here ensures the compaction will take place.
       // See http://www.openradar.me/15396578 and https://stackoverflow.com/a/40274426/1136669
       [_internalQueue addPointer:NULL];
@@ -190,16 +240,15 @@ static void runLoopSourceCallback(void *info) {
     if (_internalQueue.count == 0) {
       isQueueDrained = YES;
     }
-  }
+  } // end of lock
 
-  // itemsToProcess will be empty if _queueConsumer == nil so no need to check again.
   const auto count = itemsToProcess.size();
-  if (count > 0) {
+  if (_queueConsumer && count > 0) {
     as_activity_scope_verbose(as_activity_create("Process run loop queue batch", _rootActivity, OS_ACTIVITY_FLAG_DEFAULT));
-    const auto itemsEnd = itemsToProcess.cend();
-    for (auto iterator = itemsToProcess.begin(); iterator < itemsEnd; iterator++) {
-      unowned id value = *iterator;
-      _queueConsumer(value, isQueueDrained && iterator == itemsEnd - 1);
+    // Use const-ref because this is a __strong id.
+    for (const auto &value : itemsToProcess) {
+      bool isLast = isQueueDrained && &value == &itemsToProcess.back();
+      _queueConsumer(value, isLast);
       as_log_verbose(ASDisplayLog(), "processed %@", value);
     }
     if (count > 1) {
@@ -213,6 +262,8 @@ static void runLoopSourceCallback(void *info) {
     CFRunLoopWakeUp(_runLoop);
   }
   
+  // Clear before ending signpost so that the releases are part of the interval.
+  itemsToProcess.clear();
   ASSignpostEnd(RunLoopQueueBatch, self, "count: %d", (int)count);
 }
 
@@ -260,6 +311,7 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 @interface ASCATransactionQueue () {
   CFRunLoopSourceRef _runLoopSource;
   CFRunLoopObserverRef _preTransactionObserver;
+  CFRunLoopObserverRef _postTransactionObserver;
   
   // Current buffer for new entries, only accessed from within its mutex.
   std::vector<id<ASCATransactionQueueObserving>> _internalQueue;
@@ -279,6 +331,9 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 #if ASRunLoopQueueLoggingEnabled
   NSTimer *_runloopQueueLoggingTimer;
 #endif
+  // We must handle re-entrant transactions. It is perfectly legal, and it does occur, for the
+  // run loop to be drained from inside of the transaction, causing another observer pair to fire.
+  int _transactionDepth;
 }
 
 @end
@@ -287,7 +342,11 @@ ASSynthesizeLockingMethodsWithMutex(_internalQueueLock)
 
 // CoreAnimation commit order is 2000000, the goal of this is to process shortly beforehand
 // but after most other scheduled work on the runloop has processed.
-static int const kASASCATransactionQueueOrder = 1000000;
+static int const kASCATransactionQueuePreOrder = 1000000;
+
+// CoreAnimation commit order is 2000000, the goal of this is to process immediately after
+// but after the run loop sleeps.
+static int const kASCATransactionQueuePostOrder = 2000001;
 
 ASCATransactionQueue *_ASSharedCATransactionQueue;
 dispatch_once_t _ASSharedCATransactionQueueOnceToken;
@@ -315,13 +374,21 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
     // Self is guaranteed to outlive the observer.  Without the high cost of a weak pointer,
     // unowned(__unsafe_unretained) allows us to avoid flagging the memory cycle detector.
     unowned __typeof__(self) weakSelf = self;
-    _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASASCATransactionQueueOrder, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+    _preTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASCATransactionQueuePreOrder, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+      weakSelf->_transactionDepth++;
       while (!weakSelf->_internalQueue.empty()) {
         [weakSelf processQueue];
       }
     });
-
     CFRunLoopAddObserver(CFRunLoopGetMain(), _preTransactionObserver, kCFRunLoopCommonModes);
+    _postTransactionObserver = CFRunLoopObserverCreateWithHandler(NULL, kCFRunLoopBeforeWaiting, true, kASCATransactionQueuePostOrder, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+      ASDisplayNodeCAssert(weakSelf->_transactionDepth > 0, @"Expected to have been in transaction.");
+      weakSelf->_transactionDepth--;
+      while (!weakSelf->_internalQueue.empty()) {
+        [weakSelf processQueue];
+      }
+    });
+    CFRunLoopAddObserver(CFRunLoopGetMain(), _postTransactionObserver, kCFRunLoopCommonModes);
 
     // It is not guaranteed that the runloop will turn if it has no scheduled work, and this causes processing of
     // the queue to stop. Attaching a custom loop source to the run loop and signal it if new work needs to be done
@@ -344,17 +411,14 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
 - (void)dealloc
 {
   ASDisplayNodeAssertMainThread();
+  CFRunLoopRemoveSource(CFRunLoopGetMain(), _runLoopSource, kCFRunLoopCommonModes);
+  CFRunLoopObserverInvalidate(_preTransactionObserver);
+  CFRunLoopObserverInvalidate(_postTransactionObserver);
 
   CFRelease(_internalQueueHashSet);
-  CFRunLoopRemoveSource(CFRunLoopGetMain(), _runLoopSource, kCFRunLoopCommonModes);
   CFRelease(_runLoopSource);
-  _runLoopSource = nil;
-
-  if (CFRunLoopObserverIsValid(_preTransactionObserver)) {
-    CFRunLoopObserverInvalidate(_preTransactionObserver);
-  }
   CFRelease(_preTransactionObserver);
-  _preTransactionObserver = nil;
+  CFRelease(_postTransactionObserver);
 }
 
 #if ASRunLoopQueueLoggingEnabled
@@ -393,13 +457,25 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
   ASSignpostEnd(RunLoopQueueBatch, self, "count: %d", (int)count);
 }
 
++ (BOOL)inTransactionCommit {
+  // Note that although the _transactionDepth++ happens within runloop observer of
+  // kASCATransactionQueuePreOrder, it's unlikely anything would happen after this runloop observer
+  // and before the CATransaction commit.
+  return [ASCATransactionQueue sharedQueue]->_transactionDepth > 0;
+}
+
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object
 {
+  ASDisplayNodeAssertMainThread();
   if (!object) {
     return;
   }
 
-  if (!self.enabled) {
+  // If we are already in the transaction (say, in a layout method) we need to update now so that
+  // any changes join the transaction.
+  if (!self.enabled ||
+      (_transactionDepth > 0 &&
+       !ASActivateExperimentalFeature(ASExperimentalCoalesceRootNodeInTransaction))) {
     [object prepareForCATransactionCommit];
     return;
   }
@@ -427,4 +503,8 @@ dispatch_once_t _ASSharedCATransactionQueueOnceToken;
   return ASActivateExperimentalFeature(ASExperimentalInterfaceStateCoalescing);
 }
 
++ (ASCATransactionQueue *)sharedQueue
+{
+  return ASCATransactionQueueGet();
+}
 @end

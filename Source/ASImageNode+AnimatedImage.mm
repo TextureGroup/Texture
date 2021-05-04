@@ -79,6 +79,11 @@
   // not fire e.g. while scrolling down
   CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopCommonModes, ^(void) {
     [self animatedImageSet:animatedImage previousAnimatedImage:previousAnimatedImage];
+
+    // Animated image can take while to dealloc, do it off the main queue
+    if (previousAnimatedImage != nil && ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
+      ASPerformBackgroundDeallocation(&previousAnimatedImage);
+    }
   });
   // Don't need to wakeup the runloop as the current is already running
   // CFRunLoopWakeUp(runLoop); // Should not be necessary
@@ -88,7 +93,7 @@
 {
   // Subclass hook should not be called with the lock held
   DISABLED_ASAssertUnlocked(__instanceLock__);
-  
+
   // Subclasses may override
 }
 
@@ -171,8 +176,14 @@
   }
 
   if (_displayLink != nil) {
-    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
-    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
+    if (ASActivateExperimentalFeature(ASExperimentalAnimatedWebPNoCache)) {
+      NSAssert(_displayLinkRunloop, @"No Runloop for _displayLink");
+      [_displayLink removeFromRunLoop:_displayLinkRunloop forMode:_animatedImageRunLoopMode];
+      [_displayLink addToRunLoop:_displayLinkRunloop forMode:runLoopMode];
+    } else {
+      [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
+      [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:runLoopMode];
+    }
   }
   _animatedImageRunLoopMode = [runLoopMode copy];
 }
@@ -226,7 +237,7 @@
   if (!ASInterfaceStateIncludesVisible(self.interfaceState)) {
     return;
   }
-  
+
   if (_imageNodeFlags.animatedImagePaused) {
     return;
   }
@@ -244,10 +255,38 @@
     _playHead = 0;
     _displayLink = [CADisplayLink displayLinkWithTarget:[ASWeakProxy weakProxyWithTarget:self] selector:@selector(displayLinkFired:)];
     _lastSuccessfulFrameIndex = NSUIntegerMax;
-    
-    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
+    if (ASActivateExperimentalFeature(ASExperimentalAnimatedWebPNoCache)) {
+      _displayLinkThread = [[NSThread alloc] initWithTarget:self
+                                                   selector:@selector(threadHandler:)
+                                                     object:nil];
+      [_displayLinkThread start];
+    } else {
+      [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:_animatedImageRunLoopMode];
+    }
   } else {
     _displayLink.paused = NO;
+  }
+  [self animatedImageTransitionToState:ASAnimatedImageStart];
+}
+
+- (void)threadHandler:(id)object {
+  _displayLinkRunloop = [NSRunLoop currentRunLoop];
+  [_displayLink addToRunLoop:_displayLinkRunloop forMode:NSDefaultRunLoopMode];
+  CFRunLoopRun();
+}
+
+- (void)animatedImageTransitionToState:(ASAnimatedImageState)toState {
+  ASLockScopeSelf();
+  auto oldState = _animationState;
+  if (oldState == toState && toState != ASAnimatedImageEndLoop) {
+    return;
+  }
+  _animationState = toState;
+  {
+    ASUnlockScope(self)
+    // We may still be locked due to recursive locks from outside. At the time of this writing
+    // no call paths have that, and if we ever encounter it we need to revisit this code.
+    [self animatedImageDidEnterState:toState fromState:oldState];
   }
 }
 
@@ -273,6 +312,11 @@
   self.lastDisplayLinkFire = 0;
   
   [_animatedImage clearAnimatedImageCache];
+  {
+    ASUnlockScope(self);
+    DISABLED_ASAssertUnlocked(__instanceLock__);
+    [self animatedImageTransitionToState:ASAnimatedImageStopped];
+  }
 }
 
 #pragma mark - ASDisplayNode
@@ -322,7 +366,9 @@
 
 - (void)displayLinkFired:(CADisplayLink *)displayLink
 {
-  ASDisplayNodeAssertMainThread();
+  if (!ASActivateExperimentalFeature(ASExperimentalAnimatedWebPNoCache)) {
+    ASDisplayNodeAssertMainThread();
+  }
 
   CFTimeInterval timeBetweenLastFire;
   if (self.lastDisplayLinkFire == 0) {
@@ -337,36 +383,46 @@
   _playHead += timeBetweenLastFire;
   
   while (_playHead > self.animatedImage.totalDuration) {
-      // Set playhead to zero to keep from showing different frames on different playthroughs
+    // Set playhead to zero to keep from showing different frames on different playthroughs
+    DISABLED_ASAssertUnlocked(__instanceLock__);
+    [self animatedImageTransitionToState:ASAnimatedImageEndLoop];
     _playHead = 0;
     _playedLoops++;
   }
   
   if (self.animatedImage.loopCount > 0 && _playedLoops >= self.animatedImage.loopCount) {
-    [self stopAnimating];
+    ASPerformBlockOnMainThread(^{
+      [self stopAnimating];
+    });
     return;
   }
-  
+
   NSUInteger frameIndex = [self frameIndexAtPlayHeadPosition:_playHead];
   if (frameIndex == _lastSuccessfulFrameIndex) {
     return;
   }
-  CGImageRef frameImage = [self.animatedImage imageAtIndex:frameIndex];
-  
+
+  id frameImage = (__bridge id)[self.animatedImage imageAtIndex:frameIndex];
   if (frameImage == nil) {
     //Pause the display link until we get a file ready notification
     displayLink.paused = YES;
     self.lastDisplayLinkFire = 0;
   } else {
-    self.contents = (__bridge id)frameImage;
-    _lastSuccessfulFrameIndex = frameIndex;
-    [self displayDidFinish];
+    ASPerformBlockOnMainThread(^{
+      [self displayWillStartAsynchronously:NO];
+      self.contents = frameImage;
+      _lastSuccessfulFrameIndex = frameIndex;
+      [self displayDidFinish];
+    });
   }
 }
 
 - (NSUInteger)frameIndexAtPlayHeadPosition:(CFTimeInterval)playHead
 {
-  ASDisplayNodeAssertMainThread();
+  if (!ASActivateExperimentalFeature(ASExperimentalAnimatedWebPNoCache)) {
+    ASDisplayNodeAssertMainThread();
+  }
+
   NSUInteger frameIndex = 0;
   for (NSUInteger durationIndex = 0; durationIndex < self.animatedImage.frameCount; durationIndex++) {
     playHead -= [self.animatedImage durationAtIndex:durationIndex];

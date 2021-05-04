@@ -18,6 +18,29 @@
  */
 #define AS_CATEGORY_IMPLEMENTABLE
 
+#define AS_EXPECT(x, v) __builtin_expect((x), (v))
+
+/**
+ * AS_NORETAIN means nothing if the externally_retained attribute is not available.
+ * Individual arguments that MUST not be retained (e.g. calling from -dealloc)
+ * should be marked with AS_NORETAIN_ALWAYS to guarantee no retain.
+ * 
+ * @note This annotation affects function *definitions*, not declarations, so
+ * put them in your .mm files for non-inline functions.
+ */
+#if __has_attribute(objc_externally_retained)
+#define AS_NORETAIN __attribute__((objc_externally_retained))
+#define AS_ASSUME_NORETAIN_BEGIN                                              \
+  _Pragma("clang attribute push (__attribute__((objc_externally_retained)), apply_to=any(function,objc_method))")
+#define AS_ASSUME_NORETAIN_END _Pragma("clang attribute pop")
+#define AS_NORETAIN_ALWAYS
+#else
+#define AS_ASSUME_NORETAIN_BEGIN
+#define AS_ASSUME_NORETAIN_END
+#define AS_NORETAIN
+#define AS_NORETAIN_ALWAYS unowned
+#endif
+
 #ifdef __GNUC__
 # define ASDISPLAYNODE_GNUC(major, minor) \
 (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
@@ -128,6 +151,11 @@
 
 #define AS_ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+// https://github.com/abseil/abseil-cpp/blob/d659fe54b35ab9b8e35c72e50a4b8814167d5a84/absl/base/optimization.h#L174
+#define AS_PREDICT_FALSE(x) (__builtin_expect(x, 0))
+#define AS_PREDICT_TRUE(x) (__builtin_expect(false || (x), true))
+
+#define ASCheckFlag(x, v) ((x & v) != 0)
 #define ASCreateOnce(expr) ({ \
   static dispatch_once_t onceToken; \
   static __typeof__(expr) staticVar; \

@@ -38,13 +38,13 @@
     
     BOOL useGlobalTextKitLock = !ASActivateExperimentalFeature(ASExperimentalDisableGlobalTextkitLock);
     if (useGlobalTextKitLock) {
-        // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
-        dispatch_once(&onceToken, ^{
-            mutex = new AS::Mutex();
-        });
-        if (mutex != NULL) {
-          mutex->lock();
-        }
+      // Concurrently initialising TextKit components crashes (rdar://18448377) so we use a global lock.
+      dispatch_once(&onceToken, ^{
+        mutex = new AS::Mutex();
+      });
+      if (mutex != NULL) {
+        mutex->lock();
+      }
     }
     
     __instanceLock__ = std::make_shared<AS::Mutex>();

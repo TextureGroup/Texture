@@ -131,7 +131,7 @@ ASDK_EXTERN ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const 
 - (ASLayout *)filteredNodeLayoutTree NS_RETURNS_RETAINED AS_WARN_UNUSED_RESULT;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)new NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @end
 

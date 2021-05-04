@@ -44,8 +44,6 @@ static UIEdgeInsets kFeedHeaderInset = { .top = 20, .bottom = 20, .left = 10, .r
 - (void)setupYogaLayoutIfNeeded
 {
 #if YOGA_LAYOUT
-  [self.style yogaNodeCreateIfNeeded];
-  [self.textNode.style yogaNodeCreateIfNeeded];
   [self addYogaChild:self.textNode];
 
   self.style.padding = ASEdgeInsetsMake(kFeedHeaderInset);

@@ -50,7 +50,7 @@ static NSString *const kTestCaseUIKitWithReusedContext = @"UIKitReusedContext";
   return array;
 }
 
-- (void)testPerformance_RealisticData
+- (void)disable_testPerformance_RealisticData
 {
   NSArray *data = [self.class realisticDataSet];
 
@@ -82,7 +82,7 @@ static NSString *const kTestCaseUIKitWithReusedContext = @"UIKitReusedContext";
   ASXCTAssertRelativePerformanceInRange(ctx, kTestCaseASDK, 0.2, 0.5);
 }
 
-- (void)testPerformance_TwoParagraphLatinNoTruncation
+- (void)disable_testPerformance_TwoParagraphLatinNoTruncation
 {
   NSAttributedString *text = [ASTextNodePerformanceTests twoParagraphLatinText];
   
@@ -112,7 +112,7 @@ static NSString *const kTestCaseUIKitWithReusedContext = @"UIKitReusedContext";
   ASXCTAssertRelativePerformanceInRange(ctx, kTestCaseASDK, 0.5, 0.9);
 }
 
-- (void)testPerformance_OneParagraphLatinWithTruncation
+- (void)disable_testPerformance_OneParagraphLatinWithTruncation
 {
   NSAttributedString *text = [ASTextNodePerformanceTests oneParagraphLatinText];
   

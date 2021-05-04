@@ -9,6 +9,7 @@
 
 #import <AsyncDisplayKit/UIImage+ASConvenience.h>
 #import <AsyncDisplayKit/ASGraphicsContext.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #pragma mark - ASDKFastImageNamed
 
@@ -154,36 +155,64 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
                                                 scale:(CGFloat)scale
                                       traitCollection:(ASPrimitiveTraitCollection) traitCollection NS_RETURNS_RETAINED
 {
-  static NSCache *__pathCache = nil;
+  static NSCache<NSData *, UIImage *> *imageCache;
+  static pthread_key_t threadKey;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    __pathCache = [[NSCache alloc] init];
-    // UIBezierPath objects are fairly small and these are equally sized. 20 should be plenty for many different parameters.
-    __pathCache.countLimit = 20;
+    ASInitializeTemporaryObjectStorage(&threadKey);
+    imageCache = [[NSCache alloc] init];
+    imageCache.name = @"Texture.roundedImageCache";
   });
-  
+
   // Treat clear background color as no background color
   if ([cornerColor isEqual:[UIColor clearColor]]) {
     cornerColor = nil;
   }
-  
-  CGFloat dimension = (cornerRadius * 2) + 1;
-  CGRect bounds = CGRectMake(0, 0, dimension, dimension);
-  
+
   typedef struct {
-    UIRectCorner corners;
-    CGFloat radius;
-  } PathKey;
-  PathKey key = { roundedCorners, cornerRadius };
-  NSValue *pathKeyObject = [[NSValue alloc] initWithBytes:&key objCType:@encode(PathKey)];
+    CGFloat cornerRadius;
+    CGFloat cornerColor[4];
+    CGFloat fillColor[4];
+    CGFloat borderColor[4];
+    CGFloat borderWidth;
+    UIRectCorner roundedCorners;
+    CGFloat scale;
+  } CacheKey;
+
+  CFMutableDataRef keyBuffer = ASGetTemporaryMutableData(threadKey, sizeof(CacheKey));
+  CacheKey *key = (CacheKey *)CFDataGetMutableBytePtr(keyBuffer);
+  if (!key) {
+    ASDisplayNodeFailAssert(@"Failed to get byte pointer. Data: %@", keyBuffer);
+    return [[UIImage alloc] init];
+  }
+  key->cornerRadius = cornerRadius;
+  [cornerColor getRed:&key->cornerColor[0]
+                green:&key->cornerColor[1]
+                 blue:&key->cornerColor[2]
+                alpha:&key->cornerColor[3]];
+  [fillColor getRed:&key->fillColor[0]
+              green:&key->fillColor[1]
+               blue:&key->fillColor[2]
+              alpha:&key->fillColor[3]];
+  [borderColor getRed:&key->borderColor[0]
+                green:&key->borderColor[1]
+                 blue:&key->borderColor[2]
+                alpha:&key->borderColor[3]];
+  key->borderWidth = borderWidth;
+  key->roundedCorners = roundedCorners;
+  key->scale = scale;
+
+  if (UIImage *cached = [imageCache objectForKey:(__bridge id)keyBuffer]) {
+    return cached;
+  }
+  CGFloat capInset = MAX(borderWidth, cornerRadius);
+  NSAssert(capInset >= 0, @"borderWidth and cornerRadius must >=0");
+  CGFloat dimension = (capInset * 2) + 1;
+  CGRect bounds = CGRectMake(0, 0, dimension, dimension);
 
   CGSize cornerRadii = CGSizeMake(cornerRadius, cornerRadius);
-  UIBezierPath *path = [__pathCache objectForKey:pathKeyObject];
-  if (path == nil) {
-    path = [UIBezierPath bezierPathWithRoundedRect:bounds byRoundingCorners:roundedCorners cornerRadii:cornerRadii];
-    [__pathCache setObject:path forKey:pathKeyObject];
-  }
-  
+  UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:bounds byRoundingCorners:roundedCorners cornerRadii:cornerRadii];
+
   // We should probably check if the background color has any alpha component but that
   // might be expensive due to needing to check mulitple color spaces.
   UIImage *result = ASGraphicsCreateImage(traitCollection, bounds.size, cornerColor != nil, scale, nil, nil, ^{
@@ -205,20 +234,41 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
       // Inset border fully inside filled path (not halfway on each side of path)
       CGRect strokeRect = CGRectInset(bounds, borderWidth / 2.0, borderWidth / 2.0);
 
-      // It is rarer to have a stroke path, and our cache key only handles rounded rects for the exact-stretchable
-      // size calculated by cornerRadius, so we won't bother caching this path.  Profiling validates this decision.
-      UIBezierPath *strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
-                                                       byRoundingCorners:roundedCorners
-                                                             cornerRadii:cornerRadii];
+      UIBezierPath *strokePath;
+      if (cornerRadius == 0) {
+        // When cornerRadii is CGSizeZero, the stroke result will have extra square on top left
+        // that is not covered using bezierPathWithRoundedRect:byRoundingCorners:cornerRadii:.
+        // Seems a bug from iOS runtime.
+        strokePath = [UIBezierPath bezierPathWithRect:strokeRect];
+      } else {
+        strokePath = [UIBezierPath bezierPathWithRoundedRect:strokeRect
+                                           byRoundingCorners:roundedCorners
+                                                 cornerRadii:cornerRadii];
+      }
       [strokePath setLineWidth:borderWidth];
       BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
       [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
     }
+    // Refill the center area with fillColor since it may be contaminated by the sub pixel
+    // rendering.
+    if (borderWidth > 0) {
+      CGRect rect = CGRectMake(capInset, capInset, 1, 1);
+      CGContextRef context = UIGraphicsGetCurrentContext();
+      CGContextClearRect(context, rect);
+      CGContextSetFillColorWithColor(context, [fillColor CGColor]);
+      CGContextFillRect(context, rect);
+    }
   });
-  
-  UIEdgeInsets capInsets = UIEdgeInsetsMake(cornerRadius, cornerRadius, cornerRadius, cornerRadius);
+
+  UIEdgeInsets capInsets = UIEdgeInsetsMake(capInset, capInset, capInset, capInset);
   result = [result resizableImageWithCapInsets:capInsets resizingMode:UIImageResizingModeStretch];
-  
+
+  // Be sure to copy keyBuffer when inserting to cache.
+  if (CFDataRef copiedKey = CFDataCreateCopy(NULL, keyBuffer)) {
+    [imageCache setObject:result forKey:(__bridge_transfer id)copiedKey];
+  } else {
+    ASDisplayNodeFailAssert(@"Failed to copy key: %@", keyBuffer);
+  }
   return result;
 }
 

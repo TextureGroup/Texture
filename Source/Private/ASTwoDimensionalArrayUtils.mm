@@ -19,9 +19,9 @@
 
 #pragma mark - Public Methods
 
-NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array)
+NSMutableArray<NSMutableArray *> *ASTwoDimensionalArrayDeepMutableCopy(NSArray<NSArray *> *array) NS_RETURNS_RETAINED
 {
-  NSMutableArray *newArray = [NSMutableArray arrayWithCapacity:array.count];
+  NSMutableArray *newArray = [[NSMutableArray alloc] initWithCapacity:array.count];
   NSInteger i = 0;
   for (NSArray *subarray in array) {
     ASDisplayNodeCAssert([subarray isKindOfClass:[NSArray class]], @"This function expects NSArray<NSArray *> *");
@@ -63,7 +63,17 @@ void ASDeleteElementsInTwoDimensionalArrayAtIndexPaths(NSMutableArray *mutableAr
   }
 }
 
-NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
+void ASDeleteElementInTwoDimensionalArrayAtIndexPath(NSMutableArray *mutableArray, NSIndexPath *indexPath)
+{
+  const NSInteger section = indexPath.section;
+  AS_C_PRECONDITION(section < mutableArray.count, (void)0, @"Section out of bounds.");
+  unowned NSMutableArray *subarray = mutableArray[section];
+  const NSInteger item = indexPath.item;
+  AS_C_PRECONDITION(item < subarray.count, (void)0, @"Item out of bounds.");
+  [subarray removeObjectAtIndex:item];
+}
+
+NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray) NS_RETURNS_RETAINED
 {
   NSInteger sectionCount = twoDimensionalArray.count;
   NSInteger counts[sectionCount];
@@ -86,7 +96,7 @@ NSArray<NSIndexPath *> *ASIndexPathsForTwoDimensionalArray(NSArray <NSArray *>* 
   return [NSArray arrayByTransferring:indexPaths.data() count:totalCount];
 }
 
-NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray)
+NSArray *ASElementsInTwoDimensionalArray(NSArray <NSArray *>* twoDimensionalArray) NS_RETURNS_RETAINED
 {
   NSInteger totalCount = 0;
   for (NSArray *subarray in twoDimensionalArray) {

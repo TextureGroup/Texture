@@ -30,6 +30,10 @@
 #define PIN_WEBP_AVAILABLE  0
 #endif
 
+#if PIN_WEBP
+#import <PINRemoteImage/PINWebPAnimatedImage.h>
+#endif
+
 #import <PINRemoteImage/PINRemoteImageManager.h>
 #import <PINRemoteImage/NSData+ImageDetectors.h>
 #import <PINRemoteImage/PINRemoteImageCaching.h>
@@ -208,6 +212,17 @@ static dispatch_once_t shared_init_predicate;
 #if PIN_ANIMATED_AVAILABLE
 - (nullable id <ASAnimatedImageProtocol>)animatedImageWithData:(NSData *)animatedImageData
 {
+#if PIN_WEBP
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    PINWebPAnimatedImage.enableFasterWebPDecoding =
+        ASActivateExperimentalFeature(ASExperimentalFasterWebPDecoding);
+    PINWebPAnimatedImage.useGraphicsImageRenderer =
+        ASActivateExperimentalFeature(ASExperimentalFasterWebPGraphicsImageRenderer);
+    PINCachedAnimatedImage.webPCachingDisabled =
+        ASActivateExperimentalFeature(ASExperimentalAnimatedWebPNoCache);
+  });
+#endif
   return [[PINCachedAnimatedImage alloc] initWithAnimatedImageData:animatedImageData];
 }
 #endif
@@ -216,7 +231,7 @@ static dispatch_once_t shared_init_predicate;
 {
   PINRemoteImageManager *manager = [self sharedPINRemoteImageManager];
   PINRemoteImageManagerResult *result = [manager synchronousImageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode];
-  
+
 #if PIN_ANIMATED_AVAILABLE
   if (result.alternativeRepresentation) {
     return result.alternativeRepresentation;
@@ -365,7 +380,7 @@ static dispatch_once_t shared_init_predicate;
       return data;
   }
 #endif
-    
+
 #endif
   return nil;
 }

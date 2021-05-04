@@ -31,6 +31,15 @@ NS_ASSUME_NONNULL_BEGIN
 })
 #endif
 
+#define ASAssertExperiment(opt) \
+  NSAssert(ASActivateExperimentalFeature(opt), @"%s should be enabled.", #opt)
+#define ASAssertNotExperiment(opt) \
+  NSAssert(!ASActivateExperimentalFeature(opt), @"%s should be disabled.", #opt)
+#define ASCAssertExperiment(opt) \
+  NSCAssert(ASActivateExperimentalFeature(opt), @"%s should be enabled.", #opt)
+#define ASCAssertNotExperiment(opt) \
+  NSCAssert(!ASActivateExperimentalFeature(opt), @"%s should be disabled.", #opt)
+
 /**
  * Internal function. Use the macro without the underbar.
  */

@@ -120,7 +120,7 @@
  * then to get the measurement completion call on main,
  * then to get animateLayoutTransition: and didCompleteLayoutTransition: on main.
  */
-- (void)testLayoutTransitionWithAsyncMeasurement
+- (void)disable_testLayoutTransitionWithAsyncMeasurement
 {
   [self stubCalculatedLayoutDidChange];
   [self runFirstLayoutPassWithFixture:fixture1];

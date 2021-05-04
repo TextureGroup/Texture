@@ -32,6 +32,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL displaysAsynchronously;
 
 /**
+ @summary Strong storage for a retained delegate. Since CALayer.delegate is actually assign, not weak,
+ ASDisplayNode uses a weak proxy as the delegate, and assigns the proxy here so that it'll survive as long as
+ the layer does.
+ */
+@property (nonatomic, strong) id<CALayerDelegate> as_retainedDelegate;
+
+/**
+ @summary Set to YES to indicate to a sublayer that this is where highlight overlay layers (for pressed states) should
+ be added so that the highlight won't be clipped by a neighboring layer.
+ */
+@property (nonatomic, setter=as_setAllowsHighlightDrawing:) BOOL as_allowsHighlightDrawing;
+
+/**
  @summary Cancels any pending async display.
 
  @desc If the receiver has had display called and is waiting for the dispatched async display to be executed, this will

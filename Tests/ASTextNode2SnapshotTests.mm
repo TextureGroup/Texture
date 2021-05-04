@@ -19,10 +19,11 @@
 
 @property (nonatomic, assign) NSUInteger numberOfLines;
 @property (nonatomic, assign) NSLineBreakMode lineBreakMode;
+@property (nonatomic) NSString *text;
 
 + (NSArray<LineBreakConfig *> *)configs;
 
-- (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode;
+- (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode text:(NSString *)text;
 - (NSString *)breakModeDescription;
 
 @end
@@ -39,7 +40,10 @@
     for (int i = 0; i <= 3; i++) {
       for (int j = NSLineBreakByWordWrapping; j <= NSLineBreakByTruncatingMiddle; j++) {
         if (j == NSLineBreakByClipping) continue;
-        [setup addObject:[[LineBreakConfig alloc] initWithNumberOfLines:i lineBreakMode:(NSLineBreakMode) j]];
+        [setup addObject:[[LineBreakConfig alloc] initWithNumberOfLines:i lineBreakMode:(NSLineBreakMode) j text:@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]];
+        if (j == NSLineBreakByTruncatingMiddle && i == 1) {
+        [setup addObject:[[LineBreakConfig alloc] initWithNumberOfLines:i lineBreakMode:(NSLineBreakMode) j text:@"Lorem ipsum dolor sit amet, consectetur adipiscing"]];
+        }
       }
 
       allConfigs = [NSArray arrayWithArray:setup];
@@ -48,12 +52,13 @@
   return allConfigs;
 }
 
-- (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode
+- (instancetype)initWithNumberOfLines:(NSUInteger)numberOfLines lineBreakMode:(NSLineBreakMode)lineBreakMode text:(NSString *)text
 {
   self = [super init];
   if (self != nil) {
     _numberOfLines = numberOfLines;
     _lineBreakMode = lineBreakMode;
+    _text = text;
 
     return self;
   }
@@ -155,12 +160,7 @@
   UILabel *reference = [[UILabel alloc] init];
   ASTextNode *textNode = [[ASTextNode alloc] init]; // ASTextNode2
 
-  NSMutableAttributedString *refString = [[NSMutableAttributedString alloc] initWithString:@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:18.0f] }];
-  NSMutableAttributedString *asString = [refString mutableCopy];
 
-  reference.attributedText = refString;
-  textNode.attributedText = asString;
 
   CGSize size = (CGSize) {container.bounds.size.width, 120.0};
   CGPoint origin = (CGPoint) {CGRectGetWidth(container.bounds) / 2 - size.width / 2, CGRectGetHeight(container.bounds) / 2 - size.height / 2}; // center
@@ -195,13 +195,22 @@
 
   NSArray<LineBreakConfig *> *c = [LineBreakConfig configs];
   for (LineBreakConfig *config in c) {
+    NSMutableAttributedString *refString = [[NSMutableAttributedString alloc]
+        initWithString:config.text attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:18.0f] }];
+    NSMutableAttributedString *asString = [refString mutableCopy];
+    reference.attributedText = refString;
+    textNode.attributedText = asString;
+
     reference.lineBreakMode = textNode.truncationMode = config.lineBreakMode;
     reference.numberOfLines = textNode.maximumNumberOfLines = config.numberOfLines;
     description.text = config.description;
     [container setNeedsLayout];
     NSString *identifier = [NSString stringWithFormat:@"%@_%luLines", [config breakModeDescription], (unsigned long)config.numberOfLines];
+    if (config.text.length < 60) {
+      identifier = [identifier stringByAppendingString:@"_Short"];
+    }
     [ASSnapshotTestCase hackilySynchronouslyRecursivelyRenderNode:textNode];
-    ASSnapshotVerifyViewWithTolerance(container, identifier, 0.01);
+    ASSnapshotVerifyViewWithTolerance(container, identifier, 0);
   }
 }
 
@@ -277,6 +286,41 @@
   textNode.shadowOpacity = 0.3;
   textNode.shadowRadius = 3;
   textNode.shadowOffset = CGSizeMake(0, 1);
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
+- (void)testThatTruncationTokenDefaultInheritsAttributesFromText
+{
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(20, 80);
+
+  textNode.attributedText = [[NSMutableAttributedString alloc] initWithString:@"Quality is an important thing" attributes:@{
+    NSForegroundColorAttributeName : [UIColor grayColor],
+    NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle),
+  }];
+  textNode.truncationMode = NSLineBreakByTruncatingTail;
+  
+  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASSnapshotVerifyNode(textNode, nil);
+}
+
+- (void)testThatTruncationTokenAttributesOverwriteThoseInheritedFromTextWhenTruncateTailMode_ASTextNode2
+{
+  ASTextNode *textNode = [[ASTextNode alloc] init];
+  textNode.style.maxSize = CGSizeMake(20, 80);
+
+  NSMutableAttributedString *mas = [[NSMutableAttributedString alloc] initWithString:@"Quality is an important thing" attributes:@{
+    NSForegroundColorAttributeName : [UIColor grayColor],
+    NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle),
+  }];
+  textNode.attributedText = mas;
+  textNode.truncationMode = NSLineBreakByTruncatingTail;
+
+  textNode.truncationAttributedText = [[NSAttributedString alloc] initWithString:@"\u2026" attributes:@{
+    NSForegroundColorAttributeName : [UIColor greenColor],
+    NSUnderlineStyleAttributeName: @(NSUnderlineStyleNone),
+  }];
   ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
   ASSnapshotVerifyNode(textNode, nil);
 }

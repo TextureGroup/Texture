@@ -42,6 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Horizontal: The constrainedSize is interpreted as having unbounded .width (CGFLOAT_MAX), ...
  * Vertical & Horizontal: the constrainedSize is interpreted as unbounded in both directions.
  * @default ASScrollDirectionVerticalDirections
+ *
+ * @note This property is not consulted in Yoga2. The overflow mode for ASScrollNode defaults to
+ * "scroll" and you can use min-width=100% and max-width=100% to force the node to match its
+ * parent's width for example.
  */
 @property ASScrollDirection scrollableDirections;
 

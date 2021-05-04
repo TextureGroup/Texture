@@ -31,7 +31,32 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @see ASCollectionNode+Beta.h for full documentation.
  */
+@property (nonatomic) BOOL remeasuresBeforeLayoutPassOnBoundsChange;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
 @property (nonatomic) ASCellLayoutMode cellLayoutMode;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property(nonatomic) BOOL immediatelyApplyComputedLayouts;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property(nonatomic) NSUInteger updateBatchSize;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic) BOOL useNodeCache;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property(nonatomic) BOOL allowAsyncUpdatesForInitialContent;
 
 /**
  * Attempt to get the view-layer index path for the item with the given index path.

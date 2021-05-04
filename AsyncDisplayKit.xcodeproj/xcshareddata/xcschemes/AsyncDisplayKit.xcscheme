@@ -48,9 +48,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "ASCALayerTests">
-               </Test>
-               <Test
                   Identifier = "ASTextNodePerformanceTests">
                </Test>
             </SkippedTests>

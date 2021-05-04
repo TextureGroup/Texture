@@ -33,13 +33,13 @@ static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *s
 
 - (void)updateYogaLayoutIfNeeded
 {
+  if (!self.yoga) return;
   NSMutableArray<ASDisplayNode *> *children = [[NSMutableArray alloc] initWithCapacity:2];
   {
     ASLockScopeSelf();
 
     // Build up yoga children for button node  again
     unowned ASLayoutElementStyle *style = [self _locked_style];
-    [style yogaNodeCreateIfNeeded];
 
     // Setup stack layout values
     style.flexDirection = _laysOutHorizontally ? ASStackLayoutDirectionHorizontal : ASStackLayoutDirectionVertical;
@@ -50,12 +50,10 @@ static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *s
 
     // Setup new yoga children
     if (_imageNode.image != nil) {
-      [_imageNode.style yogaNodeCreateIfNeeded];
       [children addObject:_imageNode];
     }
 
     if (_titleNode.attributedText.length > 0) {
-      [_titleNode.style yogaNodeCreateIfNeeded];
       if (_imageAlignment == ASButtonNodeImageAlignmentBeginning) {
         [children addObject:_titleNode];
       } else {
@@ -80,7 +78,6 @@ static void ASButtonNodeResolveVerticalAlignmentForStyle(ASLayoutElementStyle *s
 
     // Add background node
     if (_backgroundImageNode.image) {
-      [_backgroundImageNode.style yogaNodeCreateIfNeeded];
       [children insertObject:_backgroundImageNode atIndex:0];
 
       _backgroundImageNode.style.positionType = YGPositionTypeAbsolute;

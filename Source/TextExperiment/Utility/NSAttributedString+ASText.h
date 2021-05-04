@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy, readonly) NSDictionary<NSString *, id> *as_attributes;
 
 /**
+ Returns the attributes at the first character as Core Text attributes if NS attributes.
+ */
+@property (nullable, nonatomic, copy, readonly) NSDictionary<NSString *, id> *as_ctAttributes;
+
+/**
  Returns the attributes for the character at a given index.
  
  @discussion Raises an `NSRangeException` if index lies beyond the end of the
@@ -597,10 +602,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Creates and returns an attachment.
- 
- 
+
+
  Example: ContentMode:bottom Alignment:Top.
- 
+
  The text      The attachment holder
  ↓                ↓
  ─────────┌──────────────────────┐───────
@@ -613,21 +618,25 @@ NS_ASSUME_NONNULL_BEGIN
  │    ██████████████ ←───────────────── The attachment content
  │    ██████████████    │
  └──────────────────────┘
- 
+
  @param content        The attachment (UIImage/UIView/CALayer).
  @param contentMode    The attachment's content mode in attachment holder
  @param attachmentSize The attachment holder's size in text layout.
  @param font           The attachment will align to this font.
  @param alignment      The attachment holder's alignment to text line.
- 
+ @param contentInset   The attachment's contentInset.
+ @param userInfo       The infomation associated with the attachment.
+
  @return An attributed string, or nil if an error occurs.
  @since ASText:6.0
  */
-+ (NSMutableAttributedString *)as_attachmentStringWithContent:(nullable id)content
++ (NSMutableAttributedString *)as_attachmentStringWithContent:(id)content
                                                   contentMode:(UIViewContentMode)contentMode
                                                attachmentSize:(CGSize)attachmentSize
                                                   alignToFont:(UIFont *)font
-                                                    alignment:(ASTextVerticalAlignment)alignment;
+                                                    alignment:(ASTextVerticalAlignment)alignment
+                                                contentInsets:(UIEdgeInsets)contentInsets
+                                                     userInfo:(NSDictionary *)userInfo;
 
 /**
  Creates and returns an attahment from a fourquare image as if it was an emoji.

@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol ASCATransactionQueueObserving <NSObject>
 - (void)prepareForCATransactionCommit;
+- (BOOL)shouldCoalesceInterfaceStateDuringTransaction;
 @end
 
 @interface ASAbstractRunLoopQueue : NSObject
@@ -32,7 +33,8 @@ AS_SUBCLASSING_RESTRICTED
  *
  * @discussion You may pass @c nil for the handler if you simply want the objects to
  * be retained at enqueue time, and released during the run loop step. This is useful
- * for creating a "main deallocation queue".
+ * for creating a "main deallocation queue", as @c ASDeallocQueue creates its own 
+ * worker thread with its own run loop.
  */
 - (instancetype)initWithRunLoop:(CFRunLoopRef)runloop
                   retainObjects:(BOOL)retainsObjects
@@ -58,12 +60,17 @@ AS_SUBCLASSING_RESTRICTED
  */
 AS_SUBCLASSING_RESTRICTED
 @interface ASCATransactionQueue : ASAbstractRunLoopQueue
+@property (class, readonly) ASCATransactionQueue *sharedQueue;
++ (ASCATransactionQueue *)sharedQueue NS_RETURNS_RETAINED;
 
 @property (readonly) BOOL isEmpty;
 
 @property (readonly, getter=isEnabled) BOOL enabled;
 
 - (void)enqueue:(id<ASCATransactionQueueObserving>)object;
+
+// Return YES if within a CATransation commit.
++ (BOOL)inTransactionCommit;
 
 @end
 
@@ -76,5 +83,15 @@ NS_INLINE ASCATransactionQueue *ASCATransactionQueueGet(void) {
   });
   return _ASSharedCATransactionQueue;
 }
+
+@interface ASDeallocQueue : NSObject
+
++ (ASDeallocQueue *)sharedDeallocationQueue NS_RETURNS_RETAINED;
+
+- (void)drain;
+
+- (void)releaseObjectInBackground:(id __strong _Nullable * _Nonnull)objectPtr;
+
+@end
 
 NS_ASSUME_NONNULL_END

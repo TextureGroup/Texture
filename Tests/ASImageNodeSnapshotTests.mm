@@ -10,6 +10,8 @@
 #import "ASSnapshotTestCase.h"
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga2.h>
 
 #if AS_AT_LEAST_IOS13
 static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
@@ -31,7 +33,16 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)setUp
 {
   [super setUp];
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = ASExperimentalFillTemplateImagesWithTintColor;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+
   self.recordMode = NO;
+}
+
+- (void)tearDown
+{
+  [super tearDown];
 }
 
 - (UIImage *)testImage
@@ -102,7 +113,7 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testTintColorOnGrayscaleNodePropertyAlwaysTemplate
 {
   ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalDrawingGlobal;
+  config.experimentalFeatures = ASExperimentalDrawingGlobal | ASExperimentalFillTemplateImagesWithTintColor;
   [ASConfigurationManager test_resetWithConfiguration:config];
 
   UIImage *test = [self testGrayscaleImage];
@@ -229,7 +240,7 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 {
   // Test to ensure that rendering with UIGraphicsRenderer don't regress
   ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalDrawingGlobal;
+  config.experimentalFeatures = ASExperimentalDrawingGlobal | ASExperimentalFillTemplateImagesWithTintColor;
   [ASConfigurationManager test_resetWithConfiguration:config];
 
   ASImageNode *imageNode = [[ASImageNode alloc] init];
@@ -239,9 +250,14 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 }
 
 #if AS_AT_LEAST_IOS13
-- (void)testDynamicAssetImage
+- (void)disabled_testDynamicAssetImage
 {
   if (@available(iOS 13.0, *)) {
+    // enable experimantal callback for traits change
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
+    [ASConfigurationManager test_resetWithConfiguration:config];
+    
     UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     ASImageNode *node = [[ASImageNode alloc] init];
     node.image = image;
@@ -260,6 +276,11 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
 - (void)testDynamicTintColor
 {
   if (@available(iOS 13.0, *)) {
+    // enable experimental callback for traits change
+    ASConfiguration *config = [ASConfiguration new];
+    config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection | ASExperimentalFillTemplateImagesWithTintColor;
+    [ASConfigurationManager test_resetWithConfiguration:config];
+    
     UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
     image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     UIColor* tintColor = UIColor.systemBackgroundColor;
@@ -280,4 +301,32 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   }
 }
 #endif // #if AS_AT_LEAST_IOS13
+#if YOGA
+- (void)testFlipsForRightToLeftLayoutDirection
+{
+  ASImageNode *node = [[ASImageNode alloc] init];
+  [node enableYoga];
+  YGNodeStyleSetDirection([node.style yogaNode], YGDirectionRTL);
+
+  UIImage *test = [self testImage];
+  node.image = test;
+
+  UIView *view = [[UIView alloc] initWithFrame:(CGRect){CGPointZero, test.size}];
+  [view addSubnode:node];
+  ASDisplayNodeSizeToFitSize(node, test.size);
+
+  [view layoutIfNeeded];
+
+  ASSnapshotVerifyNode(node, @"normal");
+
+  node.flipsForRightToLeftLayoutDirection = YES;
+
+  ASSnapshotVerifyNode(node, @"flipped");
+
+  node.flipsForRightToLeftLayoutDirection = NO;
+
+  ASSnapshotVerifyNode(node, @"unflipped");
+}
+#endif
+
 @end

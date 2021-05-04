@@ -22,6 +22,7 @@ NS_INLINE ASConfigurationManager *ASConfigurationManagerGet() {
 }
 
 @implementation ASConfigurationManager {
+@package
   ASConfiguration *_config;
   dispatch_queue_t _delegateQueue;
   BOOL _frameworkInitialized;
@@ -31,8 +32,8 @@ NS_INLINE ASConfigurationManager *ASConfigurationManagerGet() {
 + (ASConfiguration *)defaultConfiguration NS_RETURNS_RETAINED
 {
   ASConfiguration *config = [[ASConfiguration alloc] init];
-  // TODO(wsdwsd0829): Fix #788 before enabling it.
-  // config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
+  // TODO(wsdwsd0829): Fix #788 before enabling it. (Did we?)
+  config.experimentalFeatures = ASExperimentalInterfaceStateCoalescing;
   return config;
 }
 

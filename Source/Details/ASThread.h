@@ -328,6 +328,53 @@ namespace AS {
   typedef std::lock_guard<Mutex> MutexLocker;
   typedef std::unique_lock<Mutex> UniqueLock;
 
+  /**
+   * A simple variant class for holding either a pointer (to your context's mutex) or its own mutex.
+   * You must call Configure() before attempting to get the mutex.
+   */
+  class MutexOrPointer {
+  public:
+    MutexOrPointer() : configured_(false), own_mutex_(false) {}
+    void Configure(AS::RecursiveMutex *ptr) {
+      ASDisplayNodeCAssert(!configured_, @"Class cannot be configured twice.");
+      configured_ = true;
+      if (!ptr) {
+        own_mutex_ = true;
+        new (&mutex_) AS::RecursiveMutex();
+      } else {
+        pointer_ = ptr;
+      }
+    }
+    ~MutexOrPointer() {
+      if (own_mutex_) {
+        mutex_.~RecursiveMutex();
+      }
+    }
+    // Explicitly get a reference to the contained mutex.
+    AS::RecursiveMutex &get() {
+      ASDisplayNodeCAssert(configured_, @"Use of class before configuration.");
+      return own_mutex_ ? mutex_ : *pointer_;
+    }
+
+    // Implicitly get mutex ref. Useful when transitioning from instance locks
+    // to context locks. For instance, this allows us to construct a mutex locker from
+    // a MutexOrPointer instance.
+    operator AS::RecursiveMutex &() { return get(); }
+
+    // Locking method forwards for transitioning.
+    void AssertHeld() { get().AssertHeld(); }
+    void lock() { get().lock(); }
+    void unlock() { get().unlock(); }
+    bool try_lock() { return get().try_lock(); }
+   private:
+    union {
+      AS::RecursiveMutex *pointer_;
+      AS::RecursiveMutex mutex_;
+    };
+    bool configured_:1;
+    bool own_mutex_:1;
+  };
+
 } // namespace AS
 
 #endif /* __cplusplus */

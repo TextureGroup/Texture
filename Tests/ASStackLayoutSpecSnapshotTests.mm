@@ -1216,8 +1216,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testFlexWrapWithItemSpacings
 {
   ASStackLayoutSpecStyle style = {
-    .spacing = 50,
     .direction = ASStackLayoutDirectionHorizontal,
+    .spacing = 50,
     .flexWrap = ASStackLayoutFlexWrapWrap,
     .alignContent = ASStackLayoutAlignContentStart,
     .lineSpacing = 5,
@@ -1246,8 +1246,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testFlexWrapWithItemSpacingsBeingResetOnNewLines
 {
   ASStackLayoutSpecStyle style = {
-    .spacing = 5,
     .direction = ASStackLayoutDirectionHorizontal,
+    .spacing = 5,
     .flexWrap = ASStackLayoutFlexWrapWrap,
     .alignContent = ASStackLayoutAlignContentStart,
     .lineSpacing = 5,
@@ -1328,8 +1328,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASStackLayoutSpecStyle style = {
     .direction = ASStackLayoutDirectionHorizontal,
     .flexWrap = ASStackLayoutFlexWrapWrap,
-    .alignContent = ASStackLayoutAlignContentStretch,
     .alignItems = ASStackLayoutAlignItemsStart,
+    .alignContent = ASStackLayoutAlignContentStretch,
   };
   
   CGSize subnodeSize = {50, 50};

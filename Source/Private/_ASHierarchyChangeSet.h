@@ -114,7 +114,14 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 @property (nonatomic, readonly) BOOL isEmpty;
 
 /// The count of new ASCellNodes that can undergo async layout calculation. May be zero if all UIKit passthrough cells.
-@property (nonatomic, assign) NSUInteger countForAsyncLayout;
+/// You may not read this property before data latched. If so you get an assert and a 0.
+@property (nonatomic, readonly) NSUInteger countForAsyncLayout;
+
+/// You may not call this after data is latched. If so you get an assert.
+- (void)incrementCountForAsyncLayout;
+
+/// Whether the data for this changeset has been latched by the data controller.
+@property (nonatomic, assign) BOOL dataLatched;
 
 /// The top-level activity for this update.
 @property (nonatomic, OS_ACTIVITY_NULLABLE) os_activity_t rootActivity;
@@ -199,6 +206,26 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 /// Returns all item indexes affected by changes of the given type in the given section.
 - (NSIndexSet *)indexesForItemChangesOfType:(_ASHierarchyChangeType)changeType inSection:(NSUInteger)section;
 
+/**
+ * The index paths for all the items that were deleted or reloaded, including the contents of deleted or
+ * reloaded sections. If this is a reloadData, this returns all index paths.
+ *
+ * Result is sorted descending.
+ *
+ * Must be completed.
+ */
+@property (readonly) std::vector<NSIndexPath *> indexPathsForRemovedItems;
+
+/**
+ * The new index paths for all the items that were insert or reloaded, including the contents of inserted or
+ * reloaded sections. If this is a reloadData, this returns all new index paths.
+ *
+ * Result is sorted ascending.
+ *
+ * Must be completed.
+ */
+@property (readonly) std::vector<NSIndexPath *> indexPathsForInsertedItems;
+
 - (void)reloadData;
 - (void)deleteSections:(NSIndexSet *)sections animationOptions:(ASDataControllerAnimationOptions)options;
 - (void)insertSections:(NSIndexSet *)sections animationOptions:(ASDataControllerAnimationOptions)options;
@@ -208,6 +235,17 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType);
 - (void)reloadItems:(NSArray<NSIndexPath *> *)indexPaths animationOptions:(ASDataControllerAnimationOptions)options;
 - (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection animationOptions:(ASDataControllerAnimationOptions)options;
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath animationOptions:(ASDataControllerAnimationOptions)options;
+
+/**
+ * Running returned changesets in series is equivalent to running this one.
+ *
+ * The completion handler for this change is cleared and set as the completion handler of the last chunk.
+ *
+ * The first segment will contain all deletes + the first batch of inserts. All subsequent segments
+ * will only contain inserted sections & inserted items.
+ * Must be completed.
+ */
+- (std::vector<_ASHierarchyChangeSet *>)divideIntoSegmentsOfMaximumSize:(NSUInteger)sizeLimit;
 
 @end
 

@@ -9,13 +9,39 @@
 
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 
+#import <UIKit/UIKit.h>
+
+#import <objc/runtime.h>
+#import <cmath>
+#import <pthread.h>
+
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/ASThread.h>
 
+AS_ASSUME_NORETAIN_BEGIN
+
 static NSNumber *allowsGroupOpacityFromUIKitOrNil;
 static NSNumber *allowsEdgeAntialiasingFromUIKitOrNil;
+static NSNumber *applicationUserInterfaceLayoutDirection = nil;
+
+@implementation NSAttributedString (ASTextAttachment)
+
+- (BOOL)as_hasAttribute:(NSAttributedStringKey)attributeKey {
+  NSUInteger length = self.length;
+  if (length == 0) {
+    return NO;
+  }
+  NSRange range;
+  id result = [self attribute:attributeKey
+                      atIndex:0
+        longestEffectiveRange:&range
+                      inRange:NSMakeRange(0, length)];
+  return result || range.length != length;
+}
+
+@end
 
 BOOL ASDefaultAllowsGroupOpacity()
 {
@@ -37,6 +63,10 @@ BOOL ASDefaultAllowsEdgeAntialiasing()
     edgeAntialiasing = antialiasingObj ? antialiasingObj.boolValue : NO;
   });
   return edgeAntialiasing;
+}
+
+NSNumber *ASApplicationUserInterfaceLayoutDirection() {
+  return applicationUserInterfaceLayoutDirection;
 }
 
 #if AS_SIGNPOST_ENABLE
@@ -66,6 +96,7 @@ void ASInitializeFrameworkMainThread(void)
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     ASDisplayNodeCAssertMainThread();
+    applicationUserInterfaceLayoutDirection = @([UIApplication sharedApplication].userInterfaceLayoutDirection);
     // Ensure these values are cached on the main thread before needed in the background.
     if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
       // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
@@ -138,6 +169,11 @@ void ASPerformBlockOnBackgroundThread(void (^block)(void))
   } else {
     block();
   }
+}
+
+void ASPerformBackgroundDeallocation(id __strong _Nullable * _Nonnull object)
+{
+  [[ASDeallocQueue sharedDeallocationQueue] releaseObjectInBackground:object];
 }
 
 Class _Nullable ASGetClassFromType(const char  * _Nullable type)
@@ -248,7 +284,7 @@ CGFloat ASRoundPixelValue(CGFloat f)
 
 @end
 
-NSMutableSet *ASCreatePointerBasedMutableSet()
+NSMutableSet *ASCreatePointerBasedMutableSet() NS_RETURNS_RETAINED
 {
   static CFSetCallBacks callbacks;
   static dispatch_once_t onceToken;
@@ -259,3 +295,65 @@ NSMutableSet *ASCreatePointerBasedMutableSet()
   });
   return (__bridge_transfer NSMutableSet *)CFSetCreateMutable(NULL, 0, &callbacks);
 }
+
+NSMutableArray *ASCreateNonOwningMutableArray() NS_RETURNS_RETAINED {
+  static CFArrayCallBacks callbacks;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    callbacks = kCFTypeArrayCallBacks;
+    callbacks.retain = nullptr;
+    callbacks.release = nullptr;
+  });
+  return (__bridge_transfer NSMutableArray *)CFArrayCreateMutable(NULL, 0, &callbacks);
+}
+
+/**
+ * Note: we intentionally choose pthread keys instead of the thread_local storage classifier.
+ * The latter is not as efficient in current implementations (Xcode 10) as it relies on tlv_atExit
+ * which performs its own heap allocations.
+ */
+void ASInitializeTemporaryObjectStorage(pthread_key_t *keyPtr) {
+  pthread_key_create(keyPtr, [](void *ptr) {
+    if (ptr) CFRelease((CFTypeRef)ptr);
+  });
+}
+
+CFMutableArrayRef ASGetTemporaryNonowningMutableArray(pthread_key_t key) {
+  CFMutableArrayRef obj = (CFMutableArrayRef)pthread_getspecific(key);
+  if (!obj) {
+    obj = (__bridge_retained CFMutableArrayRef)ASCreateNonOwningMutableArray();
+    pthread_setspecific(key, obj);
+  } else {
+    CFArrayRemoveAllValues(obj);
+  }
+  return obj;
+}
+
+CFMutableDataRef ASGetTemporaryMutableData(pthread_key_t key, NSUInteger size) {
+  CFMutableDataRef md = (CFMutableDataRef)pthread_getspecific(key);
+  if (!md) {
+    md = CFDataCreateMutable(NULL, size);
+    CFDataSetLength(md, size);
+    pthread_setspecific(key, md);
+  } else if (UInt8 *buf = CFDataGetMutableBytePtr(md)) {
+    // We clear the data on every subsequent access. Subtle downstream bugs are likely and have been
+    // observed if the remnants of old entries are left around.
+    memset(buf, 0, size);
+  } else {
+    ASDisplayNodeCFailAssert(@"Have mutable data but failed to get byte ptr. ???");
+  }
+
+  ASDisplayNodeCAssert(size == CFDataGetLength(md), @"Size changed across calls.");
+  return md;
+}
+
+NSAttributedString *ASGetZeroAttributedString(void) {
+  static NSAttributedString *str;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    str = [[NSAttributedString alloc] init];
+  });
+  return str;
+}
+
+AS_ASSUME_NORETAIN_END

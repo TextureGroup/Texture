@@ -146,7 +146,8 @@ ASDK_EXTERN ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernode(ASDisplayN
 /**
  Given a display node, traverses up the layer tree hierarchy, returning the first display node of kind class.
  */
-ASDK_EXTERN __kindof ASDisplayNode * _Nullable ASDisplayNodeFindFirstSupernodeOfClass(ASDisplayNode *start, Class c) AS_WARN_UNUSED_RESULT  ASDISPLAYNODE_DEPRECATED_MSG("Use the `supernodeOfClass:includingSelf:` method instead.");
+ASDK_EXTERN __kindof ASDisplayNode *_Nullable ASDisplayNodeFindFirstSupernodeOfClass(
+    ASDisplayNode *start, Class c) AS_WARN_UNUSED_RESULT;
 
 /**
  * Given a layer, find the window it lives in, if any.
@@ -206,6 +207,11 @@ ASDK_EXTERN UIColor *ASDisplayNodeDefaultTintColor(void) AS_WARN_UNUSED_RESULT;
  */
 ASDK_EXTERN void ASDisplayNodeDisableHierarchyNotifications(ASDisplayNode *node);
 ASDK_EXTERN void ASDisplayNodeEnableHierarchyNotifications(ASDisplayNode *node);
+
+/**
+ Returns the CAAction to apply to this node.
+ */
+ASDK_EXTERN id<CAAction>ASDisplayNodeActionForLayer(CALayer *layer, NSString *event, ASDisplayNode *node, id<CAAction> uikitAction);
 
 // Not to be called directly.
 ASDK_EXTERN void _ASSetDebugNames(Class owningClass, NSString *names, ASDisplayNode * _Nullable object, ...);

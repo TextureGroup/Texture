@@ -19,10 +19,16 @@ static NSTimeInterval const kRunLoopRunTime = 0.01; // Allow the RunLoop to run 
 @end
 
 @implementation QueueObject
+
+- (BOOL)shouldCoalesceInterfaceStateDuringTransaction {
+  return NO;
+}
+
 - (void)prepareForCATransactionCommit
 {
   self.queueObjectProcessed = YES;
 }
+
 @end
 
 @interface ASRunLoopQueueTests : ASTestCase

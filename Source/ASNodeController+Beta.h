@@ -10,6 +10,8 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h> // for ASInterfaceState protocol
 
+@class ASNodeContext;
+
 /* ASNodeController is currently beta and open to change in the future */
 @interface ASNodeController<__covariant DisplayNodeType : ASDisplayNode *>
     : NSObject <ASInterfaceStateDelegate, ASLocking>
@@ -18,6 +20,8 @@
 
 // Until an ASNodeController can be provided in place of an ASCellNode, some apps may prefer to have
 // nodes keep their controllers alive (and a weak reference from controller to node)
+
+@property (readonly) ASNodeContext *nodeContext;
 
 @property (nonatomic) BOOL shouldInvertStrongReference;
 
@@ -47,11 +51,18 @@
 - (void)didEnterHierarchy ASDISPLAYNODE_REQUIRES_SUPER;
 - (void)didExitHierarchy  ASDISPLAYNODE_REQUIRES_SUPER;
 
+#ifdef __cplusplus
 /**
- * @discussion Attempts (via ASLockSequence, a backing-off spinlock similar to
+ * @discussion Attempts (via AS::LockSet, a backing-off multi-lock similar to
  * std::lock()) to lock both the node and its ASNodeController, if one exists.
  */
-- (ASLockSet)lockPair;
+- (AS::LockSet)lockPair;
+#endif
+
+/**
+ * Hook into Xcode's Quick Look feature. Returns the view/layer if loaded.
+ */
+- (id)debugQuickLookObject;
 
 @end
 

@@ -89,7 +89,6 @@ Copy and paste this to the top of your new file(s):
 //
 //  Copyright (c) Pinterest, Inc.  All rights reserved.
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
-//  
 ```
 
 If you’ve modified an existing file, change the header to:
@@ -226,10 +225,7 @@ static void someFunction() {
   - There is mostly no sense using nullability annotations outside of interface declarations.
 ```objc
 // Properties
-// Never include: `atomic`, `readwrite`, `strong`, `assign`.
-// Only specify nullability if it isn't assumed from NS_ASSUME.
-// (nullability, atomicity, storage class, writability, custom getter, custom setter)
-@property (nullable, copy) NSNumber *status
+@property(nonatomic, strong, nullable) NSNumber *status
 
 // Methods
 - (nullable NSNumber *)doSomethingWithString:(nullable NSString *)str;

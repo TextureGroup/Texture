@@ -18,6 +18,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * Get and Set ASDataController to use:
+ *  a) GCD dispatch queues' own autorelease pools and
+ *  b) explicit autorelease pool on Texture background queue
+ */
+BOOL ASGetEnableAutoreleasePoolInQueues(void);
+void ASSetEnableAutoreleasePoolInQueues(BOOL enable);
+
+/**
+ * Get and Set ASDataController to avoid priority inversion:
+ *  a) use dispatch_block_wait on empty block in serial edit queue.
+ *  b) use dispatch_group_wait for edit dispatch_group
+ */
+BOOL ASGetRemovePriorityInversion(void);
+void ASSetRemovePriorityInversion(BOOL enable);
+
 @class ASCellNode;
 @class ASCollectionElement;
 @class ASCollectionLayoutContext;
@@ -76,6 +92,8 @@ ASDK_EXTERN NSString * const ASCollectionInvalidUpdateException;
 - (BOOL)dataController:(ASDataController *)dataController shouldSynchronouslyProcessChangeSet:(_ASHierarchyChangeSet *)changeSet;
 - (BOOL)dataController:(ASDataController *)dataController shouldEagerlyLayoutNode:(ASCellNode *)node;
 - (BOOL)dataControllerShouldSerializeNodeCreation:(ASDataController *)dataController;
+
+- (CGRect)dataControllerFrameForDebugging:(ASDataController *)dataController;
 
 @optional
 
@@ -200,6 +218,21 @@ ASDK_EXTERN NSString * const ASCollectionInvalidUpdateException;
  * Delegate for preparing layouts. Main thead only.
  */
 @property (nonatomic, weak) id<ASDataControllerLayoutDelegate> layoutDelegate;
+
+/**
+ * See ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic) BOOL immediatelyApplyComputedLayouts;
+
+/**
+ * See ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic) NSUInteger updateBatchSize;
+
+/**
+ * See ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic) BOOL useNodeCache;
 
 #ifdef __cplusplus
 /**

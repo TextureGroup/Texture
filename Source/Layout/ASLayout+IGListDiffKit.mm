@@ -7,7 +7,7 @@
 //
 #import <AsyncDisplayKit/ASAvailability.h>
 #if AS_IG_LIST_DIFF_KIT
-#import "ASLayout+IGListDiffKit.h"
+#import <AsyncDisplayKit/ASLayout+IGListDiffKit.h>
 
 @interface ASLayout() {
 @public

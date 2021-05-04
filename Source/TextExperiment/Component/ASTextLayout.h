@@ -10,9 +10,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
-#import "ASTextDebugOption.h"
-#import "ASTextLine.h"
-#import "ASTextInput.h"
+#import <AsyncDisplayKit/ASTextDebugOption.h>
+#import <AsyncDisplayKit/ASTextLine.h>
+#import <AsyncDisplayKit/ASTextInput.h>
 
 @protocol ASTextLinePositionModifier;
 
@@ -22,6 +22,19 @@ NS_ASSUME_NONNULL_BEGIN
  The max text container size in layout.
  */
 ASDK_EXTERN const CGSize ASTextContainerMaxSize;
+
+/**
+ * Get and Set ASTextNode2 to enable the better calculation of visible text range.
+ */
+BOOL ASGetEnableImprovedTextTruncationVisibleRange(void);
+void ASSetEnableImprovedTextTruncationVisibleRange(BOOL enable);
+
+/**
+ * Get and Set ASTextLayout to fix the clickable area on truncation token when the last visible line
+ * is untruncated (e.g. the last visible line is an empty line).
+ */
+BOOL ASGetEnableImprovedTextTruncationVisibleRangeLastLineFix(void);
+void ASSetEnableImprovedTextTruncationVisibleRangeLastLineFix(BOOL enable);
 
 /**
  The ASTextContainer class defines a region in which text is laid out.
@@ -81,9 +94,6 @@ ASDK_EXTERN const CGSize ASTextContainerMaxSize;
 /// NO: (PathFillWindingNumber) Text is fill in the area that would be painted if the path were given to CGContextFillPath.
 /// Default is YES;
 @property (getter=isPathFillEvenOdd) BOOL pathFillEvenOdd;
-
-/// Whether the text is vertical form (may used for CJK text layout). Default is NO.
-@property (getter=isVerticalForm) BOOL verticalForm;
 
 /// Maximum number of rows, 0 means no limit. Default is 0.
 @property NSUInteger maximumNumberOfRows;
@@ -224,8 +234,13 @@ ASDK_EXTERN const CGSize ASTextContainerMaxSize;
 @property (nonatomic, readonly) CTFrameRef frame;
 ///< Array of `ASTextLine`, no truncated
 @property (nonatomic, readonly) NSArray<ASTextLine *> *lines;
-///< ASTextLine with truncated token, or nil
+///< ASTextLine with truncated token, or nil. Note that this may be nil if no truncation token was specified.
+///< To check if the entire string was drawn, use NSEqualRanges(visibleRange, range).
 @property (nullable, nonatomic, readonly) ASTextLine *truncatedLine;
+///< Range of the truncated line before the truncation tokens
+@property(nonatomic, readonly) NSRange truncatedLineBeforeTruncationTokenRange;
+///< The part of truncatedLine before the truncation token.
+@property(nullable, nonatomic, readonly) ASTextLine *truncatedLineBeforeTruncationToken;
 ///< Array of `ASTextAttachment`
 @property (nullable, nonatomic, readonly) NSArray<ASTextAttachment *> *attachments;
 ///< Array of NSRange(wrapped by NSValue) in text

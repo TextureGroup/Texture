@@ -38,6 +38,10 @@ NS_ASSUME_NONNULL_END
 #pragma mark - ASLayoutElementLayoutDefaults
 
 #define ASLayoutElementLayoutCalculationDefaults \
+- (CGSize)measure:(ASSizeRange)constrainedSize\
+{\
+  return [self layoutThatFits:constrainedSize].size;\
+}\
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize\
 {\
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\

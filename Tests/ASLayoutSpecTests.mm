@@ -39,6 +39,15 @@ ASDK_STYLE_PROP_STR(ASDimension, extendedDimension, setExtendedDimension, ASDime
 ASDK_STYLE_PROP_OBJ(NSString *, extendedName, setExtendedName);
 @end
 
+@interface ASLayoutElementStyleYoga (ASDKExtendedLayoutElement) <ASDKExtendedLayoutElement>
+@end
+
+@implementation ASLayoutElementStyleYoga (ASDKExtendedLayoutElement)
+ASDK_STYLE_PROP_PRIM(CGFloat, extendedWidth, setExtendedWidth, 0);
+ASDK_STYLE_PROP_STR(ASDimension, extendedDimension, setExtendedDimension, ASDimensionMake(ASDimensionUnitAuto, 0));
+ASDK_STYLE_PROP_OBJ(NSString *, extendedName, setExtendedName);
+@end
+
 /*
  * As the ASLayoutElementStyle conforms to the ASDKExtendedLayoutElement protocol now, ASDKExtendedLayoutElement properties
  * can be accessed in ASDKExtendedLayoutSpec

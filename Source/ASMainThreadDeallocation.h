@@ -10,16 +10,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSObject (ASMainThreadIvarTeardown)
+@interface NSObject (ASMainThreadDeallocation)
+
+/**
+ * Use this method to indicate that an object associated with an instance
+ * will need to be deallocated on the main thread at some point in the future.
+ * Call handleMainThreadDeallocationIfNeeded from the instance's dealloc to
+ * initiate this future deallocation.
+ *
+ * @param obj The associated object that requires main thread deallocation
+ */
+- (void)scheduleMainThreadDeallocationForObject:(id)obj;
 
 /**
  * Call this from -dealloc to schedule this instance's
- * ivars for main thread deallocation as needed.
- *
- * This method includes a check for whether it's on the main thread,
- * and it will do nothing in that case.
+ * ivars and other objects for main thread deallocation if needed.
  */
-- (void)scheduleIvarsForMainThreadDeallocation;
+- (void)handleMainThreadDeallocationIfNeeded;
 
 @end
 
