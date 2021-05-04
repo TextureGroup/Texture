@@ -29,7 +29,7 @@
 #import <AsyncDisplayKit/ASTableLayoutController.h>
 #import <AsyncDisplayKit/ASBatchContext.h>
 #import <AsyncDisplayKit/ASTableView+Undeprecated.h>
-
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 
 static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
@@ -287,6 +287,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 @implementation ASTableView
 {
+    struct _ASDisplayViewInternalFlags {
+      unsigned inHitTest:1;
+      unsigned inPointInside:1;
+  } _internalFlags;
+
   __weak id<ASTableDelegate> _asyncDelegate;
   __weak id<ASTableDataSource> _asyncDataSource;
 }
@@ -2030,6 +2035,30 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (self.superview == nil) {
     _keepalive_node = nil;
   }
+}
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    if (!_internalFlags.inHitTest) {
+        _internalFlags.inHitTest = YES;
+        UIView *hitView = [_tableNode hitTest:point withEvent:event];
+        _internalFlags.inHitTest = NO;
+        return hitView;
+    } else {
+        return [super hitTest:point withEvent:event];
+    }
+}
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    if (!_internalFlags.inPointInside) {
+        _internalFlags.inPointInside = YES;
+        BOOL result = [_tableNode pointInside:point withEvent:event];
+        _internalFlags.inPointInside = NO;
+        return result;
+    } else {
+        return [super pointInside:point withEvent:event];
+    }
 }
 
 #pragma mark - Accessibility overrides
