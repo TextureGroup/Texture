@@ -334,7 +334,6 @@
 		B35062591B010F070018CF92 /* ASBaseDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 058D0A44195D058D00B7D73C /* ASBaseDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B350625C1B010F070018CF92 /* ASLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 0516FA3B1A15563400B4EBED /* ASLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B350625D1B0111740018CF92 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943141A1575670030A7D0 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943121A1575630030A7D0 /* AssetsLibrary.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.mm */; };
 		BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.mm */; };
 		C018DF21216BF26700181FDA /* ASAbstractLayoutController+FrameworkPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = C018DF20216BF26600181FDA /* ASAbstractLayoutController+FrameworkPrivate.h */; };
@@ -1101,7 +1100,6 @@
 				CC36C191218B841A00232F23 /* CoreText.framework in Frameworks */,
 				CC36C18F218B841600232F23 /* UIKit.framework in Frameworks */,
 				92DD2FE61BF4D05E0074C9DD /* MapKit.framework in Frameworks */,
-				B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */,
 				B350625D1B0111740018CF92 /* Photos.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2675,7 +2673,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					"AS_USE_ASSETS_LIBRARY=1",
 					"AS_USE_MAPKIT=1",
 					"AS_USE_PHOTOS=1",
 					"AS_USE_VIDEO=1",
