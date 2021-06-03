@@ -99,8 +99,8 @@ static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASI
       if ([diskCache respondsToSelector:@selector(setByteLimit:)]) {
         // Set a default byteLimit. PINCache recently implemented a 50MB default (PR #201).
         // Ensure that older versions of PINCache also have a byteLimit applied.
-        // NOTE: Using 20MB limit while large cache initialization is being optimized (Issue #144).
-        ((id <ASPINDiskCache>)diskCache).byteLimit = 20 * 1024 * 1024;
+        // NOTE: Matching PINCache defualt 50MB limit.
+        ((id <ASPINDiskCache>)diskCache).byteLimit = 50 * 1024 * 1024;
       }
     }
   });
