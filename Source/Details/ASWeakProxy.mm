@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASWeakProxy.h>
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import "ASWeakProxy.h"
+#import "ASObjectDescriptionHelpers.h"
+#import "ASAssert.h"
 
 @implementation ASWeakProxy
 

@@ -9,8 +9,8 @@
 
 #import "UIResponder+AsyncDisplayKit.h"
 
-#import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASResponderChainEnumerator.h>
+#import "ASAssert.h"
+#import "ASResponderChainEnumerator.h"
 
 @implementation UIResponder (AsyncDisplayKit)
 

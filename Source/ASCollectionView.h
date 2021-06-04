@@ -9,12 +9,12 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASCollectionViewProtocols.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASBatchContext.h>
-#import <AsyncDisplayKit/ASDimension.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
-#import <AsyncDisplayKit/ASScrollDirection.h>
+#import "ASCollectionViewProtocols.h"
+#import "ASBaseDefines.h"
+#import "ASBatchContext.h"
+#import "ASDimension.h"
+#import "ASLayoutRangeType.h"
+#import "ASScrollDirection.h"
 
 @class ASCellNode;
 @class ASCollectionNode;

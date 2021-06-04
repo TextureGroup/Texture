@@ -8,7 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASControlNode.h>
+#import "ASControlNode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

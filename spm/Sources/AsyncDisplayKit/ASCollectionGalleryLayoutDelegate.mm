@@ -1,0 +1,1 @@
+../../../Source/Details/ASCollectionGalleryLayoutDelegate.mm

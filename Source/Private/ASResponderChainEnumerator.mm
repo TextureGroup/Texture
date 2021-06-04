@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASResponderChainEnumerator.h>
-#import <AsyncDisplayKit/ASAssert.h>
+#import "ASResponderChainEnumerator.h"
+#import "ASAssert.h"
 
 @implementation ASResponderChainEnumerator {
   UIResponder *_currentResponder;

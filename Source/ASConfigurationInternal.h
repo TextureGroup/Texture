@@ -10,7 +10,7 @@
 /// It will be private again after exp_unfair_lock ends.
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASConfiguration.h>
+#import "ASConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

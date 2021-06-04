@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
+#import "ASBackgroundLayoutSpec.h"
 
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
+#import "ASLayoutSpec+Subclasses.h"
 
-#import <AsyncDisplayKit/ASCollections.h>
+#import "ASCollections.h"
 
 static NSUInteger const kForegroundChildIndex = 0;
 static NSUInteger const kBackgroundChildIndex = 1;

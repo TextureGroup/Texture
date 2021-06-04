@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionView.h>
+#import "ASCollectionView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

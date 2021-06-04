@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASPendingState.h>
+#import "_ASPendingState.h"
 
-#import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "_ASCoreAnimationExtras.h"
+#import "ASEqualityHelpers.h"
+#import "ASInternalHelpers.h"
 
 #define __shouldSetNeedsDisplayForView(view) (flags.needsDisplay \
   || (flags.setOpaque && _flags.opaque != (view).opaque)\

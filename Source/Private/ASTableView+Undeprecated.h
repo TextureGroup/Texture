@@ -9,8 +9,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASLayoutRangeType.h>
+#import "ASTableNode.h"
+#import "ASLayoutRangeType.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

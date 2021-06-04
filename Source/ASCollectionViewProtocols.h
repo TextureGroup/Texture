@@ -8,7 +8,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 typedef NS_OPTIONS(unsigned short, ASCellLayoutMode) {
   /**

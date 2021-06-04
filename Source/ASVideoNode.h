@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASNetworkImageNode.h>
+#import "ASAvailability.h"
+#import "ASNetworkImageNode.h"
 
 #if AS_USE_VIDEO
 

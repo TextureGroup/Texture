@@ -6,10 +6,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
-#import <AsyncDisplayKit/NSParagraphStyle+ASText.h>
-#import <AsyncDisplayKit/ASTextRunDelegate.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
+#import "NSAttributedString+ASText.h"
+#import "NSParagraphStyle+ASText.h"
+#import "ASTextRunDelegate.h"
+#import "ASTextUtilities.h"
 #import <CoreFoundation/CoreFoundation.h>
 
 

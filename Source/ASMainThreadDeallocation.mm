@@ -6,12 +6,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
+#import "ASMainThreadDeallocation.h"
 
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASLog.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import "ASDisplayNodeExtras.h"
+#import "ASInternalHelpers.h"
+#import "ASLog.h"
+#import "ASThread.h"
 
 @implementation NSObject (ASMainThreadIvarTeardown)
 

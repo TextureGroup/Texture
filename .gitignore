@@ -30,3 +30,8 @@ playground.xcworkspace
 # Carthage
 Carthage/Checkouts
 Carthage/Build
+
+#SPM
+.swiftpm/
+.build/
+Package.resolved

@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASControlNode.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASControlNode.h"
+#import "ASBaseDefines.h"
 
 #if AS_ENABLE_TIPS
 

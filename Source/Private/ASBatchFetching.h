@@ -9,7 +9,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASScrollDirection.h>
+#import "ASScrollDirection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

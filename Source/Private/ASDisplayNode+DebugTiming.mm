@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNode+DebugTiming.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import "ASDisplayNode+DebugTiming.h"
+#import "ASDisplayNodeInternal.h"
 
 @implementation ASDisplayNode (DebugTiming)
 

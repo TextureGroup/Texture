@@ -84,12 +84,22 @@
   #error "ASTEXTNODE_EXPERIMENT_GLOBAL_ENABLE is unavailable. See ASConfiguration.h."
 #endif
 
-#define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>)
-#define AS_IG_LIST_KIT __has_include(<IGListKit/IGListKit.h>)
-#define AS_IG_LIST_DIFF_KIT __has_include(<IGListDiffKit/IGListDiffKit.h>)
+
+#ifndef AS_PIN_REMOTE_IMAGE
+    #define AS_PIN_REMOTE_IMAGE __has_include(<PINRemoteImage/PINRemoteImage.h>) || __has_include("PINRemoteImage.h")
+#endif
+
+#ifndef AS_IG_LIST_KIT
+    #define AS_IG_LIST_KIT __has_include(<IGListKit/IGListKit.h>) || __has_include("IGListKit.h")
+#endif
+
+#ifndef AS_IG_LIST_DIFF_KIT
+    #define AS_IG_LIST_DIFF_KIT __has_include(<IGListDiffKit/IGListDiffKit.h>) || __has_include("IGListDiffKit.h")
+#endif
 
 /**
- * For IGListKit versions < 3.0, you have to use IGListCollectionView.
- * For 3.0 and later, that class is removed and you use UICollectionView.
- */
-#define IG_LIST_COLLECTION_VIEW __has_include(<IGListKit/IGListCollectionView.h>)
+* For IGListKit versions < 3.0, you have to use IGListCollectionView.
+* For 3.0 and later, that class is removed and you use UICollectionView.
+*/
+#define IG_LIST_COLLECTION_VIEW 0
+

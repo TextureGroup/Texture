@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASCollectionViewCell.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import "_ASCollectionViewCell.h"
+#import "ASDisplayNode+Subclasses.h"
 
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "ASCellNode+Internal.h"
+#import "ASCollectionElement.h"
+#import "ASInternalHelpers.h"
 
 @implementation _ASCollectionViewCell
 

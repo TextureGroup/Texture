@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASRelativeLayoutSpec.h>
+#import "ASRelativeLayoutSpec.h"
 
 /** 
   * How the child is centered within the spec.

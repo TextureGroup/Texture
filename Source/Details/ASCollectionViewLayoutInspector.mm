@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionViewLayoutInspector.h>
+#import "ASCollectionViewLayoutInspector.h"
 
-#import <AsyncDisplayKit/ASCollectionView.h>
-#import <AsyncDisplayKit/ASCollectionNode.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
+#import "ASCollectionView.h"
+#import "ASCollectionNode.h"
+#import "ASCollectionView+Undeprecated.h"
 
 #pragma mark - Helper Functions
 

@@ -7,13 +7,13 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
+#import "ASBasicImageDownloader.h"
 
 #import <objc/runtime.h>
 
-#import <AsyncDisplayKit/ASBasicImageDownloaderInternal.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import "ASBasicImageDownloaderInternal.h"
+#import "ASImageContainerProtocolCategories.h"
+#import "ASThread.h"
 
 using AS::MutexLocker;
 

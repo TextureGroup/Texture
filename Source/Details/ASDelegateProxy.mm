@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDelegateProxy.h>
-#import <AsyncDisplayKit/ASTableNode.h>
-#import <AsyncDisplayKit/ASCollectionNode.h>
+#import "ASDelegateProxy.h"
+#import "ASTableNode.h"
+#import "ASCollectionNode.h"
 
 // UIKit performs a class check for UIDataSourceModelAssociation protocol conformance rather than an instance check, so
 //  the implementation of conformsToProtocol: below never gets called. We need to declare the two as conforming to the protocol here, then

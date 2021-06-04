@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/_ASScopeTimer.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
-#import <AsyncDisplayKit/ASLayoutSpecPrivate.h>
+#import "_ASScopeTimer.h"
+#import "ASDisplayNodeInternal.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASLayout.h"
+#import "ASLayoutSpec+Subclasses.h"
+#import "ASLayoutSpecPrivate.h"
 
 
 @implementation ASDisplayNode (ASLayoutSpec)

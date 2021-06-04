@@ -7,21 +7,21 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASNetworkImageNode.h>
+#import "ASNetworkImageNode.h"
 
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASImageNode+Private.h>
-#import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
-#import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
-#import <AsyncDisplayKit/ASNetworkImageLoadInfo+Private.h>
+#import "ASBasicImageDownloader.h"
+#import "ASDisplayNodeExtras.h"
+#import "ASDisplayNodeInternal.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASEqualityHelpers.h"
+#import "ASInternalHelpers.h"
+#import "ASImageNode+Private.h"
+#import "ASImageNode+AnimatedImagePrivate.h"
+#import "ASImageContainerProtocolCategories.h"
+#import "ASNetworkImageLoadInfo+Private.h"
 
 #if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
+#import "ASPINRemoteImageDownloader.h"
 #endif
 
 @interface ASNetworkImageNode ()

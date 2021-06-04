@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASImageNode.h>
-#import <AsyncDisplayKit/ASImageProtocols.h>
+#import "ASImageNode.h"
+#import "ASImageProtocols.h"
 
 #if AS_USE_PHOTOS
 #import <Photos/Photos.h>

@@ -7,8 +7,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASAvailability.h"
+#import "ASBaseDefines.h"
 #import <Foundation/Foundation.h>
 #import <os/log.h>
 #import <os/activity.h>

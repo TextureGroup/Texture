@@ -8,8 +8,8 @@
 //
 
 #import "ASDisplayNode+Ancestry.h"
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import "ASThread.h"
+#import "ASDisplayNodeExtras.h"
 
 AS_SUBCLASSING_RESTRICTED
 @interface ASNodeAncestryEnumerator : NSEnumerator

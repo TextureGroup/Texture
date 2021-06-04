@@ -7,11 +7,15 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if AS_IG_LIST_KIT
 
+#if !__has_include(<IGListKit/IGListKit.h>)
+#import "IGListKit.h"
+#else
 #import <IGListKit/IGListKit.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

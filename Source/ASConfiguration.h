@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASExperimentalFeatures.h>
+#import "ASBaseDefines.h"
+#import "ASExperimentalFeatures.h"
 
 @protocol ASConfigurationDelegate;
 

@@ -9,11 +9,11 @@
 
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 #if AS_ENABLE_TEXTNODE
 
-#import <AsyncDisplayKit/ASTextKitAttributes.h>
+#import "ASTextKitAttributes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

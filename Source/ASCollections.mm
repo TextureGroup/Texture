@@ -6,7 +6,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollections.h>
+#import "ASCollections.h"
 
 /**
  * A private allocator that signals to our retain callback to skip the retain.

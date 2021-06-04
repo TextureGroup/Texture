@@ -33,3 +33,39 @@ jobs:
       uses: actions/checkout@v2
     - name: Run build script
       run: ./build.sh ${{ matrix.mode }}
+
+  SPM:
+    name: Build from SPM manifest
+    runs-on: macOS-latest
+    env: 
+      DEVELOPER_DIR: /Applications/Xcode_12.4.app/Contents/Developer
+    strategy:
+      matrix:
+        destination: ["platform=iOS Simulator,name=iPhone 12 Pro", "platform=macOS,variant=Mac Catalyst", "platform=tvOS Simulator,name=Apple TV 4k"]
+        scheme: ["AsyncDisplayKitIGListKit"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      # Starting from Xcode 11 `xcodebuild` supports SwiftPM packages out of the box
+      # to test that we have  valid swift package we need to remove existing *.xcodeproj/xcworkspace
+      # `xcodebuild` will invoke Package.swift. 
+      - name: spm's xcodebuild - ${{ matrix.destination }}
+        run: |
+          set -o pipefail
+          rm -rf AsyncDisplayKit.xcodeproj/
+          rm -rf AsyncDisplayKit.xcworkspace/
+          swift scripts/generate_spm_sources_layout.swift
+          xcodebuild clean build -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}"
+
+  Xcode-SPM-Integration:
+    name: Build example project to verify Xcode's SPM integration
+    runs-on: macOS-latest
+    env: 
+      DEVELOPER_DIR: /Applications/Xcode_12.4.app/Contents/Developer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Check xcode's spm integration
+        run: ./build.sh build_listkit_xcode_spm_integration

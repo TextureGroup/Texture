@@ -7,10 +7,10 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASMainSerialQueue.h>
+#import "ASMainSerialQueue.h"
 
-#import <AsyncDisplayKit/ASThread.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "ASThread.h"
+#import "ASInternalHelpers.h"
 #import <queue>
 
 @interface ASMainSerialQueue ()

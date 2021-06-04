@@ -7,12 +7,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASInternalHelpers.h>
+#import "ASInternalHelpers.h"
 
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
-#import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import "ASConfigurationInternal.h"
+#import "ASRunLoopQueue.h"
+#import "ASSignpost.h"
+#import "ASThread.h"
 
 static NSNumber *allowsGroupOpacityFromUIKitOrNil;
 static NSNumber *allowsEdgeAntialiasingFromUIKitOrNil;

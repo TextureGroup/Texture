@@ -7,15 +7,15 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASEditableTextNode.h>
+#import "ASEditableTextNode.h"
 
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASTextKitComponents.h>
-#import <AsyncDisplayKit/ASTextNodeWordKerner.h>
-#import <AsyncDisplayKit/ASThread.h>
+#import "ASDisplayNode+Subclasses.h"
+#import "ASEqualityHelpers.h"
+#import "ASTextKitComponents.h"
+#import "ASTextNodeWordKerner.h"
+#import "ASThread.h"
 
 /**
  @abstract Object to hold UITextView's pending UITextInputTraits

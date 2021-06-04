@@ -8,8 +8,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
-#import <AsyncDisplayKit/ASLayout.h>
+#import "ASLayoutSpec.h"
+#import "ASLayout.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

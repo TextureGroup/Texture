@@ -7,31 +7,31 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASTextNode.h>
+#import "ASTextNode.h"
 
 #if AS_ENABLE_TEXTNODE
 
-#import <AsyncDisplayKit/ASTextNode2.h>
+#import "ASTextNode2.h"
 
-#import <AsyncDisplayKit/ASTextNode+Beta.h>
+#import "ASTextNode+Beta.h"
 
 #import <mutex>
 #import <tgmath.h>
 
-#import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASHighlightOverlayLayer.h>
+#import "_ASDisplayLayer.h"
+#import "ASDisplayNode+FrameworkPrivate.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASDisplayNodeExtras.h"
+#import "ASDisplayNodeInternal.h"
+#import "ASGraphicsContext.h"
+#import "ASHighlightOverlayLayer.h"
 
-#import <AsyncDisplayKit/ASTextKitCoreTextAdditions.h>
-#import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
-#import <AsyncDisplayKit/ASTextKitShadower.h>
+#import "ASTextKitCoreTextAdditions.h"
+#import "ASTextKitRenderer+Positioning.h"
+#import "ASTextKitShadower.h"
 
-#import <AsyncDisplayKit/CoreGraphics+ASConvenience.h>
-#import <AsyncDisplayKit/ASHashing.h>
+#import "CoreGraphics+ASConvenience.h"
+#import "ASHashing.h"
 
 /**
  * If set, we will record all values set to attributedText into an array

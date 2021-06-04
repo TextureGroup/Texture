@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 @class ASCollectionLayoutContext, ASLayout, ASCollectionElement;
 

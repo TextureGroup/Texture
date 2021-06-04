@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <AsyncDisplayKit/ASAvailability.h>
+#import "ASAvailability.h"
 
 @class ASTextNode;
 

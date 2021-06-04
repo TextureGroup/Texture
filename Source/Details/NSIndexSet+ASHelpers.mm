@@ -10,7 +10,7 @@
 // UIKit indexPath helpers
 #import <UIKit/UIKit.h>
 
-#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
+#import "NSIndexSet+ASHelpers.h"
 
 @implementation NSIndexSet (ASHelpers)
 

@@ -9,7 +9,7 @@
 
 #import "ASTextAttribute.h"
 #import <CoreText/CoreText.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import "NSAttributedString+ASText.h"
 
 NSString *const ASTextBackedStringAttributeName = @"ASTextBackedString";
 NSString *const ASTextBindingAttributeName = @"ASTextBinding";

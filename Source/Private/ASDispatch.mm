@@ -6,8 +6,8 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDispatch.h>
-#import <AsyncDisplayKit/ASConfigurationInternal.h>
+#import "ASDispatch.h"
+#import "ASConfigurationInternal.h"
 
 // Prefer C atomics in this file because ObjC blocks can't capture C++ atomics well.
 #import <stdatomic.h>

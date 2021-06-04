@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import <AsyncDisplayKit/ASBaseDefines.h>
+#import "ASBaseDefines.h"
 
 
 #ifndef CGFLOAT_EPSILON

@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import "ASObjectDescriptionHelpers.h"
 
 #import <UIKit/UIGeometry.h>
 
-#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
+#import "NSIndexSet+ASHelpers.h"
 
 NSString *ASGetDescriptionValueString(id object)
 {

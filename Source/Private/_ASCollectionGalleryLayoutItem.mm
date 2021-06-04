@@ -6,12 +6,12 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/_ASCollectionGalleryLayoutItem.h>
+#import "_ASCollectionGalleryLayoutItem.h"
 
-#import <AsyncDisplayKit/ASCollectionElement.h>
-#import <AsyncDisplayKit/ASLayout.h>
-#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASLayoutSpec.h>
+#import "ASCollectionElement.h"
+#import "ASLayout.h"
+#import "ASLayoutElementStylePrivate.h"
+#import "ASLayoutSpec.h"
 
 @interface _ASGalleryLayoutItem ()
 @property ASPrimitiveTraitCollection primitiveTraitCollection;

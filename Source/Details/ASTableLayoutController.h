@@ -8,7 +8,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASAbstractLayoutController.h>
+#import "ASAbstractLayoutController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

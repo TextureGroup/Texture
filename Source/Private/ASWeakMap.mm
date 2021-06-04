@@ -7,7 +7,7 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASWeakMap.h>
+#import "ASWeakMap.h"
 
 @interface ASWeakMapEntry ()
 @property (nonatomic, readonly) id key;

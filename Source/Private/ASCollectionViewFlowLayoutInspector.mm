@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASCollectionViewFlowLayoutInspector.h>
-#import <AsyncDisplayKit/ASCollectionView.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASCollectionNode.h>
-#import <AsyncDisplayKit/ASCollectionView+Undeprecated.h>
+#import "ASCollectionViewFlowLayoutInspector.h"
+#import "ASCollectionView.h"
+#import "ASEqualityHelpers.h"
+#import "ASCollectionNode.h"
+#import "ASCollectionView+Undeprecated.h"
 
 #define kDefaultItemSize CGSizeMake(50, 50)
 

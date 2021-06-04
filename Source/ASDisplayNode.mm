@@ -7,33 +7,33 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import "ASDisplayNodeInternal.h"
 
-#import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
-#import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
-#import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
-#import <AsyncDisplayKit/ASCellNode+Internal.h>
+#import "ASDisplayNode+Ancestry.h"
+#import "ASDisplayNode+LayoutSpec.h"
+#import "ASLayoutSpec+Subclasses.h"
+#import "ASCellNode+Internal.h"
 
-#import <AsyncDisplayKit/_ASAsyncTransaction.h>
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer+Private.h>
-#import <AsyncDisplayKit/_ASCoreAnimationExtras.h>
-#import <AsyncDisplayKit/_ASDisplayLayer.h>
-#import <AsyncDisplayKit/_ASDisplayView.h>
-#import <AsyncDisplayKit/_ASPendingState.h>
-#import <AsyncDisplayKit/_ASScopeTimer.h>
-#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
-#import <AsyncDisplayKit/ASDisplayNodeCornerLayerDelegate.h>
-#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
-#import <AsyncDisplayKit/ASEqualityHelpers.h>
-#import <AsyncDisplayKit/ASGraphicsContext.h>
-#import <AsyncDisplayKit/ASInternalHelpers.h>
-#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
-#import <AsyncDisplayKit/ASMainThreadDeallocation.h>
-#import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASRunLoopQueue.h>
-#import <AsyncDisplayKit/ASSignpost.h>
-#import <AsyncDisplayKit/ASWeakProxy.h>
-#import <AsyncDisplayKit/ASResponderChainEnumerator.h>
+#import "_ASAsyncTransaction.h"
+#import "_ASAsyncTransactionContainer+Private.h"
+#import "_ASCoreAnimationExtras.h"
+#import "_ASDisplayLayer.h"
+#import "_ASDisplayView.h"
+#import "_ASPendingState.h"
+#import "_ASScopeTimer.h"
+#import "ASDisplayNodeExtras.h"
+#import "ASDisplayNodeCornerLayerDelegate.h"
+#import "ASDisplayNode+Subclasses.h"
+#import "ASEqualityHelpers.h"
+#import "ASGraphicsContext.h"
+#import "ASInternalHelpers.h"
+#import "ASLayoutElementStylePrivate.h"
+#import "ASMainThreadDeallocation.h"
+#import "ASNodeController+Beta.h"
+#import "ASRunLoopQueue.h"
+#import "ASSignpost.h"
+#import "ASWeakProxy.h"
+#import "ASResponderChainEnumerator.h"
 
 // Conditionally time these scopes to our debug ivars (only exist in debug/profile builds)
 #if TIME_DISPLAYNODE_OPS
@@ -541,10 +541,12 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
       self.opaque = NO;
     }
       
+#if !TARGET_OS_MACCATALYST
     // CAEAGLLayer
     if([[view.layer class] isSubclassOfClass:[CAEAGLLayer class]]){
       _flags.canClearContentsOfLayer = NO;
     }
+#endif
   }
 
   return view;
