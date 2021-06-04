@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define AS_MAX_INTERFACE_STATE_DELEGATES 4
 #endif
 
-@class ASDisplayNode;
+@class ASDisplayNode, ASNodeContext;
 @protocol ASContextTransitioning;
 
 /**
@@ -45,6 +45,11 @@ typedef UIViewController * _Nonnull(^ASDisplayNodeViewControllerBlock)(void);
  * CALayer creation block. Used to create the backing layer of a new display node.
  */
 typedef CALayer * _Nonnull(^ASDisplayNodeLayerBlock)(void);
+
+/**
+ * Accessibility elements creation block. Used to specify accessibility elements of the node.
+ */
+typedef NSArray *_Nullable (^ASDisplayNodeAccessibilityElementsBlock)(void);
 
 /**
  * ASDisplayNode loaded callback block. This block is called BEFORE the -didLoad method and is always called on the main thread.
@@ -190,6 +195,11 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @note You will usually NOT call this. See the limitations documented in @c initWithLayerBlock:
  */
 - (void)setLayerBlock:(ASDisplayNodeLayerBlock)layerBlock;
+
+/**
+ * Get the context for this node, if one was set during creation.
+ */
+@property (nullable, readonly) ASNodeContext *nodeContext;
 
 /** 
  * @abstract Returns whether the node is synchronous.
@@ -362,6 +372,14 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
  * @discussion The node's view will be automatically removed from the supernode's view.
  */
 - (void)removeFromSupernode;
+
+/**
+ * @abstract Move the given subnode to a new index.
+ *
+ * @discussion This avoids extra traffic that would be involved with removing the subnode and
+ * inserting it as separate operations.
+ */
+- (void)moveSubnode:(ASDisplayNode *)node toIndex:(NSInteger)newIndex;
 
 /** 
  * @abstract The receiver's immediate subnodes.
@@ -559,6 +577,29 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
  * Defaults to NO.
  */
 @property BOOL automaticallyRelayoutOnLayoutMarginsChanges;
+
+/**
+ * @abstract For subclasses to overwrite to determine if the ASDisplayNode is flattenable and not need to be
+ * rendered.
+ *
+ * @note This is only effective if Yoga is used for layout.
+ *
+ * Defaults to NO.
+ */
+- (BOOL)computeFlattenability;
+
+/**
+ * @abstract Invalidate any previous flattenable state computed via computeFlattenability.
+ *
+ * @discussion Call this if any state changes of the node that could invalidate a previous computed
+ * flattenability.
+ */
+- (void)invalidateIsFlattenable;
+
+/**
+ * Hook into Xcode's Quick Look system. Returns the view/layer of the node if loaded.
+ */
+- (nullable id)debugQuickLookObject;
 
 @end
 
@@ -788,6 +829,13 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+/**
+ * "AS_FORCE_ACCESSIBILITY_FOR_TESTING" is A command line argument that, if present, forces Texture
+ * to process accessibility regardless of whether voice over is currently running.
+ *
+ * This is useful for test environments that run in release mode.
+ */
+
 @interface ASDisplayNode (UIViewBridgeAccessibility)
 
 // Accessibility support
@@ -817,6 +865,19 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
+
+@interface ASDisplayNode (CustomAccessibilityBehavior)
+
+/**
+ * Set the block that should be used to determining the accessibility elements of the node.
+ * When set, the accessibility-related logic (e.g. label aggregation) will not be triggered.
+ *
+ * @param block The block that returns the accessibility elements of the node.
+ */
+- (void)setAccessibilityElementsBlock:(ASDisplayNodeAccessibilityElementsBlock)block;
+
+@end
+
 @interface ASDisplayNode (ASLayoutElement) <ASLayoutElement>
 
 /**
@@ -824,15 +885,21 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
  *
  * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
  *
- * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
+ * @return An ASLayout instance defining the layout of the receiver (and its children, if the box
+ * layout model is used).
  *
- * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
- * constraint and the result.
+ * @discussion Though this method does not set the bounds of the view, it does have side
+ * effects--caching both the constraint and the result.
  *
- * @warning Subclasses must not override this; it caches results from -calculateLayoutThatFits:.  Calling this method may
- * be expensive if result is not cached.
+ * @warning Subclasses must not override this; it caches results from -calculateLayoutThatFits:.
+ * Calling this method may be expensive if result is not cached.
  *
  * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
+ *
+ * @note In the yoga2 experiment, this method may only be called on yoga root nodes. You can however
+ * call this on the root node, and then call -calculatedLayout on the intermediary node of interest.
+ * Note also that in yoga2, the minimum size specified here is ignored – you can manipulate
+ * style.minWidth and style.minHeight to force a minimum size.
  */
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize;
 
@@ -842,17 +909,7 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 @end
 
-typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
-  ASLayoutEngineTypeLayoutSpec,
-  ASLayoutEngineTypeYoga
-};
-
 @interface ASDisplayNode (ASLayout)
-
-/**
- * @abstract Returns the current layout type the node uses for layout the subtree.
- */
-@property (readonly) ASLayoutEngineType layoutEngineType;
 
 /**
  * @abstract Return the calculated size.

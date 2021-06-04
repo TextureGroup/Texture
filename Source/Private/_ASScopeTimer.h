@@ -9,6 +9,9 @@
 
 #pragma once
 
+#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
+
 /**
  Must compile as c++ for this to work.
 

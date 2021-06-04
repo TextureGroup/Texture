@@ -9,8 +9,12 @@
 
 #import <AsyncDisplayKit/ASMutableElementMap.h>
 
+#import <AsyncDisplayKit/ASConfigurationInternal.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
 #import <AsyncDisplayKit/ASElementMap.h>
+#import <AsyncDisplayKit/ASThread.h>
+#import <AsyncDisplayKit/NSIndexSet+ASHelpers.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASTwoDimensionalArrayUtils.h>
 
 typedef NSMutableArray<NSMutableArray<ASCollectionElement *> *> ASMutableCollectionElementTwoDimensionalArray;
@@ -31,6 +35,17 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
     _supplementaryElements = [ASMutableElementMap deepMutableCopyOfElementsDictionary:supplementaryElements];
   }
   return self;
+}
+
+- (void)dealloc
+{
+  if (ASActivateExperimentalFeature(ASExperimentalDeallocElementMapOffMain)) {
+    if (ASDisplayNodeThreadIsMain()) {
+      ASPerformBackgroundDeallocation(&_sections);
+      ASPerformBackgroundDeallocation(&_sectionsOfItems);
+      ASPerformBackgroundDeallocation(&_supplementaryElements);
+    }
+  }
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -128,9 +143,25 @@ typedef NSMutableDictionary<NSString *, NSMutableDictionary<NSIndexPath *, ASCol
   }];
 }
 
+- (void)removeContentAddedInChangeSet:(_ASHierarchyChangeSet *)changeSet
+{
+  NSParameterAssert(changeSet.deletedSections.count == 0);
+  NSParameterAssert(changeSet.indexPathsForRemovedItems.empty());
+
+  // Delete inserted items in descending order.
+  auto insertedItems = changeSet.indexPathsForInsertedItems;
+  for (auto it = insertedItems.rbegin(); it != insertedItems.rend(); it++) {
+    ASDeleteElementInTwoDimensionalArrayAtIndexPath(_sectionsOfItems, *it);
+  }
+
+  // Delete inserted sections.
+  [_sections removeObjectsAtIndexes:changeSet.insertedSections];
+  [_sectionsOfItems removeObjectsAtIndexes:changeSet.insertedSections];
+}
+
 #pragma mark - Helpers
 
-+ (ASMutableSupplementaryElementDictionary *)deepMutableCopyOfElementsDictionary:(ASSupplementaryElementDictionary *)originalDict
++ (ASMutableSupplementaryElementDictionary *)deepMutableCopyOfElementsDictionary:(ASSupplementaryElementDictionary *)originalDict NS_RETURNS_RETAINED
 {
   NSMutableDictionary *deepCopy = [[NSMutableDictionary alloc] initWithCapacity:originalDict.count];
   [originalDict enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSDictionary<NSIndexPath *,ASCollectionElement *> * _Nonnull obj, BOOL * _Nonnull stop) {

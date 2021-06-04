@@ -132,6 +132,8 @@ AS_CATEGORY_IMPLEMENTABLE
 AS_CATEGORY_IMPLEMENTABLE
 - (void)willCalculateLayout:(ASSizeRange)constrainedSize NS_REQUIRES_SUPER;
 
+AS_CATEGORY_IMPLEMENTABLE
+- (void)didCalculateLayout:(ASSizeRange)constrainedSize NS_REQUIRES_SUPER;
 /**
  * Only ASLayoutRangeModeVisibleOnly or ASLayoutRangeModeLowMemory are recommended.  Default is ASLayoutRangeModeVisibleOnly,
  * because this is the only way to ensure an application will not have blank / flashing views as the user navigates back after
@@ -165,6 +167,85 @@ AS_CATEGORY_IMPLEMENTABLE
  * Note: You cannot call this method after the receiver's layer/view is loaded.
  */
 - (void)enableSubtreeRasterization;
+
+/**
+ * Enable the yoga layout engine for this node and its subtree.
+ *
+ * Note: You cannot add a yoga node to a non-yoga supernode. The entire
+ * tree must be one way or the other.
+ *
+ * Note: You can use ASNodeContext to enable Yoga on a per-context basis.
+ */
+- (void)enableYoga;
+
+/**
+ * Whether yoga is enabled.
+ */
+@property (readonly) BOOL yoga;
+
+/**
+ * Enable View Flattening support for this node and its subtree
+ *
+ * Note: You cannot enable view flattening in yoga1 right now.
+ */
+- (void)enableViewFlattening;
+
+/**
+ * Returns YES if the node will have a custom measure function. This means that, when using the
+ * Yoga2 layout engine, the node cannot have any children.
+ */
+- (BOOL)hasCustomMeasure;
+
+/**
+ * A dictionary of actions that will be performed when the node is removed from the view hierarchy.
+ * This is only supported with Yoga2 and allows for nodes to be animated during removal.
+ */
+@property (nullable) NSDictionary<NSString *, id<CAAction>> *disappearanceActions;
+
+/**
+ * Set to YES when a node is in the process of having its disappearance animations performed.
+ * This can be canceled if the node is re-added before its disappearance has been completed.
+ */
+@property BOOL isDisappearing;
+
+/**
+ * @abstract Top, left, bottom, right padding values for the node.
+ */
+@property (readonly) UIEdgeInsets paddings;
+
+/**
+ * @abstract Called when the node's layer is about to enter the hierarchy.
+ * @discussion May be called more than once if the layer is participating in a higher-level
+ * animation, such as a UIViewController transition. These animations can cause the layer to get
+ * re-parented multiple times, and each time will trigger this call.
+ * @note This method is guaranteed to be called on main.
+ */
+
+AS_CATEGORY_IMPLEMENTABLE
+- (void)didEnterHierarchy;
+
+/**
+ * @abstract Called after controller sets its childern.
+ * @discussion By default it will set as Yoga children this controller's node when this node is not
+ * leaf.
+ * @note subclass need to access node on controller in order to create subtrees correctly.
+ */
+- (void)controllerDidSetChildren:(NSArray<ASDisplayNode *> *)children;
+
+/**
+ * @abstract Called after the controller inserts a child controller.
+ * @discussion By default it will insert child to this controller's node at index when this node is
+ * not leaf.
+ * @note subclass need to access node on controller in order to create subtress correctly.
+ */
+- (void)controllerDidInsertChild:(id)child atIndex:(NSInteger)index;
+
+/**
+ * @abastract Called after controller removed a child controller.
+ * @discussion By default it will remove yoga child from this controller's node when this node is
+ * not leaf.
+ */
+- (void)controllerDidRemoveChild:(id)child;
 
 @end
 

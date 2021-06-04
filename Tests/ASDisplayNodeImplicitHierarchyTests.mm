@@ -93,7 +93,7 @@
   XCTAssertEqual(node.subnodes[4], node5);
 }
 
-- (void)testInitialNodeInsertionWhenEnterPreloadState
+- (void)disable_testInitialNodeInsertionWhenEnterPreloadState
 {
   static CGSize kSize = {100, 100};
 

@@ -35,6 +35,12 @@
   cache = [OCMockObject partialMockForObject:[[ASTestImageCache alloc] init]];
   downloader = [OCMockObject partialMockForObject:[[ASTestImageDownloader alloc] init]];
   node = [[ASNetworkImageNode alloc] initWithCache:cache downloader:downloader];
+  ASSetEnableImageDownloadSynchronization(NO);
+}
+
+- (void)setUpEnablingExperiments
+{
+  ASSetEnableImageDownloadSynchronization(YES);
 }
 
 /// Test is flaky: https://github.com/facebook/AsyncDisplayKit/issues/2898
@@ -74,6 +80,15 @@
   [[downloader expect] setProgressImageBlock:[OCMArg isNotNil] callbackQueue:OCMOCK_ANY withDownloadIdentifier:@1];
   node.URL = [NSURL URLWithString:@"http://imageB"];
   [downloader verifyWithDelay:5];
+
+  // Make the node invisible.
+  [node exitInterfaceState:ASInterfaceStateInHierarchy];
+}
+
+- (void)testThatProgressBlockIsSetAndClearedCorrectlyOnChangeURLWithExperiments
+{
+  [self setUpEnablingExperiments];
+  [self testThatProgressBlockIsSetAndClearedCorrectlyOnChangeURL];
 }
 
 - (void)testThatAnimatedImageClearedCorrectlyOnChangeURL
@@ -86,6 +101,7 @@
   [node setURL:[NSURL URLWithString:@"http://imageA"] resetToDefault:YES];
 
   XCTAssertEqualObjects(nil, node.animatedImage);
+  [node exitInterfaceState:ASInterfaceStateInHierarchy];
 }
 
 - (void)testThatSettingAnImageWillStayForEnteringAndExitingPreloadState
@@ -103,6 +119,12 @@
   XCTAssertEqualObjects(image, networkImageNode.image);
 }
 
+- (void)testThatSettingAnImageWillStayForEnteringAndExitingPreloadStateWithExperiments
+{
+  [self setUpEnablingExperiments];
+  [self testThatSettingAnImageWillStayForEnteringAndExitingPreloadState];
+}
+
 - (void)testThatSettingADefaultImageWillStayForEnteringAndExitingPreloadState
 {
   UIImage *image = [[UIImage alloc] init];
@@ -116,6 +138,12 @@
   XCTAssertEqualObjects(image, networkImageNode.defaultImage);
   [networkImageNode exitHierarchyState:ASHierarchyStateRangeManaged];
   XCTAssertEqualObjects(image, networkImageNode.defaultImage);
+}
+
+- (void)testThatSettingADefaultImageWillStayForEnteringAndExitingPreloadStateWithExperiments
+{
+  [self setUpEnablingExperiments];
+  [self testThatSettingADefaultImageWillStayForEnteringAndExitingPreloadState];
 }
 
 @end
@@ -169,7 +197,7 @@
 
 - (NSUInteger)frameInterval
 {
-  return 0.2;
+  return 2;
 }
 
 - (size_t)loopCount

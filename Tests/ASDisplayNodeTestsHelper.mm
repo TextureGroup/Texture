@@ -14,7 +14,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import <libkern/OSAtomic.h>
+#include <atomic>
 
 // Poll the condition 1000 times a second.
 static CFTimeInterval kSingleRunLoopTimeout = 0.001;
@@ -27,9 +27,9 @@ BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block)
   CFTimeInterval timeoutDate = CACurrentMediaTime() + kTimeoutInterval;
   BOOL passed = NO;
   while (true) {
-    OSMemoryBarrier();
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     passed = block();
-    OSMemoryBarrier();
+    std::atomic_thread_fence(std::memory_order_seq_cst);
     if (passed) {
       break;
     }

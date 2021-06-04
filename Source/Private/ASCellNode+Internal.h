@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ASCellNodeInteractionDelegate <NSObject>
 
 /**
- * Notifies the delegate that a specified cell node invalidates it's size what could result into a size change.
+ * Notifies the delegate that a specified cell node invalidates its size which could result in a size change.
  *
  * @param node A node informing the delegate about the relayout.
  */
@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ASCellNode ()
 
-@property (nonatomic, weak) id <ASCellNodeInteractionDelegate> interactionDelegate;
+@property (weak) id <ASCellNodeInteractionDelegate> interactionDelegate;
 
 /*
  * Back-pointer to the containing scrollView instance, set only for visible cells.  Used for Cell Visibility Event callbacks.

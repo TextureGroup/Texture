@@ -59,6 +59,11 @@
   return [self.asyncdisplaykit_node accessibilityElements];
 }
 
+- (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event {
+  id<CAAction> uikitAction = [super actionForLayer:layer forKey:event];
+  return ASDisplayNodeActionForLayer(layer, event, self.scrollNode, uikitAction);
+}
+
 @end
 
 @implementation ASScrollNode
@@ -81,7 +86,7 @@
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASScopedLockSelfOrToRoot();
+  ASLockScopeSelf();
 
   ASSizeRange contentConstrainedSize = constrainedSize;
   if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections)) {
@@ -149,6 +154,13 @@
     self.view.contentSize = contentSize;
   }
 }
+
+#if YOGA
+- (void)enableYoga {
+  [super enableYoga];
+  self.style.overflow = YGOverflowScroll;
+}
+#endif
 
 - (BOOL)automaticallyManagesContentSize
 {

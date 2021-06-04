@@ -11,13 +11,16 @@
 #import <AsyncDisplayKit/ASControlNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASImageNode.h>
+#import <AsyncDisplayKit/ASTextNode2.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
+#import <AsyncDisplayKit/ASControlNode+Defines.h>
 #import <AsyncDisplayKit/ASControlTargetAction.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASThread.h>
 #if TARGET_OS_TV
 #import <AsyncDisplayKit/ASControlNode+Private.h>
 #endif
+
 
 // UIControl allows dragging some distance outside of the control itself during
 // tracking. This value depends on the device idiom (25 or 70 points), so
@@ -108,7 +111,9 @@ CGRect _ASControlNodeGetExpandedBounds(ASControlNode *controlNode);
 - (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled
 {
   [super setUserInteractionEnabled:userInteractionEnabled];
-  self.isAccessibilityElement = userInteractionEnabled;
+  if ([ASControlNode shouldUserInteractionEnabledSetIsAXElement]) {
+    self.isAccessibilityElement = userInteractionEnabled;
+  }
 }
 
 - (void)__exitHierarchy

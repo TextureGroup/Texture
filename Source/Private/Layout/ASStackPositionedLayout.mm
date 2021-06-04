@@ -116,6 +116,8 @@ static void stackOffsetAndSpacingForEachItem(const std::size_t numOfItems,
     }
     case ASStackLayoutJustifyContentStart:
       break;
+    case ASStackLayoutJustifyContentSpaceEvenly:
+      break;
   }
 }
 

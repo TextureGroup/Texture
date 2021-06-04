@@ -11,6 +11,8 @@
 
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
 
+@class ASDisplayNode;
+
 /**
 
  Private header for ASDisplayNode.mm
@@ -25,7 +27,9 @@
 
 // Supports all of the properties included in the ASDisplayNodeViewProperties protocol
 
-- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
+- (void)applyToView:(UIView *)view
+    withSpecialPropertiesHandling:(BOOL)setFrameDirectly
+                             node:(ASDisplayNode *)node;
 - (void)applyToLayer:(CALayer *)layer;
 
 + (_ASPendingState *)pendingViewStateFromLayer:(CALayer *)layer;
@@ -37,5 +41,6 @@
 @property (nonatomic, readonly) BOOL hasChanges;
 
 - (void)clearChanges;
+- (void)clearFrameChange;
 
 @end

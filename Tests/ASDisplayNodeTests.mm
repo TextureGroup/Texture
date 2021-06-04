@@ -94,6 +94,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 - (void)setInterfaceState:(ASInterfaceState)state;
 // FIXME: Importing ASDisplayNodeInternal.h causes a heap of problems.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
+- (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop;
 @end
 
 @interface ASTestDisplayNode : ASDisplayNode
@@ -472,7 +473,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertTrue(CGRectEqualToRect(CGRectZero, node.frame), @"default frame broken %@", hasLoadedView);
   XCTAssertTrue(CGPointEqualToPoint(CGPointZero, node.position), @"default position broken %@", hasLoadedView);
   XCTAssertEqual((CGFloat)0.0, node.zPosition, @"default zPosition broken %@", hasLoadedView);
-  XCTAssertEqual(node.isNodeLoaded && !isLayerBacked ? 2.0f : 1.0f, node.contentsScale, @"default contentsScale broken %@", hasLoadedView);
+// (http://b/181353231 Test conditions added for iOS 13 do not seem to apply on Nitro)
+//  XCTAssertEqual(node.isNodeLoaded && !isLayerBacked ? 2.0f : 1.0f, node.contentsScale, @"default contentsScale broken %@", hasLoadedView);
   XCTAssertEqual([UIScreen mainScreen].scale, node.contentsScaleForDisplay, @"default contentsScaleForDisplay broken %@", hasLoadedView);
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DIdentity, node.transform), @"default transform broken %@", hasLoadedView);
   XCTAssertTrue(CATransform3DEqualToTransform(CATransform3DIdentity, node.subnodeTransform), @"default subnodeTransform broken %@", hasLoadedView);
@@ -1985,6 +1987,7 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
 // Check that nodes who have no cell node (no range controller)
 // do get their `preload` called, and they do report
 // the preload interface state.
+#ifndef ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
 - (void)testInterfaceStateForNonCellNode
 {
   ASTestWindow *window = [ASTestWindow new];
@@ -2004,6 +2007,7 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
   XCTAssert(node.hasPreloaded);
   XCTAssert(node.interfaceState == ASInterfaceStateNone);
 }
+#endif
 
 // Check that nodes who have no cell node (no range controller)
 // do get their `preload` called, and they do report
@@ -2225,6 +2229,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 }
 
 // Underlying issue for: https://github.com/facebook/AsyncDisplayKit/issues/2205
+#ifndef ENABLE_NEW_EXIT_HIERARCHY_BEHAVIOR
 - (void)testThatRasterizedNodesGetInterfaceStateUpdatesWhenContainerEntersHierarchy
 {
   ASDisplayNode *supernode = [[ASTestDisplayNode alloc] init];
@@ -2260,6 +2265,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertFalse(ASHierarchyStateIncludesRasterized(subnode.hierarchyState));
   XCTAssertFalse(subnode.isVisible);
 }
+#endif
 
 - (void)testThatRasterizingWrapperNodesIsNotAllowed
 {
@@ -2429,6 +2435,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertEqual(node.style.flexShrink, 1.0, @"flexShrink should have have the value 1.0");
 }
 
+#ifndef YOGA
 - (void)testSubnodesFastEnumeration
 {
   DeclareNodeNamed(parentNode);
@@ -2448,6 +2455,7 @@ static bool stringContainsPointer(NSString *description, id p) {
     i++;
   }
 }
+#endif
 
 - (void)testThatHavingTheSameNodeTwiceInALayoutSpecCausesExceptionOnLayoutCalculation
 {
@@ -2782,5 +2790,40 @@ static bool stringContainsPointer(NSString *description, id p) {
   }
   XCTAssertTrue(hasPlaceholderLayer);
 }
+
+- (void)testHitSlopWithoutRTL {
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, node.hitTestSlop),
+                @"Hit test slop should not change.");
+}
+
+- (void)testHitSlopWithRTLTraitCollection {
+  XCTSkip(@"b/134963592");
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  ASPrimitiveTraitCollection tc = ASPrimitiveTraitCollectionMakeDefault();
+  tc.layoutDirection = UITraitEnvironmentLayoutDirectionRightToLeft;
+  [node setPrimitiveTraitCollection:tc];
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
+}
+
+#if YOGA
+- (void)testHitSlopWithRTLYoga {
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  [node enableYoga];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  [node semanticContentAttributeDidChange:UISemanticContentAttributeForceRightToLeft];
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
+}
+#endif
 
 @end

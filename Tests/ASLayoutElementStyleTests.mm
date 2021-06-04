@@ -11,21 +11,6 @@
 #import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASLayoutElement.h>
 
-#pragma mark - ASLayoutElementStyleTestsDelegate
-
-@interface ASLayoutElementStyleTestsDelegate : NSObject<ASLayoutElementStyleDelegate>
-@property (copy, nonatomic) NSString *propertyNameChanged;
-@end
-
-@implementation ASLayoutElementStyleTestsDelegate
-
-- (void)style:(id)style propertyDidChange:(NSString *)propertyName
-{
-  self.propertyNameChanged = propertyName;
-}
-
-@end
-
 #pragma mark - ASLayoutElementStyleTests
 
 @interface ASLayoutElementStyleTests : XCTestCase
@@ -112,16 +97,6 @@
   XCTAssertTrue(ASDimensionEqualToDimension(style.maxHeight, layoutSize.height));
   XCTAssertTrue(ASDimensionEqualToDimension(style.maxLayoutSize.width, layoutSize.width));
   XCTAssertTrue(ASDimensionEqualToDimension(style.maxLayoutSize.height, layoutSize.height));
-}
-  
-- (void)testSettingPropertiesWillCallDelegate
-{
-  ASLayoutElementStyleTestsDelegate *delegate = [ASLayoutElementStyleTestsDelegate new];
-  ASLayoutElementStyle *style = [[ASLayoutElementStyle alloc] initWithDelegate:delegate];
-  XCTAssertTrue(ASDimensionEqualToDimension(style.width, ASDimensionAuto));
-  style.width = ASDimensionMake(100);
-  XCTAssertTrue(ASDimensionEqualToDimension(style.width, ASDimensionMake(100)));
-  XCTAssertTrue([delegate.propertyNameChanged isEqualToString:ASLayoutElementStyleWidthProperty]);
 }
 
 @end

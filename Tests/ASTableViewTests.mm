@@ -799,7 +799,7 @@
   [node performBatchAnimated:NO updates:nil completion:nil];
 }
 
-- (void)testItemsInsertedIntoThePreloadRangeGetPreloaded
+- (void)DISABLED_testItemsInsertedIntoThePreloadRangeGetPreloaded
 {
   // Start table node setup
   ATableViewTestController *testController = [[ATableViewTestController alloc] initWithNibName:nil bundle:nil];

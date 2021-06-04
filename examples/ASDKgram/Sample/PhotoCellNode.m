@@ -280,15 +280,6 @@
 - (void)setupYogaLayoutIfNeeded
 {
 #if YOGA_LAYOUT
-  [self.style yogaNodeCreateIfNeeded];
-  [_userAvatarImageNode.style yogaNodeCreateIfNeeded];
-  [_userNameLabel.style yogaNodeCreateIfNeeded];
-  [_photoImageNode.style yogaNodeCreateIfNeeded];
-  [_photoLikesLabel.style yogaNodeCreateIfNeeded];
-  [_photoDescriptionLabel.style yogaNodeCreateIfNeeded];
-  [_photoLocationLabel.style yogaNodeCreateIfNeeded];
-  [_photoTimeIntervalSincePostLabel.style yogaNodeCreateIfNeeded];
-
   ASDisplayNode *headerStack = [ASDisplayNode yogaHorizontalStack];
   headerStack.style.margin = ASEdgeInsetsMake(InsetForHeader);
   headerStack.style.alignItems = ASStackLayoutAlignItemsCenter;

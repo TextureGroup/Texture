@@ -40,6 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)shouldTruncateForConstrainedSize:(ASSizeRange)constrainedSize;
 
+/**
+ * @abstract Like performAccessibilityCustomAction:, exposed for custom actions that are
+ * representing a link. This API and the implementation details within ASTextNode are not ready
+ * for public use and will likely change in the future.
+ */
+- (BOOL)performAccessibilityCustomActionLink:(UIAccessibilityCustomAction *)action;
+
 @end
 
 NS_ASSUME_NONNULL_END

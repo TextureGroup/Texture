@@ -91,6 +91,7 @@ static BOOL checkAttributes(const ASTextKitAttributes &attributes, const CGSize 
   FBSnapshotTestController *controller = [[FBSnapshotTestController alloc] init];
   UIImage *labelImage = UITextViewImageWithAttributes(attributes, constrainedSize, linkTextAttributes);
   UIImage *textKitImage = ASTextKitImageWithAttributes(attributes, constrainedSize);
+  // This is using a newer than google3 version of FBSnapShotTestController api.
   return [controller compareReferenceImage:labelImage toImage:textKitImage overallTolerance:0.0 error:nil];
 }
 

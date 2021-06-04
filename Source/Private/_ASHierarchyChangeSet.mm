@@ -125,7 +125,6 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
 @synthesize reverseSectionMapping = _reverseSectionMapping;
 @synthesize itemMappings = _itemMappings;
 @synthesize reverseItemMappings = _reverseItemMappings;
-@synthesize countForAsyncLayout = _countForAsyncLayout;
 
 - (instancetype)init
 {
@@ -361,6 +360,18 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
     return nil;
   }
   return [NSIndexPath indexPathForItem:newItem inSection:newSection];
+}
+
+- (NSUInteger)countForAsyncLayout
+{
+  AS_PRECONDITION(_dataLatched, 0, @"Read before data latch not allowed.");
+  return _countForAsyncLayout;
+}
+
+- (void)incrementCountForAsyncLayout
+{
+  AS_PRECONDITION(!_dataLatched, (void)0, @"Set after data latch not allowed.");
+  _countForAsyncLayout += 1;
 }
 
 - (void)reloadData
@@ -641,6 +652,172 @@ NSString *NSStringFromASHierarchyChangeType(_ASHierarchyChangeType changeType)
   return 0 < (_originalDeleteSectionChanges.count + _originalDeleteItemChanges.count
               +_originalInsertSectionChanges.count + _originalInsertItemChanges.count
               + _reloadSectionChanges.count + _reloadItemChanges.count);
+}
+
+- (std::vector<NSIndexPath *>)indexPathsForRemovedItems
+{
+  std::vector<NSIndexPath *> result;
+  if (![self _ensureCompleted]) {
+    return result;
+  }
+
+  // Reload data means all elements.
+  if (_includesReloadData) {
+    for (int s = 0; s < _oldItemCounts.size(); s++) {
+      auto count = _oldItemCounts[s];
+      result.reserve(result.size() + count);
+      for (int i = 0; i < count; i++) {
+        result.emplace_back([NSIndexPath indexPathForItem:i inSection:s]);
+      }
+    }
+    return result;
+  }
+
+  // First do sections.
+  for (NSInteger s = _deletedSections.firstIndex; s != NSNotFound; s = [_deletedSections indexGreaterThanIndex:s]) {
+    auto count = _oldItemCounts[s];
+    result.reserve(result.size() + count);
+    for (NSInteger i = 0; i < count; i++) {
+      result.emplace_back([NSIndexPath indexPathForItem:i inSection:s]);
+    }
+  }
+  // Then do items.
+  for (_ASHierarchyItemChange *d in _deleteItemChanges) {
+    unowned auto indexPaths = d.indexPaths;
+    result.reserve(indexPaths.count);
+    for (NSIndexPath *ip in indexPaths) {
+      result.emplace_back(ip);
+    }
+  }
+  // Sort descending.
+  std::sort(result.begin(), result.end(), [](unowned NSIndexPath *a, unowned NSIndexPath *b) {
+    return [a compare:b] != NSOrderedAscending;
+  });
+  return result;
+}
+
+- (std::vector<NSIndexPath *>)indexPathsForInsertedItems
+{
+  std::vector<NSIndexPath *> result;
+  if (![self _ensureCompleted]) {
+    return result;
+  }
+
+  // Reload data means all elements.
+  if (_includesReloadData) {
+    for (int s = 0; s < _newItemCounts.size(); s++) {
+      auto count = _newItemCounts[s];
+      result.reserve(result.size() + count);
+      for (int i = 0; i < count; i++) {
+        result.emplace_back([NSIndexPath indexPathForItem:i inSection:s]);
+      }
+    }
+    return result;
+  }
+
+  // First do sections.
+  for (NSInteger s = _insertedSections.firstIndex; s != NSNotFound;
+       s = [_insertedSections indexGreaterThanIndex:s]) {
+    auto count = _newItemCounts[s];
+    result.reserve(result.size() + count);
+    for (NSInteger i = 0; i < count; i++) {
+      result.emplace_back([NSIndexPath indexPathForItem:i inSection:s]);
+    }
+  }
+  // Then do items.
+  for (_ASHierarchyItemChange *i in _insertItemChanges) {
+    unowned auto indexPaths = i.indexPaths;
+    result.reserve(indexPaths.count);
+    for (NSIndexPath *ip in indexPaths) {
+      result.emplace_back(ip);
+    }
+  }
+
+  // Sort ascending.
+  std::sort(result.begin(), result.end(), [](unowned NSIndexPath *a, unowned NSIndexPath *b) {
+    return [a compare:b] == NSOrderedAscending;
+  });
+  return result;
+}
+
+- (std::vector<_ASHierarchyChangeSet *>)divideIntoSegmentsOfMaximumSize:(NSUInteger)sizeLimit
+{
+  if (![self _ensureCompleted] || sizeLimit == 0) {
+    return { self };
+  }
+
+  // Get inserted item index paths.
+  const std::vector<NSIndexPath *> insertedItems = self.indexPathsForInsertedItems;
+  if (insertedItems.size() <= sizeLimit) {
+    return { self };
+  }
+  std::vector<_ASHierarchyChangeSet *> result;
+  result.reserve(1 + insertedItems.size() / (size_t)sizeLimit);
+
+  std::vector<NSInteger> itemCounts = _oldItemCounts;
+
+  // First change has all the deletes, plus the first batch of inserts.
+  _ASHierarchyChangeSet *segment = [[_ASHierarchyChangeSet alloc] initWithOldData:itemCounts];
+  segment->_deleteSectionChanges = _deleteSectionChanges;
+  segment->_deletedSections = _deletedSections;
+  segment->_deleteItemChanges = _deleteItemChanges;
+  result.push_back(segment);
+  
+  // Account for deleted items.
+  for (NSIndexPath *indexPath : self.indexPathsForRemovedItems) {
+    itemCounts[indexPath.section]--;
+  }
+  // Account for deleted sections.
+  itemCounts.erase(std::remove_if(itemCounts.begin(), itemCounts.end(), [&self](NSInteger section) {
+    return [_deletedSections containsIndex:section];
+  }), itemCounts.end() );
+
+  bool isFirstSegment = true;
+  auto remainingItems = insertedItems.begin();
+  while (remainingItems != insertedItems.end()) {
+    // Start a new segment (except first – we are already working on a segment.)
+    if (!isFirstSegment) {
+      [segment markCompletedWithNewItemCounts:itemCounts];
+      segment = [[_ASHierarchyChangeSet alloc] initWithOldData:itemCounts];
+      result.push_back(segment);
+    }
+    isFirstSegment = false;
+
+    // Iterator to the last item in the batch.
+    const auto batchEnd = std::min(insertedItems.end(), remainingItems + sizeLimit);
+    const auto batchLast = batchEnd - 1;
+
+    // Insert sections up through section of last item.
+    const NSInteger sectionCountNeeded = [*batchLast section] + 1;
+    const NSInteger sectionCountHad = itemCounts.size();
+    const NSInteger additionalSectionsNeeded = MAX(0, sectionCountNeeded - sectionCountHad);
+    if (additionalSectionsNeeded) {
+      NSRange range = NSMakeRange(sectionCountHad, additionalSectionsNeeded);
+      [segment insertSections:[NSIndexSet indexSetWithIndexesInRange:range] animationOptions:0];
+      itemCounts.resize(NSMaxRange(range), 0);
+    }
+
+    // Insert items into this segment.
+    const NSUInteger batchSize = batchEnd - remainingItems;
+    auto items = [[NSArray<NSIndexPath *> alloc] initWithObjects:&*remainingItems count:batchSize];
+    [segment insertItems:items animationOptions:0];
+
+    // Update itemCounts.
+    for (NSIndexPath *indexPath in items) {
+      itemCounts[indexPath.section]++;
+    }
+
+    // Move to next batch.
+    remainingItems = batchEnd;
+  }
+
+  // Last batch gets the completion handler from this one.
+  result.back()->_completionHandler = _completionHandler;
+  _completionHandler = nil;
+
+  [result.back() markCompletedWithNewItemCounts:itemCounts];
+
+  return result;
 }
 
 #pragma mark - Debugging (Private)

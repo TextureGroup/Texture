@@ -774,6 +774,10 @@ NS_ASSUME_NONNULL_BEGIN
  * @param indexPath The index path of the item.
  *
  * @return A constrained size range for layout for the item at this index path.
+ *
+ * NOTE: In Yoga2, the min size is ignored and always assumed to be zero. Set the min-width or
+ * min-height property of your content, or simply choose whatever size you prefer regardless of the
+ * cell node's measured dimensions.
  */
 - (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 

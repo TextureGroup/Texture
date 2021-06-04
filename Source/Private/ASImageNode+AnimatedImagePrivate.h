@@ -17,6 +17,8 @@
   id <ASAnimatedImageProtocol> _animatedImage;
   NSString *_animatedImageRunLoopMode;
   CADisplayLink *_displayLink;
+  NSThread *_displayLinkThread;
+  NSRunLoop *_displayLinkRunloop;
   NSUInteger _lastSuccessfulFrameIndex;
   
   //accessed on main thread only

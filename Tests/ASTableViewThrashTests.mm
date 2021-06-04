@@ -56,14 +56,14 @@
 #pragma mark Test Methods
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testInitialDataRead
+- (void)disable_testInitialDataRead
 {
   ASThrashDataSource *ds = [[ASThrashDataSource alloc] initTableViewDataSourceWithData:[ASThrashTestSection sectionsWithCount:kInitialSectionCount]];
   [self verifyDataSource:ds];
 }
 
 /// Replays the Base64 representation of an ASThrashUpdate from "ASThrashTestRecordedCase" file
-- (void)testRecordedThrashCase
+- (void)disable_testRecordedThrashCase
 {
   NSURL *caseURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"ASThrashTestRecordedCase" withExtension:nil subdirectory:@"TestResources"];
   NSString *base64 = [NSString stringWithContentsOfURL:caseURL encoding:NSUTF8StringEncoding error:NULL];
@@ -80,7 +80,7 @@
 }
 
 // Disabled temporarily due to issue where cell nodes are not marked invisible before deallocation.
-- (void)testThrashingWildly
+- (void)disable_testThrashingWildly
 {
   for (NSInteger i = 0; i < kThrashingIterationCount; i++) {
     [self setUp];

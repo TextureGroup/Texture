@@ -45,6 +45,10 @@
     unsigned int showsVerticalScrollIndicator:1;
     unsigned int showsHorizontalScrollIndicator:1;
     unsigned int pagingEnabled:1;
+    unsigned int remeasuresBeforeLayoutPass:1; // default is YES
+    unsigned int immediatelyApplyComputedLayouts:1;
+    unsigned int allowAsyncUpdatesForInitialContent:1;
+    unsigned int shouldDelayLayout:1;
   } _flags;
 }
 @property (nonatomic, weak) id <ASCollectionDelegate>   delegate;
@@ -65,6 +69,10 @@
 @property (nonatomic) BOOL showsVerticalScrollIndicator;
 @property (nonatomic) BOOL showsHorizontalScrollIndicator;
 @property (nonatomic) BOOL pagingEnabled;
+@property (nonatomic) BOOL immediatelyApplyComputedLayouts;
+@property (nonatomic) BOOL allowAsyncUpdatesForInitialContent;
+@property (nonatomic) NSUInteger updateBatchSize;
+@property (nonatomic) BOOL useNodeCache;
 @end
 
 @implementation _ASCollectionPendingState
@@ -86,6 +94,7 @@
     _flags.showsVerticalScrollIndicator = YES;
     _flags.showsHorizontalScrollIndicator = YES;
     _flags.pagingEnabled = NO;
+    _flags.remeasuresBeforeLayoutPass = YES;
   }
   return self;
 }
@@ -202,6 +211,22 @@
   _flags.pagingEnabled = pagingEnabled;
 }
 
+- (BOOL)immediatelyApplyComputedLayouts {
+  return _flags.immediatelyApplyComputedLayouts;
+}
+
+- (void)setImmediatelyApplyComputedLayouts:(BOOL)immediatelyApply {
+  _flags.immediatelyApplyComputedLayouts = immediatelyApply;
+}
+
+- (BOOL)allowAsyncUpdatesForInitialContent {
+  return _flags.allowAsyncUpdatesForInitialContent;
+}
+
+- (void)setAllowAsyncUpdatesForInitialContent:(BOOL)allowAsyncUpdatesForInitialContent {
+  _flags.allowAsyncUpdatesForInitialContent = allowAsyncUpdatesForInitialContent;
+}
+
 #pragma mark Tuning Parameters
 
 - (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
@@ -313,16 +338,18 @@
   
   if (_pendingState) {
     _ASCollectionPendingState *pendingState = _pendingState;
-    self.pendingState                   = nil;
-    view.asyncDelegate                  = pendingState.delegate;
-    view.asyncDataSource                = pendingState.dataSource;
-    view.inverted                       = pendingState.inverted;
-    view.allowsSelection                = pendingState.allowsSelection;
-    view.allowsMultipleSelection        = pendingState.allowsMultipleSelection;
-    view.cellLayoutMode                 = pendingState.cellLayoutMode;
-    view.layoutInspector                = pendingState.layoutInspector;
-    view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
-    view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+    self.pendingState                             = nil;
+    view.asyncDelegate                            = pendingState.delegate;
+    view.asyncDataSource                          = pendingState.dataSource;
+    view.inverted                                 = pendingState.inverted;
+    view.allowsSelection                          = pendingState.allowsSelection;
+    view.allowsMultipleSelection                  = pendingState.allowsMultipleSelection;
+    view.cellLayoutMode                           = pendingState.cellLayoutMode;
+    view.layoutInspector                          = pendingState.layoutInspector;
+    view.showsVerticalScrollIndicator             = pendingState.showsVerticalScrollIndicator;
+    view.showsHorizontalScrollIndicator           = pendingState.showsHorizontalScrollIndicator;
+    view.remeasuresBeforeLayoutPassOnBoundsChange = pendingState->_flags.remeasuresBeforeLayoutPass;
+    view.shouldDelayLayout                        = pendingState->_flags.shouldDelayLayout;
 #if !TARGET_OS_TV
     view.pagingEnabled                  = pendingState.pagingEnabled;
 #endif
@@ -361,7 +388,14 @@
     if (pendingState.rangeMode != ASLayoutRangeModeUnspecified) {
       [_rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
-    
+
+    if (pendingState.immediatelyApplyComputedLayouts) {
+      view.dataController.immediatelyApplyComputedLayouts = YES;
+    }
+    view.updateBatchSize = pendingState.updateBatchSize;
+    view.useNodeCache = pendingState.useNodeCache;
+    view.allowAsyncUpdatesForInitialContent = pendingState.allowAsyncUpdatesForInitialContent;
+
     // Don't need to set collectionViewLayout to the view as the layout was already used to init the view in view block.
   }
 }
@@ -679,6 +713,43 @@
 }
 #endif
 
+- (void)setRemeasuresBeforeLayoutPassOnBoundsChange:(BOOL)remeasuresBeforeLayoutPass
+{
+  if ([self pendingState]) {
+    _pendingState->_flags.remeasuresBeforeLayoutPass = remeasuresBeforeLayoutPass;
+  } else {
+    self.view.remeasuresBeforeLayoutPassOnBoundsChange = remeasuresBeforeLayoutPass;
+  }
+}
+
+- (BOOL)remeasuresBeforeLayoutPassOnBoundsChange
+{
+  if ([self pendingState]) {
+    return _pendingState->_flags.remeasuresBeforeLayoutPass;
+  } else {
+    return self.view.remeasuresBeforeLayoutPassOnBoundsChange;
+  }
+}
+
+- (void)setShouldDelayLayout:(BOOL)shouldDelayLayout
+{
+  if ([self pendingState]) {
+    _pendingState->_flags.shouldDelayLayout = shouldDelayLayout;
+  } else {
+    self.view.shouldDelayLayout = shouldDelayLayout;
+  }
+}
+
+- (BOOL)shouldDelayLayout
+{
+  if ([self pendingState]) {
+    return _pendingState->_flags.shouldDelayLayout;
+  } else {
+    return self.view.shouldDelayLayout;
+  }
+}
+
+
 - (void)setCollectionViewLayout:(UICollectionViewLayout *)layout
 {
   if ([self pendingState]) {
@@ -794,6 +865,78 @@
     _pendingState.cellLayoutMode = cellLayoutMode;
   } else {
     self.view.cellLayoutMode = cellLayoutMode;
+  }
+}
+
+- (BOOL)immediatelyApplyComputedLayouts
+{
+  if ([self pendingState]) {
+    return _pendingState.immediatelyApplyComputedLayouts;
+  } else {
+    return self.dataController.immediatelyApplyComputedLayouts;
+  }
+}
+
+- (void)setImmediatelyApplyComputedLayouts:(BOOL)immediatelyApplyComputedLayouts
+{
+  if ([self pendingState]) {
+    _pendingState.immediatelyApplyComputedLayouts = immediatelyApplyComputedLayouts;
+  } else {
+    self.dataController.immediatelyApplyComputedLayouts = immediatelyApplyComputedLayouts;
+  }
+}
+
+- (NSUInteger)updateBatchSize
+{
+  if ([self pendingState]) {
+    return _pendingState.updateBatchSize;
+  } else {
+    return self.dataController.updateBatchSize;
+  }
+}
+
+- (void)setUpdateBatchSize:(NSUInteger)updateBatchSize
+{
+  if ([self pendingState]) {
+    _pendingState.updateBatchSize = updateBatchSize;
+  } else {
+    self.dataController.updateBatchSize = updateBatchSize;
+  }
+}
+
+- (BOOL)useNodeCache
+{
+  if ([self pendingState]) {
+    return _pendingState.useNodeCache;
+  } else {
+    return self.dataController.useNodeCache;
+  }
+}
+
+- (void)setUseNodeCache:(BOOL)useNodeCache
+{
+  if ([self pendingState]) {
+    _pendingState.useNodeCache = useNodeCache;
+  } else {
+    self.dataController.useNodeCache = useNodeCache;
+  }
+}
+
+- (BOOL)allowAsyncUpdatesForInitialContent
+{
+  if ([self pendingState]) {
+    return _pendingState.allowAsyncUpdatesForInitialContent;
+  } else {
+    return self.view.allowAsyncUpdatesForInitialContent;
+  }
+}
+
+- (void)setAllowAsyncUpdatesForInitialContent:(BOOL)allowAsyncUpdatesForInitialContent
+{
+  if ([self pendingState]) {
+    _pendingState.allowAsyncUpdatesForInitialContent = allowAsyncUpdatesForInitialContent;
+  } else {
+    self.view.allowAsyncUpdatesForInitialContent = allowAsyncUpdatesForInitialContent;
   }
 }
 

@@ -374,6 +374,12 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [self setAsyncDelegate:nil];
     [self setAsyncDataSource:nil];
   }
+
+  // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
+  if (ASActivateExperimentalFeature(ASExperimentalOOMBackgroundDeallocDisable) == NO) {
+    ASPerformBackgroundDeallocation(&_dataController);
+    ASPerformBackgroundDeallocation(&_rangeController);
+  }
 }
 
 #pragma mark -
@@ -934,9 +940,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   if (element != nil) {
     ASCellNode *node = element.node;
     ASDisplayNodeAssertNotNil(node, @"Node must not be nil!");
-    height = [node layoutThatFits:element.constrainedSize].size.height;
+    height = [node measure:element.constrainedSize].height;
   }
-  
+
 #if TARGET_OS_IOS
   /**
    * Weirdly enough, Apple expects the return value here to _include_ the height
@@ -1262,15 +1268,18 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     [super scrollViewDidScroll:scrollView];
     return;
   }
+
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
   if (ASInterfaceStateIncludesVisible(interfaceState)) {
     [self _checkForBatchFetching];
-  }  
+  }
+
   for (_ASTableViewCell *tableCell in _cellsForVisibilityUpdates) {
     [[tableCell node] cellNodeVisibilityEvent:ASCellNodeVisibilityEventVisibleRectChanged
                                  inScrollView:scrollView
                                 withCellFrame:tableCell.frame];
   }
+  
   if (_asyncDelegateFlags.scrollViewDidScroll) {
     [_asyncDelegate scrollViewDidScroll:scrollView];
   }
@@ -1536,6 +1545,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return self.asyncDataSource ? NSStringFromClass([self.asyncDataSource class]) : NSStringFromClass([self class]);
 }
 
+- (CALayer *)layerForRangeController:(ASRangeController *)controller {
+  return self.layer;
+}
+
 #pragma mark - ASRangeControllerDelegate
 
 - (BOOL)rangeControllerShouldUpdateRanges:(ASRangeController *)rangeController
@@ -1721,11 +1734,6 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return NO;
 }
 
-- (void)dataControllerDidFinishWaiting:(ASDataController *)dataController
-{
-  // ASCellLayoutMode is not currently supported on ASTableView (see ASCollectionView for details).
-}
-
 - (id)dataController:(ASDataController *)dataController nodeModelForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   // Not currently supported for tables. Will be added when the collection API stabilizes.
@@ -1869,6 +1877,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 #endif
 
   return (fabs(rect.size.height - size.height) < FLT_EPSILON);
+}
+
+- (CGRect)dataControllerFrameForDebugging:(ASDataController *)dataController {
+  return [self convertRect:self.bounds toView:nil];
 }
 
 #pragma mark - _ASTableViewCellDelegate

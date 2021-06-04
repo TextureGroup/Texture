@@ -81,6 +81,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT;
 
+/**
+ * Ignores size changes to the cells. Enable if you are using a custom layout that adjusts cell
+ * size.
+ */
+@property(nonatomic) BOOL ignoreCellNodeSizeChanges;
+
+/**
+ * @see ASCollectionNode+Beta.h for full documentation.
+ */
+@property (nonatomic) BOOL shouldDelayLayout;
+
 @end
 
 @interface ASCollectionView (Deprecated)

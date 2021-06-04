@@ -7,7 +7,7 @@
 //
 
 #import "ASTestCase.h"
-#import "ASIntegerMap.h"
+#import <AsyncDisplayKit/ASIntegerMap.h>
 
 @interface ASIntegerMapTests : ASTestCase
 

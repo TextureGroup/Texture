@@ -42,8 +42,6 @@
 - (void)setupYogaLayoutIfNeeded
 {
 #if YOGA_LAYOUT
-  [self.style yogaNodeCreateIfNeeded];
-  [self.activityIndicatorNode.style yogaNodeCreateIfNeeded];
   [self addYogaChild:self.activityIndicatorNode];
 
   self.style.justifyContent = ASStackLayoutJustifyContentCenter;

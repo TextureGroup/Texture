@@ -9,6 +9,10 @@
 
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASCollections.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga2.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -16,9 +20,10 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
+#import <AsyncDisplayKit/ASSignpost.h>
 #import <AsyncDisplayKit/NSArray+Diffing.h>
 
-using AS::MutexLocker;
+using namespace AS;
 
 @interface ASDisplayNode (ASLayoutElementStyleDelegate) <ASLayoutElementStyleDelegate>
 @end
@@ -28,6 +33,8 @@ using AS::MutexLocker;
 #pragma mark <ASLayoutElementStyleDelegate>
 
 - (void)style:(ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName {
+  // NOTE: In Yoga we do not use this pathway. Yoga internally propagates dirtiness up.
+  Yoga2::AssertDisabled(self);
   [self setNeedsLayout];
 }
 
@@ -59,12 +66,18 @@ using AS::MutexLocker;
   DISABLED_ASAssertLocked(__instanceLock__);
   if (_style == nil) {
 #if YOGA
-    // In Yoga mode we use the delegate to inform the tree if properties changes
+    if (_flags.yoga) {
+        ASNodeContextPush(_nodeContext);
+        _style = (ASLayoutElementStyle *)[[ASLayoutElementStyleYoga alloc] init];
+        ASNodeContextPop();
+    } else {
+      _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
+    }
+#else  // YOGA
     _style = [[ASLayoutElementStyle alloc] initWithDelegate:self];
-#else
-    _style = [[ASLayoutElementStyle alloc] init];
-#endif
+#endif  // YOGA
   }
+
   return _style;
 }
 
@@ -80,14 +93,38 @@ using AS::MutexLocker;
 
 #pragma mark Measurement Pass
 
+- (CGSize)measure:(ASSizeRange)sizeRange {
+  ASSignpostStart(Measure, self, "%@ main: %d width: %d", ASObjectDescriptionMakeTiny(self),
+                  ASDisplayNodeThreadIsMain(), (int)sizeRange.max.width);
+  CGSize result = CGSizeZero;
+  if (Yoga2::GetEnabled(self)) {
+    MutexLocker l(__instanceLock__);
+    Yoga2::CalculateLayoutAtRoot(self, sizeRange.max);
+    result = Yoga2::GetCalculatedSize(self);
+
+    // Clamp the resulting size to the min size if necessary
+    result = CGSizeMake(std::max(result.width, sizeRange.min.width),
+                        std::max(result.height, sizeRange.min.height));
+  } else {
+    result = [self layoutThatFits:sizeRange].size;
+  }
+  ASSignpostEnd(Measure, self, "height: %d", (int)result.height);
+  return result;
+}
+
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize
 {
+  if (Yoga2::GetEnabled(self)) {
+    MutexLocker l(__instanceLock__);
+    Yoga2::CalculateLayoutAtRoot(self, constrainedSize.max);
+    return Yoga2::GetCalculatedLayout(self, constrainedSize);
+  }
   return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];
 }
 
 - (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize
 {
-  ASScopedLockSelfOrToRoot();
+  ASLockScopeSelf();
 
   // If one or multiple layout transitions are in flight it still can happen that layout information is requested
   // on other threads. As the pending and calculated layout to be updated in the layout transition in here just a
@@ -137,7 +174,12 @@ ASLayoutElementStyleExtensibilityForwarding
     _primitiveTraitCollection = traitCollection;
 
     l.unlock();
+    if (ASActivateExperimentalFeature(ASExperimentalTraitCollectionDidChangeWithPreviousCollection)) {
       [self asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
+    } else {
+      [self asyncTraitCollectionDidChange];
+    }
+
   }
 }
 
@@ -164,35 +206,30 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @end
 
-#pragma mark -
 #pragma mark - ASDisplayNode (ASLayout)
 
 @implementation ASDisplayNode (ASLayout)
 
-- (ASLayoutEngineType)layoutEngineType
-{
-#if YOGA
-  MutexLocker l(__instanceLock__);
-  YGNodeRef yogaNode = _style.yogaNode;
-  BOOL hasYogaParent = (_yogaParent != nil);
-  BOOL hasYogaChildren = (_yogaChildren.count > 0);
-  if (yogaNode != NULL && (hasYogaParent || hasYogaChildren)) {
-    return ASLayoutEngineTypeYoga;
-  }
-#endif
-
-  return ASLayoutEngineTypeLayoutSpec;
-}
-
 - (ASLayout *)calculatedLayout
 {
-  MutexLocker l(__instanceLock__);
+  if (Yoga2::GetEnabled(self)) {
+#if YOGA
+    AS::LockSet locks = [self lockToRootIfNeededForLayout];
+#endif  // YOGA
+    return Yoga2::GetCalculatedLayout(self, ASSizeRangeZero);
+  }
   return _calculatedDisplayNodeLayout.layout;
 }
 
 - (CGSize)calculatedSize
 {
-  MutexLocker l(__instanceLock__);
+  if (Yoga2::GetEnabled(self)) {
+#if YOGA
+    AS::LockSet locks = [self lockToRootIfNeededForLayout];
+#endif  // YOGA
+    return Yoga2::GetCalculatedSize(self);
+  }
+
   if (_pendingDisplayNodeLayout.isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout.layout.size;
   }
@@ -208,6 +245,7 @@ ASLayoutElementStyleExtensibilityForwarding
 - (ASSizeRange)_locked_constrainedSizeForCalculatedLayout
 {
   DISABLED_ASAssertLocked(__instanceLock__);
+  Yoga2::AssertDisabled(self);
   if (_pendingDisplayNodeLayout.isValid(_layoutVersion)) {
     return _pendingDisplayNodeLayout.constrainedSize;
   }
@@ -216,7 +254,6 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @end
 
-#pragma mark -
 #pragma mark - ASDisplayNode (ASLayoutElementStylability)
 
 @implementation ASDisplayNode (ASLayoutElementStylability)
@@ -229,7 +266,6 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @end
 
-#pragma mark -
 #pragma mark - ASDisplayNode (ASLayoutInternal)
 
 @implementation ASDisplayNode (ASLayoutInternal)
@@ -242,6 +278,7 @@ ASLayoutElementStyleExtensibilityForwarding
  */
 - (void)_u_setNeedsLayoutFromAbove
 {
+  Yoga2::AssertDisabled(self);
   ASDisplayNodeAssertThreadAffinity(self);
   DISABLED_ASAssertUnlocked(__instanceLock__);
 
@@ -269,9 +306,10 @@ ASLayoutElementStyleExtensibilityForwarding
 // cannot due to locking to root in `_u_measureNodeWithBoundsIfNecessary`.
 - (void)_rootNodeDidInvalidateSize
 {
+  Yoga2::AssertDisabled(self);
   ASDisplayNodeAssertThreadAffinity(self);
   __instanceLock__.lock();
-  
+
   // We are the root node and need to re-flow the layout; at least one child needs a new size.
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.bounds.size);
 
@@ -308,6 +346,7 @@ ASLayoutElementStyleExtensibilityForwarding
 // causing real issues in cases of resizing nodes.
 - (void)displayNodeDidInvalidateSizeNewSize:(CGSize)size
 {
+  Yoga2::AssertDisabled(self);
   ASDisplayNodeAssertThreadAffinity(self);
 
   // The default implementation of display node changes the size of itself to the new size
@@ -331,7 +370,8 @@ ASLayoutElementStyleExtensibilityForwarding
 - (void)_u_measureNodeWithBoundsIfNecessary:(CGRect)bounds
 {
   DISABLED_ASAssertUnlocked(__instanceLock__);
-  ASScopedLockSelfOrToRoot();
+  ASLockScopeSelf();
+  Yoga2::AssertDisabled(self);
 
   // Check if we are a subnode in a layout transition.
   // In this case no measurement is needed as it's part of the layout transition
@@ -402,19 +442,9 @@ ASLayoutElementStyleExtensibilityForwarding
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
     NSUInteger version = _layoutVersion;
     ASSizeRange constrainedSize = [self _locked_constrainedSizeForLayoutPass];
-#if YOGA
-    // This flag indicates to the Texture+Yoga code that this next layout is intended to be
-    // displayed (vs. just for measurement). This will cause it to call setNeedsLayout on any nodes
-    // whose layout changes as a result of the Yoga recalculation. This is necessary because a
-    // change in one Yoga node can change the layout for any other node in the tree.
-    self.willApplyNextYogaCalculatedLayout = YES;
-#endif
     ASLayout *layout = [self calculateLayoutThatFits:constrainedSize
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
-#if YOGA
-    self.willApplyNextYogaCalculatedLayout = NO;
-#endif
     nextLayout = ASDisplayNodeLayout(layout, constrainedSize, boundsSizeForLayout, version);
     // Now that the constrained size of pending layout might have been reused, the layout is useless
     // Release it and any orphaned subnodes it retains
@@ -480,6 +510,7 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (ASSizeRange)_locked_constrainedSizeForLayoutPass
 {
+  Yoga2::AssertDisabled(self);
   // TODO: The logic in -_u_setNeedsLayoutFromAbove seems correct and doesn't use this method.
   // logic seems correct.  For what case does -this method need to do the CGSizeEqual checks?
   // IF WE CAN REMOVE BOUNDS CHECKS HERE, THEN WE CAN ALSO REMOVE "REQUESTED FROM ABOVE" CHECK
@@ -511,6 +542,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertThreadAffinity(self);
   DISABLED_ASAssertUnlocked(__instanceLock__);
+  Yoga2::AssertDisabled(self);
   
   ASLayout *layout;
   {
@@ -535,7 +567,6 @@ ASLayoutElementStyleExtensibilityForwarding
 
 @end
 
-#pragma mark -
 #pragma mark - ASDisplayNode (ASAutomatic Subnode Management)
 
 @implementation ASDisplayNode (ASAutomaticSubnodeManagement)
@@ -545,6 +576,9 @@ ASLayoutElementStyleExtensibilityForwarding
 - (BOOL)automaticallyManagesSubnodes
 {
   MutexLocker l(__instanceLock__);
+  if (Yoga2::GetEnabled(self)) {
+    return YES;
+  }
   return _flags.automaticallyManagesSubnodes;
 }
 
@@ -675,7 +709,7 @@ ASLayoutElementStyleExtensibilityForwarding
     NSUInteger newLayoutVersion = self->_layoutVersion;
     ASLayout *newLayout;
     {
-      ASScopedLockSelfOrToRoot();
+      ASLockScopeSelf();
 
       ASLayoutElementContext *ctx = [[ASLayoutElementContext alloc] init];
       ctx.transitionID = transitionID;
@@ -1008,15 +1042,10 @@ ASLayoutElementStyleExtensibilityForwarding
 
 - (void)_pendingLayoutTransitionDidComplete
 {
-  // This assertion introduces a breaking behavior for nodes that has ASM enabled but also manually manage some subnodes.
-  // Let's gate it behind YOGA flag.
-#if YOGA
-  [self _assertSubnodeState];
-#endif
-
   // Subclass hook
   // TODO: Disabled due to PR: https://github.com/TextureGroup/Texture/pull/1204
   DISABLED_ASAssertUnlocked(__instanceLock__);
+  Yoga2::AssertDisabled(self);
   [self calculatedLayoutDidChange];
 
   // Grab lock after calling out to subclass
@@ -1066,33 +1095,6 @@ ASLayoutElementStyleExtensibilityForwarding
   ASDisplayNodeAssertTrue(displayNodeLayout.layout.size.height >= 0.0);
   
   _calculatedDisplayNodeLayout = displayNodeLayout;
-}
-
-@end
-
-#pragma mark -
-#pragma mark - ASDisplayNode (YogaLayout)
-
-@implementation ASDisplayNode (YogaLayout)
-
-- (BOOL)locked_shouldLayoutFromYogaRoot {
-#if YOGA
-  YGNodeRef yogaNode = _style.yogaNode;
-  BOOL hasYogaParent = (_yogaParent != nil);
-  BOOL hasYogaChildren = (_yogaChildren.count > 0);
-  BOOL usesYoga = (yogaNode != NULL && (hasYogaParent || hasYogaChildren));
-  if (usesYoga) {
-    if ([self shouldHaveYogaMeasureFunc] == NO) {
-      return YES;
-    } else {
-      return NO;
-    }
-  } else {
-    return NO;
-  }
-#else
-  return NO;
-#endif
 }
 
 @end

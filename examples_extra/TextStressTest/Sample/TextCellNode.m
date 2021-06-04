@@ -62,10 +62,6 @@
  */
 - (void)simpleSetupYogaLayout
 {
-  [self.style yogaNodeCreateIfNeeded];
-  [_label1.style yogaNodeCreateIfNeeded];
-  [_label2.style yogaNodeCreateIfNeeded];
-
   _label1.style.flexGrow = 0;
   _label1.style.flexShrink = 1;
   _label1.backgroundColor = [UIColor lightGrayColor];

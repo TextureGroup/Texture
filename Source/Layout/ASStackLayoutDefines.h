@@ -41,20 +41,31 @@ typedef NS_ENUM(unsigned char, ASStackLayoutJustifyContent) {
    */
   ASStackLayoutJustifyContentEnd,
   /**
-   On overflow or if the stack has only 1 child, this value is identical to ASStackLayoutJustifyContentStart.
-   Otherwise, the starting edge of the first child is at the starting edge of the stack, 
-   the ending edge of the last child is at the ending edge of the stack, and the remaining children
-   are distributed so that the spacing between any two adjacent ones is the same.
-   If there is a remaining space after spacing division, it is combined with the last spacing (i.e the one between the last 2 children).
+   On overflow or if the stack has only 1 child, this value is identical to
+   ASStackLayoutJustifyContentStart. Otherwise, the starting edge of the first child is at the
+   starting edge of the stack, the ending edge of the last child is at the ending edge of the stack,
+   and the remaining children are distributed so that the spacing between any two adjacent ones is
+   the same. If there is a remaining space after spacing division, it is combined with the last
+   spacing (i.e the one between the last 2 children).
    */
   ASStackLayoutJustifyContentSpaceBetween,
   /**
-   On overflow or if the stack has only 1 child, this value is identical to ASStackLayoutJustifyContentCenter.
-   Otherwise, children are distributed such that the spacing between any two adjacent ones is the same,
-   and the spacing between the first/last child and the stack edges is half the size of the spacing between children.
-   If there is a remaining space after spacing division, it is combined with the last spacing (i.e the one between the last child and the stack ending edge).
+   On overflow or if the stack has only 1 child, this value is identical to
+   ASStackLayoutJustifyContentCenter. Otherwise, children are distributed such that the spacing
+   between any two adjacent ones is the same, and the spacing between the first/last child and the
+   stack edges is half the size of the spacing between children. If there is a remaining space after
+   spacing division, it is combined with the last spacing (i.e the one between the last child and
+   the stack ending edge).
    */
-  ASStackLayoutJustifyContentSpaceAround
+  ASStackLayoutJustifyContentSpaceAround,
+
+  /**
+   On overflow or if the stack has only 1 child, this value is identical to
+   ASStackLayoutJustifyContentCenter. Otherwise, children are distributed such that the remaining
+   space are of the same length before and after each child.
+   NOTE: This is available in Yoga only for now.
+   */
+  ASStackLayoutJustifyContentSpaceEvenly
 };
 
 /** Orientation of children along cross axis */

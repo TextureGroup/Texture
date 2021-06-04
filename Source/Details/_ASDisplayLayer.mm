@@ -9,9 +9,13 @@
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 
-#import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
+#import <AsyncDisplayKit/ASRunLoopQueue.h>
+#import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASLog.h>
+#import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
+#import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
+#import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 @implementation _ASDisplayLayer
@@ -20,6 +24,8 @@
 }
 
 @dynamic displaysAsynchronously;
+@synthesize as_retainedDelegate = _as_retainedDelegate;
+@synthesize as_allowsHighlightDrawing = _as_allowsHighlightDrawing;
 
 #pragma mark - Properties
 
@@ -80,7 +86,18 @@
   ASDisplayNodeAssertMainThread();
   [super layoutSublayers];
 
+  unowned ASDisplayNode *node = self.asyncdisplaykit_node;
   [self.asyncdisplaykit_node __layout];
+
+  // When a table/collection view reload during a transaction, cell will reconfigure which might
+  // involves visible -> reload(hide show) and in this case we want to merge hide show pair by
+  // delaying the process until later, aka coalesce the interface state (before CATransaction
+  // commits). However, If root node and within the CATransaction commit, we would like to keep
+  // applying the interface state until the state becomes stable.
+  if ([ASDisplayNode shouldCoalesceInterfaceStateDuringTransaction] &&
+      [ASCATransactionQueue inTransactionCommit] && node.supernode == nil) {
+    [self.asyncdisplaykit_node recursivelyApplyPendingInterfaceState];
+  }
 }
 
 - (void)setNeedsDisplay

@@ -407,6 +407,12 @@ static NSArray *DefaultLinkAttributeNames() {
   return UIAccessibilityTraitStaticText;
 }
 
+- (BOOL)performAccessibilityCustomActionLink:(UIAccessibilityCustomAction *)action
+{
+  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
+  return NO;
+}
+
 #pragma mark - Layout and Sizing
 
 - (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
@@ -435,7 +441,7 @@ static NSArray *DefaultLinkAttributeNames() {
   
   ASTextKitRenderer *renderer = [self _locked_rendererWithBounds:{.size = constrainedSize}];
   CGSize size = renderer.size;
-  if (_attributedText.length > 0) {
+  if (_attributedText.length > 0 && !self.yoga) {
     self.style.ascender = [[self class] ascenderWithAttributedString:_attributedText];
     self.style.descender = [[_attributedText attribute:NSFontAttributeName atIndex:_attributedText.length - 1 effectiveRange:NULL] descender];
     if (renderer.currentScaleFactor > 0 && renderer.currentScaleFactor < 1.0) {
@@ -452,6 +458,12 @@ static NSArray *DefaultLinkAttributeNames() {
   return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
                     std::fmin(size.height, originalConstrainedSize.height));
 }
+
+#if YOGA
+- (float)yogaBaselineWithSize:(CGSize)size {
+  return ASTextGetBaseline(size.height, self.yogaParent, self.attributedText);
+}
+#endif
 
 #pragma mark - Modifying User Text
 
@@ -510,6 +522,9 @@ static NSArray *DefaultLinkAttributeNames() {
    
     // Update attributed text with cleaned attributed string
     _attributedText = cleanedAttributedString;
+    if (self.isNodeLoaded) {
+      [self invalidateFirstAccessibilityContainerOrNonLayerBackedNode];
+    }
   }
   
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -1492,7 +1507,8 @@ static NSAttributedString *DefaultTruncationAttributedString()
 }
 #endif
 
-// All direct descendants of ASTextNode get their superclass replaced by ASTextNode2.
+// If ASExperimentalTextNode flag is set, all direct descendants of ASTextNode get their superclass
+// replaced by ASTextNode2.
 + (void)initialize
 {
   // Texture requires that node subclasses call [super initialize]

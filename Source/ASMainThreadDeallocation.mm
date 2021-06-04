@@ -15,14 +15,52 @@
 
 @implementation NSObject (ASMainThreadIvarTeardown)
 
-- (void)scheduleIvarsForMainThreadDeallocation
+- (void)scheduleMainThreadDeallocationForObject:(id)obj
+{
+  NSPointerArray *objsForMainThreadDeallocation =
+      objc_getAssociatedObject(self, @selector(scheduleMainThreadDeallocationForObject:));
+
+  if (!objsForMainThreadDeallocation) {
+    objsForMainThreadDeallocation =
+        [[NSPointerArray alloc] initWithOptions:NSPointerFunctionsStrongMemory];
+  }
+
+  [objsForMainThreadDeallocation addPointer:(void *)obj];
+  objc_setAssociatedObject(self, @selector(scheduleMainThreadDeallocationForObject:),
+                           objsForMainThreadDeallocation, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)handleMainThreadDeallocationIfNeeded
+{
+  [self deallocateIvarsOnMainThreadIfNeeded];
+  [self deallocateScheduledObjectsOnMainThreadIfNeeded];
+}
+
+- (void)deallocateScheduledObjectsOnMainThreadIfNeeded
 {
   if (ASDisplayNodeThreadIsMain()) {
     return;
   }
-  
+
+  id obj = objc_getAssociatedObject(self, @selector(scheduleMainThreadDeallocationForObject:));
+
+  if (!obj) {
+    return;
+  }
+
+  objc_setAssociatedObject(self, @selector(scheduleMainThreadDeallocationForObject:), nil,
+                           OBJC_ASSOCIATION_RETAIN);
+  ASPerformMainThreadDeallocation(&obj);
+}
+
+- (void)deallocateIvarsOnMainThreadIfNeeded
+{
+  if (ASDisplayNodeThreadIsMain()) {
+    return;
+  }
+
   NSValue *ivarsObj = [[self class] _ivarsThatMayNeedMainDeallocation];
-  
+
   // Unwrap the ivar array
   unsigned int count = 0;
   // Will be unused if assertions are disabled.

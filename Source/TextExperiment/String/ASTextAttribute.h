@@ -48,9 +48,10 @@ typedef NS_OPTIONS (NSInteger, ASTextLineStyle) {
  Text vertical alignment.
  */
 typedef NS_ENUM(NSInteger, ASTextVerticalAlignment) {
-  ASTextVerticalAlignmentTop =    0, ///< Top alignment.
-  ASTextVerticalAlignmentCenter = 1, ///< Center alignment.
-  ASTextVerticalAlignmentBottom = 2, ///< Bottom alignment.
+  ASTextVerticalAlignmentTop      = 0, ///< Top alignment.
+  ASTextVerticalAlignmentCenter   = 1, ///< Center alignment.
+  ASTextVerticalAlignmentBottom   = 2, ///< Bottom alignment.
+  ASTextVerticalAlignmentBaseline = 3, ///< Baseline alignment.
 };
 
 /**
@@ -270,7 +271,9 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  */
 @interface ASTextAttachment : NSObject<NSCoding, NSCopying>
 + (instancetype)attachmentWithContent:(nullable id)content NS_RETURNS_RETAINED;
-@property (nullable, nonatomic) id content;             ///< Supported type: UIImage, UIView, CALayer
+
+@property(nullable, nonatomic)
+    id content;  ///< Supported type: UIImage, UIView, CALayer, ASDisplayNode
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.
 @property (nonatomic) UIEdgeInsets contentInsets;               ///< The insets when drawing content.
 @property (nullable, nonatomic) NSDictionary *userInfo; ///< The user information dictionary.

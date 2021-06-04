@@ -335,3 +335,19 @@ void ASDisplayNodeEnableHierarchyNotifications(ASDisplayNode *node)
 {
   [node __decrementVisibilityNotificationsDisabled];
 }
+
+#pragma mark - Layer Actions
+
+id<CAAction>ASDisplayNodeActionForLayer(CALayer *layer, NSString *event, ASDisplayNode *node, id<CAAction> uikitAction)
+{
+  // Even though the UIKit action will take precedence, we still unconditionally forward to the node so that it can
+  // track events like kCAOnOrderIn.
+  id<CAAction> nodeAction = [(id<CALayerDelegate>) node actionForLayer:layer forKey:event];
+
+  // If UIKit specifies an action, that takes precedence. That's an animation block so it's explicit.
+  if (uikitAction && uikitAction != (id)kCFNull) {
+    return uikitAction;
+  }
+
+  return nodeAction;
+}

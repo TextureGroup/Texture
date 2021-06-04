@@ -16,6 +16,8 @@
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASDKViewController.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 #pragma mark - _ASDisplayView
 
@@ -40,7 +42,7 @@
   } _internalFlags;
 
   NSArray *_accessibilityElements;
-  CGRect _lastAccessibilityElementsFrame;
+  BOOL _inIsAccessibilityElement;
 }
 
 #pragma mark - Class
@@ -83,16 +85,7 @@
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
   id<CAAction> uikitAction = [super actionForLayer:layer forKey:event];
-
-  // Even though the UIKit action will take precedence, we still unconditionally forward to the node so that it can
-  // track events like kCAOnOrderIn.
-  id<CAAction> nodeAction = [_asyncdisplaykit_node actionForLayer:layer forKey:event];
-
-  // If UIKit specifies an action, that takes precedence. That's an animation block so it's explicit.
-  if (uikitAction && uikitAction != (id)kCFNull) {
-    return uikitAction;
-  }
-  return nodeAction;
+  return ASDisplayNodeActionForLayer(layer, event, _asyncdisplaykit_node, uikitAction);
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow
@@ -167,7 +160,8 @@
     if (node.inHierarchy) {
       [node __exitHierarchy];
     }
-    self.keepalive_node = nil;
+
+    ASPerformBackgroundDeallocation(&_keepalive_node);
   }
 
 #if DEBUG
@@ -247,7 +241,7 @@
 - (CGSize)sizeThatFits:(CGSize)size
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return node ? [node layoutThatFits:ASSizeRangeMake(size)].size : [super sizeThatFits:size];
+  return node ? [node measure:ASSizeRangeMake(CGSizeZero, size)] : [super sizeThatFits:size];
 }
 
 - (void)setNeedsDisplay

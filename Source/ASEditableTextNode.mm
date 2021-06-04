@@ -474,8 +474,10 @@
   // When we resize to fit (above) the prior layout becomes invalid. For whatever reason, UITextView doesn't invalidate its layout when its frame changes on its own, so we have to do so ourselves.
   [_textKitComponents.layoutManager invalidateLayoutForCharacterRange:NSMakeRange(0, [_textKitComponents.textStorage length]) actualCharacterRange:NULL];
 
-  // When you type beyond UITextView's bounds it scrolls you down a line. We need to remain at the top.
-  [_textKitComponents.textView setContentOffset:CGPointZero animated:NO];
+  // When text does not fill bounds, pin to content offset 0. UIKit will introduce jitter otherwise.
+  if (_textKitComponents.textView.contentSize.height <= self.bounds.size.height) {
+    [_textKitComponents.textView setContentOffset:CGPointZero animated:NO];
+  }
 }
 
 #pragma mark - Keyboard

@@ -7,17 +7,37 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#pragma once
-
-#import <Foundation/NSException.h>
-#import <pthread.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
+
+#import <Foundation/Foundation.h>
+#import <pthread.h>
+#import <dispatch/dispatch.h>
+
+AS_ASSUME_NORETAIN_BEGIN
+NS_ASSUME_NONNULL_BEGIN
 
 #if !defined(NS_BLOCK_ASSERTIONS)
   #define ASDISPLAYNODE_ASSERTIONS_ENABLED 1
 #else
   #define ASDISPLAYNODE_ASSERTIONS_ENABLED 0
 #endif
+
+/**
+ * Check a precondition in production and return the given value if it fails.
+ * Note that this hides an early return! So always use cleanups or RAII objects
+ * rather than manual cleanup.
+ */
+#define AS_PRECONDITION(expr, __return_value, ...) \
+  if (!AS_EXPECT(expr, 1)) {                       \
+    ASDisplayNodeFailAssert(__VA_ARGS__);          \
+    return __return_value;                         \
+  }
+
+#define AS_C_PRECONDITION(expr, __return_value, ...) \
+  if (!AS_EXPECT(expr, 1)) {                         \
+    ASDisplayNodeCFailAssert(__VA_ARGS__);           \
+    return __return_value;                           \
+  }
 
 /**
  * Note: In some cases it would be sufficient to do e.g.:
@@ -67,6 +87,14 @@
 #define ASDisplayNodeErrorDomain @"ASDisplayNodeErrorDomain"
 #define ASDisplayNodeNonFatalErrorCode 1
 
+NS_INLINE void ASAssertOnQueueIfIOS10(dispatch_queue_t q) {
+#ifndef NS_BLOCK_ASSERTIONS
+  if (@available(iOS 10, tvOS 10, *)) {
+    dispatch_assert_queue(q);
+  }
+#endif
+}
+
 /**
  * In debug methods, it can be useful to disable main thread assertions to get valuable information,
  * even if it means violating threading requirements. These functions are used in -debugDescription and let
@@ -99,3 +127,6 @@ ASDK_EXTERN void ASPopMainThreadAssertionsDisabled(void);
   }                                                                                                                               \
   __evaluated;                                                                                                                    \
 })                                                                                                                                \
+
+NS_ASSUME_NONNULL_END
+AS_ASSUME_NORETAIN_END

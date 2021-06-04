@@ -16,6 +16,10 @@
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 #import <AsyncDisplayKit/ASLocking.h>
 
+#if YOGA
+#import YOGA_HEADER_PATH
+#endif
+
 @class ASLayout;
 @class ASLayoutSpec;
 @protocol ASLayoutElementStylability;
@@ -74,6 +78,17 @@ typedef NS_ENUM(unsigned char, ASLayoutElementType) {
 - (nullable NSArray<id<ASLayoutElement>> *)sublayoutElements;
 
 #pragma mark - Calculate layout
+
+/**
+ * @abstract Measure the node. May be called from any thread.
+ *
+ * @param sizeRange The size range against which to measure the node.
+ * @return The size of the appropriate layout within sizeRange.
+ *
+ * @discussion Calling this method is equivalent to calling -layoutThatFits: and reading the size.
+ * This method may be faster because it may not require generating the ASLayout tree.
+ */
+- (CGSize)measure:(ASSizeRange)sizeRange;
 
 /**
  * @abstract Asks the node to return a layout based on given size range.
@@ -160,11 +175,15 @@ ASDK_EXTERN NSString * const ASLayoutElementStyleFlexBasisProperty;
 ASDK_EXTERN NSString * const ASLayoutElementStyleAlignSelfProperty;
 ASDK_EXTERN NSString * const ASLayoutElementStyleAscenderProperty;
 ASDK_EXTERN NSString * const ASLayoutElementStyleDescenderProperty;
+ASDK_EXTERN NSString * const ASLayoutElementStyleOverflowProperty;
 
 ASDK_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
 
 @protocol ASLayoutElementStyleDelegate <NSObject>
-- (void)style:(__kindof ASLayoutElementStyle *)style propertyDidChange:(NSString *)propertyName;
+
+/** Called by the style when a property changes. Not applicable to Yoga style. */
+- (void)style:(ASLayoutElementStyle *)style propertyDidChange:(NSString *)property;
+
 @end
 
 @interface ASLayoutElementStyle : NSObject <ASStackLayoutElement, ASAbsoluteLayoutElement, ASLayoutElementExtensibility, ASLocking>
@@ -179,8 +198,7 @@ ASDK_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
  *
  * @discussion The delegate must adopt the ASLayoutElementStyleDelegate protocol. The delegate is not retained.
  */
-@property (nullable, nonatomic, weak, readonly) id<ASLayoutElementStyleDelegate> delegate;
-
+@property (nullable, atomic, weak, readonly) id<ASLayoutElementStyleDelegate> delegate;
 
 #pragma mark - Sizing
 
@@ -292,6 +310,15 @@ ASDK_EXTERN NSString * const ASLayoutElementStyleLayoutPositionProperty;
  * relative size, the child’s maximum relative size will be enforced and its size will extend out of the layout spec’s.
  */
 @property (nonatomic) ASLayoutSize maxLayoutSize;
+
+#if YOGA
+
+/**
+ * @abstract The overflow mode for this container. Only available in yoga.
+ */
+@property(nonatomic) YGOverflow overflow;
+
+#endif
 
 @end
 

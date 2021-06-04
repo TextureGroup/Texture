@@ -30,6 +30,10 @@
 
 @interface ASRangeController ()
 {
+  // When set to NO, _rangeIsValid indicates that ASRangeController needs to recalculate the
+  // interfaceState of every node under it's control. When set to YES, _rangeIsValid will limit the
+  // the interfaceState recalculation to nodes that are visible, displayed, need to be preloaded and
+  // nodes that were updated previously during _updateVisibleNodeIndexPaths
   BOOL _rangeIsValid;
   BOOL _needsRangeUpdate;
   NSSet<NSIndexPath *> *_allPreviousIndexPaths;
@@ -39,6 +43,7 @@
   BOOL _preserveCurrentRangeMode;
   BOOL _didRegisterForNodeDisplayNotifications;
   CFTimeInterval _pendingDisplayNodesTimestamp;
+  ASInterfaceState _previousInterfaceState;
 
   // If the user is not currently scrolling, we will keep our ranges
   // configured to match their previous scroll direction. Defaults
@@ -71,7 +76,8 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   _contentHasBeenScrolled = NO;
   _preserveCurrentRangeMode = NO;
   _previousScrollDirection = ASScrollDirectionDown | ASScrollDirectionRight;
-  
+  _previousInterfaceState = ASInterfaceStateNone;
+
   [[[self class] allRangeControllersWeakSet] addObject:self];
   
 #if AS_RANGECONTROLLER_LOG_UPDATE_FREQ
@@ -131,6 +137,9 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)setNeedsUpdate
 {
+#if ASRangeControllerLoggingEnabled
+    NSLog(@"ASRangeController's setNeedsUpdate. collectionView: %@, _needsRangeUpdate: %@", _dataSource, _needsRangeUpdate ? @"YES" : @"NO");
+#endif
   if (!_needsRangeUpdate) {
     _needsRangeUpdate = YES;
       
@@ -143,14 +152,41 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
 
 - (void)updateIfNeeded
 {
-  if (_needsRangeUpdate) {
+#if ASRangeControllerLoggingEnabled
+    NSLog(@"ASRangeController's updateIfNeeded. collectionView: %@, _needsRangeUpdate: %@", _dataSource, _needsRangeUpdate ? @"YES" : @"NO");
+#endif
+  if (_needsRangeUpdate/* || (_previousInterfaceState != [self interfaceState])*/) {
     [self updateRanges];
   }
 }
 
 - (void)updateRanges
 {
+  // Skip range update if layout is still pending.
+  // This is necessary to avoid forcing a collection view layout update in cases like
+  // rotation, where we prefer to update content & reloadData before rotation starts,
+  // but only clean the layout after the rotation (size change). Cleaning the layout
+  // for the new content before the rotation will require a lot of unneeded work.
+    BOOL needsLayout = [self.dataSource layerForRangeController:self].needsLayout;
+#if ASRangeControllerLoggingEnabled
+    NSLog(@"ASRangeController's updateRanges. collectionView: %@, needsLayout: %@", _dataSource, needsLayout ? @"YES" : @"NO");
+#endif
+  if (needsLayout) {
+    return;
+  }
+
+//  _previousInterfaceState = [self interfaceState];
   _needsRangeUpdate = NO;
+
+  ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
+  if (!_layoutController || !_dataSource) {
+    return;
+  }
+
+  if (![_delegate rangeControllerShouldUpdateRanges:self]) {
+    return;
+  }
+
   [self _updateVisibleNodeIndexPaths];
 }
 
@@ -198,18 +234,10 @@ static UIApplicationState __ApplicationState = UIApplicationStateActive;
   _visibleNodes = newVisibleNodes;
 }
 
-- (void)_updateVisibleNodeIndexPaths
+- (void)	_updateVisibleNodeIndexPaths
 {
   as_activity_scope_verbose(as_activity_create("Update range controller", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
   as_log_verbose(ASCollectionLog(), "Updating ranges for %@", ASViewToDisplayNode(ASDynamicCast(self.delegate, UIView)));
-  ASDisplayNodeAssert(_layoutController, @"An ASLayoutController is required by ASRangeController");
-  if (!_layoutController || !_dataSource) {
-    return;
-  }
-
-  if (![_delegate rangeControllerShouldUpdateRanges:self]) {
-    return;
-  }
 
 #if AS_RANGECONTROLLER_LOG_UPDATE_FREQ
   _updateCountThisFrame += 1;

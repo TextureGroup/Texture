@@ -50,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (copy, readonly) NSString *ancestryDescription;
 
+- (ASDisplayNode *)firstNonLayerNode;
+
 @end
 
 NS_ASSUME_NONNULL_END

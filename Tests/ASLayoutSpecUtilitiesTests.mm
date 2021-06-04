@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "ASLayoutSpecUtilities.h"
+#import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 
 @interface ASLayoutSpecUtilitiesTests : XCTestCase
 

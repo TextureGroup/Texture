@@ -18,6 +18,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
 #import <AsyncDisplayKit/ASLayoutTransition.h>
+#import <AsyncDisplayKit/ASNodeContext+Private.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/_ASTransitionContext.h>
 #import <AsyncDisplayKit/ASWeakSet.h>
@@ -46,12 +47,12 @@ typedef NS_OPTIONS(unsigned short, ASDisplayNodeMethodOverrides)
   ASDisplayNodeMethodOverrideLayoutSpecThatFits     = 1 << 4,
   ASDisplayNodeMethodOverrideCalcLayoutThatFits     = 1 << 5,
   ASDisplayNodeMethodOverrideCalcSizeThatFits       = 1 << 6,
+  ASDisplayNodeMethodOverrideYogaBaseline           = 1 << 7,
 };
 
 typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 {
   Synchronous = 1 << 0,
-  YogaLayoutInProgress = 1 << 1,
 };
 
 // Can be called without the node's lock. Client is responsible for thread safety.
@@ -61,6 +62,8 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 // Returns the old value of the flag as a BOOL.
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
                               : _atomicFlags.fetch_and(~flag)) & flag) != 0)
+
+#define ASDisplayNodeGetController(obj) (obj->_strongNodeController ?: obj->_weakNodeController)
 
 ASDK_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
 ASDK_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
@@ -77,8 +80,10 @@ static constexpr CACornerMask kASCACornerAllCorners =
 @interface ASDisplayNode () <_ASTransitionContextCompletionDelegate, CALayerDelegate>
 {
 @package
-  AS::RecursiveMutex __instanceLock__;
+  AS::MutexOrPointer __instanceLock__;
+  __weak ASDisplayNode *_weakSelf;
 
+  ASNodeContext *_nodeContext;
   _ASPendingState *_pendingViewState;
 
   UIView *_view;
@@ -122,11 +127,20 @@ static constexpr CACornerMask kASCACornerAllCorners =
     unsigned isDeallocating:1;
 
 #if YOGA
-      unsigned willApplyNextYogaCalculatedLayout:1;
+      unsigned yoga:1;
+      unsigned shouldSuppressYogaCustomMeasure:1;
+      unsigned yogaIsApplyingLayout:1;
+      unsigned yogaRequestedNestedLayout:1;
 #endif
       // Automatically manages subnodes
       unsigned automaticallyManagesSubnodes:1; // Main thread only
       unsigned placeholderEnabled:1;
+
+      // Flattening support
+      unsigned viewFlattening:1;
+      unsigned haveCachedIsFlattenable:1;
+      unsigned cachedIsFlattenable:1;
+
       // Accessibility support
       unsigned isAccessibilityElement:1;
       unsigned accessibilityElementsHidden:1;
@@ -138,6 +152,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
       unsigned automaticallyRelayoutOnLayoutMarginsChanges:1;
       unsigned isViewControllerRoot:1;
       unsigned hasHadInterfaceStateDelegates:1;
+      unsigned isDisappearing:1;
   } _flags;
 
   ASInterfaceState _interfaceState;
@@ -153,15 +168,11 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // Dynamic colors support
   UIColor *_backgroundColor;
 
-@protected
   ASDisplayNode * __weak _supernode;
   NSMutableArray<ASDisplayNode *> *_subnodes;
 
   ASNodeController *_strongNodeController;
   __weak ASNodeController *_weakNodeController;
-
-  // Set this to nil whenever you modify _subnodes
-  NSArray<ASDisplayNode *> *_cachedSubnodes;
 
   std::atomic_uint _displaySentinel;
 
@@ -179,12 +190,13 @@ static constexpr CACornerMask kASCACornerAllCorners =
   NSString *_debugName;
 
 #if YOGA
-  // Only ASDisplayNodes are supported in _yogaChildren currently. This means that it is necessary to
-  // create ASDisplayNodes to make a stack layout when using Yoga.
-  // However, the implementation is mostly ready for id <ASLayoutElement>, with a few areas requiring updates.
+  // !!! Only use if !exp_unified_yoga_tree. Use ASAssertNotExperiment if you're not sure.
   NSMutableArray<ASDisplayNode *> *_yogaChildren;
+  // Unfortunately this weak pointer has to stay around because even with shared
+  // locking, there is no way to avoid racing against the final release of a
+  // parent node when ascending.
   __weak ASDisplayNode *_yogaParent;
-  ASLayout *_yogaCalculatedLayout;
+  CGSize _yogaCalculatedLayoutMaxSize;
 #endif
 
   // Layout Transition
@@ -214,7 +226,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // View Loading
   ASDisplayNodeViewBlock _viewBlock;
   ASDisplayNodeLayerBlock _layerBlock;
-  NSMutableArray<ASDisplayNodeDidLoadBlock> *_onDidLoadBlocks;
+  std::vector<ASDisplayNodeDidLoadBlock> _onDidLoadBlocks;
   Class _viewClass; // nil -> _ASDisplayView
   Class _layerClass; // nil -> _ASDisplayLayer
 
@@ -229,7 +241,9 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   // Corner Radius support
   CGFloat _cornerRadius;
+@protected
   CALayer *_clipCornerLayers[NUM_CLIP_CORNER_LAYERS];
+@package
   CACornerMask _maskedCorners;
 
   ASDisplayNodeContextModifier _willDisplayNodeContentWithRenderingContext;
@@ -253,6 +267,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
 
+  ASDisplayNodeAccessibilityElementsBlock _accessibilityElementsBlock;
 
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
@@ -274,15 +289,36 @@ static constexpr CACornerMask kASCACornerAllCorners =
 
   /// Fast path: tells whether we've ever had an interface state delegate before.
   __weak id<ASInterfaceStateDelegate> _interfaceStateDelegates[AS_MAX_INTERFACE_STATE_DELEGATES];
+
+  NSDictionary<NSString *, id<CAAction>> *_disappearanceActions;
 }
 
 + (void)scheduleNodeForRecursiveDisplay:(ASDisplayNode *)node;
+
+// When a table/collection view reload during a transaction, cell will reconfigure which might
+// involves visible -> reload(hide show) and in this case we want to merge hide show pair by
+// delaying the process until later.
++ (BOOL)shouldCoalesceInterfaceStateDuringTransaction;
 
 /// The _ASDisplayLayer backing the node, if any.
 @property (nullable, nonatomic, readonly) _ASDisplayLayer *asyncLayer;
 
 /// Bitmask to check which methods an object overrides.
 - (ASDisplayNodeMethodOverrides)methodOverrides;
+
+/**
+ * In edge cases _assign_ pointers to ASDisplayNode can be invalid, even when properly cleaned up
+ * in dealloc. This occurs when dealloc has begun, but not completed, and another thread tries to
+ * retain the _assign_ pointer. It cannot be successfully retained, the dealloc will complete,
+ * and a crash is likely. There's no obvious way to know when this is this case. _weak_ pointers, on
+ * the other hand, will have already been zeroed. Therefore ASDisplayNode will initialize a _weak_
+ * self pointer, and `tryRetain` will return a safely strongified copy of it if it is not nil.
+ *
+ * This method should be used in all cases where _assign_ pointers are stored with the expectation
+ * that the ASDisplayNode or a subclass will clean them up (this can be the only reasonable way to
+ * interop with non-objC third-party libraries, notably Yoga).
+ */
+- (nullable instancetype)tryRetain;
 
 /**
  * Invoked before a call to setNeedsLayout to the underlying view
@@ -305,9 +341,12 @@ static constexpr CACornerMask kASCACornerAllCorners =
 - (void)__setNodeController:(ASNodeController *)controller;
 
 /**
- * Called whenever the node needs to layout its subnodes and, if it's already loaded, its subviews. Executes the layout pass for the node
+ * Called whenever the node needs to layout its subnodes and, if it's already loaded, its subviews.
+ * Executes the layout pass for the node
  *
- * This method is thread-safe but asserts thread affinity.
+ * This method is thread-safe but requires thread affinity. At the same time, this method currently
+ * requires to be called without the lock held. This means that a race condition is unavoidable when
+ * calling this method from a background thread.
  */
 - (void)__layout;
 
@@ -367,12 +406,20 @@ static constexpr CACornerMask kASCACornerAllCorners =
 @property (readonly) BOOL rasterizesSubtree;
 
 /**
+ * Called during layout pass to determine if the node should be flattened
+ */
+- (BOOL)isFlattenable;
+
+/**
  * Called if a gesture recognizer was attached to an _ASDisplayView
  */
 - (void)nodeViewDidAddGestureRecognizer;
 
 // Recalculates fallbackSafeAreaInsets for the subnodes
 - (void)_fallbackUpdateSafeAreaOnChildren;
+
+// Apply pending interface to interface state recursively for node and all subnodes.
+- (void)recursivelyApplyPendingInterfaceState;
 
 @end
 

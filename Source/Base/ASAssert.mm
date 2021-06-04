@@ -7,22 +7,23 @@
 //
 
 #import <AsyncDisplayKit/ASAssert.h>
-#import <AsyncDisplayKit/ASAvailability.h>
 
 #if AS_TLS_AVAILABLE
 
-static _Thread_local int tls_mainThreadAssertionsDisabledCount;
+static thread_local int gTlsCount;
+
 BOOL ASMainThreadAssertionsAreDisabled() {
-  return tls_mainThreadAssertionsDisabledCount > 0;
+  return gTlsCount > 0;
 }
 
 void ASPushMainThreadAssertionsDisabled() {
-  tls_mainThreadAssertionsDisabledCount += 1;
+  gTlsCount += 1;
 }
 
 void ASPopMainThreadAssertionsDisabled() {
-  tls_mainThreadAssertionsDisabledCount -= 1;
-  ASDisplayNodeCAssert(tls_mainThreadAssertionsDisabledCount >= 0, @"Attempt to pop thread assertion-disabling without corresponding push.");
+  gTlsCount -= 1;
+  ASDisplayNodeCAssert(gTlsCount >= 0,
+                       @"Attempt to pop thread assertion-disabling without corresponding push.");
 }
 
 #else

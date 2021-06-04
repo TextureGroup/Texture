@@ -140,6 +140,8 @@ AS_SUBCLASSING_RESTRICTED
 
 - (NSString *)nameForRangeControllerDataSource;
 
+- (CALayer *)layerForRangeController:(ASRangeController *)rangeController;
+
 @end
 
 /**

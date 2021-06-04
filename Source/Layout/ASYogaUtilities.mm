@@ -6,17 +6,34 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASYogaUtilities.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga2.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
+#import <AsyncDisplayKit/ASYogaUtilities.h>
+
 #if YOGA /* YOGA */
+
+AS_ASSUME_NORETAIN_BEGIN
+
+using namespace AS;
+
+CGFloat ASTextGetBaseline(CGFloat height, ASDisplayNode *yogaParent, NSAttributedString *str) {
+  if (!yogaParent) return height;
+  NSUInteger len = str.length;
+  if (!len) return height;
+  BOOL isLast = (yogaParent.style.alignItems == ASStackLayoutAlignItemsBaselineLast);
+  UIFont *font = [str attribute:NSFontAttributeName
+                        atIndex:(isLast ? len - 1 : 0)
+                 effectiveRange:NULL];
+  return isLast ? height + font.descender : font.ascender;
+}
 
 @implementation ASDisplayNode (YogaHelpers)
 
 + (ASDisplayNode *)yogaNode
 {
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
-  node.automaticallyManagesSubnodes = YES;
-  [node.style yogaNodeCreateIfNeeded];
+  [node enableYoga];
+  [node enableViewFlattening];
   return node;
 }
 
@@ -43,19 +60,6 @@
 
 @end
 
-void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode *node, void(^block)(ASDisplayNode *node))
-{
-  if (node == nil) {
-    return;
-  }
-  block(node);
-  // We use the accessor here despite the copy, because the block may modify the yoga tree e.g.
-  // replacing a node.
-  for (ASDisplayNode *child in node.yogaChildren) {
-    ASDisplayNodePerformBlockOnEveryYogaChild(child, block);
-  }
-}
-
 #pragma mark - Yoga Type Conversion Helpers
 
 YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems)
@@ -72,6 +76,25 @@ YGAlign yogaAlignItems(ASStackLayoutAlignItems alignItems)
   }
 }
 
+ASStackLayoutAlignItems stackAlignItems(YGAlign alignItems, bool baseline_is_last)
+{
+  switch (alignItems) {
+    case YGAlignAuto:       return ASStackLayoutAlignItemsNotSet;
+    case YGAlignFlexStart:  return ASStackLayoutAlignItemsStart;
+    case YGAlignFlexEnd:    return ASStackLayoutAlignItemsEnd;
+    case YGAlignCenter:     return ASStackLayoutAlignItemsCenter;
+    case YGAlignStretch:    return ASStackLayoutAlignItemsStretch;
+    case YGAlignBaseline:
+      return (baseline_is_last ? ASStackLayoutAlignItemsBaselineLast
+                               : ASStackLayoutAlignItemsBaselineFirst);
+    case YGAlignSpaceAround:
+    case YGAlignSpaceBetween: {
+      NSCAssert(NO, @"Align items value not supported.");
+      return ASStackLayoutAlignItemsNotSet;
+    }
+  }
+}
+
 YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent)
 {
   switch (justifyContent) {
@@ -80,6 +103,22 @@ YGJustify yogaJustifyContent(ASStackLayoutJustifyContent justifyContent)
     case ASStackLayoutJustifyContentEnd:          return YGJustifyFlexEnd;
     case ASStackLayoutJustifyContentSpaceBetween: return YGJustifySpaceBetween;
     case ASStackLayoutJustifyContentSpaceAround:  return YGJustifySpaceAround;
+    case ASStackLayoutJustifyContentSpaceEvenly:  return YGJustifySpaceEvenly;
+  }
+}
+
+ASStackLayoutJustifyContent stackJustifyContent(YGJustify justifyContent)
+{
+  switch (justifyContent) {
+    case YGJustifyFlexStart:    return ASStackLayoutJustifyContentStart;
+    case YGJustifyCenter:       return ASStackLayoutJustifyContentCenter;
+    case YGJustifyFlexEnd:      return ASStackLayoutJustifyContentEnd;
+    case YGJustifySpaceBetween: return ASStackLayoutJustifyContentSpaceBetween;
+    case YGJustifySpaceAround:  return ASStackLayoutJustifyContentSpaceAround;
+    case YGJustifySpaceEvenly: {
+      NSCAssert(NO, @"Justify content value not supported.");
+      return ASStackLayoutJustifyContentStart;
+    }
   }
 }
 
@@ -94,6 +133,23 @@ YGAlign yogaAlignSelf(ASStackLayoutAlignSelf alignSelf)
   }
 }
 
+ASStackLayoutAlignSelf stackAlignSelf(YGAlign alignSelf)
+{
+  switch (alignSelf) {
+    case YGAlignFlexStart:  return ASStackLayoutAlignSelfStart;
+    case YGAlignCenter:     return ASStackLayoutAlignSelfCenter;
+    case YGAlignFlexEnd:    return ASStackLayoutAlignSelfEnd;
+    case YGAlignStretch:    return ASStackLayoutAlignSelfStretch;
+    case YGAlignAuto:       return ASStackLayoutAlignSelfAuto;
+    case YGAlignBaseline:
+    case YGAlignSpaceBetween:
+    case YGAlignSpaceAround: {
+      NSCAssert(NO, @"Align self value not supported.");
+      return ASStackLayoutAlignSelfStart;
+    }
+  }
+}
+
 YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction)
 {
   switch (direction) {
@@ -105,6 +161,20 @@ YGFlexDirection yogaFlexDirection(ASStackLayoutDirection direction)
       return YGFlexDirectionRow;
     case ASStackLayoutDirectionHorizontalReverse:
       return YGFlexDirectionRowReverse;
+  }
+}
+
+ASStackLayoutDirection stackFlexDirection(YGFlexDirection direction)
+{
+  switch (direction) {
+    case YGFlexDirectionColumn:
+      return ASStackLayoutDirectionVertical;
+    case YGFlexDirectionColumnReverse:
+      return ASStackLayoutDirectionVerticalReverse;
+    case YGFlexDirectionRow:
+      return ASStackLayoutDirectionHorizontal;
+    case YGFlexDirectionRowReverse:
+      return ASStackLayoutDirectionHorizontalReverse;
   }
 }
 
@@ -137,6 +207,40 @@ float yogaDimensionToPercent(ASDimension dimension)
 
 }
 
+YGValue yogaValueForDimension(ASDimension dimension)
+{
+  switch (dimension.unit) {
+    case ASDimensionUnitFraction: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitPercent};
+    }
+    case ASDimensionUnitPoints: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitPoint};
+    }
+    case ASDimensionUnitAuto: {
+      return (YGValue){yogaFloatForCGFloat(dimension.value), YGUnitAuto};
+    }
+  }
+}
+
+ASDimension dimensionForYogaValue(YGValue value)
+{
+  switch (value.unit) {
+    case YGUnitPercent: {
+      return ASDimensionMake(ASDimensionUnitFraction, cgFloatForYogaFloat(value.value, 0) / 100.0);
+    }
+    case YGUnitPoint: {
+      return ASDimensionMake(ASDimensionUnitPoints, cgFloatForYogaFloat(value.value, 0));
+    }
+    case YGUnitAuto: {
+      return ASDimensionMake(ASDimensionUnitAuto, cgFloatForYogaFloat(value.value, 0));
+    }
+    case YGUnitUndefined: {
+      // YGUnitUndefined maps over to Auto, the default value within Texture
+      return ASDimensionMake(ASDimensionUnitAuto, cgFloatForYogaFloat(value.value, 0));
+    }
+  }
+}
+
 ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets)
 {
   switch (edge) {
@@ -154,96 +258,6 @@ ASDimension dimensionForEdgeWithEdgeInsets(YGEdge edge, ASEdgeInsets insets)
   }
 }
 
-void ASLayoutElementYogaUpdateMeasureFunc(YGNodeRef yogaNode, id <ASLayoutElement> layoutElement)
-{
-  if (yogaNode == NULL) {
-    return;
-  }
-
-  BOOL shouldHaveMeasureFunc = [layoutElement implementsLayoutMethod];
-  // How expensive is it to set a baselineFunc on all (leaf) nodes?
-  BOOL shouldHaveBaselineFunc = YES;
-
-  if (layoutElement != nil) {
-    if (shouldHaveMeasureFunc || shouldHaveBaselineFunc) {
-      // Retain the Context object. This must be explicitly released with a
-      // __bridge_transfer - YGNodeFree() is not sufficient.
-      YGNodeSetContext(yogaNode, (__bridge_retained void *)layoutElement);
-    }
-    if (shouldHaveMeasureFunc) {
-      YGNodeSetMeasureFunc(yogaNode, &ASLayoutElementYogaMeasureFunc);
-    }
-    if (shouldHaveBaselineFunc) {
-      YGNodeSetBaselineFunc(yogaNode, &ASLayoutElementYogaBaselineFunc);
-    }
-    ASDisplayNodeCAssert(YGNodeGetContext(yogaNode) == (__bridge void *)layoutElement,
-                         @"Yoga node context should contain layoutElement: %@", layoutElement);
-  } else {
-    // If we lack any of the conditions above, and currently have a measureFn/baselineFn/context,
-    // get rid of it.
-    // Release the __bridge_retained Context object.
-    __unused id<ASLayoutElement> element = (__bridge_transfer id)YGNodeGetContext(yogaNode);
-    YGNodeSetContext(yogaNode, NULL);
-    YGNodeSetMeasureFunc(yogaNode, NULL);
-    YGNodeSetBaselineFunc(yogaNode, NULL);
-  }
-}
-
-float ASLayoutElementYogaBaselineFunc(YGNodeRef yogaNode, const float width, const float height)
-{
-  id<ASLayoutElement> layoutElement = (__bridge id<ASLayoutElement>)YGNodeGetContext(yogaNode);
-  ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)],
-                       @"Yoga context must be <ASLayoutElement>");
-
-  ASDisplayNode *displayNode = ASDynamicCast(layoutElement, ASDisplayNode);
-
-  switch (displayNode.style.parentAlignStyle) {
-    case ASStackLayoutAlignItemsBaselineFirst:
-      return layoutElement.style.ascender;
-    case ASStackLayoutAlignItemsBaselineLast:
-      return height + layoutElement.style.descender;
-    default:
-      return 0;
-  }
-}
-
-YGSize ASLayoutElementYogaMeasureFunc(YGNodeRef yogaNode, float width, YGMeasureMode widthMode,
-                                      float height, YGMeasureMode heightMode)
-{
-  id <ASLayoutElement> layoutElement = (__bridge id <ASLayoutElement>)YGNodeGetContext(yogaNode);
-  ASDisplayNodeCAssert([layoutElement conformsToProtocol:@protocol(ASLayoutElement)], @"Yoga context must be <ASLayoutElement>");
-
-  width = cgFloatForYogaFloat(width, CGFLOAT_MAX);
-  height = cgFloatForYogaFloat(height, CGFLOAT_MAX);
-
-  ASSizeRange sizeRange;
-  sizeRange.min = CGSizeZero;
-  sizeRange.max = CGSizeMake(width, height);
-  if (widthMode == YGMeasureModeExactly) {
-    sizeRange.min.width = sizeRange.max.width;
-  } else {
-    // Mode is (YGMeasureModeAtMost | YGMeasureModeUndefined)
-    ASDimension minWidth = layoutElement.style.minWidth;
-    sizeRange.min.width = (minWidth.unit == ASDimensionUnitPoints ? yogaDimensionToPoints(minWidth) : 0.0);
-  }
-  if (heightMode == YGMeasureModeExactly) {
-    sizeRange.min.height = sizeRange.max.height;
-  } else {
-    // Mode is (YGMeasureModeAtMost | YGMeasureModeUndefined)
-    ASDimension minHeight = layoutElement.style.minHeight;
-    sizeRange.min.height = (minHeight.unit == ASDimensionUnitPoints ? yogaDimensionToPoints(minHeight) : 0.0);
-  }
-
-  ASDisplayNodeCAssert(isnan(sizeRange.min.width) == NO && isnan(sizeRange.min.height) == NO, @"Yoga size range for measurement should not have NaN in minimum");
-  if (isnan(sizeRange.max.width)) {
-    sizeRange.max.width = CGFLOAT_MAX;
-  }
-  if (isnan(sizeRange.max.height)) {
-    sizeRange.max.height = CGFLOAT_MAX;
-  }
-
-  CGSize size = [[layoutElement layoutThatFits:sizeRange] size];
-  return (YGSize){ .width = (float)size.width, .height = (float)size.height };
-}
+AS_ASSUME_NORETAIN_END
 
 #endif /* YOGA */
