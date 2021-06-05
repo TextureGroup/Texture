@@ -217,6 +217,7 @@ willDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)willDis
 
   UILongPressGestureRecognizer *_longPressGestureRecognizer;
   ASTextNodeHighlightStyle _highlightStyle;
+  __weak id<ASTextNodeDelegate> _delegate;
   BOOL _longPressCancelsTouches;
   BOOL _passthroughNonlinkTouches;
   BOOL _alwaysHandleTruncationTokenTap;
@@ -320,7 +321,7 @@ static NSArray *DefaultLinkAttributeNames() {
   
   // If we are view-backed and the delegate cares, support the long-press callback.
   SEL longPressCallback = @selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:);
-  if (!self.isLayerBacked && [_delegate respondsToSelector:longPressCallback]) {
+  if (!self.isLayerBacked && [self.delegate respondsToSelector:longPressCallback]) {
     _longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_handleLongPress:)];
     _longPressGestureRecognizer.cancelsTouchesInView = self.longPressCancelsTouches;
     _longPressGestureRecognizer.delegate = self;
@@ -693,8 +694,8 @@ static NSArray *DefaultLinkAttributeNames() {
 
       // If highlighting, check with delegate first. If not implemented, assume YES.
       if (highlighting
-          && [self->_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
-          && ![self->_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
+          && [_delegate respondsToSelector:@selector(textNode:shouldHighlightLinkAttribute:value:atPoint:)]
+          && ![_delegate textNode:self shouldHighlightLinkAttribute:name value:value atPoint:point]) {
         value = nil;
         name = nil;
       }
@@ -741,11 +742,12 @@ static NSArray *DefaultLinkAttributeNames() {
     }
 
     // Ask our delegate if a long-press on an attribute is relevant
-    if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
-      return [_delegate textNode:self
-        shouldLongPressLinkAttribute:_highlightedLinkAttributeName
-                               value:_highlightedLinkAttributeValue
-                             atPoint:[gestureRecognizer locationInView:self.view]];
+    id<ASTextNodeDelegate> delegate = self.delegate;
+    if ([self _pendingLinkTap] && [delegate respondsToSelector:@selector(textNode:shouldLongPressLinkAttribute:value:atPoint:)]) {
+      return [delegate textNode:self
+   shouldLongPressLinkAttribute:_highlightedLinkAttributeName
+                          value:_highlightedLinkAttributeValue
+                        atPoint:[gestureRecognizer locationInView:self.view]];
     }
 
     // Otherwise we are good to go.
@@ -1140,16 +1142,20 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 {
   ASDisplayNodeAssertMainThread();
   [super touchesEnded:touches withEvent:event];
-  
-  if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:tappedLinkAttribute:value:atPoint:textRange:)]) {
+
+  ASLockScopeSelf(); // Protect usage of _highlight* ivars.
+  id<ASTextNodeDelegate> delegate = self.delegate;
+  if ([self _pendingLinkTap] && [delegate respondsToSelector:@selector(textNode:tappedLinkAttribute:value:atPoint:textRange:)]) {
     CGPoint point = [[touches anyObject] locationInView:self.view];
-    [_delegate textNode:self tappedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:point textRange:_highlightRange];
+    [delegate textNode:self
+   tappedLinkAttribute:_highlightedLinkAttributeName
+                 value:_highlightedLinkAttributeValue
+               atPoint:point
+             textRange:_highlightRange];
   }
 
-  if ([self _pendingTruncationTap]) {
-    if ([_delegate respondsToSelector:@selector(textNodeTappedTruncationToken:)]) {
-      [_delegate textNodeTappedTruncationToken:self];
-    }
+  if ([self _pendingTruncationTap] && [delegate respondsToSelector:@selector(textNodeTappedTruncationToken:)]) {
+    [delegate textNodeTappedTruncationToken:self];
   }
 
   [self _clearHighlightIfNecessary];
@@ -1187,9 +1193,10 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   
   // Respond to long-press when it begins, not when it ends.
   if (longPressRecognizer.state == UIGestureRecognizerStateBegan) {
-    if ([self _pendingLinkTap] && [_delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
+    id<ASTextNodeDelegate> delegate = self.delegate;
+    if ([self _pendingLinkTap] && [delegate respondsToSelector:@selector(textNode:longPressedLinkAttribute:value:atPoint:textRange:)]) {
       CGPoint touchPoint = [_longPressGestureRecognizer locationInView:self.view];
-      [_delegate textNode:self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
+      [delegate textNode:self longPressedLinkAttribute:_highlightedLinkAttributeName value:_highlightedLinkAttributeValue atPoint:touchPoint textRange:_highlightRange];
     }
   }
 }
@@ -1198,7 +1205,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 {
   ASLockScopeSelf();
   
-  return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && _delegate != nil;
+  return (_highlightedLinkAttributeValue != nil && ![self _pendingTruncationTap]) && self.delegate != nil;
 }
 
 - (BOOL)_pendingTruncationTap
@@ -1206,6 +1213,18 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   ASLockScopeSelf();
   
   return [_highlightedLinkAttributeName isEqualToString:ASTextNodeTruncationTokenAttributeName];
+}
+
+- (id<ASTextNodeDelegate>)delegate
+{
+  ASLockScopeSelf();
+  return _delegate;
+}
+
+- (void)setDelegate:(id<ASTextNodeDelegate>)delegate
+{
+  ASLockScopeSelf();
+  _delegate = delegate;
 }
 
 - (BOOL)alwaysHandleTruncationTokenTap
@@ -1218,6 +1237,18 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 {
   ASLockScopeSelf();
   _alwaysHandleTruncationTokenTap = alwaysHandleTruncationTokenTap;
+}
+
+- (BOOL)passthroughNonlinkTouches
+{
+  ASLockScopeSelf();
+  return _passthroughNonlinkTouches;
+}
+
+- (void)setPassthroughNonlinkTouches:(BOOL)passthroughNonlinkTouches
+{
+  ASLockScopeSelf();
+  _passthroughNonlinkTouches = passthroughNonlinkTouches;
 }
 
 #pragma mark - Shadow Properties
