@@ -37,6 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface ASTableView (UIGestureRecognizerDelegate) <UIGestureRecognizerDelegate>
+
+@end
+
 @interface ASTableView (Deprecated)
 
 @property (nonatomic, weak) id<ASTableDelegate>   asyncDelegate ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's .delegate property instead.");
