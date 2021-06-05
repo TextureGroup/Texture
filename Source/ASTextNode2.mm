@@ -198,6 +198,7 @@ static NSArray *DefaultLinkAttributeNames() {
     self.userInteractionEnabled = NO;
     self.needsDisplayOnBoundsChange = YES;
     
+    _truncationMode = NSLineBreakByTruncatingTail;
     _textContainer.truncationType = ASTextTruncationTypeEnd;
     
     // The common case is for a text node to be non-opaque and blended over some background.
