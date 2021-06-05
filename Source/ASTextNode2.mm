@@ -670,14 +670,16 @@ static NSArray *DefaultLinkAttributeNames() {
   for (const CGSize &offset : kRectOffsets) {
     const CGPoint testPoint = CGPointMake(point.x + offset.width,
                                           point.y + offset.height);
-    ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
-    if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
+    ASTextRange *range = [layout textRangeAtPoint:testPoint];
+    if (range == nil) {
       continue;
     }
     for (NSString *attributeName in _linkAttributeNames) {
       NSRange effectiveRange = NSMakeRange(0, 0);
-      id value = [_attributedText attribute:attributeName atIndex:pos.offset
-                      longestEffectiveRange:&effectiveRange inRange:clampedRange];
+      id value = [_attributedText attribute:attributeName
+                                    atIndex:range.start.offset
+                      longestEffectiveRange:&effectiveRange
+                                    inRange:clampedRange];
       if (value == nil) {
         // Didn't find any links specified with this attribute.
         continue;
