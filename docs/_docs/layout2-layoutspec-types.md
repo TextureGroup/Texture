@@ -18,8 +18,9 @@ The following `ASLayoutSpec` subclasses can be used to compose simple or very co
 <li><a href="layout2-layoutspec-types.html#asratiolayoutspec"><code>AS<b>Ratio</b>LayoutSpec</code></a></li>
 <li><a href="layout2-layoutspec-types.html#asrelativelayoutspec"><code>AS<b>Relative</b>LayoutSpec</code></a></li>
 <li><a href="layout2-layoutspec-types.html#asabsolutelayoutspec"><code>AS<b>Absolute</b>LayoutSpec</code></a></li>
-</ul>
 <li><a href="layout2-layoutspec-types.html#ascornerlayoutspec"><code>AS<b>Corner</b>LayoutSpec</code></a></li>
+</ul>
+
 
 You may also subclass <a href="layout2-layoutspec-types.html#aslayoutspec">`ASLayoutSpec`</a> in order to make your own, custom layout specs. 
 
