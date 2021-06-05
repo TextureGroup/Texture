@@ -305,7 +305,7 @@
   YGNodeRef yogaNode = self.style.yogaNode;
   if (yogaNode && [self shouldHaveYogaMeasureFunc]) {
     // Yoga internally asserts that MarkDirty() may only be called on nodes with a measurement function.
-    BOOL needsTemporaryMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) == NULL);
+    BOOL needsTemporaryMeasureFunc = !YGNodeHasMeasureFunc(yogaNode);
     if (needsTemporaryMeasureFunc) {
       ASDisplayNodeAssert(self.yogaLayoutInProgress == NO,
                           @"shouldHaveYogaMeasureFunc == YES, and inside a layout pass, but no measure func pointer! %@", self);
