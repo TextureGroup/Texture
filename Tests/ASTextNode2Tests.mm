@@ -8,13 +8,12 @@
 
 #import <CoreText/CoreText.h>
 
-#import <XCTest/XCTest.h>
+#import "ASTestCase.h"
 
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNode2.h>
-#import <AsyncDisplayKit/ASTextNode+Beta.h>
 
-#import "ASTestCase.h"
+#import <XCTest/XCTest.h>
 
 @interface ASTextNode2Tests : XCTestCase
 
@@ -64,14 +63,6 @@
   _textNode.attributedText = _attributedText;
 }
 
-- (void)testTruncation
-{
-  XCTAssertTrue([(ASTextNode *)_textNode shouldTruncateForConstrainedSize:ASSizeRangeMake(CGSizeMake(100, 100))], @"Text Node should truncate");
-
-  _textNode.frame = CGRectMake(0, 0, 100, 100);
-  XCTAssertTrue(_textNode.isTruncated, @"Text Node should be truncated");
-}
-
 - (void)testAccessibility
 {
   XCTAssertTrue(_textNode.isAccessibilityElement, @"Should be an accessibility element");
@@ -89,45 +80,6 @@
   XCTAssertTrue([_textNode.defaultAccessibilityLabel isEqualToString:_attributedText.string],
                 @"Default accessibility label incorrectly returns \n%@\n when it should be \n%@\n",
                 _textNode.defaultAccessibilityLabel, _attributedText.string);
-}
-
-- (void)testRespectingAccessibilitySetting
-{
-  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
-  textNode.attributedText = _attributedText;
-  textNode.isAccessibilityElement = NO;
-  
-  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
-  XCTAssertFalse(textNode.isAccessibilityElement);
-  
-  // Ensure removing string on an accessible text node updates the setting.
-  ASTextNode2 *accessibleTextNode = [ASTextNode2 new];
-  accessibleTextNode.attributedText = _attributedText;
-  accessibleTextNode.attributedText = nil;
-  XCTAssertFalse(accessibleTextNode.isAccessibilityElement);
-}
-
-- (void)testSupportsLayerBacking
-{
-  ASTextNode2 *textNode = [[ASTextNode2 alloc] init];
-  textNode.attributedText = [[NSAttributedString alloc] initWithString:@"new string"];
-  XCTAssertTrue(textNode.supportsLayerBacking);
-
-  NSString *link = @"https://texturegroup.com";
-  NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"Texture Website: %@", link]];
-  NSRange linkRange = [attributedText.string rangeOfString:link];
-  [attributedText addAttribute:NSLinkAttributeName value:link range:linkRange];
-  textNode.attributedText = attributedText;
-  XCTAssertFalse(textNode.supportsLayerBacking);
-}
-
-- (void)testEmptyStringSize
-{
-  CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
-  _textNode.attributedText = [[NSAttributedString alloc] initWithString:@""];
-  CGSize sizeWithEmptyString = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
-  XCTAssertTrue(ASIsCGSizeValidForSize(sizeWithEmptyString));
-  XCTAssertTrue(sizeWithEmptyString.width == 0);
 }
 
 @end

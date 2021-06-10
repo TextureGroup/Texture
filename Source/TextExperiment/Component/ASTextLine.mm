@@ -76,9 +76,9 @@
   NSUInteger runCount = CFArrayGetCount(runs);
   if (runCount == 0) return;
   
-  NSMutableArray<ASTextAttachment *> *attachments = nil;
-  NSMutableArray<NSValue *> *attachmentRanges = nil;
-  NSMutableArray<NSValue *> *attachmentRects = nil;
+  NSMutableArray *attachments = [NSMutableArray new];
+  NSMutableArray *attachmentRanges = [NSMutableArray new];
+  NSMutableArray *attachmentRects = [NSMutableArray new];
   for (NSUInteger r = 0; r < runCount; r++) {
     CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     CFIndex glyphCount = CTRunGetGlyphCount(run);
@@ -104,19 +104,14 @@
       }
       
       NSRange runRange = ASTextNSRangeFromCFRange(CTRunGetStringRange(run));
-      if (!attachments) {
-        attachments = [[NSMutableArray alloc] init];
-        attachmentRanges = [[NSMutableArray alloc] init];
-        attachmentRects = [[NSMutableArray alloc] init];
-      }
       [attachments addObject:attachment];
       [attachmentRanges addObject:[NSValue valueWithRange:runRange]];
       [attachmentRects addObject:[NSValue valueWithCGRect:runTypoBounds]];
     }
   }
-  _attachments = attachments;
-  _attachmentRanges = attachmentRanges;
-  _attachmentRects = attachmentRects;
+  _attachments = attachments.count ? attachments : nil;
+  _attachmentRanges = attachmentRanges.count ? attachmentRanges : nil;
+  _attachmentRects = attachmentRects.count ? attachmentRects : nil;
 }
 
 - (CGSize)size {
