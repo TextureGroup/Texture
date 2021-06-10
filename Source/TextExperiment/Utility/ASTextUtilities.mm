@@ -7,6 +7,7 @@
 //
 
 #import "ASTextUtilities.h"
+#import <Accelerate/Accelerate.h>
 
 NSCharacterSet *ASTextVerticalFormRotateCharacterSet() {
   static NSMutableCharacterSet *set;
