@@ -12,6 +12,7 @@
 #import <tgmath.h>
 
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
@@ -29,6 +30,11 @@
 
 // TODO: It would be nice to remove this dependency; it's the only subclass using more than +FrameworkSubclasses.h
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+
+#if AS_PIN_REMOTE_IMAGE
+#import <PINRemoteImage/PINRemoteImageMacros.h>
+#import <PINRemoteImage/PINImage+AlternativeTypes.h>
+#endif
 
 typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
@@ -362,6 +368,11 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   BOOL hasValidCropBounds = cropEnabled && !CGRectIsEmpty(cropDisplayBounds);
   CGRect bounds = (hasValidCropBounds ? cropDisplayBounds : drawParameterBounds);
 
+#if PIN_TARGET_IOS && AS_PIN_REMOTE_IMAGE 
+  if (image.pin_encodedImageData) {
+    image = [image pin_decodedImageUsingCustomDecodersWithSize:bounds.size];
+  }
+#endif
 
   ASDisplayNodeAssert(contentsScale > 0, @"invalid contentsScale at display time");
 
