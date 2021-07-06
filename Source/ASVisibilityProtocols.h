@@ -53,7 +53,7 @@ ASDK_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger vis
  * has changed.
  * 
  * If implemented by a view controller container, use this method to notify child view controllers that their view
- * depth has changed @see ASNavigationController.m
+ * depth has changed @see ASDKNavigationController.m
  *
  * If implemented on an ASDKViewController, use this method to reduce or increase the resources that your
  * view controller uses. A higher visibility depth view controller should decrease it's resource usage, a lower
@@ -80,7 +80,7 @@ ASDK_EXTERN ASLayoutRangeMode ASLayoutRangeModeForVisibilityDepth(NSUInteger vis
 
 /**
  * @abstract Container view controllers should adopt this protocol to indicate that they will manage their child's
- * visibilityDepth. For example, ASNavigationController adopts this protocol and manages its childrens visibility
+ * visibilityDepth. For example, ASDKNavigationController adopts this protocol and manages its childrens visibility
  * depth.
  *
  * If you adopt this protocol, you *must* also emit visibilityDepthDidChange messages to child view controllers.

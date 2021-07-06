@@ -1,5 +1,5 @@
 //
-//  ASNavigationController.h
+//  ASDKNavigationController.h
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -14,16 +14,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * ASNavigationController
+ * ASDKNavigationController
  *
- * @discussion ASNavigationController is a drop in replacement for UINavigationController
+ * @discussion ASDKNavigationController is a drop in replacement for UINavigationController
  * which improves memory efficiency by implementing the @c ASManagesChildVisibilityDepth protocol.
- * You can use ASNavigationController with regular UIViewControllers, as well as ASDKViewControllers. 
+ * You can use ASDKNavigationController with regular UIViewControllers, as well as ASDKViewControllers.
  * It is safe to subclass or use even where AsyncDisplayKit is not adopted.
  *
  * @see ASManagesChildVisibilityDepth
  */
-@interface ASNavigationController : UINavigationController <ASManagesChildVisibilityDepth>
+@interface ASDKNavigationController : UINavigationController <ASManagesChildVisibilityDepth>
 
 @end
 
