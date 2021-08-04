@@ -166,6 +166,11 @@ AS_CATEGORY_IMPLEMENTABLE
  */
 - (void)enableSubtreeRasterization;
 
+/**
+ * @abstract Top, left, bottom, right padding values for the node. Only used in yoga
+ */
+@property (readonly) UIEdgeInsets paddings;
+
 @end
 
 NS_ASSUME_NONNULL_END

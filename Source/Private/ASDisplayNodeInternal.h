@@ -253,6 +253,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
 
+  ASDisplayNodeAccessibilityElementsBlock _accessibilityElementsBlock;
 
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.

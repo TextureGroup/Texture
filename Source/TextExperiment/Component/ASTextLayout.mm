@@ -9,14 +9,20 @@
 
 #import <AsyncDisplayKit/ASTextLayout.h>
 
-#import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASConfigurationInternal.h>
-#import <AsyncDisplayKit/ASTextUtilities.h>
-#import <AsyncDisplayKit/ASTextAttribute.h>
-#import <AsyncDisplayKit/NSAttributedString+ASText.h>
+#import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
+#import <AsyncDisplayKit/ASNetworkImageNode.h>
+#import <AsyncDisplayKit/ASAssert.h>
+#import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
+#import <AsyncDisplayKit/ASTextAttribute.h>
+#import <AsyncDisplayKit/ASTextUtilities.h>
+#import <AsyncDisplayKit/NSAttributedString+ASText.h>
 
 const CGSize ASTextContainerMaxSize = (CGSize){0x100000, 0x100000};
+
+NSAttributedString *fillBaseAttributes(NSAttributedString *str, NSDictionary *attrs);
 
 typedef struct {
   CGFloat head;
@@ -55,22 +61,29 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   return color;
 }
 
+BOOL kTextNode2ImprovedTextTruncationVisibleRange = false;
+BOOL ASGetEnableImprovedTextTruncationVisibleRange(void) {
+  return kTextNode2ImprovedTextTruncationVisibleRange;
+}
+void ASSetEnableImprovedTextTruncationVisibleRange(BOOL enable) {
+  kTextNode2ImprovedTextTruncationVisibleRange = enable;
+}
+
+BOOL kTextNode2ImprovedTextTruncationVisibleRangeLastLineFix = false;
+BOOL ASGetEnableImprovedTextTruncationVisibleRangeLastLineFix(void) {
+  return kTextNode2ImprovedTextTruncationVisibleRangeLastLineFix;
+}
+void ASSetEnableImprovedTextTruncationVisibleRangeLastLineFix(BOOL enable) {
+  kTextNode2ImprovedTextTruncationVisibleRangeLastLineFix = enable;
+}
+
 @implementation ASTextLinePositionSimpleModifier
 - (void)modifyLines:(NSArray *)lines fromText:(NSAttributedString *)text inContainer:(ASTextContainer *)container {
-  if (container.verticalForm) {
-    for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-      ASTextLine *line = lines[i];
-      CGPoint pos = line.position;
-      pos.x = container.size.width - container.insets.right - line.row * _fixedLineHeight - _fixedLineHeight * 0.9;
-      line.position = pos;
-    }
-  } else {
-    for (NSUInteger i = 0, max = lines.count; i < max; i++) {
-      ASTextLine *line = lines[i];
-      CGPoint pos = line.position;
-      pos.y = line.row * _fixedLineHeight + _fixedLineHeight * 0.9 + container.insets.top;
-      line.position = pos;
-    }
+  for (NSUInteger i = 0, max = lines.count; i < max; i++) {
+    ASTextLine *line = lines[i];
+    CGPoint pos = line.position;
+    pos.y = line.row * _fixedLineHeight + _fixedLineHeight * 0.9 + container.insets.top;
+    line.position = pos;
   }
 }
 
@@ -286,14 +299,6 @@ dispatch_semaphore_signal(_lock);
   Setter(_pathLineWidth = pathLineWidth);
 }
 
-- (BOOL)isVerticalForm {
-  Getter(BOOL v = _verticalForm) return v;
-}
-
-- (void)setVerticalForm:(BOOL)verticalForm {
-  Setter(_verticalForm = verticalForm);
-}
-
 - (NSUInteger)maximumNumberOfRows {
   Getter(NSUInteger num = _maximumNumberOfRows) return num;
 }
@@ -342,6 +347,8 @@ dispatch_semaphore_signal(_lock);
 @property (nonatomic) CTFrameRef frame;
 @property (nonatomic) NSArray *lines;
 @property (nonatomic) ASTextLine *truncatedLine;
+@property(nonatomic) NSRange truncatedLineBeforeTruncationTokenRange;
+@property(nonatomic) ASTextLine *truncatedLineBeforeTruncationToken;
 @property (nonatomic) NSArray *attachments;
 @property (nonatomic) NSArray *attachmentRanges;
 @property (nonatomic) NSArray *attachmentRects;
@@ -395,13 +402,12 @@ dispatch_semaphore_signal(_lock);
   return [self layoutWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
-+ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
++ (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container
+    text:(NSAttributedString *)text range:(NSRange)range {
   ASTextLayout *layout = NULL;
   CGPathRef cgPath = nil;
   CGRect cgPathBox = {0};
-  BOOL isVerticalForm = NO;
   BOOL rowMaySeparated = NO;
-  NSMutableDictionary *frameAttrs = nil;
   CTFramesetterRef ctSetter = NULL;
   CTFrameRef ctFrame = NULL;
   CFArrayRef ctLines = nil;
@@ -414,7 +420,10 @@ dispatch_semaphore_signal(_lock);
   NSMutableSet *attachmentContentsSet = nil;
   BOOL needTruncation = NO;
   NSAttributedString *truncationToken = nil;
+  NSMutableAttributedString *lastLineText = nil;
   ASTextLine *truncatedLine = nil;
+  NSRange truncatedLineBeforeTruncationTokenRange;
+  ASTextLine *truncatedLineBeforeTruncationToken;
   ASRowEdge *lineRowsEdge = NULL;
   NSUInteger *lineRowsIndex = NULL;
   NSRange visibleRange;
@@ -435,30 +444,32 @@ dispatch_semaphore_signal(_lock);
   if (range.location + range.length > text.length) return nil;
   [container makeImmutable];
   maximumNumberOfRows = container.maximumNumberOfRows;
-  
-  // It may use larger constraint size when create CTFrame with
-  // CTFramesetterCreateFrame in iOS 10.
+
+  // Amazingly, nobody ever figured out _what_ the supposed layoutSizeBug on iOS 10 was, or as
+  // follows from that, whether it actually ever got fixed in, say, iOS 11.
+  // However, there is a lot of functionality now that assumes this is YES (and presumably is broken
+  // on iOS 9-). Thus, this flag should probably just be removed to simplify this code.
   BOOL needFixLayoutSizeBug = AS_AT_LEAST_IOS10;
 
   layout = [[ASTextLayout alloc] _init];
   layout.text = text;
   layout.container = container;
   layout.range = range;
-  isVerticalForm = container.verticalForm;
-  
-  // set cgPath and cgPathBox
+
+  // `exclusionPaths` are like `verticalForm` in that their behavior hasn't been verified in a long
+  // time, though I think they have a much better chance of still working.
+  // TODO Verify or remove ASTextLayout exclusionPaths
   if (container.path == nil && container.exclusionPaths.count == 0) {
     if (container.size.width <= 0 || container.size.height <= 0) FAIL_AND_RETURN
     CGRect rect = (CGRect) {CGPointZero, container.size };
+    // Note from above, `needFixLayoutSizeBug` should really always be YES
     if (needFixLayoutSizeBug) {
+      // Thus, `contraintSizeIsExtended` is always YES.  And thus we always set the main-axis
+      // constraint to "infinity"/maxSize:
       constraintSizeIsExtended = YES;
       constraintRectBeforeExtended = UIEdgeInsetsInsetRect(rect, container.insets);
       constraintRectBeforeExtended = CGRectStandardize(constraintRectBeforeExtended);
-      if (container.isVerticalForm) {
-        rect.size.width = ASTextContainerMaxSize.width;
-      } else {
-        rect.size.height = ASTextContainerMaxSize.height;
-      }
+      rect.size.height = ASTextContainerMaxSize.height;
     }
     rect = UIEdgeInsetsInsetRect(rect, container.insets);
     rect = CGRectStandardize(rect);
@@ -486,7 +497,7 @@ dispatch_semaphore_signal(_lock);
       [layout.container.exclusionPaths enumerateObjectsUsingBlock: ^(UIBezierPath *onePath, NSUInteger idx, BOOL *stop) {
         CGPathAddPath(path, NULL, onePath.CGPath);
       }];
-      
+
       cgPathBox = CGPathGetPathBoundingBox(path);
       CGAffineTransform trans = CGAffineTransformMakeScale(1, -1);
       CGMutablePathRef transPath = CGPathCreateMutableCopyByTransformingPath(path, &trans);
@@ -496,19 +507,31 @@ dispatch_semaphore_signal(_lock);
     cgPath = path;
   }
   if (!cgPath) FAIL_AND_RETURN
-  
+
+  // With no exclusion or container paths, we got a rectangular "path" `cgPath` from above. As
+  // noted, we are probably about to do a whole bunch of wrong things if we did not.
+
+  // BEGIN CTFramesetter cache code. There are two KEY LINEs in the below section, the rest of it is
+  // code to support caching of CTFramesetters, which are very expensive to create.
+
   // frame setter config
-  frameAttrs = [[NSMutableDictionary alloc] init];
-  if (container.isPathFillEvenOdd == NO) {
-    frameAttrs[(id)kCTFramePathFillRuleAttributeName] = @(kCTFramePathFillWindingNumber);
-  }
-  if (container.pathLineWidth > 0) {
-    frameAttrs[(id)kCTFramePathWidthAttributeName] = @(container.pathLineWidth);
-  }
-  if (container.isVerticalForm == YES) {
-    frameAttrs[(id)kCTFrameProgressionAttributeName] = @(kCTFrameProgressionRightToLeft);
-  }
-  
+  NSDictionary *frameAttrs = ({
+    static constexpr NSUInteger kMaxAttrCount = 3;
+    NSUInteger count = 0;
+    id keys[kMaxAttrCount];
+    id objects[kMaxAttrCount];
+    if (container.isPathFillEvenOdd == NO) {
+      keys[count] = (id)kCTFramePathFillRuleAttributeName;
+      objects[count++] = @(kCTFramePathFillWindingNumber);
+    }
+    if (container.pathLineWidth > 0) {
+      keys[count] = (id)kCTFramePathWidthAttributeName;
+      objects[count++] = @(container.pathLineWidth);
+    }
+    // If you add new attributes, make sure to update kMaxAttrCount above.
+    count ? [[NSDictionary alloc] initWithObjects:objects forKeys:keys count:count] : nil;
+  });
+
   /*
    * Framesetter cache.
    * Framesetters can only be used by one thread at a time.
@@ -555,10 +578,12 @@ dispatch_semaphore_signal(_lock);
 
   // Create a framesetter if needed.
   if (!ctSetter) {
+    // KEY LINE #1 (See above)
     ctSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)text);
   }
 
   if (!ctSetter) FAIL_AND_RETURN
+  // KEY LINE #2 (See above)
   ctFrame = CTFramesetterCreateFrame(ctSetter, ASTextCFRangeFromNSRange(range), cgPath, (CFDictionaryRef)frameAttrs);
 
   // Return to cache.
@@ -575,6 +600,11 @@ dispatch_semaphore_signal(_lock);
   }
 
   if (!ctFrame) FAIL_AND_RETURN
+
+  // END CTFramesetterCache code
+
+  // Now (Step 2?) we figure out where the individual lines are: CoreText already did this, we are
+  // just extracting them from the ctFrame reference.
   lines = [NSMutableArray new];
   ctLines = CTFrameGetLines(ctFrame);
   lineCount = CFArrayGetCount(ctLines);
@@ -583,17 +613,13 @@ dispatch_semaphore_signal(_lock);
     if (lineOrigins == NULL) FAIL_AND_RETURN
     CTFrameGetLineOrigins(ctFrame, CFRangeMake(0, lineCount), lineOrigins);
   }
-  
+
   CGRect textBoundingRect = CGRectZero;
   CGSize textBoundingSize = CGSizeZero;
   NSInteger rowIdx = -1;
   NSUInteger rowCount = 0;
   CGRect lastRect = CGRectMake(0, -FLT_MAX, 0, 0);
   CGPoint lastPosition = CGPointMake(0, -FLT_MAX);
-  if (isVerticalForm) {
-    lastRect = CGRectMake(FLT_MAX, 0, 0, 0);
-    lastPosition = CGPointMake(FLT_MAX, 0);
-  }
   
   // calculate line frame
   NSUInteger lineCurrentIdx = 0;
@@ -602,7 +628,7 @@ dispatch_semaphore_signal(_lock);
     CTLineRef ctLine = (CTLineRef)CFArrayGetValueAtIndex(ctLines, i);
     CFArrayRef ctRuns = CTLineGetGlyphRuns(ctLine);
     if (!ctRuns || CFArrayGetCount(ctRuns) == 0) continue;
-    
+
     // CoreText coordinate system
     CGPoint ctLineOrigin = lineOrigins[i];
     
@@ -610,8 +636,8 @@ dispatch_semaphore_signal(_lock);
     CGPoint position;
     position.x = cgPathBox.origin.x + ctLineOrigin.x;
     position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
-    
-    ASTextLine *line = [ASTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
+
+    ASTextLine *line = [ASTextLine lineWithCTLine:ctLine position:position vertical:NO];
     
     [lines addObject:line];
   }
@@ -619,46 +645,35 @@ dispatch_semaphore_signal(_lock);
   // Give user a chance to modify the line's position.
   [container.linePositionModifier modifyLines:lines fromText:text inContainer:container];
   
+  // We treat the first line differently:
   BOOL first = YES;
   for (ASTextLine *line in lines) {
-    CGPoint position = line.position;
-    CGRect rect = line.bounds;
+    CGPoint linePosition = line.position;
+    CGRect lineBounds = line.bounds;
     if (constraintSizeIsExtended) {
-      if (isVerticalForm) {
-        if (rect.origin.x + rect.size.width >
-            constraintRectBeforeExtended.origin.x +
-                constraintRectBeforeExtended.size.width) {
-          measuringBeyondConstraints = YES;
-        }
-      } else {
-        if (rect.origin.y + rect.size.height >
-            constraintRectBeforeExtended.origin.y +
-                constraintRectBeforeExtended.size.height) {
-          measuringBeyondConstraints = YES;
-        }
+      if (lineBounds.origin.y + lineBounds.size.height >
+          constraintRectBeforeExtended.origin.y +
+              constraintRectBeforeExtended.size.height) {
+        // To support truncation, we will sometimes keep laying out rows even though we have gone
+        // past the (vertical) constraints.
+        measuringBeyondConstraints = YES;
       }
     }
 
+    // rowIdx (and rowCount) ONLY ADVANCE for rows that are within constraints.
     BOOL newRow = !measuringBeyondConstraints;
-    if (newRow && rowMaySeparated && position.x != lastPosition.x) {
-      if (isVerticalForm) {
-        if (rect.size.width > lastRect.size.width) {
-          if (rect.origin.x > lastPosition.x && lastPosition.x > rect.origin.x - rect.size.width) newRow = NO;
-        } else {
-          if (lastRect.origin.x > position.x && position.x > lastRect.origin.x - lastRect.size.width) newRow = NO;
-        }
+    if (newRow && rowMaySeparated && linePosition.x != lastPosition.x) {
+      if (lineBounds.size.height > lastRect.size.height) {
+        // Are this line's bounds entirely above the last line's? If so, it's not a new row
+        if (lineBounds.origin.y < lastPosition.y && lastPosition.y < lineBounds.origin.y + lineBounds.size.height) newRow = NO;
       } else {
-        if (rect.size.height > lastRect.size.height) {
-          if (rect.origin.y < lastPosition.y && lastPosition.y < rect.origin.y + rect.size.height) newRow = NO;
-        } else {
-          if (lastRect.origin.y < position.y && position.y < lastRect.origin.y + lastRect.size.height) newRow = NO;
-        }
+        if (lastRect.origin.y < linePosition.y && linePosition.y < lastRect.origin.y + lastRect.size.height) newRow = NO;
       }
     }
     
     if (newRow) rowIdx++;
-    lastRect = rect;
-    lastPosition = position;
+    lastRect = lineBounds;
+    lastPosition = linePosition;
     
     line.index = lineCurrentIdx;
     line.row = rowIdx;
@@ -668,16 +683,26 @@ dispatch_semaphore_signal(_lock);
 
     if (first) {
       first = NO;
-      textBoundingRect = rect;
-    } else if (!measuringBeyondConstraints) {
+      textBoundingRect = lineBounds;
+    }
+    // We do a couple of checks: If we are within our given constraints and maximumNumberOfRows,
+    // we will expand the overall `textBoundingRect`.
+    else if (!measuringBeyondConstraints) {
       if (maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows) {
-        textBoundingRect = CGRectUnion(textBoundingRect, rect);
+        textBoundingRect = CGRectUnion(textBoundingRect, lineBounds);
       }
     }
   }
 
+  // BEGIN Truncation code.
+
   {
+    // We expect to remove lines if we truncate, but we will want them later.
     NSMutableArray<ASTextLine *> *removedLines = [NSMutableArray new];
+
+    // There are two main reasons to truncate: We exceed the given bounds, or we exceed the given
+    // `maximumNumberOfRows`. The first one we mostly figured out above. Here we now check for the
+    // `maximumNumberOfRows` limit:
     if (rowCount > 0) {
       if (maximumNumberOfRows > 0) {
         if (rowCount > maximumNumberOfRows) {
@@ -692,8 +717,12 @@ dispatch_semaphore_signal(_lock);
           } while (1);
         }
       }
-      ASTextLine *lastLine = rowCount < lines.count ? lines[rowCount - 1] : lines.lastObject;
+
+      // `rowCount` is currently set to how many rows fit our constraints. Our last line might be
+      // either the last line, or just the last one that fit (< rowCount).
+       ASTextLine *lastLine = rowCount < lines.count ? lines[rowCount - 1] : lines.lastObject;
       if (!needTruncation && lastLine.range.location + lastLine.range.length < text.length) {
+        // lastLine doesn't go to the end of the text: ie it has been truncated.
         needTruncation = YES;
         while (lines.count > rowCount) {
           ASTextLine *line = lines.lastObject;
@@ -718,21 +747,11 @@ dispatch_semaphore_signal(_lock);
           }
           lastRowIdx = line.row;
           lineRowsIndex[lastRowIdx] = i;
-          if (isVerticalForm) {
-            lastHead = rect.origin.x + rect.size.width;
-            lastFoot = lastHead - rect.size.width;
-          } else {
-            lastHead = rect.origin.y;
-            lastFoot = lastHead + rect.size.height;
-          }
+          lastHead = rect.origin.y;
+          lastFoot = lastHead + rect.size.height;
         } else {
-          if (isVerticalForm) {
-            lastHead = MAX(lastHead, rect.origin.x + rect.size.width);
-            lastFoot = MIN(lastFoot, rect.origin.x);
-          } else {
-            lastHead = MIN(lastHead, rect.origin.y);
-            lastFoot = MAX(lastFoot, rect.origin.y + rect.size.height);
-          }
+          lastHead = MIN(lastHead, rect.origin.y);
+          lastFoot = MAX(lastFoot, rect.origin.y + rect.size.height);
         }
       }
       lineRowsEdge[lastRowIdx] = (ASRowEdge) {.head = lastHead, .foot = lastFoot};
@@ -744,94 +763,76 @@ dispatch_semaphore_signal(_lock);
       }
     }
 
-    { // calculate bounding size
-      CGRect rect = textBoundingRect;
-      if (container.path) {
-        if (container.pathLineWidth > 0) {
-          CGFloat inset = container.pathLineWidth / 2;
-          rect = CGRectInset(rect, -inset, -inset);
-        }
-      } else {
-        rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
-      }
-      rect = CGRectStandardize(rect);
-      CGSize size = rect.size;
-      if (container.verticalForm) {
-        size.width += container.size.width - (rect.origin.x + rect.size.width);
-      } else {
-        size.width += rect.origin.x;
-      }
-      size.height += rect.origin.y;
-      if (size.width < 0) size.width = 0;
-      if (size.height < 0) size.height = 0;
-      size.width = ceil(size.width);
-      size.height = ceil(size.height);
-      textBoundingSize = size;
-    }
-
     visibleRange = ASTextNSRangeFromCFRange(CTFrameGetVisibleStringRange(ctFrame));
     if (needTruncation) {
       ASTextLine *lastLine = lines.lastObject;
       NSRange lastRange = lastLine.range;
-      visibleRange.length = lastRange.location + lastRange.length - visibleRange.location;
+      visibleRange.length = NSMaxRange(lastRange) - visibleRange.location;
 
       // create truncated line
       if (container.truncationType != ASTextTruncationTypeNone) {
+        CTLineTruncationType type = kCTLineTruncationEnd;
+        if (container.truncationType == ASTextTruncationTypeStart) {
+          type = kCTLineTruncationStart;
+        } else if (container.truncationType == ASTextTruncationTypeMiddle) {
+          type = kCTLineTruncationMiddle;
+        }
+
         CTLineRef truncationTokenLine = NULL;
-        if (container.truncationToken) {
-          truncationToken = container.truncationToken;
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
+        truncationToken = container.truncationToken;
+        // For Tail truncation, if the truncation token is empty or only whitespace, we simply take
+        // whatever the Framesetter already generated and go with that (e.g. last word is omitted.)
+        static dispatch_once_t nonWhitespaceCharacterSetOnce;
+        static NSCharacterSet *nonWhitespaceCharacterSet;
+        dispatch_once(&nonWhitespaceCharacterSetOnce, ^{
+          nonWhitespaceCharacterSet = NSCharacterSet.whitespaceCharacterSet.invertedSet;
+        });
+        // Truncation token is all whitespace, or just an empty string.
+        if (truncationToken && type == kCTLineTruncationEnd && NSNotFound == [truncationToken.string rangeOfCharacterFromSet:nonWhitespaceCharacterSet].location) {
+          // Don't do anything. Reset truncationToken to nil, leave truncationTokenLine as NULL.
+          truncationToken = nil;
         } else {
+          // Create a CTLine from truncationToken. By default, apply the attributes from the end of
+          // the last line to the new truncation token.
           CFArrayRef runs = CTLineGetGlyphRuns(lastLine.CTLine);
           NSUInteger runCount = CFArrayGetCount(runs);
+          NSMutableAttributedString *string =
+              [[NSMutableAttributedString alloc] initWithString:ASTextTruncationToken];
           NSMutableDictionary *attrs = nil;
           if (runCount > 0) {
-            CTRunRef run = (CTRunRef) CFArrayGetValueAtIndex(runs, runCount - 1);
-            attrs = (id) CTRunGetAttributes(run);
-            attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+
+            // Get last line run
+            CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, runCount - 1);
+
+            // Attributes from last run
+            attrs = (id)CTRunGetAttributes(run);
+            attrs = attrs ? [attrs mutableCopy] : [[NSMutableDictionary alloc] init];
             [attrs removeObjectsForKeys:[NSMutableAttributedString as_allDiscontinuousAttributeKeys]];
-            CTFontRef font = (__bridge CTFontRef) attrs[(id) kCTFontAttributeName];
-            CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
-            UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
-            if (uiFont) {
-              font = CTFontCreateWithName((__bridge CFStringRef) uiFont.fontName, uiFont.pointSize, NULL);
-            } else {
-              font = NULL;
+
+            if (container.truncationToken) {
+              string = [container.truncationToken mutableCopy];
             }
-            if (font) {
-              attrs[(id) kCTFontAttributeName] = (__bridge id) (font);
-              uiFont = nil;
-              CFRelease(font);
-            }
-            CGColorRef color = (__bridge CGColorRef) (attrs[(id) kCTForegroundColorAttributeName]);
+
+            // Ignore clear color
+            CGColorRef color = (__bridge CGColorRef)attrs[(id)kCTForegroundColorAttributeName];
             if (color && CFGetTypeID(color) == CGColorGetTypeID() && CGColorGetAlpha(color) == 0) {
-              // ignore clear color
-              [attrs removeObjectForKey:(id) kCTForegroundColorAttributeName];
+              [attrs removeObjectForKey:(id)kCTForegroundColorAttributeName];
             }
-            if (!attrs) attrs = [NSMutableDictionary new];
           }
-          truncationToken = [[NSAttributedString alloc] initWithString:ASTextTruncationToken attributes:attrs];
-          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef) truncationToken);
+          truncationToken = fillBaseAttributes(string, attrs);
+          truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
         }
         if (truncationTokenLine) {
-          CTLineTruncationType type = kCTLineTruncationEnd;
-          if (container.truncationType == ASTextTruncationTypeStart) {
-            type = kCTLineTruncationStart;
-          } else if (container.truncationType == ASTextTruncationTypeMiddle) {
-            type = kCTLineTruncationMiddle;
-          }
-          NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+          // TODO: Avoid creating this unless we actually modify the last line text.
+          lastLineText = [[text attributedSubstringFromRange:lastLine.range] mutableCopy];
           CGFloat truncatedWidth = lastLine.width;
           CGFloat atLeastOneLine = lastLine.width;
           CGRect cgPathRect = CGRectZero;
           if (CGPathIsRect(cgPath, &cgPathRect)) {
-            if (isVerticalForm) {
-              truncatedWidth = cgPathRect.size.height;
-             } else {
-              truncatedWidth = cgPathRect.size.width;
-            }
+            truncatedWidth = cgPathRect.size.width;
           }
           int i = 0;
+          int limit = (int) removedLines.count;
           if (type != kCTLineTruncationStart) { // Middle or End/Tail wants to collect some text (at least one line's
               // worth) preceding the truncated content, with which to construct a "truncated line".
             i = (int)removedLines.count - 1;
@@ -843,13 +844,19 @@ dispatch_semaphore_signal(_lock);
               [lastLineText appendAttributedString:[text attributedSubstringFromRange:removedLines[i].range]];
               atLeastOneLine += removedLines[i--].width;
             }
-            [lastLineText appendAttributedString:truncationToken];
+            if (type == kCTLineTruncationEnd) {
+              [lastLineText appendAttributedString:truncationToken];
+            }
+            if (type == kCTLineTruncationMiddle) { // If we are truncating Middle, we do not want
+              // to collect the same text into the truncated line more than once.
+              limit = i+1;
+            }
           }
           if (type != kCTLineTruncationEnd && removedLines.count > 0) { // Middle or Start/Head wants to collect some
               // text following the truncated content.
             i = 0;
             atLeastOneLine = removedLines[i].width;
-            while (atLeastOneLine < truncatedWidth && i < removedLines.count) {
+            while (atLeastOneLine < truncatedWidth && i < limit) {
               atLeastOneLine += removedLines[i++].width;
             }
             for (i--; i >= 0; i--) {
@@ -867,91 +874,134 @@ dispatch_semaphore_signal(_lock);
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
           if (ctLastLineExtend) {
-            CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth, type, truncationTokenLine);
+            // CTLineCreateTruncatedLine only reorders its CTRuns and doesn't change the range.
+            // After the reorder, some CTRuns in ctTruncatedLine are visible to the users, but we
+            // don't know which ones since this is completely handled by Core Text.
+            CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth,
+                                                                  type, truncationTokenLine);
+            if (kTextNode2ImprovedTextTruncationVisibleRange) {
+              CFArrayRef truncatedLineRuns = CTLineGetGlyphRuns(ctTruncatedLine);
+              // Calculate the range of the truncated line before the truncation tokens
+              if (truncatedLineRuns) {
+                CFIndex truncatedLineRunCount = CFArrayGetCount(truncatedLineRuns);
+
+                CGFloat truncationTokenWidth =
+                    CTLineGetTypographicBounds(truncationTokenLine, 0, 0, 0);
+                CGFloat ctLastLineExtendWidth =
+                    CTLineGetTypographicBounds(ctLastLineExtend, 0, 0, 0);
+
+                // If the last line is not truncated, the truncation token is appended directly to
+                // the text without deletion.
+                if (kTextNode2ImprovedTextTruncationVisibleRangeLastLineFix &&
+                    (truncatedWidth > ctLastLineExtendWidth)) {
+                  NSAttributedString *lastLineSubString = [lastLineText
+                      attributedSubstringFromRange:NSMakeRange(0,
+                                                               MAX(0, lastLineText.length -
+                                                                          truncationToken.length))];
+                  truncatedLineBeforeTruncationToken =
+                      [ASTextLine lineWithCTLine:CTLineCreateWithAttributedString(
+                                                     (CFAttributedStringRef)lastLineSubString)
+                                        position:lastLine.position
+                                        vertical:NO];
+
+                } else {
+                  // Since Core Text hides the information that which CTRun is the last visible one,
+                  // iterate through the runs to estimate the last visible run.
+                  for (int i = 0; i < truncatedLineRunCount; i++) {
+                    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(truncatedLineRuns,
+                                                                    truncatedLineRunCount - 1 - i);
+                    CFRange runRange = CTRunGetStringRange(run);
+                    // Make sure that lastLineSubString has a valid range.
+                    NSUInteger truncatedLineBeforeTruncationTokenRangeEnd =
+                        MAX(MIN(lastLineText.length, runRange.location + runRange.length), 0);
+                    truncatedLineBeforeTruncationTokenRange = NSMakeRange(
+                        lastLine.range.location, truncatedLineBeforeTruncationTokenRangeEnd);
+
+                    NSAttributedString *lastLineSubString = [lastLineText
+                        attributedSubstringFromRange:
+                            NSMakeRange(0, truncatedLineBeforeTruncationTokenRangeEnd)];
+                    CGFloat lastLineSubStringWidth = CTLineGetTypographicBounds(
+                        CTLineCreateWithAttributedString((CFAttributedStringRef)lastLineSubString),
+                        0, 0, 0);
+                    // If lastLineSubString and truncationToken can "almost" fit in truncatedWidth,
+                    // assume the current run is the last visible CTRun, and lastLineSubString is
+                    // the visible part in the last line. Adding 2 here for error tolerance since
+                    // truncationTokenWidth + lastLineSubStringWidth might be slightly longer than
+                    // truncatedWidth.
+                    if (truncationTokenWidth + lastLineSubStringWidth < truncatedWidth + 2) {
+                      truncatedLineBeforeTruncationToken =
+                          [ASTextLine lineWithCTLine:CTLineCreateWithAttributedString(
+                                                         (CFAttributedStringRef)lastLineSubString)
+                                            position:lastLine.position
+                                            vertical:NO];
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+
             CFRelease(ctLastLineExtend);
             if (ctTruncatedLine) {
-              truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
-              truncatedLine.index = lastLine.index;
-              truncatedLine.row = lastLine.row;
+              truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:NO];
+              // 1) If truncation mode is middle or start, and the end of the string contains taller text (or taller attachments), then truncating the line may make it taller
+              //  (By pulling up the tall text that was previously in a later, clipped line, into the truncation line).
+              // 1b) There are edge cases where truncating the line makes it taller, thus it exceeds the bounds, and we in fact needed to truncate at an earlier line.
+              //  Accommodating these cases in a robust manner would require multiple passes. (TODO_NOTREALLY)
+              // 2) In all cases, truncating the line may make it shorter. (Of course)
+              // 3) If text is not left-aligned, and truncating changed the width of the last line, it also needs to change its position.
+              BOOL adjusted = NO;
+              CGPoint adjustedPosition = truncatedLine.position;
+               if (truncatedLine.bounds.size.height > lastLine.bounds.size.height) {
+                adjusted = YES;
+                adjustedPosition = {adjustedPosition.x, lastLine.position.y + (truncatedLine.bounds.size.height - lastLine.bounds.size.height)/2};
+              }
+             if ([lastLineText as_alignment] == NSTextAlignmentRight) { // (TODO: same for center-aligned)
+                adjusted = YES;
+                adjustedPosition = {lastLine.position.x - (truncatedLine.bounds.size.width - lastLine.bounds.size.width), adjustedPosition.y};
+              }
+              if (adjusted) {
+                truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:adjustedPosition vertical:NO];
+              }
               CFRelease(ctTruncatedLine);
             }
+            textBoundingRect = CGRectUnion(textBoundingRect, truncatedLine.bounds);
+            truncatedLine.index = lastLine.index;
+            truncatedLine.row = lastLine.row;
           }
           CFRelease(truncationTokenLine);
         }
       }
     }
-  }
-  
-  if (isVerticalForm) {
-    NSCharacterSet *rotateCharset = ASTextVerticalFormRotateCharacterSet();
-    NSCharacterSet *rotateMoveCharset = ASTextVerticalFormRotateAndMoveCharacterSet();
 
-    void (^lineBlock)(ASTextLine *) = ^(ASTextLine *line){
-      CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
-      if (!runs) return;
-      NSUInteger runCount = CFArrayGetCount(runs);
-      if (runCount == 0) return;
-      NSMutableArray *lineRunRanges = [NSMutableArray new];
-      line.verticalRotateRange = lineRunRanges;
-      for (NSUInteger r = 0; r < runCount; r++) {
-        CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
-        NSMutableArray *runRanges = [NSMutableArray new];
-        [lineRunRanges addObject:runRanges];
-        NSUInteger glyphCount = CTRunGetGlyphCount(run);
-        if (glyphCount == 0) continue;
-        
-        CFIndex runStrIdx[glyphCount + 1];
-        CTRunGetStringIndices(run, CFRangeMake(0, 0), runStrIdx);
-        CFRange runStrRange = CTRunGetStringRange(run);
-        runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
-        CFDictionaryRef runAttrs = CTRunGetAttributes(run);
-        CTFontRef font = (CTFontRef)CFDictionaryGetValue(runAttrs, kCTFontAttributeName);
-        BOOL isColorGlyph = ASTextCTFontContainsColorBitmapGlyphs(font);
-        
-        NSUInteger prevIdx = 0;
-        ASTextRunGlyphDrawMode prevMode = ASTextRunGlyphDrawModeHorizontal;
-        NSString *layoutStr = layout.text.string;
-        for (NSUInteger g = 0; g < glyphCount; g++) {
-          BOOL glyphRotate = 0, glyphRotateMove = NO;
-          CFIndex runStrLen = runStrIdx[g + 1] - runStrIdx[g];
-          if (isColorGlyph) {
-            glyphRotate = YES;
-          } else if (runStrLen == 1) {
-            unichar c = [layoutStr characterAtIndex:runStrIdx[g]];
-            glyphRotate = [rotateCharset characterIsMember:c];
-            if (glyphRotate) glyphRotateMove = [rotateMoveCharset characterIsMember:c];
-          } else if (runStrLen > 1){
-            NSString *glyphStr = [layoutStr substringWithRange:NSMakeRange(runStrIdx[g], runStrLen)];
-            BOOL glyphRotate = [glyphStr rangeOfCharacterFromSet:rotateCharset].location != NSNotFound;
-            if (glyphRotate) glyphRotateMove = [glyphStr rangeOfCharacterFromSet:rotateMoveCharset].location != NSNotFound;
-          }
-          
-          ASTextRunGlyphDrawMode mode = glyphRotateMove ? ASTextRunGlyphDrawModeVerticalRotateMove : (glyphRotate ? ASTextRunGlyphDrawModeVerticalRotate : ASTextRunGlyphDrawModeHorizontal);
-          if (g == 0) {
-            prevMode = mode;
-          } else if (mode != prevMode) {
-            ASTextRunGlyphRange *aRange = [ASTextRunGlyphRange rangeWithRange:NSMakeRange(prevIdx, g - prevIdx) drawMode:prevMode];
-            [runRanges addObject:aRange];
-            prevIdx = g;
-            prevMode = mode;
-          }
+    { // calculate bounding size
+      CGRect rect = textBoundingRect;
+      if (container.path) {
+        if (container.pathLineWidth > 0) {
+          CGFloat inset = container.pathLineWidth / 2;
+          rect = CGRectInset(rect, -inset, -inset);
         }
-        if (prevIdx < glyphCount) {
-          ASTextRunGlyphRange *aRange = [ASTextRunGlyphRange rangeWithRange:NSMakeRange(prevIdx, glyphCount - prevIdx) drawMode:prevMode];
-          [runRanges addObject:aRange];
-        }
-        
+      } else {
+        rect = UIEdgeInsetsInsetRect(rect, ASTextUIEdgeInsetsInvert(container.insets));
       }
-    };
-    for (ASTextLine *line in lines) {
-      lineBlock(line);
+      rect = CGRectStandardize(rect);
+      CGSize size = rect.size;
+      size.width += rect.origin.x;
+      size.height += rect.origin.y;
+      if (size.width < 0) size.width = 0;
+      if (size.height < 0) size.height = 0;
+      size.width = ceil(size.width);
+      size.height = ceil(size.height);
+      textBoundingSize = size;
     }
-    if (truncatedLine) lineBlock(truncatedLine);
   }
-  
+
+  // We store some hints we will look up when its time to draw. First thing, do we need to draw at all?
   if (visibleRange.length > 0) {
     layout.needDrawText = YES;
-    
+
+    // ... and some finer details: We go through the NSAttrbutedString attributes looking for things
+    // that would require the following drawing behaviors, and set flags for them if so:
     void (^block)(NSDictionary *attrs, NSRange range, BOOL *stop) = ^(NSDictionary *attrs, NSRange range, BOOL *stop) {
       if (attrs[ASTextHighlightAttributeName]) layout.containsHighlight = YES;
       if (attrs[ASTextBlockBorderAttributeName]) layout.needDrawBlockBorder = YES;
@@ -963,12 +1013,18 @@ dispatch_semaphore_signal(_lock);
       if (attrs[ASTextStrikethroughAttributeName]) layout.needDrawStrikethrough = YES;
       if (attrs[ASTextBorderAttributeName]) layout.needDrawBorder = YES;
     };
-    
+
     [layout.text enumerateAttributesInRange:visibleRange options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     if (truncatedLine) {
+      if (container.truncationType == ASTextTruncationTypeStart || container.truncationType == ASTextTruncationTypeMiddle) {
+        // If truncation mode is middle or start, there is another visible range not expressed in visibleRange.
+        [lastLineText enumerateAttributesInRange:NSMakeRange(0, lastLineText.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
+      }
       [truncationToken enumerateAttributesInRange:NSMakeRange(0, truncationToken.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:block];
     }
   }
+
+  // Also, set up attachments to use for rendering later.
   for (NSUInteger i = 0, max = lines.count; i < max; i++) {
     ASTextLine *line = lines[i];
     if (truncatedLine && line.index == truncatedLine.index) line = truncatedLine;
@@ -993,6 +1049,8 @@ dispatch_semaphore_signal(_lock);
   layout.frame = ctFrame;
   layout.lines = lines;
   layout.truncatedLine = truncatedLine;
+  layout.truncatedLineBeforeTruncationTokenRange = truncatedLineBeforeTruncationTokenRange;
+  layout.truncatedLineBeforeTruncationToken = truncatedLineBeforeTruncationToken;
   layout.attachments = attachments;
   layout.attachmentRanges = attachmentRanges;
   layout.attachmentRects = attachmentRects;
@@ -1067,19 +1125,16 @@ dispatch_semaphore_signal(_lock);
  */
 - (NSUInteger)_rowIndexForEdge:(CGFloat)edge {
   if (_rowCount == 0) return NSNotFound;
-  BOOL isVertical = _container.verticalForm;
   NSUInteger lo = 0, hi = _rowCount - 1, mid = 0;
   NSUInteger rowIdx = NSNotFound;
   while (lo <= hi) {
     mid = (lo + hi) / 2;
     ASRowEdge oneEdge = _lineRowsEdge[mid];
-    if (isVertical ?
-        (oneEdge.foot <= edge && edge <= oneEdge.head) :
-        (oneEdge.head <= edge && edge <= oneEdge.foot)) {
+    if (oneEdge.head <= edge && edge <= oneEdge.foot) {
       rowIdx = mid;
       break;
     }
-    if ((isVertical ? (edge > oneEdge.head) : (edge < oneEdge.head))) {
+    if (edge < oneEdge.head) {
       if (mid == 0) break;
       hi = mid - 1;
     } else {
@@ -1101,18 +1156,10 @@ dispatch_semaphore_signal(_lock);
   if (_rowCount == 0) return NSNotFound;
   NSUInteger rowIdx = [self _rowIndexForEdge:edge];
   if (rowIdx == NSNotFound) {
-    if (_container.verticalForm) {
-      if (edge > _lineRowsEdge[0].head) {
-        rowIdx = 0;
-      } else if (edge < _lineRowsEdge[_rowCount - 1].foot) {
-        rowIdx = _rowCount - 1;
-      }
-    } else {
-      if (edge < _lineRowsEdge[0].head) {
-        rowIdx = 0;
-      } else if (edge > _lineRowsEdge[_rowCount - 1].foot) {
-        rowIdx = _rowCount - 1;
-      }
+    if (edge < _lineRowsEdge[0].head) {
+      rowIdx = 0;
+    } else if (edge > _lineRowsEdge[_rowCount - 1].foot) {
+      rowIdx = _rowCount - 1;
     }
   }
   return rowIdx;
@@ -1247,22 +1294,12 @@ dispatch_semaphore_signal(_lock);
     CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
     CGPoint glyphPosition;
     CTRunGetPositions(run, CFRangeMake(0, 1), &glyphPosition);
-    if (_container.verticalForm) {
-      CGFloat runX = glyphPosition.x;
-      runX += line.position.y;
-      CGFloat runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
-      if (runX <= point.y && point.y <= runX + runWidth) {
-        if (CTRunGetStatus(run) & kCTRunStatusRightToLeft) RTL = YES;
-        break;
-      }
-    } else {
-      CGFloat runX = glyphPosition.x;
-      runX += line.position.x;
-      CGFloat runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
-      if (runX <= point.x && point.x <= runX + runWidth) {
-        if (CTRunGetStatus(run) & kCTRunStatusRightToLeft) RTL = YES;
-        break;
-      }
+    CGFloat runX = glyphPosition.x;
+    runX += line.position.x;
+    CGFloat runWidth = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
+    if (runX <= point.x && point.x <= runX + runWidth) {
+      if (CTRunGetStatus(run) & kCTRunStatusRightToLeft) RTL = YES;
+      break;
     }
   }
   return RTL;
@@ -1311,7 +1348,7 @@ dispatch_semaphore_signal(_lock);
 
 - (NSUInteger)lineIndexForPoint:(CGPoint)point {
   if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
-  NSUInteger rowIdx = [self _rowIndexForEdge:_container.verticalForm ? point.x : point.y];
+  NSUInteger rowIdx = [self _rowIndexForEdge: point.y];
   if (rowIdx == NSNotFound) return NSNotFound;
   
   NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
@@ -1325,9 +1362,8 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (NSUInteger)closestLineIndexForPoint:(CGPoint)point {
-  BOOL isVertical = _container.verticalForm;
   if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
-  NSUInteger rowIdx = [self _closestRowIndexForEdge:isVertical ? point.x : point.y];
+  NSUInteger rowIdx = [self _closestRowIndexForEdge: point.y];
   if (rowIdx == NSNotFound) return NSNotFound;
   
   NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
@@ -1338,30 +1374,16 @@ dispatch_semaphore_signal(_lock);
   NSUInteger minIndex = lineIdx0;
   for (NSUInteger i = lineIdx0; i <= lineIdx1; i++) {
     CGRect bounds = ((ASTextLine *)_lines[i]).bounds;
-    if (isVertical) {
-      if (bounds.origin.y <= point.y && point.y <= bounds.origin.y + bounds.size.height) return i;
-      CGFloat distance;
-      if (point.y < bounds.origin.y) {
-        distance = bounds.origin.y - point.y;
-      } else {
-        distance = point.y - (bounds.origin.y + bounds.size.height);
-      }
-      if (distance < minDistance) {
-        minDistance = distance;
-        minIndex = i;
-      }
+    if (bounds.origin.x <= point.x && point.x <= bounds.origin.x + bounds.size.width) return i;
+    CGFloat distance;
+    if (point.x < bounds.origin.x) {
+      distance = bounds.origin.x - point.x;
     } else {
-      if (bounds.origin.x <= point.x && point.x <= bounds.origin.x + bounds.size.width) return i;
-      CGFloat distance;
-      if (point.x < bounds.origin.x) {
-        distance = bounds.origin.x - point.x;
-      } else {
-        distance = point.x - (bounds.origin.x + bounds.size.width);
-      }
-      if (distance < minDistance) {
-        minDistance = distance;
-        minIndex = i;
-      }
+      distance = point.x - (bounds.origin.x + bounds.size.width);
+    }
+    if (distance < minDistance) {
+      minDistance = distance;
+      minIndex = i;
     }
   }
   return minIndex;
@@ -1374,19 +1396,14 @@ dispatch_semaphore_signal(_lock);
   if (position < range.location || position > range.location + range.length) return CGFLOAT_MAX;
   
   CGFloat offset = CTLineGetOffsetForStringIndex(line.CTLine, position, NULL);
-  return _container.verticalForm ? (offset + line.position.y) : (offset + line.position.x);
+  return offset + line.position.x;
 }
 
 - (NSUInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSUInteger)lineIndex {
   if (lineIndex >= _lines.count) return NSNotFound;
   ASTextLine *line = _lines[lineIndex];
-  if (_container.verticalForm) {
-    point.x = point.y - line.position.y;
-    point.y = 0;
-  } else {
-    point.x -= line.position.x;
-    point.y = 0;
-  }
+  point.x -= line.position.x;
+  point.y = 0;
   CFIndex idx = CTLineGetStringIndexForPosition(line.CTLine, point);
   if (idx == kCFNotFound) return NSNotFound;
   
@@ -1442,12 +1459,10 @@ dispatch_semaphore_signal(_lock);
 }
 
 - (ASTextPosition *)closestPositionToPoint:(CGPoint)point {
-  BOOL isVertical = _container.verticalForm;
   // When call CTLineGetStringIndexForPosition() on ligature such as 'fi',
   // and the point `hit` the glyph's left edge, it may get the ligature inside offset.
   // I don't know why, maybe it's a bug of CoreText. Try to avoid it.
-  if (isVertical) point.y += 0.00001234;
-  else point.x += 0.00001234;
+  point.x += 0.00001234;
   
   NSUInteger lineIndex = [self closestLineIndexForPoint:point];
   if (lineIndex == NSNotFound) return nil;
@@ -1473,22 +1488,12 @@ dispatch_semaphore_signal(_lock);
       CGFloat left = [self offsetForTextPosition:bindingRange.location lineIndex:lineIndex];
       CGFloat right = [self offsetForTextPosition:bindingRange.location + bindingRange.length lineIndex:lineIndex];
       if (left != CGFLOAT_MAX && right != CGFLOAT_MAX) {
-        if (_container.isVerticalForm) {
-          if (fabs(point.y - left) < fabs(point.y - right)) {
-            position = bindingRange.location;
-            finalAffinity = ASTextAffinityForward;
-          } else {
-            position = bindingRange.location + bindingRange.length;
-            finalAffinity = ASTextAffinityBackward;
-          }
+        if (fabs(point.x - left) < fabs(point.x - right)) {
+          position = bindingRange.location;
+          finalAffinity = ASTextAffinityForward;
         } else {
-          if (fabs(point.x - left) < fabs(point.x - right)) {
-            position = bindingRange.location;
-            finalAffinity = ASTextAffinityForward;
-          } else {
-            position = bindingRange.location + bindingRange.length;
-            finalAffinity = ASTextAffinityBackward;
-          }
+          position = bindingRange.location + bindingRange.length;
+          finalAffinity = ASTextAffinityBackward;
         }
       } else if (left != CGFLOAT_MAX) {
         position = left;
@@ -1560,13 +1565,13 @@ dispatch_semaphore_signal(_lock);
   }
   
   // above whole text frame
-  if (lineIndex == 0 && (isVertical ? (point.x > line.right) : (point.y < line.top))) {
+  if (lineIndex == 0 && (point.y < line.top)) {
     position = 0;
     finalAffinity = ASTextAffinityForward;
     finalAffinityDetected = YES;
   }
   // below whole text frame
-  if (lineIndex == _lines.count - 1 && (isVertical ? (point.x < line.left) : (point.y > line.bottom))) {
+  if (lineIndex == _lines.count - 1 && (point.y > line.bottom)) {
     position = line.range.location + line.range.length;
     finalAffinity = ASTextAffinityBackward;
     finalAffinityDetected = YES;
@@ -1596,19 +1601,11 @@ dispatch_semaphore_signal(_lock);
   }
   
   [self _insideComposedCharacterSequences:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
-    if (isVertical) {
-      position = fabs(left - point.y) < fabs(right - point.y) < (right ? prev : next);
-    } else {
-      position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
-    }
+    position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
   }];
   
   [self _insideEmoji:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
-    if (isVertical) {
-      position = fabs(left - point.y) < fabs(right - point.y) < (right ? prev : next);
-    } else {
-      position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
-    }
+    position = fabs(left - point.x) < fabs(right - point.x) < (right ? prev : next);
   }];
   
   if (position < _visibleRange.location) position = _visibleRange.location;
@@ -1623,7 +1620,7 @@ dispatch_semaphore_signal(_lock);
       } else if (position <= line.range.location) {
         finalAffinity = RTL ? ASTextAffinityBackward : ASTextAffinityForward;
       } else {
-        finalAffinity = (ofs < (isVertical ? point.y : point.x) && !RTL) ? ASTextAffinityForward : ASTextAffinityBackward;
+        finalAffinity = (ofs < point.x && !RTL) ? ASTextAffinityForward : ASTextAffinityBackward;
       }
     }
   }
@@ -1647,35 +1644,19 @@ dispatch_semaphore_signal(_lock);
   if (lineIndex == NSNotFound) return oldPosition;
   ASTextLine *line = _lines[lineIndex];
   ASRowEdge vertical = _lineRowsEdge[line.row];
-  if (_container.verticalForm) {
-    point.x = (vertical.head + vertical.foot) * 0.5;
-  } else {
-    point.y = (vertical.head + vertical.foot) * 0.5;
-  }
+  point.y = (vertical.head + vertical.foot) * 0.5;
   newPos = [self closestPositionToPoint:point];
   if ([newPos compare:otherPosition] == [oldPosition compare:otherPosition] &&
       newPos.offset != otherPosition.offset) {
     return newPos;
   }
-  
-  if (_container.isVerticalForm) {
-    if ([oldPosition compare:otherPosition] == NSOrderedAscending) { // search backward
-      ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionUp offset:1];
-      if (range) return range.start;
-    } else { // search forward
-      ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionDown offset:1];
-      if (range) return range.end;
-    }
-  } else {
-    if ([oldPosition compare:otherPosition] == NSOrderedAscending) { // search backward
-      ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionLeft offset:1];
-      if (range) return range.start;
-    } else { // search forward
-      ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionRight offset:1];
-      if (range) return range.end;
-    }
+  if ([oldPosition compare:otherPosition] == NSOrderedAscending) { // search backward
+    ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionLeft offset:1];
+    if (range) return range.start;
+  } else { // search forward
+    ASTextRange *range = [self textRangeByExtendingPosition:otherPosition inDirection:UITextLayoutDirectionRight offset:1];
+    if (range) return range.end;
   }
-  
   return oldPosition;
 }
 
@@ -1691,14 +1672,8 @@ dispatch_semaphore_signal(_lock);
   BOOL RTL = [self _isRightToLeftInLine:_lines[lineIndex] atPoint:point];
   CGRect rect = [self caretRectForPosition:pos];
   if (CGRectIsNull(rect)) return nil;
-  
-  if (_container.verticalForm) {
-    ASTextRange *range = [self textRangeByExtendingPosition:pos inDirection:(rect.origin.y >= point.y && !RTL) ? UITextLayoutDirectionUp:UITextLayoutDirectionDown offset:1];
-    return range;
-  } else {
-    ASTextRange *range = [self textRangeByExtendingPosition:pos inDirection:(rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight offset:1];
-    return range;
-  }
+  ASTextRange *range = [self textRangeByExtendingPosition:pos inDirection:(rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight offset:1];
+  return range;
 }
 
 - (ASTextRange *)closestTextRangeAtPoint:(CGPoint)point {
@@ -1714,22 +1689,18 @@ dispatch_semaphore_signal(_lock);
   UITextLayoutDirection direction = UITextLayoutDirectionRight;
   if (pos.offset >= line.range.location + line.range.length) {
     if (direction != RTL) {
-      direction = _container.verticalForm ? UITextLayoutDirectionUp : UITextLayoutDirectionLeft;
+      direction = UITextLayoutDirectionLeft;
     } else {
-      direction = _container.verticalForm ? UITextLayoutDirectionDown : UITextLayoutDirectionRight;
+      direction = UITextLayoutDirectionRight;
     }
   } else if (pos.offset <= line.range.location) {
     if (direction != RTL) {
-      direction = _container.verticalForm ? UITextLayoutDirectionDown : UITextLayoutDirectionRight;
+      direction = UITextLayoutDirectionRight;
     } else {
-      direction = _container.verticalForm ? UITextLayoutDirectionUp : UITextLayoutDirectionLeft;
+      direction = UITextLayoutDirectionLeft;
     }
   } else {
-    if (_container.verticalForm) {
-      direction = (rect.origin.y >= point.y && !RTL) ? UITextLayoutDirectionUp:UITextLayoutDirectionDown;
-    } else {
-      direction = (rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight;
-    }
+    direction = (rect.origin.x >= point.x && !RTL) ? UITextLayoutDirectionLeft:UITextLayoutDirectionRight;
   }
   
   ASTextRange *range = [self textRangeByExtendingPosition:pos inDirection:direction offset:1];
@@ -1807,17 +1778,9 @@ dispatch_semaphore_signal(_lock);
   if (!position) return nil;
   if (position.offset < visibleStart || position.offset > visibleEnd) return nil;
   if (offset == 0) return [self textRangeByExtendingPosition:position];
-  
-  BOOL isVerticalForm = _container.verticalForm;
-  BOOL verticalMove, forwardMove;
-  
-  if (isVerticalForm) {
-    verticalMove = direction == UITextLayoutDirectionLeft || direction == UITextLayoutDirectionRight;
-    forwardMove = direction == UITextLayoutDirectionLeft || direction == UITextLayoutDirectionDown;
-  } else {
-    verticalMove = direction == UITextLayoutDirectionUp || direction == UITextLayoutDirectionDown;
-    forwardMove = direction == UITextLayoutDirectionDown || direction == UITextLayoutDirectionRight;
-  }
+
+  BOOL verticalMove = direction == UITextLayoutDirectionUp || direction == UITextLayoutDirectionDown;
+  BOOL forwardMove = direction == UITextLayoutDirectionDown || direction == UITextLayoutDirectionRight;
   
   if (offset < 0) {
     forwardMove = !forwardMove;
@@ -1858,32 +1821,17 @@ dispatch_semaphore_signal(_lock);
     for (NSUInteger i = 0; i < moveToLineCount; i++) {
       NSUInteger lineIndex = moveToLineFirstIndex + i;
       ASTextLine *line = _lines[lineIndex];
-      if (isVerticalForm) {
-        if (line.top <= ofs && ofs <= line.bottom) {
-          insideIndex = line.index;
-          break;
-        }
-        if (line.top < mostLeft) {
-          mostLeft = line.top;
-          mostLeftLine = line;
-        }
-        if (line.bottom > mostRight) {
-          mostRight = line.bottom;
-          mostRightLine = line;
-        }
-      } else {
-        if (line.left <= ofs && ofs <= line.right) {
-          insideIndex = line.index;
-          break;
-        }
-        if (line.left < mostLeft) {
-          mostLeft = line.left;
-          mostLeftLine = line;
-        }
-        if (line.right > mostRight) {
-          mostRight = line.right;
-          mostRightLine = line;
-        }
+      if (line.left <= ofs && ofs <= line.right) {
+        insideIndex = line.index;
+        break;
+      }
+      if (line.left < mostLeft) {
+        mostLeft = line.left;
+        mostLeftLine = line;
+      }
+      if (line.right > mostRight) {
+        mostRight = line.right;
+        mostRightLine = line;
       }
     }
     BOOL afinityEdge = NO;
@@ -1896,12 +1844,7 @@ dispatch_semaphore_signal(_lock);
       afinityEdge = YES;
     }
     ASTextLine *insideLine = _lines[insideIndex];
-    NSUInteger pos;
-    if (isVerticalForm) {
-      pos = [self textPositionForPoint:CGPointMake(insideLine.position.x, ofs) lineIndex:insideIndex];
-    } else {
-      pos = [self textPositionForPoint:CGPointMake(ofs, insideLine.position.y) lineIndex:insideIndex];
-    }
+    NSUInteger pos = [self textPositionForPoint:CGPointMake(ofs, insideLine.position.y) lineIndex:insideIndex];
     if (pos == NSNotFound) return nil;
     ASTextPosition *extPos;
     if (afinityEdge) {
@@ -1980,11 +1923,7 @@ dispatch_semaphore_signal(_lock);
   ASTextLine *line = _lines[lineIndex];
   CGFloat offset = [self offsetForTextPosition:position.offset lineIndex:lineIndex];
   if (offset == CGFLOAT_MAX) return CGPointZero;
-  if (_container.verticalForm) {
-    return CGPointMake(line.position.x, offset);
-  } else {
-    return CGPointMake(offset, line.position.y);
-  }
+  return CGPointMake(offset, line.position.y);
 }
 
 - (CGRect)caretRectForPosition:(ASTextPosition *)position {
@@ -1993,11 +1932,7 @@ dispatch_semaphore_signal(_lock);
   ASTextLine *line = _lines[lineIndex];
   CGFloat offset = [self offsetForTextPosition:position.offset lineIndex:lineIndex];
   if (offset == CGFLOAT_MAX) return CGRectNull;
-  if (_container.verticalForm) {
-    return CGRectMake(line.bounds.origin.x, offset, line.bounds.size.width, 0);
-  } else {
-    return CGRectMake(offset, line.bounds.origin.y, 0, line.bounds.size.height);
-  }
+  return CGRectMake(offset, line.bounds.origin.y, 0, line.bounds.size.height);
 }
 
 - (CGRect)firstRectForRange:(ASTextRange *)range {
@@ -2015,54 +1950,28 @@ dispatch_semaphore_signal(_lock);
     if (line.row != startLine.row) break;
     [lines addObject:line];
   }
-  if (_container.verticalForm) {
-    if (lines.count == 1) {
-      CGFloat top = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
-      CGFloat bottom;
-      if (startLine == endLine) {
-        bottom = [self offsetForTextPosition:range.end.offset lineIndex:startLineIndex];
-      } else {
-        bottom = startLine.bottom;
-      }
-      if (top == CGFLOAT_MAX || bottom == CGFLOAT_MAX) return CGRectNull;
-      if (top > bottom) ASTEXT_SWAP(top, bottom);
-      return CGRectMake(startLine.left, top, startLine.width, bottom - top);
+  if (lines.count == 1) {
+    CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+    CGFloat right;
+    if (startLine == endLine) {
+      right = [self offsetForTextPosition:range.end.offset lineIndex:startLineIndex];
     } else {
-      CGFloat top = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
-      CGFloat bottom = startLine.bottom;
-      if (top == CGFLOAT_MAX || bottom == CGFLOAT_MAX) return CGRectNull;
-      if (top > bottom) ASTEXT_SWAP(top, bottom);
-      CGRect rect = CGRectMake(startLine.left, top, startLine.width, bottom - top);
-      for (NSUInteger i = 1; i < lines.count; i++) {
-        ASTextLine *line = lines[i];
-        rect = CGRectUnion(rect, line.bounds);
-      }
-      return rect;
+      right = startLine.right;
     }
+    if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
+    if (left > right) ASTEXT_SWAP(left, right);
+    return CGRectMake(left, startLine.top, right - left, startLine.height);
   } else {
-    if (lines.count == 1) {
-      CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
-      CGFloat right;
-      if (startLine == endLine) {
-        right = [self offsetForTextPosition:range.end.offset lineIndex:startLineIndex];
-      } else {
-        right = startLine.right;
-      }
-      if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
-      if (left > right) ASTEXT_SWAP(left, right);
-      return CGRectMake(left, startLine.top, right - left, startLine.height);
-    } else {
-      CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
-      CGFloat right = startLine.right;
-      if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
-      if (left > right) ASTEXT_SWAP(left, right);
-      CGRect rect = CGRectMake(left, startLine.top, right - left, startLine.height);
-      for (NSUInteger i = 1; i < lines.count; i++) {
-        ASTextLine *line = lines[i];
-        rect = CGRectUnion(rect, line.bounds);
-      }
-      return rect;
+    CGFloat left = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
+    CGFloat right = startLine.right;
+    if (left == CGFLOAT_MAX || right == CGFLOAT_MAX) return CGRectNull;
+    if (left > right) ASTEXT_SWAP(left, right);
+    CGRect rect = CGRectMake(left, startLine.top, right - left, startLine.height);
+    for (NSUInteger i = 1; i < lines.count; i++) {
+      ASTextLine *line = lines[i];
+      rect = CGRectUnion(rect, line.bounds);
     }
+    return rect;
   }
 }
 
@@ -2080,7 +1989,6 @@ dispatch_semaphore_signal(_lock);
 - (NSArray *)selectionRectsForRange:(ASTextRange *)range {
   range = [self _correctedRangeWithEdge:range];
   
-  BOOL isVertical = _container.verticalForm;
   NSMutableArray *rects = [[NSMutableArray<ASTextSelectionRect *> alloc] init];
   if (!range) return rects;
   
@@ -2094,81 +2002,52 @@ dispatch_semaphore_signal(_lock);
   CGFloat offsetEnd = [self offsetForTextPosition:range.end.offset lineIndex:endLineIndex];
   
   ASTextSelectionRect *start = [ASTextSelectionRect new];
-  if (isVertical) {
-    start.rect = CGRectMake(startLine.left, offsetStart, startLine.width, 0);
-  } else {
-    start.rect = CGRectMake(offsetStart, startLine.top, 0, startLine.height);
-  }
+  start.rect = CGRectMake(offsetStart, startLine.top, 0, startLine.height);
   start.containsStart = YES;
-  start.isVertical = isVertical;
+  start.isVertical = NO;
   [rects addObject:start];
   
   ASTextSelectionRect *end = [ASTextSelectionRect new];
-  if (isVertical) {
-    end.rect = CGRectMake(endLine.left, offsetEnd, endLine.width, 0);
-  } else {
-    end.rect = CGRectMake(offsetEnd, endLine.top, 0, endLine.height);
-  }
+  end.rect = CGRectMake(offsetEnd, endLine.top, 0, endLine.height);
   end.containsEnd = YES;
-  end.isVertical = isVertical;
+  end.isVertical = NO;
   [rects addObject:end];
   
   if (startLine.row == endLine.row) { // same row
     if (offsetStart > offsetEnd) ASTEXT_SWAP(offsetStart, offsetEnd);
     ASTextSelectionRect *rect = [ASTextSelectionRect new];
-    if (isVertical) {
-      rect.rect = CGRectMake(startLine.bounds.origin.x, offsetStart, MAX(startLine.width, endLine.width), offsetEnd - offsetStart);
-    } else {
-      rect.rect = CGRectMake(offsetStart, startLine.bounds.origin.y, offsetEnd - offsetStart, MAX(startLine.height, endLine.height));
-    }
-    rect.isVertical = isVertical;
+    rect.rect = CGRectMake(offsetStart, startLine.bounds.origin.y, offsetEnd - offsetStart, MAX(startLine.height, endLine.height));
+    rect.isVertical = NO;
     [rects addObject:rect];
     
   } else { // more than one row
     
     // start line select rect
     ASTextSelectionRect *topRect = [ASTextSelectionRect new];
-    topRect.isVertical = isVertical;
+    topRect.isVertical = NO;
     CGFloat topOffset = [self offsetForTextPosition:range.start.offset lineIndex:startLineIndex];
     CTRunRef topRun = [self _runForLine:startLine position:range.start];
     if (topRun && (CTRunGetStatus(topRun) & kCTRunStatusRightToLeft)) {
-      if (isVertical) {
-        topRect.rect = CGRectMake(startLine.left, _container.path ? startLine.top : _container.insets.top, startLine.width, topOffset - startLine.top);
-      } else {
-        topRect.rect = CGRectMake(_container.path ? startLine.left : _container.insets.left, startLine.top, topOffset - startLine.left, startLine.height);
-      }
+      topRect.rect = CGRectMake(_container.path ? startLine.left : _container.insets.left, startLine.top, topOffset - startLine.left, startLine.height);
       topRect.writingDirection = UITextWritingDirectionRightToLeft;
     } else {
-      if (isVertical) {
-        topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
-      } else {
-        // TODO: Fixes highlighting first row only to the end of the text and not highlight
-        //       the while line to the end. Needs to brought over to multiline support
-        topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
-      }
+      // TODO: Fixes highlighting first row only to the end of the text and not highlight
+      //       the while line to the end. Needs to brought over to multiline support
+      topRect.rect = CGRectMake(topOffset, startLine.top, (_container.path ? startLine.right : _container.size.width - _container.insets.right) - topOffset - (_container.size.width - _container.insets.right - startLine.right), startLine.height);
     }
     [rects addObject:topRect];
     
     // end line select rect
     ASTextSelectionRect *bottomRect = [ASTextSelectionRect new];
-    bottomRect.isVertical = isVertical;
+    bottomRect.isVertical = NO;
     CGFloat bottomOffset = [self offsetForTextPosition:range.end.offset lineIndex:endLineIndex];
     CTRunRef bottomRun = [self _runForLine:endLine position:range.end];
     if (bottomRun && (CTRunGetStatus(bottomRun) & kCTRunStatusRightToLeft)) {
-      if (isVertical) {
-        bottomRect.rect = CGRectMake(endLine.left, bottomOffset, endLine.width, (_container.path ? endLine.bottom : _container.size.height - _container.insets.bottom) - bottomOffset);
-      } else {
-        bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
-      }
+      bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
       bottomRect.writingDirection = UITextWritingDirectionRightToLeft;
     } else {
-      if (isVertical) {
-        CGFloat top = _container.path ? endLine.top : _container.insets.top;
-        bottomRect.rect = CGRectMake(endLine.left, top, endLine.width, bottomOffset - top);
-      } else {
-        CGFloat left = _container.path ? endLine.left : _container.insets.left;
-        bottomRect.rect = CGRectMake(left, endLine.top, bottomOffset - left, endLine.height);
-      }
+      CGFloat left = _container.path ? endLine.left : _container.insets.left;
+      bottomRect.rect = CGRectMake(left, endLine.top, bottomOffset - left, endLine.height);
     }
     [rects addObject:bottomRect];
     
@@ -2186,49 +2065,28 @@ dispatch_semaphore_signal(_lock);
         }
       }
       if (startLineDetected) {
-        if (isVertical) {
-          if (!_container.path) {
-            r.origin.y = _container.insets.top;
-            r.size.height = _container.size.height - _container.insets.bottom - _container.insets.top;
-          }
-          r.size.width =  CGRectGetMinX(topRect.rect) - CGRectGetMaxX(bottomRect.rect);
-          r.origin.x = CGRectGetMaxX(bottomRect.rect);
-        } else {
-          if (!_container.path) {
-            r.origin.x = _container.insets.left;
-            r.size.width = _container.size.width - _container.insets.right - _container.insets.left;
-          }
-          r.origin.y = CGRectGetMaxY(topRect.rect);
-          r.size.height = bottomRect.rect.origin.y - r.origin.y;
+        if (!_container.path) {
+          r.origin.x = _container.insets.left;
+          r.size.width = _container.size.width - _container.insets.right - _container.insets.left;
         }
+        r.origin.y = CGRectGetMaxY(topRect.rect);
+        r.size.height = bottomRect.rect.origin.y - r.origin.y;
         
         ASTextSelectionRect *rect = [ASTextSelectionRect new];
         rect.rect = r;
-        rect.isVertical = isVertical;
+        rect.isVertical = NO;
         [rects addObject:rect];
       }
     } else {
-      if (isVertical) {
-        CGRect r0 = bottomRect.rect;
-        CGRect r1 = topRect.rect;
-        CGFloat mid = (CGRectGetMaxX(r0) + CGRectGetMinX(r1)) * 0.5;
-        r0.size.width = mid - r0.origin.x;
-        CGFloat r1ofs = r1.origin.x - mid;
-        r1.origin.x -= r1ofs;
-        r1.size.width += r1ofs;
-        topRect.rect = r1;
-        bottomRect.rect = r0;
-      } else {
-        CGRect r0 = topRect.rect;
-        CGRect r1 = bottomRect.rect;
-        CGFloat mid = (CGRectGetMaxY(r0) + CGRectGetMinY(r1)) * 0.5;
-        r0.size.height = mid - r0.origin.y;
-        CGFloat r1ofs = r1.origin.y - mid;
-        r1.origin.y -= r1ofs;
-        r1.size.height += r1ofs;
-        topRect.rect = r0;
-        bottomRect.rect = r1;
-      }
+      CGRect r0 = topRect.rect;
+      CGRect r1 = bottomRect.rect;
+      CGFloat mid = (CGRectGetMaxY(r0) + CGRectGetMinY(r1)) * 0.5;
+      r0.size.height = mid - r0.origin.y;
+      CGFloat r1ofs = r1.origin.y - mid;
+      r1.origin.y -= r1ofs;
+      r1.size.height += r1ofs;
+      topRect.rect = r0;
+      bottomRect.rect = r1;
     }
   }
   return rects;
@@ -2274,18 +2132,11 @@ typedef NS_OPTIONS(NSUInteger, ASTextBorderType) {
   ASTextBorderTypeNormal    = 1 << 1,
 };
 
-static CGRect ASTextMergeRectInSameLine(CGRect rect1, CGRect rect2, BOOL isVertical) {
-  if (isVertical) {
-    CGFloat top = MIN(rect1.origin.y, rect2.origin.y);
-    CGFloat bottom = MAX(rect1.origin.y + rect1.size.height, rect2.origin.y + rect2.size.height);
-    CGFloat width = MAX(rect1.size.width, rect2.size.width);
-    return CGRectMake(rect1.origin.x, top, width, bottom - top);
-  } else {
-    CGFloat left = MIN(rect1.origin.x, rect2.origin.x);
-    CGFloat right = MAX(rect1.origin.x + rect1.size.width, rect2.origin.x + rect2.size.width);
-    CGFloat height = MAX(rect1.size.height, rect2.size.height);
-    return CGRectMake(left, rect1.origin.y, right - left, height);
-  }
+static CGRect ASTextMergeRectInSameLine(CGRect rect1, CGRect rect2) {
+  CGFloat left = MIN(rect1.origin.x, rect2.origin.x);
+  CGFloat right = MAX(rect1.origin.x + rect1.size.width, rect2.origin.x + rect2.size.width);
+  CGFloat height = MAX(rect1.size.height, rect2.size.height);
+  return CGRectMake(left, rect1.origin.y, right - left, height);
 }
 
 static void ASTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *underlinePosition, CGFloat *lineThickness) {
@@ -2312,13 +2163,13 @@ static void ASTextGetRunsMaxMetric(CFArrayRef runs, CGFloat *xHeight, CGFloat *u
   if (lineThickness) *lineThickness = maxLineThickness;
 }
 
-static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, CGSize size, BOOL isVertical, NSArray *runRanges, CGFloat verticalOffset) {
+static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, CGSize size, NSArray *runRanges, CGFloat verticalOffset) {
   CGAffineTransform runTextMatrix = CTRunGetTextMatrix(run);
   BOOL runTextMatrixIsID = CGAffineTransformIsIdentity(runTextMatrix);
   
   CFDictionaryRef runAttrs = CTRunGetAttributes(run);
   NSValue *glyphTransformValue = (NSValue *)CFDictionaryGetValue(runAttrs, (__bridge const void *)(ASTextGlyphTransformAttributeName));
-  if (!isVertical && !glyphTransformValue) { // draw run
+  if (!glyphTransformValue) { // draw run
     if (!runTextMatrixIsID) {
       CGContextSaveGState(context);
       CGAffineTransform trans = CGContextGetTextMatrix(context);
@@ -2358,102 +2209,46 @@ static void ASTextDrawRun(ASTextLine *line, CTRunRef run, CGContextRef context, 
           CGContextSetTextDrawingMode(context, kCGTextFillStroke);
         }
       }
-      
-      if (isVertical) {
+      if (glyphTransformValue) {
         CFIndex runStrIdx[glyphCount + 1];
         CTRunGetStringIndices(run, CFRangeMake(0, 0), runStrIdx);
         CFRange runStrRange = CTRunGetStringRange(run);
         runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
         CGSize glyphAdvances[glyphCount];
         CTRunGetAdvances(run, CFRangeMake(0, 0), glyphAdvances);
-        CGFloat ascent = CTFontGetAscent(runFont);
-        CGFloat descent = CTFontGetDescent(runFont);
         CGAffineTransform glyphTransform = glyphTransformValue.CGAffineTransformValue;
         CGPoint zeroPoint = CGPointZero;
-        
-        for (ASTextRunGlyphRange *oneRange in runRanges) {
-          NSRange range = oneRange.glyphRangeInRun;
-          NSUInteger rangeMax = range.location + range.length;
-          ASTextRunGlyphDrawMode mode = oneRange.drawMode;
-          
-          for (NSUInteger g = range.location; g < rangeMax; g++) {
-            CGContextSaveGState(context); {
-              CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-              if (glyphTransformValue) {
-                CGContextSetTextMatrix(context, glyphTransform);
-              }
-              if (mode) { // CJK glyph, need rotated
-                CGFloat ofs = (ascent - descent) * 0.5;
-                CGFloat w = glyphAdvances[g].width * 0.5;
-                CGFloat x = line.position.x + verticalOffset + glyphPositions[g].y + (ofs - w);
-                CGFloat y = -line.position.y + size.height - glyphPositions[g].x - (ofs + w);
-                if (mode == ASTextRunGlyphDrawModeVerticalRotateMove) {
-                  x += w;
-                  y += w;
-                }
-                CGContextSetTextPosition(context, x, y);
-              } else {
-                CGContextRotateCTM(context, -M_PI_2);
-                CGContextSetTextPosition(context,
-                                         line.position.y - size.height + glyphPositions[g].x,
-                                         line.position.x + verticalOffset + glyphPositions[g].y);
-              }
-              
-              if (ASTextCTFontContainsColorBitmapGlyphs(runFont)) {
-                CTFontDrawGlyphs(runFont, glyphs + g, &zeroPoint, 1, context);
-              } else {
-                CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-                CGContextSetFont(context, cgFont);
-                CGContextSetFontSize(context, CTFontGetSize(runFont));
-                CGContextShowGlyphsAtPositions(context, glyphs + g, &zeroPoint, 1);
-                CGFontRelease(cgFont);
-              }
-            } CGContextRestoreGState(context);
-          }
+
+        for (NSUInteger g = 0; g < glyphCount; g++) {
+          CGContextSaveGState(context); {
+            CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+            CGContextSetTextMatrix(context, glyphTransform);
+            CGContextSetTextPosition(context,
+                                     line.position.x + glyphPositions[g].x,
+                                     size.height - (line.position.y + glyphPositions[g].y));
+
+            if (ASTextCTFontContainsColorBitmapGlyphs(runFont)) {
+              CTFontDrawGlyphs(runFont, glyphs + g, &zeroPoint, 1, context);
+            } else {
+              CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
+              CGContextSetFont(context, cgFont);
+              CGContextSetFontSize(context, CTFontGetSize(runFont));
+              CGContextShowGlyphsAtPositions(context, glyphs + g, &zeroPoint, 1);
+              CGFontRelease(cgFont);
+            }
+          } CGContextRestoreGState(context);
         }
-      } else { // not vertical
-        if (glyphTransformValue) {
-          CFIndex runStrIdx[glyphCount + 1];
-          CTRunGetStringIndices(run, CFRangeMake(0, 0), runStrIdx);
-          CFRange runStrRange = CTRunGetStringRange(run);
-          runStrIdx[glyphCount] = runStrRange.location + runStrRange.length;
-          CGSize glyphAdvances[glyphCount];
-          CTRunGetAdvances(run, CFRangeMake(0, 0), glyphAdvances);
-          CGAffineTransform glyphTransform = glyphTransformValue.CGAffineTransformValue;
-          CGPoint zeroPoint = CGPointZero;
-          
-          for (NSUInteger g = 0; g < glyphCount; g++) {
-            CGContextSaveGState(context); {
-              CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-              CGContextSetTextMatrix(context, glyphTransform);
-              CGContextSetTextPosition(context,
-                                       line.position.x + glyphPositions[g].x,
-                                       size.height - (line.position.y + glyphPositions[g].y));
-              
-              if (ASTextCTFontContainsColorBitmapGlyphs(runFont)) {
-                CTFontDrawGlyphs(runFont, glyphs + g, &zeroPoint, 1, context);
-              } else {
-                CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-                CGContextSetFont(context, cgFont);
-                CGContextSetFontSize(context, CTFontGetSize(runFont));
-                CGContextShowGlyphsAtPositions(context, glyphs + g, &zeroPoint, 1);
-                CGFontRelease(cgFont);
-              }
-            } CGContextRestoreGState(context);
-          }
+      } else {
+        if (ASTextCTFontContainsColorBitmapGlyphs(runFont)) {
+          CTFontDrawGlyphs(runFont, glyphs, glyphPositions, glyphCount, context);
         } else {
-          if (ASTextCTFontContainsColorBitmapGlyphs(runFont)) {
-            CTFontDrawGlyphs(runFont, glyphs, glyphPositions, glyphCount, context);
-          } else {
-            CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
-            CGContextSetFont(context, cgFont);
-            CGContextSetFontSize(context, CTFontGetSize(runFont));
-            CGContextShowGlyphsAtPositions(context, glyphs, glyphPositions, glyphCount);
-            CGFontRelease(cgFont);
-          }
+          CGFontRef cgFont = CTFontCopyGraphicsFont(runFont, NULL);
+          CGContextSetFont(context, cgFont);
+          CGContextSetFontSize(context, CTFontGetSize(runFont));
+          CGContextShowGlyphsAtPositions(context, glyphs, glyphPositions, glyphCount);
+          CGFontRelease(cgFont);
         }
       }
-      
     } CGContextRestoreGState(context);
   }
 }
@@ -2488,7 +2283,7 @@ static void ASTextSetLinePatternInContext(ASTextLineStyle style, CGFloat width, 
 }
 
 
-static void ASTextDrawBorderRects(CGContextRef context, CGSize size, ASTextBorder *border, NSArray *rects, BOOL isVertical) {
+static void ASTextDrawBorderRects(CGContextRef context, CGSize size, ASTextBorder *border, NSArray *rects) {
   if (rects.count == 0) return;
   
   ASTextShadow *shadow = border.shadow;
@@ -2501,11 +2296,7 @@ static void ASTextDrawBorderRects(CGContextRef context, CGSize size, ASTextBorde
   NSMutableArray *paths = [NSMutableArray new];
   for (NSValue *value in rects) {
     CGRect rect = value.CGRectValue;
-    if (isVertical) {
-      rect = UIEdgeInsetsInsetRect(rect, UIEdgeInsetRotateVertical(border.insets));
-    } else {
-      rect = UIEdgeInsetsInsetRect(rect, border.insets);
-    }
+    rect = UIEdgeInsetsInsetRect(rect, border.insets);
     rect = ASTextCGRectPixelRound(rect);
     UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:border.cornerRadius];
     [path closePath];
@@ -2547,11 +2338,7 @@ static void ASTextDrawBorderRects(CGContextRef context, CGSize size, ASTextBorde
     CGContextSetLineJoin(context, border.lineJoin);
     for (NSValue *value in rects) {
       CGRect rect = value.CGRectValue;
-      if (isVertical) {
-        rect = UIEdgeInsetsInsetRect(rect, UIEdgeInsetRotateVertical(border.insets));
-      } else {
-        rect = UIEdgeInsetsInsetRect(rect, border.insets);
-      }
+      rect = UIEdgeInsetsInsetRect(rect, border.insets);
       rect = CGRectInset(rect, inset, inset);
       UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:border.cornerRadius + radiusDelta];
       [path closePath];
@@ -2604,85 +2391,46 @@ static void ASTextDrawBorderRects(CGContextRef context, CGSize size, ASTextBorde
   }
 }
 
-static void ASTextDrawLineStyle(CGContextRef context, CGFloat length, CGFloat lineWidth, ASTextLineStyle style, CGPoint position, CGColorRef color, BOOL isVertical) {
+static void ASTextDrawLineStyle(CGContextRef context, CGFloat length, CGFloat lineWidth, ASTextLineStyle style, CGPoint position, CGColorRef color) {
   NSUInteger styleBase = style & 0xFF;
   if (styleBase == 0) return;
   
   CGContextSaveGState(context); {
-    if (isVertical) {
-      CGFloat x, y1, y2, w;
-      y1 = ASRoundPixelValue(position.y);
-      y2 = ASRoundPixelValue(position.y + length);
-      w = (styleBase == ASTextLineStyleThick ? lineWidth * 2 : lineWidth);
-      
-      CGFloat linePixel = ASTextCGFloatToPixel(w);
-      if (fabs(linePixel - floor(linePixel)) < 0.1) {
-        int iPixel = linePixel;
-        if (iPixel == 0 || (iPixel % 2)) { // odd line pixel
-          x = ASTextCGFloatPixelHalf(position.x);
-        } else {
-          x = ASFloorPixelValue(position.x);
-        }
+    CGFloat x1, x2, y, w;
+    x1 = ASRoundPixelValue(position.x);
+    x2 = ASRoundPixelValue(position.x + length);
+    w = (styleBase == ASTextLineStyleThick ? lineWidth * 2 : lineWidth);
+
+    CGFloat linePixel = ASTextCGFloatToPixel(w);
+    if (fabs(linePixel - floor(linePixel)) < 0.1) {
+      int iPixel = linePixel;
+      if (iPixel == 0 || (iPixel % 2)) { // odd line pixel
+        y = ASTextCGFloatPixelHalf(position.y);
       } else {
-        x = position.x;
-      }
-      
-      CGContextSetStrokeColorWithColor(context, color);
-      ASTextSetLinePatternInContext(style, lineWidth, position.y, context);
-      CGContextSetLineWidth(context, w);
-      if (styleBase == ASTextLineStyleSingle) {
-        CGContextMoveToPoint(context, x, y1);
-        CGContextAddLineToPoint(context, x, y2);
-        CGContextStrokePath(context);
-      } else if (styleBase == ASTextLineStyleThick) {
-        CGContextMoveToPoint(context, x, y1);
-        CGContextAddLineToPoint(context, x, y2);
-        CGContextStrokePath(context);
-      } else if (styleBase == ASTextLineStyleDouble) {
-        CGContextMoveToPoint(context, x - w, y1);
-        CGContextAddLineToPoint(context, x - w, y2);
-        CGContextStrokePath(context);
-        CGContextMoveToPoint(context, x + w, y1);
-        CGContextAddLineToPoint(context, x + w, y2);
-        CGContextStrokePath(context);
+        y = ASFloorPixelValue(position.y);
       }
     } else {
-      CGFloat x1, x2, y, w;
-      x1 = ASRoundPixelValue(position.x);
-      x2 = ASRoundPixelValue(position.x + length);
-      w = (styleBase == ASTextLineStyleThick ? lineWidth * 2 : lineWidth);
-      
-      CGFloat linePixel = ASTextCGFloatToPixel(w);
-      if (fabs(linePixel - floor(linePixel)) < 0.1) {
-        int iPixel = linePixel;
-        if (iPixel == 0 || (iPixel % 2)) { // odd line pixel
-          y = ASTextCGFloatPixelHalf(position.y);
-        } else {
-          y = ASFloorPixelValue(position.y);
-        }
-      } else {
-        y = position.y;
-      }
-      
-      CGContextSetStrokeColorWithColor(context, color);
-      ASTextSetLinePatternInContext(style, lineWidth, position.x, context);
-      CGContextSetLineWidth(context, w);
-      if (styleBase == ASTextLineStyleSingle) {
-        CGContextMoveToPoint(context, x1, y);
-        CGContextAddLineToPoint(context, x2, y);
-        CGContextStrokePath(context);
-      } else if (styleBase == ASTextLineStyleThick) {
-        CGContextMoveToPoint(context, x1, y);
-        CGContextAddLineToPoint(context, x2, y);
-        CGContextStrokePath(context);
-      } else if (styleBase == ASTextLineStyleDouble) {
-        CGContextMoveToPoint(context, x1, y - w);
-        CGContextAddLineToPoint(context, x2, y - w);
-        CGContextStrokePath(context);
-        CGContextMoveToPoint(context, x1, y + w);
-        CGContextAddLineToPoint(context, x2, y + w);
-        CGContextStrokePath(context);
-      }
+      y = position.y;
+    }
+
+    CGContextSetStrokeColorWithColor(context, color);
+    ASTextSetLinePatternInContext(style, lineWidth, position.x, context);
+    CGContextSetLineWidth(context, w);
+    if (styleBase == ASTextLineStyleSingle) {
+      CGContextMoveToPoint(context, x1, y);
+      CGContextAddLineToPoint(context, x2, y);
+      CGContextStrokePath(context);
+    } else if (styleBase == ASTextLineStyleThick) {
+      CGContextMoveToPoint(context, x1, y);
+      CGContextAddLineToPoint(context, x2, y);
+      CGContextStrokePath(context);
+    } else if (styleBase == ASTextLineStyleDouble) {
+      CGContextMoveToPoint(context, x1, y - w);
+      CGContextAddLineToPoint(context, x2, y - w);
+      CGContextStrokePath(context);
+      CGContextMoveToPoint(context, x1, y + w);
+      CGContextAddLineToPoint(context, x2, y + w);
+      CGContextStrokePath(context);
     }
   } CGContextRestoreGState(context);
 }
@@ -2694,8 +2442,7 @@ static void ASTextDrawText(ASTextLayout *layout, CGContextRef context, CGSize si
     CGContextTranslateCTM(context, 0, size.height);
     CGContextScaleCTM(context, 1, -1);
     
-    BOOL isVertical = layout.container.verticalForm;
-    CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+    CGFloat verticalOffset = 0;
     
     NSArray *lines = layout.lines;
     for (NSUInteger l = 0, lMax = lines.count; l < lMax; l++) {
@@ -2709,7 +2456,7 @@ static void ASTextDrawText(ASTextLayout *layout, CGContextRef context, CGSize si
         CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, r);
         CGContextSetTextMatrix(context, CGAffineTransformIdentity);
         CGContextSetTextPosition(context, posX, posY);
-        ASTextDrawRun(line, run, context, size, isVertical, lineRunRanges[r], verticalOffset);
+        ASTextDrawRun(line, run, context, size, lineRunRanges[r], verticalOffset);
       }
       if (cancel && cancel()) break;
     }
@@ -2725,8 +2472,7 @@ static void ASTextDrawBlockBorder(ASTextLayout *layout, CGContextRef context, CG
   CGContextSaveGState(context);
   CGContextTranslateCTM(context, point.x, point.y);
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   
   NSArray *lines = layout.lines;
   for (NSInteger l = 0, lMax = lines.count; l < lMax; l++) {
@@ -2772,18 +2518,13 @@ static void ASTextDrawBlockBorder(ASTextLayout *layout, CGContextRef context, CG
         }
         lineContinueIndex++;
       } while (true);
-      
-      if (isVertical) {
-        UIEdgeInsets insets = layout.container.insets;
-        unionRect.origin.y = insets.top;
-        unionRect.size.height = layout.container.size.height -insets.top - insets.bottom;
-      } else {
-        UIEdgeInsets insets = layout.container.insets;
-        unionRect.origin.x = insets.left;
-        unionRect.size.width = layout.container.size.width -insets.left - insets.right;
-      }
+
+      UIEdgeInsets insets = layout.container.insets;
+      unionRect.origin.x = insets.left;
+      unionRect.size.width = layout.container.size.width -insets.left - insets.right;
+
       unionRect.origin.x += verticalOffset;
-      ASTextDrawBorderRects(context, size, border, @[[NSValue valueWithCGRect:unionRect]], isVertical);
+      ASTextDrawBorderRects(context, size, border, @[[NSValue valueWithCGRect:unionRect]]);
       
       l = lineContinueIndex;
       break;
@@ -2798,8 +2539,7 @@ static void ASTextDrawBorder(ASTextLayout *layout, CGContextRef context, CGSize 
   CGContextSaveGState(context);
   CGContextTranslateCTM(context, point.x, point.y);
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   
   NSArray *lines = layout.lines;
   NSString *borderKey = (type == ASTextBorderTypeNormal ? ASTextBorderAttributeName : ASTextBackgroundBorderAttributeName);
@@ -2857,25 +2597,15 @@ static void ASTextDrawBorder(ASTextLayout *layout, CGContextRef context, CGSize 
           CTRunGetPositions(iRun, CFRangeMake(0, 1), &iRunPosition);
           CGFloat ascent, descent;
           CGFloat iRunWidth = CTRunGetTypographicBounds(iRun, CFRangeMake(0, 0), &ascent, &descent, NULL);
-          
-          if (isVertical) {
-            ASTEXT_SWAP(iRunPosition.x, iRunPosition.y);
-            iRunPosition.y += iLine.position.y;
-            CGRect iRect = CGRectMake(verticalOffset + line.position.x - descent, iRunPosition.y, ascent + descent, iRunWidth);
-            if (CGRectIsNull(extLineRect)) {
-              extLineRect = iRect;
-            } else {
-              extLineRect = CGRectUnion(extLineRect, iRect);
-            }
+
+          iRunPosition.x += iLine.position.x;
+          CGRect iRect = CGRectMake(iRunPosition.x, iLine.position.y - ascent, iRunWidth, ascent + descent);
+          if (CGRectIsNull(extLineRect)) {
+            extLineRect = iRect;
           } else {
-            iRunPosition.x += iLine.position.x;
-            CGRect iRect = CGRectMake(iRunPosition.x, iLine.position.y - ascent, iRunWidth, ascent + descent);
-            if (CGRectIsNull(extLineRect)) {
-              extLineRect = iRect;
-            } else {
-              extLineRect = CGRectUnion(extLineRect, iRect);
-            }
+            extLineRect = CGRectUnion(extLineRect, iRect);
           }
+
         }
         
         if (!CGRectIsNull(extLineRect)) {
@@ -2887,27 +2617,18 @@ static void ASTextDrawBorder(ASTextLayout *layout, CGContextRef context, CGSize 
       CGRect curRect= ((NSValue *)[runRects firstObject]).CGRectValue;
       for (NSInteger re = 0, reMax = runRects.count; re < reMax; re++) {
         CGRect rect = ((NSValue *)runRects[re]).CGRectValue;
-        if (isVertical) {
-          if (fabs(rect.origin.x - curRect.origin.x) < 1) {
-            curRect = ASTextMergeRectInSameLine(rect, curRect, isVertical);
-          } else {
-            [drawRects addObject:[NSValue valueWithCGRect:curRect]];
-            curRect = rect;
-          }
+        if (fabs(rect.origin.y - curRect.origin.y) < 1) {
+          curRect = ASTextMergeRectInSameLine(rect, curRect);
         } else {
-          if (fabs(rect.origin.y - curRect.origin.y) < 1) {
-            curRect = ASTextMergeRectInSameLine(rect, curRect, isVertical);
-          } else {
-            [drawRects addObject:[NSValue valueWithCGRect:curRect]];
-            curRect = rect;
-          }
+          [drawRects addObject:[NSValue valueWithCGRect:curRect]];
+          curRect = rect;
         }
       }
       if (!CGRectEqualToRect(curRect, CGRectZero)) {
         [drawRects addObject:[NSValue valueWithCGRect:curRect]];
       }
       
-      ASTextDrawBorderRects(context, size, border, drawRects, isVertical);
+      ASTextDrawBorderRects(context, size, border, drawRects);
       
       if (l == endLineIndex) {
         r = endRunIndex;
@@ -2930,8 +2651,7 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
   CGContextSaveGState(context);
   CGContextTranslateCTM(context, point.x, point.y);
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   CGContextTranslateCTM(context, verticalOffset, 0);
   
   for (NSUInteger l = 0, lMax = layout.lines.count; l < lMax; l++) {
@@ -2969,26 +2689,15 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
       
       CGPoint underlineStart, strikethroughStart;
       CGFloat length;
-      
-      if (isVertical) {
-        underlineStart.x = line.position.x + underlinePosition;
-        strikethroughStart.x = line.position.x + xHeight / 2;
-        
-        CGPoint runPosition = CGPointZero;
-        CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
-        underlineStart.y = strikethroughStart.y = runPosition.x + line.position.y;
-        length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
-        
-      } else {
-        underlineStart.y = line.position.y - underlinePosition;
-        strikethroughStart.y = line.position.y - xHeight / 2;
-        
-        CGPoint runPosition = CGPointZero;
-        CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
-        underlineStart.x = strikethroughStart.x = runPosition.x + line.position.x;
-        length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
-      }
-      
+
+      underlineStart.y = line.position.y - underlinePosition;
+      strikethroughStart.y = line.position.y - xHeight / 2;
+
+      CGPoint runPosition = CGPointZero;
+      CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
+      underlineStart.x = strikethroughStart.x = runPosition.x + line.position.x;
+      length = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), NULL, NULL, NULL);
+
       if (needDrawUnderline) {
         CGColorRef color = underline.color.CGColor;
         if (!color) {
@@ -3010,12 +2719,12 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
               CGContextSetShadowWithColor(context, offset, shadow.radius, shadow.color.CGColor);
               CGContextSetBlendMode(context, shadow.blendMode);
               CGContextTranslateCTM(context, offsetAlterX, 0);
-              ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color, isVertical);
+              ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color);
             } CGContextRestoreGState(context);
           } CGContextRestoreGState(context);
           shadow = shadow.subShadow;
         }
-        ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color, isVertical);
+        ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color);
       }
       
       if (needDrawStrikethrough) {
@@ -3039,12 +2748,12 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
               CGContextSetShadowWithColor(context, offset, shadow.radius, shadow.color.CGColor);
               CGContextSetBlendMode(context, shadow.blendMode);
               CGContextTranslateCTM(context, offsetAlterX, 0);
-              ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color, isVertical);
+              ASTextDrawLineStyle(context, length, thickness, underline.style, underlineStart, color);
             } CGContextRestoreGState(context);
           } CGContextRestoreGState(context);
           shadow = shadow.subShadow;
         }
-        ASTextDrawLineStyle(context, length, thickness, strikethrough.style, strikethroughStart, color, isVertical);
+        ASTextDrawLineStyle(context, length, thickness, strikethrough.style, strikethroughStart, color);
       }
     }
   }
@@ -3053,8 +2762,7 @@ static void ASTextDrawDecoration(ASTextLayout *layout, CGContextRef context, CGS
 
 static void ASTextDrawAttachment(ASTextLayout *layout, CGContextRef context, CGSize size, CGPoint point, UIView *targetView, CALayer *targetLayer, BOOL (^cancel)(void)) {
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   
   for (NSUInteger i = 0, max = layout.attachments.count; i < max; i++) {
     ASTextAttachment *a = layout.attachments[i];
@@ -3063,26 +2771,34 @@ static void ASTextDrawAttachment(ASTextLayout *layout, CGContextRef context, CGS
     UIImage *image = nil;
     UIView *view = nil;
     CALayer *layer = nil;
+    ASDisplayNode *node = nil;
     if ([a.content isKindOfClass:[UIImage class]]) {
       image = a.content;
     } else if ([a.content isKindOfClass:[UIView class]]) {
       view = a.content;
     } else if ([a.content isKindOfClass:[CALayer class]]) {
       layer = a.content;
+    } else if ([a.content isKindOfClass:[ASDisplayNode class]]) {
+      node = a.content;
     }
-    if (!image && !view && !layer) continue;
-    if (image && !context) continue;
+    if (!image && !view && !layer && !node) continue;
+    if ((image || node) && !context) continue;
     if (view && !targetView) continue;
     if (layer && !targetLayer) continue;
     if (cancel && cancel()) break;
-    
+    if (!image && node) {
+      ASNetworkImageNode *networkImage = ASDynamicCast(node, ASNetworkImageNode);
+      if ([networkImage animatedImage]) {
+        // Need to check first because [networkImage defaultImage] can return coverImage for
+        // animated image.
+        image = [[UIImage alloc] initWithCGImage:(CGImageRef)node.contents];
+      } else {
+        image = [networkImage image] ?: [networkImage defaultImage];
+      }
+    }
     CGSize asize = image ? image.size : view ? view.frame.size : layer.frame.size;
     CGRect rect = ((NSValue *)layout.attachmentRects[i]).CGRectValue;
-    if (isVertical) {
-      rect = UIEdgeInsetsInsetRect(rect, UIEdgeInsetRotateVertical(a.contentInsets));
-    } else {
-      rect = UIEdgeInsetsInsetRect(rect, a.contentInsets);
-    }
+    rect = UIEdgeInsetsInsetRect(rect, a.contentInsets);
     rect = ASTextCGRectFitWithContentMode(rect, asize, a.contentMode);
     rect = ASTextCGRectPixelRound(rect);
     rect = CGRectStandardize(rect);
@@ -3111,8 +2827,7 @@ static void ASTextDrawShadow(ASTextLayout *layout, CGContextRef context, CGSize 
   //move out of context. (0xFFFF is just a random large number)
   CGFloat offsetAlterX = size.width + 0xFFFF;
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   
   CGContextSaveGState(context); {
     CGContextTranslateCTM(context, point.x, point.y);
@@ -3149,7 +2864,7 @@ static void ASTextDrawShadow(ASTextLayout *layout, CGContextRef context, CGSize 
             CGContextSetShadowWithColor(context, offset, shadow.radius, shadow.color.CGColor);
             CGContextSetBlendMode(context, shadow.blendMode);
             CGContextTranslateCTM(context, offsetAlterX, 0);
-            ASTextDrawRun(line, run, context, size, isVertical, lineRunRanges[r], verticalOffset);
+            ASTextDrawRun(line, run, context, size, lineRunRanges[r], verticalOffset);
           } CGContextRestoreGState(context);
           shadow = shadow.subShadow;
         }
@@ -3165,8 +2880,7 @@ static void ASTextDrawInnerShadow(ASTextLayout *layout, CGContextRef context, CG
   CGContextScaleCTM(context, 1, -1);
   CGContextSetTextMatrix(context, CGAffineTransformIdentity);
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   
   NSArray *lines = layout.lines;
   for (NSUInteger l = 0, lMax = lines.count; l < lMax; l++) {
@@ -3217,7 +2931,7 @@ static void ASTextDrawInnerShadow(ASTextLayout *layout, CGContextRef context, CG
               CGContextFillRect(context, runImageBounds);
               CGContextSetBlendMode(context, kCGBlendModeDestinationIn);
               CGContextBeginTransparencyLayer(context, NULL); {
-                ASTextDrawRun(line, run, context, size, isVertical, lineRunRanges[r], verticalOffset);
+                ASTextDrawRun(line, run, context, size, lineRunRanges[r], verticalOffset);
               } CGContextEndTransparencyLayer(context);
             } CGContextEndTransparencyLayer(context);
           } CGContextEndTransparencyLayer(context);
@@ -3239,8 +2953,7 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
   CGContextSetLineJoin(context, kCGLineJoinMiter);
   CGContextSetLineCap(context, kCGLineCapButt);
   
-  BOOL isVertical = layout.container.verticalForm;
-  CGFloat verticalOffset = isVertical ? (size.width - layout.container.size.width) : 0;
+  CGFloat verticalOffset = 0;
   CGContextTranslateCTM(context, verticalOffset, 0);
   
   if (op.CTFrameBorderColor || op.CTFrameFillColor) {
@@ -3316,28 +3029,19 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
     }
     if (op.baselineColor) {
       [op.baselineColor setStroke];
-      if (isVertical) {
-        CGFloat x = ASTextCGFloatPixelHalf(line.position.x);
-        CGFloat y1 = ASTextCGFloatPixelHalf(line.top);
-        CGFloat y2 = ASTextCGFloatPixelHalf(line.bottom);
-        CGContextMoveToPoint(context, x, y1);
-        CGContextAddLineToPoint(context, x, y2);
-        CGContextStrokePath(context);
-      } else {
-        CGFloat x1 = ASTextCGFloatPixelHalf(lineBounds.origin.x);
-        CGFloat x2 = ASTextCGFloatPixelHalf(lineBounds.origin.x + lineBounds.size.width);
-        CGFloat y = ASTextCGFloatPixelHalf(line.position.y);
-        CGContextMoveToPoint(context, x1, y);
-        CGContextAddLineToPoint(context, x2, y);
-        CGContextStrokePath(context);
-      }
+      CGFloat x1 = ASTextCGFloatPixelHalf(lineBounds.origin.x);
+      CGFloat x2 = ASTextCGFloatPixelHalf(lineBounds.origin.x + lineBounds.size.width);
+      CGFloat y = ASTextCGFloatPixelHalf(line.position.y);
+      CGContextMoveToPoint(context, x1, y);
+      CGContextAddLineToPoint(context, x2, y);
+      CGContextStrokePath(context);
     }
     if (op.CTLineNumberColor) {
       [op.CTLineNumberColor set];
       NSMutableAttributedString *num = [[NSMutableAttributedString alloc] initWithString:@(l).description];
       num.as_color = op.CTLineNumberColor;
       num.as_font = [UIFont systemFontOfSize:6];
-      [num drawAtPoint:CGPointMake(line.position.x, line.position.y - (isVertical ? 1 : 6))];
+      [num drawAtPoint:CGPointMake(line.position.x, line.position.y - 6)];
     }
     if (op.CTRunFillColor || op.CTRunBorderColor || op.CTRunNumberColor || op.CGGlyphFillColor || op.CGGlyphBorderColor) {
       CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
@@ -3353,24 +3057,14 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
         CTRunGetAdvances(run, CFRangeMake(0, glyphCount), glyphAdvances);
         
         CGPoint runPosition = glyphPositions[0];
-        if (isVertical) {
-          ASTEXT_SWAP(runPosition.x, runPosition.y);
-          runPosition.x = line.position.x;
-          runPosition.y += line.position.y;
-        } else {
-          runPosition.x += line.position.x;
-          runPosition.y = line.position.y - runPosition.y;
-        }
+        runPosition.x += line.position.x;
+        runPosition.y = line.position.y - runPosition.y;
         
         CGFloat ascent, descent, leading;
         CGFloat width = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &descent, &leading);
         CGRect runTypoBounds;
-        if (isVertical) {
-          runTypoBounds = CGRectMake(runPosition.x - descent, runPosition.y, ascent + descent, width);
-        } else {
-          runTypoBounds = CGRectMake(runPosition.x, line.position.y - ascent, width, ascent + descent);
-        }
-        
+        runTypoBounds = CGRectMake(runPosition.x, line.position.y - ascent, width, ascent + descent);
+
         if (op.CTRunFillColor) {
           [op.CTRunFillColor setFill];
           CGContextAddRect(context, ASTextCGRectPixelRound(runTypoBounds));
@@ -3393,16 +3087,10 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
             CGPoint pos = glyphPositions[g];
             CGSize adv = glyphAdvances[g];
             CGRect rect;
-            if (isVertical) {
-              ASTEXT_SWAP(pos.x, pos.y);
-              pos.x = runPosition.x;
-              pos.y += line.position.y;
-              rect = CGRectMake(pos.x - descent, pos.y, runTypoBounds.size.width, adv.width);
-            } else {
-              pos.x += line.position.x;
-              pos.y = runPosition.y;
-              rect = CGRectMake(pos.x, pos.y - ascent, adv.width, runTypoBounds.size.height);
-            }
+            pos.x += line.position.x;
+            pos.y = runPosition.y;
+            rect = CGRectMake(pos.x, pos.y - ascent, adv.width, runTypoBounds.size.height);
+
             if (op.CGGlyphFillColor) {
               [op.CGGlyphFillColor setFill];
               CGContextAddRect(context, ASTextCGRectPixelRound(rect));
@@ -3481,3 +3169,15 @@ static void ASTextDrawDebug(ASTextLayout *layout, CGContextRef context, CGSize s
 }
 
 @end
+
+NSAttributedString *fillBaseAttributes(NSAttributedString *str, NSDictionary *attrs) {
+  NSUInteger len = str.length;
+  if (!len) return str;
+  NSMutableAttributedString *m_result;  // Do not create unless needed.
+  for (NSString *name in attrs) {
+    if ([str as_hasAttribute:name]) continue;
+    if (!m_result) m_result = [str mutableCopy];
+    [m_result addAttribute:name value:attrs[name] range:NSMakeRange(0, len)];
+  }
+  return m_result ?: str;
+}

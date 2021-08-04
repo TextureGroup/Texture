@@ -20,7 +20,7 @@
 + (NSParagraphStyle *)as_styleWithCTStyle:(CTParagraphStyleRef)CTStyle {
   if (CTStyle == NULL) return nil;
   
-  NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+  NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
   
 #if TARGET_OS_IOS
 #pragma clang diagnostic push

@@ -24,7 +24,10 @@ NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags
                                       @"exp_optimize_data_controller_pipeline",
                                       @"exp_disable_global_textkit_lock",
                                       @"exp_main_thread_only_data_controller",
-                                      @"exp_range_update_on_changeset_update"]));
+                                      @"exp_range_update_on_changeset_update",
+                                      @"exp_do_not_cache_accessibility_elements",
+                                      @"exp_enable_node_is_hidden_from_accessibility",
+                                      @"exp_enable_accessibility_elements_return_nil"]));
   if (flags == ASExperimentalFeatureAll) {
     return allNames;
   }

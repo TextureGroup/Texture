@@ -17,10 +17,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface NSAttributedString (ASTextAttachment)
+
+- (BOOL)as_hasAttribute:(NSAttributedStringKey)attributeKey;
+
+@end
+
 ASDK_EXTERN void ASInitializeFrameworkMainThread(void);
 
 ASDK_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);
 ASDK_EXTERN BOOL ASDefaultAllowsEdgeAntialiasing(void);
+
+/// ASTraitCollection is probably a better place to look on iOS >= 10
+/// This _may not be set_ if AS_INITIALIZE_FRAMEWORK_MANUALLY is not set or we are used by an extension
+ASDK_EXTERN NSNumber *ASApplicationUserInterfaceLayoutDirection(void);
 
 ASDK_EXTERN BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector);
 ASDK_EXTERN BOOL ASSubclassOverridesClassSelector(Class superclass, Class subclass, SEL selector);
@@ -118,6 +128,8 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASImageDownloaderPriority ASImageDown
  * Create an NSMutableSet that uses pointers for hash & equality.
  */
 ASDK_EXTERN NSMutableSet *ASCreatePointerBasedMutableSet(void);
+
+ASDK_EXTERN NSAttributedString *ASGetZeroAttributedString(void);
 
 NS_ASSUME_NONNULL_END
 

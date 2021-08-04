@@ -9,6 +9,8 @@
 
 #import "ASTextAttribute.h"
 #import <CoreText/CoreText.h>
+#import <UIKit/UIKit.h>
+#import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/NSAttributedString+ASText.h>
 
 NSString *const ASTextBackedStringAttributeName = @"ASTextBackedString";
@@ -363,6 +365,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   one.contentInsets = self.contentInsets;
   one.userInfo = self.userInfo.copy;
   return one;
+}
+
+- (void)dealloc {
+  ASPerformMainThreadDeallocation(&_userInfo);
 }
 
 @end

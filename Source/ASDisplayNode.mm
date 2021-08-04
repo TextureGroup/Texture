@@ -929,6 +929,22 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   }
 }
 
+- (UIEdgeInsets)paddings {
+  MutexLocker l(__instanceLock__);
+#if YOGA
+  if (_flags.yoga) {
+    YGNodeRef yogaNode = _style.yogaNode;
+    CGFloat top    = YGNodeLayoutGetPadding(yogaNode, YGEdgeTop);
+    CGFloat left   = YGNodeLayoutGetPadding(yogaNode, YGEdgeLeft);
+    CGFloat bottom = YGNodeLayoutGetPadding(yogaNode, YGEdgeBottom);
+    CGFloat right  = YGNodeLayoutGetPadding(yogaNode, YGEdgeRight);
+    return UIEdgeInsetsMake(top, left, bottom, right);
+  }
+#endif  // YOGA
+  return UIEdgeInsetsZero;
+  
+}
+
 - (void)checkResponderCompatibility
 {
 #if ASDISPLAYNODE_ASSERTIONS_ENABLED
