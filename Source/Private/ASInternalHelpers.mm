@@ -88,7 +88,7 @@ void ASInitializeFrameworkMainThread(void)
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     ASDisplayNodeCAssertMainThread();
-    applicationUserInterfaceLayoutDirection = @([UIApplication sharedApplication].userInterfaceLayoutDirection);
+    applicationUserInterfaceLayoutDirection = @([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified]);
     // Ensure these values are cached on the main thread before needed in the background.
     if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
       // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing

@@ -320,6 +320,10 @@ NS_INLINE UIAccessibilityTraits ASInteractiveAccessibilityTraitsMask() {
   return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
 }
 
+// dispatch_once variables must live outside of static inline function or else will be copied
+// for each separate invocation. We want them shared across all invocations.
+static BOOL shouldEnableAccessibilityForTesting;
+static dispatch_once_t kShouldEnableAccessibilityForTestingOnceToken;
 NS_INLINE BOOL ASAccessibilityIsEnabled() {
 #if DEBUG
   return true;
