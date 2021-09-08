@@ -1,5 +1,5 @@
 //
-//  ASNavigationController.mm
+//  ASDKNavigationController.mm
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -7,11 +7,11 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASNavigationController.h>
+#import <AsyncDisplayKit/ASDKNavigationController.h>
 #import <AsyncDisplayKit/ASLog.h>
 #import <AsyncDisplayKit/ASObjectDescriptionHelpers.h>
 
-@implementation ASNavigationController
+@implementation ASDKNavigationController
 {
   BOOL _parentManagesVisibilityDepth;
   NSInteger _visibilityDepth;
@@ -59,7 +59,7 @@ ASVisibilityDepthImplementation;
 
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-  as_activity_create_for_scope("Pop multiple from ASNavigationController");
+  as_activity_create_for_scope("Pop multiple from ASDKNavigationController");
   NSArray *viewControllers = [super popToViewController:viewController animated:animated];
   os_log_info(ASNodeLog(), "Popped %@ to %@, removing %@", self, viewController, ASGetDescriptionValueString(viewControllers));
 
@@ -69,7 +69,7 @@ ASVisibilityDepthImplementation;
 
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated
 {
-  as_activity_create_for_scope("Pop to root of ASNavigationController");
+  as_activity_create_for_scope("Pop to root of ASDKNavigationController");
   NSArray *viewControllers = [super popToRootViewControllerAnimated:animated];
   os_log_info(ASNodeLog(), "Popped view controllers %@ from %@", ASGetDescriptionValueString(viewControllers), self);
 
@@ -87,7 +87,7 @@ ASVisibilityDepthImplementation;
 
 - (void)setViewControllers:(NSArray *)viewControllers animated:(BOOL)animated
 {
-  as_activity_create_for_scope("Set view controllers of ASNavigationController");
+  as_activity_create_for_scope("Set view controllers of ASDKNavigationController");
   os_log_info(ASNodeLog(), "Set view controllers of %@ to %@ animated: %d", self, ASGetDescriptionValueString(viewControllers), animated);
   [super setViewControllers:viewControllers animated:animated];
   [self visibilityDepthDidChange];
@@ -95,7 +95,7 @@ ASVisibilityDepthImplementation;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-  as_activity_create_for_scope("Push view controller on ASNavigationController");
+  as_activity_create_for_scope("Push view controller on ASDKNavigationController");
   os_log_info(ASNodeLog(), "Pushing %@ onto %@", viewController, self);
   [super pushViewController:viewController animated:animated];
   [self visibilityDepthDidChange];
@@ -103,7 +103,7 @@ ASVisibilityDepthImplementation;
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
-  as_activity_create_for_scope("Pop view controller from ASNavigationController");
+  as_activity_create_for_scope("Pop view controller from ASDKNavigationController");
   UIViewController *viewController = [super popViewControllerAnimated:animated];
   os_log_info(ASNodeLog(), "Popped %@ from %@", viewController, self);
   [self visibilityDepthDidChange];
