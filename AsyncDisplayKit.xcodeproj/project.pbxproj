@@ -111,7 +111,7 @@
 		509E68651B3AEDC5009B9150 /* CoreGraphics+ASConvenience.h in Headers */ = {isa = PBXBuildFile; fileRef = 205F0E1F1B376416007741D0 /* CoreGraphics+ASConvenience.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		636EA1A41C7FF4EC00EE152F /* NSArray+Diffing.mm in Sources */ = {isa = PBXBuildFile; fileRef = DBC452DA1C5BF64600B16017 /* NSArray+Diffing.mm */; };
 		636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = AEB7B0191C5962EA00662EF4 /* ASDefaultPlayButton.mm */; };
-		680346941CE4052A0009FEB4 /* ASNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FC85DC1CE29AB700EDD713 /* ASNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		680346941CE4052A0009FEB4 /* ASDKNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FC85DC1CE29AB700EDD713 /* ASDKNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68355B341CB579B9001D4E68 /* ASImageNode+AnimatedImage.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68355B2E1CB5799E001D4E68 /* ASImageNode+AnimatedImage.mm */; };
 		68355B3E1CB57A60001D4E68 /* ASPINRemoteImageDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68355B361CB57A5A001D4E68 /* ASPINRemoteImageDownloader.mm */; };
 		68355B401CB57A69001D4E68 /* ASImageContainerProtocolCategories.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68355B381CB57A5A001D4E68 /* ASImageContainerProtocolCategories.mm */; };
@@ -127,7 +127,7 @@
 		68EE0DC01C1B4ED300BA1B99 /* ASMainSerialQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68EE0DBC1C1B4ED300BA1B99 /* ASMainSerialQueue.mm */; };
 		68FC85E31CE29B7E00EDD713 /* ASTabBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FC85E01CE29B7E00EDD713 /* ASTabBarController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68FC85E51CE29B7E00EDD713 /* ASTabBarController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68FC85E11CE29B7E00EDD713 /* ASTabBarController.mm */; };
-		68FC85E61CE29B9400EDD713 /* ASNavigationController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68FC85DD1CE29AB700EDD713 /* ASNavigationController.mm */; };
+		68FC85E61CE29B9400EDD713 /* ASDKNavigationController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68FC85DD1CE29AB700EDD713 /* ASDKNavigationController.mm */; };
 		68FC85EA1CE29C7D00EDD713 /* ASVisibilityProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 68FC85E71CE29C7D00EDD713 /* ASVisibilityProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68FC85EC1CE29C7D00EDD713 /* ASVisibilityProtocols.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68FC85E81CE29C7D00EDD713 /* ASVisibilityProtocols.mm */; };
 		6900C5F41E8072DA00BCD75C /* ASImageNode+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6900C5F31E8072DA00BCD75C /* ASImageNode+Private.h */; };
@@ -335,7 +335,7 @@
 		B350625C1B010F070018CF92 /* ASLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 0516FA3B1A15563400B4EBED /* ASLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B350625D1B0111740018CF92 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943141A1575670030A7D0 /* Photos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		B350625E1B0111780018CF92 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 051943121A1575630030A7D0 /* AssetsLibrary.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.mm */; };
+		BB5FC3CE1F9BA689007F191E /* ASDKNavigationControllerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3CD1F9BA688007F191E /* ASDKNavigationControllerTests.mm */; };
 		BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.mm */; };
 		C018DF21216BF26700181FDA /* ASAbstractLayoutController+FrameworkPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = C018DF20216BF26600181FDA /* ASAbstractLayoutController+FrameworkPrivate.h */; };
 		C057D9BD20B5453D00FC9112 /* ASTextNode2SnapshotTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C057D9BC20B5453D00FC9112 /* ASTextNode2SnapshotTests.mm */; };
@@ -702,8 +702,8 @@
 		68C215571DE10D330019C4BC /* ASCollectionViewLayoutInspector.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionViewLayoutInspector.mm; sourceTree = "<group>"; };
 		68EE0DBB1C1B4ED300BA1B99 /* ASMainSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMainSerialQueue.h; sourceTree = "<group>"; };
 		68EE0DBC1C1B4ED300BA1B99 /* ASMainSerialQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASMainSerialQueue.mm; sourceTree = "<group>"; };
-		68FC85DC1CE29AB700EDD713 /* ASNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASNavigationController.h; sourceTree = "<group>"; };
-		68FC85DD1CE29AB700EDD713 /* ASNavigationController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNavigationController.mm; sourceTree = "<group>"; };
+		68FC85DC1CE29AB700EDD713 /* ASDKNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASDKNavigationController.h; sourceTree = "<group>"; };
+		68FC85DD1CE29AB700EDD713 /* ASDKNavigationController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDKNavigationController.mm; sourceTree = "<group>"; };
 		68FC85E01CE29B7E00EDD713 /* ASTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASTabBarController.h; sourceTree = "<group>"; };
 		68FC85E11CE29B7E00EDD713 /* ASTabBarController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTabBarController.mm; sourceTree = "<group>"; };
 		68FC85E71CE29C7D00EDD713 /* ASVisibilityProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASVisibilityProtocols.h; sourceTree = "<group>"; };
@@ -868,7 +868,7 @@
 		B30BF6501C5964B0004FCD53 /* ASLayoutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASLayoutManager.h; path = TextKit/ASLayoutManager.h; sourceTree = "<group>"; };
 		B30BF6511C5964B0004FCD53 /* ASLayoutManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ASLayoutManager.mm; path = TextKit/ASLayoutManager.mm; sourceTree = "<group>"; };
 		B35061DA1B010EDF0018CF92 /* AsyncDisplayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AsyncDisplayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASNavigationControllerTests.mm; sourceTree = "<group>"; };
+		BB5FC3CD1F9BA688007F191E /* ASDKNavigationControllerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASDKNavigationControllerTests.mm; sourceTree = "<group>"; };
 		BB5FC3D01F9C9389007F191E /* ASTabBarControllerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ASTabBarControllerTests.mm; sourceTree = "<group>"; };
 		BDC2D162BD55A807C1475DA5 /* Pods-AsyncDisplayKitTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsyncDisplayKitTests.profile.xcconfig"; path = "Pods/Target Support Files/Pods-AsyncDisplayKitTests/Pods-AsyncDisplayKitTests.profile.xcconfig"; sourceTree = "<group>"; };
 		C018DF20216BF26600181FDA /* ASAbstractLayoutController+FrameworkPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASAbstractLayoutController+FrameworkPrivate.h"; sourceTree = "<group>"; };
@@ -1244,8 +1244,8 @@
 				92DD2FE21BF4B97E0074C9DD /* ASMapNode.mm */,
 				0516FA3E1A1563D200B4EBED /* ASMultiplexImageNode.h */,
 				0516FA3F1A1563D200B4EBED /* ASMultiplexImageNode.mm */,
-				68FC85DC1CE29AB700EDD713 /* ASNavigationController.h */,
-				68FC85DD1CE29AB700EDD713 /* ASNavigationController.mm */,
+				68FC85DC1CE29AB700EDD713 /* ASDKNavigationController.h */,
+				68FC85DD1CE29AB700EDD713 /* ASDKNavigationController.mm */,
 				CCED5E3C2020D36800395C40 /* ASNetworkImageLoadInfo.h */,
 				CCED5E3D2020D36800395C40 /* ASNetworkImageLoadInfo.mm */,
 				055B9FA61A1C154B00035D6D /* ASNetworkImageNode.h */,
@@ -1356,7 +1356,7 @@
 				CCE4F9B71F0DBA5000062E4E /* ASLayoutTestNode.mm */,
 				052EE0651A159FEF002C6279 /* ASMultiplexImageNodeTests.mm */,
 				058D0A32195D057000B7D73C /* ASMutableAttributedStringBuilderTests.mm */,
-				BB5FC3CD1F9BA688007F191E /* ASNavigationControllerTests.mm */,
+				BB5FC3CD1F9BA688007F191E /* ASDKNavigationControllerTests.mm */,
 				CC11F9791DB181180024D77B /* ASNetworkImageNodeTests.mm */,
 				ACF6ED591B178DC700DA7C62 /* ASOverlayLayoutSpecSnapshotTests.mm */,
 				AE6987C01DD04E1000B9E458 /* ASPagerNodeTests.mm */,
@@ -1980,7 +1980,7 @@
 				B35061FE1B010EFD0018CF92 /* ASDisplayNodeExtras.h in Headers */,
 				CC0F88601E4280B800576FED /* _ASCollectionViewCell.h in Headers */,
 				B35062001B010EFD0018CF92 /* ASEditableTextNode.h in Headers */,
-				680346941CE4052A0009FEB4 /* ASNavigationController.h in Headers */,
+				680346941CE4052A0009FEB4 /* ASDKNavigationController.h in Headers */,
 				B350621B1B010EFD0018CF92 /* ASTableLayoutController.h in Headers */,
 				B350621D1B010EFD0018CF92 /* ASHighlightOverlayLayer.h in Headers */,
 				C78F7E2B1BF7809800CDEAFC /* ASTableNode.h in Headers */,
@@ -2329,7 +2329,7 @@
 				CC01EB6F23105C7F00CDB61A /* ASImageNodeSnapshotTests.mm in Sources */,
 				CC3B208E1C3F7D0A00798563 /* ASWeakSetTests.mm in Sources */,
 				F711994E1D20C21100568860 /* ASDisplayNodeExtrasTests.mm in Sources */,
-				BB5FC3CE1F9BA689007F191E /* ASNavigationControllerTests.mm in Sources */,
+				BB5FC3CE1F9BA689007F191E /* ASDKNavigationControllerTests.mm in Sources */,
 				81FF150722EB5F410039311A /* ASButtonNodeSnapshotTests.mm in Sources */,
 				ACF6ED5D1B178DC700DA7C62 /* ASDimensionTests.mm in Sources */,
 				BB5FC3D11F9C9389007F191E /* ASTabBarControllerTests.mm in Sources */,
@@ -2528,7 +2528,7 @@
 				B35062271B010EFD0018CF92 /* ASRangeController.mm in Sources */,
 				0442850A1BAA63FE00D16268 /* ASBatchFetching.mm in Sources */,
 				CC35CEC420DD7F600006448D /* ASCollections.mm in Sources */,
-				68FC85E61CE29B9400EDD713 /* ASNavigationController.mm in Sources */,
+				68FC85E61CE29B9400EDD713 /* ASDKNavigationController.mm in Sources */,
 				9C0BA4A42582CE35001C293B /* ASTextAttribute.mm in Sources */,
 				34EFC76F1B701CF700AD841F /* ASRatioLayoutSpec.mm in Sources */,
 				254C6B8B1BF94F8A003EC431 /* ASTextKitShadower.mm in Sources */,
