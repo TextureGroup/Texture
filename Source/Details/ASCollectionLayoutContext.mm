@@ -85,7 +85,9 @@
 {
   struct {
     CGSize viewportSize;
-    ASScrollDirection scrollableDirections;
+    // Fields must be aligned without padding, otherwise hash result will be different for the same
+    // struct. That's why we use NSUInteger instead of ASScrollDirection.
+    NSUInteger scrollableDirections;
     NSUInteger elementsHash;
     NSUInteger layoutDelegateClassHash;
     NSUInteger additionalInfoHash;
