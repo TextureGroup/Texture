@@ -90,7 +90,7 @@ For example, in the case that you want to react to the fact that a new image arr
             didUpdateImage:(UIImage *)image 
             withIdentifier:(id)imageIdentifier 
                  fromImage:(UIImage *)previousImage 
-            withIdentifier:(id)previousImageIdentifier;
+            withIdentifier:(id)previousImageIdentifier
 {    
         // this is optional, in case you want to react to the fact that a new image came in
 }

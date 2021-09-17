@@ -25,7 +25,7 @@ static BOOL __shouldShowImageScalingOverlay = NO;
 
 @implementation ASImageNode (Debugging)
 
-+ (void)setShouldShowImageScalingOverlay:(BOOL)show;
++ (void)setShouldShowImageScalingOverlay:(BOOL)show
 {
   __shouldShowImageScalingOverlay = show;
 }
@@ -437,7 +437,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
                     rangeMode:(ASLayoutRangeMode)rangeMode
       displayTuningParameters:(ASRangeTuningParameters)displayTuningParameters
       preloadTuningParameters:(ASRangeTuningParameters)preloadTuningParameters
-               interfaceState:(ASInterfaceState)interfaceState;
+               interfaceState:(ASInterfaceState)interfaceState
 {
   _ASRangeDebugBarView *viewToUpdate = [self barViewForRangeController:controller];
   

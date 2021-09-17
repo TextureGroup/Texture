@@ -65,7 +65,7 @@
 
 #import "ASNodeController+Beta.h"
 #import "ASDKViewController.h"
-#import "ASNavigationController.h"
+#import "ASDKNavigationController.h"
 #import "ASTabBarController.h"
 #import "ASRangeControllerUpdateRangeProtocol+Beta.h"
 

@@ -1,6 +1,10 @@
-## Texture 3.0 Migration Guide
+## Texture 3.1 Migration Guide
 
 Got a tip for upgrading? Please open a PR to this document!
+
+- Rename all instances of ASNavigationController to ASDKNavigationController
+
+## Texture 3.0 Migration Guide
 
 - Rename all instances of ASViewController to ASDKViewController
 

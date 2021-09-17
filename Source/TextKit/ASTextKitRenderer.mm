@@ -190,7 +190,7 @@ static NSCharacterSet *_defaultAvoidTruncationCharacterSet()
 
 #pragma mark - Drawing
 
-- (void)drawInContext:(CGContextRef)context bounds:(CGRect)bounds;
+- (void)drawInContext:(CGContextRef)context bounds:(CGRect)bounds
 {
   // We add an assertion so we can track the rare conditions where a graphics context is not present
   ASDisplayNodeAssertNotNil(context, @"This is no good without a context.");

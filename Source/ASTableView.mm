@@ -1486,7 +1486,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)_beginBatchFetchingIfNeededWithContentOffset:(CGPoint)contentOffset velocity:(CGPoint)velocity
 {
-  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity)) {
+  if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, ASScrollDirectionVerticalDirections, contentOffset, velocity, NO)) {
     [self _beginBatchFetching];
   }
 }
@@ -1679,6 +1679,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   LOG(@"--- UITableView endUpdates");
   ASPerformBlockWithoutAnimation(!changeSet.animated, ^{
     [super endUpdates];
+    if (numberOfUpdates > 0 && ASActivateExperimentalFeature(ASExperimentalRangeUpdateOnChangesetUpdate)) {
+      [self->_rangeController setNeedsUpdate];
+    }
     [self->_rangeController updateIfNeeded];
     [self _scheduleCheckForBatchFetchingForNumberOfChanges:numberOfUpdates];
   });

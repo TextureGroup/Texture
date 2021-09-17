@@ -225,7 +225,7 @@ static dispatch_once_t shared_init_predicate;
 }
 #endif
 
-- (id <ASImageContainerProtocol>)synchronouslyFetchedCachedImageWithURL:(NSURL *)URL;
+- (id <ASImageContainerProtocol>)synchronouslyFetchedCachedImageWithURL:(NSURL *)URL
 {
   PINRemoteImageManager *manager = [self sharedPINRemoteImageManager];
   PINRemoteImageManagerResult *result = [manager synchronousImageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode];
@@ -271,7 +271,7 @@ static dispatch_once_t shared_init_predicate;
                         shouldRetry:(BOOL)shouldRetry
                       callbackQueue:(dispatch_queue_t)callbackQueue
                    downloadProgress:(ASImageDownloaderProgress)downloadProgress
-                         completion:(ASImageDownloaderCompletion)completion;
+                         completion:(ASImageDownloaderCompletion)completion
 {
   return [self downloadImageWithURL:URL
                         shouldRetry:shouldRetry
