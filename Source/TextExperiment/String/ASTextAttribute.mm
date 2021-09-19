@@ -112,6 +112,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   return one;
 }
 
++ (BOOL)supportsSecureCoding {
+  return YES;
+}
+
 - (void)encodeWithCoder:(NSCoder *)aCoder {
   [aCoder encodeObject:self.string forKey:@"string"];
 }
@@ -137,6 +141,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   ASTextBinding *one = [self new];
   one.deleteConfirm = deleteConfirm;
   return one;
+}
+
++ (BOOL)supportsSecureCoding {
+  return YES;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -166,6 +174,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   one.offset = offset;
   one.radius = radius;
   return one;
+}
+
++ (BOOL)supportsSecureCoding {
+  return YES;
 }
 
 + (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow NS_RETURNS_RETAINED {
@@ -229,6 +241,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   return self;
 }
 
++ (BOOL)supportsSecureCoding {
+  return YES;
+}
+
 + (instancetype)decorationWithStyle:(ASTextLineStyle)style NS_RETURNS_RETAINED {
   ASTextDecoration *one = [self new];
   one.style = style;
@@ -275,6 +291,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   one.strokeWidth = width;
   one.strokeColor = color;
   return one;
+}
+
++ (BOOL)supportsSecureCoding {
+  return YES;
 }
 
 + (instancetype)borderWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius NS_RETURNS_RETAINED {
@@ -337,6 +357,10 @@ ASTextAttributeType ASTextAttributeGetType(NSString *name){
   ASTextAttachment *one = [self new];
   one.content = content;
   return one;
+}
+
++ (BOOL)supportsSecureCoding {
+  return YES;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {

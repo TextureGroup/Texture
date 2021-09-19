@@ -171,7 +171,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  It may used for copy/paste plain text from attributed string.
  Example: If :) is replace by a custom emoji (such as😊), the backed string can be set to @":)".
  */
-@interface ASTextBackedString : NSObject <NSCoding, NSCopying>
+@interface ASTextBackedString : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)stringWithString:(nullable NSString *)string NS_RETURNS_RETAINED;
 @property (nullable, nonatomic, copy) NSString *string; ///< backed string
 @end
@@ -186,7 +186,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  ASTextView will treat the range of text as a single character during text
  selection and edit.
  */
-@interface ASTextBinding : NSObject <NSCoding, NSCopying>
+@interface ASTextBinding : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm NS_RETURNS_RETAINED;
 @property (nonatomic) BOOL deleteConfirm; ///< confirm the range when delete in ASTextView
 @end
@@ -199,7 +199,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  
  It's similar to `NSShadow`, but offers more options.
  */
-@interface ASTextShadow : NSObject <NSCoding, NSCopying>
+@interface ASTextShadow : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)shadowWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius NS_RETURNS_RETAINED;
 
 @property (nullable, nonatomic) UIColor *color; ///< shadow color
@@ -221,7 +221,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  When it's used as underline, the line is drawn below text glyphs;
  when it's used as strikethrough, the line is drawn above text glyphs.
  */
-@interface ASTextDecoration : NSObject <NSCoding, NSCopying>
+@interface ASTextDecoration : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)decorationWithStyle:(ASTextLineStyle)style NS_RETURNS_RETAINED;
 + (instancetype)decorationWithStyle:(ASTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color NS_RETURNS_RETAINED;
 @property (nonatomic) ASTextLineStyle style;                   ///< line style
@@ -244,7 +244,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  │ Text │
  ╰──────╯
  */
-@interface ASTextBorder : NSObject <NSCoding, NSCopying>
+@interface ASTextBorder : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)borderWithLineStyle:(ASTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color NS_RETURNS_RETAINED;
 + (instancetype)borderWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius NS_RETURNS_RETAINED;
 @property (nonatomic) ASTextLineStyle lineStyle;              ///< border line style
@@ -268,7 +268,7 @@ typedef void(^ASTextAction)(UIView *containerView, NSAttributedString *text, NSR
  then it will be drawn to CGContext; if the content is `UIView` or `CALayer`,
  then it will be added to the text container's view or layer.
  */
-@interface ASTextAttachment : NSObject<NSCoding, NSCopying>
+@interface ASTextAttachment : NSObject<NSSecureCoding, NSCopying>
 + (instancetype)attachmentWithContent:(nullable id)content NS_RETURNS_RETAINED;
 @property (nullable, nonatomic) id content;             ///< Supported type: UIImage, UIView, CALayer
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.

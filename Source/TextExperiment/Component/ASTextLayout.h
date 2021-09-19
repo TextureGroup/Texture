@@ -48,7 +48,7 @@ ASDK_EXTERN const CGSize ASTextContainerMaxSize;
  │                             │
  └─────────────────────────────┘
  */
-@interface ASTextContainer : NSObject <NSCoding, NSCopying>
+@interface ASTextContainer : NSObject <NSSecureCoding, NSCopying>
 
 /// Creates a container with the specified size. @param size The size.
 + (instancetype)containerWithSize:(CGSize)size NS_RETURNS_RETAINED;

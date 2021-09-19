@@ -2,7 +2,8 @@
 //  ASTextRunDelegate.mm
 //  Texture
 //
-//  Copyright (c) Pinterest, Inc.  All rights reserved.
+//  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
+//  Changes after 4/13/2017 are: Copyright (c) Pinterest, Inc.  All rights reserved.
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
@@ -29,6 +30,10 @@ static CGFloat GetWidthCallback(void *ref) {
 }
 
 @implementation ASTextRunDelegate
+
++ (BOOL)supportsSecureCoding {
+  return YES;
+}
 
 - (CTRunDelegateRef)CTRunDelegate CF_RETURNS_RETAINED {
   CTRunDelegateCallbacks callbacks;
