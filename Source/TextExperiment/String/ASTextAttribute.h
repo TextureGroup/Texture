@@ -23,7 +23,7 @@ typedef NS_OPTIONS(NSInteger, ASTextAttributeType) {
 };
 
 /// Get the attribute type from an attribute name.
-AS_EXTERN ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
+ASDK_EXTERN ASTextAttributeType ASTextAttributeGetType(NSString *attributeName);
 
 /**
  Line style in ASText (similar to NSUnderlineStyle).

@@ -35,6 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
  *   use `pragma clang diagnostic warning "-Wpadded"` around your struct definition
  *   or manually initialize the fields of your struct (`myStruct.x = 7;` etc).
  */
-AS_EXTERN NSUInteger ASHashBytes(void *bytes, size_t length);
+ASDK_EXTERN NSUInteger ASHashBytes(void *bytes, size_t length);
 
 NS_ASSUME_NONNULL_END

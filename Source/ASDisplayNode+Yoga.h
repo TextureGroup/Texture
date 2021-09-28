@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ASLayout;
 
-AS_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
+ASDK_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable node, void(^block)(ASDisplayNode *node));
 
 @interface ASDisplayNode (Yoga)
 

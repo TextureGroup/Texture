@@ -9,7 +9,7 @@
 
 import AsyncDisplayKit
 
-class OverviewViewController: ASViewController<ASTableNode> {
+class OverviewViewController: ASDKViewController<ASTableNode> {
   let tableNode = ASTableNode()
   let layoutExamples: [LayoutExampleNode.Type]
 

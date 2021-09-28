@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'Texture'
-  spec.version      = '2.8.1'
+  spec.version      = '3.1.0'
   spec.license      =  { :type => 'Apache 2',  }
   spec.homepage     = 'http://texturegroup.org'
   spec.authors      = { 'Huy Nguyen' => 'hi@huynguyen.dev', 'Garrett Moon' => 'garrett@excitedpixel.com', 'Scott Goodson' => 'scottgoodson@gmail.com', 'Michael Schneider' => 'mischneider1@gmail.com', 'Adlai Holler' => 'adlai@icloud.com' }
@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
 
   # Subspecs
   spec.subspec 'Core' do |core|
-    core.compiler_flags = '-fno-exceptions -Wno-implicit-retain-self'
+    core.compiler_flags = '-fno-exceptions'
     core.public_header_files = [
       'Source/*.h',
       'Source/Details/**/*.h',
@@ -24,7 +24,9 @@ Pod::Spec.new do |spec|
       'Source/Base/*.h',
       'Source/Debug/**/*.h',
       'Source/TextKit/ASTextNodeTypes.h',
-      'Source/TextKit/ASTextKitComponents.h'
+      'Source/TextKit/ASTextKitComponents.h',
+      'Source/TextExperiment/Component/*.h',
+      'Source/TextExperiment/String/ASTextAttribute.h',
     ]
     
     core.source_files = [

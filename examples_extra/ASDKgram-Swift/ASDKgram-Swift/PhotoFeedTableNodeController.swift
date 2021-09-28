@@ -9,17 +9,17 @@
 
 import AsyncDisplayKit
 
-class PhotoFeedTableNodeController: ASViewController<ASTableNode> {
+class PhotoFeedTableNodeController: ASDKViewController<ASTableNode> {
     
     // MARK: Lifecycle
 	
     private lazy var activityIndicatorView: UIActivityIndicatorView = {
-        return UIActivityIndicatorView(activityIndicatorStyle: .gray)
+        return UIActivityIndicatorView(style: .gray)
     }()
 	
 	var photoFeedModel = PhotoFeedModel(photoFeedModelType: .photoFeedModelTypePopular)
 	
-	init() {
+    override init() {
         super.init(node: ASTableNode())
 		
         navigationItem.title = "ASDK"
@@ -90,7 +90,7 @@ extension PhotoFeedTableNodeController: ASTableDataSource, ASTableDelegate {
 	
 	func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let photo = photoFeedModel.itemAtIndexPath(indexPath)
-		let nodeBlock: ASCellNodeBlock = { _ in
+        let nodeBlock: ASCellNodeBlock = {
 			return PhotoTableNodeCell(photoModel: photo)
 		}
 		return nodeBlock

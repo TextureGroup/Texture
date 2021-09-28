@@ -62,8 +62,8 @@ typedef NS_OPTIONS(uint_least32_t, ASDisplayNodeAtomicFlags)
 #define setFlag(flag, x) (((x ? _atomicFlags.fetch_or(flag) \
                               : _atomicFlags.fetch_and(~flag)) & flag) != 0)
 
-AS_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
-AS_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
+ASDK_EXTERN NSString * const ASRenderingEngineDidDisplayScheduledNodesNotification;
+ASDK_EXTERN NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp;
 
 // Allow 2^n increments of begin disabling hierarchy notifications
 #define VISIBILITY_NOTIFICATIONS_DISABLED_BITS 4
@@ -258,7 +258,8 @@ static constexpr CACornerMask kASCACornerAllCorners =
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.
   UIEdgeInsets _fallbackSafeAreaInsets;
 
-
+  // Right-to-Left layout support
+  UISemanticContentAttribute _semanticContentAttribute;
 
 #pragma mark - ASDisplayNode (Debugging)
   ASLayout *_unflattenedLayout;
@@ -331,6 +332,9 @@ static constexpr CACornerMask kASCACornerAllCorners =
 - (void)updateCornerRoundingWithType:(ASCornerRoundingType)newRoundingType
                         cornerRadius:(CGFloat)newCornerRadius
                        maskedCorners:(CACornerMask)newMaskedCorners;
+
+/// Update the Semantic Content Attribute. Trigger layout if this value has changed.
+- (void)updateSemanticContentAttributeWithAttribute:(UISemanticContentAttribute)attribute;
 
 /// Alternative initialiser for backing with a custom view class.  Supports asynchronous display with _ASDisplayView subclasses.
 - (instancetype)initWithViewClass:(Class)viewClass;

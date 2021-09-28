@@ -28,14 +28,16 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDispatchApply = 1 << 7,                                     // exp_dispatch_apply
   ASExperimentalDrawingGlobal = 1 << 8,                                     // exp_drawing_global
   ASExperimentalOptimizeDataControllerPipeline = 1 << 9,                    // exp_optimize_data_controller_pipeline
-  ASExperimentalDoNotCacheAccessibilityElements = 1 << 10,                  // exp_do_not_cache_accessibility_elements
+  ASExperimentalDisableGlobalTextkitLock = 1 << 10,                         // exp_disable_global_textkit_lock
+  ASExperimentalMainThreadOnlyDataController = 1 << 11,                     // exp_main_thread_only_data_controller
+  ASExperimentalRangeUpdateOnChangesetUpdate = 1 << 12,                     // exp_range_update_on_changeset_update
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
 /// Convert flags -> name array.
-AS_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
+ASDK_EXTERN NSArray<NSString *> *ASExperimentalFeaturesGetNames(ASExperimentalFeatures flags);
 
 /// Convert name array -> flags.
-AS_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
+ASDK_EXTERN ASExperimentalFeatures ASExperimentalFeaturesFromArray(NSArray<NSString *> *array);
 
 NS_ASSUME_NONNULL_END

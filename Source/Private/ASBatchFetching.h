@@ -34,13 +34,16 @@ NS_ASSUME_NONNULL_BEGIN
  @param scrollableDirections The possible scrolling directions of the scroll view.
  @param contentOffset The offset that the scrollview will scroll to.
  @param velocity The velocity of the scroll view (in points) at the moment the touch was released.
+ @param flipsHorizontallyInOppositeLayoutDirection Whether or not this scroll view flips its layout automatically in RTL.
+         See flipsHorizontallyInOppositeLayoutDirection in UICollectionViewLayout
  @return Whether or not the current state should proceed with batch fetching.
  */
-AS_EXTERN BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
+ASDK_EXTERN BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollView> *scrollView,
                                             ASScrollDirection scrollDirection,
                                             ASScrollDirection scrollableDirections,
                                             CGPoint contentOffset,
-                                            CGPoint velocity);
+                                            CGPoint velocity,
+                                            BOOL flipsHorizontallyInOppositeLayoutDirection);
 
 
 /**
@@ -55,11 +58,13 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchi
  @param visible Whether the view is visible or not.
  @param velocity The velocity of the scroll view (in points) at the moment the touch was released.
  @param delegate The delegate to be consulted if needed.
+ @param flipsHorizontallyInOppositeLayoutDirection Whether or not this scroll view flips its layout automatically in RTL.
+         See flipsHorizontallyInOppositeLayoutDirection in UICollectionViewLayout
  @return Whether or not the current state should proceed with batch fetching.
  @discussion This method is broken into a category for unit testing purposes and should be used with the ASTableView and
  * ASCollectionView batch fetching API.
  */
-AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
+ASDK_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 ASScrollDirection scrollDirection,
                                                 ASScrollDirection scrollableDirections,
                                                 CGRect bounds,
@@ -67,7 +72,9 @@ AS_EXTERN BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                                 CGPoint targetOffset,
                                                 CGFloat leadingScreens,
                                                 BOOL visible,
+                                                BOOL shouldRenderRTLLayout,
                                                 CGPoint velocity,
+                                                BOOL flipsHorizontallyInOppositeLayoutDirection,
                                                 _Nullable id<ASBatchFetchingDelegate> delegate);
 
 NS_ASSUME_NONNULL_END

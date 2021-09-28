@@ -33,7 +33,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   tc.horizontalSizeClass = UIUserInterfaceSizeClassUnspecified;
   tc.verticalSizeClass = UIUserInterfaceSizeClassUnspecified;
   tc.containerSize = CGSizeZero;
-  if (AS_AVAILABLE_IOS(10)) {
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     tc.displayGamut = UIDisplayGamutUnspecified;
     tc.preferredContentSizeCategory = UIContentSizeCategoryUnspecified;
     tc.layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified;
@@ -48,7 +48,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   }
 #endif
 
-  if (AS_AVAILABLE_IOS(13)) {
+  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     tc.accessibilityContrast = UIAccessibilityContrastUnspecified;
     tc.legibilityWeight = UILegibilityWeightUnspecified;
   }
@@ -62,7 +62,7 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   environmentTraitCollection.displayScale = traitCollection.displayScale;
   environmentTraitCollection.userInterfaceIdiom = traitCollection.userInterfaceIdiom;
   environmentTraitCollection.forceTouchCapability = traitCollection.forceTouchCapability;
-  if (AS_AVAILABLE_IOS(10)) {
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     environmentTraitCollection.displayGamut = traitCollection.displayGamut;
     environmentTraitCollection.layoutDirection = traitCollection.layoutDirection;
 
@@ -79,14 +79,14 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   }
 #endif
 
-  if (AS_AVAILABLE_IOS(13)) {
+  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     environmentTraitCollection.accessibilityContrast = traitCollection.accessibilityContrast;
     environmentTraitCollection.legibilityWeight = traitCollection.legibilityWeight;
   }
   return environmentTraitCollection;
 }
 
-AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection) {
+ASDK_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPrimitiveTraitCollection traitCollection) {
   NSMutableArray *collections = [[NSMutableArray alloc] initWithArray:@[
     [UITraitCollection traitCollectionWithHorizontalSizeClass:traitCollection.horizontalSizeClass],
     [UITraitCollection traitCollectionWithVerticalSizeClass:traitCollection.verticalSizeClass],
@@ -95,7 +95,7 @@ AS_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(ASPr
     [UITraitCollection traitCollectionWithForceTouchCapability:traitCollection.forceTouchCapability],
   ]];
   
-  if (AS_AVAILABLE_IOS(10)) {
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     [collections addObject:[UITraitCollection traitCollectionWithDisplayGamut:traitCollection.displayGamut]];
     [collections addObject:[UITraitCollection traitCollectionWithLayoutDirection:traitCollection.layoutDirection]];
     [collections addObject:[UITraitCollection traitCollectionWithPreferredContentSizeCategory:traitCollection.preferredContentSizeCategory]];
@@ -191,8 +191,9 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUIUserInterfaceStyle(UIUserInterfa
   }
 }
 
+#if TARGET_OS_IOS
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
-API_AVAILABLE(ios(13)) API_UNAVAILABLE(tvos)
+API_AVAILABLE(ios(13))
 ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(UIUserInterfaceLevel userInterfaceLevel) {
   switch (userInterfaceLevel) {
     case UIUserInterfaceLevelBase:
@@ -203,6 +204,7 @@ ASDISPLAYNODE_INLINE NSString *AS_NSStringFromUITraitEnvironmentUserInterfaceLev
       return @"Unspecified";
   }
 }
+#endif
 
 // Named so as not to conflict with a hidden Apple function, in case compiler decides not to inline
 API_AVAILABLE(ios(13))
@@ -242,7 +244,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
     [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
   }
-  if (AS_AVAILABLE_IOS(10)) {
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
     if (traits.preferredContentSizeCategory != nil) {
       [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
@@ -256,7 +258,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   }
 #endif
 
-  if (AS_AVAILABLE_IOS(13)) {
+  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     [props addObject:@{ @"accessibilityContrast": AS_NSStringFromUITraitEnvironmentAccessibilityContrast(traits.accessibilityContrast) }];
     [props addObject:@{ @"legibilityWeight": AS_NSStringFromUITraitEnvironmentLegibilityWeight(traits.legibilityWeight) }];
   }
@@ -272,7 +274,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 + (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits NS_RETURNS_RETAINED {
   ASTraitCollection *tc = [[ASTraitCollection alloc] init];
-  if (AS_AVAILABLE_IOS(10)) {
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     ASDisplayNodeCAssertPermanent(traits.preferredContentSizeCategory);
   }
   tc->_prim = traits;

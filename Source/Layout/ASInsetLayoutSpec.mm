@@ -39,7 +39,7 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
 
 @implementation ASInsetLayoutSpec
 
-- (instancetype)initWithInsets:(UIEdgeInsets)insets child:(id<ASLayoutElement>)child;
+- (instancetype)initWithInsets:(UIEdgeInsets)insets child:(id<ASLayoutElement>)child
 {
   if (!(self = [super init])) {
     return nil;

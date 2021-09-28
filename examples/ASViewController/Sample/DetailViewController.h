@@ -7,9 +7,9 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import <AsyncDisplayKit/ASViewController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
 #import "DetailRootNode.h"
 
-@interface DetailViewController : ASViewController<DetailRootNode *>
+@interface DetailViewController : ASDKViewController<DetailRootNode *>
 
 @end

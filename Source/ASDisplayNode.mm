@@ -443,7 +443,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
 {
-  if (@available(iOS 13.0, *)) {
+  if (@available(iOS 13.0, tvOS 10.0, *)) {
     // When changing between light and dark mode, often the entire node needs to re-render.
     // This change doesn't happen frequently so it's fairly safe to render nodes again
     __instanceLock__.lock();
@@ -1384,7 +1384,7 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
 {
   // This recursion must handle layers in various states:
   // 1. Just added to hierarchy, CA hasn't yet called -display
-  // 2. Previously in a hierarchy (such as a working window owned by an Intelligent Preloading class, like ASTableView / ASCollectionView / ASViewController)
+  // 2. Previously in a hierarchy (such as a working window owned by an Intelligent Preloading class, like ASTableView / ASCollectionView / ASDKViewController)
   // 3. Has no content to display at all
   // Specifically for case 1), we need to explicitly trigger a -display call now.
   // Otherwise, there is no opportunity to block the main thread after CoreAnimation's transaction commit
@@ -1628,6 +1628,21 @@ void recursivelyTriggerDisplayForLayer(CALayer *layer, BOOL shouldBlock)
           [self _setClipCornerLayersVisible:newMaskedCorners];
         }
       }
+    }
+  });
+}
+
+- (void)updateSemanticContentAttributeWithAttribute:(UISemanticContentAttribute)attribute
+{
+  __instanceLock__.lock();
+  UISemanticContentAttribute oldAttribute = _semanticContentAttribute;
+  _semanticContentAttribute = attribute;
+  __instanceLock__.unlock();
+
+  ASPerformBlockOnMainThread(^{
+    // If the value has changed we should attempt to relayout.
+    if (attribute != oldAttribute) {
+      [self setNeedsLayout];
     }
   });
 }

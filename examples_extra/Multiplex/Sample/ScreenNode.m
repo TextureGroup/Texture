@@ -115,6 +115,7 @@
 #pragma mark ASImageDownloaderProtocol.
 
 - (nullable id)downloadImageWithURL:(NSURL *)URL
+                        shouldRetry:(BOOL)shouldRetry
                       callbackQueue:(dispatch_queue_t)callbackQueue
                    downloadProgress:(nullable ASImageDownloaderProgress)downloadProgressBlock
                          completion:(ASImageDownloaderCompletion)completion

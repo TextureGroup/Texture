@@ -14,8 +14,8 @@
 
 typedef BOOL (^as_condition_block_t)(void);
 
-AS_EXTERN BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block);
+ASDK_EXTERN BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block);
 
-AS_EXTERN void ASDisplayNodeSizeToFitSize(ASDisplayNode *node, CGSize size);
-AS_EXTERN void ASDisplayNodeSizeToFitSizeRange(ASDisplayNode *node, ASSizeRange sizeRange);
-AS_EXTERN void ASCATransactionQueueWait(ASCATransactionQueue *q); // nil means shared queue
+ASDK_EXTERN void ASDisplayNodeSizeToFitSize(ASDisplayNode *node, CGSize size);
+ASDK_EXTERN void ASDisplayNodeSizeToFitSizeRange(ASDisplayNode *node, ASSizeRange sizeRange);
+ASDK_EXTERN void ASCATransactionQueueWait(ASCATransactionQueue *q); // nil means shared queue

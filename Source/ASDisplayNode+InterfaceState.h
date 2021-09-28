@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 /**
- * Interface state is available on ASDisplayNode and ASViewController, and
+ * Interface state is available on ASDisplayNode and ASDKViewController, and
  * allows checking whether a node is in an interface situation where it is prudent to trigger certain
  * actions: measurement, data loading, display, and visibility (the latter for animations or other onscreen-only effects).
  *

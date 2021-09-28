@@ -8,8 +8,8 @@
 # ls -ld /Applications/Xcode*
 # echo ************* diagnostics end
 
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.4.1,name=iPhone 8}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.4}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=13.5,name=iPhone 8}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator13.5}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -66,7 +66,7 @@ function build_example {
 
 # Lint subspec
 function lint_subspec {
-    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
+    set -o pipefail && pod env && pod lib lint --subspec="$1"
 }
 
 function cleanup {
@@ -218,7 +218,7 @@ framework|all)
 cocoapods-lint|all)
     echo "Verifying that podspec lints."
 
-    set -o pipefail && pod env && pod lib lint --allow-warnings
+    set -o pipefail && pod env && pod lib lint
     success="1"
     ;;
 

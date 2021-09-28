@@ -74,7 +74,7 @@
   };
 }
 
-- (ASSizeRange)pagerNode:(ASPagerNode *)pagerNode constrainedSizeForNodeAtIndex:(NSInteger)index;
+- (ASSizeRange)pagerNode:(ASPagerNode *)pagerNode constrainedSizeForNodeAtIndex:(NSInteger)index
 {
   return ASSizeRangeMake(pagerNode.bounds.size);
 }

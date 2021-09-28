@@ -9,6 +9,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface VideoFeedNodeController : ASViewController
+@interface VideoFeedNodeController : ASDKViewController
 
 @end

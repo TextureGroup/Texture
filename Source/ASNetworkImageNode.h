@@ -117,6 +117,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL shouldRenderProgressImages;
 
 /**
+ * Specifies whether the underlying image downloader should attempt to retry downloading the image if the remote
+ * host is unreachable. It will have no effect if the downloader does not support retrying. The default is YES.
+ */
+@property BOOL shouldRetryImageDownload;
+
+/**
  * The image quality of the current image.
  *
  * If the URL is set, this is a number between 0 and 1 and can be used to track

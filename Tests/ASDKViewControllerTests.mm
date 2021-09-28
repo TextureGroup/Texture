@@ -1,5 +1,5 @@
 //
-//  ASViewControllerTests.mm
+//  ASDKViewControllerTests.mm
 //  Texture
 //
 //  Copyright (c) Facebook, Inc. and its affiliates.  All rights reserved.
@@ -15,11 +15,11 @@
 
 #import "NSInvocation+ASTestHelpers.h"
 
-@interface ASViewControllerTests : XCTestCase
+@interface ASDKViewControllerTests : XCTestCase
 
 @end
 
-@implementation ASViewControllerTests
+@implementation ASDKViewControllerTests
 
 - (void)testThatAutomaticSubnodeManagementScrollViewInsetsAreApplied
 {
@@ -32,7 +32,7 @@
   node.layoutSpecBlock = ^(ASDisplayNode *node, ASSizeRange constrainedSize){
     return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:scrollNode];
   };
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   window.rootViewController = [[UINavigationController alloc] initWithRootViewController:vc];
   [window makeKeyAndVisible];
   [window layoutIfNeeded];
@@ -48,7 +48,7 @@
   
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
 
-  ASViewController *vc = [[ASViewController alloc] initWithNode:node];
+  ASDKViewController *vc = [[ASDKViewController alloc] initWithNode:node];
   vc.node.backgroundColor = [UIColor greenColor];
   vc.edgesForExtendedLayout = UIRectEdgeNone;
 

@@ -9,7 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define AS_EXTERN FOUNDATION_EXTERN
+#define ASDK_EXTERN FOUNDATION_EXTERN
 #define unowned __unsafe_unretained
 
 /**

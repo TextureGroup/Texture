@@ -17,5 +17,5 @@
 
 // The default action when an image node is tapped. This action will create an
 // OverrideVC and override its display traits to always be compact.
-+ (void)defaultImageTappedAction:(ASViewController *)sourceViewController;
++ (void)defaultImageTappedAction:(ASDKViewController *)sourceViewController;
 @end

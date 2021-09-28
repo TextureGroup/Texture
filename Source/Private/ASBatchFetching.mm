@@ -15,7 +15,8 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
                                             ASScrollDirection scrollDirection,
                                             ASScrollDirection scrollableDirections,
                                             CGPoint contentOffset,
-                                            CGPoint velocity)
+                                            CGPoint velocity,
+                                            BOOL flipsHorizontallyInOppositeLayoutDirection)
 {
   // Don't fetch if the scroll view does not allow
   if (![scrollView canBatchFetch]) {
@@ -29,7 +30,8 @@ BOOL ASDisplayShouldFetchBatchForScrollView(UIScrollView<ASBatchFetchingScrollVi
   CGFloat leadingScreens = scrollView.leadingScreensForBatching;
   id<ASBatchFetchingDelegate> delegate = scrollView.batchFetchingDelegate;
   BOOL visible = (scrollView.window != nil);
-  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, velocity, delegate);
+  BOOL shouldRenderRTLLayout = [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:scrollView.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+  return ASDisplayShouldFetchBatchForContext(context, scrollDirection, scrollableDirections, bounds, contentSize, contentOffset, leadingScreens, visible, shouldRenderRTLLayout, velocity, flipsHorizontallyInOppositeLayoutDirection, delegate);
 }
 
 BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
@@ -40,7 +42,9 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
                                          CGPoint targetOffset,
                                          CGFloat leadingScreens,
                                          BOOL visible,
+                                         BOOL shouldRenderRTLLayout,
                                          CGPoint velocity,
+                                         BOOL flipsHorizontallyInOppositeLayoutDirection,
                                          id<ASBatchFetchingDelegate> delegate)
 {
   // Do not allow fetching if a batch is already in-flight and hasn't been completed or cancelled
@@ -79,13 +83,18 @@ BOOL ASDisplayShouldFetchBatchForContext(ASBatchContext *context,
   }
 
   // If they are scrolling toward the head of content, don't batch fetch.
-  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || ASScrollDirectionContainsLeft(scrollDirection));
+  BOOL isScrollingTowardHead = (ASScrollDirectionContainsUp(scrollDirection) || (shouldRenderRTLLayout ? ASScrollDirectionContainsRight(scrollDirection) : ASScrollDirectionContainsLeft(scrollDirection)));
   if (isScrollingTowardHead) {
     return NO;
   }
 
   CGFloat triggerDistance = viewLength * leadingScreens;
-  CGFloat remainingDistance = contentLength - viewLength - offset;
+  CGFloat remainingDistance = 0;
+  if (!flipsHorizontallyInOppositeLayoutDirection && shouldRenderRTLLayout && ASScrollDirectionContainsHorizontalDirection(scrollableDirections)) {
+    remainingDistance = offset;
+  } else {
+    remainingDistance = contentLength - viewLength - offset;
+  }
   BOOL result = remainingDistance <= triggerDistance;
 
   if (delegate != nil && velocityLength > 0.0) {

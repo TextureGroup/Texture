@@ -64,8 +64,8 @@
 #import <AsyncDisplayKit/ASPagerNode+Beta.h>
 
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
-#import <AsyncDisplayKit/ASViewController.h>
-#import <AsyncDisplayKit/ASNavigationController.h>
+#import <AsyncDisplayKit/ASDKViewController.h>
+#import <AsyncDisplayKit/ASDKNavigationController.h>
 #import <AsyncDisplayKit/ASTabBarController.h>
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 
@@ -110,6 +110,7 @@
 #import <AsyncDisplayKit/ASMutableAttributedStringBuilder.h>
 #import <AsyncDisplayKit/ASRunLoopQueue.h>
 #import <AsyncDisplayKit/ASTextKitComponents.h>
+#import <AsyncDisplayKit/ASTextLayout.h>
 #import <AsyncDisplayKit/ASThread.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASVisibilityProtocols.h>

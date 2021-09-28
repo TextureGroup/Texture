@@ -27,13 +27,13 @@ typedef struct {
 /**
  * Lock, blocking if needed.
  */
-AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
+ASDK_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockLock(ASRecursiveUnfairLock *l);
 
 /**
  * Try to lock without blocking. Returns whether we took the lock.
  */
-AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
+ASDK_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
 
 /**
@@ -41,7 +41,7 @@ BOOL ASRecursiveUnfairLockTryLock(ASRecursiveUnfairLock *l);
  * the lock will result in an assertion failure, and undefined
  * behavior if foundation assertions are disabled.
  */
-AS_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
+ASDK_EXTERN OS_UNFAIR_LOCK_AVAILABILITY
 void ASRecursiveUnfairLockUnlock(ASRecursiveUnfairLock *l);
 
 NS_ASSUME_NONNULL_END

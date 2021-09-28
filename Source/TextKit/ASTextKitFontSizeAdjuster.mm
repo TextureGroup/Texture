@@ -40,7 +40,7 @@
 
 - (instancetype)initWithContext:(ASTextKitContext *)context
                 constrainedSize:(CGSize)constrainedSize
-              textKitAttributes:(const ASTextKitAttributes &)textComponentAttributes;
+              textKitAttributes:(const ASTextKitAttributes &)textComponentAttributes
 {
   if (self = [super init]) {
     _context = context;

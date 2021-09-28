@@ -19,7 +19,7 @@
   #warning "Texture must be compiled with std=c++11 to prevent layout issues. gnu++ is not supported. This is hopefully temporary."
 #endif
 
-AS_EXTERN NSRunLoopMode const UITrackingRunLoopMode;
+ASDK_EXTERN NSRunLoopMode const UITrackingRunLoopMode;
 
 NSInteger const ASDefaultTransactionPriority = 0;
 
@@ -44,7 +44,7 @@ NSInteger const ASDefaultTransactionPriority = 0;
   NSAssert(_operationCompletionBlock == nil, @"Should have been called and released before -dealloc");
 }
 
-- (void)callAndReleaseCompletionBlock:(BOOL)canceled;
+- (void)callAndReleaseCompletionBlock:(BOOL)canceled
 {
   ASDisplayNodeAssertMainThread();
   if (_operationCompletionBlock) {

@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, ASAsyncTransactionState) {
   ASAsyncTransactionStateComplete
 };
 
-AS_EXTERN NSInteger const ASDefaultTransactionPriority;
+ASDK_EXTERN NSInteger const ASDefaultTransactionPriority;
 
 /**
  @summary ASAsyncTransaction provides lightweight transaction semantics for asynchronous operations.

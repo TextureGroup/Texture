@@ -1,5 +1,5 @@
 //
-//  ASNavigationControllerTests.mm
+//  ASDKNavigationControllerTests.mm
 //  Texture
 //
 //  Copyright (c) Pinterest, Inc.  All rights reserved.
@@ -10,16 +10,16 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-@interface ASNavigationControllerTests : XCTestCase
+@interface ASDKNavigationControllerTests : XCTestCase
 @end
 
-@implementation ASNavigationControllerTests
+@implementation ASDKNavigationControllerTests
 
 - (void)testSetViewControllers {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController, secondController];
-  ASNavigationController *navigationController = [ASNavigationController new];
+  ASDKNavigationController *navigationController = [ASDKNavigationController new];
   [navigationController setViewControllers:@[firstController, secondController]];
   XCTAssertEqual(navigationController.topViewController, secondController);
   XCTAssertEqual(navigationController.visibleViewController, secondController);
@@ -27,10 +27,10 @@
 }
 
 - (void)testPopViewController {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController];
-  ASNavigationController *navigationController = [ASNavigationController new];
+  ASDKNavigationController *navigationController = [ASDKNavigationController new];
   [navigationController setViewControllers:@[firstController, secondController]];
   [navigationController popViewControllerAnimated:false];
   XCTAssertEqual(navigationController.topViewController, firstController);
@@ -39,10 +39,10 @@
 }
 
 - (void)testPushViewController {
-  ASViewController *firstController = [ASViewController new];
-  ASViewController *secondController = [ASViewController new];
+  ASDKViewController *firstController = [ASDKViewController new];
+  ASDKViewController *secondController = [ASDKViewController new];
   NSArray *expectedViewControllerStack = @[firstController, secondController];
-  ASNavigationController *navigationController = [[ASNavigationController new] initWithRootViewController:firstController];
+  ASDKNavigationController *navigationController = [[ASDKNavigationController new] initWithRootViewController:firstController];
   [navigationController pushViewController:secondController animated:false];
   XCTAssertEqual(navigationController.topViewController, secondController);
   XCTAssertEqual(navigationController.visibleViewController, secondController);

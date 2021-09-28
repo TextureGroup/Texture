@@ -20,7 +20,7 @@
  @param forcedSize A CGSize, that if non-CGSizeZero, indicates that the backing size should be forcedSize and not calculated based on boundsSize.
  @discussion If the image is smaller than the size and UIViewContentModeScaleToAspectFill is specified, we suggest the input size so it will be efficiently upscaled on the GPU by the displaying layer at composite time.
  */
-AS_EXTERN void ASCroppedImageBackingSizeAndDrawRectInBounds(CGSize sourceImageSize,
+ASDK_EXTERN void ASCroppedImageBackingSizeAndDrawRectInBounds(CGSize sourceImageSize,
                                                          CGSize boundsSize,
                                                          UIViewContentMode contentMode,
                                                          CGRect cropRect,

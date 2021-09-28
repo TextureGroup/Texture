@@ -61,6 +61,12 @@
 - (void)setUp
 {
   [super setUp];
+
+  // Reset experimental features to test the first version of ASTextNode.
+  ASConfiguration *config = [ASConfiguration new];
+  config.experimentalFeatures = kNilOptions;
+  [ASConfigurationManager test_resetWithConfiguration:config];
+  
   _textNode = [[ASTextNode alloc] init];
   _textNodeBucket = [[NSMutableArray alloc] init];
   

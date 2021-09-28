@@ -23,7 +23,7 @@ When this is enabled, developers only have to take one more step to have full in
  self.tableNode.view.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, inset, 0);
   </pre>
 
-  <pre lang="swift" class = "swiftCode">
+  <pre lang="swift" class = "swiftCode hidden">
   let inset = self.topBarsHeight
   self.tableNode.view.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: inset, right: 0.0)
   self.tableNode.view.scrollIndicatorInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: inset, right: 0.0)

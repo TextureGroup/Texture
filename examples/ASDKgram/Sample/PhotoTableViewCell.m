@@ -41,7 +41,7 @@
 
 #pragma mark - Class Methods
 
-+ (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width;
++ (CGFloat)heightForPhotoModel:(PhotoModel *)photo withWidth:(CGFloat)width
 {
   CGFloat photoHeight = width;
   
