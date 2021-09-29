@@ -1,5 +1,44 @@
 # Changelog
 
+## [3.1.0](https://github.com/TextureGroup/Texture/tree/3.1.0) (2021-09-09)
+
+[Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0...3.1.0)
+
+**Fixed bugs:**
+
+- Fix hit point when ASCollectionNode inverted set to true [\#1781](https://github.com/TextureGroup/Texture/pull/1781) ([bdolman](https://github.com/bdolman))
+
+**Merged pull requests:**
+
+- \[Minor Breaking API\] Rename ASNavigationController to ASDKNavigationController to fix name collision [\#2020](https://github.com/TextureGroup/Texture/pull/2020) ([rcancro](https://github.com/rcancro))
+- \[RTL\] Guard access of flipsHorizontallyInOppositeLayoutDirection for iOS \>= 11 [\#2003](https://github.com/TextureGroup/Texture/pull/2003) ([rcancro](https://github.com/rcancro))
+- \[RTL/Batching\] Make ASDisplayShouldFetchBatchForScrollView aware of flipped CV layouts [\#1985](https://github.com/TextureGroup/Texture/pull/1985) ([rcancro](https://github.com/rcancro))
+- \[Layout\] Add RTL support to LayoutSpecs [\#1983](https://github.com/TextureGroup/Texture/pull/1983) ([rcancro](https://github.com/rcancro))
+- Expand ASExperimentalRangeUpdateOnChangesetUpdate to ASTableView [\#1979](https://github.com/TextureGroup/Texture/pull/1979) ([rqueue](https://github.com/rqueue))
+- Docs: Remove Facebook and shift everything around, add Remix by Buffer [\#1978](https://github.com/TextureGroup/Texture/pull/1978) ([ay8s](https://github.com/ay8s))
+- Add experiment to ensure ASCollectionView's range controller updates … [\#1976](https://github.com/TextureGroup/Texture/pull/1976) ([rqueue](https://github.com/rqueue))
+- Remove trailing semicolons between method parameters and body [\#1973](https://github.com/TextureGroup/Texture/pull/1973) ([sdefresne](https://github.com/sdefresne))
+- Fix order-dependent ASTextNodeTests [\#1963](https://github.com/TextureGroup/Texture/pull/1963) ([tjaneczko](https://github.com/tjaneczko))
+- Update asdkGram swift sample to swift version 5.3 [\#1962](https://github.com/TextureGroup/Texture/pull/1962) ([MussaCharles](https://github.com/MussaCharles))
+- Fix mutation of variable that is never read [\#1961](https://github.com/TextureGroup/Texture/pull/1961) ([ZevEisenberg](https://github.com/ZevEisenberg))
+- Remove redundant assignment [\#1960](https://github.com/TextureGroup/Texture/pull/1960) ([ZevEisenberg](https://github.com/ZevEisenberg))
+- Podfile improvements [\#1957](https://github.com/TextureGroup/Texture/pull/1957) ([ZevEisenberg](https://github.com/ZevEisenberg))
+- Fix WKWebView Accessibility [\#1955](https://github.com/TextureGroup/Texture/pull/1955) ([ZevEisenberg](https://github.com/ZevEisenberg))
+- fix missing hidden class [\#1952](https://github.com/TextureGroup/Texture/pull/1952) ([joprice](https://github.com/joprice))
+- use https for slack link [\#1950](https://github.com/TextureGroup/Texture/pull/1950) ([joprice](https://github.com/joprice))
+- Exposes a new option in ASImageDownloaderProtocol to retry image downloads [\#1948](https://github.com/TextureGroup/Texture/pull/1948) ([chggr](https://github.com/chggr))
+- All ASCellNode nodes to be non accessible if needed [\#1941](https://github.com/TextureGroup/Texture/pull/1941) ([decim92](https://github.com/decim92))
+- \[ASTextNode2\] Make some ASTextNode2 layout files public [\#1939](https://github.com/TextureGroup/Texture/pull/1939) ([rcancro](https://github.com/rcancro))
+- Ship ASExperimentalDispatchApply [\#1924](https://github.com/TextureGroup/Texture/pull/1924) ([nguyenhuy](https://github.com/nguyenhuy))
+- Fix failing ASConfigurationTests [\#1923](https://github.com/TextureGroup/Texture/pull/1923) ([nguyenhuy](https://github.com/nguyenhuy))
+- More on ASDataController's main-thread-only mode [\#1915](https://github.com/TextureGroup/Texture/pull/1915) ([nguyenhuy](https://github.com/nguyenhuy))
+- Add an experiment that makes ASDataController to do everything on main thread [\#1911](https://github.com/TextureGroup/Texture/pull/1911) ([nguyenhuy](https://github.com/nguyenhuy))
+- Disable text kit lock [\#1910](https://github.com/TextureGroup/Texture/pull/1910) ([garrettmoon](https://github.com/garrettmoon))
+- Do not expose tgmath.h to all clients of Texture [\#1900](https://github.com/TextureGroup/Texture/pull/1900) ([bolsinga](https://github.com/bolsinga))
+- Call will / did display node for ASTextNode. Fixes \#1680 [\#1893](https://github.com/TextureGroup/Texture/pull/1893) ([garrettmoon](https://github.com/garrettmoon))
+- Remove background deallocation helper code [\#1890](https://github.com/TextureGroup/Texture/pull/1890) ([bolsinga](https://github.com/bolsinga))
+- \[Accessibility\] Ship ASExperimentalDoNotCacheAccessibilityElements [\#1888](https://github.com/TextureGroup/Texture/pull/1888) ([rcancro](https://github.com/rcancro))
+
 ## [3.0.0](https://github.com/TextureGroup/Texture/tree/3.0.0) (2020-07-15)
 
 [Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0-rc.2...3.0.0)
