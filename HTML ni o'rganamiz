@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <div>HTML Language Code Reference
+            <hr>
+            ISO Language Codes
+            You should always include the lang attribute inside the >html> tag, to declare the language of the Web page. This is meant to assist search engines and browsers: <hr>
+            
+            >html lang="en">
+            ...
+            >/html>
+            In XHTML, the language is declared inside the >html> tag as follows: <hr>
+            
+        >html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+            ...
+            >/html>
+            ISO 639-1 Language Codes
+            ISO 639-1 defines abbreviations for languages: <hr>
+            
+            See also: Reference for Country Codes. <hr>
+            
+            Language	ISO Code
+            <hr>
+            Abkhazian	ab
+            <hr>
+            Afar	aa
+            <hr>
+            Afrikaans	af
+            <hr>
+            Akan	ak
+            <hr>
+            Albanian	sq
+            <hr>
+            Amharic	am
+            <hr>
+            Arabic	ar
+            <hr>
+            Aragonese	an
+            <hr>
+            Armenian	hy
+            <hr>
+            Assamese	as
+            <hr>
+            Avaric	av
+            <hr>
+            Avestan	ae
+            <hr>
+            Aymara	ay
+            <hr>
+            Azerbaijani	az
+            <hr>
+            Bambara	bm
+            <hr>
+            Bashkir	ba
+            <hr>
+            Basque	eu
+            <hr>
+            Belarusian	be
+            <hr>
+            Bengali (Bangla)	bn
+            <hr>
+            Bihari	bh
+            <hr>
+            Bislama	bi
+            <hr>
+            Bosnian	bs
+            <hr>
+            Breton	br
+            <hr>
+            Bulgarian	bg
+            <hr>
+            Burmese	my
+            <hr>
+            Catalan	ca
+            <hr>
+            Chamorro	ch
+            <hr>
+            Chechen	ce <hr>
+            Chichewa, Chewa, Nyanja	ny <hr>
+            Chinese	zh <hr>
+            Chinese (Simplified)	zh-Hans<hr>
+            Chinese (Traditional)	zh-Hant<hr>
+            Chuvash	cv<hr>
+            Cornish	kw<hr>
+            Corsican	co<hr>
+            Cree	cr<hr>
+            Croatian	hr<hr>
+            Czech	cs<hr>
+            Danish	da<hr>
+            Divehi, Dhivehi, Maldivian	dv<hr>
+            Dutch	nl<hr>
+            Dzongkha	dz<hr>
+            English	en<hr>
+            Esperanto	eo
+            Estonian	et
+            Ewe	ee
+            Faroese	fo
+            Fijian	fj
+            Finnish	fi
+            French	fr
+            Fula, Fulah, Pulaar, Pular	ff
+            Galician	gl
+            Gaelic (Scottish)	gd
+            Gaelic (Manx)	gv
+            Georgian	ka
+            German	de
+            Greek	el
+            Greenlandic	kl
+            Guarani	gn
+            Gujarati	gu
+            Haitian Creole	ht
+            Hausa	ha
+            Hebrew	he
+            Herero	hz
+            Hindi	hi
+            Hiri Motu	ho
+            Hungarian	hu
+            Icelandic	is
+            Ido	io
+            Igbo	ig
+            Indonesian	id, in
+            Interlingua	ia
+            Interlingue	ie
+            Inuktitut	iu
+            Inupiak	ik
+            Irish	ga
+            Italian	it
+            Japanese	ja
+            Javanese	jv
+            Kalaallisut, Greenlandic	kl
+            Kannada	kn
+            Kanuri	kr
+            Kashmiri	ks
+            Kazakh	kk
+            Khmer	km
+            Kikuyu	ki
+            Kinyarwanda (Rwanda)	rw
+            Kirundi	rn
+            Kyrgyz	ky
+            Komi	kv
+            Kongo	kg
+            Korean	ko
+            Kurdish	ku
+            Kwanyama	kj
+            Lao	lo
+            Latin	la
+            Latvian (Lettish)	lv
+            Limburgish ( Limburger)	li
+            Lingala	ln
+            Lithuanian	lt
+            Luga-Katanga	lu
+            Luganda, Ganda	lg
+            Luxembourgish	lb
+            Manx	gv
+            Macedonian	mk
+            Malagasy	mg
+            Malay	ms
+            Malayalam	ml
+            Maltese	mt
+            Maori	mi
+            Marathi	mr
+            Marshallese	mh
+            Moldavian	mo
+            Mongolian	mn
+            Nauru	na
+            Navajo	nv
+            Ndonga	ng
+            Northern Ndebele	nd
+            Nepali	ne
+            Norwegian	no
+            Norwegian bokmål	nb
+            Norwegian nynorsk	nn
+            Nuosu	ii
+            Occitan	oc
+            Ojibwe	oj
+            Old Church Slavonic, Old Bulgarian	cu
+            Oriya	or
+            Oromo (Afaan Oromo)	om
+            Ossetian	os
+            Pāli	pi
+            Pashto, Pushto	ps
+            Persian (Farsi)	fa
+            Polish	pl
+            Portuguese	pt
+            Punjabi (Eastern)	pa
+            Quechua	qu
+            Romansh	rm
+            Romanian	ro
+            Russian	ru
+            Sami	se
+            Samoan	sm
+            Sango	sg
+            Sanskrit	sa
+            Serbian	sr
+            Serbo-Croatian	sh
+            Sesotho	st
+            Setswana	tn
+            Shona	sn
+            Sichuan Yi	ii
+            Sindhi	sd
+            Sinhalese	si
+            Siswati	ss
+            Slovak	sk
+            Slovenian	sl
+            Somali	so
+            Southern Ndebele	nr
+            Spanish	es
+            Sundanese	su
+            Swahili (Kiswahili)	sw
+            Swati	ss
+            Swedish	sv
+            Tagalog	tl
+            Tahitian	ty
+            Tajik	tg
+            Tamil	ta
+            Tatar	tt
+            Telugu	te
+            Thai	th
+            Tibetan	bo
+            Tigrinya	ti
+            Tonga	to
+            Tsonga	ts
+            Turkish	tr
+            Turkmen	tk
+            Twi	tw
+            Uyghur	ug
+            Ukrainian	uk
+            Urdu	ur
+            Uzbek	uz
+            Venda	ve
+            Vietnamese	vi
+            Volapük	vo
+            Wallon	wa
+            Welsh	cy
+            Wolof	wo
+            Western Frisian	fy
+            Xhosa	xh
+            Yiddish	yi, ji
+            Yoruba	yo
+            Zhuang, Chuang	za
+            Zulu	zu</div>
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="main.css">
+        <link rel="icon" href="gildirak.jpg">
+       <title>HTML ni o'rganamiz</title>
+       <link rel="stylesheet"   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" 
+       integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+        <div class="salom">
+        <header class="header">
+            <div  class="header_images">
+                <img src="Rasmhtml.png" alt="Rasmbor">
+            </div>
+            <nav class="header_clas">
+                <ul class="header_ul">
+                    <li class="header_li ,active">
+                        <a href="#">Haqida</a>
+                    </li>
+                    <li class="header_li">
+                        <a href="html.html">HTML nima o'zi </a>
+                    </li>
+                    <li class="header_li">
+                        <a href="about.html">O'zim haqimda</a>
+                    </li>
+                    <li class="header_li">
+                        <a href="savol.html">Yordam</a>
+                    </li>
+                    <li class="header_li">
+                        <a href="#">Registratsiya</a>
+                    </li>
+                </ul>
+
+            </nav>
+        </header>
+    </div>
+        <!--HTmal haqida-->
+        <div class="salom">
+        <div class="html_haqida">
+            <h1 class="html_nima">HTML nima o'zi ?</h1>
+            <div class="html_rasm">
+                <img src="html.png" alt="rasm bor">
+            </div>
+            <i>HTML (inglizcha: Hypertext Markup Language — hipermatnli belgilash tili) — 
+                SGML (Standard Generalized Markup Language — standart umumlasht
+                irilgan belgilash tili) ga asoslangan va xalqaro ISO 8879 standartiga mos keluvchi til, xalqaro toʻrda ishlatiladi.HTML tili 
+                taxminan 1991—1992-yillarda Yevropa Yadroviy Tadqiqotlar Markazida ishlovchi britaniyalik mutaxassis Tim Berners-Lee tomonidan
+                 ishlab chiqilgan. Dastlab bu til mutaxassislar uchun hujjat tayyorlash vositasi sifatida yaratilgan. HTML tilining soddaligi 
+                 (SGMLga nisbatan) va yuqori formatlash imkoniyatlarining mavjudligi uni foydalanuvchilar orasida tez tarqalishiga sabab boʻldi.
+                  Bundan tashqari unda hipermatnlardan foydalanish mumk n edi. Tilning rivojlanishi bilan unga qoʻshimcha multimedia
+                   (tasvir, tovush, animatsiya va boshqalar) imkoniyatlari qoʻshildi.</i>
+                   <ul>
+                       <li>
+                        Matn qismining mantiqiy rolini belgilash (matn sarlavhasi, paragraf, roʻyxat va hokazo).
+                       </li>
+                       <li>
+                        Hipermatnlar yaratish. Bu ayniqsa juda qulay boʻlib oʻzaro bogʻlangan hujjat sahifalari orasida navigatsiya qilishni yengillashtiradi.
+                       </li>
+                       <li>
+                        Matnning rangi, qalinligi va boshqa shrift koʻrsatkichlarini belgilash.
+                       </li>
+                       <li>
+                        Maxsus belgilar qoʻyish. ASCII kodirovkasida koʻrsatilmagan belgilar HTML vositalari bilan qoʻyish mumkin.
+                         Masalan grek alfaviti belgilari α,ψ, ζ, matematik belgilar ∫, ∞, √, ½, ¼ , ¾, moliya belgilari 
+                        €, £, ¥, ©, ®, ™ va hokazolar.
+                       </li>
+                       <li>
+                        Foydalanuvchi kiritishi uchun maydonlar yaratish.
+                        Multimedia fayllarini ochish.
+                       </li>
+                       <li>
+                        Boshqa imkoniyatlar
+                       </li>
+                   </ul>
+        </div>
+    </div>
+        <!--/Html haqida-->
+
+        <!--Main section-->
+        <div class="salom">
+        <div class="main_section">
+            <H1 class="xayr">HTML asoslari:</H1>
+            <form action="video.html" method="GET">
+           <button type="submit" class="button">Video,audio,You tobe</button>
+        </form>
+        <!-- <form action="class.html" method="GET">
+           <button type="submit" class="button">Class,attribute,universal</button>
+        </form>-->
+          <!-- <form action="color.html" method="GET">
+           <button type="submit" class="button">Colors</button> 
+        </form>-->
+          <!-- <form action="jadval.html" method="GET">
+           <button type="submit" class="button">Jadvallar</button> 
+        </form>-->
+          <!--<form action="stuktura.html" method="GET">
+           <button type="submit" class="button">HTML sturturasi</button>
+        </form>-->
+           <form action="link.html" method="GET">
+           <button type="submit" class="button">Link yaratish</button>
+        
+          
+          
+           <form action="language.html" method="GET">
+           <button type="submit" class="button">HTMl language</button>
+        </form>
+            </div>
+            <!--/Main section-->
+
+            <!--Ruxlantiruvchi-->
+            <h1 class="xayr">Agarda siz o'zizda kuch topa olmayotgan <br>
+                bo'lsangiz shu videoni ko'rishni tafsiya qilaman:</h1>
+            <div class="video">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/e2qaXakYWHM?start=30" 
+                title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
+                encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/efkSeOfd1OY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
+                encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/PWEp_V_Q1x4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
+                encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/YZN0mEtcjs0" title="YouTube video player"
+                 frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                 encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                 <iframe width="560" height="315" src="https://www.youtube.com/embed/LdgDPFaEJ48" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
+                 encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                 <iframeh="560" height="315" src="https://www.youtube.com/embed/nWqNiKva07U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                  encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  <iframe width="560" height="315" src="https://www.youtube.com/embed/4JpPKd-kuEs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                   encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <h3>Bu hayotda hamma narsa bo'ladi</h3>
+
+            </div>
+            <div class="manoli_sozlar">
+                <h1 class="xayr"> Qiyinchilik yetganda amal qilinadigan qoidalar! </h1>
+
+                    <i> Birinchi qoida: Musibatlangan faqat sen emas. <br> 
+                    
+                     Ikkinchi qoida: Alloh taqdir qilgan narsa behikmat boʻlmas. <br> 
+                    
+                     Uchinchi qoida: Foyda keltiruvchi va zararni daf qiluvchi yolgʻiz Allohdir, Allohdan boshqadan umid qilma. <br>
+                    
+                     Toʻrtinchi qoida: Senga yetgan narsa yetmay qolishi, yetmagan narsa yetishi mumkin emas. <br> 
+                    
+                     Beshinchi qoida: Dunyoning haqiqatini bil, xotirjam boʻlasan. <br>
+                    
+                     Oltinchi qoida: Rabbingga chiroyli gumonda boʻl. <br> 
+                    
+                     Yettinchi qoida: Alloh senga tanlagan narsa sen oʻzingga tanlagan narsadan koʻra yaxshiroq. <br> 
+                    
+                     Sakkizinchi qoida: Musibat qancha ogʻirlashsa, quvonish shuncha yaqinlashadi. <br> 
+                    
+                     Toʻqqizinchi qoida: Quvonish qanday kelarkin, deb oʻylama. Alloh bir narsani xohlasa, uning xayolga kelmagan sabablarini hozirlab qoʻyadi.</i>
+            </div>
+
+            <!--/Ruxlantiruvchi-->
+
+            <!--Qo'shimcha-->
+            <div class="malumot">
+
+                <h1>Qo'shimcha ma'lumotlar</h1>
+                <div class="qoshimcha">
+            <a href="https://t.me/Shahzod31"><i class="fab fa-telegram"></i>
+            </a>
+            <a href="https://instagram.com/shahzodabdashev31/">
+                <i class="fab fa-instagram"> </i> 
+            </a>
+               <a href=""><i class="fas fa-phone-alt">:94 925 29 45</i>
+               </a> 
+               </div>
+            </div>
+            </div>
+
+            <!--Qo'chimcha-->
+            
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+<title>Link o'rnatish</title>
+    </head>
+    <body>
+        <div class="kochirma">
+           <h1 class="xayr">Links are found in nearly all web pages. Links allow users to click their way from page to page.</h1> 
+
+HTML Links - Hyperlinks <br>
+HTML links are hyperlinks. <br>
+
+You can click on a link and jump to another document. <br>
+
+When you move the mouse over a link, the mouse arrow will turn into a little hand. <br>
+
+Note: A link does not have to be text. A link can be an image or any other HTML element! <br>
+
+HTML Links - Syntax <br>
+The HTML <a> tag defines a hyperlink. It has the following syntax:  <br>
+
+<a href="url">link text</a>
+The most important attribute of the <a> element is the href attribute, which indicates the link's destination. <br>
+
+The link text is the part that will be visible to the reader. <br>
+
+Clicking on the link text, will send the reader to the specified URL address. <br>
+
+Example <br>
+This example shows how to create a link to W3Schools.com: <br>
+<hr>
+
+<a href="https://www.w3schools.com/">Visit W3Schools.com!</a>
+By default, links will appear as follows in all browsers: <br>
+
+An unvisited link is underlined and blue <br>
+A visited link is underlined and purple <br>
+An active link is underlined and red <br>
+Tip: Links can of course be styled with CSS, to get another look! <br>
+
+HTML Links - The target Attribute <br>
+By default, the linked page will be displayed in the current browser window. To change this, you must specify another target for the link. <br>
+
+The target attribute specifies where to open the linked document. <br>
+
+The target attribute can have one of the following values: <br>
+
+_self - Default. Opens the document in the same window/tab as it was clicked <br>
+_blank - Opens the document in a new window or tab <br>
+_parent - Opens the document in the parent frame <br>
+_top - Opens the document in the full body of the window <br>
+Example <br>
+Use target="_blank" to open the linked document in a new browser window or tab: <br> <hr>
+
+<a href="https://www.w3schools.com/" target="_blank">Visit W3Schools!</a>
+Absolute URLs vs. Relative URLs
+Both examples above are using an absolute URL (a full web address) in the href attribute. <br>
+
+A local link (a link to a page within the same website) is specified with a relative URL (without the "https://www" part): <br> <hr>
+
+Example
+<h2>Absolute URLs</h2>
+<p><a href="https://www.w3.org/">W3C</a></p>
+<p><a href="https://www.google.com/">Google</a></p>
+
+<h2>Relative URLs</h2> <hr>
+<p><a href="html_images.asp">HTML Images</a></p>
+<p><a href="/css/default.asp">CSS Tutorial</a></p>
+HTML Links - Use an Image as a Link
+To use an image as a link, just put the <img> tag inside the <a> tag:
+
+Example <hr>
+<a href="default.asp">
+<img src="smiley.gif" alt="HTML tutorial" style="width:42px;height:42px;">
+</a>
+Link to an Email Address
+Use mailto: inside the href attribute to create a link that opens the user's email program (to let them send a new email): <br>
+
+Example <h1></h1>
+<a href="mailto:someone@example.com">Send email</a>
+Button as a Link
+To use an HTML button as a link, you have to add some JavaScript code. <br>
+
+JavaScript allows you to specify what happens at certain events, such as a click of a button: <br>
+
+Example
+<hr>
+<button onclick="document.location='default.asp'">HTML Tutorial</button>
+Tip: Learn more about JavaScript in our JavaScript Tutorial. <br>
+
+Link Titles <br>
+The title attribute specifies extra information about an element. The information is most often shown as a tooltip text when the mouse moves over the element. <br>
+
+
+Example <hr>
+<a href="https://www.w3schools.com/html/" title="Go to W3Schools HTML section">Visit our HTML Tutorial</a>
+More on Absolute URLs and Relative URLs <br>
+Example
+Use a full URL to link to a web page:  <br>
+
+<a href="https://www.w3schools.com/html/default.asp">HTML tutorial</a>
+
+Example
+<hr>
+Link to a page located in the html folder on the current web site: 
+
+<a href="/html/default.asp">HTML tutorial</a>
+
+Example
+<hr>
+Link to a page located in the same folder as the current page: 
+
+<a href="default.asp">HTML tutorial</a>
+
+You can read more about file paths in the chapter HTML File Paths. <br>
+
+Chapter Summary
+Use the <a> element to define a link <br>
+Use the href attribute to define the link address
+Use the target attribute to define where to open the linked document <br>
+Use the <img> element (inside <a>) to use an image as a link <br>
+Use the mailto: scheme inside the href attribute to create a link that opens the user's email program
+HTML Link Tags <br>
+Tag	Description <br>
+<a>	Defines a hyperlink
+        </div>
+    </body>
+</html>
+/*header*/
+.salom{
+    width: 1140px;
+    margin: 0 auto;
+}
+body{
+    font-family: sans-serif;
+}
+.header_images{
+    display: inline-block;
+    vertical-align: middle;
+}
+.header_images img {
+    width: 64px;
+}
+
+.header_clas{
+    display: inline-block;
+    vertical-align: middle;
+}
+.header_li{
+    display: inline-block;
+    padding: 10px;
+}
+   .header_li a{
+       color: #05364d;
+       text-decoration: none;
+       text-transform: uppercase;
+       font-size: 12px;
+       font-weight: 500;
+       cursor: pointer;
+       z-index: 1;
+       
+   }
+   .header_li a:hover {
+       color: #efb6df;
+   }
+   .header_li.active{
+      color: #efb6df;
+   }
+
+
+
+
+
+
+/*Html haqida*/
+.html_nima {
+   text-align: center;
+   text-transform: uppercase;
+   color: black;
+   padding-top: 40px;
+
+
+}
+.html_rasm img {
+    display: inline-block;
+    width: 450px;
+   vertical-align: middle;
+    padding-bottom: 30px;
+}
+.html_haqida {
+    background-color: #1E90FF;
+    border-radius: 15px;
+}
+.button{
+    display: inline-block;
+  margin-top: 30px;
+  border: none;
+  background-color: #1c44e4; 
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 40px;
+  cursor: pointer; 
+  margin-right: 20px;
+  text-align: center;
+}
+.button:hover{
+   background-image: linear-gradient( red,black,pink);
+}
+/*main section*/
+.video{
+    display: inline-block;
+    padding-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+.main_section{
+    display: inline-block;
+    vertical-align: middle;
+
+}
+    /*manoli*/
+.manoli_sozlar {
+    margin: 2px solid black
+}
+.xayr {
+    text-align: center;
+
+}
+.qoshimcha{
+    background-image: linear-gradient(red blue,brown);
+    margin: 100px;
+}
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*ruhlantiruvchi*/
+
+<!DOCTYPE html>
+<html>
+    <head>
+  <title>rasm joylashtirishni organamiz</title>
+    </head>
+    <body>
+        hfjfjfhgfhfhfjhfjhfjhfjhfbnncfxhgcjfhvcgxfhcg
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Savol va taklif bo'lasa</title>
+      <style>
+          #savol_uchun{
+              margin: 50px;
+          }
+      </style>
+    </head>
+    <body>
+        <form action="sddssds" method="POST">
+            <label for="Savol uchun">Savol_uchun</label> <hr>
+            <input type="text" id="savol uchun" placeholder="Savol berish"> <br>
+            
+            <button type="submit" class="button">Savolni yuborish</button>
+        </form>
+        
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sakdash</title>
+    </head>
+    <body>
+        <audio controls>
+            <source src="shah-audio.mp3" type="audio/mp3">
+            sizda brauzer eski
+        </audio><br><br>
+        <video width="560" height="315" controls>
+            <source src="shahz-video.mp4" type="video/mp4">
+            Sizda brauzer eski
+        </video><br><br>
+
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/HSe1dOAKQ2k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+<title>Video joylashtirish</title>
+    </head>
+    <body>
+        <div class="joylashtirish">
+        
+        The HTML <video> Element <br>
+            To show a video in HTML, use the <video> element:<br>
+            
+            Example <hr>
+            >video width="320" height="240" controls>
+              >source src="movie.mp4" type="video/mp4">
+              >source src="movie.ogg" type="video/ogg">
+            Your browser does not support the video tag.<br><hr>
+            </video>
+            How it Works<br>
+            The controls attribute adds video controls, like play, pause, and volume.
+            
+            It is a good idea to always include width and height attributes. If height and width are not set, the page might flicker while the video loads.<br>
+            
+            The <source> element allows you to specify alternative video files which the browser may choose from. The browser will use the first recognized format.
+            
+            The text between the <video> and </video> tags will only be displayed in browsers that do not support the <video> element.<br>
+            
+            HTML <video> Autoplay
+            To start a video automatically, use the autoplay attribute:<br>
+            
+            Example <hr>
+            <video width="320" height="240" autoplay>
+              <source src="movie.mp4" type="video/mp4">
+              <source src="movie.ogg" type="video/ogg">
+            Your browser does not support the video tag.<br>
+            </video>
+            Note: Chromium browsers do not allow autoplay in most cases. However, muted autoplay is always allowed.<br>
+            
+            Add muted after autoplay to let your video start playing automatically (but muted):
+            
+            Example <hr>
+
+            <video width="320" height="240" autoplay muted>
+              <source src="movie.mp4" type="video/mp4">
+              <source src="movie.ogg" type="video/ogg">
+            Your browser does not support the video tag.<br>
+            </video>
+            Browser Support
+            The numbers in the table specify the first browser version that fully supports the <video> element.<br>
+            </div>
+            <div class="youtobe">
+                HTML YouTube Videos <br>
+                The easiest way to play videos in HTML, is to use YouTube. <hr>
+                
+                Struggling with Video Formats?<br>
+                Converting videos to different formats can be difficult and time-consuming. <hr>
+                
+                An easier solution is to let YouTube play the videos in your web page.<br>
+                
+                YouTube Video Id<br>
+                YouTube will display an id (like tgbNymZ7vqY), when you save (or play) a video.
+                
+                You can use this id, and refer to your video in the HTML code.<br>
+                
+                Playing a YouTube Video in HTML
+                To play your video on a web page, do the following:<br> <hr>
+                
+                Upload the video to YouTube
+                Take a note of the video id<br>
+                Define an <iframe> element in your web page
+                Let the src attribute point to the video URL<br>
+                Use the width and height attributes to specify the dimension of the player
+                Add any other parameters to the URL (see below)<br>
+                Example
+                <hr>
+                >iframe width="420" height="315"
+                >src="https://www.youtube.com/embed/tgbNymZ7vqY">
+               > /iframe>
+                YouTube Autoplay + Mute<br>
+                You can let your video start playing automatically when a user visits the page, by adding autoplay=1 to the YouTube URL. However, automatically starting a video is annoying for your visitors!
+                
+                Note: Chromium browsers do not allow autoplay in most cases. However, muted autoplay is always allowed.<br>
+                
+                Add mute=1 after autoplay=1 to let your video start playing automatically (but muted). <hr>
+                
+                YouTube - Autoplay + Muted
+                <hr>
+                >iframe width="420" height="315"
+               > src="https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1">
+                /iframe>
+            </div>
+
+
+
+
+
+
+
+            <div> <p>
+                HTML Audio
+                The HTML <audio> element is used to play an audio file on a web page. <hr>
+                
+                The HTML <audio> Element <hr>
+                To play an audio file in HTML, use the <audio> element:
+                
+                Example
+                <hr>
+                <audio controls>
+                 > source src="horse.ogg" type="audio/ogg">
+                 > source src="horse.mp3" type="audio/mpeg">
+                Your browser does not support the audio element. <hr>
+                </audio>
+                HTML Audio - How It Works
+                The controls attribute adds audio controls, like play, pause, and volume.
+                
+                The <source> element allows you to specify alternative audio files which the browser may choose from. The browser will use the first recognized format.
+                
+                The text between the <audio> and </audio> tags will only be displayed in browsers that do not support the <audio> element.
+                
+                HTML <audio> Autoplay
+                To start an audio file automatically, use the autoplay attribute:
+                
+                Examplehr
+
+                audio controls autoplay>
+                 > source src="horse.ogg" type="audio/ogg">
+                 > source src="horse.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+                </audio>
+                Note: Chromium browsers do not allow autoplay in most cases. However, muted autoplay is always allowed.
+                
+                Add muted after autoplay to let your audio file start playing automatically (but muted):
+                
+                Example
+               > audio controls autoplay muted>
+                 > source src="horse.ogg" type="audio/ogg">
+                >source src="horse.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+                </audio>
+            </p>
+                
+            </div>
+    </body>
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+       <title>O'zim haqimda</title>
+       <style>
+           .ozim img{
+               border-radius: 10px;
+               width: 500px;
+               padding-left: 450px;
+           }
+           .yozuv{
+               font-size: 14px;
+               font-weight: 12px;
+           }
+          
+       </style>
+    </head>
+    <body>
+        <div class="ozim"> 
+            <img src="aboutme.png" alt="Rasmbor">
+        <h1>O'zim haqimda</h1>
+        <i>Men Abdashev Shahzod Angren shahrda tug'ilgan man hozirda frontend dasturlashi bilan 2 oydan beri 
+            shug'ilanib kelaman.Men 10 sinf o'quvchisiman HTML,CSS larni qisman bilaman Bu saytni yaratishdan
+             maqsad o'zimni kuchaytirish.Mening Aziz va qo'zivoy Bobur do'stlarim bor.Aslida bu dasturlashga
+             kirib kelishimga sabab bo'lgan insonlardir.Hozirda ular Google ,Amazon kompaniyalari bilan hamkorlikda ish yuritishadi.Mening maqsadlarimdan biri eng zo'r frontend va backend dasturchi bo'lish
+            E'tiboriz uchun rahmat.Sizlar bilan ShahzodDev bo'ldi</i>
+            </div>
+            <div><h1>Bobur ya'ni yendilmas</h1>
+                <div class="ozim">
+                <img src="bobur.jpg" alt="Bobur"> <br>
+            </div>
+            
+                <h2>Aslida men shu boladan motivatsiya olaman.Bobur yoshligidan bilimga chanqoq yoshlardan biri hozirda u TOEFL sertifikatini olishga harakat payida halitda bu bolani kelajagi ma'lum deb o'ylayman ko'rinishida sal anqovroqqa o'xshasada ammo juda ham kunchli bolalardan biri deb o'ylayman.Men o'ulashimcha hozirda uni Osmondagi bolalar ko'rsatuviga olishsa deb o'ylayman.Uning bir shiori bor"Bu hayotda dunyoga ma'nfaating tegmasa o'zingdan nasl qoldrib hayvondan farqin qolmaydi "degan gapi hali haligacha qulog'mda</h2>
+                <div class="ozim">
+                <img src="abror.jpg" alt="sssss"> br
+            </div>
+                <h2>Hozirgi aytib bermoqchi odamim.Abror bo'lib hozirda kochani ishlagan bollardan biri hisoblanadi men bu insonni juda qattiq hurmat qilaman .Abror Angren shaharda hokimiyatda ishlaydi hozirga ish menga no'malum.E'tiboriz uchun rahmat.</h2>
+            </div>
+
+    </body>
+
+</html>
+<!DOCTYPE html>
+<html>
+    <head>
+          <title>HTML nima o'zi</title>
+    </head>
+    <body>
+        <h1 class="main_h1" >
+            HTML haqida
+        </h1>
+      <i class="html.haqida">HTML (inglizcha: Hypertext Markup Language — hipermatnli belgilash tili) — SGML (Standard Generalized Markup Language — standart
+             umumlashtirilgan belgilash tili) ga asoslangan va xalqaro ISO 8879 standartiga mos keluvchi til, xalqaro toʻrda ishlatiladi.HTML 
+             tili taxminan 1991—1992-yillarda Yevropa Yadroviy Tadqiqotlar Markazida ishlovchi britaniyalik mutaxassis Tim Berners-Lee tomonidan ishlab chiqilgan. Dastlab bu til mutaxassislar uchun hujjat tayyorlash 
+             vositasi sifatida yaratilgan. 
+             HTML tilining soddaligi (SGMLga nisbatan) va yuqori formatlash imkoniyatlarining mavjudligi uni
+             foydalanuvchilar orasida tez tarqalishiga sabab boʻldi. Bundan tashqari unda hipermatnlardan foydalanish mumkin edi. Tilning 
+             rivojlanishi bilan unga qoʻshimcha multimedia (tasvir, tovush, animatsiya va boshqalar) imkoniyatlari qoʻshildi. — 15-may 2000-yi
+             HTML 1.0 versiya rasmiy ravishda mavjud emas.Barcha veb-sahifalarda HTML-belgilar mavjud bo’lib ular brauzerlar tomonidan izohlanadi. Natijada formatlangan matn kompyuter yoki mobil qurilmaning ekranida aks etadi.
+             HTML ning 5-versiyasidan oldin HTML SGML dasturi sifatida belgilardi (ISO 8879 ga muvofiq standartlashtirilgan umumlashtiruvchi til). HTML5 dan boshlab spetsifikatsiyalari DOM (ing. 
+             Document Object Model, uzb. Hujjat Ob’ekti Modeli) nuqtai nazaridan tuzilgan.
+             XHTML HTML-ning yanada qattiqroq versiyasi bo’lib, u XML sintaksisiga amal qiladi va gipermatnni belgilash uchun XML til dasturidir.
+             WEBda HTML sahifalar odatda HTTP yoki HTTPS orqali serverdan oddiy matn shaklida yoki shifrlangan holda brauzerlarga uzatiladi.
+             HTML gipermatnli belgilash tili ingliz olimi Tim Berners-Li tomonidan 1986–1991 yillarda Shveytsariyaning Jenevadagi CERN labarator
+             iyasida ishlab chiqilgan.
+             HTML dastlab nostandart turli versiyalari mavjud boʻlganligi tufayli birinchi rasmiy versiya 2.0 dan boshlangan. 1995 yil
+              „Xalqaro Oʻrgimchak toʻri konsortsiumi“ tomonidan HTMLning 3 versiyasi taklif qilindi. Ushbu versiyada juda koʻp yangiliklar,
+              jumladan jadvallar yasash, rasmlarni matn bilan atrofini oʻrash, matematik formulalar yaratish kiritildi, biroq u davrdagi 
+              brauzerlarda bu imkoniyatlar realizatsiya qilinmadi. 3.1 versiya hech qachon taklif qilinmagan boʻlib, darxol 3.2 versiyaga 
+              oʻtildi. Unda 3.1 versiyadagi baʼzi yangiliklar tushirib qoldirildi. Matematik formulalar boshqa MathML standartida alohida 
+              koʻrsatildi.
+             HMLning 4.0 versiyasida standartizatsiya kuchaytirildi, faqat maxsus brouserlarga oid teglar (masalan, <label>) tushirib 
+                 qoldirildi, baʼzi teglar eskirgan sifatida tavsiya etildi (masalan,  tegi oʻrniga CSS imkoniyatlaridan foydalanish 
+                 tavsiya etiladi).</i>
+                 <div>
+                     <ul>
+                         <h1>Versiyalari</h1>
+                         <li>
+                            HTML 2.0 — IETF tomonidan tavsiya etilgan standart holatda (18 noyabr 1995 yil) RFC 1866 sifatida nashr etilgan.
+                         </li>
+                         <li>
+                            HTML 3.0–1995 yil 28 mart — IETF Internet-loyihasi (1995 yil 28 sentyabrgacha)
+                         </li>
+                         <li>
+                            HTML 3.2–1997 yil 14 yanvar
+                         </li>
+                         <li>
+                            HTML 4.0–1997 yil 18 dekabr
+                         </li>
+                         <li>
+                            HTML 4.01–1999 yil 24 dekabr
+                         </li>
+                         <li>
+                            ISO / IEC 15445: 2000 (HTML 4.01 qat’iyligiga asoslangan ISO HTML deb nomlanadi) — 2000 yil 15 may
+                         </li>
+                     </ul>
+                     
+                 </div>
+    </body>
+</html>
