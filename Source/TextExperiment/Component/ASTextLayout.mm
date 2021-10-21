@@ -395,6 +395,53 @@ dispatch_semaphore_signal(_lock);
   return [self layoutWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
++ (BOOL)_isBeginningLineIndexOfParagraph:(NSAttributedString *)text index:(NSUInteger)index
+{
+  NSString *string = [text string];
+  NSUInteger length = [string length];
+  
+  NSRange paragraphRange = [self _rangeOfParagraphsContainingRange:string range:NSMakeRange(0, 0) parBegIndex:NULL parEndIndex:NULL];
+  
+  while (paragraphRange.length)
+  {
+    if (index == paragraphRange.location) {
+      return true;
+    }
+    if (index < paragraphRange.location) {
+      return false;
+    }
+    NSUInteger nextParagraphBegin = NSMaxRange(paragraphRange);
+    if (nextParagraphBegin>=length)
+    {
+      break;
+    }
+    // next paragraph
+    paragraphRange = [self _rangeOfParagraphsContainingRange:string range:NSMakeRange(nextParagraphBegin, 0) parBegIndex:NULL parEndIndex:NULL];
+  }
+  return false;
+}
+
++ (NSRange)_rangeOfParagraphsContainingRange:(NSString *)text range:(NSRange)range parBegIndex:(NSUInteger *)parBegIndex parEndIndex:(NSUInteger *)parEndIndex
+{
+  // get beginning and end of paragraph containing the replaced range
+  CFIndex beginIndex;
+  CFIndex endIndex;
+  
+  CFStringGetParagraphBounds((__bridge CFStringRef)text, CFRangeMake(range.location, range.length), &beginIndex, &endIndex, NULL);
+  
+  if (parBegIndex)
+  {
+    *parBegIndex = beginIndex;
+  }
+  
+  if (parEndIndex)
+  {
+    *parEndIndex = endIndex;
+  }
+  // endIndex is the first character of the following paragraph, so we don't need to add 1
+  return NSMakeRange(beginIndex, endIndex - beginIndex);
+}
+
 + (ASTextLayout *)layoutWithContainer:(ASTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
   ASTextLayout *layout = NULL;
   CGPathRef cgPath = nil;
@@ -864,10 +911,25 @@ dispatch_semaphore_signal(_lock);
               [lastLineText insertAttributedString:truncationToken atIndex:0];
             }
           }
+            
+          CGFloat headIndent = 0;
+            
+          BOOL isAtBeginOfParagraph = [self _isBeginningLineIndexOfParagraph:text index:lastLine.range.location];
+          // get the paragraph style at this index
+          CTParagraphStyleRef paragraphStyle = (__bridge CTParagraphStyleRef)[text attribute:(id)kCTParagraphStyleAttributeName atIndex:lastRange.location effectiveRange:NULL];
+            
+          if (isAtBeginOfParagraph)
+          {
+              CTParagraphStyleGetValueForSpecifier(paragraphStyle, kCTParagraphStyleSpecifierFirstLineHeadIndent, sizeof(headIndent), &headIndent);
+          }
+          else
+          {
+              CTParagraphStyleGetValueForSpecifier(paragraphStyle, kCTParagraphStyleSpecifierHeadIndent, sizeof(headIndent), &headIndent);
+          }
 
           CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef) lastLineText);
           if (ctLastLineExtend) {
-            CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth, type, truncationTokenLine);
+            CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth - headIndent, type, truncationTokenLine);
             CFRelease(ctLastLineExtend);
             if (ctTruncatedLine) {
               truncatedLine = [ASTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
