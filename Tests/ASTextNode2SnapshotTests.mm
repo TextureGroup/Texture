@@ -109,7 +109,11 @@
 #endif
   [ASConfigurationManager test_resetWithConfiguration:config];
 
-  self.recordMode = NO;
+  self.recordMode = NO
+  
+  
+
+;
 }
 
 - (void)tearDown
@@ -204,6 +208,167 @@
     ASSnapshotVerifyViewWithTolerance(container, identifier, 0.01);
   }
 }
+
+- (void)testTextTruncationModes_with_headIndentAttribute_ASTextNode2
+{
+  UIView *container = [[UIView alloc] initWithFrame:(CGRect) {CGPointZero, (CGSize) {375.0f, 667.0f}}];
+
+  UILabel *textNodeLabel = [[UILabel alloc] init];
+  UILabel *uiLabelLabel = [[UILabel alloc] init];
+  UILabel *description = [[UILabel alloc] init];
+  textNodeLabel.text = @"ASTextNode2:";
+  textNodeLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  textNodeLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+  uiLabelLabel.text = @"UILabel:";
+  uiLabelLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  uiLabelLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+
+  description.text = @"<Description>";
+  description.font = [UIFont italicSystemFontOfSize:16.0];
+  description.numberOfLines = 0;
+
+  uiLabelLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+
+  UILabel *reference = [[UILabel alloc] init];
+  ASTextNode *textNode = [[ASTextNode alloc] init]; // ASTextNode2
+
+  NSMutableAttributedString *refString = [[NSMutableAttributedString alloc] initWithString:@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:18.0f] }];
+  
+  NSMutableAttributedString *asString = [refString mutableCopy];
+  
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.headIndent = 20; // Head Indent for Testing
+  
+  [refString addAttributes:@{ NSParagraphStyleAttributeName : paragraphStyle} range:NSMakeRange(0, [refString length])];
+  [asString addAttributes:@{ NSParagraphStyleAttributeName : paragraphStyle} range:NSMakeRange(0, [asString length])];
+  
+  reference.attributedText = refString;
+  textNode.attributedText = asString;
+
+  CGSize size = (CGSize) {container.bounds.size.width, 120.0};
+  CGPoint origin = (CGPoint) {CGRectGetWidth(container.bounds) / 2 - size.width / 2, CGRectGetHeight(container.bounds) / 2 - size.height / 2}; // center
+
+  textNode.frame = (CGRect) {origin, size};
+  reference.frame = CGRectOffset(textNode.frame, 0, -160.0f);
+
+  textNodeLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, textNodeLabel.font.lineHeight}};
+  origin = (CGPoint) {textNode.frame.origin.x, textNode.frame.origin.y - textNodeLabel.bounds.size.height};
+  textNodeLabel.frame = (CGRect) {origin, textNodeLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {reference.frame.origin.x, reference.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {textNode.frame.origin.x, textNode.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {reference.frame.origin.x, reference.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  description.bounds = textNode.bounds;
+  description.frame = (CGRect) {(CGPoint) {0, container.bounds.size.height * 0.8}, description.bounds.size};
+
+  [container addSubview:reference];
+  [container addSubview:textNode.view];
+  [container addSubview:textNodeLabel];
+  [container addSubview:uiLabelLabel];
+  [container addSubview:description];
+
+  NSArray<LineBreakConfig *> *c = [LineBreakConfig configs];
+  for (LineBreakConfig *config in c) {
+    reference.lineBreakMode = textNode.truncationMode = config.lineBreakMode;
+    reference.numberOfLines = textNode.maximumNumberOfLines = config.numberOfLines;
+    description.text = config.description;
+    [container setNeedsLayout];
+    NSString *identifier = [NSString stringWithFormat:@"%@_%luLines", [config breakModeDescription], (unsigned long)config.numberOfLines];
+    [ASSnapshotTestCase hackilySynchronouslyRecursivelyRenderNode:textNode];
+    ASSnapshotVerifyViewWithTolerance(container, identifier, 0.01);
+  }
+}
+
+- (void)testTextTruncationModes_with_firstLineHeadIndentAttribute_ASTextNode2
+{
+  UIView *container = [[UIView alloc] initWithFrame:(CGRect) {CGPointZero, (CGSize) {375.0f, 667.0f}}];
+
+  UILabel *textNodeLabel = [[UILabel alloc] init];
+  UILabel *uiLabelLabel = [[UILabel alloc] init];
+  UILabel *description = [[UILabel alloc] init];
+  textNodeLabel.text = @"ASTextNode2:";
+  textNodeLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  textNodeLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+  uiLabelLabel.text = @"UILabel:";
+  uiLabelLabel.font = [UIFont boldSystemFontOfSize:16.0];
+  uiLabelLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+
+  description.text = @"<Description>";
+  description.font = [UIFont italicSystemFontOfSize:16.0];
+  description.numberOfLines = 0;
+
+  uiLabelLabel.textColor = [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0];
+
+  UILabel *reference = [[UILabel alloc] init];
+  ASTextNode *textNode = [[ASTextNode alloc] init]; // ASTextNode2
+
+  NSMutableAttributedString *refString = [[NSMutableAttributedString alloc] initWithString:@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:18.0f] }];
+  
+  NSMutableAttributedString *asString = [refString mutableCopy];
+  
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.firstLineHeadIndent = 20; // Head Indent for Testing
+  
+  [refString addAttributes:@{ NSParagraphStyleAttributeName : paragraphStyle} range:NSMakeRange(0, [refString length])];
+  [asString addAttributes:@{ NSParagraphStyleAttributeName : paragraphStyle} range:NSMakeRange(0, [asString length])];
+  
+  reference.attributedText = refString;
+  textNode.attributedText = asString;
+
+  CGSize size = (CGSize) {container.bounds.size.width, 120.0};
+  CGPoint origin = (CGPoint) {CGRectGetWidth(container.bounds) / 2 - size.width / 2, CGRectGetHeight(container.bounds) / 2 - size.height / 2}; // center
+
+  textNode.frame = (CGRect) {origin, size};
+  reference.frame = CGRectOffset(textNode.frame, 0, -160.0f);
+
+  textNodeLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, textNodeLabel.font.lineHeight}};
+  origin = (CGPoint) {textNode.frame.origin.x, textNode.frame.origin.y - textNodeLabel.bounds.size.height};
+  textNodeLabel.frame = (CGRect) {origin, textNodeLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {reference.frame.origin.x, reference.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {textNode.frame.origin.x, textNode.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  uiLabelLabel.bounds = (CGRect) {CGPointZero, (CGSize) {container.bounds.size.width, uiLabelLabel.font.lineHeight}};
+  origin = (CGPoint) {reference.frame.origin.x, reference.frame.origin.y - uiLabelLabel.bounds.size.height};
+  uiLabelLabel.frame = (CGRect) {origin, uiLabelLabel.bounds.size};
+
+  description.bounds = textNode.bounds;
+  description.frame = (CGRect) {(CGPoint) {0, container.bounds.size.height * 0.8}, description.bounds.size};
+
+  [container addSubview:reference];
+  [container addSubview:textNode.view];
+  [container addSubview:textNodeLabel];
+  [container addSubview:uiLabelLabel];
+  [container addSubview:description];
+
+  NSArray<LineBreakConfig *> *c = [LineBreakConfig configs];
+  for (LineBreakConfig *config in c) {
+    reference.lineBreakMode = textNode.truncationMode = config.lineBreakMode;
+    reference.numberOfLines = textNode.maximumNumberOfLines = config.numberOfLines;
+    description.text = config.description;
+    [container setNeedsLayout];
+    NSString *identifier = [NSString stringWithFormat:@"%@_%luLines", [config breakModeDescription], (unsigned long)config.numberOfLines];
+    [ASSnapshotTestCase hackilySynchronouslyRecursivelyRenderNode:textNode];
+    ASSnapshotVerifyViewWithTolerance(container, identifier, 0.01);
+  }
+}
+
 
 - (void)testTextContainerInsetIsIncludedWithSmallerConstrainedSize_ASTextNode2
 {
