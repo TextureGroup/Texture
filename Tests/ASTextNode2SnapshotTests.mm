@@ -109,11 +109,7 @@
 #endif
   [ASConfigurationManager test_resetWithConfiguration:config];
 
-  self.recordMode = NO
-  
-  
-
-;
+  self.recordMode = NO;
 }
 
 - (void)tearDown
