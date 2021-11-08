@@ -615,7 +615,6 @@ static ASTextNodeFrameProvider *ASTextNode2ASTextNodeFrameProviderDefault() {
   // Holding it for the duration of the method is more efficient in this case.
   MutexLocker l(__instanceLock__);
 
-  NSAttributedString *oldAttributedText = _attributedText;
   if (!ASCompareAssignCopy(_attributedText, attributedText)) {
     return;
   }
