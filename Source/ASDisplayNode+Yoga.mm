@@ -22,10 +22,13 @@
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplayKit/ASNodeController+Beta.h>
-
 #import <AsyncDisplayKit/ASDisplayNode+LayoutSpec.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga2.h>
 
 #define YOGA_LAYOUT_LOGGING 0
+
+// Access style property directly or use the getter to create one
+#define _LOCKED_ACCESS_STYLE() (_style ?: [self _locked_style])
 
 #pragma mark - ASDisplayNode+Yoga
 
@@ -129,6 +132,14 @@
   [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:attribute];
   self.style.direction = (layoutDirection == UIUserInterfaceLayoutDirectionLeftToRight
                           ? YGDirectionLTR : YGDirectionRTL);
+}
+
+- (UIUserInterfaceLayoutDirection)yogaLayoutDirection
+{
+    AS::Yoga2::AssertEnabled(self);
+    return _LOCKED_ACCESS_STYLE().direction == YGDirectionRTL
+    ? UIUserInterfaceLayoutDirectionRightToLeft
+    : UIUserInterfaceLayoutDirectionLeftToRight;
 }
 
 - (void)setYogaParent:(ASDisplayNode *)yogaParent

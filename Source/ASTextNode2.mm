@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayViewAccessiblity.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkPrivate.h>
+#import <AsyncDisplayKit/ASDisplayNode+Yoga.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
 #import <AsyncDisplayKit/ASTextKitRenderer+Positioning.h>
@@ -622,8 +623,8 @@ static ASTextNodeFrameProvider *ASTextNode2ASTextNodeFrameProviderDefault() {
   // Since truncation text matches style of attributedText, invalidate it now.
   [self _locked_invalidateTruncationText];
 
-  NSUInteger length = attributedText.length;
 #if !YOGA
+  NSUInteger length = attributedText.length;
   if (length > 0) {
     ASLayoutElementStyle *style = [self _locked_style];
     style.ascender = [[self class] ascenderWithAttributedString:attributedText];

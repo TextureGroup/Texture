@@ -10,6 +10,17 @@
 #import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #if YOGA /* YOGA */
 
+CGFloat ASTextGetBaseline(CGFloat height, ASDisplayNode *yogaParent, NSAttributedString *str) {
+    if (!yogaParent) return height;
+    NSUInteger len = str.length;
+    if (!len) return height;
+    BOOL isLast = (yogaParent.style.alignItems == ASStackLayoutAlignItemsBaselineLast);
+    UIFont *font = [str attribute:NSFontAttributeName
+                          atIndex:(isLast ? len - 1 : 0)
+                   effectiveRange:NULL];
+    return isLast ? height + font.descender : font.ascender;
+}
+
 @implementation ASDisplayNode (YogaHelpers)
 
 + (ASDisplayNode *)yogaNode

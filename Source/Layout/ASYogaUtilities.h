@@ -17,6 +17,10 @@
 // Should pass a string literal, not an NSString as the first argument to ASYogaLog
 #define ASYogaLog(x, ...) as_log_verbose(ASLayoutLog(), x, ##__VA_ARGS__);
 
+/** Helper function for Yoga baseline measurement. */
+ASDK_EXTERN CGFloat ASTextGetBaseline(CGFloat height, ASDisplayNode *_Nullable yogaParent,
+                                      NSAttributedString *str);
+
 @interface ASDisplayNode (YogaHelpers)
 
 + (ASDisplayNode *)yogaNode;
