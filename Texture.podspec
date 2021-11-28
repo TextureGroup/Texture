@@ -50,6 +50,7 @@ Pod::Spec.new do |spec|
     igl.dependency 'IGListKit', '~> 4.0'
     igl.dependency 'IGListDiffKit', '~> 4.0'
     igl.dependency 'Texture/Core'
+    igl.dependency 'Texture/PINRemoteImage'
   end
 
   spec.subspec 'Yoga' do |yoga|
