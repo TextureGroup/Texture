@@ -29,9 +29,24 @@
 extern void SortAccessibilityElements(NSMutableArray *elements);
 
 @interface ASDisplayViewAccessibilityTests : XCTestCase
+@property (nonatomic) ASConfiguration *experimentalConfiguration;
 @end
 
 @implementation ASDisplayViewAccessibilityTests
+
+- (void)setUp
+{
+  [super setUp];
+  self.experimentalConfiguration = [ASConfiguration new];
+  self.experimentalConfiguration.experimentalFeatures = ASExperimentalEnableNodeIsHiddenFromAcessibility | ASExperimentalEnableAcessibilityElementsReturnNil |ASExperimentalDoNotCacheAccessibilityElements;
+  [ASConfigurationManager test_resetWithConfiguration:self.experimentalConfiguration];
+}
+
+- (void)tearDown
+{
+  [super tearDown];
+  [ASConfigurationManager test_resetWithConfiguration:nil];
+}
 
 - (void)testAccessibilityElementsAccessors
 {

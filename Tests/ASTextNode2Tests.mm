@@ -74,7 +74,8 @@
 
 - (void)testAccessibility
 {
-  XCTAssertTrue(_textNode.isAccessibilityElement, @"Should be an accessibility element");
+  XCTAssertFalse(_textNode.isAccessibilityElement, @"Should not be an accessibility element. It is a container");
+  XCTAssertTrue(_textNode.accessibilityElements.count > 0, @"Should have some accessibility elements");
   XCTAssertTrue(_textNode.accessibilityTraits == UIAccessibilityTraitStaticText,
                 @"Should have static text accessibility trait, instead has %llu",
                 _textNode.accessibilityTraits);
