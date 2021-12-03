@@ -27,7 +27,7 @@ jobs:
           - mode: examples-pt4
             name: Build examples (examples-pt4)
     name: ${{ matrix.name }}
-    runs-on: macOS-latest
+    runs-on: macos-10.15
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v2

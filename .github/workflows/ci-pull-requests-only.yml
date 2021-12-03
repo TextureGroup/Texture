@@ -18,7 +18,7 @@ jobs:
           - mode: cocoapods-lint-other-subspecs
             name: Verify that other subspecs lint
     name: ${{ matrix.name }}
-    runs-on: macOS-latest
+    runs-on: macos-10.15
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v2
