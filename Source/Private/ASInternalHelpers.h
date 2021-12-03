@@ -17,7 +17,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-ASDK_EXTERN void ASInitializeFrameworkMainThread(void);
+ASDK_EXTERN void ASInitializeFrameworkMainThreadOnConstructor(void);
+ASDK_EXTERN void ASInitializeFrameworkMainThreadOnDestructor(void);
 
 ASDK_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);
 ASDK_EXTERN BOOL ASDefaultAllowsEdgeAntialiasing(void);

@@ -10,7 +10,7 @@ jobs:
     env: 
         DEVELOPER_DIR: /Applications/Xcode_11.5.app/Contents/Developer
     name: Verify that podspec lints
-    runs-on: macOS-latest
+    runs-on: macos-10.15
     steps:
     - name: Checkout the Git repository
       uses: actions/checkout@v2
