@@ -83,7 +83,19 @@ void _ASInitializeSignpostObservers(void)
 }
 #endif  // AS_SIGNPOST_ENABLE
 
-void ASInitializeFrameworkMainThread(void)
+void ASInitializeFrameworkMainThreadOnConstructor(void)
+{
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    ASDisplayNodeCAssertMainThread();
+    ASNotifyInitialized();
+#if AS_SIGNPOST_ENABLE
+    _ASInitializeSignpostObservers();
+#endif
+  });
+}
+
+void ASInitializeFrameworkMainThreadOnDestructor(void)
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
@@ -97,10 +109,6 @@ void ASInitializeFrameworkMainThread(void)
       allowsGroupOpacityFromUIKitOrNil = @(layer.allowsGroupOpacity);
       allowsEdgeAntialiasingFromUIKitOrNil = @(layer.allowsEdgeAntialiasing);
     }
-    ASNotifyInitialized();
-#if AS_SIGNPOST_ENABLE
-    _ASInitializeSignpostObservers();
-#endif
   });
 }
 
