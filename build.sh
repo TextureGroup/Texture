@@ -66,7 +66,7 @@ function build_example {
 
 # Lint subspec
 function lint_subspec {
-    set -o pipefail && pod env && pod lib lint --subspec="$1"
+    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
 }
 
 function cleanup {
