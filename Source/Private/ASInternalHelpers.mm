@@ -89,6 +89,12 @@ void ASInitializeFrameworkMainThreadOnDestructor(void)
   });
 }
 
+ASDK_EXTERN void ASInitializeFrameworkMainThread(void)
+{
+  ASInitializeFrameworkMainThreadOnConstructor();
+  ASInitializeFrameworkMainThreadOnDestructor();
+}
+
 BOOL ASSubclassOverridesSelector(Class superclass, Class subclass, SEL selector)
 {
   if (superclass == subclass) return NO; // Even if the class implements the selector, it doesn't override itself.
