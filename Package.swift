@@ -49,6 +49,10 @@ let package = Package(
             name: "AsyncDisplayKit",
             type: .static,
             targets: ["AsyncDisplayKit"]),
+       .library(
+            name: "AsyncDisplayKitNoPIN",
+            type: .static,
+            targets: ["AsyncDisplayKitNoPIN"]),
         .library(
             name: "AsyncDisplayKitIGListKit",
             type: .static,
@@ -62,6 +66,11 @@ let package = Package(
         .target(
             name: "AsyncDisplayKit",
             dependencies: ["PINRemoteImage"],
+            path: "spm/Sources/AsyncDisplayKit",
+            cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
+        ),
+        .target(
+            name: "AsyncDisplayKitNoPIN",
             path: "spm/Sources/AsyncDisplayKit",
             cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
         ),
