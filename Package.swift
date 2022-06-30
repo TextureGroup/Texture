@@ -49,10 +49,6 @@ let package = Package(
             name: "AsyncDisplayKit",
             type: .static,
             targets: ["AsyncDisplayKit"]),
-       .library(
-            name: "AsyncDisplayKitNoPIN",
-            type: .static,
-            targets: ["AsyncDisplayKitNoPIN"]),
         .library(
             name: "AsyncDisplayKitIGListKit",
             type: .static,
