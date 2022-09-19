@@ -100,6 +100,11 @@ static CGColorRef ASTextGetCGColor(CGColorRef color) {
   id<ASTextLinePositionModifier> _linePositionModifier;
 }
 
++ (BOOL)supportsSecureCoding
+{
+  return YES;
+}
+
 - (NSString *)description
 {
   return [NSString
