@@ -40,7 +40,7 @@ int32_t const ASLayoutElementContextDefaultTransitionID = ASLayoutElementContext
 
 #if AS_TLS_AVAILABLE
 
-static _Thread_local unowned ASLayoutElementContext *tls_context;
+static _Thread_local unowned ASLayoutElementContext *tls_context = nil;
 
 void ASLayoutElementPushContext(ASLayoutElementContext *context)
 {
@@ -59,7 +59,9 @@ ASLayoutElementContext *ASLayoutElementGetCurrentContext()
 void ASLayoutElementPopContext()
 {
   ASDisplayNodeCAssertNotNil(tls_context, @"Attempt to pop context when there wasn't a context!");
-  CFRelease((__bridge CFTypeRef)tls_context);
+  if (tls_context) {
+    CFRelease((__bridge CFTypeRef)tls_context);
+  }
   tls_context = nil;
 }
 
@@ -93,7 +95,9 @@ void ASLayoutElementPopContext()
 {
   const auto ctx = (CFTypeRef)pthread_getspecific(ASLayoutElementContextKey());
   ASDisplayNodeCAssertNotNil(ctx, @"Attempt to pop context when there wasn't a context!");
-  CFRelease(ctx);
+  if (ctx) {
+    CFRelease(ctx);
+  }
   pthread_setspecific(ASLayoutElementContextKey(), NULL);
 }
 
