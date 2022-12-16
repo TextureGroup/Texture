@@ -27,7 +27,7 @@ It is highly recommended that you use Texture's nodes within a node container. T
     <td>in place of UIKit's <code>UITableView</code></td>
   </tr>
   <tr>
-    <td><a href = "containers-asviewcontroller.html"><code>ASViewController</code></a></td>
+    <td><a href = "containers-asdkviewcontroller.html"><code>ASDKViewController</code></a></td>
     <td>in place of UIKit's <code>UIViewController</code></td>
   </tr>
   <tr>
