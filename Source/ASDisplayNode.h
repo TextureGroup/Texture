@@ -47,6 +47,11 @@ typedef UIViewController * _Nonnull(^ASDisplayNodeViewControllerBlock)(void);
 typedef CALayer * _Nonnull(^ASDisplayNodeLayerBlock)(void);
 
 /**
+ * Accessibility elements creation block. Used to specify accessibility elements of the node.
+ */
+typedef NSArray *_Nullable (^ASDisplayNodeAccessibilityElementsBlock)(void);
+
+/**
  * ASDisplayNode loaded callback block. This block is called BEFORE the -didLoad method and is always called on the main thread.
  */
 typedef void (^ASDisplayNodeDidLoadBlock)(__kindof ASDisplayNode * node);
@@ -814,6 +819,18 @@ ASDK_EXTERN NSInteger const ASDefaultDrawingPriority;
 
 // Accessibility identification support
 @property (nullable, copy)   NSString *accessibilityIdentifier;
+
+@end
+
+@interface ASDisplayNode (CustomAccessibilityBehavior)
+
+/**
+ * Set the block that should be used to determining the accessibility elements of the node.
+ * When set, the accessibility-related logic (e.g. label aggregation) will not be triggered.
+ *
+ * @param block The block that returns the accessibility elements of the node.
+ */
+- (void)setAccessibilityElementsBlock:(ASDisplayNodeAccessibilityElementsBlock)block;
 
 @end
 

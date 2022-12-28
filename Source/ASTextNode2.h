@@ -15,6 +15,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Get and Set ASTextNode to use:
+ *  a) Intrinsic size fix for NSAtrributedStrings with no paragraph styles and
+ *  b) Yoga direction to determine alignment of NSTextAlignmentNatural text nodes.
+ */
+BOOL ASGetEnableTextNode2ImprovedRTL(void);
+void ASSetEnableTextNode2ImprovedRTL(BOOL enable);
+
+/**
+ * Get and Set ASTextLayout and ASTextNode2 to enable to calculation of visible text range.
+ */
+BOOL ASGetEnableTextTruncationVisibleRange(void);
+void ASSetEnableTextTruncationVisibleRange(BOOL enable);
+
+/**
  @abstract Draws interactive rich text.
  @discussion Backed by the code in TextExperiment folder, on top of CoreText.
  */
@@ -171,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param point The point, in the receiver's coordinate system.
  @param attributeNameOut The name of the attribute at the point. Can be NULL.
  @param rangeOut The ultimate range of the found text. Can be NULL.
- @result YES if an entity exists at `point`; NO otherwise.
+ @result The entity if it exists at `point`; nil otherwise.
  */
 - (nullable id)linkAttributeValueAtPoint:(CGPoint)point attributeName:(out NSString * _Nullable * _Nullable)attributeNameOut range:(out NSRange * _Nullable)rangeOut AS_WARN_UNUSED_RESULT;
 
@@ -212,7 +226,14 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion If you still want to handle tap truncation action when passthroughNonlinkTouches is YES,
  you should set the alwaysHandleTruncationTokenTap to YES.
  */
-@property (nonatomic) BOOL passthroughNonlinkTouches;
+@property BOOL passthroughNonlinkTouches;
+
+/**
+ @abstract Whether additionalTruncationMessage is interactive.
+ @discussion This affects whether touches on additionalTruncationMessage will be intercepted when
+ passthroughNonlinkTouches is YES.
+ */
+@property BOOL additionalTruncationMessageIsInteractive;
 
 /**
  @abstract Always handle tap truncationAction, even the passthroughNonlinkTouches is YES. Default is NO.

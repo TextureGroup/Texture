@@ -37,6 +37,39 @@
   return [self as_attributesAtIndex:0];
 }
 
+- (NSDictionary *)as_ctAttributes {
+  NSDictionary *attributes = self.as_attributes;
+  if (attributes == nil) {
+    return nil;
+  }
+
+  NSMutableDictionary *mutableCTAttributes = [[NSMutableDictionary alloc] initWithCapacity:attributes.count];
+
+  // Map for NS attributes that are not mapping cleanly to CT attributes
+  static NSDictionary *NSToCTAttributeNamesMap = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    NSToCTAttributeNamesMap = @{
+      NSFontAttributeName:            (NSString *)kCTFontAttributeName,
+      NSBackgroundColorAttributeName: (NSString *)kCTBackgroundColorAttributeName,
+      NSForegroundColorAttributeName: (NSString *)kCTForegroundColorAttributeName,
+      NSUnderlineColorAttributeName:  (NSString *)kCTUnderlineColorAttributeName,
+      NSUnderlineStyleAttributeName:  (NSString *)kCTUnderlineStyleAttributeName,
+      NSStrokeWidthAttributeName:     (NSString *)kCTStrokeWidthAttributeName,
+      NSStrokeColorAttributeName:     (NSString *)kCTStrokeColorAttributeName,
+      NSKernAttributeName:            (NSString *)kCTKernAttributeName,
+      NSLigatureAttributeName:        (NSString *)kCTLigatureAttributeName
+    };
+  });
+
+  [attributes enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
+    key = NSToCTAttributeNamesMap[key] ?: key;
+    [mutableCTAttributes setObject:value forKey:key];
+  }];
+
+  return [mutableCTAttributes copy];
+}
+
 - (UIFont *)as_font {
   return [self as_fontAtIndex:0];
 }
@@ -470,14 +503,18 @@ return style. _attr_;
                                                   contentMode:(UIViewContentMode)contentMode
                                                attachmentSize:(CGSize)attachmentSize
                                                   alignToFont:(UIFont *)font
-                                                    alignment:(ASTextVerticalAlignment)alignment {
+                                                    alignment:(ASTextVerticalAlignment)alignment
+                                                contentInsets:(UIEdgeInsets)contentInsets
+                                                     userInfo:(NSDictionary *)userInfo {
   NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:ASTextAttachmentToken];
-  
+
   ASTextAttachment *attach = [ASTextAttachment new];
   attach.content = content;
   attach.contentMode = contentMode;
+  attach.userInfo = userInfo;
+  attach.contentInsets = contentInsets;
   [atr as_setTextAttachment:attach range:NSMakeRange(0, atr.length)];
-  
+
   ASTextRunDelegate *delegate = [ASTextRunDelegate new];
   delegate.width = attachmentSize.width;
   switch (alignment) {
@@ -507,16 +544,17 @@ return style. _attr_;
         delegate.descent = attachmentSize.height;
       }
     } break;
+    case ASTextVerticalAlignmentBaseline:
     default: {
       delegate.ascent = attachmentSize.height;
       delegate.descent = 0;
-    } break;
+    }
   }
-  
+
   CTRunDelegateRef delegateRef = delegate.CTRunDelegate;
   [atr as_setRunDelegate:delegateRef range:NSMakeRange(0, atr.length)];
   if (delegate) CFRelease(delegateRef);
-  
+
   return atr;
 }
 
@@ -953,29 +991,30 @@ return style. _attr_;
   [self as_setAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
 }
 
-#define ParagraphStyleSet(_attr_) \
-[self enumerateAttribute:NSParagraphStyleAttributeName \
-inRange:range \
-options:kNilOptions \
-usingBlock: ^(NSParagraphStyle *value, NSRange subRange, BOOL *stop) { \
-NSMutableParagraphStyle *style = nil; \
-if (value) { \
-if (CFGetTypeID((__bridge CFTypeRef)(value)) == CTParagraphStyleGetTypeID()) { \
-value = [NSParagraphStyle as_styleWithCTStyle:(__bridge CTParagraphStyleRef)(value)]; \
-} \
-if (value. _attr_ == _attr_) return; \
-if ([value isKindOfClass:[NSMutableParagraphStyle class]]) { \
-style = (id)value; \
-} else { \
-style = value.mutableCopy; \
-} \
-} else { \
-if ([NSParagraphStyle defaultParagraphStyle]. _attr_ == _attr_) return; \
-style = [NSParagraphStyle defaultParagraphStyle].mutableCopy; \
-} \
-style. _attr_ = _attr_; \
-[self as_setParagraphStyle:style range:subRange]; \
-}];
+#define ParagraphStyleSet(_attr_)                                                                  \
+  [self enumerateAttribute:NSParagraphStyleAttributeName                                           \
+                   inRange:range                                                                   \
+                   options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired           \
+                usingBlock:^(NSParagraphStyle * value, NSRange subRange, BOOL * stop) {            \
+                  NSMutableParagraphStyle *style = nil;                                            \
+                  if (value) {                                                                     \
+                    if (CFGetTypeID((__bridge CFTypeRef)(value)) == CTParagraphStyleGetTypeID()) { \
+                      value = [NSParagraphStyle                                                    \
+                          as_styleWithCTStyle:(__bridge CTParagraphStyleRef)(value)];              \
+                    }                                                                              \
+                    if (value._attr_ == _attr_) return;                                            \
+                    if ([value isKindOfClass:[NSMutableParagraphStyle class]]) {                   \
+                      style = (id)value;                                                           \
+                    } else {                                                                       \
+                      style = [value mutableCopy];                                                 \
+                    }                                                                              \
+                  } else {                                                                         \
+                    if ([NSParagraphStyle defaultParagraphStyle]._attr_ == _attr_) return;         \
+                    style = [[NSMutableParagraphStyle alloc] init];                                \
+                  }                                                                                \
+                  style._attr_ = _attr_;                                                           \
+                  [self as_setParagraphStyle:style range:subRange];                                \
+                }];
 
 - (void)as_setAlignment:(NSTextAlignment)alignment range:(NSRange)range {
   ParagraphStyleSet(alignment);

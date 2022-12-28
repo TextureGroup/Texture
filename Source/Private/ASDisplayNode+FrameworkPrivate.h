@@ -320,8 +320,47 @@ NS_INLINE UIAccessibilityTraits ASInteractiveAccessibilityTraitsMask() {
   return UIAccessibilityTraitLink | UIAccessibilityTraitKeyboardKey | UIAccessibilityTraitButton;
 }
 
+// dispatch_once variables must live outside of static inline function or else will be copied
+// for each separate invocation. We want them shared across all invocations.
+static BOOL shouldEnableAccessibilityForTesting;
+static dispatch_once_t kShouldEnableAccessibilityForTestingOnceToken;
+NS_INLINE BOOL ASAccessibilityIsEnabled() {
+#if DEBUG
+  return true;
+#else
+  if (UIAccessibilityIsVoiceOverRunning() || UIAccessibilityIsSwitchControlRunning()) {
+    return true;
+  }
+  // In some ui test environment where DEBUG is not defined.
+  dispatch_once(&kShouldEnableAccessibilityForTestingOnceToken, ^{
+    shouldEnableAccessibilityForTesting = [[[NSProcessInfo processInfo] arguments]
+                                           containsObject:@"AS_FORCE_ACCESSIBILITY_FOR_TESTING"];
+  });
+  return shouldEnableAccessibilityForTesting;
+#endif
+}
+
 @interface ASDisplayNode (AccessibilityInternal)
+
+/**
+ * @discussion An array of the accessibility elements from the node.
+ */
 - (nullable NSArray *)accessibilityElements;
+
+/**
+ * @discussion Invalidates the cached accessibility elements for the node
+ */
+- (void)invalidateAccessibilityElements;
+
+/**
+ * @discussion Invalidates the accessibility elements for the first accessibility container or
+ * the first non layer backed node by walking up the tree starting by self.
+ *
+ * @note Call this when a layer backed node changed (added/removed/updated) or
+ * a view in an accessibility container changed.
+ */
+- (void)invalidateFirstAccessibilityContainerOrNonLayerBackedNode;
+
 @end;
 
 @interface UIView (ASDisplayNodeInternal)

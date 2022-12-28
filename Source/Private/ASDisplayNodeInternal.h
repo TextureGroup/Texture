@@ -122,6 +122,13 @@ static constexpr CACornerMask kASCACornerAllCorners =
     unsigned isDeallocating:1;
 
 #if YOGA
+      unsigned yoga:1;
+      unsigned shouldSuppressYogaCustomMeasure:1;
+      unsigned yogaIsApplyingLayout:1;
+      unsigned yogaRequestedNestedLayout:1;
+      
+      // NOTE: This has been replaced in the large YouTube merge. I can't remove it
+      // completely in this PR as there are still many places that use it.
       unsigned willApplyNextYogaCalculatedLayout:1;
 #endif
       // Automatically manages subnodes
@@ -253,6 +260,7 @@ static constexpr CACornerMask kASCACornerAllCorners =
   CGPoint _accessibilityActivationPoint;
   UIBezierPath *_accessibilityPath;
 
+  ASDisplayNodeAccessibilityElementsBlock _accessibilityElementsBlock;
 
   // Safe Area support
   // These properties are used on iOS 10 and lower, where safe area is not supported by UIKit.

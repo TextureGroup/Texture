@@ -31,6 +31,9 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalDisableGlobalTextkitLock = 1 << 10,                         // exp_disable_global_textkit_lock
   ASExperimentalMainThreadOnlyDataController = 1 << 11,                     // exp_main_thread_only_data_controller
   ASExperimentalRangeUpdateOnChangesetUpdate = 1 << 12,                     // exp_range_update_on_changeset_update
+  ASExperimentalDoNotCacheAccessibilityElements = 1 << 23,                  // exp_do_not_cache_accessibility_elements
+  ASExperimentalEnableNodeIsHiddenFromAcessibility = 1 << 26,               // exp_enable_node_is_hidden_from_accessibility
+  ASExperimentalEnableAcessibilityElementsReturnNil = 1 << 27,              // exp_enable_accessibility_elements_return_nil
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

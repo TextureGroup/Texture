@@ -19,12 +19,14 @@ ASDK_EXTERN void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Null
 @interface ASDisplayNode (Yoga)
 
 @property (copy) NSArray *yogaChildren;
+@property (readonly, weak) ASDisplayNode *yogaParent;
 
 - (void)addYogaChild:(ASDisplayNode *)child;
 - (void)removeYogaChild:(ASDisplayNode *)child;
 - (void)insertYogaChild:(ASDisplayNode *)child atIndex:(NSUInteger)index;
 
 - (void)semanticContentAttributeDidChange:(UISemanticContentAttribute)attribute;
+- (UIUserInterfaceLayoutDirection)yogaLayoutDirection;
 
 @property BOOL yogaLayoutInProgress;
 // TODO: Make this atomic (lock).
