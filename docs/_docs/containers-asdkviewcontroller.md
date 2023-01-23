@@ -13,7 +13,7 @@ An `ASDKViewController` can be used in place of any `UIViewController` - includi
 Benefits of using an `ASDKViewController`:
 <ol>
 <li><b>Save Memory</b>. An <code>ASDKViewController</code> that goes off screen will automatically reduce the size of the <a href="intelligent-preloading.html">fetch data</a> and <a href="intelligent-preloading.html">display ranges</a> of any of its children. This is key for memory management in large applications. </li>
-<li><b><a href="asvisibility.html"><code>ASVisibility</code></a> Feature</b>. When used in an <code>ASNavigationController</code> or <code>ASTabBarController</code>, these classes know the exact number of user taps it would take to make the view controller visible.</li>
+<li><b><a href="asvisibility.html"><code>ASVisibility</code></a> Feature</b>. When used in an <code>ASDKNavigationController</code> or <code>ASTabBarController</code>, these classes know the exact number of user taps it would take to make the view controller visible.</li>
 </ol>
 
 More features will be added over time, so it is a good idea to base your view controllers off of this class. 
