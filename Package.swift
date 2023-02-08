@@ -55,23 +55,14 @@ let package = Package(
             targets: ["AsyncDisplayKitIGListKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pinterest/PINRemoteImage.git", .branch("master")),
-        .package(url: "https://github.com/3a4oT/IGListKit", .branch("spmNumber10")),
     ],
     targets: [
         .target(
             name: "AsyncDisplayKit",
             dependencies: [
-            //  "PINRemoteImage"
             ],
             path: "spm/Sources/AsyncDisplayKit",
             cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
-        ),
-        .target(
-            name: "AsyncDisplayKitIGListKit",
-            dependencies: ["IGListKit", "PINRemoteImage"],
-            path: "spm/Sources/AsyncDisplayKitIGListKit/AsyncDisplayKit",
-            cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: true)
         ),
     ],
     cLanguageStandard: .c11,
