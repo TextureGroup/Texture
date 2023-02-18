@@ -1,30 +1,46 @@
 #! /bin/zsh
 
 header_dirs=(
-  'Source/Details'
-  'Source/Layout'
-  'Source/Base'
-  'Source/Debug'
-  'Source/TextExperiment/Component'
+  'Details'
+  'Layout'
+  'Base'
+  'Debug'
+  'TextExperiment/Component'
 )
 
 header_paths=(
-  'Source/TextKit/ASTextNodeTypes.h'
-  'Source/TextKit/ASTextKitComponents.h'
-  'Source/TextExperiment/String/ASTextAttribute.h'
+  'TextKit/ASTextNodeTypes.h'
+  'TextKit/ASTextKitComponents.h'
+  'TextExperiment/String/ASTextAttribute.h'
 )
 
-mkdir -p Source/include
 
-which mv
+mkdir -p Source/include
+cd Source
 
 for path in $header_dirs; do
   for file in $path/**/*.h; do
-    echo $file    
-    /bin/mv "$file" Source/include
+    # get file name
+    file_name=${file##*/}
+    echo $file $file_name
+    cd include
+    /bin/ln -s -f ../$file $file_name
+    cd -
   done
 done
 
+for file in ./*.h; do
+  file_name=${file##*/}
+  echo $file $file_name
+  cd include
+  /bin/ln -s -f ../$file $file_name
+  cd -
+done
+
 for file in $header_paths; do
-  /bin/mv "$file" Source/include
+  file_name=${file##*/}
+  echo $file $file_name
+  cd include
+  /bin/ln -s -f ../$file $file_name
+  cd -
 done

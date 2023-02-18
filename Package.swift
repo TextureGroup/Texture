@@ -59,6 +59,7 @@ let package = Package(
       name: "AsyncDisplayKit",
       dependencies: [],
       path: "Source",
+      publicHeadersPath: "include",
       cSettings: headersSearchPath + sharedDefines + IGListKit(enabled: false)
     )
   ],
