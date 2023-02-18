@@ -1,1 +1,0 @@
-../../../Source/TextKit/ASTextKitRenderer+TextChecking.mm

@@ -1,1 +1,0 @@
-../../../Source/TextExperiment/String/ASTextRunDelegate.mm

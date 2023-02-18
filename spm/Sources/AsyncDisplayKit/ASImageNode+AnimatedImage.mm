@@ -1,1 +1,0 @@
-../../../Source/ASImageNode+AnimatedImage.mm

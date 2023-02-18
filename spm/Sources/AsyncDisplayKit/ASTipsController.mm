@@ -1,1 +1,0 @@
-../../../Source/Private/ASTipsController.mm

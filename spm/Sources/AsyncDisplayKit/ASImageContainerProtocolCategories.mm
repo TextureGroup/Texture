@@ -1,1 +1,0 @@
-../../../Source/Details/ASImageContainerProtocolCategories.mm

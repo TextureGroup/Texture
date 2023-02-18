@@ -1,1 +1,0 @@
-../../../Source/TextExperiment/Utility/ASTextUtilities.h

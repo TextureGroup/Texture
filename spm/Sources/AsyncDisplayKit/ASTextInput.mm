@@ -1,1 +1,0 @@
-../../../Source/TextExperiment/Component/ASTextInput.mm

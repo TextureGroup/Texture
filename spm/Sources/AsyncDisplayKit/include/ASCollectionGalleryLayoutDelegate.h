@@ -1,1 +1,0 @@
-../../../../Source/Details/ASCollectionGalleryLayoutDelegate.h
