@@ -116,13 +116,13 @@ func collectionNode(_ collectionNode: ASCollectionNode, nodeBlockForItemAt index
 
 In the example above, you can see how the index is used to access the photo model before creating the node block.
 
-### Replacing a UICollectionViewController with an ASViewController
+### Replacing a UICollectionViewController with an ASDKViewController
 
-Texture does not offer an equivalent to UICollectionViewController. Instead, you can use the flexibility of ASViewController to recreate any type of UI<em>...</em>ViewController. 
+Texture does not offer an equivalent to UICollectionViewController. Instead, you can use the flexibility of ASDKViewController to recreate any type of UI<em>...</em>ViewController. 
 
-Consider, the following ASViewController subclass.
+Consider, the following ASDKViewController subclass.
 
-An ASCollectionNode is assigned to be managed by an `ASViewController` in its `-initWithNode:` designated initializer method, thus making it a sort of ASCollectionNodeController.
+An ASCollectionNode is assigned to be managed by an `ASDKViewController` in its `-initWithNode:` designated initializer method, thus making it a sort of ASCollectionNodeController.
 
 <div class = "highlight-group">
 <span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
