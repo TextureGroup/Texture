@@ -38,7 +38,7 @@ typedef struct {
 /**
  * Returns an ASLayoutElementSize with default values.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMake()
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutElementSize ASLayoutElementSizeMake(void)
 {
   return (ASLayoutElementSize){
     .width = ASDimensionAuto,
