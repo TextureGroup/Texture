@@ -671,7 +671,7 @@ static NSArray *DefaultLinkAttributeNames() {
     const CGPoint testPoint = CGPointMake(point.x + offset.width,
                                           point.y + offset.height);
     ASTextPosition *pos = [layout closestPositionToPoint:testPoint];
-    if (!pos || !NSLocationInRange(pos.offset, clampedRange)) {
+    if (!pos || ASTextAffinityForward != pos.affinity || !NSLocationInRange(pos.offset, clampedRange)) {
       continue;
     }
     for (NSString *attributeName in _linkAttributeNames) {
