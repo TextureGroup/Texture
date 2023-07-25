@@ -40,6 +40,11 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
    * Indicates user has ended dragging the visible cell
    */
   ASCellNodeVisibilityEventDidEndDragging,
+  /**
+   * Indicates a cell has stopped scrolling. May not be called if
+   * ASCellNodeVisibilityEventDidEndDragging did not decelerate
+   */
+  ASCellNodeVisibilityEventDidStopScrolling,
 };
 
 /**
