@@ -1655,7 +1655,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
   _deceleratingVelocity = CGPointZero;
-    
+  for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
+    [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventDidStopScrolling inScrollView:scrollView];
+  }
+
   if (_asyncDelegateFlags.scrollViewDidEndDecelerating) {
     [_asyncDelegate scrollViewDidEndDecelerating:scrollView];
   }
