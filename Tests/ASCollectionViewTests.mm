@@ -756,8 +756,7 @@
   }] andForwardToRealObject] prepareLayout];
 
   // Rotate the device
-  UIDeviceOrientation oldDeviceOrientation = [[UIDevice currentDevice] orientation];
-  [[UIDevice currentDevice] setValue:@(UIDeviceOrientationLandscapeLeft) forKey:@"orientation"];
+  testController.view.frame = CGRectMake(0, 0, testController.view.frame.size.height, testController.view.frame.size.width);
 
   CGSize finalItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
   CGSize finalCVSize = cv.bounds.size;
@@ -768,8 +767,6 @@
   [collectionViewLayoutMock verify];
 
   // Teardown
-  [[UIDevice currentDevice] setValue:@(oldDeviceOrientation) forKey:@"orientation"];
-
   [collectionViewLayoutMock stopMocking];
 }
 
