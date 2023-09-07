@@ -121,7 +121,9 @@ UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollection, CGSiz
   }
 
   // Bad OS or experiment flag. Use UIGraphics* API.
-  UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+  if (size.width > 0 && size.height > 0) {
+    UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+  }
   ASPerformBlockWithTraitCollection(work, traitCollection)
   UIImage *image = nil;
   if (isCancelled == nil || !isCancelled()) {
