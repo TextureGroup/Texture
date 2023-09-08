@@ -47,6 +47,10 @@ UIImage *ASGraphicsCreateImageWithOptions(CGSize size, BOOL opaque, CGFloat scal
 }
 
 UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollection, CGSize size, BOOL opaque, CGFloat scale, UIImage * sourceImage, asdisplaynode_iscancelled_block_t NS_NOESCAPE isCancelled, void (NS_NOESCAPE ^work)()) {
+  if (size.width <= 0 || size.height <= 0) {
+    return nil;
+  }
+  
   if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
     if (ASActivateExperimentalFeature(ASExperimentalDrawingGlobal)) {
       // If they used default scale, reuse one of two preferred formats.
@@ -121,9 +125,7 @@ UIImage *ASGraphicsCreateImage(ASPrimitiveTraitCollection traitCollection, CGSiz
   }
 
   // Bad OS or experiment flag. Use UIGraphics* API.
-  if (size.width > 0 && size.height > 0) {
-    UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
-  }
+  UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
   ASPerformBlockWithTraitCollection(work, traitCollection)
   UIImage *image = nil;
   if (isCancelled == nil || !isCancelled()) {
