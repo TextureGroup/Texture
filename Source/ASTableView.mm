@@ -107,24 +107,27 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASCellNode *node = element.node;
   
   if (node) {
-    self.backgroundColor = node.backgroundColor;
-    self.selectedBackgroundView = node.selectedBackgroundView;
-    self.backgroundView = node.backgroundView;
+    if (node.cellBackgroundColor != nil) {
+        self.backgroundColor = node.cellBackgroundColor;
+    }
+    if (node.selectedBackgroundView != nil) {
+        self.selectedBackgroundView = node.selectedBackgroundView;
+    }
 #if TARGET_OS_IOS
     self.separatorInset = node.separatorInset;
 #endif
-    self.selectionStyle = node.selectionStyle; 
+    self.selectionStyle = node.selectionStyle;
     self.focusStyle = node.focusStyle;
     self.accessoryType = node.accessoryType;
-    self.isAccessibilityElement = node.isAccessibilityElement;
-    self.accessibilityElementsHidden = node.accessibilityElementsHidden;
+
+    if (node.tintColor != nil) {
+        self.tintColor = node.tintColor;
+    }
+
     // the following ensures that we clip the entire cell to it's bounds if node.clipsToBounds is set (the default)
     // This is actually a workaround for a bug we are seeing in some rare cases (selected background view
     // overlaps other cells if size of ASCellNode has changed.)
     self.clipsToBounds = node.clipsToBounds;
-
-    // If the cell node has been explicitly configured with a tint color, we can apply that directly to the cell view to preserve the previous behavior
-    self.tintColor = node->_tintColor;
   }
   
   [node __setSelectedFromUIKit:self.selected];
