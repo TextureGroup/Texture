@@ -12,7 +12,7 @@ Pod::Spec.new do |spec|
   spec.documentation_url = 'http://texturegroup.org/appledoc/'
 
   spec.ios.deployment_target = '9.0'
-  spec.tvos.deployment_target = '9.0'
+  spec.tvos.deployment_target = '10.0'
 
   # Subspecs
   spec.subspec 'Core' do |core|
@@ -54,7 +54,7 @@ Pod::Spec.new do |spec|
 
   spec.subspec 'Yoga' do |yoga|
     yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
-    yoga.dependency 'Yoga', '1.6.0'
+    yoga.dependency 'Yoga', '1.14.0'
     yoga.dependency 'Texture/Core'
   end
   
