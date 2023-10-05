@@ -266,6 +266,15 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   return ASObjectDescriptionMakeWithoutObject(props);
 }
 
+UIColor *UIColorResolvedWithASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits, UIColor *color) {
+  if (@available(iOS 13.0, *)) {
+    UITraitCollection *tempTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:traits.userInterfaceStyle];
+    return [color resolvedColorWithTraitCollection:tempTraitCollection];
+  }
+  return color;
+}
+
+
 #pragma mark - ASTraitCollection
 
 @implementation ASTraitCollection {

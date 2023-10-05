@@ -505,10 +505,19 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
       key.willDisplayNodeContentWithRenderingContext(context, drawParameters);
       contextIsClean = NO;
     }
+    
+    UIColor *backgroundColor = key.backgroundColor;
+    UIColor *tintColor = key.tintColor;
+    
+    if (@available(iOS 13.0, *)) {
+      UITraitCollection *tempTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:key.userInterfaceStyle];
+      backgroundColor = [backgroundColor resolvedColorWithTraitCollection:tempTraitCollection];
+      tintColor = [tintColor resolvedColorWithTraitCollection:tempTraitCollection];
+    }
 
     // if view is opaque, fill the context with background color
-    if (key.isOpaque && key.backgroundColor) {
-      [key.backgroundColor setFill];
+    if (key.isOpaque && backgroundColor) {
+      [backgroundColor setFill];
       UIRectFill({ .size = key.backingSize });
       contextIsClean = NO;
     }
@@ -529,8 +538,8 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     BOOL canUseCopy = (contextIsClean || ASImageAlphaInfoIsOpaque(CGImageGetAlphaInfo(image.CGImage)));
     CGBlendMode blendMode = canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal;
     UIImageRenderingMode renderingMode = [image renderingMode];
-    if (renderingMode == UIImageRenderingModeAlwaysTemplate && key.tintColor) {
-      [key.tintColor setFill];
+    if (renderingMode == UIImageRenderingModeAlwaysTemplate && tintColor) {
+      [tintColor setFill];
     }
 
     @synchronized(image) {

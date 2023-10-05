@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 
 #import <AsyncDisplayKit/UIView+ASConvenience.h>
+#import <AsyncDisplayKit/ASTraitCollection.h>
 
 /**
 
@@ -25,8 +26,8 @@
 
 // Supports all of the properties included in the ASDisplayNodeViewProperties protocol
 
-- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)setFrameDirectly;
-- (void)applyToLayer:(CALayer *)layer;
+- (void)applyToView:(UIView *)view withSpecialPropertiesHandling:(BOOL)specialPropertiesHandling primitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection;
+- (void)applyToLayer:(CALayer *)layer withASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)primitiveTraitCollection;
 
 + (_ASPendingState *)pendingViewStateFromLayer:(CALayer *)layer;
 + (_ASPendingState *)pendingViewStateFromView:(UIView *)view;

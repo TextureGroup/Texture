@@ -10,6 +10,58 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 
+
+@interface UITestTraitCollectionSyncViewController : UIViewController
+
+@property (nonatomic, strong) UIView *testView;
+@property (nonatomic, strong) ASDisplayNode *testNode;
+@property (nonatomic, strong) ASDisplayNode *testNodeWithViewBlock;
+
+@end
+
+@implementation UITestTraitCollectionSyncViewController
+
+- (instancetype)init
+{
+  if (self = [super init]) {
+    if (@available(iOS 13.0, *)) {
+      self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
+    }
+  }
+  return self;
+}
+
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  
+  if (@available(iOS 13.0, *)) {
+    UIColor *testColor = [UIColor systemGray6Color];
+    
+    CGSize size = CGSizeMake(100, 100);
+    UIView *testView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    testView.backgroundColor = testColor;
+    [self.view addSubview:testView];
+    self.testView = testView;
+
+    self.testNode = [[ASDisplayNode alloc] init];
+    self.testNode.frame = CGRectMake(0, 100, size.width, size.height);
+    self.testNode.backgroundColor = testColor;
+    [self.view addSubnode:self.testNode];
+    
+    self.testNodeWithViewBlock = [[ASDisplayNode alloc] initWithViewBlock:^UIView * _Nonnull{
+      UIView *testView = [UIView new];
+      testView.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+      return testView;
+    }];
+    self.testNodeWithViewBlock.frame = CGRectMake(0, 200, size.width, size.height);
+    self.testNodeWithViewBlock.backgroundColor = testColor;
+    [self.view addSubnode:self.testNodeWithViewBlock];
+  }
+}
+
+@end
+
 @interface ASDisplayNodeSnapshotTests : ASSnapshotTestCase
 
 @end
@@ -159,6 +211,47 @@ NS_INLINE UIImage *BlueImageMake(CGRect bounds)
       ASSnapshotVerifyNode(node, @"dark");
     }];
   }
+}
+
+- (void)testBackgroundDynamicColorWhenOverrideUserInterfaceStyle {
+  if (@available(iOS 13.0, *)) {
+    UIViewController *rootViewController = [[UIViewController alloc] init];
+    
+    UITestTraitCollectionSyncViewController *testViewController = [[UITestTraitCollectionSyncViewController alloc] init];
+    UINavigationController *contentViewController = [[UINavigationController alloc] initWithRootViewController:testViewController];
+    
+    [rootViewController addChildViewController:contentViewController];
+    [rootViewController.view addSubview:contentViewController.view];
+    [contentViewController didMoveToParentViewController: rootViewController];
+    
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    window.rootViewController = rootViewController;
+    [window makeKeyAndVisible];
+
+    // Wait for UIKit do its work to build up such a complicate view-level display
+    // instead of calling [testViewController view] which is NOT the timing we needed to test here
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2]];
+
+    [self snapshotVerifyNode:testViewController.testNode withIdentifier: @"dark"];
+    [self snapshotVerifyNode:testViewController.testNodeWithViewBlock withIdentifier: @"light"];
+  }
+}
+
+- (void)ensureDisplaySynchronously:(ASDisplayNode *)node
+{
+  // Can NOT use ASSnapshotVerifyNode
+  // Because hackilySynchronouslyRecursivelyRenderNode will reset node's trait collection
+  node.displaysAsynchronously = NO;
+  ASDisplayNodePerformBlockOnEveryNode(nil, node, YES, ^(ASDisplayNode * _Nonnull node) {
+    [node.layer setNeedsDisplay];
+  });
+  [node recursivelyEnsureDisplaySynchronously:YES];
+}
+
+- (void)snapshotVerifyNode:(ASDisplayNode *)node withIdentifier:(NSString *)suffix
+{
+  [self ensureDisplaySynchronously:node];
+  FBSnapshotVerifyLayerWithOptions(node.layer, suffix, ASSnapshotTestCaseDefaultSuffixes(), 0);
 }
 
 #endif // #if AS_AT_LEAST_IOS13

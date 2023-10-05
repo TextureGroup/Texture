@@ -458,7 +458,8 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
           self->__instanceLock__.lock();
           CGFloat cornerRadius = self->_cornerRadius;
           ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
-          UIColor *backgroundColor = self->_backgroundColor;
+          UIColor *backgroundColor = UIColorResolvedWithASPrimitiveTraitCollection(self->_primitiveTraitCollection, self->_backgroundColor);
+         
           self->__instanceLock__.unlock();
           // TODO: we should resolve color using node's trait collection
           // but Texture changes it from many places, so we may receive the wrong one.
@@ -596,6 +597,12 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   } else {
     TIME_SCOPED(_debugTimeToCreateView);
     _view = [self _locked_viewToLoad];
+    if ([self supernode] == nil) {
+      // Make sure we using the right trait collection for rendering
+      // UIView might set overrideUserInterfaceStyle which might lead to different display, so we should keep the initial value is same with UIView
+      // Trait collection will be propagate down to subnodes when _setSupernode is called, so we don't need to broadcast this change
+        _primitiveTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(_view.traitCollection);
+    }
     _view.asyncdisplaykit_node = self;
     _layer = _view.layer;
   }
@@ -3397,10 +3404,10 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   ASDisplayNodeAssert([self _locked_isNodeLoaded], @"Expected node to be loaded before applying pending state.");
 
   if (_flags.layerBacked) {
-    [_pendingViewState applyToLayer:_layer];
+    [_pendingViewState applyToLayer:_layer withASPrimitiveTraitCollection:_primitiveTraitCollection];
   } else {
     BOOL specialPropertiesHandling = ASDisplayNodeNeedsSpecialPropertiesHandling(checkFlag(Synchronous), _flags.layerBacked);
-    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling];
+    [_pendingViewState applyToView:_view withSpecialPropertiesHandling:specialPropertiesHandling primitiveTraitCollection:_primitiveTraitCollection];
   }
 
   // _ASPendingState objects can add up very quickly when adding
@@ -3761,6 +3768,7 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
 - (void)addSubnode:(ASDisplayNode *)subnode
 {
   if (subnode.layerBacked) {
+
     // Call -addSubnode: so that we use the asyncdisplaykit_node path if possible.
     [self.layer addSubnode:subnode];
   } else {
