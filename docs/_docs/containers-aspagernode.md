@@ -100,9 +100,9 @@ func pagerNode(_ pagerNode: ASPagerNode, nodeBlockAt index: Int) -> ASCellNodeBl
 </div>
 </div>
 
-### Using an ASViewController For Optimal Performance
+### Using an ASDKViewController For Optimal Performance
 
-One especially useful pattern is to return an `ASCellNode` that is initialized with an existing `UIViewController` or `ASViewController`. For optimal performance, use an `ASViewController`.
+One especially useful pattern is to return an `ASCellNode` that is initialized with an existing `UIViewController` or `ASDKViewController`. For optimal performance, use an `ASDKViewController`.
 
 <div class = "highlight-group">
 <span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>
@@ -141,21 +141,21 @@ func pagerNode(_ pagerNode: ASPagerNode, nodeAt index: Int) -> ASCellNode {
 
 In this example, you can see that the node is constructed using the `-initWithViewControllerBlock:` method.  It is usually necessary to provide a cell created this way with a `style.preferredSize` so that it can be laid out correctly.
 
-### Use ASPagerNode as root node of an ASViewController
+### Use ASPagerNode as root node of an ASDKViewController
 
 #### Log message while popping back in the view controller hierarchy
-If you use an `ASPagerNode` embedded in an `ASViewController` in full screen. If you pop back from the view controller hierarchy you will see some error message in the console.
+If you use an `ASPagerNode` embedded in an `ASDKViewController` in full screen. If you pop back from the view controller hierarchy you will see some error message in the console.
 
-To resolve the error message set `self.automaticallyAdjustsScrollViewInsets = NO;` in `viewDidLoad` in your `ASViewController` subclass.
+To resolve the error message set `self.automaticallyAdjustsScrollViewInsets = NO;` in `viewDidLoad` in your `ASDKViewController` subclass.
 
 #### `navigationBar.translucent` is set to YES
-If you have an `ASPagerNode` embedded in an `ASViewController` in full screen and set the `navigationBar.translucent` to `YES`, you will see an error message while pushing the view controller on the view controller stack.
+If you have an `ASPagerNode` embedded in an `ASDKViewController` in full screen and set the `navigationBar.translucent` to `YES`, you will see an error message while pushing the view controller on the view controller stack.
 
-To resolve the error message add `[self.pagerNode waitUntilAllUpdatesAreCommitted];`  within `- (void)viewWillAppear:(BOOL)animated`  in your `ASViewController` subclass.
+To resolve the error message add `[self.pagerNode waitUntilAllUpdatesAreCommitted];`  within `- (void)viewWillAppear:(BOOL)animated`  in your `ASDKViewController` subclass.
 Unfortunately the disadvantage of this is that the first measurement pass will block the main thread until it finishes.
 
 #### Some more details about the error messages above
-The reason for this error message is that due to the asynchronous nature of Texture, measurement of nodes will happen on a background thread as UIKit will resize the view of the `ASViewController`  on  on the main thread. The new layout pass has to wait until the old layout pass finishes with an old layout constrained size. Unfortunately while the measurement pass with the old constrained size is still in progress the `ASPagerFlowLayout` that is backing a `ASPagerNode` will print some errors in the console as it expects sizes for nodes already measured with the new constrained size.
+The reason for this error message is that due to the asynchronous nature of Texture, measurement of nodes will happen on a background thread as UIKit will resize the view of the `ASDKViewController`  on  on the main thread. The new layout pass has to wait until the old layout pass finishes with an old layout constrained size. Unfortunately while the measurement pass with the old constrained size is still in progress the `ASPagerFlowLayout` that is backing a `ASPagerNode` will print some errors in the console as it expects sizes for nodes already measured with the new constrained size.
 
 ### Sample Apps
 
