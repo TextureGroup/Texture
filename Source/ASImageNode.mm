@@ -301,6 +301,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
         UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
         if ( generatedImage != nil ) {
           drawImage = generatedImage;
+          _image = drawImage;
         }
       }
     }
