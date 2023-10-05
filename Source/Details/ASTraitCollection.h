@@ -85,7 +85,7 @@ ASDK_EXTERN NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCol
 /**
  * Returns a color resolved with a ASPrimitiveTraitCollection.
  */
-AS_EXTERN UIColor *UIColorResolvedWithASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits, UIColor *color);
+ASDK_EXTERN UIColor *UIColorResolvedWithASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits, UIColor *color);
 
 /**
  * This function will walk the layout element hierarchy and updates the layout element trait collection for every
