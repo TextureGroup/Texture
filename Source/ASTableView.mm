@@ -353,7 +353,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     super.estimatedSectionHeaderHeight = 0.0;
     super.estimatedSectionFooterHeight = 0.0;
   }
-  
+
+  self.panGestureRecognizer.delegate = self;
   return self;
 }
 
@@ -2043,6 +2044,42 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   [self waitUntilAllUpdatesAreCommitted];
   return [super accessibilityElements];
+}
+
+@end
+
+#pragma mark - UIGestureRecognizerDelegate
+
+@implementation ASTableView (UIGestureRecognizerDelegate)
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+  return [self.tableNode gestureRecognizerShouldBegin:gestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+  return [self.tableNode gestureRecognizer:gestureRecognizer shouldReceiveTouch:touch];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceivePress:(UIPress *)press
+{
+  return [self.tableNode gestureRecognizer:gestureRecognizer shouldReceivePress:press];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+  return [self.tableNode gestureRecognizer:gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:otherGestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+  return [self.tableNode gestureRecognizer:gestureRecognizer shouldRequireFailureOfGestureRecognizer:otherGestureRecognizer];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+  return [self.tableNode gestureRecognizer:gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:otherGestureRecognizer];
 }
 
 @end
