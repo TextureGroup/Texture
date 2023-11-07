@@ -298,7 +298,16 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
         _imageNodeFlags.regenerateFromImageAsset = NO;
         UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-        UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
+
+        UIImage *generatedImage;
+        UIImageConfiguration *config = drawImage.configuration;
+        if (config) {
+          config = [config configurationWithTraitCollection:tc];
+          generatedImage = [drawImage.imageAsset imageWithConfiguration:config];
+        }
+        else {
+          generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
+        }
         if ( generatedImage != nil ) {
           drawImage = generatedImage;
           _image = drawImage;
