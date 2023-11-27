@@ -77,11 +77,12 @@
   if (self) {
     _rangeMode = ASLayoutRangeModeUnspecified;
     _tuningParameters = [ASAbstractLayoutController defaultTuningParameters];
+    _contentInset = UIEdgeInsetsZero;
+    _contentOffset = CGPointZero;
+    _leadingScreensForBatching = 2;
     _flags.allowsSelection = YES;
     _flags.allowsMultipleSelection = NO;
     _flags.inverted = NO;
-    _contentInset = UIEdgeInsetsZero;
-    _contentOffset = CGPointZero;
     _flags.animatesContentOffset = NO;
     _flags.showsVerticalScrollIndicator = YES;
     _flags.showsHorizontalScrollIndicator = YES;
@@ -323,6 +324,7 @@
     view.layoutInspector                = pendingState.layoutInspector;
     view.showsVerticalScrollIndicator   = pendingState.showsVerticalScrollIndicator;
     view.showsHorizontalScrollIndicator = pendingState.showsHorizontalScrollIndicator;
+    view.leadingScreensForBatching      = pendingState.leadingScreensForBatching;
 #if !TARGET_OS_TV
     view.pagingEnabled                  = pendingState.pagingEnabled;
 #endif
