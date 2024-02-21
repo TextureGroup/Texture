@@ -976,8 +976,20 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (NSArray *)rectsForTextRange:(NSRange)textRange
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  return @[];
+  ASDisplayNodeAssertMainThread();
+  ASLockScopeSelf();
+
+  ASTextContainer *textContainerCopy = [_textContainer copy];
+  textContainerCopy.size = self.calculatedSize;
+  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(textContainerCopy, _attributedText);
+  NSArray<ASTextSelectionRect *> *selectionRects = [layout selectionRectsForRange:[ASTextRange rangeWithRange:textRange]];
+  NSMutableArray<NSValue *> *result = [NSMutableArray arrayWithCapacity:selectionRects.count];
+  for (ASTextSelectionRect *selectionRect in selectionRects) {
+    NSValue *value;
+    if ((value = [NSValue valueWithCGRect:selectionRect.rect]))
+      [result addObject:value];
+  }
+  return result;
 }
 
 - (NSArray *)highlightRectsForTextRange:(NSRange)textRange
