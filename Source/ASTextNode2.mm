@@ -994,8 +994,15 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 
 - (CGRect)frameForTextRange:(NSRange)textRange
 {
-  AS_TEXT_ALERT_UNIMPLEMENTED_FEATURE();
-  return CGRectZero;
+  ASDisplayNodeAssertMainThread();
+  ASLockScopeSelf();
+
+  ASTextContainer *textContainerCopy = [_textContainer copy];
+  textContainerCopy.size = self.calculatedSize;
+  ASTextLayout *layout = ASTextNodeCompatibleLayoutWithContainerAndText(textContainerCopy, _attributedText);
+  CGRect rect = [layout firstRectForRange:[ASTextRange rangeWithRange:textRange]];
+  rect = ASTextNodeAdjustRenderRectForShadowPadding(rect, self.shadowPadding);
+  return rect;
 }
 
 #pragma mark - Placeholders
