@@ -1,16 +1,16 @@
 #!/bin/bash
-# echo ************* diagnostics
-# echo available devices
-# instruments -s devices
-# echo available sdk
-# xcodebuild -showsdks
-# echo available Xcode
-# ls -ld /Applications/Xcode*
-# echo ************* diagnostics end
+echo ************* diagnostics
+echo available devices
+instruments -s devices
+echo available sdk
+xcodebuild -showsdks
+echo available Xcode
+ls -ld /Applications/Xcode*
+echo ************* diagnostics end
 
 # run this on a 2x device until we've updated snapshot images to 3x
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=16.2,name=iPhone SE (3rd generation)}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator16.2}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=17.2,name=iPhone SE (3rd generation)}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator17.2}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -41,7 +41,6 @@ function build_example {
         set -o pipefail && xcodebuild \
             -workspace "${example}/Sample.xcworkspace" \
             -scheme Sample \
-            -sdk "$SDK" \
             -destination "$PLATFORM" \
             -derivedDataPath "$DERIVED_DATA_PATH" \
             build
@@ -57,7 +56,6 @@ function build_example {
         set -o pipefail && xcodebuild \
             -project "Sample.xcodeproj" \
             -scheme Sample \
-            -sdk "$SDK" \
             -destination "$PLATFORM" \
             build
 
@@ -67,7 +65,7 @@ function build_example {
 
 # Lint subspec
 function lint_subspec {
-    set -o pipefail && pod env && pod lib lint --allow-warnings --subspec="$1"
+    set -o pipefail && pod env && pod lib lint --verbose --allow-warnings --subspec="$1"
 }
 
 function cleanup {
@@ -87,7 +85,6 @@ tests|all)
     set -o pipefail && xcodebuild \
         -workspace AsyncDisplayKit.xcworkspace \
         -scheme AsyncDisplayKit \
-        -sdk "$SDK" \
         -destination "$PLATFORM" \
         build-for-testing test
     success="1"
@@ -99,7 +96,6 @@ tests_listkit)
     set -o pipefail && xcodebuild \
         -workspace SubspecWorkspaces/ASDKListKit/ASDKListKit.xcworkspace \
         -scheme ASDKListKitTests \
-        -sdk "$SDK" \
         -destination "$PLATFORM" \
         build-for-testing test
     success="1"
@@ -198,7 +194,6 @@ life-without-cocoapods|all)
     set -o pipefail && xcodebuild \
         -workspace "smoke-tests/Life Without CocoaPods/Life Without CocoaPods.xcworkspace" \
         -scheme "Life Without CocoaPods" \
-        -sdk "$SDK" \
         -destination "$PLATFORM" \
         build
     success="1"
@@ -210,7 +205,6 @@ framework|all)
     set -o pipefail && xcodebuild \
         -project "smoke-tests/Framework/Sample.xcodeproj" \
         -scheme Sample \
-        -sdk "$SDK" \
         -destination "$PLATFORM" \
         build
     success="1"
