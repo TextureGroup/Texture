@@ -305,7 +305,7 @@
   YGNodeRef yogaNode = self.style.yogaNode;
   if (yogaNode && [self shouldHaveYogaMeasureFunc]) {
     // Yoga internally asserts that MarkDirty() may only be called on nodes with a measurement function.
-    BOOL needsTemporaryMeasureFunc = (YGNodeGetMeasureFunc(yogaNode) == NULL);
+    BOOL needsTemporaryMeasureFunc = !YGNodeGetMeasureFunc(yogaNode);
     if (needsTemporaryMeasureFunc) {
       ASDisplayNodeAssert(self.yogaLayoutInProgress == NO,
                           @"shouldHaveYogaMeasureFunc == YES, and inside a layout pass, but no measure func pointer! %@", self);
@@ -378,7 +378,7 @@
   // Prepare all children for the layout pass with the current Yoga tree configuration.
   ASDisplayNodePerformBlockOnEveryYogaChild(self, ^(ASDisplayNode *_Nonnull node) {
     node.yogaLayoutInProgress = YES;
-    ASDisplayNode *yogaParent = node.yogaParent; 
+    ASDisplayNode *yogaParent = node.yogaParent;
     if (yogaParent) {
       node.style.parentAlignStyle = yogaParent.style.alignItems;
     } else {
