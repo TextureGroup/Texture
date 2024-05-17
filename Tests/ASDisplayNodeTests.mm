@@ -628,10 +628,8 @@ for (ASDisplayNode *n in @[ nodes ]) {\
   XCTAssertEqual(YES, node.accessibilityViewIsModal, @"accessibilityViewIsModal broken %@", hasLoadedView);
   XCTAssertEqual(YES, node.shouldGroupAccessibilityChildren, @"shouldGroupAccessibilityChildren broken %@", hasLoadedView);
   XCTAssertEqual(UIAccessibilityNavigationStyleSeparate, node.accessibilityNavigationStyle, @"accessibilityNavigationStyle broken %@", hasLoadedView);
-  if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
-    XCTAssertNotNil(node.accessibilityCustomActions, @"accessibilityCustomActions broken %@", hasLoadedView);
-    XCTAssertEqualObjects(@"custom action", ((UIAccessibilityCustomAction *)(node.accessibilityCustomActions.firstObject)).name, @"accessibilityCustomActions broken %@", hasLoadedView);
-  }
+  XCTAssertNotNil(node.accessibilityCustomActions, @"accessibilityCustomActions broken %@", hasLoadedView);
+  XCTAssertEqualObjects(@"custom action", ((UIAccessibilityCustomAction *)(node.accessibilityCustomActions.firstObject)).name, @"accessibilityCustomActions broken %@", hasLoadedView);
 
   XCTAssertTrue(CGPointEqualToPoint(CGPointMake(1.0, 1.0), node.accessibilityActivationPoint), @"accessibilityActivationPoint broken %@", hasLoadedView);
   XCTAssertNotNil(node.accessibilityPath, @"accessibilityPath broken %@", hasLoadedView);
@@ -705,9 +703,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
     node.accessibilityViewIsModal = YES;
     node.shouldGroupAccessibilityChildren = YES;
     node.accessibilityNavigationStyle = UIAccessibilityNavigationStyleSeparate;
-    if (AS_AVAILABLE_IOS_TVOS(8, 9)) {
-      node.accessibilityCustomActions = @[ [[UIAccessibilityCustomAction alloc] initWithName:@"custom action" target:self selector:@selector(dummySelector)] ];
-    }
+    node.accessibilityCustomActions = @[ [[UIAccessibilityCustomAction alloc] initWithName:@"custom action" target:self selector:@selector(dummySelector)] ];
     node.accessibilityActivationPoint = CGPointMake(1.0, 1.0);
     node.accessibilityPath = [UIBezierPath bezierPath];
 
@@ -1298,7 +1294,7 @@ static inline BOOL _CGPointEqualToPointWithEpsilon(CGPoint point1, CGPoint point
     node.idGestureRecognizer = [[UIGestureRecognizer alloc] init];
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(1000, 1000), YES, 1);
     node.bigImage = UIGraphicsGetImageFromCurrentImageContext();
-    node.randomProperty = @[ @"Hello, world!" ];
+    node.randomProperty = [NSArray arrayWithObject:@"Hello, world!"];
     UIGraphicsEndImageContext();
     weakImage = node.bigImage;
     weakView = node.view;
