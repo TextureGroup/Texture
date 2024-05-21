@@ -99,10 +99,8 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
       && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
       && _imageModificationBlock == other.imageModificationBlock;
-    if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-      // iOS 12, tvOS 10 and later (userInterfaceStyle only available in iOS12+)
-      areKeysEqual = areKeysEqual && _userInterfaceStyle == other.userInterfaceStyle;
-    }
+    // iOS 12, tvOS 10 and later (userInterfaceStyle only available in iOS12+)
+    areKeysEqual = areKeysEqual && _userInterfaceStyle == other.userInterfaceStyle;
     return areKeysEqual;
   } else {
     return NO;
@@ -294,14 +292,12 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   {
     ASLockScopeSelf();
     UIImage *drawImage = _image;
-    if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-      if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
-        _imageNodeFlags.regenerateFromImageAsset = NO;
-        UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-        UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
-        if ( generatedImage != nil ) {
-          drawImage = generatedImage;
-        }
+    if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
+      _imageNodeFlags.regenerateFromImageAsset = NO;
+      UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
+      UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
+      if ( generatedImage != nil ) {
+        drawImage = generatedImage;
       }
     }
 
@@ -426,10 +422,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
   contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
-
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    contentsKey.userInterfaceStyle = drawParameter->_traitCollection.userInterfaceStyle;
-  }
+  contentsKey.userInterfaceStyle = drawParameter->_traitCollection.userInterfaceStyle;
 
   if (isCancelled()) {
     return nil;
@@ -780,7 +773,7 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
   [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
 
-  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
+  {
     AS::MutexLocker l(__instanceLock__);
       // update image if userInterfaceStyle was changed (dark mode)
       if (_image != nil

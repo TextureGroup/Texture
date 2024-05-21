@@ -27,9 +27,7 @@ BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block)
   CFTimeInterval timeoutDate = CACurrentMediaTime() + kTimeoutInterval;
   BOOL passed = NO;
   while (true) {
-    OSMemoryBarrier();
     passed = block();
-    OSMemoryBarrier();
     if (passed) {
       break;
     }

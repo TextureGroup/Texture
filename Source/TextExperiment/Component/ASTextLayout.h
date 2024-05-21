@@ -10,9 +10,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreText/CoreText.h>
 
-#import "ASTextDebugOption.h"
-#import "ASTextLine.h"
-#import "ASTextInput.h"
+#import <AsyncDisplayKit/ASTextDebugOption.h>
+#import <AsyncDisplayKit/ASTextLine.h>
+#import <AsyncDisplayKit/ASTextInput.h>
 
 @protocol ASTextLinePositionModifier;
 

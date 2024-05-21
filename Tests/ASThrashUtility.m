@@ -423,12 +423,14 @@ static atomic_uint ASThrashTestSectionNextID = 1;
 
 + (ASThrashUpdate *)thrashUpdateWithBase64String:(NSString *)base64
 {
-  return [NSKeyedUnarchiver unarchiveObjectWithData:[[NSData alloc] initWithBase64EncodedString:base64 options:kNilOptions]];
+  NSError *error = nil;
+  return [NSKeyedUnarchiver unarchivedObjectOfClass:[ASThrashUpdate class] fromData:[[NSData alloc] initWithBase64EncodedString:base64 options:kNilOptions] error:&error];
 }
 
 - (NSString *)base64Representation
 {
-  return [[NSKeyedArchiver archivedDataWithRootObject:self] base64EncodedStringWithOptions:kNilOptions];
+  NSError *error = nil;
+  return [[NSKeyedArchiver archivedDataWithRootObject:self requiringSecureCoding:NO error:&error] base64EncodedStringWithOptions:kNilOptions];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder

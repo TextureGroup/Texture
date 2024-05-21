@@ -443,42 +443,40 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
 {
-  if (@available(iOS 13.0, tvOS 10.0, *)) {
-    // When changing between light and dark mode, often the entire node needs to re-render.
-    // This change doesn't happen frequently so it's fairly safe to render nodes again
-    __instanceLock__.lock();
-    BOOL loaded = _loaded(self);
-    ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
-    __instanceLock__.unlock();
-    if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-      if (loaded) {
-        // we need to run that on main thread, cause accessing CALayer properties.
-        // It seems than in iOS 13 sometimes it causes deadlock.
-        ASPerformBlockOnMainThread(^{
-          self->__instanceLock__.lock();
-          CGFloat cornerRadius = self->_cornerRadius;
-          ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
-          UIColor *backgroundColor = self->_backgroundColor;
-          self->__instanceLock__.unlock();
-          // TODO: we should resolve color using node's trait collection
-          // but Texture changes it from many places, so we may receive the wrong one.
-          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
-          if (!CGColorEqualToColor(self->_layer.backgroundColor, cgBackgroundColor)) {
-            // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
-            // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
-            // We utilize the _backgroundColor instance variable to track the full dynamic color
-            // and apply any changes here when trait collection updates occur.
-            self->_layer.backgroundColor = cgBackgroundColor;
-          }
+  // When changing between light and dark mode, often the entire node needs to re-render.
+  // This change doesn't happen frequently so it's fairly safe to render nodes again
+  __instanceLock__.lock();
+  BOOL loaded = _loaded(self);
+  ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
+  __instanceLock__.unlock();
+  if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+    if (loaded) {
+      // we need to run that on main thread, cause accessing CALayer properties.
+      // It seems than in iOS 13 sometimes it causes deadlock.
+      ASPerformBlockOnMainThread(^{
+        self->__instanceLock__.lock();
+        CGFloat cornerRadius = self->_cornerRadius;
+        ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
+        UIColor *backgroundColor = self->_backgroundColor;
+        self->__instanceLock__.unlock();
+        // TODO: we should resolve color using node's trait collection
+        // but Texture changes it from many places, so we may receive the wrong one.
+        CGColorRef cgBackgroundColor = backgroundColor.CGColor;
+        if (!CGColorEqualToColor(self->_layer.backgroundColor, cgBackgroundColor)) {
+          // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+          // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
+          // We utilize the _backgroundColor instance variable to track the full dynamic color
+          // and apply any changes here when trait collection updates occur.
+          self->_layer.backgroundColor = cgBackgroundColor;
+        }
 
-          // If we have clipping corners, re-render the clipping corner layer upon user interface style change
-          if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
-            [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
-          }
-          
-          [self setNeedsDisplay];
-        });
-      }
+        // If we have clipping corners, re-render the clipping corner layer upon user interface style change
+        if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
+          [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
+        }
+        
+        [self setNeedsDisplay];
+      });
     }
   }
 }
@@ -835,7 +833,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     }
 
     _fallbackSafeAreaInsets = insets;
-    needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
+    needsManualUpdate = _flags.layerBacked;
     updatesLayoutMargins = needsManualUpdate && [self _locked_insetsLayoutMarginsFromSafeArea];
   }
 
@@ -856,7 +854,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   CGRect bounds = self.bounds;
 
   for (ASDisplayNode *child in self.subnodes) {
-    if (AS_AT_LEAST_IOS11 && !child.layerBacked) {
+    if (!child.layerBacked) {
       // In iOS 11 view-backed nodes already know what their safe area is.
       continue;
     }
