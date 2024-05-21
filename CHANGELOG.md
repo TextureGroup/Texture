@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.2.0](https://github.com/TextureGroup/Texture/tree/3.2.0) (2024-05-21)
+
+[Full Changelog](https://github.com/TextureGroup/Texture/compare/3.1.0...3.2.0)
+
+**Merged pull requests:**
+
+- Update to Xcode 15 [\#2107](https://github.com/TextureGroup/Texture/pull/2107) ([andyfinnell](https://github.com/andyfinnell))
+- Fix build errors and a crash in xcode 15 [\#2093](https://github.com/TextureGroup/Texture/pull/2093) ([cacmartinez](https://github.com/cacmartinez))
+- Trying to get CI to work [\#2085](https://github.com/TextureGroup/Texture/pull/2085) ([rcancro](https://github.com/rcancro))
+- \[ASCellNodeVisibilityEvent\] Add a new event when scrolling stops [\#2084](https://github.com/TextureGroup/Texture/pull/2084) ([rcancro](https://github.com/rcancro))
+- Docs: Fix references of ASViewController/ASNavigationController \(non-existent\) to ASDKViewController/ASDKNavigationController [\#2072](https://github.com/TextureGroup/Texture/pull/2072) ([JoeFerrucci](https://github.com/JoeFerrucci))
+- fix typo: ASStackLayoutElement.h [\#2067](https://github.com/TextureGroup/Texture/pull/2067) ([Ueeek](https://github.com/Ueeek))
+- \[ASTextKitRenderer\] Adding locking when accessing the text renderer cache [\#2075](https://github.com/TextureGroup/Texture/pull/2075) ([rcancro](https://github.com/rcancro))
+- Switch UITextWritingDirection to NSWritingDirection [\#2071](https://github.com/TextureGroup/Texture/pull/2071) ([garrettmoon](https://github.com/garrettmoon))
+- Increase default diskCache byte limit from 20 to 50MB\(PINCache default\) [\#2002](https://github.com/TextureGroup/Texture/pull/2002) ([MussaCharles](https://github.com/MussaCharles))
+- Bring back ASInitializeFrameworkMainThread so we don't break the API [\#2050](https://github.com/TextureGroup/Texture/pull/2050) ([rcancro](https://github.com/rcancro))
+- Try to fix the CI [\#2047](https://github.com/TextureGroup/Texture/pull/2047) ([rcancro](https://github.com/rcancro))
+- Xcode 13 ASLoadFrameworkInitializer dead lock fix on running unit test [\#2032](https://github.com/TextureGroup/Texture/pull/2032) ([GeekTree0101](https://github.com/GeekTree0101))
+
 ## [3.1.0](https://github.com/TextureGroup/Texture/tree/3.1.0) (2021-09-09)
 
 [Full Changelog](https://github.com/TextureGroup/Texture/compare/3.0.0...3.1.0)
