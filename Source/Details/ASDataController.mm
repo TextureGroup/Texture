@@ -909,27 +909,28 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   _pendingMap = [newMap copy];
   _visibleMap = _pendingMap;
 
-  for (ASCollectionElement *element in _visibleMap) {
-    // Ignore this element if it is no longer in the latest data. It is still recognized in the UIKit world but will be deleted soon.
-    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
-    if (indexPathInPendingMap == nil) {
-      continue;
-    }
-
-    NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-    ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
-
-    if (ASSizeRangeHasSignificantArea(newConstrainedSize)) {
-      element.constrainedSize = newConstrainedSize;
-
-      // Node may not be allocated yet (e.g node virtualization or same size optimization)
-      // Call context.nodeIfAllocated here to avoid premature node allocation and layout
-      ASCellNode *node = element.nodeIfAllocated;
-      if (node) {
-        [self _layoutNode:node withConstrainedSize:newConstrainedSize];
-      }
-    }
-  }
+  // First update size constraints on the main thread.
+  NSDictionary<ASCollectionElement *, NSIndexPath *> *elementToIndexPath = _visibleMap.elementToIndexPath;
+  [elementToIndexPath
+   enumerateKeysAndObjectsUsingBlock:^(ASCollectionElement *element, NSIndexPath *indexPath,
+                                       __unused BOOL *stop) {
+     element.constrainedSize = [self constrainedSizeForNodeOfKind:(element.supplementaryElementKind
+                                                                   ?: ASDataControllerRowNodeKind)
+                                                      atIndexPath:indexPath];
+   }];
+  
+  // Then concurrently synchronously ensure every node is measured against new constraints.
+  [elementToIndexPath
+   enumerateKeysAndObjectsWithOptions:NSEnumerationConcurrent
+   usingBlock:^(ASCollectionElement *element, NSIndexPath *indexPath,
+                __unused BOOL *stop) {
+     const ASSizeRange sizeRange = element.constrainedSize;
+     if (ASSizeRangeHasSignificantArea(sizeRange)) {
+       if (ASCellNode *node = element.nodeIfAllocated) {
+         [self _layoutNode:node withConstrainedSize:sizeRange];
+       }
+     }
+   }];
 }
 
 # pragma mark - ASPrimitiveTraitCollection

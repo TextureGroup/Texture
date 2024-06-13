@@ -61,6 +61,11 @@ AS_SUBCLASSING_RESTRICTED
 @property (copy, readonly) NSArray<ASCollectionElement *> *itemElements;
 
 /**
+ * All the elements in the map, in NSDictionary form. O(1)
+ */
+@property (readonly) NSDictionary<ASCollectionElement *, NSIndexPath *> *elementToIndexPath;
+
+/**
  * Returns the index path that corresponds to the same element in @c map at the given @c indexPath.
  * O(1) for items, fast O(N) for sections.
  *
