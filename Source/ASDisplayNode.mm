@@ -3334,6 +3334,24 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   return _hitTestSlop;
 }
 
+- (BOOL)isRTL
+{
+  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
+    ASDisplayNodeAssertMainThread();
+    return _primitiveTraitCollection.layoutDirection == UITraitEnvironmentLayoutDirectionRightToLeft;
+  } else if(_view) {
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:_view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+  } else {
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:UISemanticContentAttributeUnspecified] == UIUserInterfaceLayoutDirectionRightToLeft;
+  }
+}
+
+- (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop
+{
+  ASDisplayNodeAssertMainThread();
+  return [self isRTL] ? UIEdgeInsetsMake(slop.top, slop.right, slop.bottom, slop.left) : slop;
+}
+
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
   ASDisplayNodeAssertMainThread();
@@ -3342,7 +3360,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     // Safer to use UIView's -pointInside:withEvent: if we can.
     return [_view pointInside:point withEvent:event];
   } else {
-    return CGRectContainsPoint(UIEdgeInsetsInsetRect(self.bounds, slop), point);
+    return CGRectContainsPoint(UIEdgeInsetsInsetRect(self.bounds, [self adjustedHitTestSlopFor:slop]), point);
   }
 }
 

@@ -94,6 +94,7 @@ for (ASDisplayNode *n in @[ nodes ]) {\
 - (void)setInterfaceState:(ASInterfaceState)state;
 // FIXME: Importing ASDisplayNodeInternal.h causes a heap of problems.
 - (void)enterInterfaceState:(ASInterfaceState)interfaceState;
+- (UIEdgeInsets)adjustedHitTestSlopFor:(UIEdgeInsets)slop;
 @end
 
 @interface ASTestDisplayNode : ASDisplayNode
@@ -2760,6 +2761,29 @@ static bool stringContainsPointer(NSString *description, id p) {
   OCMExpect([mockNode layerActionForKey:@"position"]);
   node.layer.position = CGPointMake(10, 10);
   OCMVerifyAll(mockNode);
+}
+
+- (void)testHitSlopWithRTLTraitCollection {
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  ASPrimitiveTraitCollection tc = ASPrimitiveTraitCollectionMakeDefault();
+  tc.layoutDirection = UITraitEnvironmentLayoutDirectionRightToLeft;
+  [node setPrimitiveTraitCollection:tc];
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
+}
+
+// TODO reenable once can import ASDisplayNode+Yoga.h
+- (void)disable_testHitSlopWithRTLYoga {
+  ASDisplayNode *node = [[ASDisplayNode alloc] init];
+  node.frame = CGRectMake(0, 0, 100, 100);
+  [node semanticContentAttributeDidChange:UISemanticContentAttributeForceRightToLeft];
+  node.hitTestSlop = UIEdgeInsetsMake(-10, -20, -30, -40);
+  UIEdgeInsets adjustedSlop = [node adjustedHitTestSlopFor:node.hitTestSlop];
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(adjustedSlop, UIEdgeInsetsMake(-10, -40, -30, -20)),
+                @"Hit test slop not adjusted correctly.");
 }
 
 - (void)testPlaceholder
