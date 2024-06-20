@@ -168,6 +168,7 @@
 {
   if (CGRectIsEmpty(self.bounds)) {
     _attemptedDisplayWhileZeroSized = YES;
+    self.contents = nil;
   }
   
   [self.asyncDelegate displayAsyncLayer:self asynchronously:asynchronously];
