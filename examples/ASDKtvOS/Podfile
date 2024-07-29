@@ -1,0 +1,6 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :tvos, '9.0'
+target 'Sample' do
+  pod 'Texture/PINRemoteImage', :path => '../..'
+  pod 'Texture/Video', :path => '../..'
+end
