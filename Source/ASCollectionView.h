@@ -436,6 +436,22 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section;
 
 /**
+ * Asks the delegate for the minimum inter-item spacing that should be applied to the given section.
+ *
+ * @see the same method in UICollectionViewDelegate.
+ */
+- (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+minimumInteritemSpacingForSectionAtIndex:(NSInteger)section;
+
+/**
+ * Asks the delegate for the minimum line-spacing that should be applied to the given section.
+ *
+ * @see the same method in UICollectionViewDelegate.
+ */
+ - (CGFloat)collectionView:(UICollectionView *)cv layout:(UICollectionViewLayout *)l
+ minimumLineSpacingForSectionAtIndex:(NSInteger)section;
+
+/**
  * Asks the delegate for the size range that should be used to measure the header in the given flow layout section.
  *
  * @param collectionNode The sender.
