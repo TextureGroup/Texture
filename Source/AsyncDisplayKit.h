@@ -59,6 +59,7 @@
 #import <AsyncDisplayKit/ASImageProtocols.h>
 #import <AsyncDisplayKit/ASInsetLayoutSpec.h>
 #import <AsyncDisplayKit/ASIntegerMap.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASLayout+IGListDiffKit.h>
 #import <AsyncDisplayKit/ASLayout.h>
 #import <AsyncDisplayKit/ASLayoutController.h>
