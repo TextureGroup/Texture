@@ -39,6 +39,26 @@
   }
 }
 
+- (void)setPosition:(CGPoint)position
+{
+  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsCGPositionValidForLayout(position), @"Caught attempt to set invalid position %@ on %@.", NSStringFromCGPoint(position), self);
+  if (!valid) {
+    return;
+  }
+  
+  [super setPosition:position];
+}
+
+- (void)setTransform:(CATransform3D)transform
+{
+  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsTransformValidForLayout(transform), @"Caught attempt to set invalid transform on %@.", self);
+  if (!valid) {
+    return;
+  }
+  
+  [super setTransform:transform];
+}
+
 - (void)setBounds:(CGRect)bounds
 {
   BOOL valid = ASDisplayNodeAssertNonFatal(ASIsCGRectValidForLayout(bounds), @"Caught attempt to set invalid bounds %@ on %@.", NSStringFromCGRect(bounds), self);
