@@ -220,6 +220,11 @@ static BOOL nodeIsHiddenFromAcessibility(ASDisplayNode *node) {
   return node.isHidden || node.alpha == 0.0 || node.accessibilityElementsHidden;
 }
 
+/// returns YES if this view should be considered "hidden" from the screen reader.
+static BOOL viewIsHiddenFromAcessibility(UIView *view) {
+  return view.isHidden || view.alpha == 0.0 || view.accessibilityElementsHidden;
+}
+
 /// Collect all accessibliity elements for a given view and view node
 static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *elements)
 {
@@ -300,6 +305,36 @@ static void CollectAccessibilityElements(ASDisplayNode *node, NSMutableArray *el
     } else if (subnode.accessibilityElementCount > 0) {
       // UIView is itself a UIAccessibilityContainer just add it
       [elements addObject:subnode.view];
+    }
+  }
+
+  if (modalSubnode) {
+    return;
+  }
+    
+  NSArray *subviews = view.subviews;
+  for (UIView *subview in subviews) {
+    // If a view is is already added then skip it
+    if ([elements containsObject:subview]) {
+      continue;
+    }
+    
+    // If a view is hidden or has an alpha of 0.0 we should not include it
+    if (viewIsHiddenFromAcessibility(subview)) {
+      continue;
+    }
+    
+    // If a subview is outside of the view's window, exclude it UNLESS it is a subview of an UIScrollView.
+    // In this case UIKit will return the element even if it is outside of the window or the scrollView's visible rect (contentOffset + contentSize)
+    CGRect viewInWindowCoords = [node convertRect:subview.frame toNode:nil];
+    if (!CGRectIntersectsRect(view.window.frame, viewInWindowCoords) && !recusivelyCheckSuperviewsForScrollView(view)) {
+      continue;
+    }
+    
+    if (subview.isAccessibilityElement) {
+      [elements addObject:subview];
+    } else if (subview.accessibilityElementCount > 0) {
+      [elements addObject:subview];
     }
   }
 }
