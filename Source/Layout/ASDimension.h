@@ -12,6 +12,7 @@
 #import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASAssert.h>
+#import <QuartzCore/QuartzCore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -52,6 +53,14 @@ ASDISPLAYNODE_INLINE BOOL ASIsCGPositionValidForLayout(CGPoint point)
 ASDISPLAYNODE_INLINE BOOL ASIsCGRectValidForLayout(CGRect rect)
 {
   return (ASIsCGPositionValidForLayout(rect.origin) && ASIsCGSizeValidForLayout(rect.size));
+}
+
+ASDISPLAYNODE_INLINE BOOL ASIsTransformValidForLayout(CATransform3D t)
+{
+  return !isnan(t.m11) && !isnan(t.m12) && !isnan(t.m13) && !isnan(t.m14) &&
+  !isnan(t.m21) && !isnan(t.m22) && !isnan(t.m23) && !isnan(t.m24) &&
+  !isnan(t.m31) && !isnan(t.m32) && !isnan(t.m33) && !isnan(t.m34) &&
+  !isnan(t.m41) && !isnan(t.m42) && !isnan(t.m43) && !isnan(t.m44);
 }
 
 #pragma mark - ASDimension
