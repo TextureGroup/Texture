@@ -32,3 +32,5 @@ In your `AppDelegate.m` file,
 </ul>
 
 **Make sure to call this method before initializing any ASControlNodes - including ASButtonNodes, ASImageNodes, and ASTextNodes.**
+
+**Note: This only works for ASControlNodes’s with addTarget:action: pairs added. It will not work with gesture recognizers.**
