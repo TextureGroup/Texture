@@ -1,11 +1,7 @@
-// swift-tools-version:5.7
-
-import PackageDescription
-
 let package = Package(
     name: "Texture",
     platforms: [
-        .iOS(.v14),  // Set iOS deployment target to match the podspec
+        .iOS(.v14),
         .tvOS(.v14)
     ],
     products: [
@@ -16,8 +12,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pinterest/PINRemoteImage.git", from: "3.0.0"),
-        .package(url: "https://github.com/Instagram/IGListKit.git", from: "4.0.0"),
-        .package(url: "https://github.com/facebook/yoga.git", from: "2.0.0")
+        .package(url: "https://github.com/Instagram/IGListKit.git", .upToNextMajor(from: "4.0.0")),
+        .package(url: "https://github.com/facebook/yoga.git", .exact("2.0.0"))
     ],
     targets: [
         .target(
