@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   not implement reuse (it will be called once per row).  Unlike UICollectionView's version,
  *   this method is not called when the row is about to display.
  */
-- (ASCellNode *)pagerNode:(ASPagerNode *)pagerNode nodeAtIndex:(NSInteger)index;
+- (ASCellNode *)pagerNode:(ASPagerNode *)pagerNode nodeAtIndex:(NSInteger)index NS_SWIFT_UI_ACTOR;
 
 /**
  * This method replaces -collectionView:nodeBlockForItemAtIndexPath:
@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Returns the current page index. Main thread only.
  */
-@property (nonatomic, readonly) NSInteger currentPageIndex;
+@property (nonatomic, readonly) NSInteger currentPageIndex NS_SWIFT_UI_ACTOR;
 
 /**
  * Scroll the contents of the receiver to ensure that the page is visible
