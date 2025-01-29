@@ -922,7 +922,7 @@ typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
 - (void)transitionLayoutWithSizeRange:(ASSizeRange)constrainedSize
                              animated:(BOOL)animated
                    shouldMeasureAsync:(BOOL)shouldMeasureAsync
-                measurementCompletion:(nullable void(^)(void))completion NS_SWIFT_UI_ACTOR;
+                measurementCompletion:(nullable NS_SWIFT_UI_ACTOR void(^)(void))completion NS_SWIFT_UI_ACTOR;
 
 
 /**
@@ -939,7 +939,7 @@ typedef NS_ENUM(NSInteger, ASLayoutEngineType) {
  */
 - (void)transitionLayoutWithAnimation:(BOOL)animated
                    shouldMeasureAsync:(BOOL)shouldMeasureAsync
-                measurementCompletion:(nullable void(^)(void))completion NS_SWIFT_UI_ACTOR;
+                measurementCompletion:(nullable NS_SWIFT_UI_ACTOR void(^)(void))completion NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Cancels all performing layout transitions. Can be called on any thread.
