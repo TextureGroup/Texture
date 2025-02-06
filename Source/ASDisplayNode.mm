@@ -2104,7 +2104,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDisplayNodeFailAssert(@"Cannot add a view-backed node as a subnode of a layer-backed node. Supernode: %@, subnode: %@", self, subnode);
     return;
   }
-
+  
   BOOL isRasterized = subtreeIsRasterized(self);
   if (isRasterized && subnode.nodeLoaded) {
     ASDisplayNodeFailAssert(@"Cannot add loaded node %@ to rasterized subtree of node %@", ASObjectDescriptionMakeTiny(subnode), ASObjectDescriptionMakeTiny(self));
@@ -2114,7 +2114,9 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   __instanceLock__.lock();
     NSUInteger subnodesCount = _subnodes.count;
   __instanceLock__.unlock();
-  if (subnodeIndex > subnodesCount || subnodeIndex < 0) {
+  
+  // If the subnodeIndex is out of bounds OR it will be once we call [subnode removeFromSupernode], exit early
+  if (subnodeIndex > subnodesCount || subnodeIndex < 0 || (subnode.supernode == self && subnodeIndex >= subnodesCount)) {
     ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)subnodeIndex, (long)subnodesCount);
     return;
   }
