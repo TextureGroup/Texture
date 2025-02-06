@@ -2114,11 +2114,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   __instanceLock__.lock();
     NSUInteger subnodesCount = _subnodes.count;
   __instanceLock__.unlock();
+
   if (subnodeIndex > subnodesCount || subnodeIndex < 0) {
     ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)subnodeIndex, (long)subnodesCount);
     return;
   }
-  
+
+  // Check if subnode is already a in _subnodes. If so make sure the subnodeIndex will not be out of bounds once we call [subnode removeFromSupernode]
+  if (subnode.supernode == self && subnodeIndex >= subnodesCount) {
+    ASDisplayNodeFailAssert(@"node %@ is already a subnode of %@. index %ld will be out of bounds once we call [subnode removeFromSupernode]. This can be caused by using automaticallyManagesSubnodes while also calling addSubnode explicitly.", subnode, self, subnodeIndex);
+    return;
+  }
+
   // Disable appearance methods during move between supernodes, but make sure we restore their state after we do our thing
   ASDisplayNode *oldParent = subnode.supernode;
   BOOL disableNotifications = shouldDisableNotificationsForMovingBetweenParents(oldParent, self);

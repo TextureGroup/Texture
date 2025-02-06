@@ -2783,4 +2783,15 @@ static bool stringContainsPointer(NSString *description, id p) {
   XCTAssertTrue(hasPlaceholderLayer);
 }
 
+- (void)testInsertExistingSubnode
+{
+  DeclareNodeNamed(parent);
+  DeclareNodeNamed(child);
+  
+  [parent addSubnode:child];
+  // Previously this would cause a crash. We now protect inserting an already existing subnode out of bounds
+  XCTAssertThrows([parent insertSubnode:child atIndex:1]);
+  XCTAssertTrue(parent.subnodes.count == 1);
+}
+
 @end
