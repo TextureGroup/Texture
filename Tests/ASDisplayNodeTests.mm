@@ -2789,7 +2789,7 @@ static bool stringContainsPointer(NSString *description, id p) {
   DeclareNodeNamed(child);
   
   [parent addSubnode:child];
-  // Previously this would cause a crash. We now protect inserting an already existing subnode
+  // Previously this would cause a crash. We now protect inserting an already existing subnode out of bounds
   XCTAssertThrows([parent insertSubnode:child atIndex:1]);
   XCTAssertTrue(parent.subnodes.count == 1);
 }
