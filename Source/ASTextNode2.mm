@@ -1029,11 +1029,11 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   if (!_passthroughNonlinkTouches) {
     return [super pointInside:point withEvent:event];
   }
-
-  if (_alwaysHandleTruncationTokenTap) {
-    return YES;
+    
+  if (!CGRectContainsPoint(self.bounds, point)){
+    return [super pointInside:point withEvent:event];
   }
-  
+    
   NSRange range = NSMakeRange(0, 0);
   NSString *linkAttributeName = nil;
   BOOL inAdditionalTruncationMessage = NO;
@@ -1043,6 +1043,10 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
                                                      range:&range
                              inAdditionalTruncationMessage:&inAdditionalTruncationMessage
                                            forHighlighting:YES];
+    
+  if (_alwaysHandleTruncationTokenTap && inAdditionalTruncationMessage) {
+    return YES;
+  }
   
   NSUInteger lastCharIndex = NSIntegerMax;
   BOOL linkCrossesVisibleRange = (lastCharIndex > range.location) && (lastCharIndex < NSMaxRange(range) - 1);
