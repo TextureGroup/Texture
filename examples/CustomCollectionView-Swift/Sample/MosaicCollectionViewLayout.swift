@@ -81,7 +81,7 @@ class MosaicCollectionViewLayout: UICollectionViewFlowLayout {
         let columnIndex: Int = self._shortestColumnIndexInSection(section: section)
         let indexPath = IndexPath(item: idx, section: section)
         
-        let itemSize = self._itemSizeAtIndexPath(indexPath: indexPath);
+        let itemSize = self._itemSizeAtIndexPath(indexPath: indexPath)
         let xOffset = _sectionInset.left + (columnWidth + columnSpacing) * CGFloat(columnIndex)
         let yOffset = _columnHeights![section][columnIndex]
         
@@ -136,14 +136,14 @@ class MosaicCollectionViewLayout: UICollectionViewFlowLayout {
   
   override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
     if (!(self.collectionView?.bounds.size.equalTo(newBounds.size))!) {
-      return true;
+      return true
     }
-    return false;
+    return false
   }
   
   func _widthForSection (section: Int) -> CGFloat
   {
-    return self.collectionView!.bounds.size.width - _sectionInset.left - _sectionInset.right;
+    return self.collectionView!.bounds.size.width - _sectionInset.left - _sectionInset.right
   }
   
   func _columnWidthForSection(section: Int) -> CGFloat
@@ -179,11 +179,11 @@ class MosaicCollectionViewLayout: UICollectionViewFlowLayout {
   
   func _tallestColumnIndexInSection(section: Int) -> Int
   {
-    var index: Int = 0;
-    var tallestHeight: CGFloat = 0;
-    _ = _columnHeights?[section].enumerated().map { (idx,height) in
+    var index: Int = 0
+    var tallestHeight: CGFloat = 0
+    _columnHeights?[section].enumerated().forEach { (idx,height) in
       if (height > tallestHeight) {
-        index = idx;
+        index = idx
         tallestHeight = height
       }
     }
@@ -192,11 +192,11 @@ class MosaicCollectionViewLayout: UICollectionViewFlowLayout {
   
   func _shortestColumnIndexInSection(section: Int) -> Int
   {
-    var index: Int = 0;
+    var index: Int = 0
     var shortestHeight: CGFloat = CGFloat.greatestFiniteMagnitude
-    _ = _columnHeights?[section].enumerated().map { (idx,height) in
+    _columnHeights?[section].enumerated().forEach { (idx,height) in
       if (height < shortestHeight) {
-        index = idx;
+        index = idx
         shortestHeight = height
       }
     }
@@ -241,6 +241,6 @@ class MosaicCollectionViewLayoutInspector: NSObject, ASCollectionViewLayoutInspe
   }
   
   func scrollableDirections() -> ASScrollDirection {
-    return ASScrollDirectionVerticalDirections;
+    return ASScrollDirectionVerticalDirections
   }
 }
