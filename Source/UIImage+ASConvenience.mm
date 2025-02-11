@@ -209,6 +209,15 @@ UIImage *cachedImageNamed(NSString *imageName, UITraitCollection *traitCollectio
       BOOL canUseCopy = (CGColorGetAlpha(borderColor.CGColor) == 1);
       [strokePath strokeWithBlendMode:(canUseCopy ? kCGBlendModeCopy : kCGBlendModeNormal) alpha:1];
     }
+    // Refill the center area with fillColor since it may be contaminated by the sub pixel
+    // rendering.
+    if (borderWidth > 0) {
+      CGRect rect = CGRectMake(capInset, capInset, 1, 1);
+      CGContextRef context = UIGraphicsGetCurrentContext();
+      CGContextClearRect(context, rect);
+      CGContextSetFillColorWithColor(context, [fillColor CGColor]);
+      CGContextFillRect(context, rect);
+    }
   });
   
   UIEdgeInsets capInsets = UIEdgeInsetsMake(cornerRadius, cornerRadius, cornerRadius, cornerRadius);
