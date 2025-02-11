@@ -15,8 +15,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Copy returns self. Only here for dictionary use.
 AS_SUBCLASSING_RESTRICTED
-@interface ASCollectionElement : NSObject
+@interface ASCollectionElement : NSObject <NSCopying>
 
 @property (nullable, nonatomic, copy, readonly) NSString *supplementaryElementKind;
 @property (nonatomic) ASSizeRange constrainedSize;
