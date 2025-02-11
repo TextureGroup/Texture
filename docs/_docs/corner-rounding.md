@@ -100,7 +100,7 @@ Use this flowchart to select the most performant strategy to round a set of corn
 
 ## Texture Support
 
-The following code exemplifies different ways how to archive corner rounding within Texture:
+The following code exemplifies different ways how to achieve corner rounding within Texture:
 
 ### Use `.cornerRadius`
 
