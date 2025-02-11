@@ -890,7 +890,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
             if (delegateDidLoadImageFromCache) {
               [delegate imageNodeDidLoadImageFromCache:self];
             }
-            as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@ cacheType: %@", self, [imageContainer asdk_image], URL, cacheType);
+            as_log_verbose(ASImageLoadingLog(), "Decached image for %@ img: %@ url: %@ cacheType: %@", self, [imageContainer asdk_image], URL, @(cacheType));
             finished(imageContainer, nil, nil, cacheType == ASImageCacheTypeSynchronous ? ASNetworkImageSourceSynchronousCache : ASNetworkImageSourceAsynchronousCache, nil);
           }
         };
