@@ -163,6 +163,7 @@
     view.allowsMultipleSelection              = pendingState.allowsMultipleSelection;
     view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
     view.automaticallyAdjustsContentOffset    = pendingState.automaticallyAdjustsContentOffset;
+    view.leadingScreensForBatching            = pendingState.leadingScreensForBatching;
 #if !TARGET_OS_TV
     view.pagingEnabled                        = pendingState.pagingEnabled;
 #endif
