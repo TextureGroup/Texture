@@ -122,6 +122,7 @@ typedef struct {
  * and other nodes that are ready to do their final display). Each render of every progressive jpeg network node would cause this to be called, so
  * this hook could be called up to 1 + (pJPEGcount * pJPEGrenderCount) times. The render count depends on how many times the downloader calls the
  * progressImage block.
+ * @note This is only called when immediate children implement custom CALayer rendering. To propagate beyond immediate supernode, turn on ASExperimentalHierarchyDisplayDidFinishIsRecursive
  */
 AS_CATEGORY_IMPLEMENTABLE
 - (void)hierarchyDisplayDidFinish NS_REQUIRES_SUPER;
