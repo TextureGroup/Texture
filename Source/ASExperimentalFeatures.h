@@ -33,6 +33,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalRangeUpdateOnChangesetUpdate = 1 << 12,                     // exp_range_update_on_changeset_update
   ASExperimentalNoTextRendererCache = 1 << 13,                              // exp_no_text_renderer_cache
   ASExperimentalLockTextRendererCache = 1 << 14,                            // exp_lock_text_renderer_cache
+  ASExperimentalHierarchyDisplayDidFinishIsRecursive = 1 << 15,             // exp_hierarchy_display_did_finish_is_recursive
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 
