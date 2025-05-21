@@ -1,0 +1,20 @@
+PODS:
+  - iOSSnapshotTestCase/Core (8.0.0)
+  - OCMock (3.9.4)
+
+DEPENDENCIES:
+  - iOSSnapshotTestCase/Core (~> 8.0)
+  - OCMock (~> 3.9)
+
+SPEC REPOS:
+  trunk:
+    - iOSSnapshotTestCase
+    - OCMock
+
+SPEC CHECKSUMS:
+  iOSSnapshotTestCase: a670511f9ee3829c2b9c23e6e68f315fd7b6790f
+  OCMock: 589f2c84dacb1f5aaf6e4cec1f292551fe748e74
+
+PODFILE CHECKSUM: 3b874fa5a23281754f91a64090a82ef01ee76cc7
+
+COCOAPODS: 1.15.2
