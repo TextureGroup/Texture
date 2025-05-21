@@ -34,6 +34,7 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalNoTextRendererCache = 1 << 13,                              // exp_no_text_renderer_cache
   ASExperimentalLockTextRendererCache = 1 << 14,                            // exp_lock_text_renderer_cache
   ASExperimentalHierarchyDisplayDidFinishIsRecursive = 1 << 15,             // exp_hierarchy_display_did_finish_is_recursive
+  ASExperimentalCheckBatchFetchingOnScroll = 1 << 16,                       // exp_check_batch_fetching_on_scroll
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

@@ -143,6 +143,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
 
   /**
+   * We want to check for batch fetching on scroll, but every tick would be too much. So check once at the
+   * beginning
+   */
+  BOOL _hasCheckedForBatchFetchingOnScroll;
+
+  /**
    * Set during beginInteractiveMovementForItemAtIndexPath and UIGestureRecognizerStateEnded
    * (or UIGestureRecognizerStateFailed, UIGestureRecognizerStateCancelled.
    */
@@ -1620,7 +1626,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
-  if (ASInterfaceStateIncludesVisible(interfaceState)) {
+  if (ASInterfaceStateIncludesVisible(interfaceState) && !ASActivateExperimentalFeature(ASExperimentalCheckBatchFetchingOnScroll)) {
+    // The following call to _checkForBatchFetching is effectively a no-op, because during scrolling
+    //  isDragging and isTracking are YES.
     [self _checkForBatchFetching];
   }
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
@@ -1629,6 +1637,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   if (_asyncDelegateFlags.scrollViewDidScroll) {
     [_asyncDelegate scrollViewDidScroll:scrollView];
+  }
+  if (ASInterfaceStateIncludesVisible(interfaceState) && !_hasCheckedForBatchFetchingOnScroll && ASActivateExperimentalFeature(ASExperimentalCheckBatchFetchingOnScroll)) {
+    // Check after the delegate it give it a chance to turn on/off batch fetching
+    [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset velocity:CGPointZero];
+    _hasCheckedForBatchFetchingOnScroll = YES;
   }
 }
 
@@ -1644,6 +1657,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     ASDisplayNodeAssert(_batchContext != nil, @"Batch context should exist");
     [self _beginBatchFetchingIfNeededWithContentOffset:*targetContentOffset velocity:velocity];
   }
+  
+  _hasCheckedForBatchFetchingOnScroll = NO; // reset once the scroll is done
   
   if (_asyncDelegateFlags.scrollViewWillEndDragging) {
     [_asyncDelegate scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:(targetContentOffset ? : &contentOffset)];
