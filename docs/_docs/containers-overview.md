@@ -27,11 +27,11 @@ It is highly recommended that you use Texture's nodes within a node container. T
     <td>in place of UIKit's <code>UITableView</code></td>
   </tr>
   <tr>
-    <td><a href = "containers-asviewcontroller.html"><code>ASViewController</code></a></td>
+    <td><a href = "containers-asdkviewcontroller.html"><code>ASDKViewController</code></a></td>
     <td>in place of UIKit's <code>UIViewController</code></td>
   </tr>
   <tr>
-    <td><code>ASNavigationController</code></td>
+    <td><code>ASDKNavigationController</code></td>
     <td>in place of UIKit's <code>UINavigationController</code>. Implements the <a href = "asvisibility.html"><code>ASVisibility</code></a> protocol.</td>
   </tr>
   <tr>

@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeDidStartFetchingData:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeDidStartFetchingData:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node will load image from cache
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeWillLoadImageFromCache:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeWillLoadImageFromCache:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node finished loading image from cache
@@ -183,7 +183,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeDidLoadImageFromCache:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeDidLoadImageFromCache:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node failed to load image from cache
@@ -192,7 +192,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeDidFailToLoadImageFromCache:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeDidFailToLoadImageFromCache:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node will load image from network
@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeWillLoadImageFromNetwork:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeWillLoadImageFromNetwork:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node will start display
@@ -210,7 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeWillStartDisplayAsynchronously:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeWillStartDisplayAsynchronously:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 /**
  * Notification that the image node finished downloading an image, with additional info.
@@ -251,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @discussion Called on the main thread.
  */
-- (void)imageNodeDidFinishDecoding:(ASNetworkImageNode *)imageNode;
+- (void)imageNodeDidFinishDecoding:(ASNetworkImageNode *)imageNode NS_SWIFT_UI_ACTOR;
 
 
 @end

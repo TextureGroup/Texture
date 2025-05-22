@@ -90,7 +90,7 @@ Let's say you want to add an `ASButtonNode` to the view of one of your existing 
 
 The next thing you'll notice is that, if you set titles of various lengths for different control states, the button will dynamically grow and shrink as the title changes.  This is because changing the title causes `-setNeedsLayout` to be called on the button.  Within a node hierarchy, this makes sense, and will work as expected.
 
-Long story short, use an `ASViewController`.
+Long story short, use an `ASDKViewController`.
 
 ##### Selected State
 
