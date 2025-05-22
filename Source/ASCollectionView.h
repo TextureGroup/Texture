@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return The context object, or @c nil if no context was provided.
  */
-- (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT;
+- (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT NS_SWIFT_UI_ACTOR;
 
 @end
 

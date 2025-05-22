@@ -54,10 +54,6 @@
   #define __IPHONE_13_0 130000
 #endif
 
-#define AS_AT_LEAST_IOS10  (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_10_0)
-#define AS_AT_LEAST_IOS11  (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_11_0)
-#define AS_AT_LEAST_IOS13  (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
-
 // Use __builtin_available if we're on Xcode >= 9, AS_AT_LEAST otherwise.
 #if __has_builtin(__builtin_available)
   #define AS_AVAILABLE_IOS(ver)               __builtin_available(iOS ver, *)

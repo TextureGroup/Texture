@@ -7,16 +7,20 @@
 //  Licensed under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 //
 
-#import "ASAvailability.h"
-
 #import <UIKit/UIKit.h>
 
+#import <AsyncDisplayKit/ASAvailability.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASImageProtocols.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
+ASDK_EXTERN void ASInitializeFrameworkMainThreadOnConstructor(void);
+ASDK_EXTERN void ASInitializeFrameworkMainThreadOnDestructor(void);
+
+// Calls both ASInitializeFrameworkMainThreadOnConstructor and ASInitializeFrameworkMainThreadOnDestructor
+// Used when manually initializing texture
 ASDK_EXTERN void ASInitializeFrameworkMainThread(void);
 
 ASDK_EXTERN BOOL ASDefaultAllowsGroupOpacity(void);

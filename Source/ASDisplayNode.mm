@@ -255,9 +255,16 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 }
 
 #if !AS_INITIALIZE_FRAMEWORK_MANUALLY
-__attribute__((constructor)) static void ASLoadFrameworkInitializer(void)
+__attribute__((constructor)) static void ASLoadFrameworkInitializerOnConstructor(void)
 {
-  ASInitializeFrameworkMainThread();
+  ASInitializeFrameworkMainThreadOnConstructor();
+}
+#endif
+
+#if !AS_INITIALIZE_FRAMEWORK_MANUALLY
+__attribute__((destructor)) static void ASLoadFrameworkInitializerOnDestructor(void)
+{
+  ASInitializeFrameworkMainThreadOnDestructor();
 }
 #endif
 
@@ -436,42 +443,40 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
 
 - (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection
 {
-  if (@available(iOS 13.0, tvOS 10.0, *)) {
-    // When changing between light and dark mode, often the entire node needs to re-render.
-    // This change doesn't happen frequently so it's fairly safe to render nodes again
-    __instanceLock__.lock();
-    BOOL loaded = _loaded(self);
-    ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
-    __instanceLock__.unlock();
-    if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-      if (loaded) {
-        // we need to run that on main thread, cause accessing CALayer properties.
-        // It seems than in iOS 13 sometimes it causes deadlock.
-        ASPerformBlockOnMainThread(^{
-          self->__instanceLock__.lock();
-          CGFloat cornerRadius = self->_cornerRadius;
-          ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
-          UIColor *backgroundColor = self->_backgroundColor;
-          self->__instanceLock__.unlock();
-          // TODO: we should resolve color using node's trait collection
-          // but Texture changes it from many places, so we may receive the wrong one.
-          CGColorRef cgBackgroundColor = backgroundColor.CGColor;
-          if (!CGColorEqualToColor(self->_layer.backgroundColor, cgBackgroundColor)) {
-            // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
-            // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
-            // We utilize the _backgroundColor instance variable to track the full dynamic color
-            // and apply any changes here when trait collection updates occur.
-            self->_layer.backgroundColor = cgBackgroundColor;
-          }
+  // When changing between light and dark mode, often the entire node needs to re-render.
+  // This change doesn't happen frequently so it's fairly safe to render nodes again
+  __instanceLock__.lock();
+  BOOL loaded = _loaded(self);
+  ASPrimitiveTraitCollection primitiveTraitCollection = _primitiveTraitCollection;
+  __instanceLock__.unlock();
+  if (primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+    if (loaded) {
+      // we need to run that on main thread, cause accessing CALayer properties.
+      // It seems than in iOS 13 sometimes it causes deadlock.
+      ASPerformBlockOnMainThread(^{
+        self->__instanceLock__.lock();
+        CGFloat cornerRadius = self->_cornerRadius;
+        ASCornerRoundingType cornerRoundingType = self->_cornerRoundingType;
+        UIColor *backgroundColor = self->_backgroundColor;
+        self->__instanceLock__.unlock();
+        // TODO: we should resolve color using node's trait collection
+        // but Texture changes it from many places, so we may receive the wrong one.
+        CGColorRef cgBackgroundColor = backgroundColor.CGColor;
+        if (!CGColorEqualToColor(self->_layer.backgroundColor, cgBackgroundColor)) {
+          // Background colors do not dynamically update for layer backed nodes since they utilize CGColorRef
+          // instead of UIColor. Non layer backed node also receive color to the layer (see [_ASPendingState -applyToView:withSpecialPropertiesHandling:]).
+          // We utilize the _backgroundColor instance variable to track the full dynamic color
+          // and apply any changes here when trait collection updates occur.
+          self->_layer.backgroundColor = cgBackgroundColor;
+        }
 
-          // If we have clipping corners, re-render the clipping corner layer upon user interface style change
-          if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
-            [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
-          }
-          
-          [self setNeedsDisplay];
-        });
-      }
+        // If we have clipping corners, re-render the clipping corner layer upon user interface style change
+        if (cornerRoundingType == ASCornerRoundingTypeClipping && cornerRadius > 0.0f) {
+          [self _updateClipCornerLayerContentsWithRadius:cornerRadius backgroundColor:backgroundColor];
+        }
+        
+        [self setNeedsDisplay];
+      });
     }
   }
 }
@@ -828,7 +833,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
     }
 
     _fallbackSafeAreaInsets = insets;
-    needsManualUpdate = !AS_AT_LEAST_IOS11 || _flags.layerBacked;
+    needsManualUpdate = _flags.layerBacked;
     updatesLayoutMargins = needsManualUpdate && [self _locked_insetsLayoutMarginsFromSafeArea];
   }
 
@@ -849,7 +854,7 @@ ASSynthesizeLockingMethodsWithMutex(__instanceLock__);
   CGRect bounds = self.bounds;
 
   for (ASDisplayNode *child in self.subnodes) {
-    if (AS_AT_LEAST_IOS11 && !child.layerBacked) {
+    if (!child.layerBacked) {
       // In iOS 11 view-backed nodes already know what their safe area is.
       continue;
     }
@@ -1313,7 +1318,7 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
 
 // Track that a node will be displayed as part of the current node hierarchy.
 // The node sending the message should usually be passed as the parameter, similar to the delegation pattern.
-- (void)_pendingNodeWillDisplay:(ASDisplayNode *)node
+- (BOOL)_pendingNodeWillDisplay:(ASDisplayNode *)node
 {
   ASDisplayNodeAssertMainThread();
 
@@ -1321,13 +1326,14 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
   if (!_pendingDisplayNodes) {
     _pendingDisplayNodes = [[ASWeakSet alloc] init];
   }
-
+  BOOL wasEmpty = [_pendingDisplayNodes isEmpty];
   [_pendingDisplayNodes addObject:node];
+  return wasEmpty;
 }
 
 // Notify that a node that was pending display finished
 // The node sending the message should usually be passed as the parameter, similar to the delegation pattern.
-- (void)_pendingNodeDidDisplay:(ASDisplayNode *)node
+- (BOOL)_pendingNodeDidDisplay:(ASDisplayNode *)node
 {
   ASDisplayNodeAssertMainThread();
 
@@ -1362,6 +1368,10 @@ NSString * const ASRenderingEngineDidDisplayNodesScheduledBeforeTimestamp = @"AS
       }
     }
     __instanceLock__.unlock();
+    
+    return YES;
+  } else {
+    return NO;
   }
 }
 
@@ -1763,13 +1773,29 @@ static void _recursivelySetDisplaySuspended(ASDisplayNode *node, CALayer *layer,
 - (void)subnodeDisplayWillStart:(ASDisplayNode *)subnode
 {
   // Subclass hook
-  [self _pendingNodeWillDisplay:subnode];
+  BOOL didAddFirstOne = [self _pendingNodeWillDisplay:subnode];
+  
+  if (didAddFirstOne && ASActivateExperimentalFeature(ASExperimentalHierarchyDisplayDidFinishIsRecursive)) {
+    __instanceLock__.lock();
+    ASDisplayNode *supernode = _supernode;
+    __instanceLock__.unlock();
+    
+    [supernode subnodeDisplayWillStart:self];
+  }
 }
 
 - (void)subnodeDisplayDidFinish:(ASDisplayNode *)subnode
 {
   // Subclass hook
-  [self _pendingNodeDidDisplay:subnode];
+  BOOL didRemoveLastOne = [self _pendingNodeDidDisplay:subnode];
+  
+  if (didRemoveLastOne && ASActivateExperimentalFeature(ASExperimentalHierarchyDisplayDidFinishIsRecursive)) {
+    __instanceLock__.lock();
+    ASDisplayNode *supernode = _supernode;
+    __instanceLock__.unlock();
+    
+    [supernode subnodeDisplayDidFinish:self];
+  }
 }
 
 #pragma mark <CALayerDelegate>
@@ -2109,11 +2135,18 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
   __instanceLock__.lock();
     NSUInteger subnodesCount = _subnodes.count;
   __instanceLock__.unlock();
+
   if (subnodeIndex > subnodesCount || subnodeIndex < 0) {
     ASDisplayNodeFailAssert(@"Cannot insert a subnode at index %ld. Count is %ld", (long)subnodeIndex, (long)subnodesCount);
     return;
   }
-  
+
+  // Check if subnode is already a in _subnodes. If so make sure the subnodeIndex will not be out of bounds once we call [subnode removeFromSupernode]
+  if (subnode.supernode == self && subnodeIndex >= subnodesCount) {
+    ASDisplayNodeFailAssert(@"node %@ is already a subnode of %@. index %ld will be out of bounds once we call [subnode removeFromSupernode]. This can be caused by using automaticallyManagesSubnodes while also calling addSubnode explicitly.", subnode, self, subnodeIndex);
+    return;
+  }
+
   // Disable appearance methods during move between supernodes, but make sure we restore their state after we do our thing
   ASDisplayNode *oldParent = subnode.supernode;
   BOOL disableNotifications = shouldDisableNotificationsForMovingBetweenParents(oldParent, self);

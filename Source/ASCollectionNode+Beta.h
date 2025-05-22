@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The elements that are currently displayed. The "UIKit index space". Must be accessed on main thread.
  */
-@property (nonatomic, readonly) ASElementMap *visibleElements;
+@property (nonatomic, readonly) ASElementMap *visibleElements NS_SWIFT_UI_ACTOR;
 
 @property (nullable, readonly) id<ASCollectionLayoutDelegate> layoutDelegate;
 
@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  When isSynchronized == YES, the block is run block immediately (before the method returns).
  */
-- (void)onDidFinishSynchronizing:(void (^)(void))didFinishSynchronizing;
+- (void)onDidFinishSynchronizing:(NS_SWIFT_UI_ACTOR void (^)(void))didFinishSynchronizing;
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(nullable id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator;
 

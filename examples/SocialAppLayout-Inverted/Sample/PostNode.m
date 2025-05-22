@@ -136,16 +136,13 @@
         _avatarNode.URL = [NSURL URLWithString:_post.photo];
         _avatarNode.imageModificationBlock = ^UIImage *(UIImage *image, ASPrimitiveTraitCollection traitCollection) {
             
-            UIImage *modifiedImage;
             CGRect rect = CGRectMake(0, 0, image.size.width, image.size.height);
             
-            UIGraphicsBeginImageContextWithOptions(image.size, false, [[UIScreen mainScreen] scale]);
-            
+            UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:image.size];
+          UIImage *modifiedImage = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
             [[UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:44.0] addClip];
             [image drawInRect:rect];
-            modifiedImage = UIGraphicsGetImageFromCurrentImageContext();
-            
-            UIGraphicsEndImageContext();
+          }];
             
             return modifiedImage;
             
