@@ -179,7 +179,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   _imageNodeFlags.cropEnabled = YES;
   _imageNodeFlags.forceUpscaling = NO;
-  _imageNodeFlags.regenerateFromImageAsset = NO;
   _cropRect = CGRectMake(0.5, 0.5, 0, 0);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
@@ -292,8 +291,7 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   {
     ASLockScopeSelf();
     UIImage *drawImage = _image;
-    if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
-      _imageNodeFlags.regenerateFromImageAsset = NO;
+      if (drawImage != nil && drawImage.imageAsset != nil) {
       UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
       UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
       if ( generatedImage != nil ) {
@@ -768,19 +766,6 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     NSFontAttributeName: [UIFont systemFontOfSize:15.0],
     NSForegroundColorAttributeName: [UIColor redColor]
   };
-}
-
-- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
-  [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
-
-  {
-    AS::MutexLocker l(__instanceLock__);
-      // update image if userInterfaceStyle was changed (dark mode)
-      if (_image != nil
-          && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-        _imageNodeFlags.regenerateFromImageAsset = YES;
-      }
-  }
 }
 
 
