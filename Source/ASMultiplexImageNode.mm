@@ -25,11 +25,7 @@
 #import <AsyncDisplayKit/ASPhotosFrameworkImageRequest.h>
 #endif
 
-#if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
-#else
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
-#endif
+#import <AsyncDisplayKit/ASDefaultImageDownloader.h>
 
 using AS::MutexLocker;
 
@@ -190,11 +186,7 @@ typedef void(^ASMultiplexImageLoadCompletionBlock)(UIImage *image, id imageIdent
 
 - (instancetype)init
 {
-#if AS_PIN_REMOTE_IMAGE
-  return [self initWithCache:[ASPINRemoteImageDownloader sharedDownloader] downloader:[ASPINRemoteImageDownloader sharedDownloader]];
-#else
-  return [self initWithCache:nil downloader:[ASBasicImageDownloader sharedImageDownloader]];
-#endif
+  return [self initWithCache:[ASDefaultImageDownloader defaultCache] downloader:[ASDefaultImageDownloader defaultDownloader]];
 }
 
 - (void)dealloc

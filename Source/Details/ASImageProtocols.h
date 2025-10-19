@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, ASImageCacheType) {
   ASImageCacheTypeSynchronous,
 };
 
-typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable imageFromCache, ASImageCacheType cacheType);
+typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable imageFromCache, ASImageCacheType cacheType) NS_SWIFT_SENDABLE;
 
 @protocol ASImageCacheProtocol <NSObject>
 
@@ -71,12 +71,12 @@ typedef void(^ASImageCacherCompletion)(id <ASImageContainerProtocol> _Nullable i
  @param downloadIdentifier The identifier for the download task that completed.
  @param userInfo Any additional info that your downloader would like to communicate through Texture.
  */
-typedef void(^ASImageDownloaderCompletion)(id <ASImageContainerProtocol> _Nullable image, NSError * _Nullable error, id _Nullable downloadIdentifier, id _Nullable userInfo);
+typedef void(^ASImageDownloaderCompletion)(id <ASImageContainerProtocol> _Nullable image, NSError * _Nullable error, id _Nullable downloadIdentifier, id _Nullable userInfo) NS_SWIFT_SENDABLE;
 
 /**
  @param progress The progress of the download, in the range of (0.0, 1.0), inclusive.
  */
-typedef void(^ASImageDownloaderProgress)(CGFloat progress);
+typedef void(^ASImageDownloaderProgress)(CGFloat progress) NS_SWIFT_SENDABLE;
 typedef void(^ASImageDownloaderProgressImage)(UIImage *progressImage, CGFloat progress, id _Nullable downloadIdentifier);
 
 typedef NS_ENUM(NSUInteger, ASImageDownloaderPriority) {
@@ -197,7 +197,7 @@ withDownloadIdentifier:(id)downloadIdentifier;
 /**
  @abstract Return the objects's cover image.
  */
-@property (nonatomic, readonly) UIImage *coverImage;
+@property (nonatomic, readonly, nullable) UIImage *coverImage;
 /**
  @abstract Return a boolean to indicate that the cover image is ready.
  */
@@ -225,16 +225,16 @@ withDownloadIdentifier:(id)downloadIdentifier;
 /**
  @abstract Return any error that has occured. Playback will be paused if this returns non-nil.
  */
-@property (nonatomic, readonly) NSError *error;
+@property (nonatomic, readonly, nullable) NSError *error;
 /**
  @abstract Should be called when playback is ready.
  */
-@property (nonatomic) dispatch_block_t playbackReadyCallback;
+@property (nonatomic, nullable) dispatch_block_t playbackReadyCallback NS_SWIFT_SENDABLE;
 
 /**
  @abstract Return the image at a given index.
  */
-- (CGImageRef)imageAtIndex:(NSUInteger)index;
+- (nullable CGImageRef)imageAtIndex:(NSUInteger)index;
 /**
  @abstract Return the duration at a given index.
  */

@@ -127,3 +127,4 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/_ASTransitionContext.h>
+#import <AsyncDisplayKit/ASDefaultImageDownloader.h>
