@@ -30,6 +30,11 @@ typedef NS_OPTIONS(NSUInteger, ASExperimentalFeatures) {
   ASExperimentalOptimizeDataControllerPipeline = 1 << 9,                    // exp_optimize_data_controller_pipeline
   ASExperimentalDisableGlobalTextkitLock = 1 << 10,                         // exp_disable_global_textkit_lock
   ASExperimentalMainThreadOnlyDataController = 1 << 11,                     // exp_main_thread_only_data_controller
+  ASExperimentalRangeUpdateOnChangesetUpdate = 1 << 12,                     // exp_range_update_on_changeset_update
+  ASExperimentalNoTextRendererCache = 1 << 13,                              // exp_no_text_renderer_cache
+  ASExperimentalLockTextRendererCache = 1 << 14,                            // exp_lock_text_renderer_cache
+  ASExperimentalHierarchyDisplayDidFinishIsRecursive = 1 << 15,             // exp_hierarchy_display_did_finish_is_recursive
+  ASExperimentalCheckBatchFetchingOnScroll = 1 << 16,                       // exp_check_batch_fetching_on_scroll
   ASExperimentalFeatureAll = 0xFFFFFFFF
 };
 

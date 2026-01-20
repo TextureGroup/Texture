@@ -30,6 +30,7 @@ static ASExperimentalFeatures features[] = {
   ASExperimentalOptimizeDataControllerPipeline,
   ASExperimentalDisableGlobalTextkitLock,
   ASExperimentalMainThreadOnlyDataController,
+  ASExperimentalRangeUpdateOnChangesetUpdate,
 };
 
 @interface ASConfigurationTests : ASTestCase <ASConfigurationDelegate>
@@ -53,7 +54,8 @@ static ASExperimentalFeatures features[] = {
     @"exp_drawing_global",
     @"exp_optimize_data_controller_pipeline",
     @"exp_disable_global_textkit_lock",
-    @"exp_main_thread_only_data_controller"
+    @"exp_main_thread_only_data_controller",
+    @"exp_range_update_on_changeset_update"
   ];
 }
 

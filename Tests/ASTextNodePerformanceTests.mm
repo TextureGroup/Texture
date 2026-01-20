@@ -41,7 +41,9 @@ static NSString *const kTestCaseUIKitWithReusedContext = @"UIKitReusedContext";
   dispatch_once(&onceToken, ^{
     NSString *file = [[NSBundle bundleForClass:self] pathForResource:@"AttributedStringsFixture0" ofType:@"plist" inDirectory:@"TestResources"];
     if (file != nil) {
-    	array = [NSKeyedUnarchiver unarchiveObjectWithFile:file];
+      NSError *error = nil;
+      NSData *data = [NSData dataWithContentsOfFile:file];
+      array = [NSKeyedUnarchiver unarchivedArrayOfObjectsOfClass:[NSAttributedString class] fromData:data error:&error];
     }
     NSAssert([array isKindOfClass:[NSArray class]], nil);
     NSSet *unique = [NSSet setWithArray:array];

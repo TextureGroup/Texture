@@ -10,7 +10,7 @@ nextPage: button-node.html
 
 ### 3 Ways to Party
 
-There are three ways in which you can implement the cells you'll use in your Texture app: subclassing `ASCellNode`, initializing with an existing `ASViewController` or using an existing UIView or `CALayer`.
+There are three ways in which you can implement the cells you'll use in your Texture app: subclassing `ASCellNode`, initializing with an existing `ASDKViewController` or using an existing UIView or `CALayer`.
 
 #### Subclassing
 
@@ -24,7 +24,7 @@ Most likely, you'll write a few of the following:
 - `-layout` -- Also called on the main thread.  Layout is complete after the call to super which means you can do any extra tweaking you need to do.
 
 
-#### Initializing with an `ASViewController`
+#### Initializing with an `ASDKViewController`
 
 Say you already have some type of view controller written to display a view in your app.  If you want to take that view controller and drop its view in as a cell in one of the scrolling nodes or a pager node its no problem.
 

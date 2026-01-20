@@ -9,7 +9,6 @@
 
 #import <AsyncDisplayKit/ASNetworkImageNode.h>
 
-#import <AsyncDisplayKit/ASBasicImageDownloader.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
 #import <AsyncDisplayKit/ASDisplayNode+Subclasses.h>
@@ -19,10 +18,7 @@
 #import <AsyncDisplayKit/ASImageNode+AnimatedImagePrivate.h>
 #import <AsyncDisplayKit/ASImageContainerProtocolCategories.h>
 #import <AsyncDisplayKit/ASNetworkImageLoadInfo+Private.h>
-
-#if AS_PIN_REMOTE_IMAGE
-#import <AsyncDisplayKit/ASPINRemoteImageDownloader.h>
-#endif
+#import <AsyncDisplayKit/ASDefaultImageDownloader.h>
 
 @interface ASNetworkImageNode ()
 {
@@ -111,11 +107,7 @@ static std::atomic_bool _useMainThreadDelegateCallbacks(true);
 
 - (instancetype)init
 {
-#if AS_PIN_REMOTE_IMAGE
-  return [self initWithCache:[ASPINRemoteImageDownloader sharedDownloader] downloader:[ASPINRemoteImageDownloader sharedDownloader]];
-#else
-  return [self initWithCache:nil downloader:[ASBasicImageDownloader sharedImageDownloader]];
-#endif
+  return [self initWithCache:[ASDefaultImageDownloader defaultCache] downloader:[ASDefaultImageDownloader defaultDownloader]];
 }
 
 - (void)dealloc

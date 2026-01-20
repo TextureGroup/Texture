@@ -46,63 +46,63 @@ typedef NS_OPTIONS(unsigned char, ASInterfaceState)
  * @discussion Subclasses may use this to monitor when they become visible, should free cached data, and much more.
  * @see ASInterfaceState
  */
-- (void)interfaceStateDidChange:(ASInterfaceState)newState fromState:(ASInterfaceState)oldState;
+- (void)interfaceStateDidChange:(ASInterfaceState)newState fromState:(ASInterfaceState)oldState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the node becomes visible.
  * @discussion Subclasses may use this to monitor when they become visible.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didEnterVisibleState;
+- (void)didEnterVisibleState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the node is no longer visible.
  * @discussion Subclasses may use this to monitor when they are no longer visible.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didExitVisibleState;
+- (void)didExitVisibleState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the the node has entered the display state.
  * @discussion Subclasses may use this to monitor when a node should be rendering its content.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didEnterDisplayState;
+- (void)didEnterDisplayState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the the node has exited the display state.
  * @discussion Subclasses may use this to monitor when a node should no longer be rendering its content.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didExitDisplayState;
+- (void)didExitDisplayState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the the node has entered the preload state.
  * @discussion Subclasses may use this to monitor data for a node should be preloaded, either from a local or remote source.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didEnterPreloadState;
+- (void)didEnterPreloadState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called whenever the the node has exited the preload state.
  * @discussion Subclasses may use this to monitor whether preloading data for a node should be canceled.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didExitPreloadState;
+- (void)didExitPreloadState NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called when the node has completed applying the layout.
  * @discussion Can be used for operations that are performed after layout has completed.
  * @note This method is guaranteed to be called on main.
  */
-- (void)nodeDidLayout;
+- (void)nodeDidLayout NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called when the node loads.
  * @discussion Can be used for operations that are performed after the node's view is available.
  * @note This method is guaranteed to be called on main.
  */
-- (void)nodeDidLoad;
+- (void)nodeDidLoad NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Indicates that the receiver and all subnodes have finished displaying.
@@ -114,7 +114,7 @@ typedef NS_OPTIONS(unsigned char, ASInterfaceState)
  * the progressImage block.
  * @note This method is guaranteed to be called on main.
  */
-- (void)hierarchyDisplayDidFinish;
+- (void)hierarchyDisplayDidFinish NS_SWIFT_UI_ACTOR;
 
 @optional
 /**
@@ -125,7 +125,7 @@ typedef NS_OPTIONS(unsigned char, ASInterfaceState)
  * to attempt to ascend the node tree when handling this, as the root node is locked when this is
  * called.
  */
-- (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize;
+- (void)nodeWillCalculateLayout:(ASSizeRange)constrainedSize NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called when the node's layer is about to enter the hierarchy.
@@ -134,7 +134,7 @@ typedef NS_OPTIONS(unsigned char, ASInterfaceState)
  * re-parented multiple times, and each time will trigger this call.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didEnterHierarchy;
+- (void)didEnterHierarchy NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract Called when the node's layer has exited the hierarchy.
@@ -143,6 +143,6 @@ typedef NS_OPTIONS(unsigned char, ASInterfaceState)
  * re-parented multiple times, and each time will trigger this call.
  * @note This method is guaranteed to be called on main.
  */
-- (void)didExitHierarchy;
+- (void)didExitHierarchy NS_SWIFT_UI_ACTOR;
 
 @end

@@ -99,8 +99,8 @@ static inline PINRemoteImageManagerPriority PINRemoteImageManagerPriorityWithASI
       if ([diskCache respondsToSelector:@selector(setByteLimit:)]) {
         // Set a default byteLimit. PINCache recently implemented a 50MB default (PR #201).
         // Ensure that older versions of PINCache also have a byteLimit applied.
-        // NOTE: Using 20MB limit while large cache initialization is being optimized (Issue #144).
-        ((id <ASPINDiskCache>)diskCache).byteLimit = 20 * 1024 * 1024;
+        // NOTE: Matching PINCache defualt 50MB limit.
+        ((id <ASPINDiskCache>)diskCache).byteLimit = 50 * 1024 * 1024;
       }
     }
   });
@@ -212,7 +212,7 @@ static dispatch_once_t shared_init_predicate;
 }
 #endif
 
-- (id <ASImageContainerProtocol>)synchronouslyFetchedCachedImageWithURL:(NSURL *)URL;
+- (id <ASImageContainerProtocol>)synchronouslyFetchedCachedImageWithURL:(NSURL *)URL
 {
   PINRemoteImageManager *manager = [self sharedPINRemoteImageManager];
   PINRemoteImageManagerResult *result = [manager synchronousImageFromCacheWithURL:URL processorKey:nil options:PINRemoteImageManagerDownloadOptionsSkipDecode];
@@ -258,7 +258,7 @@ static dispatch_once_t shared_init_predicate;
                         shouldRetry:(BOOL)shouldRetry
                       callbackQueue:(dispatch_queue_t)callbackQueue
                    downloadProgress:(ASImageDownloaderProgress)downloadProgress
-                         completion:(ASImageDownloaderCompletion)completion;
+                         completion:(ASImageDownloaderCompletion)completion
 {
   return [self downloadImageWithURL:URL
                         shouldRetry:shouldRetry

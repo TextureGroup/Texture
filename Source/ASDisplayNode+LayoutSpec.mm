@@ -107,6 +107,27 @@
   }
   layout = [layout filteredNodeLayoutTree];
 
+  // Flip layout if layout should be rendered right-to-left
+  BOOL shouldRenderRTLLayout = [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:_semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+  if (shouldRenderRTLLayout) {
+      for (ASLayout *sublayout in layout.sublayouts) {
+          switch (_semanticContentAttribute) {
+              case UISemanticContentAttributeUnspecified:
+              case UISemanticContentAttributeForceRightToLeft: {
+                  // Flip
+                CGPoint flippedPosition = CGPointMake(layout.size.width - CGRectGetWidth(sublayout.frame) - sublayout.position.x, sublayout.position.y);
+                sublayout.position = flippedPosition;
+              }
+              case UISemanticContentAttributePlayback:
+              case UISemanticContentAttributeForceLeftToRight:
+              case UISemanticContentAttributeSpatial:
+                  // Don't flip
+                  break;
+          }
+      }
+  }
+
+
   return layout;
 }
 

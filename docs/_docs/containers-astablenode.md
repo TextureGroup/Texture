@@ -74,13 +74,13 @@ These two methods, need to return either an <a href = "cell-node.html">`ASCellNo
 
 Note that neither of these methods require a reuse mechanism.
 
-### Replacing UITableViewController with ASViewController
+### Replacing UITableViewController with ASDKViewController
 
-Texture does not offer an equivalent to `UITableViewController`. Instead, use an `ASViewController` initialized with an `ASTableNode`. 
+Texture does not offer an equivalent to `UITableViewController`. Instead, use an `ASDKViewController` initialized with an `ASTableNode`. 
 
-Consider, again, the `ASViewController` subclass - PhotoFeedNodeController - from the <a href="https://github.com/texturegroup/texture/tree/master/examples/ASDKgram">`ASDKgram sample app`</a> that uses a table node as its managed node.
+Consider, again, the `ASDKViewController` subclass - PhotoFeedNodeController - from the <a href="https://github.com/texturegroup/texture/tree/master/examples/ASDKgram">`ASDKgram sample app`</a> that uses a table node as its managed node.
 
-An `ASTableNode` is assigned to be managed by an `ASViewController` in its `-initWithNode:` designated initializer method. 
+An `ASTableNode` is assigned to be managed by an `ASDKViewController` in its `-initWithNode:` designated initializer method. 
 
 <div class = "highlight-group">
 <span class="language-toggle"><a data-lang="swift" class="swiftButton">Swift</a><a data-lang="objective-c" class = "active objcButton">Objective-C</a></span>

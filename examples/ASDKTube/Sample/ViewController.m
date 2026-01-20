@@ -73,7 +73,7 @@
   return cellNode;
 }
 
-- (ASVideoPlayerNode *)videoPlayerNode;
+- (ASVideoPlayerNode *)videoPlayerNode
 {
   if (_videoPlayerNode) {
     return _videoPlayerNode;

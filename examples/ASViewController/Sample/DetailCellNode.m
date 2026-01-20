@@ -50,7 +50,7 @@
 - (NSURL *)imageURL
 {
     CGSize imageSize = self.calculatedSize;
-    NSString *imageURLString = [NSString stringWithFormat:@"http://lorempixel.com/%ld/%ld/%@/%ld", (NSInteger)imageSize.width, (NSInteger)imageSize.height, self.imageCategory, self.row];
+    NSString *imageURLString = [NSString stringWithFormat:@"https://lorempixel.com/%ld/%ld/%@/%ld", (NSInteger)imageSize.width, (NSInteger)imageSize.height, self.imageCategory, self.row];
     return [NSURL URLWithString:imageURLString];
 }
 

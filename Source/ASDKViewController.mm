@@ -165,10 +165,6 @@
     [_node recursivelyEnsureDisplaySynchronously:YES];
   }
   [super viewDidLayoutSubviews];
-
-  if (!AS_AT_LEAST_IOS11) {
-    [self _updateNodeFallbackSafeArea];
-  }
 }
 
 - (void)_updateNodeFallbackSafeArea
@@ -286,21 +282,12 @@ ASVisibilityDepthImplementation;
 
 - (UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
-    return super.additionalSafeAreaInsets;
-  }
-
-  return _fallbackAdditionalSafeAreaInsets;
+  return super.additionalSafeAreaInsets;
 }
 
 - (void)setAdditionalSafeAreaInsets:(UIEdgeInsets)additionalSafeAreaInsets
 {
-  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
-    [super setAdditionalSafeAreaInsets:additionalSafeAreaInsets];
-  } else {
-    _fallbackAdditionalSafeAreaInsets = additionalSafeAreaInsets;
-    [self _updateNodeFallbackSafeArea];
-  }
+  [super setAdditionalSafeAreaInsets:additionalSafeAreaInsets];
 }
 
 #pragma mark - ASTraitEnvironment

@@ -27,7 +27,7 @@ By setting `.automaticallyManagesSubnodes` to `YES` on the `ASCellNode`, we _no 
 </span>
 <div class = "code">
 <pre lang="objc" class="objcCode">
-- (instancetype)initWithPhotoObject:(PhotoModel *)photo;
+- (instancetype)initWithPhotoObject:(PhotoModel *)photo
 {
   self = [super init];
   
@@ -103,7 +103,7 @@ class PhotoCellNode {
 </span>
 <div class = "code">
 <pre lang="objc" class="objcCode">
-- (instancetype)initWithPhotoObject:(PhotoModel *)photo;
+- (instancetype)initWithPhotoObject:(PhotoModel *)photo
 {
   self = [super init];
   

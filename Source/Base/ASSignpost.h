@@ -55,45 +55,25 @@ typedef NS_ENUM(uint32_t, ASSignpostName) {
 #if AS_HAS_OS_SIGNPOST
 
 #define ASSignpostStart(name, identifier, format, ...) ({\
-  if (AS_AVAILABLE_IOS_TVOS(12, 12)) { \
     unowned os_log_t log = ASPointsOfInterestLog(); \
     os_signpost_id_t spid = os_signpost_id_make_with_id(log, identifier); \
     os_signpost_interval_begin(log, spid, #name, format, ##__VA_ARGS__); \
-  } else if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
-    kdebug_signpost_start(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
-  } else { \
-    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_START, (uintptr_t)identifier, 0, 0, 0); \
-  } \
 })
 
 #define ASSignpostEnd(name, identifier, format, ...) ({\
-  if (AS_AVAILABLE_IOS_TVOS(12, 12)) { \
     unowned os_log_t log = ASPointsOfInterestLog(); \
     os_signpost_id_t spid = os_signpost_id_make_with_id(log, identifier); \
     os_signpost_interval_end(log, spid, #name, format, ##__VA_ARGS__); \
-  } else if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
-    kdebug_signpost_end(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
-  } else { \
-    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_END, (uintptr_t)identifier, 0, 0, 0); \
-  } \
 })
 
 #else // !AS_HAS_OS_SIGNPOST
 
 #define ASSignpostStart(name, identifier, format, ...) ({\
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
     kdebug_signpost_start(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
-  } else { \
-    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_START, (uintptr_t)identifier, 0, 0, 0); \
-  } \
 })
 
 #define ASSignpostEnd(name, identifier, format, ...) ({\
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) { \
     kdebug_signpost_end(ASSignpost##name, (uintptr_t)identifier, 0, 0, 0); \
-  } else { \
-    syscall(SYS_kdebug_trace, APPSDBG_CODE(DBG_MACH_CHUD, ASSignpost##name) | DBG_FUNC_END, (uintptr_t)identifier, 0, 0, 0); \
-  } \
 })
 
 #endif

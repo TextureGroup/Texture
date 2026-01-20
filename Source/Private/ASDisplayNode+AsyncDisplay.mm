@@ -485,7 +485,7 @@ using AS::MutexLocker;
   _willDisplayNodeContentWithRenderingContext = contextModifier;
 }
 
-- (void)setDidDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier;
+- (void)setDidDisplayNodeContentWithRenderingContext:(ASDisplayNodeContextModifier)contextModifier
 {
   MutexLocker l(__instanceLock__);
   _didDisplayNodeContentWithRenderingContext = contextModifier;

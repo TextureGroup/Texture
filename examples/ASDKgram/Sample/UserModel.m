@@ -65,7 +65,7 @@
   });
 }
 
-- (void)downloadCompleteUserDataWithCompletionBlock:(void(^)(UserModel *))block;
+- (void)downloadCompleteUserDataWithCompletionBlock:(void(^)(UserModel *))block
 {
   if (_fullUserInfoFetchDone) {
     NSAssert(!_fullUserInfoCompletionBlock, @"Should not have a waiting block at this point");

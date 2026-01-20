@@ -115,7 +115,7 @@ static NSCache *sharedRendererCache()
  we maintain a LRU renderer cache that is queried via a unique key based on text kit attributes and constrained size. 
  */
 
-static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, CGSize constrainedSize)
+static ASTextKitRenderer *_rendererForAttributes(ASTextKitAttributes attributes, CGSize constrainedSize)
 {
   NSCache *cache = sharedRendererCache();
   
@@ -128,6 +128,23 @@ static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, 
   }
   
   return renderer;
+}
+
+static AS::RecursiveMutex __sharedRendererCacheInstanceLock__;
+
+static ASTextKitRenderer *rendererForAttributes(ASTextKitAttributes attributes, CGSize constrainedSize)
+{
+  BOOL neverCache = ASActivateExperimentalFeature(ASExperimentalNoTextRendererCache);
+  if (neverCache) {
+    return [[ASTextKitRenderer alloc] initWithTextKitAttributes:attributes constrainedSize:constrainedSize];
+  }
+  
+  BOOL lockCache = ASActivateExperimentalFeature(ASExperimentalLockTextRendererCache);
+  if (lockCache) {
+    AS::MutexLocker l(__sharedRendererCacheInstanceLock__);
+    return _rendererForAttributes(attributes, constrainedSize);
+  }
+  return _rendererForAttributes(attributes, constrainedSize);
 }
 
 #pragma mark - ASTextNodeDrawParameter

@@ -327,11 +327,9 @@
   CFTimeInterval timeBetweenLastFire;
   if (self.lastDisplayLinkFire == 0) {
     timeBetweenLastFire = 0;
-  } else if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    timeBetweenLastFire = displayLink.targetTimestamp - displayLink.timestamp;
   } else {
-    timeBetweenLastFire = CACurrentMediaTime() - self.lastDisplayLinkFire;
-  }
+    timeBetweenLastFire = displayLink.targetTimestamp - displayLink.timestamp;
+  } 
   self.lastDisplayLinkFire = CACurrentMediaTime();
   
   _playHead += timeBetweenLastFire;

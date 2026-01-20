@@ -25,7 +25,7 @@ Here are the main directories within the repository:
   - [Private](https://github.com/TextureGroup/Texture/tree/master/Source/Private): Framework-private files that are not exposed to end users, including implementation details, private data structures and helpers.
   - [TextKit](https://github.com/TextureGroup/Texture/tree/master/Source/TextKit): All files related to TextKit that are used by ASTextNode.
   - [tvOS](https://github.com/TextureGroup/Texture/tree/master/Source/tvOS): tvOS support.
-  - All other files in the [Source](https://github.com/TextureGroup/Texture/tree/master/Source) directory: Main files, including important components such as nodes (e.g ASDisplayNode, ASButtonNode, ASImageNode, ASCollectionNode and ASTableNode), ASNavigationController, etc.
+  - All other files in the [Source](https://github.com/TextureGroup/Texture/tree/master/Source) directory: Main files, including important components such as nodes (e.g ASDisplayNode, ASButtonNode, ASImageNode, ASCollectionNode and ASTableNode), ASDKNavigationController, etc.
 - [Tests](https://github.com/TextureGroup/Texture/tree/master/Tests): The framework's test suite, including unit, integration and snapshot test cases.
 - [docs](https://github.com/TextureGroup/Texture/tree/master/docs): Texture documentation that powers [texturegroup.org](https://texturegroup.org/).
 - [examples](https://github.com/TextureGroup/Texture/tree/master/examples): Sample projects which demonstrate how to use various features of the framework.

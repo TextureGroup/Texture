@@ -31,7 +31,7 @@
   return [[self alloc] initWithRatio:ratio child:child];
 }
 
-- (instancetype)initWithRatio:(CGFloat)ratio child:(id<ASLayoutElement>)child;
+- (instancetype)initWithRatio:(CGFloat)ratio child:(id<ASLayoutElement>)child
 {
   if (!(self = [super init])) {
     return nil;

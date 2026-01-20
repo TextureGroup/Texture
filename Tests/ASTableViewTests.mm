@@ -118,6 +118,7 @@
 @interface ASTestTextCellNode : ASTextCellNode
 /** Calculated by counting how many times -layoutSpecThatFits: is called on the main thread. */
 @property (nonatomic) int numberOfLayoutsOnMainThread;
+@property (nonatomic) NSUInteger didEnterPreloadStateCount;
 @end
 
 @implementation ASTestTextCellNode
@@ -128,6 +129,12 @@
     _numberOfLayoutsOnMainThread++;
   }
   return [super layoutSpecThatFits:constrainedSize];
+}
+
+- (void)didEnterPreloadState
+{
+  [super didEnterPreloadState];
+  _didEnterPreloadStateCount++;
 }
 
 @end
@@ -232,6 +239,36 @@
 
 @end
 
+@interface ATableViewTestController: UIViewController
+
+@property (nonatomic) ASTableNode *tableNode;
+@property (nonatomic) ASTableViewFilledDataSource *dataSource;
+
+@end
+
+@implementation ATableViewTestController
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+    ASTableNode *tableNode = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+    tableNode.frame = CGRectMake(0, 0, 100, 500);
+
+    ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+
+    tableNode.delegate = dataSource;
+    tableNode.dataSource = dataSource;
+    
+    self.tableNode = tableNode;
+    self.dataSource = dataSource;
+
+    [self.view addSubview:self.tableNode.view];
+  }
+  return self;
+}
+
+@end
+
 @interface ASTableViewTests : ASTestCase
 @property (nonatomic, retain) ASTableView *testTableView;
 @end
@@ -242,7 +279,8 @@
 {
   [super setUp];
   ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline
+                              | ASExperimentalRangeUpdateOnChangesetUpdate;
   [ASConfigurationManager test_resetWithConfiguration:config];
 }
 
@@ -285,7 +323,7 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
         CGRect rect = [tableView rectForRowAtIndexPath:indexPath];
         XCTAssertEqual(rect.size.width, 100);  // specified width should be ignored for table
-        XCTAssertEqual(rect.size.height, 42 + separatorHeight);
+        XCTAssertTrue(abs(rect.size.height - (42 + separatorHeight)) < FLT_EPSILON);
       }
   }
 }
@@ -761,6 +799,93 @@
   [node performBatchAnimated:NO updates:nil completion:nil];
 }
 
+- (void)testItemsInsertedIntoThePreloadRangeGetPreloaded
+{
+  // Start table node setup
+  ATableViewTestController *testController = [[ATableViewTestController alloc] initWithNibName:nil bundle:nil];
+  ASTableNode *tableNode = testController.tableNode;
+  ASTableViewFilledDataSource *dataSource = testController.dataSource;
+
+  UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  window.rootViewController = testController;
+  [window makeKeyAndVisible];
+  
+  ASRangeTuningParameters minimumPreloadParams = { .leadingBufferScreenfuls = 1, .trailingBufferScreenfuls = 1 };
+  [tableNode setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [tableNode updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+  
+  [tableNode reloadData];
+  [tableNode waitUntilAllUpdatesAreProcessed];
+  [testController.tableNode.view layoutIfNeeded];
+  // End table node setup
+
+
+  NSIndexPath *lastVisibleIndex = [[tableNode indexPathsForVisibleRows] sortedArrayUsingSelector:@selector(compare:)].lastObject;
+  
+  NSInteger itemCount = dataSource.rowsPerSection;
+  BOOL isLastItemInSection = lastVisibleIndex.row == itemCount - 1;
+  NSInteger nextItemSection = isLastItemInSection ? lastVisibleIndex.section + 1 : lastVisibleIndex.section;
+  NSInteger nextItemRow = isLastItemInSection ? 0 : lastVisibleIndex.row + 1;
+  
+  XCTAssertTrue(dataSource.numberOfSections > nextItemSection, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  XCTAssertTrue(dataSource.rowsPerSection > nextItemRow, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  
+  NSIndexPath *nextItemIndexPath = [NSIndexPath indexPathForRow:nextItemRow inSection:nextItemSection];
+  ASTestTextCellNode *nodeBeforeUpdate = (ASTestTextCellNode *)[tableNode nodeForRowAtIndexPath:nextItemIndexPath];
+
+  XCTestExpectation *noChangeDone = [self expectationWithDescription:@"Batch update with no changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  __block ASTestTextCellNode *nodeAfterUpdate;
+  [tableNode performBatchUpdates:^{
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTestTextCellNode *)[tableNode nodeForRowAtIndexPath:nextItemIndexPath];
+    [noChangeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ noChangeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate == nodeAfterUpdate, @"Node should not have changed since no updates were made.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"Node should have been preloaded.");
+
+  XCTestExpectation *changeDone = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  [tableNode performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [tableNode deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+    [tableNode insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTestTextCellNode *)[tableNode nodeForRowAtIndexPath:nextItemIndexPath];
+    [changeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdate, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"New node should have been preloaded.");
+  
+  minimumPreloadParams = { .leadingBufferScreenfuls = 0, .trailingBufferScreenfuls = 0 };
+  [tableNode setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [tableNode updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+
+  XCTestExpectation *changeDoneZeroSreenfuls = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 0 screenful."];
+  
+  nodeBeforeUpdate = nodeAfterUpdate;
+  __block ASTestTextCellNode *nodeAfterUpdateZeroSreenfuls;
+  [tableNode performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [tableNode deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+    [tableNode insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdateZeroSreenfuls = (ASTestTextCellNode *)[tableNode nodeForRowAtIndexPath:nextItemIndexPath];
+    [changeDoneZeroSreenfuls fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDoneZeroSreenfuls ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdateZeroSreenfuls, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdateZeroSreenfuls.didEnterPreloadStateCount == 0, @"New node should NOT have been preloaded.");
+}
+
 // https://github.com/facebook/AsyncDisplayKit/issues/2252#issuecomment-263689979
 - (void)testIssue2252
 {
@@ -922,6 +1047,59 @@
   UITableViewCell *uikitCell = [tableView cellForRowAtIndexPath:indexPath];
   BOOL areColorsEqual = CGColorEqualToColor(uikitCell.tintColor.CGColor, UIColor.yellowColor.CGColor);
   XCTAssertTrue(areColorsEqual);
+}
+
+- (void)testAllPendingStatePropertiesTransferredToView {
+  // Create node without loading view
+  ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+  
+  XCTAssertFalse(node.isNodeLoaded, @"View should not be loaded before setting properties");
+  
+  // Set pending state properties before view loads
+  node.leadingScreensForBatching = 3.6;
+  node.inverted = YES;
+  node.allowsSelectionDuringEditing = YES;
+  node.allowsMultipleSelection = YES;
+  node.allowsMultipleSelectionDuringEditing = YES;
+  node.pagingEnabled = YES;
+  node.automaticallyAdjustsContentOffset = NO;
+  UIEdgeInsets testInsets = UIEdgeInsetsMake(10, 20, 30, 40);
+  node.contentInset = testInsets;
+  CGPoint testOffset = CGPointMake(50, 60);
+  node.contentOffset = testOffset;
+  ASTableViewFilledDelegate *delegate = [ASTableViewFilledDelegate new];
+  node.delegate = delegate;
+  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+  node.dataSource = dataSource;
+  
+  // Load the view (triggers pending state transfer)
+  ASTableView *view = node.view;
+  
+  XCTAssertTrue(node.isNodeLoaded, @"View should be loaded after accessing node.view");
+  
+  // Verify properties were transferred correctly
+  XCTAssertEqual(view.leadingScreensForBatching, 3.6,
+                 @"leadingScreensForBatching should transfer from pending state");
+  XCTAssertEqual(view.inverted, YES, 
+                 @"inverted should transfer from pending state");
+  XCTAssertEqual(view.allowsSelectionDuringEditing, YES,
+                 @"allowsSelectionDuringEditing should transfer from pending state");
+  XCTAssertEqual(view.allowsMultipleSelection, YES, 
+                 @"allowsMultipleSelection should transfer from pending state");
+  XCTAssertEqual(view.allowsMultipleSelectionDuringEditing, YES, 
+                 @"allowsMultipleSelectionDuringEditing should transfer from pending state");
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(view.contentInset, testInsets), 
+                @"contentInset should transfer from pending state");
+  XCTAssertTrue(CGPointEqualToPoint(view.contentOffset, testOffset), 
+                @"contentOffset should transfer from pending state");
+  XCTAssertEqual(view.automaticallyAdjustsContentOffset, NO, 
+                 @"automaticallyAdjustsContentOffset should transfer from pending state");
+  XCTAssertEqual(view.pagingEnabled, YES, 
+                 @"pagingEnabled should transfer from pending state");
+  XCTAssertEqual(view.asyncDelegate, delegate,
+                 @"delegate should transfer from pending state");
+  XCTAssertEqual(view.asyncDataSource, dataSource,
+                 @"dataSource should transfer from pending state");
 }
 
 @end

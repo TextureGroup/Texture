@@ -11,7 +11,6 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
-#if AS_AT_LEAST_IOS13
 static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   CGRect rect = CGRect{.origin = CGPointZero, .size = size};
   UIGraphicsBeginImageContextWithOptions(size, false, 0);
@@ -21,7 +20,6 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   UIGraphicsEndImageContext();
   return image;
 }
-#endif
 
 @interface ASImageNodeSnapshotTests : ASSnapshotTestCase
 @end
@@ -238,10 +236,8 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
   ASSnapshotVerifyNode(imageNode, nil);
 }
 
-#if AS_AT_LEAST_IOS13
 - (void)testDynamicAssetImage
 {
-  if (@available(iOS 13.0, *)) {
     UIImage *image = [UIImage imageNamed:@"light-dark" inBundle:[NSBundle bundleForClass:[self class]] compatibleWithTraitCollection:nil];
     ASImageNode *node = [[ASImageNode alloc] init];
     node.image = image;
@@ -254,12 +250,10 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
-  }
 }
 
 - (void)testDynamicTintColor
 {
-  if (@available(iOS 13.0, *)) {
     UIImage *image = makeImageWithColor(UIColor.redColor, CGSize{.width =  100, .height = 100});
     image = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     UIColor* tintColor = UIColor.systemBackgroundColor;
@@ -277,7 +271,5 @@ static UIImage* makeImageWithColor(UIColor *color, CGSize size) {
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
-  }
 }
-#endif // #if AS_AT_LEAST_IOS13
 @end

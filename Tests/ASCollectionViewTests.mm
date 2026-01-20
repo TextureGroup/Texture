@@ -24,6 +24,7 @@
 
 @property (nonatomic) NSUInteger setSelectedCounter;
 @property (nonatomic) NSUInteger applyLayoutAttributesCount;
+@property (nonatomic) NSUInteger didEnterPreloadStateCount;
 
 @end
 
@@ -38,6 +39,12 @@
 - (void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
   _applyLayoutAttributesCount++;
+}
+
+- (void)didEnterPreloadState
+{
+  [super didEnterPreloadState];
+  _didEnterPreloadStateCount++;
 }
 
 @end
@@ -177,7 +184,8 @@
 {
   [super setUp];
   ASConfiguration *config = [ASConfiguration new];
-  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline;
+  config.experimentalFeatures = ASExperimentalOptimizeDataControllerPipeline
+                              | ASExperimentalRangeUpdateOnChangesetUpdate;
   [ASConfigurationManager test_resetWithConfiguration:config];
 }
 
@@ -518,6 +526,81 @@
   } completion:nil]);
 }
 
+- (void)testItemsInsertedIntoThePreloadRangeGetPreloaded
+{
+  updateValidationTestPrologue
+  
+  ASRangeTuningParameters minimumPreloadParams = { .leadingBufferScreenfuls = 1, .trailingBufferScreenfuls = 1 };
+  [cn setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [cn updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+
+  __weak ASCollectionViewTestController *weakController = testController;
+  NSIndexPath *lastVisibleIndex = [cv indexPathsForVisibleItems].lastObject;
+  
+  NSInteger itemCount = weakController.asyncDelegate->_itemCounts[lastVisibleIndex.section];
+  BOOL isLastItemInSection = lastVisibleIndex.row == itemCount - 1;
+  NSInteger nextItemSection = isLastItemInSection ? lastVisibleIndex.section + 1 : lastVisibleIndex.section;
+  NSInteger nextItemRow = isLastItemInSection ? 0 : lastVisibleIndex.row + 1;
+  
+  XCTAssertTrue(weakController.asyncDelegate->_itemCounts.size() > nextItemSection, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  XCTAssertTrue(weakController.asyncDelegate->_itemCounts[nextItemSection] > nextItemRow, @"There is no items after the last visible item. Update the section/row counts so that there is one for this test to work properly.");
+  
+  NSIndexPath *nextItemIndexPath = [NSIndexPath indexPathForRow:nextItemRow inSection:nextItemSection];
+  ASTextCellNodeWithSetSelectedCounter *nodeBeforeUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+
+  XCTestExpectation *noChangeDone = [self expectationWithDescription:@"Batch update with no changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  __block ASTextCellNodeWithSetSelectedCounter *nodeAfterUpdate;
+  [cv performBatchUpdates:^{
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [noChangeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ noChangeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate == nodeAfterUpdate, @"Node should not have changed since no updates were made.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"Node should have been preloaded.");
+
+  XCTestExpectation *changeDone = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 1 screenful."];
+  
+  [cv performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [cv deleteItemsAtIndexPaths:indexPaths];
+    [cv insertItemsAtIndexPaths:indexPaths];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdate = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [changeDone fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDone ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdate, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdate.didEnterPreloadStateCount == 1, @"New node should have been preloaded.");
+  
+  minimumPreloadParams = { .leadingBufferScreenfuls = 0, .trailingBufferScreenfuls = 0 };
+  [cn setTuningParameters:minimumPreloadParams forRangeMode:ASLayoutRangeModeMinimum rangeType:ASLayoutRangeTypePreload];
+  [cn updateCurrentRangeWithMode:ASLayoutRangeModeMinimum];
+
+  XCTestExpectation *changeDoneZeroSreenfuls = [self expectationWithDescription:@"Batch update with changes done and completion block has been called. Tuning params set to 0 screenful."];
+  
+  nodeBeforeUpdate = nodeAfterUpdate;
+  __block ASTextCellNodeWithSetSelectedCounter *nodeAfterUpdateZeroSreenfuls;
+  [cv performBatchUpdates:^{
+    NSArray *indexPaths = @[ nextItemIndexPath ];
+    [cv deleteItemsAtIndexPaths:indexPaths];
+    [cv insertItemsAtIndexPaths:indexPaths];
+  } completion:^(BOOL finished) {
+    nodeAfterUpdateZeroSreenfuls = (ASTextCellNodeWithSetSelectedCounter *)[cv nodeForItemAtIndexPath:nextItemIndexPath];
+    [changeDoneZeroSreenfuls fulfill];
+  }];
+  
+  [self waitForExpectations:@[ changeDoneZeroSreenfuls ] timeout:1];
+  
+  XCTAssertTrue(nodeBeforeUpdate != nodeAfterUpdateZeroSreenfuls, @"Node should have changed after updating.");
+  XCTAssertTrue(nodeAfterUpdateZeroSreenfuls.didEnterPreloadStateCount == 0, @"New node should NOT have been preloaded.");
+}
+
 - (void)testCellNodeLayoutAttributes
 {
   updateValidationTestPrologue
@@ -673,8 +756,7 @@
   }] andForwardToRealObject] prepareLayout];
 
   // Rotate the device
-  UIDeviceOrientation oldDeviceOrientation = [[UIDevice currentDevice] orientation];
-  [[UIDevice currentDevice] setValue:@(UIDeviceOrientationLandscapeLeft) forKey:@"orientation"];
+  testController.view.frame = CGRectMake(0, 0, testController.view.frame.size.height, testController.view.frame.size.width);
 
   CGSize finalItemSize = [cv nodeForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].calculatedSize;
   CGSize finalCVSize = cv.bounds.size;
@@ -685,8 +767,6 @@
   [collectionViewLayoutMock verify];
 
   // Teardown
-  [[UIDevice currentDevice] setValue:@(oldDeviceOrientation) forKey:@"orientation"];
-
   [collectionViewLayoutMock stopMocking];
 }
 
@@ -1217,6 +1297,65 @@
     XCTAssert(node.inDisplayState || !node.nodeLoaded, @"Only nodes in the display range should be loaded.");
   }
 
+}
+
+- (void)testAllPendingStatePropertiesTransferredToView {
+  // Create node without loading view
+  UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+  ASCollectionNode *node = [[ASCollectionNode alloc] initWithFrame:CGRectZero 
+                                             collectionViewLayout:layout];
+  
+  XCTAssertFalse(node.isNodeLoaded, @"View should not be loaded before setting properties");
+  
+  // Set pending state properties before view loads
+  node.leadingScreensForBatching = 3.6;
+  node.inverted = YES;
+  node.allowsMultipleSelection = YES;
+  node.alwaysBounceVertical = YES;
+  node.alwaysBounceHorizontal = YES;
+  node.pagingEnabled = YES;
+  node.showsVerticalScrollIndicator = NO;
+  node.showsHorizontalScrollIndicator = NO;
+  UIEdgeInsets testInsets = UIEdgeInsetsMake(10, 20, 30, 40);
+  node.contentInset = testInsets;
+  CGPoint testOffset = CGPointMake(50, 60);
+  node.contentOffset = testOffset;
+  ASCollectionViewTestDelegate *delegate = [[ASCollectionViewTestDelegate alloc] initWithNumberOfSections:10 numberOfItemsInSection:10];
+  node.delegate = delegate;
+  ASCollectionViewTestDelegate *dataSource = [[ASCollectionViewTestDelegate alloc] initWithNumberOfSections:20 numberOfItemsInSection:20];
+  node.dataSource = dataSource;
+
+  
+  // Load the view (triggers pending state transfer)
+  ASCollectionView *view = node.view;
+  
+  XCTAssertTrue(node.isNodeLoaded, @"View should be loaded after accessing node.view");
+  
+  // Verify properties were transferred correctly
+  XCTAssertEqual(view.leadingScreensForBatching, 3.6, 
+                 @"leadingScreensForBatching should transfer from pending state");
+  XCTAssertEqual(view.inverted, YES, 
+                 @"inverted should transfer from pending state");
+  XCTAssertEqual(view.allowsMultipleSelection, YES,
+                 @"allowsMultipleSelection should transfer from pending state");
+  XCTAssertEqual(view.alwaysBounceVertical, YES, 
+                 @"alwaysBounceVertical should transfer from pending state");
+  XCTAssertEqual(view.alwaysBounceHorizontal, YES, 
+                 @"alwaysBounceHorizontal should transfer from pending state");
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(view.contentInset, testInsets), 
+                @"contentInset should transfer from pending state");
+  XCTAssertTrue(CGPointEqualToPoint(view.contentOffset, testOffset), 
+                @"contentOffset should transfer from pending state");
+  XCTAssertEqual(view.showsVerticalScrollIndicator, NO, 
+                 @"showsVerticalScrollIndicator should transfer from pending state");
+  XCTAssertEqual(view.showsHorizontalScrollIndicator, NO, 
+                 @"showsHorizontalScrollIndicator should transfer from pending state");
+  XCTAssertEqual(view.pagingEnabled, YES, 
+                 @"pagingEnabled should transfer from pending state");
+  XCTAssertEqual(view.asyncDelegate, delegate,
+                 @"delegate should transfer from pending state");
+  XCTAssertEqual(view.asyncDataSource, dataSource,
+                 @"dataSource should transfer from pending state");
 }
 
 @end
