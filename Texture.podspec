@@ -22,26 +22,17 @@ Pod::Spec.new do |spec|
     core.tvos.deployment_target = tvos_deployment_target
     core.compiler_flags = '-fno-exceptions'
     core.public_header_files = [
-      'Source/*.h',
-      'Source/Details/**/*.h',
-      'Source/Layout/**/*.h',
-      'Source/Base/*.h',
-      'Source/Debug/**/*.h',
-      'Source/Private/ASCollectionView+Undeprecated.h',
-      'Source/TextKit/ASTextNodeTypes.h',
-      'Source/TextKit/ASTextKitComponents.h',
-      'Source/TextExperiment/Component/*.h',
-      'Source/TextExperiment/String/ASTextAttribute.h',
+      'Source/Texture/include/*.h'
     ]
 
     core.source_files = [
-      'Source/**/*.{h,mm}',
+      'Source/Texture/**/*.{h,mm}',
 
       # Most TextKit components are not public because the C++ content
       # in the headers will cause build errors when using
       # `use_frameworks!` on 0.39.0 & Swift 2.1.
       # See https://github.com/facebook/AsyncDisplayKit/issues/1153
-      'Source/TextKit/*.h',
+      'Source/Texture/TextKit/*.h',
     ]
   end
 
@@ -56,15 +47,15 @@ Pod::Spec.new do |spec|
   spec.subspec 'IGListKit' do |igl|
     igl.ios.deployment_target = ios_deployment_target
     igl.tvos.deployment_target = tvos_deployment_target
-    igl.dependency 'IGListKit', '~> 4.0'
-    igl.dependency 'IGListDiffKit', '~> 4.0'
+    igl.dependency 'IGListKit', '~> 5.0'
+    igl.dependency 'IGListDiffKit', '~> 5.0'
     igl.dependency 'Texture/Core'
   end
 
   spec.subspec 'Yoga' do |yoga|
     yoga.ios.deployment_target = ios_deployment_target
     yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
-    yoga.dependency 'Yoga', '~> 2.0'
+    yoga.dependency 'Yoga', '~> 3.1'
     yoga.dependency 'Texture/Core'
   end
 

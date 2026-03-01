@@ -30,3 +30,12 @@ playground.xcworkspace
 # Carthage
 Carthage/Checkouts
 Carthage/Build
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# Examples 
+examples/**/Podfile.lock
+examples_extra/**/Podfile.lock

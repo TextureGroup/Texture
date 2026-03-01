@@ -9,8 +9,8 @@
 # echo ************* diagnostics end
 
 # run this on a 2x device until we've updated snapshot images to 3x
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=18.5,name=iPhone SE (3rd generation)}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator18.5}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,name=iPhone 17}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
@@ -79,6 +79,37 @@ function cleanup {
     # remove all Pods directories
     find . -name Pods -type d -exec rm -rf {} +
     find . -name Podfile.lock -type f -delete
+}
+
+# Build an SPM smoke test — works for both .xcodeproj and Package.swift directories.
+# For .xcodeproj dirs: uses -project <path> with the given scheme name.
+# For Package.swift dirs: xcodebuild must run from within the package directory,
+# and auto-generates schemes as "<Name>-Package".
+function build_spm_package {
+    package_path="$1"
+    scheme="$2"
+
+    echo "Building SPM package: $package_path (scheme: $scheme)"
+
+    xcodeproj=$(find "${package_path}" -maxdepth 1 -name "*.xcodeproj" -type d 2>/dev/null | head -1)
+    if [ -n "$xcodeproj" ]; then
+        set -o pipefail && xcodebuild \
+            -project "$xcodeproj" \
+            -scheme "$scheme" \
+            -sdk "$SDK" \
+            -destination "$PLATFORM" \
+            build
+    else
+        # Run in a subshell so the cd is scoped and the trap still fires on failure.
+        (
+            cd "$package_path"
+            set -o pipefail && xcodebuild \
+                -scheme "${scheme}-Package" \
+                -sdk "$SDK" \
+                -destination "$PLATFORM" \
+                build
+        )
+    fi
 }
 
 MODE="$1"
@@ -228,6 +259,16 @@ framework|all)
         -sdk "$SDK" \
         -destination "$PLATFORM" \
         build
+    success="1"
+    ;;
+
+spm-smoke-tests|all)
+    echo "Verifying that all SPM smoke tests compile."
+
+    build_spm_package "smoke-tests/SwiftPackageManagerIntegration" "SwiftPackageManagerIntegration"
+    build_spm_package "smoke-tests/YogaIntegration" "YogaIntegration"
+    build_spm_package "smoke-tests/IGListKitIntegration" "IGListKitIntegration"
+
     success="1"
     ;;
 

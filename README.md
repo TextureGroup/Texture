@@ -10,11 +10,52 @@
 
 [![Version](https://img.shields.io/cocoapods/v/Texture.svg)](http://cocoapods.org/pods/Texture)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-59C939.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 [![License](https://img.shields.io/cocoapods/l/Texture.svg)](https://github.com/texturegroup/texture/blob/master/LICENSE)
 
 ## Installation
 
-Texture is available via CocoaPods or Carthage. See our [Installation](http://texturegroup.org/docs/installation.html) guide for instructions.
+Texture is available via CocoaPods, Carthage, or Swift Package Manager. See our [Installation](http://texturegroup.org/docs/installation.html) guide for instructions.
+
+### Swift Package Manager
+
+Add Texture to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/texturegroup/texture.git", from: "3.0.0")
+]
+```
+
+Then add `AsyncDisplayKit` as a dependency of your target:
+
+```swift
+.target(
+    name: "MyApp",
+    dependencies: [
+        .product(name: "AsyncDisplayKit", package: "texture")
+    ]
+)
+```
+
+#### Optional traits
+
+Texture supports SPM traits to opt into optional integrations:
+
+| Trait | Description |
+|-------|-------------|
+| `IGListKit` | Enables [IGListKit](https://github.com/Instagram/IGListKit) integration (`AS_IG_LIST_KIT`) |
+| `Yoga` | Enables [Yoga](https://github.com/facebook/yoga) layout engine support |
+
+Enable traits in your dependency declaration:
+
+```swift
+.package(
+    url: "https://github.com/texturegroup/texture.git",
+    from: "3.0.0",
+    traits: ["IGListKit", "Yoga"]
+)
+```
 
 ## Performance Gains
 
