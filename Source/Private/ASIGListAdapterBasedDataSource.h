@@ -24,6 +24,6 @@ AS_SUBCLASSING_RESTRICTED
 
 @end
 
-#endif
-
 NS_ASSUME_NONNULL_END
+
+#endif

@@ -10,11 +10,129 @@
 
 [![Version](https://img.shields.io/cocoapods/v/Texture.svg)](http://cocoapods.org/pods/Texture)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-59C939.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 [![License](https://img.shields.io/cocoapods/l/Texture.svg)](https://github.com/texturegroup/texture/blob/master/LICENSE)
 
 ## Installation
 
-Texture is available via CocoaPods or Carthage. See our [Installation](http://texturegroup.org/docs/installation.html) guide for instructions.
+Texture is available via CocoaPods, Carthage, or Swift Package Manager. See our [Installation](http://texturegroup.org/docs/installation.html) guide for instructions.
+
+### Swift Package Manager
+
+Texture supports Swift Package Manager with Package Traits for modular feature integration.
+
+#### Basic Usage (AsyncDisplayKit only)
+
+Most users just need the core AsyncDisplayKit functionality:
+
+```swift
+// In your Package.swift
+dependencies: [
+    .package(url: "https://github.com/TextureGroup/Texture.git", from: "3.3.0")
+],
+targets: [
+    .target(
+        name: "YourApp",
+        dependencies: [
+            .product(name: "AsyncDisplayKit", package: "Texture")
+        ]
+    )
+]
+```
+
+**Default Features (included automatically):**
+- Core AsyncDisplayKit (ASDisplayNode, ASImageNode, ASTextNode2, ASButtonNode, etc.)
+- PINRemoteImage integration (ASPINRemoteImageDownloader)
+- Collection views (ASCollectionNode, ASTableNode)
+- Layout specs (ASStackLayoutSpec, ASInsetLayoutSpec, etc.)
+- TextNode2 (modern text rendering, replaces legacy TextNode)
+
+**Optional Features (enable via traits):**
+- IGListKit integration (advanced collection views with modern Swift API)
+
+**⚠️ SPM Limitations:**
+Video (ASVideoNode), MapKit (ASMapNode), and Photos features are **not available** via Swift Package Manager due to technical limitations. These Objective-C classes are wrapped in conditional compilation directives (`#if AS_USE_VIDEO`) which prevents them from being exported in the Swift module interface.
+
+**If you need Video/MapKit/Photos features:**
+- Use **CocoaPods** or **Carthage** (full feature support)
+- Or use these features from **Objective-C code** (.m files)
+
+**Future directions:** We're exploring solutions like Swift wrapper modules (TextureVideoExtensions, TextureMapKitExtensions) to provide Swift API for these features via SPM.
+
+#### Advanced Usage: IGListKit Integration
+
+For advanced collection view support with IGListKit, you need **both steps**:
+
+1. **Enable the IGListKit trait** on the package dependency
+2. **Add the TextureIGListKitExtensions product** to your target
+
+```swift
+// In your Package.swift
+dependencies: [
+    .package(
+        url: "https://github.com/TextureGroup/Texture.git",
+        from: "3.3.0",
+        traits: [.init(name: "IGListKit")]  // Step 1: Enable trait
+    )
+],
+targets: [
+    .target(
+        name: "YourApp",
+        dependencies: [
+            .product(name: "AsyncDisplayKit", package: "Texture"),
+            .product(name: "TextureIGListKitExtensions", package: "Texture")  // Step 2: Add product
+        ]
+    )
+]
+```
+
+**Why both steps?** Due to Swift Package Manager limitations, traits apply to the entire package, not individual products. This means you must explicitly enable the IGListKit trait AND add the product dependency. See [Issue #8350](https://github.com/swiftlang/swift-package-manager/issues/8350) for details.
+
+**⚠️ Important Notes:**
+- **SPM uses IGListKit 5.0+** (breaking changes from 4.x used in CocoaPods/Carthage)
+- **Not a drop-in replacement** - migration and testing required
+- **No Carthage/CocoaPods support planned** - we recommend migrating to SPM
+- Provides Swift API: `ListAdapter.setCollectionNode(_:)` (replaces Objective-C `setASDKCollectionNode:`)
+
+📖 **[Read the full IGListKit migration guide →](Sources/TextureIGListKitExtensions/README.md)**
+
+#### Migrating from CocoaPods to SPM
+
+If you're migrating from CocoaPods, here's how the subspecs map to SPM features:
+
+| Feature | CocoaPods | SPM | Notes |
+|---------|-----------|-----|-------|
+| **Core** | `pod 'Texture'` (default) | `.product(name: "AsyncDisplayKit", ...)` | ✅ Always included |
+| **PINRemoteImage** | Included by default | Always included | ✅ Same behavior |
+| **Video** | Included by default | **Not available** | ❌ SPM limitation (see above) |
+| **MapKit** | Included by default | **Not available** | ❌ SPM limitation (see above) |
+| **Photos** | Included by default | **Not available** | ❌ SPM limitation (see above) |
+| **AssetsLibrary** | Included by default | **Removed** | ❌ Deprecated iOS 9.0, use Photos |
+| **IGListKit** | `pod 'Texture/IGListKit'` | Optional trait + product | ⚠️ Uses IGListKit 5.0+ |
+| **TextNode2** | `pod 'Texture/TextNode2'` | Enabled by default | ✅ Modern TextNode used |
+| **Yoga** | `pod 'Texture/Yoga'` | Not supported | Add as separate dependency |
+
+**Key differences:**
+- **TextNode2 is default**: SPM uses the modern TextNode implementation automatically (no legacy TextNode)
+- ❌ **Video/MapKit/Photos not available**: Due to Swift Package Manager limitations with conditionally compiled Objective-C classes
+- ❌ **AssetsLibrary removed**: Deprecated in iOS 9.0, use Photos framework instead
+- ⚠️ **IGListKit version**: SPM uses IGListKit 5.0+ instead of 4.x (breaking changes)
+- ℹ️ **Yoga**: Not integrated in SPM - add Yoga as a separate dependency if needed
+
+#### Note for Contributors
+
+When adding or removing source files in the `Source/` directory, you must regenerate the SPM symlink structure:
+
+```bash
+# Regenerate SPM layout
+swift scripts/generate_spm_sources_layout.swift
+
+# Commit the generated changes
+git add spm/Sources
+git commit -m "Update SPM layout for new/removed files"
+```
+
+**Important:** Always commit the generated `spm/Sources` directory changes along with your source file changes. This ensures SPM users can build the project correctly.
 
 ## Performance Gains
 

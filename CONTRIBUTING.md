@@ -80,6 +80,20 @@ Before submitting a pull request, please make sure the following is done…
 5. Ensure tests pass CI on GitHub for your Pull Request.
 6. If you haven't already, sign the CLA.
 
+## Swift Package Manager (SPM) Contributions
+
+If your changes add, remove, or move source files in the `Source/` directory, you **must** regenerate the SPM symlink structure:
+
+```bash
+# Regenerate SPM layout
+swift scripts/generate_spm_sources_layout.swift
+
+# Commit the generated changes
+git add spm/Sources
+```
+
+**Important:** Always include the generated `spm/Sources` directory changes in your pull request. The CI will fail if the SPM layout is out of sync with the source files. Our build script automatically verifies this by cleaning and regenerating the layout during testing.
+
 **Copyright Notice for files**
 Copy and paste this to the top of your new file(s):
 ```objc
