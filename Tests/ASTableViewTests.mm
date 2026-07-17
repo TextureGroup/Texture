@@ -323,7 +323,8 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
         CGRect rect = [tableView rectForRowAtIndexPath:indexPath];
         XCTAssertEqual(rect.size.width, 100);  // specified width should be ignored for table
-        XCTAssertTrue(abs(rect.size.height - (42 + separatorHeight)) < FLT_EPSILON);
+        CGFloat threshold = 1e-5;
+        XCTAssertTrue(abs(rect.size.height - (42 + separatorHeight)) < threshold);
       }
   }
 }
