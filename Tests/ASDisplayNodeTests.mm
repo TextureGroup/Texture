@@ -2111,8 +2111,8 @@ static bool stringContainsPointer(NSString *description, id p) {
   NSString *viewDescription = [parent.view valueForKey:@"recursiveDescription"];
 
   // Make sure string contains a, b, and c's pointer string
-  XCTAssertTrue(stringContainsPointer(viewDescription, a), @"Layer backed node not present");
-  XCTAssertTrue(stringContainsPointer(viewDescription, b), @"Layer-backed node not present");
+  XCTAssertTrue(stringContainsPointer(viewDescription, a.layer), @"Layer backed node not present");
+  XCTAssertTrue(stringContainsPointer(viewDescription, b.layer), @"Layer-backed node not present");
   XCTAssertTrue(stringContainsPointer(viewDescription, c), @"View-backed node not present");
 
   // Make sure layer names have display node in description
