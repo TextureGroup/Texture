@@ -9,8 +9,8 @@
 # echo ************* diagnostics end
 
 # run this on a 2x device until we've updated snapshot images to 3x
-PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=18.5,name=iPhone SE (3rd generation)}"
-SDK="${TEXTURE_BUILD_SDK:-iphonesimulator18.5}"
+PLATFORM="${TEXTURE_BUILD_PLATFORM:-platform=iOS Simulator,OS=26.5,name=iPhone 17}"
+SDK="${TEXTURE_BUILD_SDK:-iphonesimulator26.5}"
 DERIVED_DATA_PATH="~/ASDKDerivedData"
 
 # It is pitch black.
