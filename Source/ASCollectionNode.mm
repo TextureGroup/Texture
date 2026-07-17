@@ -967,6 +967,11 @@
   return [self.dataController.pendingMap contextForSection:section];
 }
 
+- (void)forceCheckForBatchFetching
+{
+  [self.view forceCheckForBatchFetching];
+}
+
 #pragma mark - Editing
 
 - (void)registerSupplementaryNodeOfKind:(NSString *)elementKind

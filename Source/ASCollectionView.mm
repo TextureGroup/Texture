@@ -1861,6 +1861,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   });
 }
 
+- (void)forceCheckForBatchFetching
+{
+  [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset velocity:CGPointZero];
+}
+
 - (void)_checkForBatchFetching
 {
   // Dragging will be handled in scrollViewWillEndDragging:withVelocity:targetContentOffset:

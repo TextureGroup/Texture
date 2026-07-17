@@ -81,6 +81,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable id<ASSectionContext>)contextForSection:(NSInteger)section AS_WARN_UNUSED_RESULT NS_SWIFT_UI_ACTOR;
 
+/**
+ Force a check for batch fetching. Ignores if the user is scrolling.
+ */
+- (void)forceCheckForBatchFetching;
+
 @end
 
 @interface ASCollectionView (Deprecated)
