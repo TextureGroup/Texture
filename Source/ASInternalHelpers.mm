@@ -65,7 +65,7 @@ void ASInitializeFrameworkMainThreadOnConstructor(void)
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDisplayNodeCAssertMainThread();
+    ASDisplayNodeCAssert([NSThread isMainThread], @"This method must be called on the main/preview-host thread");
     ASNotifyInitialized();
 #if AS_SIGNPOST_ENABLE
     _ASInitializeSignpostObservers();
@@ -77,7 +77,7 @@ void ASInitializeFrameworkMainThreadOnDestructor(void)
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    ASDisplayNodeCAssertMainThread();
+    ASDisplayNodeCAssert([NSThread isMainThread], @"This method must be called on the main/preview-host thread");
     // Ensure these values are cached on the main thread before needed in the background.
     if (ASActivateExperimentalFeature(ASExperimentalLayerDefaults)) {
       // Nop. We will gather default values on-demand in ASDefaultAllowsGroupOpacity and ASDefaultAllowsEdgeAntialiasing
