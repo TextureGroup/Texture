@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>منصة محترفين وسوق - صفحة واحدة</title>
+<style>
+  :root{
+    --bg:#f5f8fb; --card:#fff; --accent:#0b74d1; --accent-2:#2ea44f; --muted:#6b7280;
+  }
+  *{box-sizing:border-box;font-family: "Segoe UI", Tahoma, Arial, sans-serif}
+  body{margin:0;background:var(--bg);color:#072033;direction:rtl}
+  header{background:#fff;border-bottom:1px solid #e6eef6;padding:14px 18px;position:sticky;top:0;z-index:20}
+  header .wrap{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:18px;margin:0}
+  nav ul{display:flex;gap:10px;list-style:none;padding:0;margin:0}
+  nav a{color:var(--accent);text-decoration:none;font-weight:700;padding:6px 8px;border-radius:8px}
+  nav a:hover{background:rgba(11,116,209,0.06)}
+  main{max-width:1100px;margin:20px auto;padding:0 12px;display:flex;flex-direction:column;gap:20px}
+  .panel{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(10,30,60,0.04)}
+  /* search & results */
+  .search-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .search-row input[type="search"]{flex:1;padding:10px;border-radius:10px;border:1px solid #e6edf3}
+  .filters{display:flex;gap:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:12px}
+  .card{background:#fff;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;border:1px solid rgba(0,0,0,0.04)}
+  .card img{width:100%;height:150px;object-fit:cover;border-radius:8px;background:#f1f6fb}
+  .card .title{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;color:var(--accent)}
+  .meta{font-size:13px;color:var(--muted)}
+  .actions{display:flex;gap:8px;margin-top:auto}
+  .btn{padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;background:#fff}
+  .btn.primary{background:var(--accent);color:#fff;border:none}
+  .btn.green{background:var(--accent-2);color:#fff;border:none}
+  .small{padding:6px 8px;font-size:13px}
+  /* request & posts */
+  .form-row{display:flex;gap:8px;flex-wrap:wrap}
+  input,textarea,select{padding:10px;border-radius:8px;border:1px solid #e6edf3;font-size:14px;width:100%}
+  textarea{min-height:80px;resize:vertical}
+  footer{max-width:1100px;margin:14px auto;text-align:center;color:var(--muted);font-size:13px}
+  /* modal */
+  .modal-back{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:99;padding:12px}
+  .modal{background:#fff;border-radius:12px;padding:14px;max-width:720px;width:100%}
+  .modal h3{margin:0 0 10px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-block;padding:6px 8px;border-radius:8px;background:#f1f6fb;font-size:13px}
+  @media (max-width:700px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>منصة محترفين + سوق (صفحة واحدة)</h1>
+    <nav>
+      <ul>
+        <li><a href="#search" onclick="scrollToSection('search')">بحث</a></li>
+        <li><a href="#requests" onclick="scrollToSection('requests')">طلبات</a></li>
+        <li><a href="#posts" onclick="scrollToSection('posts')">مقالات</a></li>
+        <li><a href="#messages" onclick="scrollToSection('messages')">رسائل</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Search / Professionals -->
+  <section id="search" class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div style="display:flex;flex-direction:column">
+        <div class="search-row">
+          <input id="q" type="search" placeholder="ابحث باسم/تخصص/مدينة..." />
+          <select id="filterSpec">
+            <option value="">كل التخصصات</option>
+          </select>
+          <select id="filterCountry">
+            <option value="">الكل (البلد)</option>
+            <option value="local">محلي</option>
+            <option value="intl">دولي</option>
+          </select>
+          <button id="addProfBtn" class="btn primary">أضف محترف</button>
+        </div>
+        <div class="meta" style="margin-top:8px">ابحث عن محترفين، عرض ملفاتهم، إرسال طلب استشارة أو شراء خدمة.</div>
+      </div>
+      <div style="min-width:160px;text-align:center">
+        <div class="chip">إجمالي محترفين: <span id="countProfs">0</span></div>
+      </div>
+    </div>
+
+    <div id="professional-list" class="grid" style="margin-top:12px"></div>
+  </section>
+
+  <!-- Requests -->
+  <section id="requests" class="panel">
+    <h3>نشـر طلب مساعدة / استشارة</h3>
+    <div class="form-row" style="margin-top:8px">
+      <input id="req_title" placeholder="عنوان الطلب (مثال: تصميم أساسات لمبنى سكني)" />
+      <select id="req_spec" style="width:200px">
+        <option value="">اختر تخصصًا (اختياري)</option>
+      </select>
+      <select id="req_type" style="width:160px">
+        <option value="consult">استشارة</option>
+        <option value="job">طلب عمل</option>
+        <option value="project">مشروع</option>
+      </select>
+    </div>
+    <div style="margin-top:8px">
+      <textarea id="req_desc" placeholder="وصف الطلب بالتفصيل..."></textarea>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-start">
+      <button id="postReqBtn" class="btn primary">نشر الطلب</button>
+      <button id="clearReqBtn" class="btn">مسح النموذج</button>
+    </div>
+    <div id="requests-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+  </section>
+
+  <!-- Posts / Content -->
+  <section id="posts" class="panel">
+    <h3>المحتوى المهني / منشورات</h3>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="post_title" placeholder="عنوان المقال أو الفكرة" style="flex:2" />
+      <input id="post_author" placeholder="اسم المحترف" style="width:220px" />
+      <button id="postBtn" class="btn primary">نشر</button>
+    </div>
+    <div style="margin-top:8px">
+      <textarea id="post_body" placeholder="اكتب المقال أو نشر الحالة..." ></textarea>
+    </div>
+    <div id="posts-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+  </section>
+
+  <!-- Messages -->
+  <section id="messages" class="panel">
+    <h3>رسائل وطلبات تواصل</h3>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="msg_target" style="width:260px"></select>
+      <input id="msg_subject" placeholder="موضوع الرسالة" style="flex:1" />
+      <button id="sendMsgBtn" class="btn green">إرسال رسالة</button>
+    </div>
+    <div style="margin-top:8px">
+      <textarea id="msg_body" placeholder="نص الرسالة..."></textarea>
+    </div>
+    <div id="messages-list" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+  </section>
+</main>
+
+<footer>نسخة تجريبية - البيانات محفوظة محليًا فقط (localStorage). © 2025</footer>
+
+<!-- modal -->
+<div id="modal" class="modal-back" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modal-title">عنوان</h3>
+    <div id="modal-body"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button id="modal-cancel" class="btn">إلغاء</button>
+      <button id="modal-ok" class="btn primary">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* بيانات ووظائف صفحة واحدة - تخزين محلي ومكونات بسيطة */
+const STORAGE = 'pronet_v1';
+let state = { professionals: [], requests: [], posts: [], messages: [] };
+
+/* عناصر DOM */
+const $list = id => document.getElementById(id);
+const $professionalList = $list('professional-list');
+const $countProfs = $list('countProfs');
+const $filterSpec = $list('filterSpec');
+const $filterCountry = $list('filterCountry');
+const $q = $list('q');
+const $addProfBtn = $list('addProfBtn');
+
+const $reqTitle = $list('req_title'), $reqSpec = $list('req_spec'), $reqType = $list('req_type'), $reqDesc = $list('req_desc');
+const $postTitle = $list('post_title'), $postAuthor = $list('post_author'), $postBody = $list('post_body');
+const $msgTarget = $list('msg_target'), $msgSubject = $list('msg_subject'), $msgBody = $list('msg_body');
+
+const $requestsList = $list('requests-list'), $postsList = $list('posts-list'), $messagesList = $list('messages-list');
+
+/* modal */
+const $modal = $list('modal'), $modalTitle = $list('modal-title'), $modalBody = $list('modal-body');
+const $modalOk = $list('modal-ok'), $modalCancel = $list('modal-cancel');
+
+/* utils */
+function save(){ localStorage.setItem(STORAGE, JSON.stringify(state)); }
+function load(){ try{ const s = localStorage.getItem(STORAGE); if(s) state = JSON.parse(s); }catch(e){} }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+function showModal(title, bodyEl, onOk){ $modalTitle.textContent = title; $modalBody.innerHTML=''; $modalBody.appendChild(bodyEl); $modal.style.display='flex'; $modal.setAttribute('aria-hidden','false'); $modalOk.onclick = ()=>{ if(onOk()) closeModal(); }; $modalCancel.onclick = closeModal; document.onkeydown = (e)=>{ if(e.key==='Escape') closeModal(); if(e.key==='Enter'){ const a=document.activeElement; if(a && a.tagName!=='TEXTAREA'){ e.preventDefault(); $modalOk.click(); } } }; }
+function closeModal(){ $modal.style.display='none'; $modal.setAttribute('aria-hidden','true'); $modalOk.onclick = null; $modalCancel.onclick = null; document.onkeydown=null; }
+
+/* بيانات مبدئية (نماذج) */
+function seed(){
+  if(state.professionals.length) return;
+  state.professionals = [
+    {id:uid(), name:'م. أحمد علي', spec:'هندسة مدنية', city:'الرياض', country:'local', bio:'مهندس إنشائي بخبرة 8 سنوات', price:50, photo:''},
+    {id:uid(), name:'د. سارة محمد', spec:'طبيبة عامة', city:'القاهرة', country:'intl', bio:'طبيبة استشارية مع خبرة سريرية واسعة', price:30, photo:''},
+    {id:uid(), name:'م. خالد المنور', spec:'هندسة كهربائية', city:'دبي', country:'intl', bio:'تصميم شبكات كهربائية ومخططات مباني', price:40, photo:''}
+  ];
+  state.posts = [
+    {id:uid(), title:'كيفية حساب أحمال المبنى البسيط', author:'م. أحمد', body:'ملاحظات سريعة حول تحديد الأحمال', ts:Date.now()},
+  ];
+  save();
+}
+
+/* rendering */
+function populateFilters(){
+  const specs = Array.from(new Set(state.professionals.map(p=>p.spec))).filter(Boolean);
+  $filterSpec.innerHTML = '<option value="">كل التخصصات</option>' + specs.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  $reqSpec.innerHTML = '<option value="">اختر تخصصًا (اختياري)</option>' + specs.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+}
+function renderProfessionals(){
+  const q = ($q.value||'').trim().toLowerCase();
+  const specFilter = $filterSpec.value;
+  const countryFilter = $filterCountry.value;
+  $professionalList.innerHTML = '';
+  const items = state.professionals.filter(p=>{
+    if(specFilter && p.spec !== specFilter) return false;
+    if(countryFilter && ((countryFilter==='local' && p.country!=='local') || (countryFilter==='intl' && p.country!=='intl'))) return false;
+    if(!q) return true;
+    return (p.name+' '+p.spec+' '+p.city+' '+p.bio).toLowerCase().includes(q);
+  });
+  $countProfs.textContent = items.length;
+  if(items.length===0){ $professionalList.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px">لا يوجد محترفين مطابقين</div>'; return; }
+  for(const p of items){
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="width:84px;height:84px;border-radius:8px;overflow:hidden;background:#eef6ff;flex-shrink:0">
+          ${p.photo?`<img src="${p.photo}" alt="${escapeHtml(p.name)}" style="width:100%;height:100%;object-fit:cover">`:'<div style="padding:12px;color:var(--muted)">صورة</div>'}
+        </div>
+        <div style="flex:1">
+          <div class="title"><div>${escapeHtml(p.name)}</div><div style="font-size:14px;color:var(--muted)">${escapeHtml(p.spec)}</div></div>
+          <div class="meta">${escapeHtml(p.city)} • ${p.country==='intl'?'يشحن/يعمل دوليًا':'محلي'}</div>
+        </div>
+      </div>
+      <div style="min-height:44px">${escapeHtml(p.bio)}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-weight:800;color:#0b74d1">سعر الجلسة: $${Number(p.price||0).toFixed(2)}</div>
+        <div style="flex:1"></div>
+        <button class="btn small" data-id="${p.id}" onclick="viewProfile('${p.id}')">عرض</button>
+        <button class="btn small primary" onclick="contactProf('${p.id}','hire')">احجز/اشترِ</button>
+      </div>`;
+    $professionalList.appendChild(el);
+  }
+  refreshMsgTargets();
+}
+function renderRequests(){ $requestsList.innerHTML=''; for(const r of [...state.requests].reverse()){ const el=document.createElement('div'); el.className='card'; el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:8px"><div><strong>${escapeHtml(r.title)}</strong><div class="meta">${escapeHtml(r.type)} • ${escapeHtml(r.spec||'عام')}</div></div><div class="meta">${new Date(r.ts).toLocaleString()}</div></div><div style="margin-top:8px">${escapeHtml(r.desc)}</div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" onclick="replyToRequest('${r.id}')">أرسل عرض</button></div>`; $requestsList.appendChild(el);} }
+function renderPosts(){ $postsList.innerHTML=''; for(const p of [...state.posts].reverse()){ const el = document.createElement('div'); el.className='card'; el.innerHTML=`<div style="display:flex;justify-content:space-between"><div><strong>${escapeHtml(p.title)}</strong><div class="meta">${escapeHtml(p.author)}</div></div><div class="meta">${new Date(p.ts).toLocaleString()}</div></div><div style="margin-top:8px">${escapeHtml(p.body)}</div>`; $postsList.appendChild(el);} }
+function renderMessages(){ $messagesList.innerHTML=''; for(const m of [...state.messages].reverse()){ const el = document.createElement('div'); el.className='card'; el.innerHTML=`<div style="display:flex;justify-content:space-between"><div><strong>${escapeHtml(m.toName)}</strong><div class="meta">${escapeHtml(m.subject)}</div></div><div class="meta">${new Date(m.ts).toLocaleString()}</div></div><div style="margin-top:8px">${escapeHtml(m.body)}</div>`; $messagesList.appendChild(el);} }
+function refreshAll(){ populateFilters(); renderProfessionals(); renderRequests(); renderPosts(); renderMessages(); refreshMsgTargets(); }
+
+/* interactions */
+function addProfessionalModal(){
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="row"><input id="p_name" placeholder="الاسم الكامل" /><input id="p_spec" placeholder="التخصص (مثال: هندسة مدنية)" /></div>
+    <div class="row" style="margin-top:8px"><input id="p_city" placeholder="المدينة" /><select id="p_country2"><option value="local">محلي</option><option value="intl">دولي</option></select></div>
+    <div style="margin-top:8px"><input id="p_price" type="number" placeholder="سعر الجلسة USD" /></div>
+    <div style="margin-top:8px"><textarea id="p_bio" placeholder="نبذة قصيرة"></textarea></div>
+    <div style="margin-top:8px"><label class="meta">تحميل صورة (اختياري)</label><input id="p_img" type="file" accept="image/*" /></div>
+  `;
+  showModal('أضف محترفًا جديدًا', div, ()=>{
+    const name = div.querySelector('#p_name').value.trim();
+    const spec = div.querySelector('#p_spec').value.trim();
+    if(!name || !spec){ alert('الرجاء إدخال اسم وتخصص'); return false; }
+    const city = div.querySelector('#p_city').value.trim()||'غير محددة';
+    const country = div.querySelector('#p_country2').value;
+    const price = parseFloat(div.querySelector('#p_price').value)||0;
+    const bio = div.querySelector('#p_bio').value.trim();
+    const file = div.querySelector('#p_img').files && div.querySelector('#p_img').files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = ()=> {
+        state.professionals.push({id:uid(), name, spec, city, country, bio, price, photo:reader.result});
+        save(); refreshAll();
+      };
+      reader.readAsDataURL(file);
+    } else {
+      state.professionals.push({id:uid(), name, spec, city, country, bio, price, photo:''});
+      save(); refreshAll();
+    }
+    return true;
+  });
+}
+
+function viewProfile(id){
+  const p = state.professionals.find(x=>x.id===id); if(!p) return alert('غير موجود');
+  const div = document.createElement('div');
+  div.innerHTML = `<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:120px;border-radius:8px;overflow:hidden;background:#eef6ff">${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover">`:'<div style="padding:10px;color:var(--muted)">لا صورة</div>'}</div><div style="flex:1"><h3 style="margin:0">${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml(p.spec)} • ${escapeHtml(p.city)}</div><div style="margin-top:8px;font-weight:800;color:#0b74d1">السعر: $${Number(p.price).toFixed(2)}</div></div></div><div style="margin-top:12px">${escapeHtml(p.bio)}</div>`;
+  showModal('ملف المحترف', div, ()=>true);
+}
+
+function contactProf(id, mode){
+  const p = state.professionals.find(x=>x.id===id); if(!p) return;
+  const div = document.createElement('div');
+  div.innerHTML = `<div class="field"><label>إلى: </label><div style="font-weight:800">${escapeHtml(p.name)}</div></div>
+    <div style="margin-top:8px"><input id="c_subject" placeholder="موضوع (مثال: حجز استشارة)" /></div>
+    <div style="margin-top:8px"><textarea id="c_body" placeholder="نص الرسالة..."></textarea></div>`;
+  showModal(mode==='hire'?'طلب حجز/شراء':'إرسال رسالة', div, ()=>{
+    const subj = div.querySelector('#c_subject').value.trim()|| (mode==='hire'?'طلب حجز':'رسالة');
+    const body = div.querySelector('#c_body').value.trim(); if(!body){ alert('أدخل نص الرسالة'); return false; }
+    state.messages.push({id:uid(), toId:p.id, toName:p.name, subject:subj, body, ts:Date.now()});
+    save(); refreshAll(); alert('تم إرسال الرسالة (محليًا في النظام).');
+    return true;
+  });
+}
+
+/* requests/posts/messages actions */
+function postRequest(){
+  const title = $reqTitle.value.trim(); if(!title){ alert('أدخل عنوان الطلب'); return; }
+  state.requests.push({id:uid(), title, spec:$reqSpec.value, type:$reqType.value, desc:$reqDesc.value.trim(), ts:Date.now()});
+  save(); $reqTitle.value=''; $reqDesc.value=''; $reqSpec.value=''; renderRequests();
+}
+function publishPost(){
+  const title = $postTitle.value.trim(); const author = $postAuthor.value.trim()||'مجهول'; const body = $postBody.value.trim();
+  if(!title || !body){ alert('العنوان والمحتوى مطلوبان'); return; }
+  state.posts.push({id:uid(), title, author, body, ts:Date.now()});
+  save(); $postTitle.value=''; $postAuthor.value=''; $postBody.value=''; renderPosts();
+}
+function sendMessage(){
+  const toId = $msgTarget.value; if(!toId){ alert('اختر مستلمًا'); return; }
+  const subj = $msgSubject.value.trim()||'رسالة';
+  const body = $msgBody.value.trim(); if(!body){ alert('أدخل نص الرسالة'); return; }
+  const prof = state.professionals.find(p=>p.id===toId);
+  state.messages.push({id:uid(), toId, toName: prof?prof.name:'مستخدم', subject:subj, body, ts:Date.now()});
+  save(); $msgSubject.value=''; $msgBody.value=''; renderMessages();
+}
+function replyToRequest(reqId){
+  const req = state.requests.find(r=>r.id===reqId); if(!req) return;
+  const div = document.createElement('div');
+  div.innerHTML = `<div>طلب: <strong>${escapeHtml(req.title)}</strong></div><div style="margin-top:8px"><input id="offer_name" placeholder="اسمك" /></div><div style="margin-top:8px"><textarea id="offer_text" placeholder="تفاصيل العرض و السعر..."></textarea></div>`;
+  showModal('أرسل عرضًا للطلب', div, ()=>{
+    const name = div.querySelector('#offer_name').value.trim()||'مقدم عرض';
+    const text = div.querySelector('#offer_text').value.trim(); if(!text){ alert('أدخل نص العرض'); return false; }
+    state.messages.push({id:uid(), toId:null, toName:`عرض على: ${req.title}`, subject:`عرض من ${name}`, body:text, ts:Date.now()});
+    save(); renderMessages(); alert('تم إرسال العرض (محليًا).'); return true;
+  });
+}
+
+/* message target select */
+function refreshMsgTargets(){
+  $msgTarget.innerHTML = '<option value="">اختر محترفًا</option>' + state.professionals.map(p=>`<option value="${p.id}">${escapeHtml(p.name)} — ${escapeHtml(p.spec)}</option>`).join('');
+}
+
+/* init events */
+$addProfBtn.addEventListener('click', addProfessionalModal);
+$q.addEventListener('input', renderProfessionals);
+$filterSpec.addEventListener('change', renderProfessionals);
+$filterCountry.addEventListener('change', renderProfessionals);
+
+$list('postBtn')?.addEventListener('click', publishPost);
+$list('postBtn')?.addEventListener && $list('postBtn').addEventListener('click', publishPost);
+$list('postReqBtn')?.addEventListener && $list('postReqBtn').addEventListener('click', postRequest);
+$list('postReqBtn')?.addEventListener('click', postRequest);
+$list('clearReqBtn')?.addEventListener('click', ()=>{ $reqTitle.value=''; $reqDesc.value=''; $reqSpec.value=''; });
+$list('sendMsgBtn')?.addEventListener && $list('sendMsgBtn').addEventListener('click', sendMessage);
+$list('sendMsgBtn')?.addEventListener('click', sendMessage);
+
+/* small compatibility for element ids */
+document.getElementById('postBtn')?.addEventListener('click', publishPost);
+document.getElementById('postReqBtn')?.addEventListener('click', postRequest);
+document.getElementById('sendMsgBtn')?.addEventListener('click', sendMessage);
+
+/* init */
+load(); seed(); refreshAll();
+
+/* helper to navigate */
+function scrollToSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); }
+</script>
+
+</body>
+</html>
+```// filepath: vscode
