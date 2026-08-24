@@ -40,6 +40,9 @@
   - debug-tool-hit-test-visualization
   - debug-tool-pixel-scaling
   - debug-tool-ASRangeController
+- title: Additional Tools
+  items:
+  - texture-swift-support
 - title: Advanced Technologies
   items:
   - asvisibility
@@ -66,5 +69,5 @@
   - editable-text-node
   - multiplex-image-node
 
-  
-  
+
+
