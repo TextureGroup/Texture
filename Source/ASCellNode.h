@@ -216,6 +216,11 @@ typedef NS_ENUM(NSUInteger, ASCellNodeVisibilityEvent) {
  */
 @property UIEdgeInsets separatorInset;
 
+/* @abstract The inset of the cell background color
+ * ASTableView uses these properties when configuring UITableViewCells that host ASCellNodes.
+ */
+@property UIColor *cellBackgroundColor;
+
 @end
 
 @interface ASCellNode (Unavailable)
