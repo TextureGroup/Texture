@@ -184,7 +184,11 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
                                             moves:&moves];
 
     _insertedSubnodePositions = findNodesInLayoutAtIndexes(pendingLayout, insertions, &_insertedSubnodes);
-    _removedSubnodes = [previousNodes objectsAtIndexes:deletions];
+    
+    NSMutableArray *mutableRemovedNodes = [[previousNodes objectsAtIndexes:deletions] mutableCopy];
+    [mutableRemovedNodes removeObjectIdenticalTo:[NSNull null]];
+    _removedSubnodes = [mutableRemovedNodes copy];
+      
     // These should arrive sorted in ascending order of move destinations.
     for (NSIndexPath *move in moves) {
       _subnodeMoves.emplace_back(previousLayout.sublayouts[([move indexAtPosition:0])].layoutElement,
