@@ -21,14 +21,11 @@
   #define AS_ENABLE_TEXTNODE 1 // Enable old TextNode by default
 #endif
 
-// This needs to stay in sync with Weaver
-// SPM always enables video so ASVideoNode is compiled and exported to Swift.
+// Default on so Swift clients see ASVideoNode / ASVideoNodeDelegate.
+// SWIFT_PACKAGE is not defined when an app imports this module, so gating
+// on it hides video APIs from Swift even when the package compiled them.
 #ifndef AS_USE_VIDEO
-  #if SWIFT_PACKAGE
-    #define AS_USE_VIDEO 1
-  #else
-    #define AS_USE_VIDEO 0
-  #endif
+  #define AS_USE_VIDEO 1
 #endif
 
 #ifndef AS_USE_PHOTOS
