@@ -1,0 +1,12 @@
+module AsyncDisplayKit {
+    umbrella header "AsyncDisplayKit.h"
+    export *
+    explicit module ASControlNode_Subclasses {
+        header "AsyncDisplayKit/ASControlNode+Subclasses.h"
+        export *
+    }
+    explicit module ASDisplayNode_Subclasses {
+        header "AsyncDisplayKit/ASDisplayNode+Subclasses.h"
+        export *
+    }
+}
