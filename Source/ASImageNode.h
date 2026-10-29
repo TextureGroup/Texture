@@ -119,7 +119,7 @@ typedef UIImage * _Nullable (^asimagenode_modification_block_t)(UIImage *image, 
  * `displaySuspended` is YES, `displayCompletionBlock` is will be
  * performed immediately and `YES` will be passed for `canceled`.
  */
-- (void)setNeedsDisplayWithCompletion:(nullable void (^)(BOOL canceled))displayCompletionBlock;
+- (void)setNeedsDisplayWithCompletion:(nullable NS_SWIFT_UI_ACTOR void (^)(BOOL canceled))displayCompletionBlock;
 
 #if TARGET_OS_TV
 /** 

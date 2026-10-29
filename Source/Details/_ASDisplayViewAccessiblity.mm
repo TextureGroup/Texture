@@ -90,11 +90,9 @@ static CGRect ASAccessibilityFrameForNode(ASDisplayNode *node) {
   accessibilityElement.accessibilityValue = node.accessibilityValue;
   accessibilityElement.accessibilityTraits = node.accessibilityTraits;
   accessibilityElement.accessibilityElementsHidden = node.accessibilityElementsHidden;
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
-    accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
-    accessibilityElement.accessibilityAttributedHint = node.accessibilityAttributedHint;
-    accessibilityElement.accessibilityAttributedValue = node.accessibilityAttributedValue;
-  }
+  accessibilityElement.accessibilityAttributedLabel = node.accessibilityAttributedLabel;
+  accessibilityElement.accessibilityAttributedHint = node.accessibilityAttributedHint;
+  accessibilityElement.accessibilityAttributedValue = node.accessibilityAttributedValue;
   return accessibilityElement;
 }
 
@@ -190,20 +188,15 @@ static void CollectAccessibilityElementsForContainer(ASDisplayNode *container, U
 
   SortAccessibilityElements(labeledNodes);
 
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
-    NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
-    NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
-    [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-      if (idx != 0) {
-        [attributedLabel appendAttributedString:[[NSAttributedString alloc] initWithString:@", "]];
-      }
-      [attributedLabel appendAttributedString:(NSAttributedString *)obj];
-    }];
-    accessiblityElement.accessibilityAttributedLabel = attributedLabel;
-  } else {
-    NSArray *labels = [labeledNodes valueForKey:@"accessibilityLabel"];
-    accessiblityElement.accessibilityLabel = [labels componentsJoinedByString:@", "];
-  }
+  NSArray *attributedLabels = [labeledNodes valueForKey:@"accessibilityAttributedLabel"];
+  NSMutableAttributedString *attributedLabel = [NSMutableAttributedString new];
+  [attributedLabels enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    if (idx != 0) {
+      [attributedLabel appendAttributedString:[[NSAttributedString alloc] initWithString:@", "]];
+    }
+    [attributedLabel appendAttributedString:(NSAttributedString *)obj];
+  }];
+  accessiblityElement.accessibilityAttributedLabel = attributedLabel;
 
   SortAccessibilityElements(actions);
   accessiblityElement.accessibilityCustomActions = actions;

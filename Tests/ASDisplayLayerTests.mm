@@ -595,4 +595,117 @@ static _ASDisplayLayerTestDelegateClassModes _class_modes;
   [self checkSuspendResume:NO];
 }
 
+- (void)testSetPosition
+{
+  _ASDisplayLayer *layer = [[_ASDisplayLayer alloc] init];
+  CGPoint origin = CGPointMake(20, 20);
+  layer.position = CGPointZero; // Make sure CGPointZero doesn't throw
+  
+  layer.position = origin;
+  XCTAssertTrue(CGPointEqualToPoint(layer.position, origin));
+  
+  XCTAssertThrows(layer.position = CGPointMake(NAN, 50));
+  XCTAssertTrue(CGPointEqualToPoint(layer.position, origin));
+  
+  XCTAssertThrows(layer.position = CGPointMake(NAN, NAN));
+  XCTAssertTrue(CGPointEqualToPoint(layer.position, origin));
+  
+  XCTAssertThrows(layer.position = CGPointMake(50, NAN));
+  XCTAssertTrue(CGPointEqualToPoint(layer.position, origin));
+  
+  origin = CGPointMake(10, 10);
+  layer.position = origin;
+  XCTAssertTrue(CGPointEqualToPoint(layer.position, origin));
+}
+
+- (void)testSetTransform
+{
+  _ASDisplayLayer *layer = [[_ASDisplayLayer alloc] init];
+  
+  CATransform3D transform = CATransform3DIdentity;
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  
+  transform.m11 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m12 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m13 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m14 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m21 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m22 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m23 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m24 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m31 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m32 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m33 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m34 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m41 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m42 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m43 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  transform.m44 = NAN;
+  XCTAssertThrows(layer.transform = transform);
+  XCTAssertTrue(CATransform3DEqualToTransform(layer.transform, CATransform3DIdentity));
+  transform = CATransform3DIdentity;
+  
+  layer.transform = transform;
+}
+
 @end

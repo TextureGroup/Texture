@@ -8,19 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		27F2D2683285DCB73EE734BB /* Pods_Sample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DA4A9952245B7E9BA8201F /* Pods_Sample.framework */; };
+		4450BB142BFBDF7700EA0889 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4450BB132BFBDF7700EA0889 /* Assets.xcassets */; };
 		5D823AD51DD3B7770075E14A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D823AD41DD3B7770075E14A /* AppDelegate.swift */; };
 		5D823AD71DD3B7770075E14A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D823AD61DD3B7770075E14A /* ViewController.swift */; };
-		5D823ADC1DD3B7770075E14A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D823ADB1DD3B7770075E14A /* Assets.xcassets */; };
 		5D823ADF1DD3B7770075E14A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D823ADD1DD3B7770075E14A /* LaunchScreen.storyboard */; };
 		5D823AE71DD3B7D30075E14A /* MosaicCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D823AE61DD3B7D30075E14A /* MosaicCollectionViewLayout.swift */; };
 		5D823AE91DD3B7D70075E14A /* ImageCellNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D823AE81DD3B7D70075E14A /* ImageCellNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4450BB132BFBDF7700EA0889 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D823AD11DD3B7770075E14A /* Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D823AD41DD3B7770075E14A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5D823AD61DD3B7770075E14A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		5D823ADB1DD3B7770075E14A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D823ADE1DD3B7770075E14A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5D823AE01DD3B7770075E14A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D823AE61DD3B7D30075E14A /* MosaicCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MosaicCollectionViewLayout.swift; sourceTree = "<group>"; };
@@ -76,7 +76,7 @@
 				5D823AD61DD3B7770075E14A /* ViewController.swift */,
 				5D823AE81DD3B7D70075E14A /* ImageCellNode.swift */,
 				5D823AE61DD3B7D30075E14A /* MosaicCollectionViewLayout.swift */,
-				5D823ADB1DD3B7770075E14A /* Assets.xcassets */,
+				4450BB132BFBDF7700EA0889 /* Assets.xcassets */,
 				5D823ADD1DD3B7770075E14A /* LaunchScreen.storyboard */,
 				5D823AE01DD3B7770075E14A /* Info.plist */,
 			);
@@ -155,8 +155,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4450BB142BFBDF7700EA0889 /* Assets.xcassets in Resources */,
 				5D823ADF1DD3B7770075E14A /* LaunchScreen.storyboard in Resources */,
-				5D823ADC1DD3B7770075E14A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +345,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 888KTQ92ZP;
 				INFOPLIST_FILE = Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.AsyncDisplayKit.Sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -359,6 +360,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 888KTQ92ZP;
 				INFOPLIST_FILE = Sample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.AsyncDisplayKit.Sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";

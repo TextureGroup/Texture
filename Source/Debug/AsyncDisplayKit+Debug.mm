@@ -297,7 +297,18 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
 + (UIWindow *)keyWindow
 {
   // hack to work around app extensions not having UIApplication...not sure of a better way to do this?
-  return [[NSClassFromString(@"UIApplication") sharedApplication] keyWindow];
+  UIApplication *application = [NSClassFromString(@"UIApplication") sharedApplication];
+  NSMutableArray<UIWindowScene *> *windowScenes = [NSMutableArray array];
+  for (UIScene *scene in [application connectedScenes]) {
+    if ([scene isKindOfClass:[UIWindowScene class]]) {
+      [windowScenes addObject:(UIWindowScene *)scene];
+    }
+  }
+  if (@available(iOS 15, *)) {
+    return [windowScenes firstObject].keyWindow;
+  } else {
+    return [windowScenes firstObject].windows.firstObject;
+  }
 }
 
 + (_ASRangeDebugOverlayView *)sharedInstance NS_RETURNS_RETAINED

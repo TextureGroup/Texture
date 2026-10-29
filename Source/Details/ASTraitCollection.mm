@@ -33,25 +33,18 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault() {
   tc.horizontalSizeClass = UIUserInterfaceSizeClassUnspecified;
   tc.verticalSizeClass = UIUserInterfaceSizeClassUnspecified;
   tc.containerSize = CGSizeZero;
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    tc.displayGamut = UIDisplayGamutUnspecified;
-    tc.preferredContentSizeCategory = UIContentSizeCategoryUnspecified;
-    tc.layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified;
-  }
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    tc.userInterfaceStyle = UIUserInterfaceStyleUnspecified;
-  }
+  tc.displayGamut = UIDisplayGamutUnspecified;
+  tc.preferredContentSizeCategory = UIContentSizeCategoryUnspecified;
+  tc.layoutDirection = UITraitEnvironmentLayoutDirectionUnspecified;
+  tc.userInterfaceStyle = UIUserInterfaceStyleUnspecified;
 
 #if TARGET_OS_IOS
-  if(AS_AVAILABLE_IOS(13)){
-    tc.userInterfaceLevel = UIUserInterfaceLevelUnspecified;
-  }
+  tc.userInterfaceLevel = UIUserInterfaceLevelUnspecified;
 #endif
 
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
-    tc.accessibilityContrast = UIAccessibilityContrastUnspecified;
-    tc.legibilityWeight = UILegibilityWeightUnspecified;
-  }
+  tc.accessibilityContrast = UIAccessibilityContrastUnspecified;
+  tc.legibilityWeight = UILegibilityWeightUnspecified;
+  
   return tc;
 }
 
@@ -62,27 +55,19 @@ ASPrimitiveTraitCollection ASPrimitiveTraitCollectionFromUITraitCollection(UITra
   environmentTraitCollection.displayScale = traitCollection.displayScale;
   environmentTraitCollection.userInterfaceIdiom = traitCollection.userInterfaceIdiom;
   environmentTraitCollection.forceTouchCapability = traitCollection.forceTouchCapability;
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    environmentTraitCollection.displayGamut = traitCollection.displayGamut;
-    environmentTraitCollection.layoutDirection = traitCollection.layoutDirection;
+  environmentTraitCollection.displayGamut = traitCollection.displayGamut;
+  environmentTraitCollection.layoutDirection = traitCollection.layoutDirection;
 
-    ASDisplayNodeCAssertPermanent(traitCollection.preferredContentSizeCategory);
-    environmentTraitCollection.preferredContentSizeCategory = traitCollection.preferredContentSizeCategory;
-  }
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
-  }
+  ASDisplayNodeCAssertPermanent(traitCollection.preferredContentSizeCategory);
+  environmentTraitCollection.preferredContentSizeCategory = traitCollection.preferredContentSizeCategory;
+  environmentTraitCollection.userInterfaceStyle = traitCollection.userInterfaceStyle;
 
 #if TARGET_OS_IOS
-  if(AS_AVAILABLE_IOS(13)){
-    environmentTraitCollection.userInterfaceLevel = traitCollection.userInterfaceLevel;
-  }
+  environmentTraitCollection.userInterfaceLevel = traitCollection.userInterfaceLevel;
 #endif
 
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
-    environmentTraitCollection.accessibilityContrast = traitCollection.accessibilityContrast;
-    environmentTraitCollection.legibilityWeight = traitCollection.legibilityWeight;
-  }
+  environmentTraitCollection.accessibilityContrast = traitCollection.accessibilityContrast;
+  environmentTraitCollection.legibilityWeight = traitCollection.legibilityWeight;
   return environmentTraitCollection;
 }
 
@@ -95,14 +80,10 @@ ASDK_EXTERN UITraitCollection * ASPrimitiveTraitCollectionToUITraitCollection(AS
     [UITraitCollection traitCollectionWithForceTouchCapability:traitCollection.forceTouchCapability],
   ]];
   
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    [collections addObject:[UITraitCollection traitCollectionWithDisplayGamut:traitCollection.displayGamut]];
-    [collections addObject:[UITraitCollection traitCollectionWithLayoutDirection:traitCollection.layoutDirection]];
-    [collections addObject:[UITraitCollection traitCollectionWithPreferredContentSizeCategory:traitCollection.preferredContentSizeCategory]];
-  }
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    [collections addObject:[UITraitCollection traitCollectionWithUserInterfaceStyle:traitCollection.userInterfaceStyle]];
-  }
+  [collections addObject:[UITraitCollection traitCollectionWithDisplayGamut:traitCollection.displayGamut]];
+  [collections addObject:[UITraitCollection traitCollectionWithLayoutDirection:traitCollection.layoutDirection]];
+  [collections addObject:[UITraitCollection traitCollectionWithPreferredContentSizeCategory:traitCollection.preferredContentSizeCategory]];
+  [collections addObject:[UITraitCollection traitCollectionWithUserInterfaceStyle:traitCollection.userInterfaceStyle]];
   
   UITraitCollection *result = [UITraitCollection traitCollectionWithTraitsFromCollections:collections];
   return result;
@@ -241,27 +222,19 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
   [props addObject:@{ @"displayScale": [NSString stringWithFormat: @"%.0lf", (double)traits.displayScale] }];
   [props addObject:@{ @"userInterfaceIdiom": AS_NSStringFromUIUserInterfaceIdiom(traits.userInterfaceIdiom) }];
   [props addObject:@{ @"forceTouchCapability": AS_NSStringFromUIForceTouchCapability(traits.forceTouchCapability) }];
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
+  [props addObject:@{ @"userInterfaceStyle": AS_NSStringFromUIUserInterfaceStyle(traits.userInterfaceStyle) }];
+  [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
+  if (traits.preferredContentSizeCategory != nil) {
+    [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
   }
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    [props addObject:@{ @"layoutDirection": AS_NSStringFromUITraitEnvironmentLayoutDirection(traits.layoutDirection) }];
-    if (traits.preferredContentSizeCategory != nil) {
-      [props addObject:@{ @"preferredContentSizeCategory": traits.preferredContentSizeCategory }];
-    }
-    [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
-  }
+  [props addObject:@{ @"displayGamut": AS_NSStringFromUIDisplayGamut(traits.displayGamut) }];
 
 #if TARGET_OS_IOS
-  if (AS_AVAILABLE_IOS(13)){
-    [props addObject:@{ @"userInterfaceLevel": AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(traits.userInterfaceLevel) }];
-  }
+  [props addObject:@{ @"userInterfaceLevel": AS_NSStringFromUITraitEnvironmentUserInterfaceLevel(traits.userInterfaceLevel) }];
 #endif
 
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
-    [props addObject:@{ @"accessibilityContrast": AS_NSStringFromUITraitEnvironmentAccessibilityContrast(traits.accessibilityContrast) }];
-    [props addObject:@{ @"legibilityWeight": AS_NSStringFromUITraitEnvironmentLegibilityWeight(traits.legibilityWeight) }];
-  }
+  [props addObject:@{ @"accessibilityContrast": AS_NSStringFromUITraitEnvironmentAccessibilityContrast(traits.accessibilityContrast) }];
+  [props addObject:@{ @"legibilityWeight": AS_NSStringFromUITraitEnvironmentLegibilityWeight(traits.legibilityWeight) }];
   [props addObject:@{ @"containerSize": NSStringFromCGSize(traits.containerSize) }];
   return ASObjectDescriptionMakeWithoutObject(props);
 }
@@ -274,9 +247,7 @@ NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection trai
 
 + (ASTraitCollection *)traitCollectionWithASPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traits NS_RETURNS_RETAINED {
   ASTraitCollection *tc = [[ASTraitCollection alloc] init];
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    ASDisplayNodeCAssertPermanent(traits.preferredContentSizeCategory);
-  }
+  ASDisplayNodeCAssertPermanent(traits.preferredContentSizeCategory);
   tc->_prim = traits;
   return tc;
 }

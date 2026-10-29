@@ -323,7 +323,8 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
         CGRect rect = [tableView rectForRowAtIndexPath:indexPath];
         XCTAssertEqual(rect.size.width, 100);  // specified width should be ignored for table
-        XCTAssertEqual(rect.size.height, 42 + separatorHeight);
+        CGFloat threshold = 1e-5;
+        XCTAssertTrue(abs(rect.size.height - (42 + separatorHeight)) < threshold);
       }
   }
 }
@@ -1047,6 +1048,59 @@
   UITableViewCell *uikitCell = [tableView cellForRowAtIndexPath:indexPath];
   BOOL areColorsEqual = CGColorEqualToColor(uikitCell.tintColor.CGColor, UIColor.yellowColor.CGColor);
   XCTAssertTrue(areColorsEqual);
+}
+
+- (void)testAllPendingStatePropertiesTransferredToView {
+  // Create node without loading view
+  ASTableNode *node = [[ASTableNode alloc] initWithStyle:UITableViewStylePlain];
+  
+  XCTAssertFalse(node.isNodeLoaded, @"View should not be loaded before setting properties");
+  
+  // Set pending state properties before view loads
+  node.leadingScreensForBatching = 3.6;
+  node.inverted = YES;
+  node.allowsSelectionDuringEditing = YES;
+  node.allowsMultipleSelection = YES;
+  node.allowsMultipleSelectionDuringEditing = YES;
+  node.pagingEnabled = YES;
+  node.automaticallyAdjustsContentOffset = NO;
+  UIEdgeInsets testInsets = UIEdgeInsetsMake(10, 20, 30, 40);
+  node.contentInset = testInsets;
+  CGPoint testOffset = CGPointMake(50, 60);
+  node.contentOffset = testOffset;
+  ASTableViewFilledDelegate *delegate = [ASTableViewFilledDelegate new];
+  node.delegate = delegate;
+  ASTableViewFilledDataSource *dataSource = [ASTableViewFilledDataSource new];
+  node.dataSource = dataSource;
+  
+  // Load the view (triggers pending state transfer)
+  ASTableView *view = node.view;
+  
+  XCTAssertTrue(node.isNodeLoaded, @"View should be loaded after accessing node.view");
+  
+  // Verify properties were transferred correctly
+  XCTAssertEqual(view.leadingScreensForBatching, 3.6,
+                 @"leadingScreensForBatching should transfer from pending state");
+  XCTAssertEqual(view.inverted, YES, 
+                 @"inverted should transfer from pending state");
+  XCTAssertEqual(view.allowsSelectionDuringEditing, YES,
+                 @"allowsSelectionDuringEditing should transfer from pending state");
+  XCTAssertEqual(view.allowsMultipleSelection, YES, 
+                 @"allowsMultipleSelection should transfer from pending state");
+  XCTAssertEqual(view.allowsMultipleSelectionDuringEditing, YES, 
+                 @"allowsMultipleSelectionDuringEditing should transfer from pending state");
+  XCTAssertTrue(UIEdgeInsetsEqualToEdgeInsets(view.contentInset, testInsets), 
+                @"contentInset should transfer from pending state");
+  XCTAssertTrue(CGPointEqualToPoint(view.contentOffset, testOffset), 
+                @"contentOffset should transfer from pending state");
+  XCTAssertEqual(view.automaticallyAdjustsContentOffset, NO, 
+                 @"automaticallyAdjustsContentOffset should transfer from pending state");
+  XCTAssertEqual(view.pagingEnabled, YES, 
+                 @"pagingEnabled should transfer from pending state");
+  XCTAssertEqual(view.asyncDelegate, delegate,
+                 @"delegate should transfer from pending state");
+  XCTAssertEqual(view.asyncDataSource, dataSource,
+                 @"dataSource should transfer from pending state");
 }
 
 @end

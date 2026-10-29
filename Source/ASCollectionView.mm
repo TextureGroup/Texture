@@ -143,6 +143,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   BOOL _hasEverCheckedForBatchFetchingDueToUpdate;
 
   /**
+   * We want to check for batch fetching on scroll, but every tick would be too much. So check once at the
+   * beginning
+   */
+  BOOL _hasCheckedForBatchFetchingOnScroll;
+
+  /**
    * Set during beginInteractiveMovementForItemAtIndexPath and UIGestureRecognizerStateEnded
    * (or UIGestureRecognizerStateFailed, UIGestureRecognizerStateCancelled.
    */
@@ -277,9 +283,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // Experiments done by Instagram show that this option being YES (default)
   // when unused causes a significant hit to scroll performance.
   // https://github.com/Instagram/IGListKit/issues/318
-  if (AS_AVAILABLE_IOS_TVOS(10, 10)) {
-    super.prefetchingEnabled = NO;
-  }
+  super.prefetchingEnabled = NO;
 
   _layoutController = [[ASCollectionViewLayoutController alloc] initWithCollectionView:self];
   
@@ -1622,7 +1626,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
   ASInterfaceState interfaceState = [self interfaceStateForRangeController:_rangeController];
-  if (ASInterfaceStateIncludesVisible(interfaceState)) {
+  if (ASInterfaceStateIncludesVisible(interfaceState) && !ASActivateExperimentalFeature(ASExperimentalCheckBatchFetchingOnScroll)) {
+    // The following call to _checkForBatchFetching is effectively a no-op, because during scrolling
+    //  isDragging and isTracking are YES.
     [self _checkForBatchFetching];
   }
   for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
@@ -1631,6 +1637,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
   if (_asyncDelegateFlags.scrollViewDidScroll) {
     [_asyncDelegate scrollViewDidScroll:scrollView];
+  }
+  if (ASInterfaceStateIncludesVisible(interfaceState) && !_hasCheckedForBatchFetchingOnScroll && ASActivateExperimentalFeature(ASExperimentalCheckBatchFetchingOnScroll)) {
+    // Check after the delegate it give it a chance to turn on/off batch fetching
+    [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset velocity:CGPointZero];
+    _hasCheckedForBatchFetchingOnScroll = YES;
   }
 }
 
@@ -1647,6 +1658,8 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     [self _beginBatchFetchingIfNeededWithContentOffset:*targetContentOffset velocity:velocity];
   }
   
+  _hasCheckedForBatchFetchingOnScroll = NO; // reset once the scroll is done
+  
   if (_asyncDelegateFlags.scrollViewWillEndDragging) {
     [_asyncDelegate scrollViewWillEndDragging:scrollView withVelocity:velocity targetContentOffset:(targetContentOffset ? : &contentOffset)];
   }
@@ -1655,7 +1668,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
   _deceleratingVelocity = CGPointZero;
-    
+  for (_ASCollectionViewCell *cell in _cellsForVisibilityUpdates) {
+    [cell cellNodeVisibilityEvent:ASCellNodeVisibilityEventDidStopScrolling inScrollView:scrollView];
+  }
+
   if (_asyncDelegateFlags.scrollViewDidEndDecelerating) {
     [_asyncDelegate scrollViewDidEndDecelerating:scrollView];
   }
@@ -1845,6 +1861,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   });
 }
 
+- (void)forceCheckForBatchFetching
+{
+  [self _beginBatchFetchingIfNeededWithContentOffset:self.contentOffset velocity:CGPointZero];
+}
+
 - (void)_checkForBatchFetching
 {
   // Dragging will be handled in scrollViewWillEndDragging:withVelocity:targetContentOffset:
@@ -1860,9 +1881,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // Since we are accessing self.collectionViewLayout, we should make sure we are on main
   ASDisplayNodeAssertMainThread();
   BOOL flipsHorizontallyInOppositeLayoutDirection = NO;
-  if (AS_AVAILABLE_IOS(11.0)) {
-    flipsHorizontallyInOppositeLayoutDirection = self.collectionViewLayout.flipsHorizontallyInOppositeLayoutDirection;
-  }
+  flipsHorizontallyInOppositeLayoutDirection = self.collectionViewLayout.flipsHorizontallyInOppositeLayoutDirection;
   if (ASDisplayShouldFetchBatchForScrollView(self, self.scrollDirection, self.scrollableDirections, contentOffset, velocity, flipsHorizontallyInOppositeLayoutDirection)) {
     [self _beginBatchFetching];
   }

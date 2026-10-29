@@ -184,11 +184,8 @@
   ASSnapshotVerifyNode(node, @"red_tint_from_parent");
 }
 
-#if AS_AT_LEAST_IOS13
-
 - (void)testUserInterfaceStyleSnapshotTesting
 {
-  if (@available(iOS 13.0, *)) {
     UITraitCollection.currentTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
 
     ASTextNode *node = [[ASTextNode alloc] init];
@@ -226,12 +223,10 @@
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
-  }
 }
 
 - (void)testUserInterfaceStyleSnapshotTestingTintColor
 {
-  if (@available(iOS 13.0, *)) {
     UITraitCollection.currentTraitCollection = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
 
     ASTextNode *node = [[ASTextNode alloc] init];
@@ -267,12 +262,6 @@
     [[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] performAsCurrentTraitCollection:^{
       ASSnapshotVerifyNode(node, @"user_interface_style_dark");
     }];
-  }
 }
-
-
-
-
-#endif // #if AS_AT_LEAST_IOS13
 
 @end

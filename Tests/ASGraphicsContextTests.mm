@@ -26,11 +26,8 @@
   [ASConfigurationManager test_resetWithConfiguration:config];
 }
 
-
-#if AS_AT_LEAST_IOS13
 - (void)testCanceled
 {
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     CGSize size = CGSize{.width=100, .height=100};
     
     XCTestExpectation *expectationCancelled = [self expectationWithDescription:@"canceled"];
@@ -46,12 +43,10 @@
     XCTAssertNil(canceledImage);
     
     [self waitForExpectations:@[expectationCancelled] timeout:1];
-  }
 }
 
 - (void)testCanceledNil
 {
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     CGSize size = CGSize{.width=100, .height=100};
     ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
     
@@ -63,12 +58,10 @@
     XCTAssert(image);
     
     [self waitForExpectations:@[expectation] timeout:1];
-  }
 }
 
 - (void)testTraitCollectionPassedToWork
 {
-  if (AS_AVAILABLE_IOS_TVOS(13, 13)) {
     CGSize size = CGSize{.width=100, .height=100};
     
     XCTestExpectation *expectationDark = [self expectationWithDescription:@"trait collection dark"];
@@ -90,7 +83,5 @@
     });
 
     [self waitForExpectations:@[expectationDark, expectationLight] timeout:1];
-  }
 }
-#endif
 @end

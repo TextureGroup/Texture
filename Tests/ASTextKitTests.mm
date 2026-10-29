@@ -195,8 +195,8 @@ static BOOL checkAttributes(const ASTextKitAttributes &attributes, const CGSize 
   [[ASTextKitRenderer alloc]
    initWithTextKitAttributes:{
      .attributedString = attributedString,
+     .truncationAttributedString = [[NSAttributedString alloc] initWithString:@"... Continue Reading"],
      .maximumNumberOfLines = 1,
-     .truncationAttributedString = [[NSAttributedString alloc] initWithString:@"... Continue Reading"]
    }
    constrainedSize:{ 100, 100 }];
   XCTAssert([renderer rectsForTextRange:NSMakeRange(0, attributedString.length) measureOption:ASTextKitRendererMeasureOptionBlock].count > 0);

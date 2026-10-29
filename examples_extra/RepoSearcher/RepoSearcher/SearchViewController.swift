@@ -23,7 +23,7 @@ final class SearchViewController: ASDKViewController<ASCollectionNode> {
     let searchToken = SearchToken()
     var filterString = ""
     
-    init() {
+    override init() {
         let flowLayout = UICollectionViewFlowLayout()
         super.init(node: ASCollectionNode(collectionViewLayout: flowLayout))
         adapter.setASDKCollectionNode(node)

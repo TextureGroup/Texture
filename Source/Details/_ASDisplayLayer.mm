@@ -13,6 +13,7 @@
 #import <AsyncDisplayKit/ASAssert.h>
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDisplayNodeInternal.h>
+#import <AsyncDisplayKit/ASInternalHelpers.h>
 
 @implementation _ASDisplayLayer
 {
@@ -36,6 +37,26 @@
       [self cancelAsyncDisplay];
     }
   }
+}
+
+- (void)setPosition:(CGPoint)position
+{
+  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsCGPositionValidForLayout(position), @"Caught attempt to set invalid position %@ on %@.", NSStringFromCGPoint(position), self);
+  if (!valid) {
+    return;
+  }
+  
+  [super setPosition:position];
+}
+
+- (void)setTransform:(CATransform3D)transform
+{
+  BOOL valid = ASDisplayNodeAssertNonFatal(ASIsTransformValidForLayout(transform), @"Caught attempt to set invalid transform on %@.", self);
+  if (!valid) {
+    return;
+  }
+  
+  [super setTransform:transform];
 }
 
 - (void)setBounds:(CGRect)bounds
@@ -125,6 +146,8 @@
     return @YES;
   } else if ([key isEqualToString:@"opaque"]) {
     return @YES;
+  } else if ([key isEqualToString:@"contentsScale"]) {
+    return @(ASScreenScale());
   } else {
     return [super defaultValueForKey:key];
   }

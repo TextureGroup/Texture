@@ -762,8 +762,10 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   if (shouldApply) {
     UIColor *oldBackgroundColor = _backgroundColor;
     _backgroundColor = newBackgroundColor;
+    BOOL resolveWithNodeTraits = ASActivateExperimentalFeature(ASExperimentalResolveBackgroundColorWithNodeTraits);
+    UITraitCollection *traitCollection = resolveWithNodeTraits ? ASPrimitiveTraitCollectionToUITraitCollection(_primitiveTraitCollection) : nil;
     if (_flags.layerBacked) {
-      _layer.backgroundColor = _backgroundColor.CGColor;
+      _layer.backgroundColor = resolveWithNodeTraits ? [_backgroundColor resolvedColorWithTraitCollection:traitCollection].CGColor : _backgroundColor.CGColor;
     } else {
       /*
        NOTE: Setting to the view and layer individually is necessary.
@@ -775,7 +777,7 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
        */
       _view.backgroundColor = _backgroundColor;
       // Gather the CGColorRef from the view incase there are any changes it might apply to which CGColorRef is returned for dynamic colors
-      _layer.backgroundColor = _view.backgroundColor.CGColor;
+      _layer.backgroundColor = resolveWithNodeTraits ? [_backgroundColor resolvedColorWithTraitCollection:traitCollection].CGColor : _view.backgroundColor.CGColor;
     }
 
     if (![oldBackgroundColor isEqual:newBackgroundColor]) {
@@ -964,11 +966,6 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
   ASDisplayNodeAssert(!_flags.layerBacked, @"Danger: this property is undefined on layer-backed nodes.");
   UIEdgeInsets margins = _getFromViewOnly(layoutMargins);
 
-  if (!AS_AT_LEAST_IOS11 && self.insetsLayoutMarginsFromSafeArea) {
-    UIEdgeInsets safeArea = self.safeAreaInsets;
-    margins = ASConcatInsets(margins, safeArea);
-  }
-
   return margins;
 }
 
@@ -1006,11 +1003,10 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 {
   _bridge_prologue_read;
 
-  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
-    if (!_flags.layerBacked && _loaded(self)) {
-      return self.view.safeAreaInsets;
-    }
+  if (!_flags.layerBacked && _loaded(self)) {
+    return self.view.safeAreaInsets;
   }
+
   return _fallbackSafeAreaInsets;
 }
 
@@ -1030,13 +1026,11 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 
     _flags.fallbackInsetsLayoutMarginsFromSafeArea = insetsLayoutMarginsFromSafeArea;
 
-    if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
-      if (!_flags.layerBacked) {
-        _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
-      }
+    if (!_flags.layerBacked) {
+      _setToViewOnly(insetsLayoutMarginsFromSafeArea, insetsLayoutMarginsFromSafeArea);
     }
 
-    shouldNotifyAboutUpdate = _loaded(self) && (!AS_AT_LEAST_IOS11 || _flags.layerBacked);
+    shouldNotifyAboutUpdate = _loaded(self) && _flags.layerBacked;
   }
 
   if (shouldNotifyAboutUpdate) {
@@ -1086,31 +1080,20 @@ if (shouldApply) { _layer.layerProperty = (layerValueExpr); } else { ASDisplayNo
 - (CACornerMask)layerMaskedCorners
 {
   _bridge_prologue_read;
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
-    return _getFromLayer(maskedCorners);
-  } else {
-    return kASCACornerAllCorners;
-  }
+  return _getFromLayer(maskedCorners);
 }
 
 - (void)setLayerMaskedCorners:(CACornerMask)newLayerMaskedCorners
 {
   _bridge_prologue_write;
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
-    _setToLayer(maskedCorners, newLayerMaskedCorners);
-  } else {
-    ASDisplayNodeAssert(newLayerMaskedCorners == kASCACornerAllCorners,
-                        @"Cannot change maskedCorners property in iOS < 11 while using DefaultSlowCALayer rounding.");
-  }
+  _setToLayer(maskedCorners, newLayerMaskedCorners);
 }
 
 - (BOOL)_locked_insetsLayoutMarginsFromSafeArea
 {
   DISABLED_ASAssertLocked(__instanceLock__);
-  if (AS_AVAILABLE_IOS_TVOS(11.0, 11.0)) {
-    if (!_flags.layerBacked) {
-      return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
-    }
+  if (!_flags.layerBacked) {
+    return _getFromViewOnly(insetsLayoutMarginsFromSafeArea);
   }
   return _flags.fallbackInsetsLayoutMarginsFromSafeArea;
 }
@@ -1161,11 +1144,10 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
   _bridge_prologue_write;
   NSString *oldAccessibilityLabel = _getFromViewOnly(accessibilityLabel);
   _setAccessibilityToViewAndProperty(_accessibilityLabel, accessibilityLabel, accessibilityLabel, accessibilityLabel);
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+  {
     NSAttributedString *accessibilityAttributedLabel = accessibilityLabel ? [[NSAttributedString alloc] initWithString:accessibilityLabel] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel, accessibilityAttributedLabel);
   }
-
   // We need to update action name when it's changed to reflect the latest state.
   // Note: Update the custom action itself won't work when a11y is inside a list of custom actions
   // in which one action results in a name change in the next action. In that case the UIAccessibility
@@ -1201,7 +1183,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityHint, accessibilityHint, accessibilityHint, accessibilityHint);
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+  {
     NSAttributedString *accessibilityAttributedHint = accessibilityHint ? [[NSAttributedString alloc] initWithString:accessibilityHint] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint, accessibilityAttributedHint);
   }
@@ -1231,7 +1213,7 @@ nodeProperty = nodeValueExpr; _setToViewOnly(viewAndPendingViewStateProperty, vi
 {
   _bridge_prologue_write;
   _setAccessibilityToViewAndProperty(_accessibilityValue, accessibilityValue, accessibilityValue, accessibilityValue);
-  if (AS_AVAILABLE_IOS_TVOS(11, 11)) {
+  {
     NSAttributedString *accessibilityAttributedValue = accessibilityValue ? [[NSAttributedString alloc] initWithString:accessibilityValue] : nil;
     _setAccessibilityToViewAndProperty(_accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue, accessibilityAttributedValue);
   }

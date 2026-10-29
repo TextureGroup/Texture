@@ -66,7 +66,7 @@ typedef NS_OPTIONS(NSUInteger, ASMapNodeShowAnnotationsOptions)
  
  If the live map view has been created, this may only be set on the main thread.
  */
-@property (nonatomic, weak) id <MKMapViewDelegate> mapDelegate;
+@property (nonatomic, weak) id <MKMapViewDelegate> mapDelegate NS_SWIFT_UI_ACTOR;
 
 /**
  * @abstract The annotations to display on the map.

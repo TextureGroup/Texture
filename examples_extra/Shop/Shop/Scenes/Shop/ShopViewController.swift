@@ -22,7 +22,7 @@ class ShopViewController: ASDKViewController<ASTableNode> {
     
     // MARK: - Object life cycle
     
-    init() {
+    override init() {
         super.init(node: ASTableNode())
         tableNode.delegate = self
         tableNode.dataSource = self

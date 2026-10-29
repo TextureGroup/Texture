@@ -152,14 +152,8 @@ static inline void ASDispatchSyncOnOtherThread(dispatch_block_t block) {
   ASDisplayNode *node = [[ASDisplayNode alloc] initWithViewClass:ASBridgedPropertiesTestView.class];
   ASBridgedPropertiesTestView *view = (ASBridgedPropertiesTestView *)node.view;
   NSUInteger initialSetNeedsDisplayCount = view.setNeedsDisplayCount;
-#if AS_AT_LEAST_IOS13
-  // This is called an extra time on iOS13 for unknown reasons. Need to Investigate.
-  if (@available(iOS 13.0, *)) {
-    XCTAssertEqual(initialSetNeedsDisplayCount, 2);
-  } else {
-    XCTAssertEqual(initialSetNeedsDisplayCount, 1);
-  }
-#endif
+
+  XCTAssertEqual(initialSetNeedsDisplayCount, 1);
 
   ASDispatchSyncOnOtherThread(^{
     node.tintColor = UIColor.orangeColor;
