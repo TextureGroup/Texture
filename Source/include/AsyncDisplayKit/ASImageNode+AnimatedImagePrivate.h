@@ -1,0 +1,1 @@
+../../Private/ASImageNode+AnimatedImagePrivate.h

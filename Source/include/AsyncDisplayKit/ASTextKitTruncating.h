@@ -1,0 +1,1 @@
+../../TextKit/ASTextKitTruncating.h
